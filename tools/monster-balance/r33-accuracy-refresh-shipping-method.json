@@ -1,0 +1,356 @@
+{
+  "provenance": {
+    "profile_revision": [
+      33
+    ],
+    "profile_file": "tools/monster-balance/r33-refresh-eight-worlds-joint-profiles.json",
+    "profile_sha256": "7960ef201d3690a942a42ee7955cceb48578e8f790a732ac1d5c3706a7d64145",
+    "worlds": 8,
+    "binary_sha256": "c6304996878423e46bc1812cd5735213a8ddd3928821abd397a8fac750e3ef9e",
+    "mechanics_revision": 33,
+    "phase": "shipping",
+    "not_full_r33_progression": true
+  },
+  "specs": {
+    "rat": {
+      "depth": 1,
+      "role": "nimble vermin",
+      "before": {
+        "offense": 11,
+        "defense": -13,
+        "accuracy": -1,
+        "dodge": 3,
+        "dr": 0,
+        "max_hp": 22
+      },
+      "after": {
+        "offense": 11,
+        "defense": -13,
+        "accuracy": -1,
+        "dodge": 4,
+        "dr": 0,
+        "max_hp": 22
+      }
+    },
+    "cave-bat": {
+      "depth": 1,
+      "role": "small flying skirmisher",
+      "before": {
+        "offense": 6,
+        "defense": -14,
+        "accuracy": -2,
+        "dodge": 5,
+        "dr": 0,
+        "max_hp": 16
+      },
+      "after": {
+        "offense": 6,
+        "defense": -14,
+        "accuracy": -2,
+        "dodge": 7,
+        "dr": 0,
+        "max_hp": 16
+      }
+    },
+    "shellback-beetle": {
+      "depth": 1,
+      "role": "slow armored body",
+      "before": {
+        "offense": 20,
+        "defense": -9,
+        "accuracy": -2,
+        "dodge": -3,
+        "dr": 14,
+        "max_hp": 46
+      },
+      "after": {
+        "offense": 20,
+        "defense": -9,
+        "accuracy": -2,
+        "dodge": -7,
+        "dr": 14,
+        "max_hp": 46
+      }
+    },
+    "bear": {
+      "depth": 6,
+      "role": "heavy mauler",
+      "before": {
+        "offense": 46,
+        "defense": 6,
+        "accuracy": 10,
+        "dodge": -5,
+        "dr": 0,
+        "max_hp": 136
+      },
+      "after": {
+        "offense": 46,
+        "defense": 6,
+        "accuracy": 6,
+        "dodge": -9,
+        "dr": 0,
+        "max_hp": 136
+      }
+    },
+    "giant-beetle": {
+      "depth": 8,
+      "role": "large armored predator",
+      "before": {
+        "offense": 70,
+        "defense": 3,
+        "accuracy": 12,
+        "dodge": 16,
+        "dr": 21,
+        "max_hp": 118
+      },
+      "after": {
+        "offense": 70,
+        "defense": 3,
+        "accuracy": 8,
+        "dodge": 8,
+        "dr": 21,
+        "max_hp": 118
+      }
+    },
+    "tiger": {
+      "depth": 10,
+      "role": "precise mobile hunter",
+      "before": {
+        "offense": 112,
+        "defense": 1,
+        "accuracy": 21,
+        "dodge": 23,
+        "dr": 0,
+        "max_hp": 106
+      },
+      "after": {
+        "offense": 112,
+        "defense": 1,
+        "accuracy": 25,
+        "dodge": 38,
+        "dr": 0,
+        "max_hp": 106
+      }
+    },
+    "horn-1": {
+      "depth": 12,
+      "role": "precise ranged caster",
+      "before": {
+        "offense": 40,
+        "defense": 10,
+        "accuracy": 37,
+        "dodge": 43,
+        "dr": 0,
+        "max_hp": 160
+      },
+      "after": {
+        "offense": 40,
+        "defense": 10,
+        "accuracy": 41,
+        "dodge": 43,
+        "dr": 0,
+        "max_hp": 160
+      }
+    },
+    "wendigo": {
+      "depth": 17,
+      "role": "mobile starving hunter",
+      "before": {
+        "offense": 262,
+        "defense": 11,
+        "accuracy": 96,
+        "dodge": 34,
+        "dr": 0,
+        "max_hp": 166
+      },
+      "after": {
+        "offense": 262,
+        "defense": 11,
+        "accuracy": 100,
+        "dodge": 50,
+        "dr": 0,
+        "max_hp": 166
+      }
+    },
+    "troll": {
+      "depth": 19,
+      "role": "huge regenerating brute",
+      "before": {
+        "offense": 194,
+        "defense": 42,
+        "accuracy": 117,
+        "dodge": 24,
+        "dr": 18,
+        "max_hp": 352
+      },
+      "after": {
+        "offense": 194,
+        "defense": 42,
+        "accuracy": 111,
+        "dodge": 16,
+        "dr": 18,
+        "max_hp": 352
+      }
+    },
+    "dire-bear": {
+      "depth": 20,
+      "role": "giant mauler",
+      "before": {
+        "offense": 188,
+        "defense": 58,
+        "accuracy": 128,
+        "dodge": 17,
+        "dr": 15,
+        "max_hp": 448
+      },
+      "after": {
+        "offense": 188,
+        "defense": 58,
+        "accuracy": 124,
+        "dodge": 9,
+        "dr": 15,
+        "max_hp": 448
+      }
+    },
+    "horn-3": {
+      "depth": 22,
+      "role": "precise ranged caster",
+      "before": {
+        "offense": 132,
+        "defense": 28,
+        "accuracy": 132,
+        "dodge": 75,
+        "dr": 0,
+        "max_hp": 268
+      },
+      "after": {
+        "offense": 132,
+        "defense": 28,
+        "accuracy": 136,
+        "dodge": 75,
+        "dr": 0,
+        "max_hp": 268
+      }
+    },
+    "night-crawler": {
+      "depth": 24,
+      "role": "moderately mobile tentacled hunter",
+      "before": {
+        "offense": 200,
+        "defense": 32,
+        "accuracy": 140,
+        "dodge": 35,
+        "dr": 0,
+        "max_hp": 292
+      },
+      "after": {
+        "offense": 200,
+        "defense": 32,
+        "accuracy": 144,
+        "dodge": 74,
+        "dr": 0,
+        "max_hp": 292
+      }
+    },
+    "sabretooth": {
+      "depth": 25,
+      "role": "precise prehistoric hunter",
+      "before": {
+        "offense": 616,
+        "defense": 21,
+        "accuracy": 138,
+        "dodge": 46,
+        "dr": 0,
+        "max_hp": 226
+      },
+      "after": {
+        "offense": 616,
+        "defense": 21,
+        "accuracy": 142,
+        "dodge": 78,
+        "dr": 0,
+        "max_hp": 226
+      }
+    },
+    "skin-walker": {
+      "depth": 26,
+      "role": "evasive shape-changing hunter",
+      "before": {
+        "offense": 310,
+        "defense": 46,
+        "accuracy": 148,
+        "dodge": 44,
+        "dr": 0,
+        "max_hp": 376
+      },
+      "after": {
+        "offense": 310,
+        "defense": 46,
+        "accuracy": 148,
+        "dodge": 92,
+        "dr": 0,
+        "max_hp": 376
+      }
+    },
+    "vampire": {
+      "depth": 30,
+      "role": "evasive undead skirmisher",
+      "before": {
+        "offense": 370,
+        "defense": 52,
+        "accuracy": 154,
+        "dodge": 56,
+        "dr": 0,
+        "max_hp": 412
+      },
+      "after": {
+        "offense": 370,
+        "defense": 52,
+        "accuracy": 158,
+        "dodge": 96,
+        "dr": 0,
+        "max_hp": 412
+      }
+    },
+    "minotaur": {
+      "depth": 33,
+      "role": "committed heavy charger",
+      "before": {
+        "offense": 646,
+        "defense": 114,
+        "accuracy": 153,
+        "dodge": 37,
+        "dr": 56,
+        "max_hp": 784
+      },
+      "after": {
+        "offense": 646,
+        "defense": 114,
+        "accuracy": 147,
+        "dodge": 29,
+        "dr": 56,
+        "max_hp": 784
+      }
+    },
+    "saidribee-queen": {
+      "depth": 28,
+      "role": "large dedicated summoner",
+      "before": {
+        "offense": 230,
+        "defense": 48,
+        "accuracy": 145,
+        "dodge": 35,
+        "dr": 0,
+        "max_hp": 430
+      },
+      "after": {
+        "offense": 230,
+        "defense": 48,
+        "accuracy": 145,
+        "dodge": 27,
+        "dr": 0,
+        "max_hp": 430
+      }
+    }
+  }
+}

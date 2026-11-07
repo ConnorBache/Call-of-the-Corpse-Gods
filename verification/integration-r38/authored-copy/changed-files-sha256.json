@@ -1,0 +1,9 @@
+{
+  "crates/corpse-core/src/ahvamitt.rs": "4ef66d772105bd43afd030f9ec22f34aaf5d159e1ab2eeaa4e74f4b565d22de5",
+  "crates/corpse-core/src/borge.rs": "2a0c4f3e63c3f9d84d8c06a77ce8d570862bd9d3660a68244d5e4d11f792afff",
+  "crates/corpse-core/src/new_creatures.rs": "7d2119bab96d4e7b25c7150e9d5ec32b0c7894315ecc754e14e41dc62137a381",
+  "crates/corpse-desktop/assets/manual.json": "f1c7edcce4ef71516ed05d3b1eeb352866ce87219286d405ad7e9b171f77576f",
+  "crates/corpse-desktop/src/ability_ui.rs": "2a8eeaed673868f60abc00bf7be34053566dae11e0d3f7d90ec256cee3604db7",
+  "crates/corpse-desktop/src/authored_copy_r38_tests.rs": "5b58742ed0bc094978f8a801360a806c5c8aaecaa7c647a49aa2d251595f7bb7",
+  "crates/corpse-desktop/src/pack.rs": "6a53b627b134e1ca960b3067bb0f90e6ac53e6ed74bcfccebb37b86cfebaad48"
+}

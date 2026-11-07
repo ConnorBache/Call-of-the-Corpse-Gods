@@ -1,0 +1,329 @@
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/r51-ui-work/source/crates/corpse-desktop)
+warning: use of deprecated method `indexmap::map::IndexMap::<K, V, S>::remove`: `remove` disrupts the map order -- use `swap_remove` or `shift_remove` for explicit behavior.
+  --> crates/corpse-desktop/src/hallucination_ui.rs:75:55
+   |
+75 |   let mut hidden=room(43.,1);hidden.player.conditions.remove("telepathic");hidden.player.stats.perception=0.;hidden.actors_at_mut(1....
+   |                                                       ^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `indexmap::map::IndexMap::<K, V, S>::remove`: `remove` disrupts the map order -- use `swap_remove` or `shift_remove` for explicit behavior.
+  --> crates/corpse-desktop/src/visual_requests_revision50_tests.rs:94:48
+   |
+94 |     run.actors_at_mut(run.depth)[0].conditions.remove("invisible");
+   |                                                ^^^^^^
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/corpse-desktop/src/tracked_engine.rs:43:30
+   |
+43 | ...   let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity ex...
+   |                            ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+43 -         let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+43 +         let identity=NEXT_ID.try_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+   |
+
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:1760:17
+     |
+1760 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:2807:17
+     |
+2807 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+
+warning: unused variable: `x`
+    --> crates/corpse-desktop/src/main.rs:2013:38
+     |
+2013 | ...   Event::MouseMotion { x, y, .. } if screen==Screen::Game && run.as_ref().is_some_and(|r|r.run.status=="playing"&&!r.run.offer...
+     |                            ^ help: try ignoring the field: `x: _`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `y`
+    --> crates/corpse-desktop/src/main.rs:2013:41
+     |
+2013 | ...   Event::MouseMotion { x, y, .. } if screen==Screen::Game && run.as_ref().is_some_and(|r|r.run.status=="playing"&&!r.run.offer...
+     |                               ^ help: try ignoring the field: `y: _`
+
+warning: constant `TOP` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:4:11
+  |
+4 | pub const TOP: i32 = 278;
+  |           ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `ROW` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:5:11
+  |
+5 | pub const ROW: i32 = 34;
+  |           ^^^
+
+warning: constant `CAPACITY` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:6:11
+  |
+6 | pub const CAPACITY: usize = 12;
+  |           ^^^^^^^^
+
+warning: function `feature_color` is never used
+  --> crates/corpse-desktop/src/appearance_material.rs:52:8
+   |
+52 | pub fn feature_color(profile: &Profile, key: &str, fallback: Rgb) -> Rgb {
+   |        ^^^^^^^^^^^^^
+
+warning: method `compiled_storage_stats` is never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:354:25
+    |
+155 | impl Profile {
+    | ------------ method in this implementation
+...
+354 |     #[cfg(test)] pub fn compiled_storage_stats(&self)->Value{self.1.storage_stats()}
+    |                         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `saved_preset_id` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:112:9
+    |
+106 | pub struct Status {
+    |            ------ field in this struct
+...
+112 |     pub saved_preset_id: Option<String>,
+    |         ^^^^^^^^^^^^^^^
+    |
+    = note: `Status` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: methods `edited`, `begin_gesture`, `reset_group`, and `preferences` are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:401:12
+    |
+230 | impl Store {
+    | ---------- methods in this implementation
+...
+401 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+449 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+517 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+653 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: method `dependencies` is never used
+  --> crates/corpse-desktop/src/tile_overlay.rs:38:9
+   |
+34 | impl Frame{
+   | ---------- method in this implementation
+...
+38 |  pub fn dependencies(&self,p:&Painter)->Vec<Rect>{
+   |         ^^^^^^^^^^^^
+
+warning: method `hover_intersects` is never used
+  --> crates/corpse-desktop/src/overlay_damage.rs:50:12
+   |
+35 | impl Frame{
+   | ---------- method in this implementation
+...
+50 |     pub fn hover_intersects(&self,r:Rect)->bool{self.hover.as_ref().is_some_and(|s|s.bounds.intersect(r).is_some())}
+   |            ^^^^^^^^^^^^^^^^
+
+warning: function `cosmetic_seed` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:27:8
+   |
+27 | pub fn cosmetic_seed(seed: &str, depth: u32) -> u32 {
+   |        ^^^^^^^^^^^^^
+
+warning: function `materials_animated` is never used
+  --> crates/corpse-desktop/src/entity_profile.rs:93:8
+   |
+93 | pub fn materials_animated(p: &Profile) -> bool {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: fields `ordinary` and `conditional` are never read
+  --> crates/corpse-desktop/src/manual.rs:44:9
+   |
+43 | pub struct Depth {
+   |            ----- fields in this struct
+44 |     pub ordinary: Vec<String>,
+   |         ^^^^^^^^
+45 |     pub conditional: Vec<String>,
+   |         ^^^^^^^^^^^
+
+warning: field `desktop` is never read
+  --> crates/corpse-desktop/src/display_ui.rs:60:5
+   |
+58 | pub struct DisplaySettings {
+   |            --------------- field in this struct
+59 |     mode: DisplayMode,
+60 |     desktop: Resolution,
+   |     ^^^^^^^
+
+warning: constant `CLOSE` is never used
+  --> crates/corpse-desktop/src/pack.rs:24:7
+   |
+24 | const CLOSE: Rect = Rect(929, 214, 36, 32);
+   |       ^^^^^
+
+warning: constant `CANCEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:25:7
+   |
+25 | const CANCEL: Rect = Rect(881, 281, 80, 32);
+   |       ^^^^^^
+
+warning: constant `ROW` is never used
+  --> crates/corpse-desktop/src/pack.rs:26:7
+   |
+26 | const ROW: i32 = 30;
+   |       ^^^
+
+warning: constant `EDGE` is never used
+  --> crates/corpse-desktop/src/pack.rs:27:7
+   |
+27 | const EDGE: [u8; 3] = [53, 55, 68];
+   |       ^^^^
+
+warning: constant `PANEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:28:7
+   |
+28 | const PANEL: [u8; 3] = [11, 13, 21];
+   |       ^^^^^
+
+warning: constant `SELECTED` is never used
+  --> crates/corpse-desktop/src/pack.rs:29:7
+   |
+29 | const SELECTED: [u8; 3] = [53, 51, 68];
+   |       ^^^^^^^^
+
+warning: function `tinker_eligible` is never used
+    --> crates/corpse-desktop/src/pack.rs:1230:4
+     |
+1230 | fn tinker_eligible(i: &Item) -> bool {
+     |    ^^^^^^^^^^^^^^^
+
+warning: fields `dead` and `gods` are never read
+   --> crates/corpse-desktop/src/render.rs:199:9
+    |
+155 | pub struct View {
+    |            ---- fields in this struct
+...
+199 |     pub dead: bool,
+    |         ^^^^
+...
+203 |     pub gods: String,
+    |         ^^^^
+    |
+    = note: `View` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `center` is never used
+    --> crates/corpse-desktop/src/render.rs:1073:12
+     |
+ 335 | impl Painter {
+     | ------------ method in this implementation
+...
+1073 |     pub fn center(&mut self, s: &str, y: i32, size: u16, c: Rgb) {
+     |            ^^^^^^
+
+warning: constant `TOOLBAR_LABELS` is never used
+    --> crates/corpse-desktop/src/render.rs:3230:11
+     |
+3230 | pub const TOOLBAR_LABELS: [&str; 3] = TOOLBAR_ACTIONS;
+     |           ^^^^^^^^^^^^^^
+
+warning: associated function `resolve` is never used
+  --> crates/corpse-desktop/src/enemy_list.rs:12:12
+   |
+11 | impl Layout {
+   | ----------- associated function in this implementation
+12 |     pub fn resolve(p: &crate::appearance_profile::Profile, map_left: i32) -> Self {
+   |            ^^^^^^^
+
+warning: function `read_save_bytes` is never used
+   --> crates/corpse-desktop/src/session_store.rs:200:8
+    |
+200 | pub fn read_save_bytes(path:&Path)->std::io::Result<Vec<u8>>{read_recording_bytes(path).map(|(bytes,_)|bytes)}
+    |        ^^^^^^^^^^^^^^^
+
+warning: field `path` is never read
+  --> crates/corpse-desktop/src/incremental_store.rs:51:5
+   |
+50 | pub(super) struct JournalState {
+   |                   ------------ field in this struct
+51 |     path:PathBuf,kind:Kind,token:Token,next_sequence:u64,last_checksum:u32,
+   |     ^^^^
+
+warning: variant `Hotkeys` is never constructed
+  --> crates/corpse-desktop/src/typography_ui.rs:13:5
+   |
+ 5 | pub enum Role {
+   |          ---- variant in this enum
+...
+13 |     Hotkeys,
+   |     ^^^^^^^
+   |
+   = note: `Role` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: associated items `ALL` and `parse` are never used
+  --> crates/corpse-desktop/src/typography_ui.rs:16:15
+   |
+15 | impl Role {
+   | --------- associated items in this implementation
+16 |     pub const ALL: [Self; 8] = [
+   |               ^^^
+...
+38 |     pub fn parse(key: &str) -> Option<Self> {
+   |            ^^^^^
+
+warning: function `chronicle_metrics` is never used
+   --> crates/corpse-desktop/src/typography_ui.rs:123:8
+    |
+123 | pub fn chronicle_metrics(
+    |        ^^^^^^^^^^^^^^^^^
+
+warning: method `name` is never used
+ --> crates/corpse-desktop/src/hover_reuse_bench.rs:9:15
+  |
+9 | impl Arm { fn name(self) -> &'static str { match self { Self::Fresh => "fresh", Self::Cached => "cached" } } }
+  | --------      ^^^^
+  | |
+  | method in this implementation
+
+warning: `corpse-desktop` (bin "corpse-desktop" test) generated 37 warnings (run `cargo fix --bin "corpse-desktop" -p corpse-desktop --tests` to apply 3 suggestions)
+    Finished `test` profile [optimized] target(s) in 2m 27s
+  Executable unittests src/main.rs (target/debug/deps/corpse_desktop-1e13fa2e6b813f30)

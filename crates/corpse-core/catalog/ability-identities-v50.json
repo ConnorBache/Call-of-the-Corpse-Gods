@@ -1,0 +1,506 @@
+[
+  {
+    "godId": 0,
+    "slot": 1,
+    "legacyId": "shrail-rage-at-the-dying-of-the-light",
+    "revision50Id": "shrail-rage-at-the-dying-of-the-light",
+    "name": "Rage at the Dying of the Light"
+  },
+  {
+    "godId": 0,
+    "slot": 2,
+    "legacyId": "shrail-unyielding-assault",
+    "revision50Id": "shrail-execute",
+    "name": "Execute"
+  },
+  {
+    "godId": 0,
+    "slot": 3,
+    "legacyId": "shrail-i-hit-back",
+    "revision50Id": "shrail-grappler",
+    "name": "Grappler"
+  },
+  {
+    "godId": 0,
+    "slot": 4,
+    "legacyId": "shrail-fight-long",
+    "revision50Id": "shrail-fight-long",
+    "name": "Fight Long"
+  },
+  {
+    "godId": 0,
+    "slot": 5,
+    "legacyId": "shrail-beat-to-death",
+    "revision50Id": "shrail-unstoppable-force",
+    "name": "Unstoppable Force"
+  },
+  {
+    "godId": 0,
+    "slot": 6,
+    "legacyId": "shrail-fury-crafting",
+    "revision50Id": "shrail-masochism",
+    "name": "Masochism"
+  },
+  {
+    "godId": 1,
+    "slot": 1,
+    "legacyId": "pelian-you-shall-never-be-rid-of-me",
+    "revision50Id": "pelian-you-shall-never-be-rid-of-me",
+    "name": "You Shall Never Be Rid of Me"
+  },
+  {
+    "godId": 1,
+    "slot": 2,
+    "legacyId": "pelian-i-came-for-you",
+    "revision50Id": "pelian-i-came-for-you",
+    "name": "I Came For You"
+  },
+  {
+    "godId": 1,
+    "slot": 3,
+    "legacyId": "pelian-never-without-a-fight",
+    "revision50Id": "pelian-fated-duel",
+    "name": "Fated Duel"
+  },
+  {
+    "godId": 1,
+    "slot": 4,
+    "legacyId": "pelian-never-surrender",
+    "revision50Id": "pelian-never-surrender",
+    "name": "Never Surrender"
+  },
+  {
+    "godId": 1,
+    "slot": 5,
+    "legacyId": "pelian-bulwark-of-mind",
+    "revision50Id": "pelian-bulwark-of-mind",
+    "name": "Bulwark of Mind"
+  },
+  {
+    "godId": 1,
+    "slot": 6,
+    "legacyId": "pelian-zeal-craft",
+    "revision50Id": "pelian-relentless-pursuit",
+    "name": "Relentless Pursuit"
+  },
+  {
+    "godId": 2,
+    "slot": 1,
+    "legacyId": "isheilah-missed-me",
+    "revision50Id": "isheilah-missed-me",
+    "name": "Missed Me"
+  },
+  {
+    "godId": 2,
+    "slot": 2,
+    "legacyId": "isheilah-tools-of-the-trade",
+    "revision50Id": "isheilah-tools-of-the-trade",
+    "name": "Tools of the Trade"
+  },
+  {
+    "godId": 2,
+    "slot": 3,
+    "legacyId": "isheilah-make-slippery",
+    "revision50Id": "isheilah-make-slippery",
+    "name": "Make Slippery"
+  },
+  {
+    "godId": 2,
+    "slot": 4,
+    "legacyId": "isheilah-quick-hand",
+    "revision50Id": "isheilah-quick-hand",
+    "name": "Quick Hand"
+  },
+  {
+    "godId": 2,
+    "slot": 5,
+    "legacyId": "isheilah-are-you-sure-about-that",
+    "revision50Id": "isheilah-are-you-sure-about-that",
+    "name": "Are You Sure About That?"
+  },
+  {
+    "godId": 2,
+    "slot": 6,
+    "legacyId": "isheilah-guile-craft",
+    "revision50Id": "isheilah-spellslinger",
+    "name": "Spellslinger"
+  },
+  {
+    "godId": 3,
+    "slot": 1,
+    "legacyId": "numo-implant-thought",
+    "revision50Id": "numo-implant-thought",
+    "name": "Implant Thought"
+  },
+  {
+    "godId": 3,
+    "slot": 2,
+    "legacyId": "numo-distract",
+    "revision50Id": "numo-distract",
+    "name": "Distract"
+  },
+  {
+    "godId": 3,
+    "slot": 3,
+    "legacyId": "numo-mind-read",
+    "revision50Id": "numo-mind-read",
+    "name": "Mind Read"
+  },
+  {
+    "godId": 3,
+    "slot": 4,
+    "legacyId": "numo-mind-slave",
+    "revision50Id": "numo-mind-slave",
+    "name": "Mind Slave"
+  },
+  {
+    "godId": 3,
+    "slot": 5,
+    "legacyId": "numo-revert",
+    "revision50Id": "numo-weave-of-time",
+    "name": "Weave of Time"
+  },
+  {
+    "godId": 3,
+    "slot": 6,
+    "legacyId": "numo-remember",
+    "revision50Id": "numo-remember",
+    "name": "Remember"
+  },
+  {
+    "godId": 4,
+    "slot": 1,
+    "legacyId": "etill-phase-through",
+    "revision50Id": "etill-phase-through",
+    "name": "Phase Through"
+  },
+  {
+    "godId": 4,
+    "slot": 2,
+    "legacyId": "etill-rushing-torrent",
+    "revision50Id": "etill-rushing-torrent",
+    "name": "Rushing Torrent"
+  },
+  {
+    "godId": 4,
+    "slot": 3,
+    "legacyId": "etill-drown",
+    "revision50Id": "etill-drown",
+    "name": "Drown"
+  },
+  {
+    "godId": 4,
+    "slot": 4,
+    "legacyId": "etill-float-away",
+    "revision50Id": "etill-float-away",
+    "name": "Float Away"
+  },
+  {
+    "godId": 4,
+    "slot": 5,
+    "legacyId": "etill-half-here",
+    "revision50Id": "etill-half-here",
+    "name": "Half Here"
+  },
+  {
+    "godId": 4,
+    "slot": 6,
+    "legacyId": "etill-riptide",
+    "revision50Id": "etill-riptide",
+    "name": "Riptide"
+  },
+  {
+    "godId": 5,
+    "slot": 1,
+    "legacyId": "ursa-waking-nightmare",
+    "revision50Id": "ursa-waking-nightmares",
+    "name": "Waking Nightmares"
+  },
+  {
+    "godId": 5,
+    "slot": 2,
+    "legacyId": "ursa-sudden-sleep",
+    "revision50Id": "ursa-sudden-sleep",
+    "name": "Sudden Sleep"
+  },
+  {
+    "godId": 5,
+    "slot": 3,
+    "legacyId": "ursa-dream-of-time-gone-by",
+    "revision50Id": "ursa-dream-of-time-gone-by",
+    "name": "Dream of Time Gone By"
+  },
+  {
+    "godId": 5,
+    "slot": 4,
+    "legacyId": "ursa-sleep-walk",
+    "revision50Id": "ursa-sleep-walk",
+    "name": "Sleep Walk"
+  },
+  {
+    "godId": 5,
+    "slot": 5,
+    "legacyId": "ursa-dream-see",
+    "revision50Id": "ursa-dream-see",
+    "name": "Dream-See"
+  },
+  {
+    "godId": 5,
+    "slot": 6,
+    "legacyId": "ursa-dream-craft",
+    "revision50Id": "ursa-oblivious",
+    "name": "Oblivious"
+  },
+  {
+    "godId": 6,
+    "slot": 1,
+    "legacyId": "lichor-overflowing",
+    "revision50Id": "lichor-overflowing",
+    "name": "Overflowing"
+  },
+  {
+    "godId": 6,
+    "slot": 2,
+    "legacyId": "lichor-bleed-them",
+    "revision50Id": "lichor-bleed-them",
+    "name": "Bleed Them"
+  },
+  {
+    "godId": 6,
+    "slot": 3,
+    "legacyId": "lichor-blood-letting",
+    "revision50Id": "lichor-blood-letting",
+    "name": "Blood Letting"
+  },
+  {
+    "godId": 6,
+    "slot": 4,
+    "legacyId": "lichor-hardened-blood",
+    "revision50Id": "lichor-hardened-blood",
+    "name": "Hardened Blood"
+  },
+  {
+    "godId": 6,
+    "slot": 5,
+    "legacyId": "lichor-blood-weapon",
+    "revision50Id": "lichor-blood-weapon",
+    "name": "Blood Weapon"
+  },
+  {
+    "godId": 6,
+    "slot": 6,
+    "legacyId": "lichor-the-number-of-blood",
+    "revision50Id": "lichor-the-number-of-blood",
+    "name": "The Number of Blood"
+  },
+  {
+    "godId": 7,
+    "slot": 1,
+    "legacyId": "dawel-step-through-shadows",
+    "revision50Id": "dawel-step-through-shadows",
+    "name": "Step Through Shadows"
+  },
+  {
+    "godId": 7,
+    "slot": 2,
+    "legacyId": "dawel-silent-strike",
+    "revision50Id": "dawel-silent-strike",
+    "name": "Silent Strike"
+  },
+  {
+    "godId": 7,
+    "slot": 3,
+    "legacyId": "dawel-unspeak",
+    "revision50Id": "dawel-unspeak",
+    "name": "Unspeak"
+  },
+  {
+    "godId": 7,
+    "slot": 4,
+    "legacyId": "dawel-reverse-entropy",
+    "revision50Id": "dawel-reverse-entropy",
+    "name": "Reverse Entropy"
+  },
+  {
+    "godId": 7,
+    "slot": 5,
+    "legacyId": "dawel-shadow-in-the-dark",
+    "revision50Id": "dawel-shadow-in-the-dark",
+    "name": "Shadow in the Dark"
+  },
+  {
+    "godId": 7,
+    "slot": 6,
+    "legacyId": "dawel-not-there",
+    "revision50Id": "dawel-not-there",
+    "name": "Not There"
+  },
+  {
+    "godId": 8,
+    "slot": 1,
+    "legacyId": "grisha-boundless-hunger",
+    "revision50Id": "grisha-boundless-hunger",
+    "name": "Boundless Hunger"
+  },
+  {
+    "godId": 8,
+    "slot": 2,
+    "legacyId": "grisha-entropy",
+    "revision50Id": "grisha-entropy",
+    "name": "Entropy"
+  },
+  {
+    "godId": 8,
+    "slot": 3,
+    "legacyId": "grisha-erase-metaphysical",
+    "revision50Id": "grisha-erase-metaphysical",
+    "name": "Erase Metaphysical"
+  },
+  {
+    "godId": 8,
+    "slot": 4,
+    "legacyId": "grisha-death-swift",
+    "revision50Id": "grisha-death-swift",
+    "name": "Death Swift"
+  },
+  {
+    "godId": 8,
+    "slot": 5,
+    "legacyId": "grisha-black-pit",
+    "revision50Id": "grisha-black-pit",
+    "name": "Black Pit"
+  },
+  {
+    "godId": 8,
+    "slot": 6,
+    "legacyId": "grisha-uncast",
+    "revision50Id": "grisha-witch-hatred",
+    "name": "Witch-Hatred"
+  },
+  {
+    "godId": 9,
+    "slot": 1,
+    "legacyId": "anavani-shine",
+    "revision50Id": "anavani-shine",
+    "name": "Shine"
+  },
+  {
+    "godId": 9,
+    "slot": 2,
+    "legacyId": "anavani-ascend",
+    "revision50Id": "anavani-ascend",
+    "name": "Ascend"
+  },
+  {
+    "godId": 9,
+    "slot": 3,
+    "legacyId": "anavani-nova",
+    "revision50Id": "anavani-nova",
+    "name": "Nova"
+  },
+  {
+    "godId": 9,
+    "slot": 4,
+    "legacyId": "anavani-illuminate",
+    "revision50Id": "anavani-illuminate",
+    "name": "Sparkle"
+  },
+  {
+    "godId": 9,
+    "slot": 5,
+    "legacyId": "anavani-star-power",
+    "revision50Id": "anavani-star-power",
+    "name": "Star Power"
+  },
+  {
+    "godId": 9,
+    "slot": 6,
+    "legacyId": "anavani-make-kneel",
+    "revision50Id": "anavani-commandment",
+    "name": "Commandment"
+  },
+  {
+    "godId": 10,
+    "slot": 1,
+    "legacyId": "kative-divine-craftsman",
+    "revision50Id": "kative-cogworks",
+    "name": "Cogworks"
+  },
+  {
+    "godId": 10,
+    "slot": 2,
+    "legacyId": "kative-mini-me",
+    "revision50Id": "kative-mini-me",
+    "name": "Mini-Me"
+  },
+  {
+    "godId": 10,
+    "slot": 3,
+    "legacyId": "kative-adaptive-armor",
+    "revision50Id": "kative-clay-army",
+    "name": "Clay Army"
+  },
+  {
+    "godId": 10,
+    "slot": 4,
+    "legacyId": "kative-artifice-craft",
+    "revision50Id": "kative-appropriate",
+    "name": "Appropriate"
+  },
+  {
+    "godId": 10,
+    "slot": 5,
+    "legacyId": "kative-tinker",
+    "revision50Id": "kative-tinker",
+    "name": "Tinker"
+  },
+  {
+    "godId": 10,
+    "slot": 6,
+    "legacyId": "kative-dilute-potion",
+    "revision50Id": "kative-bottomless-pack",
+    "name": "Bottomless Pack"
+  },
+  {
+    "godId": 11,
+    "slot": 1,
+    "legacyId": "morae-fortune-teller",
+    "revision50Id": "morae-fortune-teller",
+    "name": "Fortune Teller"
+  },
+  {
+    "godId": 11,
+    "slot": 2,
+    "legacyId": "morae-bonded-by-unseen-threads",
+    "revision50Id": "morae-bonded-by-unseen-threads",
+    "name": "Bonded By Unseen Threads"
+  },
+  {
+    "godId": 11,
+    "slot": 3,
+    "legacyId": "morae-turning-the-wheel",
+    "revision50Id": "morae-turning-the-wheel",
+    "name": "Turning the Wheel"
+  },
+  {
+    "godId": 11,
+    "slot": 4,
+    "legacyId": "morae-sever-fate",
+    "revision50Id": "morae-sever-fate",
+    "name": "Sever Fate"
+  },
+  {
+    "godId": 11,
+    "slot": 5,
+    "legacyId": "morae-see-the-future",
+    "revision50Id": "morae-see-the-future",
+    "name": "See The Future"
+  },
+  {
+    "godId": 11,
+    "slot": 6,
+    "legacyId": "morae-all-seeing-eyes",
+    "revision50Id": "morae-all-seeing-eyes",
+    "name": "All-Seeing Eyes"
+  }
+]

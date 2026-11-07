@@ -1,0 +1,80 @@
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -631,11 +631,21 @@
+         self.native_fill(self.native_x(x as f64),self.native_y(y as f64),
+             self.native_x((x+w) as f64),self.native_y((y+h) as f64),c,a);
+     }
++    /// O(native perimeter pixels), O(1) scratch. Keep minimum-one-pixel
++    /// strokes inside the rounded panel footprint, including its own clip.
+     pub fn border(&mut self, x: i32, y: i32, w: i32, h: i32, c: Rgb) {
+-        self.rect(x, y, w, 1, c);
+-        self.rect(x, y + h - 1, w, 1, c);
+-        self.rect(x, y, 1, h, c);
+-        self.rect(x + w - 1, y, 1, h, c);
++        if w <= 0 || h <= 0 { return; }
++        let (left, top) = (self.native_x(x as f64), self.native_y(y as f64));
++        let right = self.native_x((x + w) as f64).max(left + 1);
++        let bottom = self.native_y((y + h) as f64).max(top + 1);
++        let inner_left = self.native_x((x + 1) as f64).clamp(left + 1, right);
++        let inner_top = self.native_y((y + 1) as f64).clamp(top + 1, bottom);
++        let inner_right = self.native_x((x + w - 1) as f64).clamp(left, right - 1);
++        let inner_bottom = self.native_y((y + h - 1) as f64).clamp(top, bottom - 1);
++        self.native_fill(left, top, right, inner_top, c, 255);
++        self.native_fill(left, inner_bottom, right, bottom, c, 255);
++        self.native_fill(left, top, inner_left, bottom, c, 255);
++        self.native_fill(inner_right, top, right, bottom, c, 255);
+     }
+     /// Warm O(G metric work + mask pixels); cold adds font rasterization; cached mask rows.
+     pub fn text(&mut self, s: &str, x: i32, y: i32, size: u16, c: Rgb) {
+--- a/crates/corpse-desktop/src/visual_requests_revision50_tests.rs
++++ b/crates/corpse-desktop/src/visual_requests_revision50_tests.rs
+@@ -157,3 +157,32 @@
+     }
+     assert_eq!(run, frozen);
+ }
++
++#[test]
++fn revision50_dialog_borders_survive_their_own_fractional_clip() {
++    for (w, h) in [(1280, 800), (960, 720), (1920, 1080), (1537, 911), (960, 1200)] {
++        let mut p = Painter::new(); p.resize(w, h); p.clear([1, 2, 3]);
++        let background = p.pixels.clone();
++        let ink = [53, 55, 68];
++        let bounds = p.centered_sheet(|s| {
++            let (x, y, w, h) = crate::inspection_ui::bounds(&s.profile);
++            let bounds = s.logical_damage_rect(x, y, w, h).unwrap();
++            s.clip = Some((x, y, w, h));
++            s.border(x, y, w, h, ink);
++            s.clip = None;
++            bounds
++        });
++        let pixel = |x: usize, y: usize| &p.pixels[(y * p.width + x) * 4..(y * p.width + x) * 4 + 3];
++        for x in bounds.x..bounds.right() {
++            assert_eq!(pixel(x, bounds.y), ink, "top {w}x{h}");
++            assert_eq!(pixel(x, bounds.bottom() - 1), ink, "bottom {w}x{h}");
++        }
++        for y in bounds.y..bounds.bottom() {
++            assert_eq!(pixel(bounds.x, y), ink, "left {w}x{h}");
++            assert_eq!(pixel(bounds.right() - 1, y), ink, "right {w}x{h}");
++        }
++        for (i, (actual, original)) in p.pixels.chunks_exact(4).zip(background.chunks_exact(4)).enumerate() {
++            if !bounds.contains(i % p.width, i / p.width) { assert_eq!(actual, original, "outside panel footprint"); }
++        }
++    }
++}
+--- a/docs/revision50-visual-follow-up.md
++++ b/docs/revision50-visual-follow-up.md
+@@ -60,8 +60,12 @@
+ 
+ ## Complexity
+ 
+-The runtime change is one constant. Modal input/damage transformation remains
+-O(1) time and extra memory per conversion; painting retains existing content,
++The modal scale change is one constant. Native border strokes are clamped
++inside their rounded panel footprint so fractional scaling cannot place a
++minimum-one-pixel bottom/right stroke outside the panel's own clip. Border
++painting remains O(native perimeter pixels) time and O(1) extra memory; it
++continues through shared CPU/GPU and dirty-region clipping. Modal input/damage
++transformation remains O(1) time and extra memory per conversion; painting retains existing content,
+ font shaping/rasterization, clipping and pixel costs. Native glyph cache misses
+ depend on outline complexity and raster area, not constant time. Dialog content
+ layout and scrolling retain their prior text-length and wrapped-line costs.

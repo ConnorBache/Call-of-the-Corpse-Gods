@@ -1,0 +1,33 @@
+{
+  "binary": {
+    "bytes": 120090534,
+    "sha256": "244e97b011ff795a9c90965c7a2cbf6c08c24d2fddd18d9a31bc90e6fa1c2b03"
+  },
+  "command": "CARGO_INCREMENTAL=0 tools/cargo.sh build --release --locked --offline -j2 --target x86_64-pc-windows-gnu -p corpse-desktop",
+  "environment": [
+    "CARGO_INCREMENTAL=0",
+    "CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=tools/windows-linker.sh",
+    "SDL2_LIB_DIR=../native-windows-sdk/SDL2-2.32.10/x86_64-w64-mingw32/lib"
+  ],
+  "exit_code": 0,
+  "exit_code_file": {
+    "bytes": 2,
+    "path": "verification/r51-ui/windows-build.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "host": "Cloud Linux x86_64",
+  "kind": "r51-build-report",
+  "limits": "Successful cross-compilation only; no Windows execution.",
+  "log": {
+    "bytes": 42150,
+    "path": "verification/r51-ui/windows-build.log",
+    "sha256": "8f922501970ac34afc4c2921b7132c74e249a224d50c87d3759110fdb2e3af70"
+  },
+  "profile": "release",
+  "revision": 51,
+  "rust_toolchain": "1.99.1",
+  "schema": 1,
+  "source_snapshot_sha256": "7dfe86d997d3bcca56b381b9ef77ec335fdcc8baa39bf83a5631e04a6880e7be",
+  "target": "x86_64-pc-windows-gnu",
+  "windows_runtime_verified": false
+}

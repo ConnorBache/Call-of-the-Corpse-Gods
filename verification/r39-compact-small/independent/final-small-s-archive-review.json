@@ -1,0 +1,686 @@
+{
+  "status": "passed",
+  "zip": "compact-r39/artifacts/corpse-gods-native-r39-compact-small-s-windows-x64.zip",
+  "zip_bytes": 19599802,
+  "zip_sha256": "fab5fd3b6c1536c66fbe5aaf6eaa4f2ba6e6d1172611bc1e0b5be5eeeb16b562",
+  "archive_member_count": 104,
+  "zip_crc_verified": true,
+  "manifest_files_hash_verified": 103,
+  "original_binary_sha256": "04ed683bc209a33b3f3b1b40c74fdad35cdd7783e159f1199398bc0c0221f6a6",
+  "packaged_binary_sha256": "04ed683bc209a33b3f3b1b40c74fdad35cdd7783e159f1199398bc0c0221f6a6",
+  "loadable_pe_sections_hashes_unchanged": {
+    ".text": "d031166a7f8376f72930c28f14d9c8de2313c9315b7cffdadfa36e4059f7a217",
+    ".data": "dbcffb52fbc1ea6a6c849e776dae85c933474bfe9ac2eff8473479e42c4253d8",
+    ".rdata": "d3c3e16796ef03a1040afb5ab4f1c1879b61038c678b2162d0cb6064b70148c9",
+    ".pdata": "7dffdba219082e69ffb6dce938cbff61100474ca18ceb4eb9566c6cd69fa28c2",
+    ".xdata": "d7a16f17951cf909929b9c4581920d98a01bdd4ef43b36ca828813baefd882f4",
+    ".bss": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".idata": "e07296a59ede9435bd7aefcae316b5ffa9ac87126ddc2344f0babd027110788d",
+    ".tls": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+    ".rsrc": "4feebc1a47f58144135a06bf7b3bfb0a0206bbaa33904c86900e4e39e03c3853",
+    ".reloc": "9b852fa03e291ec2be5b8f3bbcc0e21f45d32408c64700cc480383811446cf89"
+  },
+  "runtime_art_embedded_count": 84,
+  "original_canonical_pngs_not_embedded": true,
+  "members": [
+    "MANIFEST.json",
+    "SDL2.dll",
+    "START-HERE.txt",
+    "corpse-desktop.exe",
+    "notices/IBMPlexMono-OFL.txt",
+    "notices/Inconsolata-OFL.txt",
+    "notices/Liberation-OFL.txt",
+    "notices/NotoCJK-OFL.txt",
+    "notices/NotoCore-OFL.txt",
+    "notices/SDL2-LICENSE.txt",
+    "notices/assets-NOTICE.md",
+    "notices/brogue/CC-BY-SA-4.0.txt",
+    "notices/brogue/NOTICE.txt",
+    "notices/brogue/UPSTREAM-LICENSE.txt",
+    "notices/compact-art-manifest.json",
+    "notices/crates/adler2-2.0.1/LICENSE-0BSD",
+    "notices/crates/adler2-2.0.1/LICENSE-APACHE",
+    "notices/crates/adler2-2.0.1/LICENSE-MIT",
+    "notices/crates/allocator-api2-0.2.21/LICENSE-APACHE",
+    "notices/crates/allocator-api2-0.2.21/LICENSE-MIT",
+    "notices/crates/bitflags-1.3.2/LICENSE-APACHE",
+    "notices/crates/bitflags-1.3.2/LICENSE-MIT",
+    "notices/crates/byteorder-lite-0.1.0/LICENSE-MIT",
+    "notices/crates/cfg-if-1.0.5/LICENSE-APACHE",
+    "notices/crates/cfg-if-1.0.5/LICENSE-MIT",
+    "notices/crates/core_maths-0.1.1/LICENSE",
+    "notices/crates/crc32fast-1.5.2/LICENSE-APACHE",
+    "notices/crates/crc32fast-1.5.2/LICENSE-MIT",
+    "notices/crates/equivalent-1.0.3/LICENSE-APACHE",
+    "notices/crates/equivalent-1.0.3/LICENSE-MIT",
+    "notices/crates/fdeflate-0.3.7/LICENSE-APACHE",
+    "notices/crates/fdeflate-0.3.7/LICENSE-MIT",
+    "notices/crates/flate2-1.1.10/LICENSE-APACHE",
+    "notices/crates/flate2-1.1.10/LICENSE-MIT",
+    "notices/crates/foldhash-0.1.5/LICENSE",
+    "notices/crates/foldhash-0.2.0/LICENSE",
+    "notices/crates/fontdue-0.9.5/LICENSE-APACHE",
+    "notices/crates/fontdue-0.9.5/LICENSE-MIT",
+    "notices/crates/fontdue-0.9.5/LICENSE-ZLIB",
+    "notices/crates/getrandom-0.3.4/LICENSE-APACHE",
+    "notices/crates/getrandom-0.3.4/LICENSE-MIT",
+    "notices/crates/hashbrown-0.15.5/LICENSE-APACHE",
+    "notices/crates/hashbrown-0.15.5/LICENSE-MIT",
+    "notices/crates/hashbrown-0.17.1/LICENSE-APACHE",
+    "notices/crates/hashbrown-0.17.1/LICENSE-MIT",
+    "notices/crates/image-webp-0.2.4/LICENSE-APACHE",
+    "notices/crates/image-webp-0.2.4/LICENSE-MIT",
+    "notices/crates/indexmap-2.14.2/LICENSE-APACHE",
+    "notices/crates/indexmap-2.14.2/LICENSE-MIT",
+    "notices/crates/itoa-1.0.18/LICENSE-APACHE",
+    "notices/crates/itoa-1.0.18/LICENSE-MIT",
+    "notices/crates/lazy_static-1.5.1/LICENSE-APACHE",
+    "notices/crates/lazy_static-1.5.1/LICENSE-MIT",
+    "notices/crates/libc-0.2.191/LICENSE-APACHE",
+    "notices/crates/libc-0.2.191/LICENSE-MIT",
+    "notices/crates/libm-0.2.16/LICENSE.txt",
+    "notices/crates/manifest.json",
+    "notices/crates/memchr-2.8.3/COPYING",
+    "notices/crates/memchr-2.8.3/LICENSE-MIT",
+    "notices/crates/miniz_oxide-0.8.9/LICENSE",
+    "notices/crates/miniz_oxide-0.8.9/LICENSE-APACHE.md",
+    "notices/crates/miniz_oxide-0.8.9/LICENSE-MIT.md",
+    "notices/crates/miniz_oxide-0.8.9/LICENSE-ZLIB.md",
+    "notices/crates/miniz_oxide-0.9.1/LICENSE",
+    "notices/crates/miniz_oxide-0.9.1/LICENSE-APACHE.md",
+    "notices/crates/miniz_oxide-0.9.1/LICENSE-MIT.md",
+    "notices/crates/miniz_oxide-0.9.1/LICENSE-ZLIB.md",
+    "notices/crates/native-runtime/GCC-MinGW-14.2.0-COPYRIGHT.txt",
+    "notices/crates/native-runtime/MinGW-w64-12.0.0-COPYRIGHT.txt",
+    "notices/crates/native-runtime/README.txt",
+    "notices/crates/native-runtime/Rust-1.99.1-COPYRIGHT-library.html",
+    "notices/crates/png-0.17.16/LICENSE-APACHE",
+    "notices/crates/png-0.17.16/LICENSE-MIT",
+    "notices/crates/proc-macro2-1.0.107/LICENSE-APACHE",
+    "notices/crates/proc-macro2-1.0.107/LICENSE-MIT",
+    "notices/crates/quick-error-2.0.1/LICENSE-APACHE",
+    "notices/crates/quick-error-2.0.1/LICENSE-MIT",
+    "notices/crates/quote-1.0.47/LICENSE-APACHE",
+    "notices/crates/quote-1.0.47/LICENSE-MIT",
+    "notices/crates/sdl2-0.38.0/LICENSE",
+    "notices/crates/sdl2-sys-0.38.0/SDL-LICENSE.txt",
+    "notices/crates/sdl2-sys-0.38.0/rust-sdl2-LICENSE",
+    "notices/crates/serde-1.0.229/LICENSE-APACHE",
+    "notices/crates/serde-1.0.229/LICENSE-MIT",
+    "notices/crates/serde_core-1.0.229/LICENSE-APACHE",
+    "notices/crates/serde_core-1.0.229/LICENSE-MIT",
+    "notices/crates/serde_derive-1.0.229/LICENSE-APACHE",
+    "notices/crates/serde_derive-1.0.229/LICENSE-MIT",
+    "notices/crates/serde_json-1.0.154/LICENSE-APACHE",
+    "notices/crates/serde_json-1.0.154/LICENSE-MIT",
+    "notices/crates/simd-adler32-0.3.10/LICENSE.md",
+    "notices/crates/syn-3.0.9/LICENSE-APACHE",
+    "notices/crates/syn-3.0.9/LICENSE-MIT",
+    "notices/crates/ttf-parser-0.25.1/LICENSE-APACHE",
+    "notices/crates/ttf-parser-0.25.1/LICENSE-MIT",
+    "notices/crates/unicode-ident-1.0.27/LICENSE-APACHE",
+    "notices/crates/unicode-ident-1.0.27/LICENSE-MIT",
+    "notices/crates/unicode-ident-1.0.27/LICENSE-UNICODE",
+    "notices/crates/version-compare-0.1.1/LICENSE",
+    "notices/crates/zlib-rs-0.6.8/LICENSE",
+    "notices/crates/zmij-1.0.23/LICENSE-MIT",
+    "notices/creature-alpha-manifest.json",
+    "notices/legacy-art-distribution.json",
+    "notices/ui-runtime-manifest.json"
+  ],
+  "art": [
+    {
+      "name": "banshee",
+      "bytes": 121744,
+      "sha256": "6e7f746632bd5239cae4235c40a22d953f1d48acbc75916da58ed958485cc002",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "bastidion",
+      "bytes": 242218,
+      "sha256": "32303459f5dfbb578dec85551c61bdb13a1b9573ff0632d688a5786b1dc5b7d0",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "bear",
+      "bytes": 110068,
+      "sha256": "4f70ab3833cf541a00a1c27addf6c05f8824fa9854e0ed76c3a4c85d44fcc0e5",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "blorb",
+      "bytes": 97344,
+      "sha256": "15924274945887837d15c266c327441e7ba5e0c16affea45f48c4858ba8d7d32",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "bombardier",
+      "bytes": 131320,
+      "sha256": "e45eeadb87981cff95b6346ead0f48cf39b080f01f8ca62044cc005f88baa0e1",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "cancer",
+      "bytes": 171264,
+      "sha256": "019f5b25a1871bdd44d848ee46ed58d425f9b3f267429904c16cda7e03b78f10",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "cave-bat",
+      "bytes": 63014,
+      "sha256": "8a30c6ada1313a21e1e680f2d68df860e944b714be53b3c6bbf7ff0a0c815241",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "chimera",
+      "bytes": 154252,
+      "sha256": "e8dbf0597469b442e0c44c6a07c45617511547aeb7444230d53c3a4f69884c6a",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "dire-bear",
+      "bytes": 148642,
+      "sha256": "4fa2cd2512d23cc1035af0b3ee8c979610aaca2288ffc51db45863a8ff44eb54",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "dragon",
+      "bytes": 189388,
+      "sha256": "fe25d5ac3237f35b3da814cfb5f8781a0699ae7c710522b9beece36c05fae458",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "dryad",
+      "bytes": 130132,
+      "sha256": "041a0e13cafd65db54e4ce370ed34faee0c21e574f25b7007c6902fae51c3777",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "giant-beetle",
+      "bytes": 201246,
+      "sha256": "4ecb48dde7bdec3322b77f5077a50abfe80981f454bce7b94bb113a67549f840",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "glim",
+      "bytes": 157184,
+      "sha256": "2def9591835e568b2ba69f1884bad230439a4041383e115af4d4da6167c72f23",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "greater-ichor-fish",
+      "bytes": 167926,
+      "sha256": "b41632efc0776b00659b5e62563b6137dee969f425807bd4df472985708e61f2",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "greater-ichor-leviathan",
+      "bytes": 213196,
+      "sha256": "6857b5a150c6726ed7eeea676d03a9b384540edb833ee18a7e6c1451e9e48548",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "greater-ichor-shark",
+      "bytes": 170716,
+      "sha256": "56473703b34bebf5c0676261219623b572910a76dd7a1d659a8add897e9946d5",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "half-here",
+      "bytes": 96876,
+      "sha256": "0447bf46cb78da9c21f9251652a3bb1e012d877d10c960a80226afc05c013286",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "hemogoblin-bloodmancer",
+      "bytes": 118336,
+      "sha256": "d50e37f5fdc32c3fd94b223663dc6d15c8ad8756d028afb7e65d8cba40f4de1c",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "hemogoblin-inventor",
+      "bytes": 137930,
+      "sha256": "2f3d7ba0b637257ca4fcf9c087f9d28f45e0c1a3c6a410b4ef417e634eeeea4e",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "hemogoblin-mech",
+      "bytes": 261204,
+      "sha256": "67c3c23b48c9e1ad66755cd931219755f17edfac608c5a7e9a9916e80663d612",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "hemogoblin",
+      "bytes": 118516,
+      "sha256": "e273a7ea27d779a6d91242da72eb640bfa2217e9a46abc0c8269e88e9e8097c9",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "horn-1",
+      "bytes": 86380,
+      "sha256": "4e418ed53072f251a7230737f4c88ef5ae93f92578642931e35522f89e757bed",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "horn-2",
+      "bytes": 109228,
+      "sha256": "0a47c23abd5b6ce0e1f3e0643abc14b5fad8c9dce19d2efbc0619e5b7474dd11",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "horn-3",
+      "bytes": 76452,
+      "sha256": "99d42aa501794416e51dd316faa6eb84516fbb4848243b4d845a640a77c888a4",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "horn-4",
+      "bytes": 82146,
+      "sha256": "612719f6286645e5269176de25f01ab6effa6d0d919b2aeb7bb6b69d5286b3a4",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "horn-5",
+      "bytes": 132220,
+      "sha256": "d9a23358401c56f3ba67a7caabf6c0883f27e21a67d5e6cc409ed5700b535f67",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "horn-6",
+      "bytes": 114550,
+      "sha256": "4ba8948ac95037586385897bb2e1d1efbf23a9755c149b84b0e4eb99e43af332",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "horn-7",
+      "bytes": 190186,
+      "sha256": "f73718672becc8e37c9ba6ce23abccc882be174a867af724d46dbe7eae3ea7e2",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "ichor-fish-standard",
+      "bytes": 119926,
+      "sha256": "8f86c050956f7bf9eae19227b6ab7a18f657c84bf5d98a8f96d8e9b8c0b1d03a",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "ichor-leviathan",
+      "bytes": 197300,
+      "sha256": "c62c01afdd30af92ba4d0dfeed377496f84a200e0230fe148ad50fa7fd987769",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "ichor-shark",
+      "bytes": 103820,
+      "sha256": "4935a2b9c90e7694c74aa6eb18326e3572d0456707d48de0805b3d739dd2937d",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "kelpie",
+      "bytes": 207240,
+      "sha256": "f170e8b301b85f0d1ee7dd3e5019861194f22ecf07f702f6aaaf1fe5507c642c",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "killspawn",
+      "bytes": 260126,
+      "sha256": "032436bc13fa9f9e18a462040dea4561f7d6f073f2f6428e52fff41c5dda7753",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "lesser-ichor-fish",
+      "bytes": 153354,
+      "sha256": "68d6447590c232e51bda20d7c44313490e4ed811f4cd6434edb2632e1b95f351",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "lesser-ichor-leviathan",
+      "bytes": 207366,
+      "sha256": "1b66d0a3215611b02acadbf66c89f816f19c4b3c402588a57f94362292a4288d",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "lesser-ichor-shark",
+      "bytes": 97012,
+      "sha256": "8bee35ac99e36161dc1a2a7c928af559254eb0cbeba72052c75fba0aff9583e4",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "long-saidri",
+      "bytes": 89336,
+      "sha256": "4bcc7818b85a3508b20de919ddd88c17511542213d7593478e0ea7fde27fa5d8",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "maulchild",
+      "bytes": 125078,
+      "sha256": "d493179d89c4e63a55aaaf2f34cfebad685ea52c137d94c4bbe1154bc758c5fb",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "mini-me",
+      "bytes": 73246,
+      "sha256": "536b8d93a9bf851a651f4cbd3b0d21dac702972c8920907e2b9d9add708a9897",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "minotaur",
+      "bytes": 111064,
+      "sha256": "69d082c3db398cc8d0ce79bf917ec0ad67cb7a225dfa9c22f7048eda2ed1dfd2",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "moonspawn",
+      "bytes": 184678,
+      "sha256": "66c5519129028610d49a5ba2991918d087ef2d225cd9892ca1366855e877e67c",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "needleling",
+      "bytes": 104542,
+      "sha256": "82c4c87358eb25492637f58419314294042ec5c55d90b83f286a75083754ed71",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "night-crawler",
+      "bytes": 532466,
+      "sha256": "1052dd6e554daed51df51244696eb58385215845c3752c4374d9a40dc9104f6e",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-birther",
+      "bytes": 64474,
+      "sha256": "10fd67d8c014ba1b59e307510752574007e2f79c1709bbaffc455d233efcbdf2",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-biter",
+      "bytes": 107866,
+      "sha256": "acf98219d73908d4fd0649b8c40a3d20b881dcf85c2b68a68a2b031cf66cd32e",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-breather",
+      "bytes": 81138,
+      "sha256": "6a9697306a674b2f01eca4e5b80f5db10bc7b4f44af3f852a3fe57c24de78165",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-greater-birther",
+      "bytes": 107184,
+      "sha256": "8410cd387c893f0666289594564634ec7732b89e0659479b4b29cb508278e7a5",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-greater-biter",
+      "bytes": 112518,
+      "sha256": "69ae21fe012e0cf42c25a43496108876507dc40f7fcf1b36004cd5569415c7d1",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-greater-breather",
+      "bytes": 115862,
+      "sha256": "0e6deda48fde45ba05d1e363e97e8e24367e485281202ac3f2b798c299566360",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-greater-screamer",
+      "bytes": 127664,
+      "sha256": "5f0e2f208016bf08e1a4699a69448e8b6c0103e5906fa8d760c3ae1d0ab58ffa",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-greater-spitter",
+      "bytes": 84038,
+      "sha256": "687b932433dd5efac70a7d5b589cbc30d5e1d6e311af3a06164669b8fa83b48c",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-jackal",
+      "bytes": 96728,
+      "sha256": "cecd14d23e9ba2fd3e8d8ee2e072c7e43e69e7569b08e86858edf7d01856c027",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-screamer",
+      "bytes": 80704,
+      "sha256": "6c23dadb8f84e19268dae8cb620b181238770d2e02d207b7f9944731cb0200b1",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "pale-spitter",
+      "bytes": 78776,
+      "sha256": "ecaf9937431c074679b3712b2a3d80a99e4a8ffe26a0da3ab397393e693d20c5",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "phoenix",
+      "bytes": 348502,
+      "sha256": "b97e63ec78bc4ae4b8ed71bc55f0ded5af76f2e1848f060822282d57e3bb682f",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "rat",
+      "bytes": 120914,
+      "sha256": "375fb7c7ac42de9b09b0711e952f69cbcf9cd6edc39359ed398acb7cbe450ad0",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "river-drake",
+      "bytes": 104014,
+      "sha256": "c8a89676437d63adb1e20e01aae148c27544220f7b204f9ffd6fff1ee9139f0c",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "sabretooth",
+      "bytes": 168992,
+      "sha256": "f2f37603d8bb8e48516849009cf8d4fec3fc949204166b3fbfa853d75f77f9e0",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "saidri-guardian",
+      "bytes": 202530,
+      "sha256": "77e546f723f46879fb50646a165a9b5f67f2dbd45fb882865b9de16df94eba0a",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "saidribee-queen",
+      "bytes": 320876,
+      "sha256": "9cb3301bccd780fdd131cd2aabe29ae13c2105e81b95129ea80075ec380df03a",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "samara",
+      "bytes": 310528,
+      "sha256": "b2c9d0e630da1a3b29c6715a8e676a01dc376b339f6fe5f8d63284f5c47ef6db",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "shellback-beetle",
+      "bytes": 100314,
+      "sha256": "99cee5b7c7f41cb3c3c37c14aed5015cd09c09f9fb6be9ae3ef9a4725615addb",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "short-saidri",
+      "bytes": 173116,
+      "sha256": "c70f2c4e71e4dadfc2585d808c9daa2445f8c79a0a8e240e1bf663ecd62f92a6",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "skin-walker",
+      "bytes": 210656,
+      "sha256": "9dd338a34a3cb933bc6045b437298b5d5186be841727a5242fccea37bb2f0bc4",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "sphinx",
+      "bytes": 190824,
+      "sha256": "fd85d4cd0d3684d21b8205482ebc6aeef59eb122e99dd076eb85b34fc2fb02c7",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "tiger",
+      "bytes": 141764,
+      "sha256": "dead64cb97a6a8a5d183231781ba7d335a607379ce6dfe17001fe3f329df1291",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "troll",
+      "bytes": 117908,
+      "sha256": "db44657f3a28632aabb85e05d967cb08b544310972b04bafbc3ce78f4033ce9a",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "ursa-major",
+      "bytes": 219044,
+      "sha256": "a641e739b51d1cf167aa93b3abef31cf9ae640e222078da02043edca0b89bd4e",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "ursa-minor",
+      "bytes": 167470,
+      "sha256": "f99c5969c3a7a30785eb3394ec1fa8c30d8eec6916341867febf53e3c64ea18b",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "valta",
+      "bytes": 91354,
+      "sha256": "a88dbd8c195d3144069e7703d4ce6f0ede69693cb3bb1c59e45b7aaa055091b1",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "vampire",
+      "bytes": 158022,
+      "sha256": "3ca0648544eebb9e151d0d56213df7ffa9e56fc2940f6844a0e69bb4917de147",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "wendigo",
+      "bytes": 57920,
+      "sha256": "8eb218e9aa752b2579e619a276fb26b30ed3a2249c2d1ced6298d941fe1ee769",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "witch",
+      "bytes": 77798,
+      "sha256": "0222fe6994a89499ddf072a517b9906635f031d07358573b6da9924a56b5a3f7",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "yeti",
+      "bytes": 139330,
+      "sha256": "4931ec3012dc412c4923fa671f274d53caf54ff8e0664f3b50c1a501a30bb8d8",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-ancient",
+      "bytes": 105136,
+      "sha256": "2fbde5c6d6c3ab29336b12922e5d3dc1d3fd4679f65f7e06e37e53e53024d8e4",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-child",
+      "bytes": 102248,
+      "sha256": "407805bdf338e33e8c6ab8f7c0d780837bbdce2c59e950982dcbf6d18d1e2975",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-greater",
+      "bytes": 115302,
+      "sha256": "fea6300ccc7614302686480653a6d2a4847d73c6a405c6f36016f85aa7437e8f",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-hulking",
+      "bytes": 124032,
+      "sha256": "23029c462cef9b22b4a06aef7f04d5b8cf4be1a2c13e80651fdc2658cc6bbd46",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-infant",
+      "bytes": 69070,
+      "sha256": "d3d88a6cc2dc322d8d79a9b1320ee2780dd9d88fe86f3e6597d41f6542972cf0",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-lesser",
+      "bytes": 110254,
+      "sha256": "4f3bd35062fdb26baac820af69be7b458d28c9c51003a37351478f28bc8a8de0",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-mature",
+      "bytes": 116006,
+      "sha256": "beb004fefc3dfb9c861be6d03c37a2b9c00f0cb3572765c3b0d5bc8591c25eb9",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-timeless",
+      "bytes": 136640,
+      "sha256": "cb81e8c34f956c8a024a961e46a9c42c0b976d5b2bcce71b8a03992cf6b3623c",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-transcendent",
+      "bytes": 126278,
+      "sha256": "fb84e62716253735244c45542b44dd7b0c65d784986129288f95afdc0786c198",
+      "occurrences_in_packaged_exe": 1
+    },
+    {
+      "name": "zillennia-unqualified",
+      "bytes": 95968,
+      "sha256": "748e98689c2350aef3c1be1a2972b353b4aa1b772e43c05065f4020dfbfc3f7b",
+      "occurrences_in_packaged_exe": 1
+    }
+  ],
+  "windows_runtime_tested": false,
+  "lossless_ui_streams_embedded": [
+    {
+      "name": "BrogueCE-ASCII",
+      "sha256": "3277454d3da3796f398a8643d7ee88414a2849be70aa92eec2902f511612eff1",
+      "embedded": true
+    },
+    {
+      "name": "bestiary-ink-splash-broad",
+      "sha256": "57a5a972b442a5a7e58ec3a151f76b7b07dee756412c216f55392d987308c65d",
+      "embedded": true
+    },
+    {
+      "name": "menu-logo",
+      "sha256": "900d88752458eaa11cca357f73067f26073575a3a69fd314927b0479b35ffecc",
+      "embedded": true
+    },
+    {
+      "name": "window-icon",
+      "sha256": "c5b5275abeefbcb4db0d09310691cf367247233838c906fd59b72807682e6c44",
+      "embedded": true
+    }
+  ],
+  "code_freeze_files_checked": 1172,
+  "code_freeze_sha256": "609b9ca7d0a5d4cbdbd877766d9205d1b000b5560a5a644041646ac39a3a8e97",
+  "build_profile": {
+    "command": [
+      "cargo",
+      "build",
+      "--release",
+      "--locked",
+      "--jobs",
+      "2",
+      "--target",
+      "x86_64-pc-windows-gnu",
+      "-p",
+      "corpse-desktop"
+    ],
+    "overrides": {
+      "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+      "CARGO_PROFILE_RELEASE_DEBUG": "0",
+      "CARGO_PROFILE_RELEASE_LTO": "fat",
+      "CARGO_PROFILE_RELEASE_OPT_LEVEL": "s",
+      "CARGO_PROFILE_RELEASE_STRIP": "symbols"
+    },
+    "profile": "release",
+    "rust": "1.99.1",
+    "target": "x86_64-pc-windows-gnu"
+  }
+}

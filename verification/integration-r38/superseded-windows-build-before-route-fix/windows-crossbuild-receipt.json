@@ -1,0 +1,41 @@
+{
+  "started_utc": "2026-10-28T19:53:08.060628+00:00",
+  "command": [
+    "sh",
+    "tools/cargo.sh",
+    "build",
+    "--release",
+    "--locked",
+    "--jobs",
+    "2",
+    "--target",
+    "x86_64-pc-windows-gnu",
+    "-p",
+    "corpse-desktop"
+  ],
+  "simulation_revision": 38,
+  "frozen_code_manifest_sha256": "3fd47b62e53b59d44ae8566110a18f5844eb55fff8f58e5df284b7a3c5da5938",
+  "frozen_code_file_count": 1072,
+  "rust_toolchain": "1.99.1",
+  "target": "x86_64-pc-windows-gnu",
+  "windows_runtime_verified": false,
+  "compiler": "Official Debian Trixie GCC14 POSIX / MinGW-w64 12.0.0",
+  "sdl": "Official SDL2 2.32.10",
+  "finished_utc": "2026-10-28T19:59:43.694613+00:00",
+  "seconds": 395.634,
+  "exit_code": 0,
+  "frozen_code_verified_before_and_after": true,
+  "build_succeeded": true,
+  "original_exe": {
+    "bytes": 170024126,
+    "sha256": "c739571ee21a701f03ac85fd59963dbf6d36797b216d8effbee294e8b646527b"
+  },
+  "staged_exe": {
+    "path": "/workspace/scratch/69f53637ba6f/generation-r38/staging/windows-r38/corpse-desktop.exe",
+    "bytes": 101584560,
+    "sha256": "461be3b6f42415dc83de8dc54b0cccd77b598d057e9a3bba4310ea088e371ad6"
+  },
+  "static_pe_checks_passed": true,
+  "cargo_lock_sha256": "9342120cd87b86ee9b54768431c805d075cd2aaaee0ff142151e2d8555dc5ccb",
+  "limitations": "Unsigned cross-build and static PE/resource checks only. No Windows runtime exercise."
+}

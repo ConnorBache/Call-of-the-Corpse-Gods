@@ -1,0 +1,806 @@
+[
+  {
+    "case": "generated_10_floors-history-5-wait",
+    "bytes": 2246716,
+    "exact_cross_build_and_first_candidate_bytes": true,
+    "sha256": "0a14a8fa5c2fd6b7feddd4bcfe8a43cb9fea95cf84aff8b7d8706ba3d951e707",
+    "profile": {
+      "benchmark.command_plus_save": {
+        "calls": 1,
+        "inclusive_ns": 15028193,
+        "exclusive_ns": 9451
+      },
+      "command.action_dispatch": {
+        "calls": 1,
+        "inclusive_ns": 3316138,
+        "exclusive_ns": 86801
+      },
+      "command.core_dispatch": {
+        "calls": 1,
+        "inclusive_ns": 3413613,
+        "exclusive_ns": 21932
+      },
+      "command.finish": {
+        "calls": 1,
+        "inclusive_ns": 852176,
+        "exclusive_ns": 18818
+      },
+      "command.temporal_dispatch": {
+        "calls": 1,
+        "inclusive_ns": 9700248,
+        "exclusive_ns": 15053
+      },
+      "command.validate": {
+        "calls": 1,
+        "inclusive_ns": 75543,
+        "exclusive_ns": 58423
+      },
+      "desktop.save_encode": {
+        "calls": 1,
+        "inclusive_ns": 5318494,
+        "exclusive_ns": 5297644
+      },
+      "environment.burst_victims": {
+        "calls": 1,
+        "inclusive_ns": 282,
+        "exclusive_ns": 282
+      },
+      "environment.cleanup_and_items": {
+        "calls": 1,
+        "inclusive_ns": 47238,
+        "exclusive_ns": 43443
+      },
+      "environment.damage_exposure": {
+        "calls": 1,
+        "inclusive_ns": 44139,
+        "exclusive_ns": 41092
+      },
+      "environment.fire_advance": {
+        "calls": 1,
+        "inclusive_ns": 497990,
+        "exclusive_ns": 180356
+      },
+      "environment.fire_views": {
+        "calls": 2,
+        "inclusive_ns": 3560,
+        "exclusive_ns": 3560
+      },
+      "environment.freeze_blood_fungi": {
+        "calls": 1,
+        "inclusive_ns": 31327,
+        "exclusive_ns": 28486
+      },
+      "environment.freeze_mask": {
+        "calls": 1,
+        "inclusive_ns": 2451,
+        "exclusive_ns": 2451
+      },
+      "environment.gas_diffusion": {
+        "calls": 1,
+        "inclusive_ns": 64655,
+        "exclusive_ns": 42716
+      },
+      "environment.gas_views": {
+        "calls": 2,
+        "inclusive_ns": 39665,
+        "exclusive_ns": 39665
+      },
+      "environment.initialize": {
+        "calls": 4,
+        "inclusive_ns": 14729,
+        "exclusive_ns": 14729
+      },
+      "environment.item_drift": {
+        "calls": 1,
+        "inclusive_ns": 2313,
+        "exclusive_ns": 2313
+      },
+      "environment.passive_emitters": {
+        "calls": 1,
+        "inclusive_ns": 66761,
+        "exclusive_ns": 62881
+      },
+      "environment.propagation": {
+        "calls": 1,
+        "inclusive_ns": 563780,
+        "exclusive_ns": 1041
+      },
+      "environment.razorleaves": {
+        "calls": 1,
+        "inclusive_ns": 8494,
+        "exclusive_ns": 8242
+      },
+      "environment.setup": {
+        "calls": 1,
+        "inclusive_ns": 33724,
+        "exclusive_ns": 12434
+      },
+      "environment.total": {
+        "calls": 1,
+        "inclusive_ns": 788442,
+        "exclusive_ns": 1473
+      },
+      "environment.validate": {
+        "calls": 2,
+        "inclusive_ns": 8185,
+        "exclusive_ns": 8185
+      },
+      "environment.vents": {
+        "calls": 1,
+        "inclusive_ns": 544,
+        "exclusive_ns": 544
+      },
+      "finish.remember": {
+        "calls": 1,
+        "inclusive_ns": 323728,
+        "exclusive_ns": 32201
+      },
+      "history.export": {
+        "calls": 1,
+        "inclusive_ns": 20850,
+        "exclusive_ns": 20521
+      },
+      "history.export_cache_hit": {
+        "calls": 5,
+        "inclusive_ns": 329,
+        "exclusive_ns": 329
+      },
+      "history.inverse_diff": {
+        "calls": 1,
+        "inclusive_ns": 1958716,
+        "exclusive_ns": 1958716
+      },
+      "history.journal_after_block": {
+        "calls": 3,
+        "inclusive_ns": 1259371,
+        "exclusive_ns": 1259371
+      },
+      "history.journal_first_old": {
+        "calls": 3,
+        "inclusive_ns": 1422449,
+        "exclusive_ns": 1422449
+      },
+      "history.journal_header": {
+        "calls": 2,
+        "inclusive_ns": 61869,
+        "exclusive_ns": 61869
+      },
+      "history.journal_mutable_access": {
+        "calls": 2699,
+        "inclusive_ns": 922844,
+        "exclusive_ns": 922844
+      },
+      "history.journal_project": {
+        "calls": 1,
+        "inclusive_ns": 2764476,
+        "exclusive_ns": 20787
+      },
+      "history.journal_seal": {
+        "calls": 1,
+        "inclusive_ns": 6155766,
+        "exclusive_ns": 1432574
+      },
+      "history.opening_identity_guard": {
+        "calls": 1,
+        "inclusive_ns": 80263,
+        "exclusive_ns": 80263
+      },
+      "history.opening_identity_reuse": {
+        "calls": 1,
+        "inclusive_ns": 7311,
+        "exclusive_ns": 7311
+      },
+      "history.resources": {
+        "calls": 2,
+        "inclusive_ns": 903772,
+        "exclusive_ns": 100635
+      },
+      "history.snapshot": {
+        "calls": 2,
+        "inclusive_ns": 28242,
+        "exclusive_ns": 28242
+      },
+      "movement.actor": {
+        "calls": 4,
+        "inclusive_ns": 660905,
+        "exclusive_ns": 71848
+      },
+      "offscreen.total": {
+        "calls": 1,
+        "inclusive_ns": 44758,
+        "exclusive_ns": 34205
+      },
+      "offscreen.validate": {
+        "calls": 2,
+        "inclusive_ns": 22745,
+        "exclusive_ns": 22745
+      },
+      "stats.effective": {
+        "calls": 38,
+        "inclusive_ns": 27989,
+        "exclusive_ns": 27989
+      },
+      "tick.actor_upkeep": {
+        "calls": 1,
+        "inclusive_ns": 36292,
+        "exclusive_ns": 28577
+      },
+      "tick.ai": {
+        "calls": 1,
+        "inclusive_ns": 840625,
+        "exclusive_ns": 142200
+      },
+      "tick.clocks_and_setup": {
+        "calls": 1,
+        "inclusive_ns": 59873,
+        "exclusive_ns": 55331
+      },
+      "tick.currents": {
+        "calls": 1,
+        "inclusive_ns": 8296,
+        "exclusive_ns": 8296
+      },
+      "tick.environments": {
+        "calls": 1,
+        "inclusive_ns": 788852,
+        "exclusive_ns": 410
+      },
+      "tick.final_settlement": {
+        "calls": 1,
+        "inclusive_ns": 20561,
+        "exclusive_ns": 20561
+      },
+      "tick.haste": {
+        "calls": 1,
+        "inclusive_ns": 55740,
+        "exclusive_ns": 38573
+      },
+      "tick.inactive_floors": {
+        "calls": 1,
+        "inclusive_ns": 45513,
+        "exclusive_ns": 755
+      },
+      "tick.late_statuses": {
+        "calls": 1,
+        "inclusive_ns": 853349,
+        "exclusive_ns": 9012
+      },
+      "tick.pre_ai_sync_riptide": {
+        "calls": 1,
+        "inclusive_ns": 1692,
+        "exclusive_ns": 1613
+      },
+      "tick.total": {
+        "calls": 1,
+        "inclusive_ns": 1814249,
+        "exclusive_ns": 1857
+      },
+      "vision.detection": {
+        "calls": 16,
+        "inclusive_ns": 25018,
+        "exclusive_ns": 7700
+      },
+      "vision.lighting": {
+        "calls": 3,
+        "inclusive_ns": 5764,
+        "exclusive_ns": 5764
+      },
+      "vision.lighting_dependency_check": {
+        "calls": 8,
+        "inclusive_ns": 928894,
+        "exclusive_ns": 745872
+      },
+      "vision.lighting_field_build": {
+        "calls": 1,
+        "inclusive_ns": 183022,
+        "exclusive_ns": 183022
+      },
+      "vision.native_terrain_mask": {
+        "calls": 1,
+        "inclusive_ns": 291214,
+        "exclusive_ns": 206959
+      },
+      "vision.observer_field_build": {
+        "calls": 1,
+        "inclusive_ns": 57108,
+        "exclusive_ns": 57108
+      },
+      "vision.optical_field_build": {
+        "calls": 1,
+        "inclusive_ns": 1003,
+        "exclusive_ns": 1003
+      },
+      "vision.optical_route": {
+        "calls": 19,
+        "inclusive_ns": 6666,
+        "exclusive_ns": 6666
+      }
+    },
+    "command_inclusive": {
+      "baseline": {
+        "n": 6,
+        "median_ms": 10.272399,
+        "max_ms": 14.137643,
+        "raw_ms": [
+          10.304613,
+          10.240185,
+          9.241244,
+          10.874859,
+          14.137643,
+          9.544092000000001
+        ]
+      },
+      "candidate": {
+        "n": 6,
+        "median_ms": 8.670618000000001,
+        "max_ms": 11.518843,
+        "raw_ms": [
+          8.573487,
+          7.914933,
+          8.767749,
+          11.161619,
+          11.518843,
+          8.181040000000001
+        ]
+      }
+    },
+    "immediate_save_inclusive": {
+      "baseline": {
+        "n": 6,
+        "median_ms": 13.9348235,
+        "max_ms": 17.756814,
+        "raw_ms": [
+          13.239287000000001,
+          13.598686,
+          12.701030000000001,
+          14.270961,
+          16.128799,
+          17.756814
+        ]
+      },
+      "candidate": {
+        "n": 6,
+        "median_ms": 5.7583,
+        "max_ms": 9.568784,
+        "raw_ms": [
+          5.968702,
+          5.547898,
+          5.303526000000001,
+          9.568784,
+          6.011197999999999,
+          4.844323999999999
+        ]
+      }
+    },
+    "command_plus_save_inclusive": {
+      "baseline": {
+        "n": 6,
+        "median_ms": 24.492798,
+        "max_ms": 30.266807999999997,
+        "raw_ms": [
+          23.544384,
+          23.839178,
+          21.942558000000002,
+          25.146418,
+          30.266807999999997,
+          27.301271
+        ]
+      },
+      "candidate": {
+        "n": 6,
+        "median_ms": 14.307254,
+        "max_ms": 20.730885,
+        "raw_ms": [
+          14.542851,
+          13.46345,
+          14.071657,
+          20.730885,
+          17.530326,
+          13.025636
+        ]
+      }
+    }
+  },
+  {
+    "case": "generated_10_floors_future_anchor-history-5-wait",
+    "bytes": 15578695,
+    "exact_cross_build_and_first_candidate_bytes": true,
+    "sha256": "b2b69255eaa02c942612c4b91f1684e740d61967b32a5f4921ea1e9ee038992e",
+    "profile": {
+      "benchmark.command_plus_save": {
+        "calls": 1,
+        "inclusive_ns": 34867366,
+        "exclusive_ns": 14745
+      },
+      "command.action_dispatch": {
+        "calls": 1,
+        "inclusive_ns": 2448101,
+        "exclusive_ns": 82744
+      },
+      "command.core_dispatch": {
+        "calls": 1,
+        "inclusive_ns": 2527588,
+        "exclusive_ns": 21638
+      },
+      "command.finish": {
+        "calls": 1,
+        "inclusive_ns": 397112,
+        "exclusive_ns": 17877
+      },
+      "command.temporal_dispatch": {
+        "calls": 1,
+        "inclusive_ns": 14372252,
+        "exclusive_ns": 18664
+      },
+      "command.validate": {
+        "calls": 1,
+        "inclusive_ns": 57849,
+        "exclusive_ns": 41967
+      },
+      "desktop.save_encode": {
+        "calls": 1,
+        "inclusive_ns": 20480369,
+        "exclusive_ns": 19430595
+      },
+      "environment.burst_victims": {
+        "calls": 1,
+        "inclusive_ns": 389,
+        "exclusive_ns": 389
+      },
+      "environment.cleanup_and_items": {
+        "calls": 1,
+        "inclusive_ns": 10075,
+        "exclusive_ns": 6400
+      },
+      "environment.damage_exposure": {
+        "calls": 1,
+        "inclusive_ns": 42979,
+        "exclusive_ns": 39754
+      },
+      "environment.fire_advance": {
+        "calls": 1,
+        "inclusive_ns": 393861,
+        "exclusive_ns": 176476
+      },
+      "environment.fire_views": {
+        "calls": 2,
+        "inclusive_ns": 3454,
+        "exclusive_ns": 3454
+      },
+      "environment.freeze_blood_fungi": {
+        "calls": 1,
+        "inclusive_ns": 63291,
+        "exclusive_ns": 60727
+      },
+      "environment.freeze_mask": {
+        "calls": 1,
+        "inclusive_ns": 2369,
+        "exclusive_ns": 2369
+      },
+      "environment.gas_diffusion": {
+        "calls": 1,
+        "inclusive_ns": 64112,
+        "exclusive_ns": 41860
+      },
+      "environment.gas_views": {
+        "calls": 2,
+        "inclusive_ns": 37977,
+        "exclusive_ns": 37977
+      },
+      "environment.initialize": {
+        "calls": 4,
+        "inclusive_ns": 15147,
+        "exclusive_ns": 15147
+      },
+      "environment.item_drift": {
+        "calls": 1,
+        "inclusive_ns": 2200,
+        "exclusive_ns": 2200
+      },
+      "environment.passive_emitters": {
+        "calls": 1,
+        "inclusive_ns": 66853,
+        "exclusive_ns": 62709
+      },
+      "environment.propagation": {
+        "calls": 1,
+        "inclusive_ns": 459114,
+        "exclusive_ns": 1046
+      },
+      "environment.razorleaves": {
+        "calls": 1,
+        "inclusive_ns": 8258,
+        "exclusive_ns": 8010
+      },
+      "environment.setup": {
+        "calls": 1,
+        "inclusive_ns": 33410,
+        "exclusive_ns": 12344
+      },
+      "environment.total": {
+        "calls": 1,
+        "inclusive_ns": 677231,
+        "exclusive_ns": 1509
+      },
+      "environment.validate": {
+        "calls": 2,
+        "inclusive_ns": 6943,
+        "exclusive_ns": 6943
+      },
+      "environment.vents": {
+        "calls": 1,
+        "inclusive_ns": 462,
+        "exclusive_ns": 462
+      },
+      "finish.remember": {
+        "calls": 1,
+        "inclusive_ns": 260119,
+        "exclusive_ns": 30579
+      },
+      "history.export": {
+        "calls": 1,
+        "inclusive_ns": 1049774,
+        "exclusive_ns": 1048961
+      },
+      "history.export_cache_hit": {
+        "calls": 5,
+        "inclusive_ns": 813,
+        "exclusive_ns": 813
+      },
+      "history.inverse_diff": {
+        "calls": 1,
+        "inclusive_ns": 2552893,
+        "exclusive_ns": 2552893
+      },
+      "history.journal_after_block": {
+        "calls": 3,
+        "inclusive_ns": 1667334,
+        "exclusive_ns": 1667334
+      },
+      "history.journal_first_old": {
+        "calls": 3,
+        "inclusive_ns": 1569298,
+        "exclusive_ns": 1569298
+      },
+      "history.journal_header": {
+        "calls": 2,
+        "inclusive_ns": 656683,
+        "exclusive_ns": 656683
+      },
+      "history.journal_mutable_access": {
+        "calls": 2699,
+        "inclusive_ns": 531378,
+        "exclusive_ns": 531378
+      },
+      "history.journal_project": {
+        "calls": 1,
+        "inclusive_ns": 3912199,
+        "exclusive_ns": 18884
+      },
+      "history.journal_seal": {
+        "calls": 1,
+        "inclusive_ns": 10737821,
+        "exclusive_ns": 4272729
+      },
+      "history.opening_identity_guard": {
+        "calls": 1,
+        "inclusive_ns": 656539,
+        "exclusive_ns": 656539
+      },
+      "history.opening_identity_reuse": {
+        "calls": 1,
+        "inclusive_ns": 8448,
+        "exclusive_ns": 8448
+      },
+      "history.resources": {
+        "calls": 2,
+        "inclusive_ns": 530770,
+        "exclusive_ns": 96174
+      },
+      "history.snapshot": {
+        "calls": 2,
+        "inclusive_ns": 423192,
+        "exclusive_ns": 423192
+      },
+      "movement.actor": {
+        "calls": 4,
+        "inclusive_ns": 356222,
+        "exclusive_ns": 61393
+      },
+      "offscreen.total": {
+        "calls": 1,
+        "inclusive_ns": 43630,
+        "exclusive_ns": 34277
+      },
+      "offscreen.validate": {
+        "calls": 2,
+        "inclusive_ns": 21326,
+        "exclusive_ns": 21326
+      },
+      "stats.effective": {
+        "calls": 38,
+        "inclusive_ns": 27801,
+        "exclusive_ns": 27801
+      },
+      "tick.actor_upkeep": {
+        "calls": 1,
+        "inclusive_ns": 37548,
+        "exclusive_ns": 29820
+      },
+      "tick.ai": {
+        "calls": 1,
+        "inclusive_ns": 557257,
+        "exclusive_ns": 131932
+      },
+      "tick.clocks_and_setup": {
+        "calls": 1,
+        "inclusive_ns": 57500,
+        "exclusive_ns": 53080
+      },
+      "tick.currents": {
+        "calls": 1,
+        "inclusive_ns": 8325,
+        "exclusive_ns": 8325
+      },
+      "tick.environments": {
+        "calls": 1,
+        "inclusive_ns": 677883,
+        "exclusive_ns": 652
+      },
+      "tick.final_settlement": {
+        "calls": 1,
+        "inclusive_ns": 19475,
+        "exclusive_ns": 19475
+      },
+      "tick.haste": {
+        "calls": 1,
+        "inclusive_ns": 55273,
+        "exclusive_ns": 37703
+      },
+      "tick.inactive_floors": {
+        "calls": 1,
+        "inclusive_ns": 44266,
+        "exclusive_ns": 636
+      },
+      "tick.late_statuses": {
+        "calls": 1,
+        "inclusive_ns": 740853,
+        "exclusive_ns": 8653
+      },
+      "tick.pre_ai_sync_riptide": {
+        "calls": 1,
+        "inclusive_ns": 1566,
+        "exclusive_ns": 1482
+      },
+      "tick.total": {
+        "calls": 1,
+        "inclusive_ns": 1415796,
+        "exclusive_ns": 1597
+      },
+      "vision.detection": {
+        "calls": 16,
+        "inclusive_ns": 55628,
+        "exclusive_ns": 38575
+      },
+      "vision.lighting": {
+        "calls": 3,
+        "inclusive_ns": 5769,
+        "exclusive_ns": 5769
+      },
+      "vision.lighting_dependency_check": {
+        "calls": 8,
+        "inclusive_ns": 545239,
+        "exclusive_ns": 332557
+      },
+      "vision.lighting_field_build": {
+        "calls": 1,
+        "inclusive_ns": 212682,
+        "exclusive_ns": 212682
+      },
+      "vision.native_terrain_mask": {
+        "calls": 1,
+        "inclusive_ns": 229338,
+        "exclusive_ns": 148170
+      },
+      "vision.observer_field_build": {
+        "calls": 1,
+        "inclusive_ns": 41178,
+        "exclusive_ns": 41178
+      },
+      "vision.optical_field_build": {
+        "calls": 1,
+        "inclusive_ns": 1323,
+        "exclusive_ns": 1323
+      },
+      "vision.optical_route": {
+        "calls": 19,
+        "inclusive_ns": 7049,
+        "exclusive_ns": 7049
+      }
+    },
+    "command_inclusive": {
+      "baseline": {
+        "n": 6,
+        "median_ms": 23.861818,
+        "max_ms": 27.500963,
+        "raw_ms": [
+          14.958392,
+          27.500963,
+          19.495361,
+          23.772814,
+          26.274037,
+          23.950822
+        ]
+      },
+      "candidate": {
+        "n": 6,
+        "median_ms": 14.146041,
+        "max_ms": 22.575650999999997,
+        "raw_ms": [
+          14.608206000000001,
+          14.841839,
+          12.671751,
+          22.575650999999997,
+          13.5152,
+          13.683876
+        ]
+      }
+    },
+    "immediate_save_inclusive": {
+      "baseline": {
+        "n": 6,
+        "median_ms": 51.931343,
+        "max_ms": 59.766916,
+        "raw_ms": [
+          37.007381,
+          42.194105,
+          59.766916,
+          53.116783,
+          53.697649,
+          50.745903
+        ]
+      },
+      "candidate": {
+        "n": 6,
+        "median_ms": 22.213751000000002,
+        "max_ms": 24.418934999999998,
+        "raw_ms": [
+          24.418934999999998,
+          22.305702,
+          22.1218,
+          23.385485000000003,
+          19.780763,
+          20.422182
+        ]
+      }
+    },
+    "command_plus_save_inclusive": {
+      "baseline": {
+        "n": 6,
+        "median_ms": 75.79368149999999,
+        "max_ms": 79.972294,
+        "raw_ms": [
+          51.966197,
+          69.695596,
+          79.26297699999999,
+          76.890104,
+          79.972294,
+          74.697259
+        ]
+      },
+      "candidate": {
+        "n": 6,
+        "median_ms": 35.9713365,
+        "max_ms": 45.961572,
+        "raw_ms": [
+          39.027946,
+          37.148409,
+          34.794264,
+          45.961572,
+          33.29634,
+          34.106637
+        ]
+      }
+    }
+  }
+]

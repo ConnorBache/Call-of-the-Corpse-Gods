@@ -1,0 +1,12 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/sub-biomes-r37/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 28.58s
+     Running tests/sub_biome_persistence_r37.rs (target/debug/deps/sub_biome_persistence_r37-7e84b225b4d2c9be)
+
+running 3 tests
+test rejects_short_null_or_legacy_new_layers ... ok
+test persisted_overlays_and_knowledge_roundtrip_without_new_rng ... ok
+test revert_and_future_restore_melted_snow_and_permanent_fire_flags ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

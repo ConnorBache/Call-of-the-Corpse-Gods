@@ -1,0 +1,73 @@
+{
+  "status": "passed",
+  "count": 11,
+  "scope": "Actual opt-s Linux renders compared independently. Menu/start/game exact to original baselineQ100;8Q90 manual pages exact to opt-z candidate. Not Windows runtime.",
+  "rows": [
+    {
+      "name": "night-crawler",
+      "reference": "compact-r39/render-qa-small/night-crawler.png",
+      "rgba_exact": true,
+      "rgba_sha256": "2e8b0179fc3da41107b98a3f1e2954aa31fa9eafff9af923b3e5ceaaa4d2533f"
+    },
+    {
+      "name": "saidribee-queen",
+      "reference": "compact-r39/render-qa-small/saidribee-queen.png",
+      "rgba_exact": true,
+      "rgba_sha256": "761c493d40711ba71ceb8a625741172ac4cb46979d8def3fc6cbd329958eab23"
+    },
+    {
+      "name": "vampire",
+      "reference": "compact-r39/render-qa-small/vampire.png",
+      "rgba_exact": true,
+      "rgba_sha256": "92f100d087ed4fdf3fe92eb5ff49fe525a6f688431e5649236e5af61e71c36b9"
+    },
+    {
+      "name": "skin-walker",
+      "reference": "compact-r39/render-qa-small/skin-walker.png",
+      "rgba_exact": true,
+      "rgba_sha256": "defced9e3713d523496d0686be3490277b3e8ee2f7530d478b851614c7b06c26"
+    },
+    {
+      "name": "menu",
+      "reference": "compact-r39/render-qa-small/menu-baseline.png",
+      "rgba_exact": true,
+      "rgba_sha256": "7f9f9b3900489ff329b95439cea483c9b69325ebf0e13438dad7ecc05a4c1f70"
+    },
+    {
+      "name": "kelpie",
+      "reference": "compact-r39/render-qa-small/kelpie.png",
+      "rgba_exact": true,
+      "rgba_sha256": "4e4e72a0b0b091a5e05d55db53110d4b46035a66490721eea0f2fb6545b1c1c3"
+    },
+    {
+      "name": "game",
+      "reference": "compact-r39/render-qa-small/game-baseline.png",
+      "rgba_exact": true,
+      "rgba_sha256": "98223408dae457f65dbe1e9c26c44332bdc78824ab0ed9eb9486af0ed8c24621"
+    },
+    {
+      "name": "zillennia-transcendent",
+      "reference": "compact-r39/render-qa-small/zillennia-transcendent.png",
+      "rgba_exact": true,
+      "rgba_sha256": "c6c1b3164b4692e1aba69a5864e4c519a0be58f0e39a3c876c3586f901de5ff4"
+    },
+    {
+      "name": "start",
+      "reference": "compact-r39/render-qa-small/start-baseline.png",
+      "rgba_exact": true,
+      "rgba_sha256": "e53d4cbac8ff8d19529e6e415f43d73e143b8849ca4e6b61e1ae7d17d760357b"
+    },
+    {
+      "name": "phoenix",
+      "reference": "compact-r39/render-qa-small/phoenix.png",
+      "rgba_exact": true,
+      "rgba_sha256": "f3876d8c52435145bccd4ab0149374e8b8e69e5cfe1f8b7b4cd7008cdd379fe6"
+    },
+    {
+      "name": "witch",
+      "reference": "compact-r39/render-qa-small/witch.png",
+      "rgba_exact": true,
+      "rgba_sha256": "4dd5248bd6d0f8d5c78c179c3988da56d25966e906bebb9a6e64d023bb84390c"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-desktop)
+warning: unused import: `RunIdValue`
+ --> crates/corpse-desktop/examples/../src/tracked_engine.rs:9:43
+  |
+9 | pub use metadata::{Operation, OrderValue, RunIdValue};
+  |                                           ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/corpse-desktop/examples/../src/tracked_engine.rs:43:30
+   |
+43 | ...   let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity ex...
+   |                            ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+43 -         let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+43 +         let identity=NEXT_ID.try_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+   |
+
+warning: `corpse-desktop` (example "timeweave_save_bench") generated 2 warnings (run `cargo fix --example "timeweave_save_bench" -p corpse-desktop` to apply 2 suggestions)
+warning: unused import: `RunIdValue`
+ --> crates/corpse-desktop/src/tracked_engine.rs:9:43
+  |
+9 | pub use metadata::{Operation, OrderValue, RunIdValue};
+  |                                           ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated method `indexmap::map::IndexMap::<K, V, S>::remove`: `remove` disrupts the map order -- use `swap_remove` or `shift_remove` for explicit behavior.
+  --> crates/corpse-desktop/src/hallucination_ui.rs:75:55
+   |
+75 |   let mut hidden=room(43.,1);hidden.player.conditions.remove("telepathic");hidden.player.stats.perception=0.;hidden.actors_at_mut(1....
+   |                                                       ^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+error[E0599]: no method named `clone` found for struct `render::View` in the current scope
+   --> crates/corpse-desktop/src/revision50_jewelry_capture_tests.rs:76:30
+    |
+ 76 |         let mut preview=base.clone();preview.target_path=target.application_preview(&r,Some((12,10)));
+    |                              ^^^^^ method not found in `render::View`
+    |
+   ::: crates/corpse-desktop/src/render.rs:144:1
+    |
+144 | pub struct View {
+    | --------------- method `clone` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `clone`, perhaps you need to implement it:
+            candidate #1: `Clone`
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/corpse-desktop/src/tracked_engine.rs:43:30
+   |
+43 | ...   let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity ex...
+   |                            ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+43 -         let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+43 +         let identity=NEXT_ID.try_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+   |
+
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:1699:17
+     |
+1699 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:2741:17
+     |
+2741 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+
+warning: unused variable: `x`
+    --> crates/corpse-desktop/src/main.rs:1963:38
+     |
+1963 | ...   Event::MouseMotion { x, y, .. } if screen==Screen::Game && run.as_ref().is_some_and(|r|r.run.status=="playing"&&!r.run.offer...
+     |                            ^ help: try ignoring the field: `x: _`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `y`
+    --> crates/corpse-desktop/src/main.rs:1963:41
+     |
+1963 | ...   Event::MouseMotion { x, y, .. } if screen==Screen::Game && run.as_ref().is_some_and(|r|r.run.status=="playing"&&!r.run.offer...
+     |                               ^ help: try ignoring the field: `y: _`
+
+For more information about this error, try `rustc --explain E0599`.
+warning: `corpse-desktop` (bin "corpse-desktop" test) generated 7 warnings
+error: could not compile `corpse-desktop` (bin "corpse-desktop" test) due to 1 previous error; 7 warnings emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `corpse-core` (lib test) generated 2 warnings (1 duplicate)

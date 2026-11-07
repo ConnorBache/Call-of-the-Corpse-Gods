@@ -1,0 +1,1125 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-core)
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-desktop)
+warning: fields `category`, `group`, `step`, and `description` are never read
+  --> crates/corpse-desktop/tests/../src/appearance_profile.rs:15:9
+   |
+13 | pub struct Control {
+   |            ------- fields in this struct
+14 |     pub path: String,
+15 |     pub category: String,
+   |         ^^^^^^^^
+16 |     pub group: Option<String>,
+   |         ^^^^^
+...
+22 |     pub step: Option<f64>,
+   |         ^^^^
+...
+25 |     pub description: Option<String>,
+   |         ^^^^^^^^^^^
+   |
+   = note: `Control` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `next` and `label` are never used
+  --> crates/corpse-desktop/tests/../src/appearance_store.rs:24:12
+   |
+23 | impl DisplayMode {
+   | ---------------- methods in this implementation
+24 |     pub fn next(self) -> Self {
+   |            ^^^^
+...
+45 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+
+warning: method `working` is never used
+   --> crates/corpse-desktop/tests/../src/appearance_store.rs:399:12
+    |
+225 | impl Store {
+    | ---------- method in this implementation
+...
+399 |     pub fn working(&self) -> &Profile {
+    |            ^^^^^^^
+
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:1599:17
+     |
+1599 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `TOP` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:4:11
+  |
+4 | pub const TOP: i32 = 278;
+  |           ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `ROW` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:5:11
+  |
+5 | pub const ROW: i32 = 34;
+  |           ^^^
+
+warning: constant `CAPACITY` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:6:11
+  |
+6 | pub const CAPACITY: usize = 12;
+  |           ^^^^^^^^
+
+warning: function `feature_color` is never used
+  --> crates/corpse-desktop/src/appearance_material.rs:55:8
+   |
+55 | pub fn feature_color(profile: &Profile, key: &str, fallback: Rgb) -> Rgb {
+   |        ^^^^^^^^^^^^^
+
+warning: fields `category`, `group`, `step`, and `description` are never read
+  --> crates/corpse-desktop/src/appearance_profile.rs:15:9
+   |
+13 | pub struct Control {
+   |            ------- fields in this struct
+14 |     pub path: String,
+15 |     pub category: String,
+   |         ^^^^^^^^
+16 |     pub group: Option<String>,
+   |         ^^^^^
+...
+22 |     pub step: Option<f64>,
+   |         ^^^^
+...
+25 |     pub description: Option<String>,
+   |         ^^^^^^^^^^^
+   |
+   = note: `Control` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: function `get_mut` is never used
+  --> crates/corpse-desktop/src/appearance_profile.rs:50:4
+   |
+50 | fn get_mut<'a>(v: &'a mut Value, path: &str) -> Option<&'a mut Value> {
+   |    ^^^^^^^
+
+warning: multiple associated items are never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:161:12
+    |
+151 | impl Profile {
+    | ------------ associated items in this implementation
+...
+161 |     pub fn parse(raw: &str) -> Result<Self, String> {
+    |            ^^^^^
+...
+252 |     pub fn boolean(&self, path: &str) -> bool {
+    |            ^^^^^^^
+...
+258 |     pub fn json(&self) -> String {
+    |            ^^^^
+...
+271 |     pub fn set(&self, path: &str, value: Value) -> Result<Self, String> {
+    |            ^^^
+...
+287 |     pub fn reset(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^
+...
+317 |     pub fn reset_group(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^^^^^^^
+...
+326 |     pub fn named(&self, name: &str) -> Self {
+    |            ^^^^^
+
+warning: method `label` is never used
+  --> crates/corpse-desktop/src/appearance_store.rs:45:12
+   |
+23 | impl DisplayMode {
+   | ---------------- method in this implementation
+...
+45 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+
+warning: field `profile` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:101:5
+    |
+100 | struct History {
+    |        ------- field in this struct
+101 |     profile: Profile,
+    |     ^^^^^^^
+    |
+    = note: `History` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Status` is never constructed
+   --> crates/corpse-desktop/src/appearance_store.rs:105:12
+    |
+105 | pub struct Status {
+    |            ^^^^^^
+
+warning: multiple methods are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:396:12
+    |
+225 | impl Store {
+    | ---------- methods in this implementation
+...
+396 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+399 |     pub fn working(&self) -> &Profile {
+    |            ^^^^^^^
+...
+406 |     pub fn presets(&self) -> &[Preset] {
+    |            ^^^^^^^
+...
+409 |     pub fn status(&self) -> Status {
+    |            ^^^^^^
+...
+431 |     pub fn open(&mut self) {
+    |            ^^^^
+...
+444 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+483 |     fn edit(&mut self, next: Profile) {
+    |        ^^^^
+...
+495 |     pub fn set(&mut self, path: &str, value: Value) -> Result<(), String> {
+    |            ^^^
+...
+504 |     pub fn reset_property(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^^
+...
+512 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+527 |     pub fn reset_all(&mut self) {
+    |            ^^^^^^^^^
+...
+535 |     pub fn undo(&mut self) {
+    |            ^^^^
+...
+545 |     pub fn redo(&mut self) {
+    |            ^^^^
+...
+555 |     pub fn preview(&mut self, value: Profile) {
+    |            ^^^^^^^
+...
+560 |     pub fn begin_preview(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+563 |     pub fn commit_preview(&mut self) {
+    |            ^^^^^^^^^^^^^^
+...
+568 |     pub fn cancel_preview(&mut self) {
+    |            ^^^^^^^^^^^^^^
+...
+571 |     pub fn compare(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^
+...
+579 |     fn require(&self, id: &str) -> Result<&Preset, String> {
+    |        ^^^^^^^
+...
+586 |     fn unique(&self, name: &str, except: Option<&str>) -> Result<String, String> {
+    |        ^^^^^^
+...
+648 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+654 |     pub fn save_preset(&mut self, name: &str) -> Result<String, String> {
+    |            ^^^^^^^^^^^
+...
+674 |     pub fn update_preset(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+689 |     pub fn load_preset(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+696 |     pub fn duplicate_preset(&mut self, id: &str, name: &str) -> Result<String, String> {
+    |            ^^^^^^^^^^^^^^^^
+...
+713 |     pub fn rename_preset(&mut self, id: &str, name: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+726 |     pub fn delete_preset(&mut self, id: &str, confirmed: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+745 |     pub fn set_default(&mut self, id: Option<&str>) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+753 |     pub fn import_json(&mut self, text: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+759 |     pub fn export_json(&self) -> String {
+    |            ^^^^^^^^^^^
+...
+762 |     pub fn import_file(&mut self, path: &Path) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+765 |     pub fn export_file(&self, path: &Path) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: constant `CATEGORIES` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:12:11
+   |
+12 | pub const CATEGORIES: [&str; 10] = [
+   |           ^^^^^^^^^^
+
+warning: variants `Changed`, `ReducedMotion`, `Close`, `Copy`, and `Paste` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:27:5
+   |
+25 | pub enum Action {
+   |          ------ variants in this enum
+26 |     None,
+27 |     Changed,
+   |     ^^^^^^^
+28 |     ReducedMotion(bool),
+   |     ^^^^^^^^^^^^^
+29 |     Fullscreen,
+30 |     Close,
+   |     ^^^^^
+31 |     Copy(String),
+   |     ^^^^
+32 |     Paste,
+   |     ^^^^^
+   |
+   = note: `Action` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variants `Search`, `Value`, `PresetName`, and `FilePath` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:36:5
+   |
+35 | enum Focus {
+   |      ----- variants in this enum
+36 |     Search,
+   |     ^^^^^^
+37 |     Value(usize),
+   |     ^^^^^
+38 |     PresetName,
+   |     ^^^^^^^^^^
+39 |     FilePath,
+   |     ^^^^^^^^
+   |
+   = note: `Focus` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: variants `Delete` and `Overwrite` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:44:5
+   |
+43 | enum Confirmation {
+   |      ------------ variants in this enum
+44 |     Delete(String),
+   |     ^^^^^^
+45 |     Overwrite(String),
+   |     ^^^^^^^^^
+   |
+   = note: `Confirmation` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `category`, `group`, and `preset` are never read
+  --> crates/corpse-desktop/src/appearance_ui.rs:52:5
+   |
+47 | pub struct SettingsView {
+   |            ------------ fields in this struct
+...
+52 |     category: usize,
+   |     ^^^^^^^^
+53 |     group: usize,
+   |     ^^^^^
+...
+60 |     preset: usize,
+   |     ^^^^^^
+
+warning: function `integrated_layout` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:66:4
+   |
+66 | fn integrated_layout(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^^^^^
+
+warning: function `integrated_role` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:83:4
+   |
+83 | fn integrated_role(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^^^
+
+warning: function `retained_only` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:96:4
+   |
+96 | fn retained_only(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^
+
+warning: function `partially_applied` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:139:4
+    |
+139 | fn partially_applied(path: &str) -> bool {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: function `changed_notice` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:152:4
+    |
+152 | fn changed_notice(path: &str) -> &'static str {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `display` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:162:4
+    |
+162 | fn display(v: Option<&Value>) -> String {
+    |    ^^^^^^^
+
+warning: function `button` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:169:4
+    |
+169 | fn button(p: &mut Painter, label: &str, x: i32, y: i32, w: i32, active: bool) {
+    |    ^^^^^^
+
+warning: function `field` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:180:4
+    |
+180 | fn field(p: &mut Painter, label: &str, value: &str, x: i32, y: i32, w: i32, active: bool) {
+    |    ^^^^^
+
+warning: multiple methods are never used
+    --> crates/corpse-desktop/src/appearance_ui.rs:220:12
+     |
+ 192 | impl SettingsView {
+     | ----------------- methods in this implementation
+...
+ 220 |     pub fn open(&mut self) {
+     |            ^^^^
+...
+ 231 |     pub fn import_file(&mut self, path: &Path) -> Action {
+     |            ^^^^^^^^^^^
+...
+ 252 |     fn finish(&mut self, result: Result<(), String>, success: &str) -> Action {
+     |        ^^^^^^
+...
+ 264 |     fn groups(&self) -> Vec<&str> {
+     |        ^^^^^^
+...
+ 281 |     fn filtered(&self) -> Vec<usize> {
+     |        ^^^^^^^^
+...
+ 307 |     fn change_category(&mut self, n: usize) {
+     |        ^^^^^^^^^^^^^^^
+...
+ 318 |     fn focus(&mut self, focus: Focus) {
+     |        ^^^^^
+...
+ 328 |     fn select_control(&mut self, relative: usize) {
+     |        ^^^^^^^^^^^^^^
+...
+ 335 |     fn selected_control(&self) -> Option<&'static Control> {
+     |        ^^^^^^^^^^^^^^^^
+...
+ 338 |     fn edit_selected(&mut self, direction: i32) -> Action {
+     |        ^^^^^^^^^^^^^
+...
+ 364 |     fn commit_input(&mut self) -> Action {
+     |        ^^^^^^^^^^^^
+...
+ 435 |     fn page_rows(&self) -> usize {
+     |        ^^^^^^^^^
+...
+ 442 |     pub fn scroll(&mut self, delta: i32) {
+     |            ^^^^^^
+...
+ 447 |     pub fn key(&mut self, key: Keycode, mods: Mod) -> Action {
+     |            ^^^
+...
+ 552 |     fn toggle_reduced(&mut self) -> Action {
+     |        ^^^^^^^^^^^^^^
+...
+ 568 |     fn selected_preset(&self) -> Result<String, String> {
+     |        ^^^^^^^^^^^^^^^
+...
+ 575 |     fn preset_action(&mut self, n: usize) -> Action {
+     |        ^^^^^^^^^^^^^
+...
+ 620 |     fn confirm_action(&mut self) -> Action {
+     |        ^^^^^^^^^^^^^^
+...
+ 636 |     pub fn click(&mut self, x: i32, y: i32) -> Action {
+     |            ^^^^^
+...
+ 724 |     fn preset_click(&mut self, x: i32, y: i32) -> Action {
+     |        ^^^^^^^^^^^^
+...
+ 790 |     pub fn paint(&self, p: &mut Painter) {
+     |            ^^^^^
+...
+ 912 |     fn paint_controls(&self, p: &mut Painter) {
+     |        ^^^^^^^^^^^^^^
+...
+1043 |     fn paint_presets(&self, p: &mut Painter) {
+     |        ^^^^^^^^^^^^^
+
+warning: function `vary` is never used
+  --> crates/corpse-desktop/src/color.rs:81:8
+   |
+81 | pub fn vary(fg: Rgb, bg: Rgb, tile: &str, x: f64, y: f64, seed: u32) -> (Rgb, Rgb) {
+   |        ^^^^
+
+warning: function `desaturate` is never used
+   --> crates/corpse-desktop/src/color.rs:151:4
+    |
+151 | fn desaturate(c: Rgb, t: f64) -> Rgb {
+    |    ^^^^^^^^^^
+
+warning: function `memory` is never used
+   --> crates/corpse-desktop/src/color.rs:155:8
+    |
+155 | pub fn memory(c: Rgb) -> Rgb {
+    |        ^^^^^^
+
+warning: function `environment` is never used
+   --> crates/corpse-desktop/src/color.rs:171:8
+    |
+171 | pub fn environment(c: Rgb, bg: bool, light: Light, emissive: bool, tile: &str) -> Rgb {
+    |        ^^^^^^^^^^^
+
+warning: function `shadow_gamma` is never used
+   --> crates/corpse-desktop/src/color.rs:226:8
+    |
+226 | pub fn shadow_gamma(distance: f64, light: Light, tile: &str) -> f64 {
+    |        ^^^^^^^^^^^^
+
+warning: function `shadow` is never used
+   --> crates/corpse-desktop/src/color.rs:242:8
+    |
+242 | pub fn shadow(c: Rgb, gamma: f64) -> Rgb {
+    |        ^^^^^^
+
+warning: function `translucent_ink` is never used
+   --> crates/corpse-desktop/src/color.rs:262:8
+    |
+262 | pub fn translucent_ink(fg: Rgb, bg: Rgb, min: f64, alpha: f64) -> Rgb {
+    |        ^^^^^^^^^^^^^^^
+
+warning: function `ramp` is never used
+   --> crates/corpse-desktop/src/color.rs:277:4
+    |
+277 | fn ramp(dark: Rgb, normal: Rgb, bright: Rgb, amount: f64) -> Rgb {
+    |    ^^^^
+
+warning: function `offset` is never used
+   --> crates/corpse-desktop/src/color.rs:284:4
+    |
+284 | fn offset(anchor: Rgb, actual: Rgb, reference: Rgb) -> Rgb {
+    |    ^^^^^^
+
+warning: function `illuminated` is never used
+   --> crates/corpse-desktop/src/color.rs:289:8
+    |
+289 | pub fn illuminated(fg: Rgb, bg: Rgb, tile: &str, light: Light, stone_floor: bool) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^^
+
+warning: function `map_colors` is never used
+   --> crates/corpse-desktop/src/color.rs:335:8
+    |
+335 | pub fn map_colors(fg: Rgb, bg: Rgb, c: Context<'_>) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^
+
+warning: function `map_colors_emissive` is never used
+   --> crates/corpse-desktop/src/color.rs:338:8
+    |
+338 | pub fn map_colors_emissive(mut fg: Rgb, mut bg: Rgb, c: Context<'_>, emissive: bool) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: function `terrain_style` is never used
+   --> crates/corpse-desktop/src/color.rs:375:8
+    |
+375 | pub fn terrain_style(
+    |        ^^^^^^^^^^^^^
+
+warning: function `light_field` is never used
+   --> crates/corpse-desktop/src/color.rs:453:8
+    |
+453 | pub fn light_field(observation: &corpse_core::vision::TerrainObservation) -> Vec<Light> {
+    |        ^^^^^^^^^^^
+
+warning: function `cosmetic_seed` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:27:8
+   |
+27 | pub fn cosmetic_seed(seed: &str, depth: u32) -> u32 {
+   |        ^^^^^^^^^^^^^
+
+warning: function `vary` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:60:8
+   |
+60 | pub fn vary(p: &Profile, fg: Rgb, bg: Rgb, tile: &str, x: f64, y: f64, seed: u32) -> (Rgb, Rgb) {
+   |        ^^^^
+
+warning: function `terrain_style` is never used
+   --> crates/corpse-desktop/src/color_profile.rs:499:8
+    |
+499 | pub fn terrain_style(
+    |        ^^^^^^^^^^^^^
+
+warning: function `materials_animated` is never used
+  --> crates/corpse-desktop/src/entity_profile.rs:93:8
+   |
+93 | pub fn materials_animated(p: &Profile) -> bool {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: constant `BOUNDS` is never used
+  --> crates/corpse-desktop/src/inspection_ui.rs:18:11
+   |
+18 | pub const BOUNDS: (i32, i32, i32, i32) = (24, 138, 520, 572);
+   |           ^^^^^^
+
+warning: function `close_hit` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1360:8
+     |
+1360 | pub fn close_hit(x: i32, y: i32) -> bool {
+     |        ^^^^^^^^^
+
+warning: function `hover_bounds` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1417:4
+     |
+1417 | fn hover_bounds(
+     |    ^^^^^^^^^^^^
+
+warning: function `paint_hover` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1441:8
+     |
+1441 | pub fn paint_hover(report: &Report, p: &mut Painter, x: i32, y: i32) {
+     |        ^^^^^^^^^^^
+
+warning: fields `ordinary` and `conditional` are never read
+  --> crates/corpse-desktop/src/manual.rs:43:9
+   |
+42 | pub struct Depth {
+   |            ----- fields in this struct
+43 |     pub ordinary: Vec<String>,
+   |         ^^^^^^^^
+44 |     pub conditional: Vec<String>,
+   |         ^^^^^^^^^^^
+
+warning: fields `depths` and `companions` are never read
+  --> crates/corpse-desktop/src/manual.rs:49:9
+   |
+47 | pub struct Catalog {
+   |            ------- fields in this struct
+48 |     pub entries: Vec<Entry>,
+49 |     pub depths: Vec<Depth>,
+   |         ^^^^^^
+50 |     pub companions: Vec<String>,
+   |         ^^^^^^^^^^
+
+warning: methods `paint` and `paint_at_depth` are never used
+   --> crates/corpse-desktop/src/manual.rs:129:12
+    |
+ 61 | impl Manual {
+    | ----------- methods in this implementation
+...
+129 |     pub fn paint(&mut self, p: &mut Painter) {
+    |            ^^^^^
+...
+138 |     pub fn paint_at_depth(&mut self, p: &mut Painter, _time_ms: f64, depth: usize) {
+    |            ^^^^^^^^^^^^^^
+
+warning: associated function `at` is never used
+   --> crates/corpse-desktop/src/manual.rs:284:8
+    |
+283 | impl Theme {
+    | ---------- associated function in this implementation
+284 |     fn at(depth: usize) -> Self { Self::at_depth(depth as f64) }
+    |        ^^
+
+warning: function `actor_cell` is never used
+   --> crates/corpse-desktop/src/observe.rs:234:4
+    |
+234 | fn actor_cell(
+    |    ^^^^^^^^^^
+
+warning: constant `BOUNDS` is never used
+  --> crates/corpse-desktop/src/pack.rs:21:11
+   |
+21 | pub const BOUNDS: (i32, i32, i32, i32) = (73, 131, 900, 579);
+   |           ^^^^^^
+
+warning: constant `LIST` is never used
+  --> crates/corpse-desktop/src/pack.rs:22:7
+   |
+22 | const LIST: Rect = Rect(85, 249, 480, 449);
+   |       ^^^^
+
+warning: constant `DETAIL` is never used
+  --> crates/corpse-desktop/src/pack.rs:23:7
+   |
+23 | const DETAIL: Rect = Rect(577, 249, 384, 449);
+   |       ^^^^^^
+
+warning: constant `CLOSE` is never used
+  --> crates/corpse-desktop/src/pack.rs:24:7
+   |
+24 | const CLOSE: Rect = Rect(929, 135, 36, 32);
+   |       ^^^^^
+
+warning: constant `CANCEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:25:7
+   |
+25 | const CANCEL: Rect = Rect(881, 202, 80, 32);
+   |       ^^^^^^
+
+warning: constant `ROW` is never used
+  --> crates/corpse-desktop/src/pack.rs:26:7
+   |
+26 | const ROW: i32 = 30;
+   |       ^^^
+
+warning: constant `EDGE` is never used
+  --> crates/corpse-desktop/src/pack.rs:27:7
+   |
+27 | const EDGE: [u8; 3] = [53, 55, 68];
+   |       ^^^^
+
+warning: constant `PANEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:28:7
+   |
+28 | const PANEL: [u8; 3] = [11, 13, 21];
+   |       ^^^^^
+
+warning: constant `SELECTED` is never used
+  --> crates/corpse-desktop/src/pack.rs:29:7
+   |
+29 | const SELECTED: [u8; 3] = [53, 51, 68];
+   |       ^^^^^^^^
+
+warning: methods `bounds` and `set_read_only` are never used
+   --> crates/corpse-desktop/src/pack.rs:224:12
+    |
+173 | impl PackView {
+    | ------------- methods in this implementation
+...
+224 |     pub fn bounds(&self) -> (i32, i32, i32, i32) {
+    |            ^^^^^^
+...
+270 |     pub fn set_read_only(&mut self, read_only: bool) {
+    |            ^^^^^^^^^^^^^
+
+warning: variant `Fire` is never constructed
+  --> crates/corpse-desktop/src/render.rs:41:5
+   |
+40 | pub enum Animation {
+   |          --------- variant in this enum
+41 |     Fire { phase: f64 },
+   |     ^^^^
+   |
+   = note: `Animation` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `dead` and `gods` are never read
+   --> crates/corpse-desktop/src/render.rs:136:9
+    |
+105 | pub struct View {
+    |            ---- fields in this struct
+...
+136 |     pub dead: bool,
+    |         ^^^^
+...
+140 |     pub gods: String,
+    |         ^^^^
+
+warning: methods `map_glyph` and `game` are never used
+    --> crates/corpse-desktop/src/render.rs:709:12
+     |
+ 178 | impl Painter {
+     | ------------ methods in this implementation
+...
+ 709 |     pub fn map_glyph(&mut self, ch: char, x: i32, y: i32, w: i32, h: i32, c: Rgb) {
+     |            ^^^^^^^^^
+...
+1524 |     pub fn game(&mut self, v: &View, notice: &str, inventory: bool) {
+     |            ^^^^
+
+warning: function `map_layout` is never used
+    --> crates/corpse-desktop/src/render.rs:2139:8
+     |
+2139 | pub fn map_layout(w: usize, h: usize) -> (i32, i32, i32, i32) {
+     |        ^^^^^^^^^^
+
+warning: constant `TOOLBAR_LABELS` is never used
+    --> crates/corpse-desktop/src/render.rs:2589:11
+     |
+2589 | pub const TOOLBAR_LABELS: [&str; 9] = [
+     |           ^^^^^^^^^^^^^^
+
+warning: function `toolbar_action` is never used
+    --> crates/corpse-desktop/src/render.rs:2620:8
+     |
+2620 | pub fn toolbar_action(x: i32, y: i32) -> Option<usize> {
+     |        ^^^^^^^^^^^^^^
+
+warning: function `hover_description` is never used
+  --> crates/corpse-desktop/src/statuses_ui.rs:81:8
+   |
+81 | pub fn hover_description(status: &Status) -> String {
+   |        ^^^^^^^^^^^^^^^^^
+
+warning: associated items `ALL` and `parse` are never used
+  --> crates/corpse-desktop/src/typography_ui.rs:16:15
+   |
+15 | impl Role {
+   | --------- associated items in this implementation
+16 |     pub const ALL: [Self; 8] = [
+   |               ^^^
+...
+38 |     pub fn parse(key: &str) -> Option<Self> {
+   |            ^^^^^
+
+warning: function `chronicle_metrics` is never used
+   --> crates/corpse-desktop/src/typography_ui.rs:123:8
+    |
+123 | pub fn chronicle_metrics(
+    |        ^^^^^^^^^^^^^^^^^
+
+warning: `corpse-desktop` (test "appearance") generated 3 warnings
+warning: method `reset_group` is never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:317:12
+    |
+151 | impl Profile {
+    | ------------ method in this implementation
+...
+317 |     pub fn reset_group(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^^^^^^^
+
+warning: field `saved_preset_id` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:111:9
+    |
+105 | pub struct Status {
+    |            ------ field in this struct
+...
+111 |     pub saved_preset_id: Option<String>,
+    |         ^^^^^^^^^^^^^^^
+    |
+    = note: `Status` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: methods `edited`, `begin_gesture`, `reset_group`, and `preferences` are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:396:12
+    |
+225 | impl Store {
+    | ---------- methods in this implementation
+...
+396 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+444 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+512 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+648 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: `corpse-desktop` (bin "corpse-desktop") generated 72 warnings
+warning: `corpse-desktop` (bin "corpse-desktop" test) generated 22 warnings (19 duplicates)
+    Finished `test` profile [optimized] target(s) in 1m 19s
+     Running unittests src/main.rs (target/debug/deps/corpse_desktop-9925816a96528e99)
+
+running 232 tests
+test appearance_store::display_mode_tests::combined_display_write_failure_keeps_both_previous_values ... ok
+test ability_ui::ahvamitt_ui_tests::ahvamitt_ui_carried_mask_grants_one_teleport_row_and_preserves_cooldown_when_dropped ... ok
+test appearance_store::display_mode_tests::failed_persistence_keeps_previous_mode_and_file ... ok
+test appearance_store::display_mode_tests::invalid_explicit_mode_rejects_entire_load_without_mutation ... ok
+test appearance_store::display_mode_tests::missing_resolution_is_compatible_and_invalid_is_transactional ... ok
+test appearance_store::display_mode_tests::legacy_boolean_migrates_and_explicit_mode_takes_precedence ... ok
+test appearance_store::display_mode_tests::resolution_bounds_limit_framebuffer_allocation ... ok
+test appearance_store::display_mode_tests::resolution_roundtrip_and_old_preferences_preserve_it ... ok
+test ability_ui::ahvamitt_ui_tests::ahvamitt_ui_exact_flavor_and_interaction_preview_without_bestiary_entry ... ok
+test appearance_ui::tests::borderless_display_control_uses_full_label_hit_area_and_persists ... ok
+test appearance_ui::tests::comparing_original_keeps_editor_values_at_edited_snapshot ... ok
+test appearance_ui::tests::deleting_preset_requires_confirmation_and_cancel_is_safe ... ok
+test appearance_ui::tests::exact_edit_cancel_undo_and_repeat_do_not_move_panel ... ok
+test appearance_ui::tests::failed_display_preference_save_does_not_claim_success ... ok
+test ability_ui::tests::active_targeted_toggle_deactivates_before_target_prompt ... ok
+test appearance_ui::tests::export_copy_and_pasted_import_use_edited_snapshot ... ok
+test ability_ui::tests::crafted_rows_share_command_order_and_native_execution ... ok
+test ability_ui::tests::adaptive_armor_all_types_survive_detail_projection ... ok
+test appearance_ui::tests::hide_discards_preview_and_exits_comparison ... ok
+test chronicle::tests::consecutive_and_provenance_only ... ok
+test chronicle::tests::source_priority_order ... ok
+test chronicle::tests::bounded_recent_window ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::dark_blue_telepathy ... ok
+test color::tests::srgb_roundtrip ... ok
+test appearance_ui::tests::invalid_value_stays_editable_and_does_not_change_profile ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test creature_abilities_ui::tests::revision33_deeper_zillennia_ground_erasure_is_observation_only_prose ... ok
+test creature_abilities_ui::tests::revision33_queen_summon_metadata_reports_actual_cost_and_world_cooldown ... ok
+test appearance_ui::tests::search_and_group_navigation_remain_bounded ... ok
+test appearance_store::display_mode_tests::every_mode_round_trips_and_survives_preset_and_motion_writes ... ok
+test color_profile::tests::default_profile_preserves_600_frozen_color_cases ... ok
+test creature_presentation::tests::v33_hallucination_in_half_here_body_changes_shared_observation_only ... ok
+test creature_presentation::tests::v33_hallucinations_are_repeatable_per_tick_and_do_not_reveal_hidden_state ... ok
+test creature_presentation::tests::borge_mark_uses_visible_projected_identity_without_fog_leak ... ok
+test appearance_ui::tests::fixed_editor_paints_all_pages_and_extreme_settings_without_moving_controls ... ok
+test debug_floor_ui::tests::debug_god_picker_keeps_distinct_ids_and_exact_seed_suffix ... ok
+test ability_ui::ahvamitt_ui_tests::ahvamitt_ui_actual_renderer_review ... ok
+test display_ui::tests::borderless_locks_to_desktop_and_preserves_window_selection ... ok
+test display_ui::tests::cancel_does_not_apply_and_keyboard_mouse_share_actions ... ok
+test display_ui::tests::empty_invalid_duplicate_inputs_are_safe_and_bounded ... ok
+test display_ui::tests::input_bounds_are_exclusive_and_gaps_do_nothing ... ok
+test creature_presentation::tests::v33_clean_water_blood_and_ichor_are_distinct_without_state_changes ... ok
+test creature_presentation::tests::v33_disguise_map_list_hover_inspector_and_rng_are_consistent ... ok
+test creature_presentation::tests::v33_telepathy_keeps_disguise_and_fog_does_not_admit_hidden_actor ... ok
+test creature_presentation::tests::v33_hallucinogenic_cloud_has_actual_gas_field_tint ... ok
+test dream_ui::integration_tests::dream_ui_awake_hides_nightmares_and_shards_without_changing_state ... ok
+test dream_ui::integration_tests::dream_ui_nightmares_are_excluded_from_bestiary_and_disguises ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+test dream_ui::integration_tests::dream_ui_nightmare_sensing_does_not_reveal_remote_terrain_or_hidden_normal_creatures ... ok
+test dream_ui::integration_tests::dream_ui_permanent_toggle_replaces_temporary_row_without_duplicates ... ok
+test dream_ui::tests::cosmetic_flicker_is_repeatable_and_exempts_dream_entities ... ok
+test dream_ui::tests::override_replaces_every_normal_world_color_but_preserves_identity ... ok
+test effects::tests::explosions_hold_until_tick_changes ... ok
+test effects::tests::flash_boundaries ... ok
+test dream_ui::integration_tests::dream_ui_map_inspection_path_and_targeting_use_the_detached_dream_layer ... ok
+test dream_ui::integration_tests::dream_ui_actual_renderer_flickers_without_mutation_and_exports_review ... ok
+test dream_ui::integration_tests::dream_ui_half_here_retains_its_dream_perspective_after_waking ... ok
+test dream_ui::integration_tests::dream_ui_overlap_preserves_disguise_and_override_beats_custom_palette ... ok
+test hazards_ui::tests::portal_ui_hazard_warning_uses_known_arrival_not_hidden_live_state ... ok
+test hazards_ui::tests::non_euclidean_ui_hazard_warning_checks_both_known_exits_not_hidden_state ... ok
+test inspection_ui::bow_tests::source_141_bow_hover_forecasts ... ok
+test inspection_ui::hover_tests::resource_projection_preserves_clone_sphinx_and_infinity ... ok
+test inspection_ui::hover_tests::source_hover_geometry_80_cases ... ok
+test inspection_ui::tests::detected_items_keep_snapshot_identity_and_per_item_deduplication ... ok
+test dream_ui::integration_tests::dream_ui_plane_overlap_statuses_row_and_body_are_consistent ... ok
+test inspection_ui::tests::hidden_live_terrain_items_actors_never_enrich_memory ... ok
+test inspection_ui::appearance_tests::authored_inspector_scroll_disclosure_and_hover_share_resolved_geometry ... ok
+test inspection_ui::tests::sound_only_marker_replaces_all_prior_scene_information ... ok
+test debug_floor_ui::tests::no_choice_starter_loadout_can_enter_and_reopen_without_healing ... ok
+test inspection_ui::tests::source_gas_exposure_copy ... ok
+test inspection_ui::tests::source_58_terrain_reports ... ok
+test manual::tests::all_authored_entries_and_art_exist ... ok
+test manual::tests::all_bestiary_entries_preserve_owner_supplied_natural_history ... ok
+test inspection_ui::hover_tests::hover_is_detached_bounded_and_has_no_disclosure_hitbox ... ok
+test manual::tests::aspects_and_depth_styles_are_deterministic ... ok
+test manual::tests::background_darkens_monotonically_with_readable_text ... ok
+test manual::tests::balanced_entries_show_current_birth_stats_without_editing_authored_assets ... ok
+test manual::tests::bastidion_uses_actual_birth_template_at_every_depth ... ok
+test manual::tests::benchmark_animated_manual_warm_frames ... ignored, opt-in optimized paint timing; not a correctness assertion
+test manual::tests::character_dependent_companions_never_invent_stats ... ok
+test ability_ui::tests::frozen_ability_rows ... ok
+test manual::tests::concise_labels_keep_authored_effects_and_unique_sources ... ok
+test manual::tests::depth_windows ... ok
+test inspection_ui::tests::drawer_paint_bounds_scroll_disclosure_and_repeat_open ... ok
+test manual::tests::export_solid_visual_palette_map ... ok
+test manual::tests::export_visual_background_review ... ok
+test hazards_ui::tests::frozen_warning_projection ... ok
+test manual::tests::fractional_visual_floors_interpolate_without_tier_switches ... ok
+test manual::tests::mouse_controls_cover_pages_and_creature_navigation ... ok
+test manual::tests::roster_is_unique_and_sorted_by_first_appearance ... ok
+test manual::tests::clean_art_pages_have_no_animated_decal_pass ... ok
+test manual::tests::selected_art_consumes_png_alpha_without_runtime_keying ... ok
+test manual::tests::first_appearance_controls_solid_page_color_not_combat_reference ... ok
+test manual::tests::summoned_duplicates_are_excluded_only_from_bestiary ... ok
+test manual::tests::setting_bold_changes_actual_pixels_without_changing_layout ... ok
+test manual::tests::trimming_preserves_every_authored_rgba_pixel_including_black ... ok
+test manual::tests::whole_roster_visual_palette_never_backtracks ... ok
+test manual::tests::zillennia_pages_show_their_current_depth_quality_actor ... ok
+test menu_ui::tests::common_aspect_ratios_keep_every_hit_region_on_screen ... ok
+test menu_ui::tests::complete_large_hit_regions_and_no_gap_activation ... ok
+test manual::tests::artwork_never_overlaps_title_navigation_or_footer ... ok
+test menu_ui::tests::settings_is_accessible_from_the_main_menu ... ok
+test menu_ui::tests::title_has_every_authored_letter ... ok
+test modal_ui::tests::default_geometry_and_changed_css_baselines_are_preserved ... ok
+test modal_ui::tests::frozen_source_pack_and_authored_hover_placements_match ... ok
+test modal_ui::tests::measured_wrapping_preserves_newlines_and_breaks_long_words ... ok
+test modal_ui::tests::profile_extremes_keep_fixed_tracks_and_modal_containment ... ok
+test manual::tests::setting_name_is_capitalized_and_bold_even_across_wrapped_lines ... ok
+test menu_ui::tests::selection_never_moves_composition_and_disabled_continue_is_gray ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_actual_renderer_controlled_capture ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_aliases_remain_in_the_viewed_plane ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_aliases_keep_actor_and_item_identity_single ... ok
+test inspection_ui::tests::source_creature_flavor_scene_resources_conditions_and_forecasts ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_no_projected_sight_and_legacy_gate ... ok
+test observe::epidite_ui_tests::epidite_ui_blessed_hearts_have_one_label_and_doubled_observed_rewards ... ok
+test observe::epidite_ui_tests::epidite_ui_actual_renderer_subscript_and_review ... ok
+test observe::epidite_ui_tests::epidite_ui_countdown_is_direct_observation_not_fog_or_render_time ... ok
+test observe::feeding_observation_tests::bloody_wall_inspection_map_and_fog_use_observed_overlay_only ... ok
+test observe::flesh_palette::tests::flesh_colors_preserve_user_edits_and_semantic_glyphs ... ok
+test observe::flesh_palette::tests::organic_ridges_are_stable_and_only_touch_authored_ground ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_marker_preserves_terrain_and_known_exits_without_rng ... ok
+test observe::tests::ability_total_survives_scrolling ... ok
+test observe::tests::compound_identity_and_annotations_survive_projection ... ok
+test observe::tests::entrance_uses_blue_omega_without_changing_stair_identity ... ok
+test observe::tests::export_flesh_visual_review ... ok
+test observe::tests::hidden_live_terrain_and_actors_are_not_emitted ... ok
+test observe::pocket_biome_observation_tests::localized_nest_flowers_and_permafrost_render_without_replacing_stairs_or_leaking_fog ... ok
+test observe::tests::palette_is_authored ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_generated_debug_capture ... ok
+test observe::tests::source_renderer_avatar_scene_projection ... ok
+test observe::epidite_ui_tests::epidite_ui_single_digit_boundary_and_exact_hover_clock ... ok
+test observe::tests::native_blood_river_remains_water_and_ichor_stays_distinct ... ok
+test observe::tests::source_actor_ink_across_ambient_and_distance ... ok
+test manual::tests::every_entry_fits_without_discarding_authored_text ... ok
+test pack::completed_engine_action_tests::potions_expose_the_implemented_throw_target_action ... ok
+test pack::completed_engine_action_tests::tree_tap_exposes_use_without_admitting_unknown_tools ... ok
+test pack::tests::ahvamitt_ui_mask_uses_teleport_command_and_no_unsupported_apply_action ... ok
+test pack::tests::available_throw_does_not_disclose_unknown_potion_contents ... ok
+test pack::tests::borge_heart_provenance_is_visible_and_refreshes_without_changing_reward ... ok
+test pack::tests::borge_shard_has_targeted_use_either_hand_and_no_throw ... ok
+test pack::tests::bow_apply_is_gated_by_equipment_and_arrows ... ok
+test pack::tests::crafting_selection_cancel_stale_and_valid_paths ... ok
+test pack::tests::dream_ui_dagger_apply_and_pack_refresh_restrict_consumables_not_equipment ... ok
+test pack::tests::equipment_selection_and_slot_commands_follow_source ... ok
+test pack::appearance_tests::custom_profile_reflows_input_rows_buttons_and_paint_without_run_changes ... ok
+test pack::tests::read_only_pack_consumes_inputs_without_actions ... ok
+test pack::tests::reorder_never_crosses_sections_or_changes_simulation ... ok
+test manual::tests::all_actual_layouts_keep_prose_in_page_and_headings_with_body ... ok
+test pack::tests::supported_tinker_targets_once_without_spending_during_selection ... ok
+test pack::tests::tinker_availability_and_session_invalidation_follow_source ... ok
+test observe::tests::unknown_cells_never_gain_flesh_or_blood_details ... ok
+test pack::tests::use_command_runs_through_temporal_engine_and_refreshes_selection ... ok
+test pack::tests::verdania_labels_are_revision_gated_without_changing_sap_effect ... ok
+test pack::tests::visually_stacked_items_keep_original_member_and_slots ... ok
+test observe::tests::source_renderer_generated_scene_projection ... ok
+test portal_ui::tests::portal_ui_generated_floor_capture ... ok
+test pack::tests::paint_and_repeated_open_close_are_fixed_nonmutating_and_clipped ... ok
+test portal_ui::tests::portal_ui_ground_item_alias_observed_only_and_single_identity ... ok
+test portal_ui::tests::portal_ui_unknown_mate_stays_unknown ... ok
+test render::gameplay_hierarchy_tests::export_gameplay_hierarchy_review ... ok
+test portal_ui::tests::portal_ui_ascii_italic_pair_color_and_legacy_gate ... ok
+test portal_ui::tests::portal_ui_remote_actor_alias_inspection_and_one_list_entry ... ok
+test observe::tests::source_semantic_features_and_fixture_ink ... ok
+test render::gameplay_hierarchy_tests::memory_preserves_geometry_without_revealing_black_space ... ok
+test render::gameplay_hierarchy_tests::long_domain_heading_and_passive_metadata_fit_fixed_allocations ... ok
+test render::gameplay_hierarchy_tests::measured_wrap_bounds_long_tokens_and_chronicle_fade_is_continuous ... ok
+test render::gameplay_hierarchy_tests::hidden_world_edits_cannot_change_painted_frame ... ok
+test render::tests::blessing_hits_exclude_button_gaps ... ok
+test render::tests::ability_summary_uses_measured_ellipsis_and_compact_counters ... ok
+test render::tests::continue_disabled_never_receives_active_menu_highlight ... ok
+test render::tests::downscaled_thin_rectangles_survive_with_clipping ... ok
+test render::tests::entrance_omega_has_a_real_bundled_glyph_not_missing_character_box ... ok
+test render::tests::fire_is_deterministic_animated ... ok
+test render::tests::floor_fits ... ok
+test pack::tests::source_grouping_and_descriptions_64_cases ... ok
+test render::tests::cosmetic_frames_preserve_complete_hud_and_chronicle ... ok
+test render::tests::embers_are_crisp_deterministic_drawable_resolution_particles ... ok
+test render::tests::toolbar_hits_match_painted_rectangles ... ok
+test portal_ui::tests::portal_ui_actual_renderer_italic_is_distinct_and_capture ... ok
+test render::tests::paint_menu_manual ... ok
+test render::gameplay_hierarchy_tests::sidebar_content_never_moves_map_or_toolbar ... ok
+test session_store::envelope_tests::utc_calendar_matches_epoch_and_leap_day ... ok
+test session_store::tests::source_archive_gate_preserves_eligible_resume_and_excludes_fixtures ... ok
+test startup_ui::tests::accepted_error_is_reported_once_and_allows_retry ... ok
+test startup_ui::tests::leaving_form_invalidates_success_even_after_reopening ... ok
+test startup_ui::tests::repeat_start_is_bounded_and_cancelled_result_never_commits ... ok
+test startup_ui::tests::valid_success_is_delivered_once_and_disconnection_is_visible ... ok
+test statuses_ui::tests::native_disoriented_and_hallucinating_labels_expire_without_internal_penalty_labels ... ok
+test statuses_ui::tests::new_actor_or_replaced_session_does_not_inherit_meter_certainty ... ok
+test render::tests::native_resolution_rasterizes_fonts_and_ascii_at_device_size ... ok
+test statuses_ui::tests::source_meter_baselines_unknown_expiration_reapplication ... ok
+test statuses_ui::tests::unknown_internal_keys_never_become_conditions ... ok
+test session_store::envelope_tests::provenance_survives_native_save_and_plain_source_import ... ok
+test targeting_ui::tests::non_euclidean_ui_projectile_preview_stops_at_stochastic_entry ... ok
+test targeting_ui::tests::non_euclidean_ui_projectile_unknown_exit_cannot_leak_or_change_preview ... ok
+test targeting_ui::tests::portal_ui_target_preview_crosses_and_preserves_hidden_state ... ok
+test targeting_ui::tests::hidden_terrain_and_interceptors_cannot_change_preview ... ok
+test render::tests::path_tints_are_white_restrained_and_preserve_glyph_ink ... ok
+test targeting_ui::tests::source_275_knowledge_limited_projectile_rays ... ok
+test terminal_ui::tests::export_finale_review ... ok
+test terminal_ui::tests::export_modern_collapse_loss_review ... ok
+test terminal_ui::tests::finale_labels_keep_exact_designer_wording ... ok
+test terminal_ui::tests::legacy_victory_retains_original_labels ... ok
+test session_store::autosave_tests::accepted_state_is_saved_and_terminal_death_removes_resume ... ok
+test creature_abilities_ui::tests::source_1024_dynamic_creature_ability_reports ... ok
+test tests::continue_keeps_active_progress_instead_of_loading_stale_save ... ok
+test tests::controls_dispatch_exact_direction ... ok
+test tests::continue_requires_live_run_and_never_revives_terminal_run ... ok
+test tests::debug_continue_resumes_only_preserved_normal_run ... ok
+test tests::menu_pointer_matches_seven_buttons_and_excludes_gaps ... ok
+test session_store::debug_isolation_tests::debug_never_replaces_continue_or_highscores_even_on_force_and_death ... ok
+test travel_ui::tests::controller_advances_replans_and_cancels_without_simulation_writes ... ok
+test travel_ui::tests::controller_stops_on_harm_displacement_hazard_and_blocker ... ok
+test travel_ui::tests::deep_water_never_enters_player_paths_even_with_flight_or_drown ... ok
+test terminal_ui::tests::collapse_loss_paints_exact_reason ... ok
+test travel_ui::tests::non_euclidean_ui_deterministic_entry_known_arrival_and_unknown_exit ... ok
+test travel_ui::tests::hidden_live_changes_cannot_rewrite_historical_routes ... ok
+test terminal_ui::tests::terminal_summary_is_detached_and_handles_victory ... ok
+test terminal_ui::tests::collapse_victory_paints_exact_heading ... ok
+test travel_ui::tests::non_euclidean_ui_routes_stop_at_random_choice_and_never_draw_rng ... ok
+test travel_ui::tests::source_displaced_phase_graphs_preserve_stable_ties_and_cycle_termination ... ok
+test travel_ui::tests::portal_ui_arrival_alias_completes_without_bounce ... ok
+test travel_ui::tests::portal_ui_known_pair_route_arrival_and_unknown_mate ... ok
+test wait_ui::tests::damage_precedes_threats_and_time ... ok
+test wait_ui::tests::threat_reasons_keep_source_actor_order ... ok
+test tests::manual_render_test_matches_live_and_respects_fractional_visual_override ... ok
+test travel_ui::tests::source_observed_threat_changes_keep_reason_priority ... ok
+test travel_ui::tests::source_player_routes_preserve_knowledge_hazards_and_phase ... ok
+test statuses_ui::tests::source_185_observed_status_and_scheduler_cases ... ok
+test embedded_assets::tests::all_distribution_plates_are_embedded_and_decode ... ok
+test manual::tests::transparent_trim_preserves_every_occupied_pixel ... ok
+
+test result: ok. 231 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 9.67s
+
+     Running tests/appearance.rs (target/debug/deps/appearance-f7c63e5242038903)
+
+running 30 tests
+test appearance_store::display_mode_tests::resolution_bounds_limit_framebuffer_allocation ... ok
+test appearance_store::display_mode_tests::combined_display_write_failure_keeps_both_previous_values ... ok
+test appearance_store::display_mode_tests::invalid_explicit_mode_rejects_entire_load_without_mutation ... ok
+test appearance_store::display_mode_tests::failed_persistence_keeps_previous_mode_and_file ... ok
+test appearance_store::display_mode_tests::resolution_roundtrip_and_old_preferences_preserve_it ... ok
+test entity_reset_restores_inheritance_without_losing_numeric_tuning ... ok
+test defaults_and_control_catalog_are_exact_and_immutable ... ok
+test default_directory_preparation_is_explicit_and_path_is_per_user ... ok
+test appearance_store::display_mode_tests::legacy_boolean_migrates_and_explicit_mode_takes_precedence ... ok
+test failed_storage_rolls_back_library_and_keeps_work_exportable ... ok
+test atomic_export_import_and_empty_parent_path ... ok
+test inherited_materials_change_only_unedited_child_fields ... ok
+test import_export_preserves_unknown_fields_and_is_undoable ... ok
+test corrupt_storage_is_left_untouched_on_load ... ok
+test appearance_store::display_mode_tests::missing_resolution_is_compatible_and_invalid_is_transactional ... ok
+test gestures_undo_redo_and_redo_invalidation ... ok
+test malformed_native_preferences_roll_back_all_fields ... ok
+test native_float_input_equal_to_default_is_a_true_noop ... ok
+test malformed_import_and_failed_property_edits_do_not_mutate ... ok
+test appearance_store::display_mode_tests::every_mode_round_trips_and_survives_preset_and_motion_writes ... ok
+test preview_export_commit_discard_close_and_original_comparison ... ok
+test unsafe_depth_and_oversized_values_are_rejected ... ok
+test working_edits_are_not_silently_persisted_without_save ... ok
+test near_limit_export_uses_compact_json_and_can_be_imported_again ... ok
+test source_validation_edit_reset_fixtures_match ... ok
+test preset_crud_startup_and_preferences_roundtrip ... ok
+test source_store_transition_fixtures_match ... ok
+test history_character_budget_retains_nearest_changes ... ok
+test history_is_bounded_and_reset_is_reversible ... ok
+test preset_count_and_total_library_budget_are_transactional ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.52s
+
+     Running tests/appearance_entities.rs (target/debug/deps/appearance_entities-b71422265a606b16)
+
+running 11 tests
+test color::tests::srgb_roundtrip ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::dark_blue_telepathy ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test source_stationary_and_animated_pulses_match ... ok
+test source_material_inheritance_matches ... ok
+test color_profile::tests::default_profile_preserves_600_frozen_color_cases ... ok
+test source_feature_colors_fallbacks_and_grading_match ... ok
+test source_observed_fog_transition_and_all_seeing_match ... ok
+test source_entity_inheritance_parent_and_tuning_match ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+     Running tests/appearance_lighting.rs (target/debug/deps/appearance_lighting-1433eebd95b04985)
+
+running 8 tests
+test color::tests::contrast_after_alpha ... ok
+test color::tests::srgb_roundtrip ... ok
+test color::tests::dark_blue_telepathy ... ok
+test source_deterministic_flicker_matches ... ok
+test unknown_origin_never_expands_and_future_source_payloads_are_inert ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test source_all_lighting_controls_and_conservative_rays_match ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+     Running tests/appearance_typography.rs (target/debug/deps/appearance_typography-69a89bcb6af239a4)
+
+running 4 tests
+test bundled_family_order_and_unavailable_faces_are_explicit ... ok
+test explicit_height_overrides_derived_track_and_compact_baseline_survives ... ok
+test default_role_reset_preserves_selector_specific_weight_and_size ... ok
+test frozen_source_role_override_rules_match_for_every_role ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

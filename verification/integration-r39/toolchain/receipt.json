@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "created_utc": "2026-10-29T21:13:04.772325+00:00",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "target": "x86_64-pc-windows-gnu",
+  "mingw": "Official Debian Trixie GCC14 POSIX / MinGW-w64 12.0.0",
+  "sdl": "Official SDL2 2.32.10",
+  "link_smoke_sha256": "4581e37464c518c1a50001349ff013ebdff6ecb96deb6e08c8bad010efd6e2d0",
+  "windows_runtime_verified": false,
+  "rustup_init_sha256": "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4"
+}

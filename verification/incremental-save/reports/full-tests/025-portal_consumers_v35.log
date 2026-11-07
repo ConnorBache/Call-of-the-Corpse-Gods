@@ -1,0 +1,13 @@
+
+running 8 tests
+test reverse_entropy_aura_uses_linked_range_but_not_other_plane ... ok
+test mini_me_cannot_spawn_on_an_occupied_link_alias ... ok
+test native_plane_yeti_and_silence_reach_the_linked_endpoint ... ok
+test dryad_heals_through_portal_without_changing_recipient_identity ... ok
+test endpoint_ranges_feed_half_here_and_counterattacks ... ok
+test linked_grab_survives_until_endpoint_separation ... ok
+test horn_bolt_uses_portal_range_and_hits_the_actual_remote_actor ... ok
+test directed_fire_cone_reaches_remote_space_without_cross_plane_damage ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "r51-independent-static-pe-comparison",
+  "original_sha256": "244e97b011ff795a9c90965c7a2cbf6c08c24d2fddd18d9a31bc90e6fa1c2b03",
+  "packaged_sha256": "c299ba8f2ff428918218f00ba2fb15f51d693562f31e2affbc70b9a5aa3a18d5",
+  "invariant_header_fields": {
+    "Machine": 34404,
+    "SizeOfOptionalHeader": 240,
+    "Magic": 523,
+    "AddressOfEntryPoint": 5104,
+    "BaseOfCode": 4096,
+    "ImageBase": 5368709120,
+    "SectionAlignment": 4096,
+    "FileAlignment": 512,
+    "MajorOperatingSystemVersion": 4,
+    "MinorOperatingSystemVersion": 0,
+    "MajorImageVersion": 0,
+    "MinorImageVersion": 0,
+    "MajorSubsystemVersion": 5,
+    "MinorSubsystemVersion": 2,
+    "Win32VersionValue": 0,
+    "Subsystem": 3,
+    "DllCharacteristics": 352,
+    "SizeOfStackReserve": 2097152,
+    "SizeOfStackCommit": 4096,
+    "SizeOfHeapReserve": 1048576,
+    "SizeOfHeapCommit": 4096,
+    "LoaderFlags": 0,
+    "NumberOfRvaAndSizes": 16
+  },
+  "all_invariant_fields_equal": true,
+  "header_changes": {
+    "NumberOfSections": {
+      "before": 20,
+      "after": 10
+    },
+    "TimeDateStamp": {
+      "before": 1794038275,
+      "after": 1794038286
+    },
+    "PointerToSymbolTable": {
+      "before": 115472384,
+      "after": 0
+    },
+    "NumberOfSymbols": {
+      "before": 36780,
+      "after": 0
+    },
+    "Characteristics": {
+      "before": 38,
+      "after": 558
+    },
+    "SizeOfImage": {
+      "before": 115511296,
+      "after": 29581312
+    },
+    "SizeOfHeaders": {
+      "before": 1536,
+      "after": 1024
+    },
+    "CheckSum": {
+      "before": 120111109,
+      "after": 29622022
+    }
+  },
+  "removed_debug_sections": [
+    ".debug_abbrev",
+    ".debug_aranges",
+    ".debug_frame",
+    ".debug_info",
+    ".debug_line",
+    ".debug_line_str",
+    ".debug_loclists",
+    ".debug_ranges",
+    ".debug_rnglists",
+    ".debug_str"
+  ],
+  "retained_section_count": 10,
+  "retained_bytes_virtual_sizes_rvas_flags_and_raw_sizes_equal": true,
+  "raw_offsets_aligned_in_bounds_and_nonoverlapping": true,
+  "headers_and_image_cover_all_retained_sections": true,
+  "non_debug_data_directories_unchanged": true,
+  "application_manifest_embedded_unchanged": true,
+  "application_manifest_sha256": "445c0ca467b3648a66862277abef47b4958c50a7cc15913bb84fa950b7227497",
+  "windows_runtime_verified": false,
+  "limits": "Static validation only. Debug stripping can alter timestamps/checksums and file layout; deterministic ZIP ordering is not reproducible-executable proof."
+}

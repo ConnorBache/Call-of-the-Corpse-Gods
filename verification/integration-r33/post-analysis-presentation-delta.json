@@ -1,0 +1,72 @@
+{
+  "analysis_receipt": "verification/accuracy-dodge-v33-final-receipt.json",
+  "analysis_receipt_sha256": "58bbd91a1c332c6f447f4b2243a38998cda5ec6e4098023f32142987bddfbe31",
+  "final_input_fingerprint": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "original_numerical_receipt_preserved": true,
+  "full_numeric_matrices_rerun_after_presentation_guard": false,
+  "changed_recorded_paths": [
+    {
+      "path": "crates/corpse-core/src/lib.rs",
+      "analysis_sha256": "f05b90e6c89e9c2c860d4c8b7fe1670d545ac5fb096d03e40459758b14e364f2",
+      "final_sha256": "21d6a3940c53c411e03d64d98f823c89742f3e26c43c8a4d7111453765291229"
+    },
+    {
+      "path": "crates/corpse-core/src/witch.rs",
+      "analysis_sha256": "140cd4b8d93f8e7ffbb30d869990922b87e13fee53f4400c555082514b1d1890",
+      "final_sha256": "76bcb7470a837861c298defc038cc98729795ac85f778a5970746dd11c936080"
+    },
+    {
+      "path": "docs/complexity-ledger.md",
+      "analysis_sha256": "c4ad60b15f974e1bbdcd0eb42ed908a6f0b9db4c7d780623857c94a45ae5678c",
+      "final_sha256": "7eb42144dd356959dea654ee752597445ae69c396927cd112cbe53ca749f2f6e"
+    }
+  ],
+  "unchanged_recorded_paths": [
+    "crates/corpse-core/src/accuracy_dodge.rs",
+    "crates/corpse-core/src/catalog/accuracy-dodge-v33.json",
+    "crates/corpse-core/src/catalog/witch-accuracy-dodge-v33.json",
+    "crates/corpse-core/src/physical_balance.rs",
+    "crates/corpse-core/tests/accuracy_dodge_v33.rs",
+    "crates/corpse-core/examples/physical_trade_arena.rs",
+    "crates/corpse-core/examples/accuracy_npc_arena.rs",
+    "docs/accuracy-dodge-r33.md",
+    "tools/monster-balance/accuracy_dodge_r33.py",
+    "tools/monster-balance/accuracy_npc_r33.py",
+    "tools/monster-balance/accuracy_witch_r33.py",
+    "tools/monster-balance/extract_r33_refresh.py",
+    "tools/monster-balance/summarize_accuracy_r33.py",
+    "tools/monster-balance/r33-accuracy-shipping.json",
+    "tools/monster-balance/r33-accuracy-shipping.csv",
+    "tools/monster-balance/r33-accuracy-summary.json",
+    "tools/monster-balance/r33-accuracy-summary.csv",
+    "tools/monster-balance/r33-accuracy-npc-shipping.json",
+    "tools/monster-balance/r33-accuracy-npc-shipping.csv",
+    "tools/monster-balance/r33-accuracy-witch-shipping.json",
+    "tools/monster-balance/r33-accuracy-witch-shipping.csv",
+    "tools/monster-balance/r33-accuracy-refresh32-shipping.json",
+    "tools/monster-balance/r33-accuracy-refresh32-shipping.csv",
+    "tools/monster-balance/r33-accuracy-vampire-refresh32-final.json",
+    "tools/monster-balance/r33-accuracy-vampire-refresh32-final.csv",
+    "tools/monster-balance/r33-accuracy-shipping-method.json",
+    "tools/monster-balance/r33-accuracy-refresh32-shipping-method.json",
+    "tools/monster-balance/r33-refresh-debug32-joint-profiles.json",
+    "tools/monster-balance/r33-refresh-debug32-receipt.json",
+    "tools/monster-balance/r33-refresh-debug32-paired-comparison.json",
+    "tools/monster-balance/r33-accuracy-vampire-real-low-tail-final.json",
+    "tools/monster-balance/r33-accuracy-untouched-heavy-sentinels.json",
+    "verification/accuracy-dodge-v33-tests.log",
+    "verification/accuracy-dodge-v33-final-build.log",
+    "verification/accuracy-dodge-v33-arena.log",
+    "verification/accuracy-dodge-v33-npc.log",
+    "verification/accuracy-dodge-v33-witch.log",
+    "verification/accuracy-dodge-v33-refresh32-arena.log",
+    "verification/accuracy-dodge-v33-vampire-final.log"
+  ],
+  "final_presentation_scope": "Core/shared UI apparent actor labels, pre-lethal display-name capture, and test correction. True actor/source/item provenance, stat overlays and combat RNG rules unchanged.",
+  "full_delta": "verification/integration-r33/presentation-final-refreeze.json",
+  "equivalence": [
+    "verification/integration-r33/skin-log-state-comparison.json",
+    "verification/integration-r33/presentation-combat-smoke-receipt.json"
+  ],
+  "limits": "Selected deterministic state-equivalence smoke and full regression gate are not exhaustive proof across every possible fight. Original analysis binary hashes remain the actual historical measurement binaries, not the final release executable."
+}

@@ -1,0 +1,13 @@
+
+running 8 tests
+test color::tests::dark_blue_telepathy ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::srgb_roundtrip ... ok
+test source_deterministic_flicker_matches ... ok
+test unknown_origin_never_expands_and_future_source_payloads_are_inert ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test source_all_lighting_controls_and_conservative_rays_match ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+

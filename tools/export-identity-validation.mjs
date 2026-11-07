@@ -1,0 +1,2 @@
+import fs from'node:fs';import{BESTIARY,EVENT_CREATURES}from'../../release-v48/source/call-of-the-corpse-gods/dist/src/bestiary.js';import{ZILLENNIA_QUALITIES}from'../../release-v48/source/call-of-the-corpse-gods/dist/src/zillennia-qualities.js';
+fs.writeFileSync(new URL('../crates/corpse-core/catalog/validation-identities-v48.json',import.meta.url),JSON.stringify({creatures:[...BESTIARY,...EVENT_CREATURES].flatMap(x=>[x.id,x.name]),qualities:ZILLENNIA_QUALITIES.map(x=>x.id)}));

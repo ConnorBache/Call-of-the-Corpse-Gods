@@ -1,0 +1,13 @@
+{
+  "written_after_accepted_gate": true,
+  "date_utc": "2026-10-26T19:36:45.142398+00:00",
+  "compiled_input_fingerprint": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "files": {
+    "README.md": "f4372e29351730303be23a6d5cb9612cfb8d918659b88d9e1c13680ae18ce930",
+    "NATIVE-VERIFICATION.md": "0c99b8875ce0e99a46c8fcc7cd2462c07788ea3bd58ad6dd95ec28393c6116e7",
+    "INTEGRATED-VERIFICATION.json": "b4f47866fb6e77c2c75609940468e66c8fbdb8fbb5c5c03b92cdb1b2f43b0b7d",
+    "docs/native-verification-r31-historical.md": "ae643c03c6a57d2d82d92788ce65d11c0be10b40eb81047519beaacb1813f210",
+    "docs/integrated-verification-r31-historical.json": "bbb0e20a3491e1f6d8d7d9f6c2392a285f37845c73a42b4cc9faa1180b0b5953",
+    "verification/integration-r33/windows-crossbuild-receipt.json": "a748dd25b316f1fd7d2e21acc80e8a201243741d42297026e3c3dd1a3ffc2c7b"
+  }
+}

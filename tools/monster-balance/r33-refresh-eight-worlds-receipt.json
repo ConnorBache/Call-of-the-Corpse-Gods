@@ -1,0 +1,66 @@
+{
+  "scope": "Eight fresh r33 generated worlds; heart census only, no survival simulation or full-run balance claim.",
+  "source_sha256": "a2afe77ee8f6e7bce935935a1e0878efed70f874a2cc2c40dba43b365049a739",
+  "binary_sha256": "c08e8b057ede856d73d9b6ed29922a02a586b4a2570a18681ff3638ff9fba064",
+  "samples": 8,
+  "failures": [],
+  "nest_accounting": [
+    {
+      "seed": "3-6-5:r33-specialization-refresh-000000",
+      "depth": 28,
+      "ordinary_budget": 36.0,
+      "initial_non_godbeast_blessings": 49.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "6-1-8:r33-specialization-refresh-000001",
+      "depth": 31,
+      "ordinary_budget": 39.0,
+      "initial_non_godbeast_blessings": 52.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "9-4-3:r33-specialization-refresh-000002",
+      "depth": 33,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "0-11-6:r33-specialization-refresh-000003",
+      "depth": 32,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "11-6-1:r33-specialization-refresh-000004",
+      "depth": 34,
+      "ordinary_budget": 41.0,
+      "initial_non_godbeast_blessings": 54.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "2-1-4:r33-specialization-refresh-000005",
+      "depth": 28,
+      "ordinary_budget": 34.0,
+      "initial_non_godbeast_blessings": 47.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "5-8-11:r33-specialization-refresh-000006",
+      "depth": 34,
+      "ordinary_budget": 41.0,
+      "initial_non_godbeast_blessings": 54.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "8-11-2:r33-specialization-refresh-000007",
+      "depth": 31,
+      "ordinary_budget": 37.0,
+      "initial_non_godbeast_blessings": 50.0,
+      "conditional_nest_blessings": 13.0
+    }
+  ],
+  "track_caveat": "The historical ordinary track means initial non-Godbeast actors, and now includes the new conditional Nest. all_initial also includes initial Zillennia; neither includes future summons or event fish."
+}

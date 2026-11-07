@@ -1,0 +1,22 @@
+
+running 17 tests
+test tests::empty_or_accuracy_only_candidates_preserve_authored_queen_hp ... ok
+test tests::escape_reports_trapped_instead_of_claiming_settled_lifetime ... ok
+test tests::chase_moves_toward_distant_caster ... ok
+test tests::audit_records_unlogged_ruin_after_mitigation_before_hp_cap ... ok
+test tests::escape_moves_out_of_hazard_and_does_not_wait_for_remote_gas ... ok
+test tests::explicit_summoned_candidates_change_only_newborn_numbers ... ok
+test tests::grass_sensitivity_uses_ordinary_fuel_not_permanent_fire ... ok
+test tests::preserves_traits_and_short_sword ... ok
+test tests::miss_attempts_count_and_capped_damage_counter_is_separate ... ok
+test tests::rejects_stranded_aquatics ... ok
+test tests::dispatch_executes_yeti_slow ... ok
+test tests::linked_pair_keeps_minor_first_and_major_sleeping ... ok
+test tests::support_counterpart_preserves_frontliner ... ok
+test tests::audit_does_not_change_state_rng_or_events ... ok
+test tests::three_cast_payload_uses_native_twins_and_excludes_parent ... ok
+test tests::lifetime_expectation_is_explicitly_kill_conditional ... ok
+test tests::deterministic_real_dispatch ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

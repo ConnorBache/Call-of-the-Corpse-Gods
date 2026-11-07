@@ -1,0 +1,69 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "reference_runtime": "v24.19.0",
+  "rust": "1.99.1, release, thin LTO",
+  "scope": "Normal simulation dispatch with temporal history on six generated floor1 Avatar runs, ten generated floors per run. Rendering, autosave, filesystem and startup excluded. No Windows-runtime or end-to-end FPS claim.",
+  "fixture_sha256": "4edc10b3e7593be9243b4d8a4548c4d6072eb13de8056b64bdc6a34e4a61a7f3",
+  "rows": [
+    {
+      "seed": "00-09-10:independent-native-walk-0",
+      "commands": 80,
+      "samples": 480,
+      "javascript_median_ms": 79.89689099999669,
+      "rust_median_ms": 6.3029530000000005,
+      "javascript_p95_ms": 94.5444439999992,
+      "rust_p95_ms": 8.632117999999998,
+      "median_ratio": 12.676104517992865
+    },
+    {
+      "seed": "00-09-10:independent-native-walk-1",
+      "commands": 72,
+      "samples": 432,
+      "javascript_median_ms": 83.52640299999621,
+      "rust_median_ms": 5.118205,
+      "javascript_p95_ms": 96.00281499999983,
+      "rust_p95_ms": 6.264149000000001,
+      "median_ratio": 16.319471963314523
+    },
+    {
+      "seed": "00-09-10:independent-native-walk-2",
+      "commands": 80,
+      "samples": 480,
+      "javascript_median_ms": 76.80110100001912,
+      "rust_median_ms": 4.241975,
+      "javascript_p95_ms": 89.80052199999045,
+      "rust_p95_ms": 5.063187,
+      "median_ratio": 18.105033858054117
+    },
+    {
+      "seed": "00-09-10:independent-native-walk-3",
+      "commands": 80,
+      "samples": 480,
+      "javascript_median_ms": 81.57382200000575,
+      "rust_median_ms": 4.792051000000001,
+      "javascript_p95_ms": 102.61594700001297,
+      "rust_p95_ms": 6.562791,
+      "median_ratio": 17.022736611109885
+    },
+    {
+      "seed": "00-09-10:independent-native-walk-4",
+      "commands": 80,
+      "samples": 480,
+      "javascript_median_ms": 78.56786000001011,
+      "rust_median_ms": 4.756842,
+      "javascript_p95_ms": 90.27793099998962,
+      "rust_p95_ms": 5.380254,
+      "median_ratio": 16.51681094306057
+    },
+    {
+      "seed": "00-09-10:independent-native-walk-5",
+      "commands": 80,
+      "samples": 480,
+      "javascript_median_ms": 86.77922400005627,
+      "rust_median_ms": 6.233286999999999,
+      "javascript_p95_ms": 101.53054299997166,
+      "rust_p95_ms": 7.911677000000001,
+      "median_ratio": 13.921904125392635
+    }
+  ]
+}

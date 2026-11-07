@@ -1,0 +1,41 @@
+{
+  "recorded_at_utc": "2026-10-29T21:26:24.335674+00:00",
+  "status": "focused_pass_not_final_release_audit",
+  "test": "shard_weapon_independent_r39",
+  "passed": 17,
+  "failed": 0,
+  "log": "verification/integration-r39/independent-review/dream-and-final-miss.log",
+  "scope": "Controlled deterministic fixtures, not natural generation or interactive platform testing. Source hashes recorded after run, final full-gate pairing still required.",
+  "source_sha256": {
+    "crates/corpse-core/src/borge.rs": "0375c9723c7f7d7ba3f881a90a3eab2a001bf4446e317d332b4ebb4f81e767fe",
+    "crates/corpse-core/src/inventory.rs": "515c2d10f2b1786f37353914084ad7d73a7e45a8cfabfa1d49546249f9f8890d",
+    "crates/corpse-core/src/projectiles.rs": "f5e421f8a52f21c63af02623684e3fcbbacd3a59a826c5d18ee709fda6349897",
+    "crates/corpse-core/src/engine.rs": "f04da82a425d8f55443f04f597336830f85ea376e3751a43a96cd1170aca0ab4",
+    "crates/corpse-core/src/dreamwalking.rs": "f331be55d3b0267dc6635e6615ef669e08ec9fa7d4455416ee34e097ed30664c",
+    "crates/corpse-core/src/model_generated.rs": "7b6d40008646d0629528e4e0f4b89c9eeb93a329abf83f6ae246dc5befeecbf1",
+    "crates/corpse-core/src/storage.rs": "57fc946d0b56bdf3bc545447dc3e4d0ea8ad5590c728069b1b1caaa92dbee6c7",
+    "crates/corpse-core/src/environment.rs": "8e5f1265fdc48258ae93c8a007f1be2914610f7f2998c958106e130ba496c06b",
+    "crates/corpse-core/src/zillennia_ground.rs": "d84f2193ebdf8ea6184f4ea1e01fd3a9cd2d66a003b717095a8079b1e7fb82f8",
+    "crates/corpse-core/src/item_placement.rs": "7d36f665d9a8097bcb7f72b7dffb0c72834f5aca233aa46d4c4100b78d15c85d",
+    "crates/corpse-core/src/travel.rs": "a7d52d1caf0506d200503915762ed740b8599ab736656c5446db75f47ec6a86c",
+    "crates/corpse-core/src/finale.rs": "2e733b661f0c8b187d90c8ed05f3a4a7d1d8aa8558964b07dac00fe93670c66c",
+    "crates/corpse-core/src/item_magic.rs": "e84ab2f1ac250c8de3b718ef337b821be4aab0a67f2a41c12fa89e93c471365b",
+    "crates/corpse-core/src/offscreen.rs": "6368016f89c91cf55dd7905584cb6f2b27016ccc11819a963a8d88eee06e5fe6",
+    "crates/corpse-core/tests/shard_weapon_independent_r39.rs": "1bbce7956bfe229c25ab01900ba294fa0aeef00f7688a6ad1ef1b20c7b494ff7"
+  },
+  "log_sha256": "3d49947f99f2485a5f07637715a79089e699db8b49b36fbeb24bb34228c15d7b",
+  "findings_fixed": [
+    "equipped main-hand Shard ignored by Never Without a Fight counterstrike",
+    "Shard early return skipped Nova post-hit ability",
+    "Erase Metaphysical could remove no-revival marker (identified by core worker)"
+  ],
+  "fixture_failures_not_production": [
+    "NE initial adjacent-source loop assumption",
+    "NE alternate test cells not sorted for binary search; corrected to canonical sorted origin-fork fixture"
+  ],
+  "limits": [
+    "Final workspace full gate owned by lead",
+    "Frozen source/archive audit pending",
+    "No live Windows/macOS runtime verification performed by this reviewer"
+  ]
+}

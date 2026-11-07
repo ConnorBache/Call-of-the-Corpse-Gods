@@ -1,0 +1,10 @@
+
+running 5 tests
+test binary_blessing_doubles_stats_exp_energy_preserves_identity_provenance_quantity_and_stacks ... ok
+test flash_every_thirty_world_turns_uses_los_bypasses_dr_and_blesses_only_exposed_ground ... ok
+test pulse_ignores_dream_targets_and_new_death_hearts_wait_for_next_flash ... ok
+test actual_dispatch_and_offscreen_ticks_advance_the_saved_clock ... ok
+test generation_tower_and_clock_blessed_state_roundtrip ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+

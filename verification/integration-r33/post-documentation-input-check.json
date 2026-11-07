@@ -1,0 +1,10 @@
+{
+  "checked_utc": "2026-10-26T19:36:47.013471+00:00",
+  "release_docs_written_after_gate": true,
+  "checked_compiled_input_files": 1124,
+  "compiled_inputs_unchanged_after_release_docs": true,
+  "changed_inputs": [],
+  "all_current_release_doc_local_links_exist": true,
+  "final_gate_sha256": "5b9faeb9d9fa5577f92723ab0a4053d19d6f1c929dd0f50c5853094720cfdb4e",
+  "document_hash_receipt_sha256": "54d0d90d82460b8dc4b6196e00a4b0728f0088259e876dab5f619909b9108a87"
+}

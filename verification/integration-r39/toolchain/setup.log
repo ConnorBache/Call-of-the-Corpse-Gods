@@ -1,0 +1,53 @@
+Downloaded rustup-init 21139856 5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4
+info: profile set to minimal
+info: default host tuple is x86_64-unknown-linux-gnu
+info: syncing channel updates for 1.99.1-x86_64-unknown-linux-gnu
+info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+info: downloading 3 components
+info: default toolchain set to 1.99.1-x86_64-unknown-linux-gnu
+
+  1.99.1-x86_64-unknown-linux-gnu installed - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+
+
+Rust is installed now. Great!
+
+To get started you need Cargo's bin directory 
+(/workspace/scratch/69f53637ba6f/shard-r39/source/.cargo/bin) in your PATH
+environment variable. This has not been done automatically.
+
+To configure your current shell, you need to source
+the corresponding env file under 
+/workspace/scratch/69f53637ba6f/shard-r39/source/.cargo.
+
+Consider running the right command for your shell (note the leading DOT):
+. "/workspace/scratch/69f53637ba6f/shard-r39/source/.cargo/env" # For 
+sh/ash/dash/pdksh/zsh
+cargo:rerun-if-env-changed=CC_x86_64-unknown-linux-gnu
+CC_x86_64-unknown-linux-gnu = None
+cargo:rerun-if-env-changed=CC_x86_64_unknown_linux_gnu
+CC_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_unknown_linux_gnu
+CFLAGS_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-unknown-linux-gnu
+CFLAGS_x86_64-unknown-linux-gnu = None
+info: downloading component rust-std
+RUST_READY
+Downloaded gcc-mingw-w64-base_14.2.0-19+27+b1_amd64.deb 194268 8d2c64b886ab4a435a78ddc4cd3b510f149b65fbd6be8472e8f460627562718a
+Downloaded binutils-mingw-w64-x86-64_2.44-3+12+b1_amd64.deb 3473344 b53f4a091b16a0d0952b8e3bd6027931641386258f96b37db1f0c62c787221d3
+Downloaded gcc-mingw-w64-x86-64-posix-runtime_14.2.0-19+27+b1_amd64.deb 13037152 c898d96177574a8a7238564a1e799d8ddfed5a3d2ea005510305f9ad466a6f59
+Downloaded gcc-mingw-w64-x86-64-posix_14.2.0-19+27+b1_amd64.deb 37567656 e32d24cfd1482394f16d9a84c1d0a9f5aa08ee826a79acc383c70cc8c23c4fe5
+Downloaded mingw-w64-common_12.0.0-5_all.deb 5792084 97dce5d0d8aff1cade4786ad4ef5078345477a598829afcac2e7f2fbc5399990
+Downloaded mingw-w64-x86-64-dev_12.0.0-5_all.deb 4871860 0bf89cf7454cccb49cd2a46a6f7b33896f6ae3a1a2fe33e02c40be6155bbb385
+Downloaded SDL2-devel-2.32.10-mingw.tar.gz 13892870 83a5d74012311edc3c0d40ea6faecbe57ad692aa033fa5dc273cc937e3938ff2
+ALL_DEPS_READY

@@ -1,0 +1,121 @@
+{
+  "checked_utc": "2026-10-28T17:59:36.264653+00:00",
+  "core_source_fingerprint": "ee90c75d8f952dd586ef16921388630b8aae8d054d04a712a263edb986b7fbf2",
+  "core_input_count": 268,
+  "source_drift": [],
+  "unique_seeds": 4,
+  "unique_generated_floors": 160,
+  "repeated_deterministic_floor_generations": 320,
+  "corn_chambers_checked": 3,
+  "generation": [
+    {
+      "seed": "sub-biome-review-1",
+      "elapsed_ms": 1970.597
+    },
+    {
+      "seed": "sub-biome-review-2",
+      "elapsed_ms": 1760.427
+    },
+    {
+      "seed": "r37-independent-0",
+      "elapsed_ms": 1735.75
+    },
+    {
+      "seed": "r37-independent-1",
+      "elapsed_ms": 1884.945
+    }
+  ],
+  "corn_chambers": [
+    {
+      "seed": "sub-biome-review-1",
+      "depth": 31.0,
+      "cells": 81.0,
+      "residents": 8.0,
+      "portals": 4.0,
+      "speed_cells": 8.0,
+      "random_cells": 15.0,
+      "links": 30.0
+    },
+    {
+      "seed": "r37-independent-0",
+      "depth": 36.0,
+      "cells": 81.0,
+      "residents": 8.0,
+      "portals": 4.0,
+      "speed_cells": 10.0,
+      "random_cells": 21.0,
+      "links": 28.0
+    },
+    {
+      "seed": "r37-independent-1",
+      "depth": 34.0,
+      "cells": 81.0,
+      "residents": 8.0,
+      "portals": 4.0,
+      "speed_cells": 8.0,
+      "random_cells": 32.0,
+      "links": 36.0
+    }
+  ],
+  "performance": [
+    {
+      "seed": "sub-biome-review-1",
+      "depth": 31.0,
+      "links": 30.0,
+      "route40_cold_ms": 0.667,
+      "route40_warm_ms": 0.73,
+      "ray40_ms": 2.726
+    },
+    {
+      "seed": "r37-independent-0",
+      "depth": 36.0,
+      "links": 28.0,
+      "route40_cold_ms": 0.871,
+      "route40_warm_ms": 0.978,
+      "ray40_ms": 13.403
+    },
+    {
+      "seed": "r37-independent-1",
+      "depth": 34.0,
+      "links": 36.0,
+      "route40_cold_ms": 1.287,
+      "route40_warm_ms": 1.212,
+      "ray40_ms": 7.098
+    }
+  ],
+  "full_wait_commands": [
+    {
+      "seed": "sub-biome-review-1",
+      "depth": 31.0,
+      "ms": 75.4,
+      "took_turn": "true",
+      "deterministic": "true"
+    },
+    {
+      "seed": "r37-independent-0",
+      "depth": 36.0,
+      "ms": 115.598,
+      "took_turn": "true",
+      "deterministic": "true"
+    },
+    {
+      "seed": "r37-independent-1",
+      "depth": 34.0,
+      "ms": 53.269,
+      "took_turn": "true",
+      "deterministic": "true"
+    }
+  ],
+  "real_command_save_resume_regression": {
+    "passed": 1,
+    "failed": 0,
+    "commands": [
+      "Wait",
+      "Move(+1,0)",
+      "Wait"
+    ]
+  },
+  "scope": "Independent optimized Linux core generation, route and ray helper queries, real turn command/save/resume. Not full workspace suite, desktop frame benchmark, worst-case performance proof, Windows runtime test or final archive verification.",
+  "fixture_controls": "Move player into an unoccupied generated Corn chamber cell; give high HP to survive deep encounters. Keep actual generated actors, geometry, state and full-floor simulation. No runtime code changes.",
+  "resolved_issue": "Generated cornDimensionResident marker initially rejected all turn commands. Lead registered the marker and preserved it through corpse/revival; actual generated commands now pass."
+}

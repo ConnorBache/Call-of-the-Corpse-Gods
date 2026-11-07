@@ -1,0 +1,214 @@
+{
+  "status": "passed",
+  "simulation_revision": 36,
+  "completed_utc": "2026-10-28T15:39:08.761752+00:00",
+  "gate_started_utc": "2026-10-28T15:25:54.438390+00:00",
+  "workspace": {
+    "label": "workspace",
+    "command": [
+      "sh",
+      "tools/cargo.sh",
+      "test",
+      "--workspace",
+      "--locked",
+      "--all-targets",
+      "--no-fail-fast"
+    ],
+    "exit_code": 0,
+    "seconds": 790.731,
+    "targets": 142,
+    "log": "verification/integration-r36/final-gate/workspace.log",
+    "log_sha256": "bdb076159651ec5b2458344b5cc6c9ed4e7f250e5de8f322f0cc4d5232470460",
+    "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+    "failed_tests": [],
+    "passed": 865,
+    "failed": 0,
+    "ignored": 1,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "doctests": {
+    "label": "doctests",
+    "command": [
+      "sh",
+      "tools/cargo.sh",
+      "test",
+      "--workspace",
+      "--locked",
+      "--doc",
+      "--no-fail-fast"
+    ],
+    "exit_code": 0,
+    "seconds": 1.216,
+    "targets": 1,
+    "log": "verification/integration-r36/final-gate/doctests.log",
+    "log_sha256": "e4dca9bddba980c24ce79fa7a5fb46a458298492c575617e11977c5a1d9134a0",
+    "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+    "failed_tests": [],
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "frozen_code_manifest_sha256": "f0b38fb5e06763c1cae69d2fc0a72c8cc647cd612ca75b50ba5c2ae1eff2ec03",
+  "frozen_input_count": 1057,
+  "frozen_inputs_verified_before_and_after": true,
+  "profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "cargo_version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "focused": {
+    "result": "passed",
+    "scope": "combined affected core focused sweep; not full workspace gate",
+    "targets": 24,
+    "counts": {
+      "passed": 222,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    "log": "verification/integration-r36/independent/combined-focused.log",
+    "sha256": "fa004e26d2ad9eef16f8db49637a236ef7f0978a5f49a2417ac218710c9aad98",
+    "completedUtc": "2026-10-28T15:25:52.517210+00:00"
+  },
+  "windows_crossbuild_verified": true,
+  "windows_runtime_verified": false,
+  "windows_executable_unsigned": true,
+  "windows_exe_sha256": "625fa2a4f2ec4d2014b07ab66c17d4cdebc1a8e4a6820c1e4529705a82fce5d0",
+  "windows_exe_bytes": 101339579,
+  "windows_static_dependency_closure": [
+    "SDL2.dll"
+  ],
+  "original_r35_input": {
+    "library_file_id": "libfile_3e0271ad0468819193074fc8ab8ba853",
+    "version": 6,
+    "filename": "corpse-gods-native-r35-portals-source.zip",
+    "bytes": 285281949,
+    "sha256": "79f8ef3cfc5fdffcaf6a1c688996244f407c02960e2f894d8595d75dd356ebd4"
+  },
+  "preservation_verified": true,
+  "preserved_authored_files": 316,
+  "preserved_historical_verification_files": 160,
+  "preserved_historical_top_level_r35_files": 3,
+  "generation_samples": {
+    "geometry-sweep.json": {
+      "sampleFloors": 144,
+      "totals": {
+        "shapeAttempts": 1806,
+        "shapeCandidates": 131,
+        "assignmentAttempts": 343,
+        "assignmentRejections": 212,
+        "safetyRejections": 0,
+        "acceptedPockets": 131,
+        "acceptedCells": 1379,
+        "acceptedGroups": 624,
+        "acceptedTwoSourceGroups": 131
+      },
+      "elapsedSeconds": 7.396270953
+    },
+    "populated-sweep.json": {
+      "sampleFloors": 12,
+      "totals": {
+        "shapeAttempts": 149,
+        "shapeCandidates": 11,
+        "assignmentAttempts": 25,
+        "assignmentRejections": 14,
+        "safetyRejections": 0,
+        "acceptedPockets": 11,
+        "acceptedCells": 106,
+        "acceptedGroups": 48,
+        "acceptedTwoSourceGroups": 10
+      },
+      "elapsedSeconds": 8.166613592,
+      "inventory": {
+        "allFloors": 160,
+        "eligibleFloors20to40": 84,
+        "installedEligibleFloors": 77,
+        "omittedEligibleFloors": 7,
+        "below20Floors": 76,
+        "below20Installed": 0
+      }
+    },
+    "focusedChecks": {
+      "integration": {
+        "passed": 11,
+        "failed": 0
+      },
+      "proposalUnits": {
+        "passed": 4,
+        "failed": 0
+      },
+      "environment": {
+        "CARGO_INCREMENTAL": "0",
+        "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+        "CARGO_PROFILE_TEST_DEBUG": "0",
+        "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+        "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+      },
+      "commands": [
+        "./tools/cargo.sh test -p corpse-core --test non_euclidean_generation_v36 --locked -- --nocapture",
+        "./tools/cargo.sh test -p corpse-core --lib non_euclidean_generation --locked -- --nocapture"
+      ]
+    },
+    "assignmentAdjacency": "Live eight-neighbor movement with existing wall-corner rule; cardinal CA contiguity and cardinal full/portal-free safety proofs remain.",
+    "sourceSha256": {
+      "crates/corpse-core/src/non_euclidean_generation.rs": "eb5659738d7138f10431845a3a485e7736babb8a94ed2975936075218b8c9671",
+      "crates/corpse-core/tests/non_euclidean_generation_v36.rs": "cdfaeba711731587aed260ddf9e234cefd2106609aa3cf0ec10b29587689982f",
+      "docs/non-euclidean-generation-r36.md": "e1d720315b56a9bfb0d9dd196efd014ec7d07c3d07407befe6f82e7ea9ec8689"
+    }
+  },
+  "renderer_capture": {
+    "actual_native_rasterizer": true,
+    "interactive_window_verification": false,
+    "windows_runtime_verification": false,
+    "provenance": "Controlled topology and Epidite clocks; generated floor20 DEBUG map uses controlled player placement/full reveal, no simulated turns.",
+    "artifacts": [
+      {
+        "path": "epidite-10-turns-controlled.png",
+        "bytes": 346553,
+        "sha256": "1457c3eb5f2b2efb3537c084a58369b65653c982e224b944432a7fa3570f3607"
+      },
+      {
+        "path": "epidite-9-turns-controlled.png",
+        "bytes": 346628,
+        "sha256": "cacf15b90bcc7a8d97d1bfe5f5452e28a1719b420e72cb672b90b94bc85c2d21"
+      },
+      {
+        "path": "non-euclidean-generated-floor20-debug.png",
+        "bytes": 748147,
+        "sha256": "68e421d2199a61cf4460a380642b98b79b9e7b25eb2f27592b48b5280e67a97c"
+      },
+      {
+        "path": "non-euclidean-possible-exits-controlled.png",
+        "bytes": 353124,
+        "sha256": "5a2d91cdfdd5eb516fb374651695d5db97b8232e05c23975bd656bcf6558e6ca"
+      }
+    ]
+  },
+  "limitations": [
+    "Unsigned Windows cross-build and static PE/resource checks only; Windows launch, rendering, input and save behavior were not exercised.",
+    "Controlled tests and sampled seeded floors do not certify exhaustive seed coverage or survival balance.",
+    "Bounded AI possible-shot search examines at most 256 branch prefixes; budget exhaustion may decline a shot. Directional fire cones may decline uncertain central headings; committed emitted rays retain actual stochastic physics.",
+    "Pockets may be omitted after bounded CA/assignment safety rejection; 70/30 describes proposal draws, not the accepted final group ratio."
+  ],
+  "evidence_sha256": {
+    "final-gate/final-gate-receipt.json": "78d86bea839d639869b416a792c9a9ad825c42947a2393dc28d7eca5e5621fcd",
+    "final-gate/code-freeze.json": "5563719a50aaf9ffdd8373f125784474005c151cc426c1911f18eb45db7b39f7",
+    "final-gate/workspace.log": "bdb076159651ec5b2458344b5cc6c9ed4e7f250e5de8f322f0cc4d5232470460",
+    "final-gate/doctests.log": "e4dca9bddba980c24ce79fa7a5fb46a458298492c575617e11977c5a1d9134a0",
+    "source-freeze.json": "32f28ecd4fd70b1bc202aa36a3aff2015c1a05a13d3ada4b48218e2b07b931c6",
+    "generation/summary.json": "b4aa93d1b05761fb0acc8dfc6283437afb024e3d0b2b08fff33d7710b15786d7",
+    "generation/geometry-sweep.json": "d387cd254da2e9a24f51a2a15cbf586b001650c1b38806efdd2bea12c6bc4753",
+    "generation/populated-sweep.json": "1f60d5a5a939ea11116e91bda501fb1499b61360a76b0b10f6eec45574f2715c",
+    "independent/combined-focused-receipt.json": "1fe63482309b04a1cb1d10aeb6aeab805fb4a51847cf35718c8a52901e8acde6",
+    "desktop-ui/receipt.json": "6e27137ecbbd77f5618c2501941b15faa802658b2004d787382a94c228b6c751",
+    "windows-build/windows-crossbuild-receipt.json": "e14beb70aa4a3c232ca5da0d985c808e194ce3188a59b59e2001fd365ad163da",
+    "preservation-audit.json": "2e89489c3c9e848b396e01f6d09d13102384525ee11235c56f61b1969c825c86"
+  }
+}

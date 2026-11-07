@@ -1,0 +1,15 @@
+{
+  "reason": "Full gate exposed stale assertion that revision37 is unsupported. Lead corrected only two revision-boundary test files; production core files remain byte-identical to independent review inputs. Final full-gate receipt separately tests revised assertions.",
+  "changed_inputs": [
+    {
+      "path": "crates/corpse-core/tests/flavor_placement.rs",
+      "tested_sha256": "ce79f68881b5308a0f793400ff308fd4a8f5d45c61b2d31e03e00f34c9ea83d8",
+      "final_sha256": "c8fa4e1cc06c50e9d0759f0951eb455db20f96c3aead5391c280377b816a56e8"
+    },
+    {
+      "path": "crates/corpse-core/tests/physical_balance.rs",
+      "tested_sha256": "974d04b6c8649589d7d1b4450ce321ff18978deb9a9c124ff8ad041778e68f81",
+      "final_sha256": "98f414ec9f992c4bef7e9dc902e04cb012c3a7ffbdf302cec9e91c48db76fdea"
+    }
+  ]
+}

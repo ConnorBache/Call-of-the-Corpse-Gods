@@ -1,0 +1,14 @@
+{
+  "docx_semantic_blocks_exact": 233,
+  "docx_external_relationships": [],
+  "title_rule_absent": true,
+  "self_contained_html": true,
+  "source_markdown_copied_exactly": true,
+  "source_sha256": "bcfb207c91e31f45e379f1917e6d7c663051710f392ab9281b210f2f5fe99158",
+  "html_checks": {
+    "semantic_blocks_exact": 233,
+    "table_count": 6,
+    "external_assets_links_or_scripts": 0,
+    "browser_visual_QA": "not established: local Chromium blocked by sandbox socket restrictions; escalation wrapper failed"
+  }
+}

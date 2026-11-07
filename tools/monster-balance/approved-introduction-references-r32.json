@@ -1,0 +1,2958 @@
+{
+  "status": "placement-approved-before-tuning; role targets proposed fitting centers",
+  "revision": 32,
+  "authority": "latest designer numerical-role instruction, canonical r31 manual histories/mechanics, existing authored fixed events",
+  "source_sha256": "9b24b38d5ac630c6e536581b71b2d824a857febe77db532775fd793752135a41",
+  "units": "gross incoming damage across completed creature lifetime as percent of initial player maximum HP, never per hit; report net loss after regeneration separately",
+  "rules": {
+    "fighters": "10\u201350 percent, rising with depth and explicit constraints; point targets are fitting centers, not survival promises",
+    "skirmishers": "60\u201380 percent matched-depth Fighter output; preserve real mobility",
+    "mages": "about half matched-depth Fighter total output including bursts and residuals",
+    "controllers_supports": "low direct damage and gradual one-note restriction/heal utility; paired differential tests, not attack-only claim",
+    "summoners": "ten normal turns between casts; three actual casts worth one matched Fighter via children, include descendant summons in group tests",
+    "legacy": "r29/30/31 actors, generation, saves and replay unchanged",
+    "prose": "no descriptions or authored Natural History edits",
+    "reference": "all previously collected ordinary hearts and starter weapon per existing benchmark; moving ranges changes progression distributions, so regenerate reference profiles before fitting",
+    "target_depth": "Earliest reachable natural or conditional appearance; approved original midpoint retained only for diagnostics. Fixed per-species stats; later weaker encounters are expected.",
+    "group_warning": "solo targets do not sum into group outcomes, preserve pair/spawn/habitat/pack/caps and report group death rates"
+  },
+  "entries": [
+    {
+      "id": "blorb",
+      "name": "Blorb",
+      "current": {
+        "ordinary": [
+          1,
+          3
+        ],
+        "conditional_depths": [
+          1
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "a30f3dcb6991b504faadab63fefc099de41ff99a1b626ee2d1f85bd7f2577a9f",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          3
+        ],
+        "first_any": 1
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 10.0,
+      "reference_depth": 1,
+      "rationale": "Weak refuse scavenger: bottom of Fighter band; retain Slow and tiny body.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "rat",
+      "name": "Giant Rat",
+      "current": {
+        "ordinary": [
+          1,
+          3
+        ],
+        "conditional_depths": [],
+        "first_any": 1
+      },
+      "authored_history_sha256": "77d9ee4f0dad1e8c3f1c9294874b9029250af506f85976b9ab0d583f6bb5989b",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          3
+        ],
+        "first_any": 1
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 20.0,
+      "reference_depth": 1,
+      "rationale": "Authored floor-one anchor: blood-grown vermin costs one fifth of starting HP over its full life.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "shellback-beetle",
+      "name": "Shellback Beetle",
+      "current": {
+        "ordinary": [
+          1,
+          4
+        ],
+        "conditional_depths": [
+          2
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "fe3f4d343a9946f5712122c04dc8161fd243cb9fa2bc3f75ddef048c9566560a",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          4
+        ],
+        "first_any": 1
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 24.0,
+      "reference_depth": 1,
+      "rationale": "Shallow foliage eater; heavy shell and Slow justify more stationary cost than Rat, not a deeper introduction.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "hemogoblin",
+      "name": "Hemogoblin",
+      "current": {
+        "ordinary": [
+          1,
+          5
+        ],
+        "conditional_depths": [
+          3
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "53de9758931867a0759debbefbb1beceb2e05208e247c3225ffe46d29992e27b",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          5
+        ],
+        "first_any": 1
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 20.0,
+      "reference_depth": 1,
+      "rationale": "Basic blood-corrupted goblin is an early melee baseline, below its magical and mechanical specialists.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "cave-bat",
+      "name": "Cave Bat",
+      "current": {
+        "ordinary": [
+          1,
+          6
+        ],
+        "conditional_depths": [
+          4
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "5ad0322ed8b7ddbd27ee8992325c7e586412d09f76d9a27f856de68021f60de8",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          6
+        ],
+        "first_any": 1
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 14.0,
+      "reference_depth": 1,
+      "rationale": "Small high-cave blood feeder; flight/Fast provide mobility, trading away 30 percent of comparable Fighter lifetime damage.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 20.0,
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "pale:Jackal",
+      "name": "Pale Jackal",
+      "current": {
+        "ordinary": [
+          1,
+          7
+        ],
+        "conditional_depths": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "5937e386b7f1dd51c9e7e6724c654f8220b089aa5b2ba378406e57be2bd72749",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          7
+        ],
+        "first_any": 1
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 12.0,
+      "reference_depth": 1,
+      "rationale": "Small expendable pale defensive offspring; deliberately weak individually and measured separately when summoned.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "needleling",
+      "name": "Needleling",
+      "current": {
+        "ordinary": [
+          1,
+          7
+        ],
+        "conditional_depths": [
+          5
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "9882306b9df2a8b3cc6fc7d42545bf3efd5cdbf30cca01d52e84bc336e156d65",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          7
+        ],
+        "first_any": 1
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 20.0,
+      "reference_depth": 1,
+      "rationale": "Dog-sized disease machine introduces a simple venom tail; preserve mechanical body and include all residual poison.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "bastidion",
+      "name": "Bastidion",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "dc7cb141116ca5cf9d7c879629d4352b23b91f852f89122823142edb7a3ee0a5",
+      "category": "rooted_environment_actor",
+      "proposed": {
+        "conditional_depths": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 1
+      },
+      "role": "Controller (rooted hazard)",
+      "target_lifetime_loss_pct": null,
+      "reference_depth": null,
+      "rationale": "Common corpse-rooting fungus belongs throughout Flesh, not an ordinary roaming Fighter. Forty depth-scaled bodies are one species; preserve rooted/no-revival/gas immunity.",
+      "measurement": "zero ordinary attack; report killed-and-settled gas exposure and matched-group restriction cost by depth, gas/fire chain reactions separately; no universal finite lifetime scalar",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "short-saidri",
+      "name": "Short-legged Saidribee",
+      "current": {
+        "ordinary": [
+          1,
+          8
+        ],
+        "conditional_depths": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "1f7972e02afa6206a1febb496493244852ef1f56a10e62e57d53c14dd30debe4",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          1,
+          8
+        ],
+        "first_any": 1
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 15.0,
+      "reference_depth": 1,
+      "rationale": "Small flying hive worker: mobility and venom, below the grounded roaming guardian and nest guardian.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 21.43,
+      "diagnostic_midpoint": 1
+    },
+    {
+      "id": "pale:Biter",
+      "name": "Pale Biter",
+      "current": {
+        "ordinary": [
+          1,
+          9
+        ],
+        "conditional_depths": [
+          6,
+          7,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "first_any": 1
+      },
+      "authored_history_sha256": "6287cb2349829f0daac58a26b0784f6b7adaf9ead9e0a54b97953c21f3e8e8a9",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          3,
+          11
+        ],
+        "first_any": 3
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 25.0,
+      "reference_depth": 3,
+      "rationale": "Human-sized aggressive ancient pale with repeat bite and life-drink belongs after tiny vermin, before grown pales.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 7.0
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad",
+      "current": {
+        "ordinary": [
+          2,
+          10
+        ],
+        "conditional_depths": [],
+        "first_any": 2
+      },
+      "authored_history_sha256": "620e3056bdff8c9d479a0a7e4a42aa164a03af3fd96b85429293d459aa62df7d",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          3,
+          12
+        ],
+        "first_any": 3
+      },
+      "role": "Support",
+      "target_lifetime_loss_pct": 6.0,
+      "reference_depth": 3,
+      "rationale": "God-tree descendant heals allies rather than winning solo trades; early introduction teaches prioritization.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 7.5
+    },
+    {
+      "id": "hemogoblin-bloodmancer",
+      "name": "Hemogoblin Bloodmancer",
+      "current": {
+        "ordinary": [
+          2,
+          11
+        ],
+        "conditional_depths": [
+          7,
+          8,
+          9
+        ],
+        "first_any": 2
+      },
+      "authored_history_sha256": "eadacd10c75db5f63803be99b4542e0adac68c58577aa1d33d870bd8474f7849",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          5,
+          14
+        ],
+        "first_any": 5
+      },
+      "role": "Controller",
+      "target_lifetime_loss_pct": 8.0,
+      "reference_depth": 5,
+      "rationale": "Magical goblin specialist follows basic goblins; pull and bleeding are utility, not an excuse for Fighter raw damage.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 9.5
+    },
+    {
+      "id": "zillennia:infant",
+      "name": "Infant Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          4
+        ],
+        "first_any": 4
+      },
+      "authored_history_sha256": "90d1dea48dd037fdd3bd6536bf5340768e397bbe78711fac81ccf102559ef2ae",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          4
+        ],
+        "first_any": 4
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 40.0,
+      "reference_depth": 4,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 4.0
+    },
+    {
+      "id": "lesser-ichor-fish",
+      "name": "Lesser Ichor-Fish",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "first_any": 4
+      },
+      "authored_history_sha256": "3c12d34f83ba5b683e4661c4cac6c3dfe35f736b780cd2ee84edde0abc0ede08",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "first_any": 4
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 24,
+      "reference_depth": 4,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 6.0
+    },
+    {
+      "id": "ichor-fish-standard",
+      "name": "Ichor-Fish",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "first_any": 4
+      },
+      "authored_history_sha256": "3c12d34f83ba5b683e4661c4cac6c3dfe35f736b780cd2ee84edde0abc0ede08",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "first_any": 4
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 27,
+      "reference_depth": 4,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 8.5
+    },
+    {
+      "id": "pale:Breather",
+      "name": "Pale Breather",
+      "current": {
+        "ordinary": [
+          3,
+          11
+        ],
+        "conditional_depths": [
+          6,
+          7,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "first_any": 3
+      },
+      "authored_history_sha256": "173912a9ad029e7bb3e45fc8509b455894eb1435932bf5110bdeb2b96b685d08",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          5,
+          13
+        ],
+        "first_any": 5
+      },
+      "role": "Controller",
+      "target_lifetime_loss_pct": 10.0,
+      "reference_depth": 5,
+      "rationale": "Pale gas-defense specialist follows basic bites; retain its one-note gas identity and measure lingering clouds separately.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 9.0
+    },
+    {
+      "id": "zillennia:child",
+      "name": "Child Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "first_any": 5
+      },
+      "authored_history_sha256": "f63095d97b93ded7fe825d96b16106286875e4661de1c3f299488c6fcbc709b0",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "first_any": 5
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 41.1,
+      "reference_depth": 5,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 6.5
+    },
+    {
+      "id": "pale:Spitter",
+      "name": "Pale Spitter",
+      "current": {
+        "ordinary": [
+          4,
+          12
+        ],
+        "conditional_depths": [
+          6,
+          7,
+          8,
+          9,
+          10,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "first_any": 4
+      },
+      "authored_history_sha256": "cfc81577507f8b2ba2ee949f7bf44768f900b1653ecba939e06b3a1bdd34cc69",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          4,
+          12
+        ],
+        "first_any": 4
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 12.0,
+      "reference_depth": 4,
+      "rationale": "Low-beast projectile specialist: about half its peer Fighter budget, with existing recovery and gas shot intact.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 8.0
+    },
+    {
+      "id": "pale:Screamer",
+      "name": "Pale Screamer",
+      "current": {
+        "ordinary": [
+          4,
+          13
+        ],
+        "conditional_depths": [
+          6,
+          7,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "first_any": 4
+      },
+      "authored_history_sha256": "6350650939b9f9c021a6c0ce5b686b14317e4d7d6ed5af400eee07c7c3becba0",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          4,
+          13
+        ],
+        "first_any": 4
+      },
+      "role": "Support/Controller",
+      "target_lifetime_loss_pct": 6.0,
+      "reference_depth": 4,
+      "rationale": "Emboldens pale kin and weakens foes; early group utility should be clear without broad spell proliferation.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 8.5
+    },
+    {
+      "id": "pale:Birther",
+      "name": "Pale Birther",
+      "current": {
+        "ordinary": [
+          5,
+          14
+        ],
+        "conditional_depths": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "first_any": 5
+      },
+      "authored_history_sha256": "a948693dc4b5b3d04bb38c5cfa21efa11fe6c148ec9f82bf25f1eab44cf469fc",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          6,
+          15
+        ],
+        "first_any": 6
+      },
+      "role": "Summoner",
+      "target_lifetime_loss_pct": 5.0,
+      "reference_depth": 6,
+      "rationale": "Low-beast mother follows the first small pale group; most power is children, with ten-turn cooldown and three-cast Fighter-equivalent budget.",
+      "measurement": "direct lifetime damage separate; three casts of actual child mixture/descendants must equal one matched Fighter, not three Fighters; include parents in total encounter sensitivity",
+      "three_cast_child_budget_pct": 25,
+      "summon_cooldown_normal_turns": 10,
+      "diagnostic_midpoint": 10.5
+    },
+    {
+      "id": "greater-ichor-fish",
+      "name": "Greater Ichor-Fish",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ],
+        "first_any": 5
+      },
+      "authored_history_sha256": "3c12d34f83ba5b683e4661c4cac6c3dfe35f736b780cd2ee84edde0abc0ede08",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ],
+        "first_any": 5
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 30,
+      "reference_depth": 5,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 11.5
+    },
+    {
+      "id": "giant-beetle",
+      "name": "Giant Beetle",
+      "current": {
+        "ordinary": [
+          6,
+          15
+        ],
+        "conditional_depths": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "first_any": 6
+      },
+      "authored_history_sha256": "743211fd00efddadd20794b65540049cdb5acf6f437b5d5e344f0ef5e369c603",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          8,
+          17
+        ],
+        "first_any": 8
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 28.0,
+      "reference_depth": 8,
+      "rationale": "Horse-sized flying humanoid predator follows dog-sized shellback and worker bee; keep armor/body more important than evasiveness.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 12.5
+    },
+    {
+      "id": "samara",
+      "name": "Devil's Samara",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 8
+      },
+      "authored_history_sha256": "447e0163e7adcc5f302b3ccaad00377e79eca8b5f9c3a81e9bff131528670e99",
+      "category": "rooted_environment_actor",
+      "proposed": {
+        "conditional_depths": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 8
+      },
+      "role": "Controller/Artillery (rooted hazard)",
+      "target_lifetime_loss_pct": null,
+      "reference_depth": null,
+      "rationale": "Dangerous razor-seed tree remains terrain from depth8 in Forest/Meadow; rooted avoidability is its counterplay, not a moving attacker.",
+      "measurement": "zero ordinary attack; existing 2-percent razorleaf exposure per tick preserved; route and kill-plus-settlement costs reported, no universal exposure duration",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "glim",
+      "name": "Glim",
+      "current": {
+        "ordinary": [
+          7,
+          16
+        ],
+        "conditional_depths": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "first_any": 7
+      },
+      "authored_history_sha256": "b10df5532d0229982fcb26a897783e8737e1305cf9dda1ac3ee3c0de36daba2a",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          7,
+          16
+        ],
+        "first_any": 7
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 30.0,
+      "reference_depth": 7,
+      "rationale": "Huge slime quadruped is stronger than Blorb; slime-bound movement is a real downside despite Fast and justifies a stronger contact trade.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 11.5
+    },
+    {
+      "id": "zillennia:lesser",
+      "name": "Lesser Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          9,
+          10,
+          11,
+          12
+        ],
+        "first_any": 9
+      },
+      "authored_history_sha256": "c5c33dad88e962d1206a264239b6358295a1a3ed801cd81e60caefc1271db8d0",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          9,
+          10,
+          11,
+          12
+        ],
+        "first_any": 9
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 42.2,
+      "reference_depth": 9,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 10.5
+    },
+    {
+      "id": "bear",
+      "name": "Bear",
+      "current": {
+        "ordinary": [
+          8,
+          16
+        ],
+        "conditional_depths": [
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "first_any": 8
+      },
+      "authored_history_sha256": "90d8db845c9745e8c6860d61c6e798598568cd4da8326672c5a9da718388dbf3",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          6,
+          14
+        ],
+        "first_any": 6
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 28.0,
+      "reference_depth": 6,
+      "rationale": "Ordinary flesh-eating bear belongs below supernatural horse breeds and larger corrupted brutes.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 10.0
+    },
+    {
+      "id": "witch",
+      "name": "Witch",
+      "current": {
+        "ordinary": [
+          8,
+          17
+        ],
+        "conditional_depths": [
+          15
+        ],
+        "first_any": 8
+      },
+      "authored_history_sha256": "3499c5257146dd584c2dae2bcf754073a838cf9d7c9777c9d5bd60878ba9d32e",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          27,
+          36
+        ],
+        "first_any": 27
+      },
+      "role": "Controller",
+      "target_lifetime_loss_pct": 15.0,
+      "reference_depth": 27,
+      "rationale": "Explicit designer request and eldritch-corruption history demand substantially deeper placement; retain current slow/bleed/poison cycle, do not invent births from prose.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 31.5
+    },
+    {
+      "id": "horn-1",
+      "name": "Unicorn",
+      "current": {
+        "ordinary": [
+          9,
+          18
+        ],
+        "conditional_depths": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "first_any": 9
+      },
+      "authored_history_sha256": "7676838b1ad542e665d825225ed414d01afff186c41717f26b45a1346bac17ad",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          12,
+          21
+        ],
+        "first_any": 12
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 15.0,
+      "reference_depth": 12,
+      "rationale": "Otherworldly one-horn horse enters midgame; ranged bolt budget is half a 30-percent Fighter.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 16.5
+    },
+    {
+      "id": "horn-2",
+      "name": "Bicorn",
+      "current": {
+        "ordinary": [
+          10,
+          19
+        ],
+        "conditional_depths": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "first_any": 10
+      },
+      "authored_history_sha256": "0547ca33f8392b2db138fecd6414d8f645101c9a085659ee0abb1ed5ee3f23fa",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          12,
+          21
+        ],
+        "first_any": 12
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 22.0,
+      "reference_depth": 12,
+      "rationale": "Two-horn bull has unrestricted Fast pursuit; mobile bruiser keeps about 73 percent of peer Fighter damage, unlike committed Minotaur.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 31.43,
+      "diagnostic_midpoint": 16.5
+    },
+    {
+      "id": "sphinx",
+      "name": "Sphinx",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 12
+      },
+      "authored_history_sha256": "fd6b1ff3690c74ec38eb3602b55f8a11b548de79ff2229c84e52df228feffba6",
+      "category": "invulnerable_story_guardian",
+      "proposed": {
+        "conditional_depths": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 12
+      },
+      "role": "Controller/pursuit puzzle",
+      "target_lifetime_loss_pct": null,
+      "reference_depth": null,
+      "rationale": "Immortal optional treasure guardian is solved through guile and chase; keep depth12+ chamber and invulnerability rather than assign impossible kill-life metric.",
+      "measurement": "no finite kill-life target; test provoke delay, pursuit, treasure escape and survivability",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "lesser-ichor-shark",
+      "name": "Lesser Ichor-Shark",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "first_any": 10
+      },
+      "authored_history_sha256": "0dfe4a8da1e50e38dffd6882803ffa0cfdda7cd3cfc73213010dc6dbf5d0318d",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "first_any": 10
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 34,
+      "reference_depth": 10,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 16.5
+    },
+    {
+      "id": "hemogoblin-inventor",
+      "name": "Hemogoblin Inventor",
+      "current": {
+        "ordinary": [
+          11,
+          20
+        ],
+        "conditional_depths": [],
+        "first_any": 11
+      },
+      "authored_history_sha256": "493f8edb95eac1adca0f6ee7abb00cc706e254b5bf10514d9f7921a7a3bf4673",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          14,
+          23
+        ],
+        "first_any": 14
+      },
+      "role": "Support",
+      "target_lifetime_loss_pct": 4.0,
+      "reference_depth": 14,
+      "rationale": "Inventor is a pilot/enabler, not a second full-strength combatant; move its pinnacle-of-warfare mech pair to middle depths.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 18.5
+    },
+    {
+      "id": "hemogoblin-mech",
+      "name": "Hemogoblin Mech",
+      "current": {
+        "ordinary": [
+          11,
+          20
+        ],
+        "conditional_depths": [],
+        "first_any": 11
+      },
+      "authored_history_sha256": "357efdf73f52f94cc222014f9769f1ac6bb971365510786dca85ee587470394c",
+      "category": "paired_follower",
+      "proposed": {
+        "ordinary": [
+          14,
+          23
+        ],
+        "first_any": 14
+      },
+      "role": "Fighter/Artillery",
+      "target_lifetime_loss_pct": 38.0,
+      "reference_depth": 14,
+      "rationale": "Large dormant machine is threatening after piloting; its dependency justifies stronger contact than an unconstrained midgame Fighter.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 18.5
+    },
+    {
+      "id": "zillennia:unqualified",
+      "name": "Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "first_any": 13
+      },
+      "authored_history_sha256": "6ee2bd3127e4a4d9d2d2deccdfdcada46074efd05faf2c282904aeda0c73f55d",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "first_any": 13
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 43.3,
+      "reference_depth": 13,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 14.5
+    },
+    {
+      "id": "tiger",
+      "name": "Tiger",
+      "current": {
+        "ordinary": [
+          12,
+          20
+        ],
+        "conditional_depths": [
+          14,
+          15,
+          16,
+          17,
+          18
+        ],
+        "first_any": 12
+      },
+      "authored_history_sha256": "15594f2b836795c679fe56ac1b52df59388197eac241793cf316b1e4107bf3ca",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          10,
+          19
+        ],
+        "first_any": 10
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 20.0,
+      "reference_depth": 10,
+      "rationale": "Natural stalking predator appears before magical undead; Fast/flanking is worth 20-40 percent lower straight-trade power than Fighter peers.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 28.57,
+      "diagnostic_midpoint": 14.5
+    },
+    {
+      "id": "bombardier",
+      "name": "Bombardier Beetle",
+      "current": {
+        "ordinary": [
+          13,
+          21
+        ],
+        "conditional_depths": [
+          19
+        ],
+        "first_any": 13
+      },
+      "authored_history_sha256": "be4b07b337147c49f1340c59cd0bfdbfd0c639c024902665c01f90c36df0d518",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          13,
+          21
+        ],
+        "first_any": 13
+      },
+      "role": "Mage/Artillery (burst exception)",
+      "target_lifetime_loss_pct": null,
+      "reference_depth": 13,
+      "rationale": "Keep authored half-max-HP explosion exactly; tune fragility/opportunity if needed, report quick-kill versus approach rather than pretending a 25-percent lifetime cap.",
+      "measurement": "preserve ceil(maxHP/2) explosion; quick-kill vs approach split; completed-life mean and residual fire observed, not forced to Mage target",
+      "fixed_explosion_packet_pct": 50,
+      "diagnostic_midpoint": 17.0
+    },
+    {
+      "id": "long-saidri",
+      "name": "Long-legged Saidribee",
+      "current": {
+        "ordinary": [
+          13,
+          22
+        ],
+        "conditional_depths": [
+          20
+        ],
+        "first_any": 13
+      },
+      "authored_history_sha256": "59e7afa35bfeac552c8bb2404c65f24694fd14647bb0e39b58d4dd56b8598da0",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          13,
+          22
+        ],
+        "first_any": 13
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 31.0,
+      "reference_depth": 13,
+      "rationale": "Larger roaming bee guardian uses grounded muscle and more venom, between flying worker and nest guardian.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 17.5
+    },
+    {
+      "id": "kelpie",
+      "name": "Kelpie",
+      "current": {
+        "ordinary": [
+          14,
+          23
+        ],
+        "conditional_depths": [
+          21
+        ],
+        "first_any": 14
+      },
+      "authored_history_sha256": "276f4bdf5998684b795299408eaf27a6d584adfa882f3bcfe1c95b37609cb363",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          16,
+          25
+        ],
+        "first_any": 16
+      },
+      "role": "Fighter/Controller",
+      "target_lifetime_loss_pct": 36.0,
+      "reference_depth": 16,
+      "rationale": "Man-eating magical water horse is a mid-depth predator; water confinement earns more contact strength, deep-water hold remains situational.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 20.5
+    },
+    {
+      "id": "wendigo",
+      "name": "Wendigo",
+      "current": {
+        "ordinary": [
+          15,
+          24
+        ],
+        "conditional_depths": [
+          22
+        ],
+        "first_any": 15
+      },
+      "authored_history_sha256": "898f4f4950e845b2d2875b74de2df65f33fbe9253076a9b31a6d30d0f5b6eadb",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          17,
+          26
+        ],
+        "first_any": 17
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 24.0,
+      "reference_depth": 17,
+      "rationale": "Starved resurrected cannibal starts weaker than an equivalent Fighter but escapes and grows by eating corpses; growth stages are not new spawn species.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 34.29,
+      "diagnostic_midpoint": 21.5
+    },
+    {
+      "id": "zillennia:mature",
+      "name": "Mature Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          17,
+          18,
+          19,
+          20
+        ],
+        "first_any": 17
+      },
+      "authored_history_sha256": "89ee36970f775e94405ea8e29699d634c4e745807f57fc741af6faa18d6995e2",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          17,
+          18,
+          19,
+          20
+        ],
+        "first_any": 17
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 44.4,
+      "reference_depth": 17,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 18.5
+    },
+    {
+      "id": "ichor-shark",
+      "name": "Ichor Shark",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "first_any": 15
+      },
+      "authored_history_sha256": "0dfe4a8da1e50e38dffd6882803ffa0cfdda7cd3cfc73213010dc6dbf5d0318d",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "first_any": 15
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 38,
+      "reference_depth": 15,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 21.5
+    },
+    {
+      "id": "pale:Greater Biter",
+      "name": "Greater Pale Biter",
+      "current": {
+        "ordinary": [
+          16,
+          24
+        ],
+        "conditional_depths": [],
+        "first_any": 16
+      },
+      "authored_history_sha256": "3b5ea57ab3363ee00630773fcdeae88f4a07e00f95d681a18fddc2fbcacd6b00",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          18,
+          27
+        ],
+        "first_any": 18
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 35.0,
+      "reference_depth": 18,
+      "rationale": "Towering crocodile-mawed pale upgrades the small Biter; repeat bite and life-drink remain its identity.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 22.5
+    },
+    {
+      "id": "pale:Greater Spitter",
+      "name": "Greater Pale Spitter",
+      "current": {
+        "ordinary": [
+          17,
+          25
+        ],
+        "conditional_depths": [],
+        "first_any": 17
+      },
+      "authored_history_sha256": "4ceb9378bad9ba45dcdaf149b7612a33322a1910ca0014016e6674b5aec0454d",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          19,
+          28
+        ],
+        "first_any": 19
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 18.0,
+      "reference_depth": 19,
+      "rationale": "Long grown pale remains projectile/gas artillery at roughly half its Fighter peer, not a stronger melee reskin.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 23.5
+    },
+    {
+      "id": "troll",
+      "name": "Troll",
+      "current": {
+        "ordinary": [
+          17,
+          26
+        ],
+        "conditional_depths": [
+          23,
+          24
+        ],
+        "first_any": 17
+      },
+      "authored_history_sha256": "ec251ce976a0a849de9258dea421b97923deaa77b9b90fede7be8257007a9b2a",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          19,
+          28
+        ],
+        "first_any": 19
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 38.0,
+      "reference_depth": 19,
+      "rationale": "Huge blood-wall brute earns high durability from regeneration; sits below mythic and divine late threats.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 23.5
+    },
+    {
+      "id": "pale:Greater Breather",
+      "name": "Greater Pale Breather",
+      "current": {
+        "ordinary": [
+          18,
+          27
+        ],
+        "conditional_depths": [],
+        "first_any": 18
+      },
+      "authored_history_sha256": "3747113c47e75f3ff0a74d7426b9aae7e3e588afcba53e4f57c3ee58b2d15002",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          22,
+          31
+        ],
+        "first_any": 22
+      },
+      "role": "Controller",
+      "target_lifetime_loss_pct": 14.0,
+      "reference_depth": 22,
+      "rationale": "Existentially dreadful grown breather is later than ordinary pale growth, but keeps the existing gas toolkit rather than invented soul mechanics.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 26.5
+    },
+    {
+      "id": "pale:Greater Screamer",
+      "name": "Greater Pale Screamer",
+      "current": {
+        "ordinary": [
+          19,
+          28
+        ],
+        "conditional_depths": [],
+        "first_any": 19
+      },
+      "authored_history_sha256": "9e17078079d76ebf5ad455010397eac4b5011dc3bffc7a6358a16e15e3838d65",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          20,
+          29
+        ],
+        "first_any": 20
+      },
+      "role": "Support/Controller",
+      "target_lifetime_loss_pct": 9.0,
+      "reference_depth": 20,
+      "rationale": "Colossal disorienting maw follows early screamers; utility scales gradually, raw damage stays low.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 24.5
+    },
+    {
+      "id": "zillennia:greater",
+      "name": "Greater Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          21,
+          22,
+          23,
+          24
+        ],
+        "first_any": 21
+      },
+      "authored_history_sha256": "d5430763d7780cf4049958ff796851aeb54680c0762e376787e89083cfc6468c",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          21,
+          22,
+          23,
+          24
+        ],
+        "first_any": 21
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 45.6,
+      "reference_depth": 21,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 22.5
+    },
+    {
+      "id": "pale:Greater Birther",
+      "name": "Greater Pale Birther",
+      "current": {
+        "ordinary": [
+          20,
+          29
+        ],
+        "conditional_depths": [],
+        "first_any": 20
+      },
+      "authored_history_sha256": "5e013856766e8bbdcc2c06d10672fb7617e395aa3a1b3f5fff3a8e700c3c81cb",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          23,
+          32
+        ],
+        "first_any": 23
+      },
+      "role": "Summoner",
+      "target_lifetime_loss_pct": 7.0,
+      "reference_depth": 23,
+      "rationale": "Large mother of multiple low-beast families comes after their grown variants; test random children and recursive Birther descendants explicitly.",
+      "measurement": "direct lifetime damage separate; three casts of actual child mixture/descendants must equal one matched Fighter, not three Fighters; include parents in total encounter sensitivity",
+      "three_cast_child_budget_pct": 38,
+      "summon_cooldown_normal_turns": 10,
+      "diagnostic_midpoint": 27.5
+    },
+    {
+      "id": "greater-ichor-shark",
+      "name": "Greater Ichor Shark",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ],
+        "first_any": 20
+      },
+      "authored_history_sha256": "0dfe4a8da1e50e38dffd6882803ffa0cfdda7cd3cfc73213010dc6dbf5d0318d",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ],
+        "first_any": 20
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 42,
+      "reference_depth": 20,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 26.5
+    },
+    {
+      "id": "dire-bear",
+      "name": "Dire Bear",
+      "current": {
+        "ordinary": [
+          21,
+          29
+        ],
+        "conditional_depths": [
+          25,
+          26,
+          27
+        ],
+        "first_any": 21
+      },
+      "authored_history_sha256": "6baf0300b6afb2b4252e22dfd0051d38e8d444b3b5da10ddbdc2db445252474e",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          20,
+          29
+        ],
+        "first_any": 20
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 36.0,
+      "reference_depth": 20,
+      "rationale": "Torso-swallowing giant bear belongs just below demonic blade ogres and mythic late predators.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 24.5
+    },
+    {
+      "id": "river-drake",
+      "name": "River Drake",
+      "current": {
+        "ordinary": [
+          21,
+          30
+        ],
+        "conditional_depths": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "first_any": 21
+      },
+      "authored_history_sha256": "14f9e3f2df3138e5180f68c438db43bc729d66742031cdd6ef525bb90439006c",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          22,
+          31
+        ],
+        "first_any": 22
+      },
+      "role": "Fighter/Artillery/Controller",
+      "target_lifetime_loss_pct": 40.0,
+      "reference_depth": 22,
+      "rationale": "Lake-conquering draconid has jet and grasp but is water-bound; precedes flying Chimera and apex Dragon.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 26.5
+    },
+    {
+      "id": "horn-3",
+      "name": "Tricorn",
+      "current": {
+        "ordinary": [
+          22,
+          31
+        ],
+        "conditional_depths": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "first_any": 22
+      },
+      "authored_history_sha256": "1437e7ad0606aba751785c270399ff711e995bff23948e98cb58c23a4362313a",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          22,
+          31
+        ],
+        "first_any": 22
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 18.0,
+      "reference_depth": 22,
+      "rationale": "Three-horn dimensional horse adds existing Beckon to the bolt; keeps spell progression without Fighter melee strength.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 26.5
+    },
+    {
+      "id": "killspawn",
+      "name": "Killspawn",
+      "current": {
+        "ordinary": [
+          23,
+          32
+        ],
+        "conditional_depths": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "first_any": 23
+      },
+      "authored_history_sha256": "a6f3b72a48e5288ec223c7e384eaafa1f4b4ee3bbc2895da14996312ec467490",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          25,
+          34
+        ],
+        "first_any": 25
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 45.0,
+      "reference_depth": 25,
+      "rationale": "Fully formed metal demon devoted to killing; Slow is the explicit downside that earns an upper-band stationary lifetime cost.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 29.5
+    },
+    {
+      "id": "zillennia:hulking",
+      "name": "Hulking Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          25,
+          26,
+          27,
+          28
+        ],
+        "first_any": 25
+      },
+      "authored_history_sha256": "17b8db8290ed69f21a2b47f61bff0e995736c741f5789fe81363808935a36d46",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          25,
+          26,
+          27,
+          28
+        ],
+        "first_any": 25
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 46.7,
+      "reference_depth": 25,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 26.5
+    },
+    {
+      "id": "horn-4",
+      "name": "Quadricorn",
+      "current": {
+        "ordinary": [
+          24,
+          33
+        ],
+        "conditional_depths": [
+          31
+        ],
+        "first_any": 24
+      },
+      "authored_history_sha256": "94ed26be9ff396a7bb13f203f05eb5b4b506085458aa85fc14a671974b6c8a9a",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          24,
+          33
+        ],
+        "first_any": 24
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 27.0,
+      "reference_depth": 24,
+      "rationale": "Four-horn mobile bull advances Bicorn while remaining 25 percent weaker in a direct trade than a matched Fighter.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 38.57,
+      "diagnostic_midpoint": 28.5
+    },
+    {
+      "id": "sabretooth",
+      "name": "Sabretooth Tiger",
+      "current": {
+        "ordinary": [
+          25,
+          33
+        ],
+        "conditional_depths": [],
+        "first_any": 25
+      },
+      "authored_history_sha256": "f022dc2d8434e7e53ceb59ad2fa13262157ba581ac0d2daeb4f4a46d22b960ea",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          25,
+          33
+        ],
+        "first_any": 25
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 27.0,
+      "reference_depth": 25,
+      "rationale": "Large revived prehistoric stalker upgrades Tiger, with strong bite but mobile ambush rather than tank durability.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 38.57,
+      "diagnostic_midpoint": 29.0
+    },
+    {
+      "id": "lesser-ichor-leviathan",
+      "name": "Lesser Ichor Leviathan",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "first_any": 25
+      },
+      "authored_history_sha256": "3f9382050429f6e8b789c05b128ee76e2bfcde2b0f52458cf1b510e46034266a",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "first_any": 25
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 46,
+      "reference_depth": 25,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 31.5
+    },
+    {
+      "id": "vampire",
+      "name": "Vampire",
+      "current": {
+        "ordinary": [
+          26,
+          34
+        ],
+        "conditional_depths": [
+          32
+        ],
+        "first_any": 26
+      },
+      "authored_history_sha256": "c207714377483962288ddfa41bc0a745f23e0b623b34a8226ba83ed24db19b39",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          30,
+          38
+        ],
+        "first_any": 30
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 32.0,
+      "reference_depth": 30,
+      "rationale": "History explicitly calls it among the most dangerous Flesh monsters; push later, preserve life drain and bat retreat rather than fake extra attacks.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 45.71,
+      "diagnostic_midpoint": 34.0
+    },
+    {
+      "id": "banshee",
+      "name": "Banshee",
+      "current": {
+        "ordinary": [
+          26,
+          35
+        ],
+        "conditional_depths": [
+          33
+        ],
+        "first_any": 26
+      },
+      "authored_history_sha256": "92b6882b79810fd4e72603d5673015c4177d397b0939c5f91365fc8f06aa1adb",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          29,
+          37
+        ],
+        "first_any": 29
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 22.0,
+      "reference_depth": 29,
+      "rationale": "Fatal armor-piercing shriek belongs deep; sight/cadence and one-per-group cap remain, with about half late Fighter damage.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 33.0
+    },
+    {
+      "id": "maulchild",
+      "name": "Maulchild",
+      "current": {
+        "ordinary": [
+          27,
+          36
+        ],
+        "conditional_depths": [
+          29,
+          30,
+          31,
+          32,
+          33,
+          34
+        ],
+        "first_any": 27
+      },
+      "authored_history_sha256": "7d2c2f647b7b93730241a2ed21e931830ff2e260116eb640dae4f0caaffd0929",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          25,
+          34
+        ],
+        "first_any": 25
+      },
+      "role": "Controller",
+      "target_lifetime_loss_pct": 0.0,
+      "reference_depth": 25,
+      "rationale": "Harmless affectionate demon exists to hold prey for allies; keep literal zero damage and overlap Killspawn, measure marginal group cost instead.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 29.5
+    },
+    {
+      "id": "zillennia:ancient",
+      "name": "Ancient Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          29,
+          30,
+          31,
+          32
+        ],
+        "first_any": 29
+      },
+      "authored_history_sha256": "3fc8b9f79e0a180f63e0aba20b44349c1c98fd2999f72634ee8be14bbb0080ca",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          29,
+          30,
+          31,
+          32
+        ],
+        "first_any": 29
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 47.8,
+      "reference_depth": 29,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 30.5
+    },
+    {
+      "id": "horn-5",
+      "name": "Pentacorn",
+      "current": {
+        "ordinary": [
+          28,
+          37
+        ],
+        "conditional_depths": [
+          34,
+          35
+        ],
+        "first_any": 28
+      },
+      "authored_history_sha256": "e06b0ca68afe135784b244821f5a4a9c2c619e65b22d6254c7ceb2a60c5842b1",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          29,
+          38
+        ],
+        "first_any": 29
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 21.0,
+      "reference_depth": 29,
+      "rationale": "Five-horn horse brings malevolent bolt/Beckon/wall control late; complexity does not justify Fighter raw output.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 33.5
+    },
+    {
+      "id": "horn-6",
+      "name": "Hexacorn",
+      "current": {
+        "ordinary": [
+          29,
+          37
+        ],
+        "conditional_depths": [],
+        "first_any": 29
+      },
+      "authored_history_sha256": "539602da8db6308da0305ed35f2575814fe180627570e3a7b89d5ce15cd3b54b",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          30,
+          38
+        ],
+        "first_any": 30
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 30.0,
+      "reference_depth": 30,
+      "rationale": "Six-horn bull stays an unconstrained mobile attacker, approximately 70 percent of late Fighter straight-trade strength.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 42.86,
+      "diagnostic_midpoint": 34.0
+    },
+    {
+      "id": "phoenix",
+      "name": "Phoenix",
+      "current": {
+        "ordinary": [
+          30,
+          38
+        ],
+        "conditional_depths": [
+          36
+        ],
+        "first_any": 30
+      },
+      "authored_history_sha256": "f97e1af0cfa2463315ee56ae53b2084f76b1def5427ef595498551b4eb3fed9a",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          32,
+          40
+        ],
+        "first_any": 32
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 42.0,
+      "reference_depth": 32,
+      "rationale": "Rebirth guardian of the Administrator belongs near finale; 42 percent is first-life target only until corpse denial/revival is included in a complete encounter.",
+      "measurement": "first life target 42, not finite lifetime claim; full encounter requires explicit corpse-denial action or otherwise mark revival/everburn censor",
+      "diagnostic_midpoint": 36.0
+    },
+    {
+      "id": "yeti",
+      "name": "Yeti",
+      "current": {
+        "ordinary": [
+          30,
+          39
+        ],
+        "conditional_depths": [
+          37
+        ],
+        "first_any": 30
+      },
+      "authored_history_sha256": "130b5406acea1768a461b890ea6633f3bbcb640a9cdb9ab857332c9fe676d194",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          27,
+          36
+        ],
+        "first_any": 27
+      },
+      "role": "Fighter/Controller",
+      "target_lifetime_loss_pct": 40.0,
+      "reference_depth": 27,
+      "rationale": "Mountain brute with contact chill is formidable but not above divine moon children by flavor; earlier than current placement, retain slow pressure.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 31.5
+    },
+    {
+      "id": "ichor-leviathan",
+      "name": "Ichor Leviathan",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 30
+      },
+      "authored_history_sha256": "3f9382050429f6e8b789c05b128ee76e2bfcde2b0f52458cf1b510e46034266a",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 30
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 48,
+      "reference_depth": 30,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 35.0
+    },
+    {
+      "id": "moonspawn",
+      "name": "Moonspawn",
+      "current": {
+        "ordinary": [
+          31,
+          40
+        ],
+        "conditional_depths": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "first_any": 31
+      },
+      "authored_history_sha256": "006f44c2920274eaf9ddaa6e84990c6b9fad3b470f544134933f41efed39d804",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          33,
+          40
+        ],
+        "first_any": 33
+      },
+      "role": "Skirmisher",
+      "target_lifetime_loss_pct": 31.0,
+      "reference_depth": 33,
+      "rationale": "Anavani's moon-bear child belongs near divine apex; blink mobility trades down to about 70 percent of a comparable Fighter.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "matched_fighter_budget_pct": 44.29,
+      "diagnostic_midpoint": 36.5
+    },
+    {
+      "id": "zillennia:timeless",
+      "name": "Timeless Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          33,
+          34,
+          35,
+          36
+        ],
+        "first_any": 33
+      },
+      "authored_history_sha256": "e30f06e6c16a66b1c22f774e52582fddfcee575a21e2eed464af62ebf7d3d801",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          33,
+          34,
+          35,
+          36
+        ],
+        "first_any": 33
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 48.9,
+      "reference_depth": 33,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 34.5
+    },
+    {
+      "id": "valta",
+      "name": "Valta",
+      "current": {
+        "ordinary": [
+          32,
+          40
+        ],
+        "conditional_depths": [
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ],
+        "first_any": 32
+      },
+      "authored_history_sha256": "ad239ca9e1321e918fe22556d2cc56b1344c26cd0364dde888bf48aeb4af91d4",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          34,
+          40
+        ],
+        "first_any": 34
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 22.0,
+      "reference_depth": 34,
+      "rationale": "Protective moon companion fires charged moonbeams and blinks; late divine artillery at about half Fighter damage.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 37.0
+    },
+    {
+      "id": "saidri-guardian",
+      "name": "Saidribee Guardian",
+      "current": {
+        "ordinary": [
+          33,
+          40
+        ],
+        "conditional_depths": [
+          40
+        ],
+        "first_any": 33
+      },
+      "authored_history_sha256": "b181baae90a11b733ef6e0f15c16104dc49a0edee6a85cd947a2ddd0ea1ab551",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          31,
+          40
+        ],
+        "first_any": 31
+      },
+      "role": "Fighter/Controller",
+      "target_lifetime_loss_pct": 44.0,
+      "reference_depth": 31,
+      "rationale": "Huge protective nest guardian is final bee tier; powerful venom/grasp but below apex mythical creatures in introduction.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 35.5
+    },
+    {
+      "id": "chimera",
+      "name": "Chimera",
+      "current": {
+        "ordinary": [
+          34,
+          40
+        ],
+        "conditional_depths": [],
+        "first_any": 34
+      },
+      "authored_history_sha256": "82ecc901dcdeada076975d1294745ecfcc08dd0fc3c291f5d69680004d606538",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          35,
+          40
+        ],
+        "first_any": 35
+      },
+      "role": "Fighter/Artillery",
+      "target_lifetime_loss_pct": 45.0,
+      "reference_depth": 35,
+      "rationale": "Flying three-headed abomination combines strong body with fire breath; total lifetime budget includes both and remains below Dragon.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 37.5
+    },
+    {
+      "id": "cancer",
+      "name": "Cancer",
+      "current": {
+        "ordinary": [
+          34,
+          40
+        ],
+        "conditional_depths": [],
+        "first_any": 34
+      },
+      "authored_history_sha256": "e1941640633b3b7d1ec586b054c1d2a089ee8f085a16ad5b722c1c457cd13a69",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          35,
+          40
+        ],
+        "first_any": 35
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 48.0,
+      "reference_depth": 35,
+      "rationale": "Mythic constellation crab crushes metal: high armor-piercing Fighter near the top of permitted range.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 37.5
+    },
+    {
+      "id": "horn-7",
+      "name": "Heptacorn",
+      "current": {
+        "ordinary": [
+          35,
+          40
+        ],
+        "conditional_depths": [],
+        "first_any": 35
+      },
+      "authored_history_sha256": "724b6d983a70acf2b404dd87dcb471aaf5d603354f490c7eb46d5e5cefa982ba",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          36,
+          40
+        ],
+        "first_any": 36
+      },
+      "role": "Mage/Artillery",
+      "target_lifetime_loss_pct": 24.0,
+      "reference_depth": 36,
+      "rationale": "Most powerful dimensional corn remains a late spell killer, at half the 48-percent apex Fighter budget.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 38.0
+    },
+    {
+      "id": "zillennia:transcendent",
+      "name": "Transcendent Zillennia",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 37
+      },
+      "authored_history_sha256": "5edecadaadcc9ad4020436c4e1a310904f97ba16695950e0de7ad2bf90f47bf1",
+      "category": "scaled_godbeast_actor",
+      "proposed": {
+        "conditional_depths": [
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 37
+      },
+      "role": "Fighter/Artillery/Controller (Godbeast)",
+      "target_lifetime_loss_pct": 50.0,
+      "reference_depth": 37,
+      "rationale": "Preserve authored depth-scaled quality and one-per-domain event schedule; god-born void horror stays exceptional through body, ruin, silence and darkness without new lore or spells.",
+      "measurement": "whole boss life plus ruin residual, actual silence/darkness/LOS; separate approach, not ordinary adjacent-only surrogate",
+      "diagnostic_midpoint": 38.5
+    },
+    {
+      "id": "greater-ichor-leviathan",
+      "name": "Greater Ichor Leviathan",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 35
+      },
+      "authored_history_sha256": "3f9382050429f6e8b789c05b128ee76e2bfcde2b0f52458cf1b510e46034266a",
+      "category": "event_only",
+      "proposed": {
+        "conditional_depths": [
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "first_any": 35
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 50,
+      "reference_depth": 35,
+      "rationale": "Keep Mercuria well activation, ichor confinement and existing fish\u2192shark\u2192leviathan depth tier. Habitat limitation justifies higher contact value; all siphon remains.",
+      "measurement": "gross whole-life damage in ichor with fixed shore vs immersed approach cohorts; cannot act on ordinary land",
+      "diagnostic_midpoint": 37.5
+    },
+    {
+      "id": "ursa-minor",
+      "name": "Ursa Minor",
+      "current": {
+        "ordinary": [
+          36,
+          40
+        ],
+        "conditional_depths": [],
+        "first_any": 36
+      },
+      "authored_history_sha256": "9fbd109ef0f1bc718af4f3b9849818bd64f1ac668afe453848737a2d3f5df1ff",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          36,
+          40
+        ],
+        "first_any": 36
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 32.0,
+      "reference_depth": 36,
+      "rationale": "Constellation bear-child's death summons its stronger companion: solo budget intentionally lower to reserve danger for the linked fight.",
+      "measurement": "solo value is diagnostic; primary encounter is linked Minor death\u2192Major wake/chase, target60 percent whole group with movement counterplay and separate death risk",
+      "linked_pair_target_pct": 60,
+      "diagnostic_midpoint": 38.0
+    },
+    {
+      "id": "ursa-major",
+      "name": "Ursa Major",
+      "current": {
+        "ordinary": [
+          36,
+          40
+        ],
+        "conditional_depths": [],
+        "first_any": 36
+      },
+      "authored_history_sha256": "47a6c4e3cf4b060178eac431bcdc16415ff258c6554761cf26e139d8a3dc6f1c",
+      "category": "paired_follower",
+      "proposed": {
+        "ordinary": [
+          36,
+          40
+        ],
+        "first_any": 36
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 48.0,
+      "reference_depth": 36,
+      "rationale": "Elder divine bear is stronger than Minor in body and melee; keep sleeping link, test whole pair separately instead of summing solo means.",
+      "measurement": "solo value is diagnostic; primary encounter is linked Minor death\u2192Major wake/chase, target60 percent whole group with movement counterplay and separate death risk",
+      "linked_pair_target_pct": 60,
+      "diagnostic_midpoint": 38.0
+    },
+    {
+      "id": "minotaur",
+      "name": "Minotaur",
+      "current": {
+        "ordinary": [
+          37,
+          40
+        ],
+        "conditional_depths": [],
+        "first_any": 37
+      },
+      "authored_history_sha256": "c1ec71f99228f7393db2c9a02ee10516192826a7273c28db8f96004591fb17c1",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          33,
+          40
+        ],
+        "first_any": 33
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 50.0,
+      "reference_depth": 33,
+      "rationale": "Huge labyrinth brute is an upper-band polarizing Fighter precisely because committed direction is exploitable; not a Skirmisher despite Fast.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 36.5
+    },
+    {
+      "id": "dragon",
+      "name": "Dragon",
+      "current": {
+        "ordinary": [
+          38,
+          40
+        ],
+        "conditional_depths": [],
+        "first_any": 38
+      },
+      "authored_history_sha256": "92cee3e8a9074150674e9fabfac142a0e421756fda3209b1c4255f80115b59f9",
+      "category": "ordinary",
+      "proposed": {
+        "ordinary": [
+          38,
+          40
+        ],
+        "first_any": 38
+      },
+      "role": "Fighter/Artillery",
+      "target_lifetime_loss_pct": 50.0,
+      "reference_depth": 38,
+      "rationale": "Legendary apex reptile stays in the deepest three floors; combined body/breath/burning target is 50 percent, not the old 80-percent exception.",
+      "measurement": "gross incoming damage through creature death plus residual status tail; full-health fixed reference player, report net loss, death and censor rates",
+      "diagnostic_midpoint": 39.0
+    },
+    {
+      "id": "pale:Greater Jackal",
+      "name": "Greater Pale Jackal",
+      "category": "unspawned_legacy_template",
+      "current": {
+        "ordinary": null,
+        "conditional_depths": [],
+        "first_any": null
+      },
+      "proposed": {
+        "ordinary": null,
+        "conditional_depths": [],
+        "first_any": null
+      },
+      "role": "Fighter (legacy)",
+      "target_lifetime_loss_pct": null,
+      "rationale": "Constructor exists but no ordinary, setup, birth or event producer in canonical source. Do not invent a spawn window or pretend unreachable tuning is tested.",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "ichor-fish",
+      "name": "Ichor Fish (legacy alias)",
+      "category": "legacy_alias",
+      "current": {
+        "first_any": null
+      },
+      "proposed": {
+        "alias_of": "lesser-ichor-fish",
+        "first_any": null
+      },
+      "role": "Fighter (habitat-constrained)",
+      "target_lifetime_loss_pct": 24,
+      "rationale": "Alias follows Lesser Ichor-Fish numerical tuning; it is not an extra species or random-pool entry.",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "flesh-administrator",
+      "name": "The Flesh Administrator",
+      "category": "fixed_finale_boss",
+      "current": {
+        "first_any": 40,
+        "ordinary": null,
+        "conditional_depths": [
+          40
+        ]
+      },
+      "proposed": {
+        "first_any": 40,
+        "ordinary": null,
+        "conditional_depths": [
+          40
+        ]
+      },
+      "role": "Fighter",
+      "target_lifetime_loss_pct": 50,
+      "reference_depth": 40,
+      "rationale": "Preserve sole female final Fighter, floor40 placement, heartless/no-revival and collapse trigger. Latest requested Fighter10\u201350 range supersedes earlier provisional70\u201390 target; no new phase or ability.",
+      "diagnostic_midpoint": 40
+    },
+    {
+      "id": "Mercuria",
+      "name": "Mercuria",
+      "category": "environmental_godbeast_event",
+      "current": {
+        "first_any": 4,
+        "schedule": "one bag-selected event per five-floor domain; first4/5"
+      },
+      "proposed": {
+        "first_any": 4,
+        "schedule": "unchanged"
+      },
+      "role": "Environmental event / conditional spawner",
+      "target_lifetime_loss_pct": null,
+      "rationale": "Well is an optional activated event, not a killable summoner actor. Preserve well/ichor/permanent reward and evaluate its children separately; three-cast cooldown rule does not silently replace well ecology.",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "Veridian",
+      "name": "Veridian",
+      "category": "environmental_godbeast_event",
+      "current": {
+        "first_any": 4,
+        "schedule": "one bag-selected event per five-floor domain; first4/5"
+      },
+      "proposed": {
+        "first_any": 4,
+        "schedule": "unchanged"
+      },
+      "role": "Environmental boon/event",
+      "target_lifetime_loss_pct": null,
+      "rationale": "God-tree tap grants authored Sap and is not a combat monster. Preserve one-harvest-per-run state, no Fighter damage target.",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "half-here",
+      "name": "Half Here",
+      "category": "summoned_player_duplicate",
+      "current": {
+        "first_any": null,
+        "trigger": "player ability"
+      },
+      "proposed": {
+        "first_any": null,
+        "trigger": "unchanged"
+      },
+      "role": "Player-dependent duplicate",
+      "target_lifetime_loss_pct": null,
+      "rationale": "Not a random enemy or fixed-stat species; excluded from current79-page bestiary by design. Preserve copied player stats and ability lifecycle.",
+      "diagnostic_midpoint": null
+    },
+    {
+      "id": "mini-me",
+      "name": "Mini-Me",
+      "category": "summoned_player_duplicate",
+      "current": {
+        "first_any": null,
+        "trigger": "player ability"
+      },
+      "proposed": {
+        "first_any": null,
+        "trigger": "unchanged"
+      },
+      "role": "Player-dependent duplicate",
+      "target_lifetime_loss_pct": null,
+      "rationale": "Not a random enemy or fixed-stat species; excluded from current79-page bestiary by design. Preserve copied player stats, no corpse and ability lifecycle.",
+      "diagnostic_midpoint": null
+    }
+  ],
+  "state_variants": [
+    {
+      "id": "wendigo growth2\u20135",
+      "inherits": "wendigo",
+      "placement": "arises through corpse-feast only, no added depth pool",
+      "target": "base24%; report actual growth progression separately instead of normalizing grown form to base"
+    },
+    {
+      "id": "vampire bat",
+      "inherits": "vampire",
+      "placement": "existing transformation retains actor stats",
+      "target": "32% whole uninterrupted life including retreat; censored if arena does not pursue"
+    },
+    {
+      "id": "Birther empty/full Energy",
+      "inherits": [
+        "pale:Birther",
+        "pale:Greater Birther"
+      ],
+      "placement": "same individual before/after births, not separate roster",
+      "target": "direct5/7 plus three-cast child25/38"
+    },
+    {
+      "id": "Bastidion depth bodies",
+      "inherits": "bastidion",
+      "placement": "existing40 scaled templates, one species",
+      "target": "hazard scenarios by depth"
+    },
+    {
+      "id": "Mercurial conversion",
+      "placement": "any eligible existing actor converted by Ichor interactions; no new random roster",
+      "target": "inherits base body; report resulting Ichor habitat/siphon sensitivity"
+    }
+  ],
+  "placement_integration_requirements": [
+    "new r32 final bounds must not be widened a second time",
+    "paired Mech/Major exactly follow Inventor/Minor bounds",
+    "routine authored setups follow compatible r32 species bounds; preserve biomes/coordinates and exclude previously authored impossible combinations unless specifically approved",
+    "revision-aware corpse representative must be eligible at that depth: Witch corpse15 must disappear and deep Witch corpse appear; corpses can revive",
+    "Pale births retain valid child pools; conditional manual depths follow parent range transitively",
+    "leave Godbeast5-floor schedule, Zillennia quality bands, Ichor windows, rooted terrain windows and Administrator40 unchanged",
+    "regenerate manual depth arrays from actual runtime producers; preserve descriptions/history byte-for-byte",
+    "test every ordinary species is reachable in at least one candidate, wet-only species in wet habitat, exact reward budget feasible across all40 depths",
+    "rebuild post-placement progression cohorts before statistical tuning"
+  ]
+}

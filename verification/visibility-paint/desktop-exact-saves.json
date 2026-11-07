@@ -1,0 +1,110 @@
+[
+  {
+    "case": "generated",
+    "side": "baseline",
+    "pass": 0,
+    "save_sha256": "2cc283c34b0384fc3130902a0cfdd5f238f9e030194618f6ac0b4c3eb55e524d",
+    "bytes": 1849825,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "generated",
+    "side": "baseline",
+    "pass": 1,
+    "save_sha256": "2cc283c34b0384fc3130902a0cfdd5f238f9e030194618f6ac0b4c3eb55e524d",
+    "bytes": 1849825,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "generated",
+    "side": "merged",
+    "pass": 0,
+    "save_sha256": "2cc283c34b0384fc3130902a0cfdd5f238f9e030194618f6ac0b4c3eb55e524d",
+    "bytes": 1849825,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "generated",
+    "side": "merged",
+    "pass": 1,
+    "save_sha256": "2cc283c34b0384fc3130902a0cfdd5f238f9e030194618f6ac0b4c3eb55e524d",
+    "bytes": 1849825,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "crowded148",
+    "side": "baseline",
+    "pass": 0,
+    "save_sha256": "405a29a3d3499f9fafebdfeff38e724e3878480036c7d3af8ad952a194629021",
+    "bytes": 1904470,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "crowded148",
+    "side": "baseline",
+    "pass": 1,
+    "save_sha256": "405a29a3d3499f9fafebdfeff38e724e3878480036c7d3af8ad952a194629021",
+    "bytes": 1904470,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "crowded148",
+    "side": "merged",
+    "pass": 0,
+    "save_sha256": "405a29a3d3499f9fafebdfeff38e724e3878480036c7d3af8ad952a194629021",
+    "bytes": 1904470,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "crowded148",
+    "side": "merged",
+    "pass": 1,
+    "save_sha256": "405a29a3d3499f9fafebdfeff38e724e3878480036c7d3af8ad952a194629021",
+    "bytes": 1904470,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "seven-portals",
+    "side": "baseline",
+    "pass": 0,
+    "save_sha256": "0d1027c61748d01858f90e5bb9c9d4120ce15c7b115d45b628ddaeb57892e1a1",
+    "bytes": 1850029,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "seven-portals",
+    "side": "baseline",
+    "pass": 1,
+    "save_sha256": "0d1027c61748d01858f90e5bb9c9d4120ce15c7b115d45b628ddaeb57892e1a1",
+    "bytes": 1850029,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "seven-portals",
+    "side": "merged",
+    "pass": 0,
+    "save_sha256": "0d1027c61748d01858f90e5bb9c9d4120ce15c7b115d45b628ddaeb57892e1a1",
+    "bytes": 1850029,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  },
+  {
+    "case": "seven-portals",
+    "side": "merged",
+    "pass": 1,
+    "save_sha256": "0d1027c61748d01858f90e5bb9c9d4120ce15c7b115d45b628ddaeb57892e1a1",
+    "bytes": 1850029,
+    "state_unchanged": true,
+    "roundtrip_checked": true
+  }
+]

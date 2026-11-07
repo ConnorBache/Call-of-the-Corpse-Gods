@@ -1,0 +1,6 @@
+START floor40-fire-review-0 fire=2291 actors=18
+START floor40-fire-review-1 fire=2291 actors=20
+START floor40-fire-review-2 fire=2291 actors=20
+START floor40-fire-review-3 fire=2291 actors=16
+END floor40-fire-review-3 20 tick21 statusdead
+START floor40-fire-review-4 fire=2291 actors=17

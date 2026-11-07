@@ -1,0 +1,59 @@
+=== revision50 ===
+
+running 11 tests
+test ability_ui::revision50_ui_tests::reserve_projection_uses_actual_capacity_and_preserves_state ... ok
+test ability_ui::revision50_ui_tests::revision50_catalog_copy_and_costs_do_not_leak_into_legacy ... ok
+test inspection_ui::hover_tests::revision50_melee_previews_share_greatsword_base_but_bow_stays_explicit ... ok
+test inspection_ui::hover_tests::revision50_missed_me_forecast_is_conditional_retreat_not_halved_odds ... ok
+test pack::revision50_pack_tests::all_item_grants_have_revision50_names_and_copy ... ok
+test pack::revision50_pack_tests::category_capacity_and_equipment_actions_are_versioned ... ok
+test pack::revision50_pack_tests::reserve_changes_invalidate_pack_and_reach_item_tooltips ... ok
+test targeting_ui::revision50_target_tests::clay_rejects_same_and_distant_targets_before_payment ... ok
+test targeting_ui::revision50_target_tests::cogworks_modes_report_wall_limit_and_legacy_has_no_pursuit ... ok
+test targeting_ui::revision50_target_tests::empty_and_invisible_nightmare_targets_do_not_mutate ... ok
+test targeting_ui::revision50_target_tests::invalid_implant_selection_is_read_only ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 565 filtered out; finished in 0.59s
+
+exit=0
+=== cogworks ===
+
+running 7 tests
+test cogworks_ui::tests::clay_keeps_wall_glyph_and_authored_label_through_reconstruction ... ok
+test cogworks_ui::tests::current_color_survives_reconstruction_without_world_mutation ... ok
+test cogworks_ui::tests::legacy_revision_and_changed_terrain_do_not_get_authored_ink ... ok
+test cogworks_ui::tests::remembered_and_unknown_cells_ignore_hidden_modification_changes ... ok
+test render::damage::cogworks_scene_tests::detached_cogworks_marker_changes_retained_cell_stack ... ok
+test render::tile_damage::cogworks_damage_tests::detached_cogworks_marker_invalidates_tile_paint ... ok
+test targeting_ui::revision50_target_tests::cogworks_modes_report_wall_limit_and_legacy_has_no_pursuit ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 569 filtered out; finished in 1.56s
+
+exit=0
+=== corpse_marker ===
+
+running 3 tests
+test render::corpse_marker_tests::corpse_cross_is_clipped_and_gpu_recording_does_not_paint_cpu_pixels ... ok
+test render::corpse_marker_tests::corpse_cross_preserves_glyph_and_observed_death_semantics ... ok
+test render::corpse_marker_tests::corpse_toggle_repairs_retained_and_tile_frames ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 573 filtered out; finished in 10.93s
+
+exit=0
+=== blood_dot_sequence ===
+
+running 1 test
+test observe::blood_dot_sequence_tests::floor_blood_changes_dots_not_background_in_full_and_reference_paths ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 575 filtered out; finished in 7.00s
+
+exit=0
+=== compact_dialog ===
+
+running 2 tests
+test render::compact_dialog_tests::compact_dialog_input_damage_and_canvas_restore_share_one_transform ... ok
+test render::compact_dialog_tests::compact_dialogs_render_repeatably_and_restore_background_after_dismissal ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 574 filtered out; finished in 4.81s
+
+exit=0

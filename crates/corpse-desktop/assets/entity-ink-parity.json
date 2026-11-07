@@ -1,0 +1,94 @@
+[
+  {
+    "ambient": -90,
+    "distance": 1,
+    "visible": false,
+    "color": null
+  },
+  {
+    "ambient": -90,
+    "distance": 4,
+    "visible": false,
+    "color": null
+  },
+  {
+    "ambient": -40,
+    "distance": 1,
+    "visible": true,
+    "color": [
+      176,
+      78,
+      83
+    ]
+  },
+  {
+    "ambient": -40,
+    "distance": 4,
+    "visible": true,
+    "color": [
+      176,
+      78,
+      83
+    ]
+  },
+  {
+    "ambient": 0,
+    "distance": 1,
+    "visible": true,
+    "color": [
+      186,
+      83,
+      88
+    ]
+  },
+  {
+    "ambient": 0,
+    "distance": 4,
+    "visible": true,
+    "color": [
+      186,
+      83,
+      88
+    ]
+  },
+  {
+    "ambient": 50,
+    "distance": 1,
+    "visible": true,
+    "color": [
+      186,
+      83,
+      88
+    ]
+  },
+  {
+    "ambient": 50,
+    "distance": 4,
+    "visible": true,
+    "color": [
+      186,
+      83,
+      88
+    ]
+  },
+  {
+    "ambient": 100,
+    "distance": 1,
+    "visible": true,
+    "color": [
+      189,
+      90,
+      95
+    ]
+  },
+  {
+    "ambient": 100,
+    "distance": 4,
+    "visible": true,
+    "color": [
+      189,
+      91,
+      96
+    ]
+  }
+]

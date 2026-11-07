@@ -1,0 +1,134 @@
+{
+  "scope": "Final native displayed-sRGB illumination calibration. Rendering only; no simulation/visibility/perception/LOS/LoE changes.",
+  "deliverableImages": [
+    {
+      "file": "illumination-levels-native.png",
+      "size": [
+        2200,
+        1200
+      ],
+      "sha256": "57188b8a4348ec69bb3329cc92a7bae309d1733290304aee4985a0f221ee27ac"
+    },
+    {
+      "file": "darkness-potion-native-comparison.png",
+      "size": [
+        1920,
+        1200
+      ],
+      "sha256": "485b93ce0462a5bd6b3c191e5537dbf548590676c88df3946086f08bb7c0bfbd"
+    }
+  ],
+  "visualReview": "Both final sheets inspected at native size. All eleven illumination columns present, dark-to-bright progression clear, green vegetation and blue depth separation retained, real potion before/after/expiry restores original pixels.",
+  "nativeSceneCount": 55,
+  "nativeEquality": "Full, retained and tile rendering are exactly pixel-identical for all 55 scenes.",
+  "referenceFloor": [
+    {
+      "illumination": -100.0,
+      "rgb": [
+        2,
+        1,
+        2
+      ]
+    },
+    {
+      "illumination": -75.0,
+      "rgb": [
+        7,
+        6,
+        6
+      ]
+    },
+    {
+      "illumination": -50.0,
+      "rgb": [
+        14,
+        11,
+        13
+      ]
+    },
+    {
+      "illumination": -25.0,
+      "rgb": [
+        22,
+        18,
+        21
+      ]
+    },
+    {
+      "illumination": 0.0,
+      "rgb": [
+        34,
+        28,
+        32
+      ]
+    },
+    {
+      "illumination": 25.0,
+      "rgb": [
+        51,
+        42,
+        48
+      ]
+    },
+    {
+      "illumination": 50.0,
+      "rgb": [
+        70,
+        57,
+        66
+      ]
+    },
+    {
+      "illumination": 75.0,
+      "rgb": [
+        92,
+        76,
+        86
+      ]
+    },
+    {
+      "illumination": 100.0,
+      "rgb": [
+        116,
+        95,
+        109
+      ]
+    }
+  ],
+  "openGlSceneCount": 55,
+  "openGlMaxChannelDelta": 2,
+  "platform": {
+    "system": "Linux",
+    "SDL_VIDEODRIVER": "offscreen",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "MESA_SHADER_CACHE_DISABLE": "true",
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "physicalGpuVerified": false,
+    "windowsRuntimeVerified": false
+  },
+  "waterGpuMaxChannelDelta": 3,
+  "waterGpuSizes": [
+    [
+      1280,
+      800
+    ],
+    [
+      1920,
+      1080
+    ],
+    [
+      960,
+      1200
+    ]
+  ],
+  "realPotionSceneCount": 15,
+  "logs": [
+    "../r51-ui/desktop-compile-illumination-3b.log",
+    "../r51-ui/illumination-targeted-3.log",
+    "../r51-ui/illumination-gpu-3.log",
+    "../r51-ui/illumination-final-sheet.log"
+  ],
+  "wholeWorkspaceStatus": "Tracked separately by parent aggregate verification; this manifest does not claim full workspace success.",
+  "ancillaryImage": "diagnostic-level-subset.png is a seven-column diagnostic, not the final eleven-column user comparison."
+}

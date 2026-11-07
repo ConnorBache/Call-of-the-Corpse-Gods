@@ -1,0 +1,55 @@
+{
+  "status": "passed",
+  "scope": "Independently compare lead-produced actual Linux release fixedseed renders. Full-frame RGBA identical for menu/start/game baselineQ100 vs Q90 small with losslessUI. Not Windows or interactiveSDL test.",
+  "rows": [
+    {
+      "name": "menu",
+      "dimensions": [
+        1280,
+        800
+      ],
+      "rgba_exact": true,
+      "rgba_sha256": "7f9f9b3900489ff329b95439cea483c9b69325ebf0e13438dad7ecc05a4c1f70"
+    },
+    {
+      "name": "start",
+      "dimensions": [
+        1280,
+        800
+      ],
+      "rgba_exact": true,
+      "rgba_sha256": "e53d4cbac8ff8d19529e6e415f43d73e143b8849ca4e6b61e1ae7d17d760357b"
+    },
+    {
+      "name": "game",
+      "dimensions": [
+        1280,
+        800
+      ],
+      "rgba_exact": true,
+      "rgba_sha256": "98223408dae457f65dbe1e9c26c44332bdc78824ab0ed9eb9486af0ed8c24621"
+    }
+  ],
+  "manual_visual_review": {
+    "status": "passed",
+    "scope": "Actual Linux size-optimized release fullpages inspected Phoenix/NightCrawler/Queen/Transcendent; complete silhouettes, no obvious new matte/halo or removed anatomy/flame/tendril; menu visually inspected and exactRGBAcomparison passed.",
+    "pages": [
+      {
+        "name": "phoenix",
+        "sha256": "3df52f185c7866ebfcf98a68ae7e459e411e68ea2fe776fce022af37e65743fd"
+      },
+      {
+        "name": "night-crawler",
+        "sha256": "ab9e0570a7063553acae5a626767196193557180896f515431566db497a56808"
+      },
+      {
+        "name": "saidribee-queen",
+        "sha256": "be428e4233c82b9f1fdc5dd7e0034c987e71bd7fc1d9bd131b9ef4c793e15bb6"
+      },
+      {
+        "name": "zillennia-transcendent",
+        "sha256": "5e41c8649fcc817f52a3af8b734c0527487c6ea68a89aac072942d0f070cf9bb"
+      }
+    ]
+  }
+}

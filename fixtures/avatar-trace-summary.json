@@ -1,0 +1,265 @@
+{
+  "abilities": [
+    "shrail-unyielding-assault",
+    "anavani-illuminate",
+    "kative-dilute-potion"
+  ],
+  "inventory": [
+    {
+      "id": 1,
+      "name": "Shortsword",
+      "kind": "weapon",
+      "glyph": ")",
+      "damage": 30,
+      "hands": 1,
+      "equipped": "hand1",
+      "enhancements": []
+    },
+    {
+      "id": 2,
+      "name": "Bow",
+      "kind": "weapon",
+      "glyph": ")",
+      "damage": 15,
+      "hands": 2,
+      "offenseMultiplier": 0.5,
+      "rangedWeapon": "bow",
+      "bonus": {},
+      "baseBonus": {},
+      "enhancements": []
+    },
+    {
+      "id": 3,
+      "name": "Arrows",
+      "kind": "ammo",
+      "effect": "arrows",
+      "glyph": "/",
+      "quantity": 5,
+      "enhancements": []
+    }
+  ],
+  "enemy": {
+    "id": 4,
+    "x": 16,
+    "y": 14,
+    "creatureKind": "hemogoblin",
+    "name": "Hemogoblin",
+    "glyph": "h",
+    "color": "#BA5358",
+    "hp": 34,
+    "maxHp": 34,
+    "energy": 50,
+    "stats": {
+      "offense": 7,
+      "defense": -11,
+      "accuracy": -1,
+      "dodge": 2,
+      "dr": 0,
+      "perception": 40,
+      "maxEnergy": 50
+    },
+    "state": "hunting",
+    "abilities": [],
+    "active": [],
+    "conditions": {
+      "bestiaryTraitsInitialized": 1,
+      "stealth": 2
+    },
+    "lastSeen": {
+      "x": 12,
+      "y": 14
+    }
+  },
+  "steps": [
+    {
+      "command": {
+        "type": "wait"
+      },
+      "tick": 1,
+      "rng": 2476076006,
+      "hp": 100,
+      "enemyHp": 34,
+      "enemyPosition": [
+        15,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 1,
+        "dy": 0
+      },
+      "tick": 2,
+      "rng": 2476076006,
+      "hp": 100,
+      "enemyHp": 34,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 1,
+        "dy": 0
+      },
+      "tick": 3,
+      "rng": 3834332888,
+      "hp": 100,
+      "enemyHp": 34,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 1,
+        "dy": 0
+      },
+      "tick": 4,
+      "rng": 2932326264,
+      "hp": 100,
+      "enemyHp": 17.068,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 1,
+        "dy": 0
+      },
+      "tick": 5,
+      "rng": 4182686817,
+      "hp": 100,
+      "enemyHp": 4.136000000000001,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "wait"
+      },
+      "tick": 6,
+      "rng": 4136889088,
+      "hp": 100,
+      "enemyHp": 4.204000000000001,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 0,
+        "dy": 1
+      },
+      "tick": 7,
+      "rng": 4119228889,
+      "hp": 100,
+      "enemyHp": 4.272,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 1,
+        "dy": 0
+      },
+      "tick": 8,
+      "rng": 1686143555,
+      "hp": 91,
+      "enemyHp": 4.34,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 0,
+        "dy": -1
+      },
+      "tick": 9,
+      "rng": 610676170,
+      "hp": 84.2,
+      "enemyHp": 4.4079999999999995,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 0,
+        "dy": -1
+      },
+      "tick": 10,
+      "rng": 3968589667,
+      "hp": 84.4,
+      "enemyHp": 4.475999999999999,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 0,
+        "dy": -1
+      },
+      "tick": 11,
+      "rng": 1282318518,
+      "hp": 84.60000000000001,
+      "enemyHp": 0,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "move",
+        "dx": 0,
+        "dy": -1
+      },
+      "tick": 12,
+      "rng": 1282318518,
+      "hp": 84.80000000000001,
+      "enemyHp": 0,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    },
+    {
+      "command": {
+        "type": "use",
+        "id": 5
+      },
+      "tick": 13,
+      "rng": 1282318518,
+      "hp": 85.00000000000001,
+      "enemyHp": 0,
+      "enemyPosition": [
+        14,
+        14
+      ]
+    }
+  ]
+}

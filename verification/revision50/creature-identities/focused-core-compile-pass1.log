@@ -1,0 +1,48 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+error[E0433]: cannot find `heart_items` in `corpse_core`
+  --> crates/corpse-core/tests/revision50_creature_identity.rs:46:39
+   |
+46 |         let mut expected=corpse_core::heart_items::heart_for(&old,201.).unwrap();
+   |                                       ^^^^^^^^^^^ could not find `heart_items` in `corpse_core`
+
+error[E0433]: cannot find `heart_items` in `corpse_core`
+  --> crates/corpse-core/tests/revision50_creature_identity.rs:47:32
+   |
+47 |         let heart=corpse_core::heart_items::heart_for(&new,201.).unwrap();
+   |                                ^^^^^^^^^^^ could not find `heart_items` in `corpse_core`
+
+error[E0433]: cannot find `heart_items` in `corpse_core`
+  --> crates/corpse-core/tests/revision50_creature_identity.rs:65:60
+   |
+65 |     let old=actor("pale:Biter",46.);let heart=corpse_core::heart_items::heart_for(&old,201.).unwrap();
+   |                                                            ^^^^^^^^^^^ could not find `heart_items` in `corpse_core`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `corpse-core` (test "revision50_creature_identity") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

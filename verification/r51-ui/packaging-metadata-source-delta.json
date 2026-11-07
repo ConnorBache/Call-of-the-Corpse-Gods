@@ -1,0 +1,17 @@
+{
+  "affected_python_packaging_tests": {
+    "exit_file": "verification/r51-ui/final-packaging-unit.exit",
+    "failed": 0,
+    "log": "verification/r51-ui/final-packaging-unit.log",
+    "passed": 9
+  },
+  "changed_files": [
+    "tools/package-r51-windows.py"
+  ],
+  "final_snapshot_sha256": "7dfe86d997d3bcca56b381b9ef77ec335fdcc8baa39bf83a5631e04a6880e7be",
+  "full_rust_workspace_invocation_still_running_on_identical_rust_inputs": true,
+  "old_snapshot_sha256": "1310ab2a6462fb2f1006e75adb3e91927f4b94e72c4bda93d9f1007e36141b4a",
+  "reason": "Corrected an overbroad PE receipt claim to list exactly the selected fields and non-debug mapped sections compared. No executable behavior or packaging transformation changed.",
+  "rust_crates_fixtures_manifests_toolchain_and_cargo_runner_unchanged": true,
+  "timestamp_utc": "2026-11-07T07:44:52.104270+00:00"
+}

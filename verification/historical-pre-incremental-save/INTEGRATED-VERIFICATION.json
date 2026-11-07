@@ -1,0 +1,16 @@
+{
+  "revision": 39,
+  "scope": "save/rewind coarse journal final native executable test gate",
+  "current_report": "docs/SAVE-REWIND-PERFORMANCE.md",
+  "test_summary": "verification/save-rewind/full-test-summary.json",
+  "totals": {
+    "passed": 1021,
+    "failed": 0,
+    "ignored": 7,
+    "measured": 0,
+    "filtered": 0
+  },
+  "targets": 143,
+  "windows_runtime_verified": false,
+  "historical_receipt": "verification/historical-pre-save-journal/INTEGRATED-VERIFICATION.json"
+}

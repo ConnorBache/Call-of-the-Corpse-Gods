@@ -1,0 +1,39 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling equivalent v1.0.3
+   Compiling serde v1.0.229
+   Compiling hashbrown v0.17.1
+   Compiling serde_json v1.0.154
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling foldhash v0.2.0
+   Compiling syn v3.0.9
+   Compiling indexmap v2.14.2
+   Compiling serde_derive v1.0.229
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-core)
+error[E0433]: cannot find `non_euclidean_generation` in the crate root
+  --> crates/corpse-core/src/portals.rs:13:24
+   |
+13 |  if let Some(g)=crate::non_euclidean_generation::group_at(f,at) {let mut out=g.sources.clone();out.push(g.destination);return out}
+   |                        ^^^^^^^^^^^^^^^^^^^^^^^^ could not find `non_euclidean_generation` in the crate root
+
+error[E0433]: cannot find `non_euclidean_generation` in the crate root
+  --> crates/corpse-core/src/portals.rs:23:59
+   |
+23 | ...<usize> {let v=crate::non_euclidean_generation::exits(f,at);if !v.is_empty(){v}else{vec![arrival(f,at)]}}
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^ could not find `non_euclidean_generation` in the crate root
+
+error[E0609]: no field `non_euclidean` on type `&generated::Floor`
+  --> crates/corpse-core/src/portals.rs:21:18
+   |
+21 |  for pocket in f.non_euclidean.as_ref().into_iter().flatten(){for group in &pocket.groups {for &source in &group.sources {out.push((...
+   |                  ^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `portals`, `pocket_biomes`, `entrance`, `remembered_hazards`, `monster_entry_tick` ... and 51 others
+
+Some errors have detailed explanations: E0433, E0609.
+For more information about an error, try `rustc --explain E0433`.
+error: could not compile `corpse-core` (lib) due to 3 previous errors

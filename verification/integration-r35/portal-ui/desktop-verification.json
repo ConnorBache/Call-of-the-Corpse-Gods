@@ -1,0 +1,25 @@
+{
+  "scope": "Portal desktop presentation, target/path preview and arrival hazard warnings",
+  "new_tests": 10,
+  "new_tests_passed": true,
+  "generated_capture_exercised_separately": true,
+  "legacy_targeting_travel_passed": true,
+  "images": [
+    {
+      "file": "portal-colors-italic-controlled.png",
+      "bytes": 345237,
+      "sha256": "3ef463245b5695a9b02aefe7b89014f2269c22a53c777125b584ca21ea8464f8",
+      "caption": "Native SDL software renderer, controlled floor1 fixture with seven pairs to show supported colors. Not natural gameplay."
+    },
+    {
+      "file": "portals-generated-floor10-debug.png",
+      "bytes": 730335,
+      "sha256": "63b9f04b1009a87d3d8a261c30ec45be233846e26467271caf92eebc6c34b766",
+      "caption": "Generated revision35 floor10, seed portal-review-r35. Capture copy repositions player beside portal, reveals floor and removes pending offers. No simulation turns; terrain/pair placement unchanged. Not a survival playthrough."
+    }
+  ],
+  "simulation_rng_modified_by_renderer": false,
+  "windows_runtime_tested": false,
+  "ground_item_alias": "Observed-only render and inspection aliases; one real item identity; direct visibility required at both endpoints; legacy gated.",
+  "final_targeted_log": "items-final.log"
+}

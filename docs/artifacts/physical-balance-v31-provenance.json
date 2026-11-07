@@ -1,0 +1,49 @@
+{
+  "revision": 31,
+  "status": "Integrated unreleased physical pass; 48 metadata rows, not all-roster or whole-game balance",
+  "profile_source_sha256": "8c885f2b1cac055d24ed6e727a87fc07d67e6af909b2466744b7d603d2f1eb8d",
+  "scenario": "revision30/31 unchanged ordinary-horde policy; floor-entry; dry; no machines; default Shortsword; all hearts from prior floors (plus75/50% independently-thinned sensitivity); no activated abilities or chosen level grants",
+  "profile_cohorts": 10000,
+  "collection_rates": [
+    50,
+    75,
+    100
+  ],
+  "model_cases": 138,
+  "model_trials": 7640000,
+  "native_cases": 139,
+  "native_trials": 102400,
+  "native_censored_trials": 2678,
+  "native_holdout": {
+    "profile_permutation_seed": 310043,
+    "offset": 4096,
+    "population": "held-out indices within fixed joint progression dataset; no newly generated worlds"
+  },
+  "hashes": {
+    "fixtures/physical-reference-profiles-v31.npz": "d8b3a49ebb9abee2601c1e0138dfa3fc6a8fb1a974f31139b87d154c1e29069e",
+    "crates/corpse-core/src/catalog/population-v48.json": "7b4ba8f5c049ad3886696dad2b412bd736a8271878721d13dcfa7226999a6a67",
+    "crates/corpse-core/src/catalog/ordinary-roster-v48.json": "bd4af5a0e7ed3bf36010537d330a2b3bf21967e0b68fbc3da78f7061911e78b1",
+    "crates/corpse-core/catalog/heart-items-v48.json": "44e84333abc9c943e25f481a174592256222b0d575c37c07f4948f5bcfc8269d",
+    "crates/corpse-core/src/catalog/physical-balance-v31.json": "b2b8ba02d7c6905103ee46373f045032a27fe77932b4ad83278b0667c1b18f20",
+    "crates/corpse-core/examples/physical_trade_arena.rs": "eef01faa276fe42e8224a410ca4db6cb6e18887209c0afbf3591defa00174823",
+    "tools/physical-balance/exchange.py": "ad1beb5f9ac9378cc7d524eeebabe876483c80e47a79c6974d52417550fdc34c",
+    "tools/physical-balance/validate.py": "bc23ad49f9fce59f2d52e63ab44c14b9602c0e741b55de7d17631eb68a872d9c",
+    "tools/physical-balance/validate_native.py": "8ad23addd4dda50271d8371b7f8c0a312689a8f8af748b253c0053dc2819ef66",
+    "docs/artifacts/physical-balance-v31-summary.csv": "e1d12dd326fc13a1292b72efe7cd0373f9880eb1d6e73485ad6b4b9780e238d6",
+    "docs/artifacts/physical-balance-v31-before-after.csv": "6f713ce38b2772841f49dda7b4721501f2d3ab17f0bbdf284b7c98f3d3951b18",
+    "docs/artifacts/physical-balance-v31-native-validation.json": "0b700cd18c226eb0bc1f09ca7a7d9802da8d0d5e998516148a7ca57c125e929e",
+    "docs/artifacts/physical-balance-v31-native-cases.json": "395785ad1c1c72b02a5a190d6778b4632ba5c2904518c16ccb61e160efc560fc",
+    "docs/artifacts/physical-balance-v31-native-summary.csv": "7af9c1924a5e313651f1f02a480f2d3a1bf2f9f77fe30384d4799723bbec23fd"
+  },
+  "shipping_exclusion": "NPZ profiles, Python validators, native example harness and documentation results are developer assets, not included in shipping game binary",
+  "measurement": "Whole-life net HP loss, native passive/status/terrain effects and post-kill residuals where applicable; censored means are not complete fight results",
+  "scope_exclusions": [
+    "dedicated casters/supports/summoners",
+    "Pale gas/spit/scream/breather families and Greater Jackal",
+    "rooted fungi and Samara",
+    "invulnerable Sphinx",
+    "named Godbeasts",
+    "generated-floor tactics and full-run survival",
+    "collapse escape benchmark"
+  ]
+}

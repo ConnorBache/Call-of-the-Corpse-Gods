@@ -1,0 +1,16 @@
+{
+  "simulation_revision": 33,
+  "status": "implemented; focused native regressions, integration gate separately required",
+  "defined_nonfinal_candidates": ["Mercuria", "Zillennia", "Verdania (legacy Veridian ID)", "Borge"],
+  "encounter_floors": [5, 10, 15, 20, 25, 30, 35],
+  "final_encounter": {"floor": 40, "name": "The Flesh Administrator", "extra_godbeast": false},
+  "legacy_revisions_unchanged": [29, 30, 31, 32],
+  "commands": ["Move bump-to-interact", "Interact obelisk/altar", "Equip", "UseAt adjacent creature", "Move equipped bump attack"],
+  "persistent_event_fields": ["activated", "sacrificeActorId", "sacrificeName", "rewardCreated", "altar", "displayName"],
+  "persistent_heart_fields": ["sourceActorId", "borgeDepth"],
+  "revival_guard": "existing enemy:beast:no-revival trait plus unpreventable actual-death pipeline",
+  "deferred": ["three undesigned Godbeasts", "new trap designs", "new special-room designs"],
+  "tests": ["crates/corpse-core/tests/borge_event.rs", "crates/corpse-core/tests/tree_tap_commands.rs", "desktop Pack/inspection Borge regressions"],
+  "design_and_complexity": "docs/borge-event-r33.md",
+  "verification_limit": "Source tests do not establish platform screenshot/interaction verification or exhaustive generated-seed behavior."
+}

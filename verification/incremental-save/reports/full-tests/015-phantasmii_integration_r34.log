@@ -1,0 +1,21 @@
+
+running 16 tests
+test dream_sparkle_real_dispatch_never_changes_waking_terrain_fire_or_lights ... ok
+test body_melee_damages_shared_pool_without_waking_or_cross_plane_projection_hit ... ok
+test nightmare_actual_kill_dissolves_without_corpse_loot_or_rewards ... ok
+test report_eight_nightmare_numerical_profiles ... ok
+test lethal_sleeping_body_packets_resolve_shared_death_exactly_once ... ok
+test dream_created_half_here_remains_dream_side_after_real_wake_and_load ... ok
+test fixture_replay_with_revert_preserves_both_layers_and_half_here_plane ... ok
+test waking_fire_keeps_provenance_and_hits_waking_actor_not_overlapping_projection ... ok
+test staircase_bumps_cancel_coordinates_and_time_in_normal_and_haste_paths ... ok
+test dagger_altar_three_shard_stack_unlock_save_and_toggle_are_real_commands ... ok
+test synthetic_dream_controls_cannot_bypass_terminal_choice_debug_or_paralysis_gates ... ok
+test quest_fixture_replay_reproduces_events_and_complete_dream_state ... ok
+test save_load_and_actual_revert_restore_both_layers_and_half_here_creation_plane ... ok
+test early_wake_keeps_partial_shards_and_reentry_still_requires_the_altar ... ok
+test actual_see_future_restores_dream_layer_and_half_here_plane_after_waking ... ok
+test nested_dream_floor_geometry_environment_and_transient_context_corruption_is_rejected ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+

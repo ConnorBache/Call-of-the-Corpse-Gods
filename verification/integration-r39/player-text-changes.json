@@ -1,0 +1,64 @@
+{
+  "revision": 39,
+  "source_user_message": "Sentinel_a0022734bacc8191bbc03606f8efc77f",
+  "miss_policy_user_message": "Sentinel_4df0180d8b9c8191a90a31741567d85a",
+  "batch2": {
+    "11": {
+      "state": "user replacement applied",
+      "text": "The Borge is satisfied."
+    },
+    "12": {
+      "state": "approved unchanged"
+    },
+    "13": {
+      "state": "approved unchanged"
+    },
+    "14": {
+      "state": "mechanics corrected, not prose approval",
+      "current_revision": "UseAt/Apply path removed; ordinary equip, accuracy and Throw used",
+      "historical": "The old guard remains reachable only through legacy revisions <=38"
+    },
+    "15": {
+      "state": "unanswered; not approved",
+      "current_revision": "Old targeted Apply path unavailable",
+      "historical": "Guard retained for <=38"
+    },
+    "16": {
+      "state": "mixed authorship",
+      "retained_text": "The Shard of the Borge disintegrates.",
+      "retained_origin": "assistant; explicitly retained by replacement-last-sentence instruction",
+      "user_text": "The corpse blackens and turns to stone.",
+      "condition": "Only appended to ordinary player You kill the <creature> chronicle; not Nightmare dissolution, non-player death, miss or any other log"
+    },
+    "17": {
+      "state": "clarification answered; not user-approved",
+      "condition": "Beginning Dreamwalking blocked by living dream-plane occupant at origin or portal-linked equivalent"
+    },
+    "18": {
+      "state": "approved unchanged"
+    },
+    "19": {
+      "state": "approved unchanged"
+    },
+    "20": {
+      "state": "approved unchanged"
+    }
+  },
+  "new_assistant_text_over_three_words": [
+    {
+      "text": "Invalid dream ground item",
+      "location": "crates/corpse-core/src/storage.rs",
+      "purpose": "Save validation error for malformed plane marker",
+      "approved": false
+    }
+  ],
+  "ui_new_prose": [],
+  "authored_item_description": "Unchanged",
+  "global_deletion_claim": false,
+  "changed_existing_diagnostics": [
+    {
+      "location": "crates/corpse-core/src/storage.rs and replay.rs",
+      "change": "Accepted-revision numeric lists extended to 39; surrounding diagnostic wording retained. Prior authorship classification remains unresolved/partial, not newly established."
+    }
+  ]
+}

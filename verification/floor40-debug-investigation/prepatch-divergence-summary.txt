@@ -1,0 +1,9 @@
+Prepatch source: verification/r51-ui/direct-core-tests/libprevision_core.rlib
+Failure after first Unblessed Wait: canonical state divergence, no unsupported error.
+Tick: 1.0 vs 1.0
+Environment cells metric: 2291.0 vs 71021.0
+RNG: 2801532684.0 vs 4200096673.0
+Floor 1 dirty/lastTick/active-root-links: False/0.0/2 vs True/1.0/0
+Floor 15 dirty/lastTick/active-root-links: False/0.0/2 vs True/1.0/0
+Floor 25 dirty/lastTick/active-root-links: False/0.0/24 vs True/1.0/0
+Floor 40 dirty/lastTick/active-root-links: True/1.0/0 vs True/1.0/0

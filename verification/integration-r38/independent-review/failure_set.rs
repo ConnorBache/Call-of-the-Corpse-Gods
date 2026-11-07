@@ -1,0 +1,3 @@
+#[allow(dead_code)] mod qa {include!("stress.rs");pub fn check_run(r:&corpse_core::Run)->Vec<String>{check(r)}}
+use corpse_core::startup;use serde_json::{Value,json};
+fn main(){let text=std::fs::read_to_string(std::env::args().nth(1).unwrap()).unwrap();for line in text.lines(){let row:Value=serde_json::from_str(line).unwrap();if row.get("generation_error").is_none(){continue}let seed=row["seed"].as_str().unwrap();let result=(||{let mut r=startup::new_run_shell_revision(seed,"Unblessed",false,38.)?;startup::ensure_floors(&mut r,40)?;Ok::<_,String>(json!({"floors":r.floors.len(),"errors":qa::check_run(&r)}))})();println!("{}",json!({"seed":seed,"baseline_error":row["generation_error"],"candidate":result}));}}

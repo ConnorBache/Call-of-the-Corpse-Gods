@@ -1,0 +1,8 @@
+
+running 3 tests
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_amulet_refresh_and_apply_cancel ... ok
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_long_ring_copy_and_light_exception ... ok
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_status_meters_remaining_turns ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 581 filtered out; finished in 0.62s
+

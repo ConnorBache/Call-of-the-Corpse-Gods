@@ -1,0 +1,13 @@
+
+running 8 tests
+test live_stash_take_after_drop_then_revert_keeps_every_source_item_exactly_once ... ok
+test live_stash_put_after_drop_then_revert_cannot_duplicate_reconstructed_item ... ok
+test live_stash_equip_after_world_turn_then_revert_is_a_consistent_transaction ... ok
+test future_restore_returns_pack_and_stash_to_one_consistent_branch ... ok
+test live_stash_then_explicit_save_load_revert_preserves_source_item_uniqueness ... ok
+test pending_haste_stash_edits_and_saved_resume_revert_both_restore_one_branch ... ok
+test reconstructed_loot_leaves_tree_taps_but_keeps_initial_honey_and_no_unearned_shard ... ok
+test floor_forty_blessed_all_gods_use_live_offer_queues_then_explicit_exhaustion ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 36.84s
+

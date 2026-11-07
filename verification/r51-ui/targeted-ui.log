@@ -1,0 +1,212 @@
+=== quiet_ui ===
+
+running 11 tests
+test render::quiet_ui_tests::quiet_ui_ability_metadata_uses_available_width_and_right_edge ... ok
+test render::quiet_ui_tests::quiet_ui_condition_names_are_short_and_meaningful ... ok
+test render::quiet_ui_tests::quiet_ui_map_hover_can_reveal_a_scrolled_off_profile ... ok
+test render::quiet_ui_tests::quiet_ui_player_stats_use_effective_bonus_units_without_world_changes ... ok
+test render::quiet_ui_tests::quiet_ui_prepaid_activation_remains_available_at_exact_funding ... ok
+test render::quiet_ui_tests::quiet_ui_small_corpse_marker_is_bounded_relative_to_heart_ring ... FAILED
+test render::quiet_ui_tests::quiet_ui_toolbar_is_exactly_three_evenly_spaced_labels ... ok
+test render::quiet_ui_tests::quiet_ui_two_way_hover_restores_full_retained_and_tile_frames ... ok
+test render::quiet_ui_tests::quiet_ui_unread_ability_and_stat_changes_repaint_all_responsive_modes ... ok
+test render::quiet_ui_tests::quiet_ui_unused_reserves_are_hidden_without_mutating_them ... ok
+test render::quiet_ui_tests::water_squiggle_is_cosmetic_bounded_and_repaints_without_trails ... ok
+
+failures:
+
+---- render::quiet_ui_tests::quiet_ui_small_corpse_marker_is_bounded_relative_to_heart_ring stdout ----
+
+thread 'render::quiet_ui_tests::quiet_ui_small_corpse_marker_is_bounded_relative_to_heart_ring' (11) panicked at crates/corpse-desktop/src/quiet_ui_tests.rs:121:13:
+1 ^^: (7, 6) vs (3, 4)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    render::quiet_ui_tests::quiet_ui_small_corpse_marker_is_bounded_relative_to_heart_ring
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 683 filtered out; finished in 6.43s
+
+=== grass_amulet ===
+
+running 5 tests
+test observe::grass_amulet_observe_tests::grass_amulet_grass_alignment_is_knowledge_safe_and_keeps_other_terrain ... ok
+test observe::grass_amulet_observe_tests::grass_amulet_item_identity_overrides_and_legacy_profiles_are_preserved ... ok
+test observe::grass_amulet_observe_tests::grass_amulet_map_projection_uses_question_mark_without_changing_saved_item ... ok
+test render::grass_amulet_render_tests::grass_amulet_alignment_repaint_restores_full_retained_and_tile_frames ... ok
+test render::grass_amulet_render_tests::grass_amulet_bottom_alignment_moves_ink_only_and_reuses_masks ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 689 filtered out; finished in 4.47s
+
+=== ember_glyph_tests ===
+
+running 3 tests
+test render::ember_glyph_tests::ember_dot_cache_clip_and_gpu_use_the_same_native_mask ... ok
+test render::ember_glyph_tests::ember_middle_dot_keeps_font_geometry_at_native_fractional_and_hidpi_sizes ... ok
+test render::ember_glyph_tests::ember_scene_preserves_authored_symbol_preferences_and_detached_knowledge ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 691 filtered out; finished in 2.73s
+
+=== bestiary_progress ===
+
+running 10 tests
+test bestiary_progress::tests::disguised_actor_unlocks_only_apparent_page_and_hallucinations_unlock_nothing ... ok
+test bestiary_progress::tests::durable_discovery_unread_and_duplicate_batches ... ok
+test bestiary_progress::tests::error_notice_is_once_per_failure_and_preserves_other_notices ... ok
+test bestiary_progress::tests::every_population_template_has_expected_authored_page_or_explicit_no_page ... ok
+test bestiary_progress::tests::explicit_profiles_are_isolated ... ok
+test bestiary_progress::tests::failed_write_keeps_memory_and_reports_error ... ok
+test bestiary_progress::tests::malformed_record_is_never_overwritten ... ok
+test bestiary_progress::tests::notification_once_per_discovery_and_no_run_mutation ... ok
+test bestiary_progress::tests::observed_rows_only_no_hidden_actor_or_rng_mutation ... ok
+test bestiary_progress::tests::quality_alias_and_vampire_bat_map_to_the_authored_species_page ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 684 filtered out; finished in 0.03s
+
+=== discovery_privacy ===
+
+running 3 tests
+test manual::discovery_privacy_tests::discovery_transition_wide_and_portrait_capture ... ok
+test manual::discovery_privacy_tests::locked_page_pixels_do_not_depend_on_secret_content ... ok
+test manual::discovery_privacy_tests::unread_marker_and_known_page_change_pixels_then_view_clears_unread ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 691 filtered out; finished in 1.34s
+
+=== travel_ui::tests ===
+
+running 21 tests
+test travel_ui::tests::autoexplore_cancel_and_new_discovery_reset_frontier_preview ... ok
+test travel_ui::tests::autoexplore_complete_inaccessible_and_legacy_unknown_maps_are_quiet ... ok
+test travel_ui::tests::autoexplore_first_press_only_previews_second_transfers_known_route ... ok
+test travel_ui::tests::autoexplore_hidden_walls_occupants_and_hazards_do_not_change_frontier ... ok
+test travel_ui::tests::autoexplore_new_observed_threat_stops_before_the_next_command ... ok
+test travel_ui::tests::autoexplore_no_visibility_progress_never_oscillates_or_steps_into_darkness ... ok
+test travel_ui::tests::autoexplore_observed_hazard_still_requires_confirmation_and_stops ... ok
+test travel_ui::tests::autoexplore_stale_preview_is_not_confirmed_after_a_threat_or_floor_change ... ok
+test travel_ui::tests::controller_advances_replans_and_cancels_without_simulation_writes ... ok
+test travel_ui::tests::controller_stops_on_harm_displacement_hazard_and_blocker ... ok
+test travel_ui::tests::deep_water_never_enters_player_paths_even_with_flight_or_drown ... ok
+test travel_ui::tests::hidden_live_changes_cannot_rewrite_historical_routes ... ok
+test travel_ui::tests::non_euclidean_ui_deterministic_entry_known_arrival_and_unknown_exit ... ok
+test travel_ui::tests::non_euclidean_ui_routes_stop_at_random_choice_and_never_draw_rng ... ok
+test travel_ui::tests::portal_ui_arrival_alias_completes_without_bounce ... ok
+test travel_ui::tests::portal_ui_known_pair_route_arrival_and_unknown_mate ... ok
+test travel_ui::tests::r37_speed_up_known_route_and_unknown_destination ... ok
+test travel_ui::tests::r37_speed_up_middle_pair_does_not_bounce_in_preview ... ok
+test travel_ui::tests::source_displaced_phase_graphs_preserve_stable_ties_and_cycle_termination ... ok
+test travel_ui::tests::source_observed_threat_changes_keep_reason_priority ... ok
+test travel_ui::tests::source_player_routes_preserve_knowledge_hazards_and_phase ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 673 filtered out; finished in 0.71s
+
+=== autoexplore_other_input ===
+
+running 1 test
+test tests::autoexplore_other_input_cancels_but_hover_and_x_do_not ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 693 filtered out; finished in 0.00s
+
+=== display_ui ===
+
+running 6 tests
+test display_ui::tests::automatic_is_default_and_can_be_restored_after_manual_selection ... ok
+test display_ui::tests::borderless_locks_to_desktop_and_preserves_window_selection ... ok
+test display_ui::tests::cancel_does_not_apply_and_keyboard_mouse_share_actions ... ok
+test display_ui::tests::empty_invalid_duplicate_inputs_are_safe_and_bounded ... ok
+test display_ui::tests::input_bounds_are_exclusive_and_gaps_do_nothing ... ok
+test display_ui::tests::reopening_preserves_explicit_size_missing_from_new_monitor_modes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 688 filtered out; finished in 0.00s
+
+=== native_drawable ===
+
+running 1 test
+test native_drawable_contract_tests::window_area_and_density_use_exact_drawable_pixels_without_changing_hit_targets ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 693 filtered out; finished in 0.25s
+
+=== player_background ===
+
+running 3 tests
+test observe::player_background_tests::explicit_player_background_is_still_respected ... ok
+test observe::player_background_tests::player_inherits_each_lit_terrain_background ... ok
+test render::render_background::tests::player_background_matches_terrain_and_retained_repaints ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 691 filtered out; finished in 0.82s
+
+=== stat_presentation ===
+
+running 3 tests
+test stat_presentation::revision51_hud_tests::revision51_hud_damage_rounds_signed_bonus_without_altering_stats ... ok
+test stat_presentation::tests::bonuses_preserve_sign_and_convert_after_mechanical_rounding ... ok
+test stat_presentation::tests::enemy_damage_uses_its_own_attack_coefficients ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 691 filtered out; finished in 0.03s
+
+=== statuses_ui ===
+
+running 11 tests
+test statuses_ui::carried_jewelry_status_tests::r50_carried_dream_craft_projection_ignores_historical_flags ... ok
+test statuses_ui::revision50_amulet_status_tests::compact_discord_retains_full_description_data ... ok
+test statuses_ui::revision50_amulet_status_tests::named_amulet_statuses_expose_only_names_and_remaining_turns ... ok
+test statuses_ui::revision50_amulet_status_tests::revision50_fire_immunity_turns_exclude_fresh_metadata ... ok
+test statuses_ui::revision51_display_unit_tests::current_status_units_are_contextual_and_legacy_observations_unchanged ... ok
+test statuses_ui::revision51_venom_tests::revision51_venom_preview_sums_each_rounded_resisted_packet ... ok
+test statuses_ui::tests::native_disoriented_and_hallucinating_labels_expire_without_internal_penalty_labels ... ok
+test statuses_ui::tests::new_actor_or_replaced_session_does_not_inherit_meter_certainty ... ok
+test statuses_ui::tests::source_185_observed_status_and_scheduler_cases ... ok
+test statuses_ui::tests::source_meter_baselines_unknown_expiration_reapplication ... ok
+test statuses_ui::tests::unknown_internal_keys_never_become_conditions ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 683 filtered out; finished in 1.42s
+
+=== refreshed_hover ===
+
+running 1 test
+test refreshed_hover_tests::stationary_map_pointer_uses_new_actor_positions_and_resized_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 693 filtered out; finished in 0.24s
+
+=== pack::revision50_item_knowledge_tests ===
+
+running 7 tests
+test pack::revision50_item_knowledge_tests::r50_item_hover_all_potions_reveal_effect_before_clicking ... ok
+test pack::revision50_item_knowledge_tests::r50_item_hover_cancel_reopen_refresh_and_scroll_are_read_only ... ok
+test pack::revision50_item_knowledge_tests::r50_item_hover_carried_jewelry_is_active_without_equipment_controls ... ok
+test pack::revision50_item_knowledge_tests::r50_item_hover_jewelry_hearts_tools_and_grants_keep_effect_details ... ok
+test pack::revision50_item_knowledge_tests::r50_item_hover_legacy_unknown_potion_stays_unknown ... ok
+test pack::revision50_item_knowledge_tests::r51_all_amulet_descriptions_keep_effects_costs_and_targeting ... ok
+test pack::revision50_item_knowledge_tests::r51_all_ring_descriptions_are_only_names_types_and_effects ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 687 filtered out; finished in 1.45s
+
+=== pack::revision50_pack_tests ===
+
+running 13 tests
+test pack::revision50_pack_tests::all_item_grants_have_revision50_names_and_copy ... ok
+test pack::revision50_pack_tests::amulet_apply_energy_cost_names_and_preview_follow_current_state ... ok
+test pack::revision50_pack_tests::authored_ring_effect_tooltips_are_versioned_and_keep_item_grants ... ok
+test pack::revision50_pack_tests::carried_jewelry_grant_and_bonus_copy_preserves_legacy ... ok
+test pack::revision50_pack_tests::category_capacity_and_equipment_actions_are_versioned ... ok
+test pack::revision50_pack_tests::category_counts_include_all_carried_jewelry_and_stack_units ... ok
+test pack::revision50_pack_tests::category_geometry_keeps_empty_headers_and_scrolls_to_last_item ... ok
+test pack::revision50_pack_tests::category_order_and_reordering_never_cross_sections ... ok
+test pack::revision50_pack_tests::five_empty_category_sections_keep_independent_limits ... ok
+test pack::revision50_pack_tests::reserve_changes_invalidate_pack_and_reach_item_tooltips ... ok
+test pack::revision50_pack_tests::ring_names_follow_vampirism_and_ice_immunity_clarifications ... ok
+test pack::revision50_pack_tests::unlimited_trinkets_are_finite_in_ui_and_keep_special_actions ... ok
+test pack::revision50_pack_tests::unsupported_direct_projection_items_are_not_hidden_or_called_trinkets ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 681 filtered out; finished in 0.27s
+
+=== pack::revision50_jewelry_capture_tests ===
+
+running 5 tests
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_actual_item_hovers ... ok
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_amulet_refresh_and_apply_cancel ... ok
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_concise_ring_copy_and_long_grants ... ok
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_five_carried_categories ... ok
+test pack::revision50_jewelry_capture_tests::revision50_jewelry_capture_status_meters_remaining_turns ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 689 filtered out; finished in 2.41s
+

@@ -1,0 +1,237 @@
+TARGET revision50_ability_energy
+
+running 4 tests
+test missing_capacity_rejects_paid_activation_without_spending_player_energy ... ok
+test upkeep_uses_reserve_then_exhausted_player_fallback ... ok
+test paid_activation_uses_its_reserve_without_player_energy ... FAILED
+test repeated_initialization_cannot_refresh_charge ... ok
+
+failures:
+
+---- paid_activation_uses_its_reserve_without_player_energy stdout ----
+
+thread 'paid_activation_uses_its_reserve_without_player_energy' (10) panicked at crates/corpse-core/tests/revision50_ability_energy.rs:13:5:
+assertion failed: abilities::activate(&mut r, id, &Field::Missing, &Field::Missing,
+        &Field::Missing).unwrap()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    paid_activation_uses_its_reserve_without_player_energy
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+TARGET revision50_catalog
+
+running 2 tests
+test revision50_preserves_all_72_names_and_authorized_descriptions ... ok
+test revision50_identity_map_is_complete_unique_and_keeps_old_catalog ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+TARGET revision50_combat
+
+running 22 tests
+test execute_strict_threshold_and_exact_cost_and_revision_gate ... ok
+test force_into_killed_target_square_runs_corpse_stomp ... ok
+test commandment_restores_existing_forced_move_value ... ok
+test force_does_not_silently_limit_attack_to_melee_distance ... ok
+test masochism_crossings_rearm_after_healing_and_are_strict ... ok
+test force_swaps_instead_of_pushing_nonflyer_over_chasm ... ok
+test commandment_cannot_push_nonflying_enemy_into_chasm ... ok
+test commandment_paid_push_uses_reserve_with_empty_shared_bar ... ok
+test masochism_common_damage_packet_hook_runs_once_for_four_crossings ... ok
+test masochism_is_passive_revision_gated_and_never_triggers_on_healing ... ok
+test masochism_multiple_thresholds_grant_ten_total_and_healing_rearms ... ok
+test force_pushes_else_swaps_and_old_revision_is_inert ... ok
+test missed_me_retreats_only_with_space_and_spends_no_reaction_if_trapped ... ok
+test oblivious_blocks_unseen_enemy_but_not_environment_or_ally ... ok
+test commandment_passive_one_active_max_and_insufficient_energy_fallback ... ok
+test paid_combat_uses_its_own_reserve_and_missing_reserve_refuses_payment ... ok
+test rage_free_first_rescue_then_uses_own_reserve_and_legacy_stays_unchanged ... ok
+test surrender_admission_and_payment_both_use_the_ability_reserve ... ok
+test masochism_uses_derived_maximum_and_does_not_shorten_longer_haste ... ok
+test witch_hatred_uses_explicit_trait_and_does_not_charge_execute ... ok
+test replaced_debuff_and_counter_and_nightmare_are_inert ... ok
+test masochism_normal_and_haste_phase_share_existing_duration_clock ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+TARGET revision50_nightmares
+
+running 11 tests
+test decoys_do_not_follow_stairs_or_fall_through_terrain ... ok
+test blocked_curse_does_not_dissolve_and_immediate_blast_does ... ok
+test passive_fire_and_biological_statuses_do_not_affect_hallucination ... ok
+test decoys_never_execute_enemy_special_actions ... ok
+test strike_removes_only_decoy_without_rewards_or_shared_damage ... ok
+test resolved_curse_projectile_dissolves_and_preserves_caster_cost_and_recovery ... ok
+test direct_breath_and_ruin_pulse_dissolve_but_lingering_fire_does_not ... ok
+test occupied_decoy_square_is_rejected_before_spending ... ok
+test independent_serialized_actor_and_multiple_decoys ... ok
+test recharge_on_hundredth_normal_turn_persists_through_save ... ok
+test invalid_activation_is_atomic_including_bad_birth_cursor ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+TARGET revision50_player_attack
+
+running 9 tests
+test revision50_early_ruin_packets_keep_the_existing_forgiving_start ... ok
+test balance_admission_does_not_open_unimplemented_intermediate_revisions ... ok
+test revision50_preserves_latest_physical_profiles_without_new_retuning ... ok
+test revision50_copies_greatsword_baseline_without_stale_offhand ... ok
+test explicit_ranged_damage_is_identical_across_player_baseline_revision ... ok
+test main_and_generic_player_strikes_share_the_revisioned_base ... ok
+test revision50_natural_births_and_population_plans_preserve_revision46 ... ok
+test revision50_actual_witch_and_queen_births_keep_parent_specific_profiles ... ok
+test revision50_internal_floor_generation_keeps_existing_layouts ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.86s
+
+TARGET revision50_preserved_edges
+
+running 12 tests
+test future_save_load_and_seed_replay_restore_reveal_then_expire_it_once ... ignored, Revision 50 release admission intentionally disabled pending integration
+test reveal_stays_active_through_final_observation_of_a_bonus_action ... ok
+test reveal_persists_through_explicitly_no_action_commands_and_failed_actions ... ok
+test ordinary_consumption_and_action_abilities_expire_reveal ... ok
+test dream_sparkle_uses_only_its_current_plane_on_noncombustible_terrain ... ok
+test sparkle_admits_occupied_squares_and_reveal_shows_hidden_creatures ... ok
+test weave_movement_expires_reveal_and_snapshot_restoration_keeps_original_boundary ... ok
+test haste_and_came_and_pursuit_moves_finish_actions_without_world_turns ... ok
+test future_snapshot_and_raw_save_preserve_reveal_without_widening_release_admission ... ok
+test sparkle_rejects_unseen_invalid_and_unfunded_targets_without_mutation ... ok
+test legacy_sparkle_keeps_terrain_filter_and_ordinary_fire_keeps_it_in_r50 ... ok
+test sparkle_accepts_every_visible_terrain_and_ignites_immediately ... ok
+
+test result: ok. 11 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+TARGET revision50_reserve_finish
+
+running 3 tests
+test legacy_finish_ignores_future_reserve_fields ... ok
+test exhausted_reserve_uses_shared_affordability_at_finish ... ok
+test reserve_funded_active_modes_survive_real_free_command_finish ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+TARGET revision50_runtime_paths
+
+running 23 tests
+test duel_haste_movement_does_not_charge_an_extra_upkeep_turn ... FAILED
+test duel_dispatch_uses_fixed_five_by_five_square_and_only_exempts_chosen_enemy ... FAILED
+test duel_leaving_area_expires_before_exit_turn_upkeep_and_does_not_reactivate_on_return ... FAILED
+test duel_actual_attack_blocks_outsider_without_rng_but_allows_selected_enemy ... FAILED
+test implant_exact_fifteen_energy_is_sufficient_and_leaves_zero ... ok
+test duel_pays_three_per_world_turn_without_energy_regeneration_and_expires_unfunded ... FAILED
+test implant_can_choose_the_player_as_the_adjacent_creature ... ok
+test implant_dispatch_spends_fifteen_and_one_action_for_the_selected_immediate_attack ... ok
+test nightmare_actual_melee_miss_retains_decoy_and_landed_zero_damage_strike_dissolves_it ... ok
+test duel_invalid_admission_and_floor_change_do_not_leave_protection_active ... FAILED
+test nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks ... FAILED
+test implant_missing_reserve_never_silently_falls_back_to_player_energy ... ok
+test nightmare_is_targeted_by_actual_enemy_turn_and_disappears_without_a_reward ... FAILED
+test nightmare_ranged_miss_retains_and_landed_projectile_dissolves_decoy ... ok
+test pursuit_blocked_bonus_move_preserves_credit_and_does_not_tick_or_draw_rng ... FAILED
+test pursuit_bonus_cannot_make_an_attack_free_or_resolve_it_twice ... FAILED
+test pursuit_bonus_round_trips_and_does_not_repeat_a_world_or_haste_phase ... FAILED
+test pursuit_dispatch_grants_exactly_one_movement_only_credit_per_world_turn ... FAILED
+test pursuit_attack_displacement_from_unstoppable_force_never_earns_credit ... FAILED
+test pursuit_wait_is_an_ordinary_turn_and_discards_unused_credit ... FAILED
+test implant_insufficient_energy_and_silence_reject_before_payment_or_attack ... ok
+test implant_uses_its_explicit_own_reserve_even_with_zero_player_energy ... ok
+test implant_invalid_target_or_nonadjacent_victim_is_atomic ... ok
+
+failures:
+
+---- duel_haste_movement_does_not_charge_an_extra_upkeep_turn stdout ----
+
+thread 'duel_haste_movement_does_not_charge_an_extra_upkeep_turn' (101) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:330:88:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- duel_dispatch_uses_fixed_five_by_five_square_and_only_exempts_chosen_enemy stdout ----
+
+thread 'duel_dispatch_uses_fixed_five_by_five_square_and_only_exempts_chosen_enemy' (100) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:330:88:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- duel_leaving_area_expires_before_exit_turn_upkeep_and_does_not_reactivate_on_return stdout ----
+
+thread 'duel_leaving_area_expires_before_exit_turn_upkeep_and_does_not_reactivate_on_return' (103) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:330:88:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- duel_actual_attack_blocks_outsider_without_rng_but_allows_selected_enemy stdout ----
+
+thread 'duel_actual_attack_blocks_outsider_without_rng_but_allows_selected_enemy' (99) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:330:88:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- duel_pays_three_per_world_turn_without_energy_regeneration_and_expires_unfunded stdout ----
+
+thread 'duel_pays_three_per_world_turn_without_energy_regeneration_and_expires_unfunded' (104) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:330:88:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- duel_invalid_admission_and_floor_change_do_not_leave_protection_active stdout ----
+
+thread 'duel_invalid_admission_and_floor_change_do_not_leave_protection_active' (102) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:330:88:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks stdout ----
+
+thread 'nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks' (113) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:193:90:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- nightmare_is_targeted_by_actual_enemy_turn_and_disappears_without_a_reward stdout ----
+
+thread 'nightmare_is_targeted_by_actual_enemy_turn_and_disappears_without_a_reward' (114) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:224:56:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- pursuit_blocked_bonus_move_preserves_credit_and_does_not_tick_or_draw_rng stdout ----
+
+thread 'pursuit_blocked_bonus_move_preserves_credit_and_does_not_tick_or_draw_rng' (117) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:82:87:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- pursuit_bonus_cannot_make_an_attack_free_or_resolve_it_twice stdout ----
+
+thread 'pursuit_bonus_cannot_make_an_attack_free_or_resolve_it_twice' (118) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:82:87:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- pursuit_bonus_round_trips_and_does_not_repeat_a_world_or_haste_phase stdout ----
+
+thread 'pursuit_bonus_round_trips_and_does_not_repeat_a_world_or_haste_phase' (119) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:82:87:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- pursuit_dispatch_grants_exactly_one_movement_only_credit_per_world_turn stdout ----
+
+thread 'pursuit_dispatch_grants_exactly_one_movement_only_credit_per_world_turn' (120) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:82:87:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- pursuit_attack_displacement_from_unstoppable_force_never_earns_credit stdout ----
+
+thread 'pursuit_attack_displacement_from_unstoppable_force_never_earns_credit' (116) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:82:87:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+---- pursuit_wait_is_an_ordinary_turn_and_discards_unused_credit stdout ----
+
+thread 'pursuit_wait_is_an_ordinary_turn_and_discards_unused_credit' (121) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:82:87:
+called `Result::unwrap()` on an `Err` value: EngineError("Unsupported environment integration: living burning/emitter/ability traits")
+
+
+failures:
+    duel_actual_attack_blocks_outsider_without_rng_but_allows_selected_enemy
+    duel_dispatch_uses_fixed_five_by_five_square_and_only_exempts_chosen_enemy
+    duel_haste_movement_does_not_charge_an_extra_upkeep_turn
+    duel_invalid_admission_and_floor_change_do_not_leave_protection_active
+    duel_leaving_area_expires_before_exit_turn_upkeep_and_does_not_reactivate_on_return
+    duel_pays_three_per_world_turn_without_energy_regeneration_and_expires_unfunded
+    nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks
+    nightmare_is_targeted_by_actual_enemy_turn_and_disappears_without_a_reward
+    pursuit_attack_displacement_from_unstoppable_force_never_earns_credit
+    pursuit_blocked_bonus_move_preserves_credit_and_does_not_tick_or_draw_rng
+    pursuit_bonus_cannot_make_an_attack_free_or_resolve_it_twice
+    pursuit_bonus_round_trips_and_does_not_repeat_a_world_or_haste_phase
+    pursuit_dispatch_grants_exactly_one_movement_only_credit_per_world_turn
+    pursuit_wait_is_an_ordinary_turn_and_discards_unused_credit
+
+test result: FAILED. 9 passed; 14 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+

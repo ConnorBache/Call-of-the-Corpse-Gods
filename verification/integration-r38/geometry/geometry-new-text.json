@@ -1,0 +1,23 @@
+[
+  {
+    "file": "crates/corpse-core/src/generation/world.rs",
+    "line": 54,
+    "text": "Unsupported generation recovery window",
+    "authorship": "assistant",
+    "context": "generation error diagnostic; invalid input or exhausted safe placement"
+  },
+  {
+    "file": "crates/corpse-core/src/generation/world.rs",
+    "line": 231,
+    "text": "Unsupported generation candidate attempt",
+    "authorship": "assistant",
+    "context": "generation error diagnostic; invalid input or exhausted safe placement"
+  },
+  {
+    "file": "crates/corpse-core/src/generation/godbeast_room.rs",
+    "line": 160,
+    "text": "No safe Godbeast tap location",
+    "authorship": "assistant",
+    "context": "generation error diagnostic; invalid input or exhausted safe placement"
+  }
+]

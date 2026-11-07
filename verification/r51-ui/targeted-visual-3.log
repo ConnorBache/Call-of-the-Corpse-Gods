@@ -1,0 +1,67 @@
+=== darkness_render_tests:: ===
+
+running 3 tests
+test darkness_render_tests::darkness_materials_glow_dilution_profiles_and_ring_exclusion ... ok
+test darkness_render_tests::darkness_native_throw_before_after_expiry_and_incremental_pixels ... ok
+test darkness_render_tests::illumination_native_examples_same_tiles_levels_sources_and_potion_expiry ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 709 filtered out; finished in 6.98s
+
+=== water_render_tests:: ===
+
+running 7 tests
+test water_render_tests::water_depth_flight_phase_ascend_ring_and_dream_body_are_exempt ... ok
+test water_render_tests::water_depth_gpu_records_only_one_clipped_veil_and_clears_on_exit ... ok
+test water_render_tests::water_depth_native_captures_separate_shallows_and_preserve_readable_tint ... ok
+test water_render_tests::water_depth_native_gpu_pixel_parity ... ignored, Isolated SDL native raster check: SDL_VIDEODRIVER=offscreen, --test-threads=1
+test water_render_tests::water_depth_observation_uses_true_swimming_not_glyph_hover_or_stale_status ... ok
+test water_render_tests::water_depth_real_engine_save_load_recomputes_and_does_not_persist_tint ... ok
+test water_render_tests::water_depth_retained_and_tile_entry_exit_load_flight_and_animation_are_exact ... ok
+
+test result: ok. 6 passed; 0 failed; 1 ignored; 0 measured; 705 filtered out; finished in 12.10s
+
+=== quiet_ui_tests:: ===
+
+running 11 tests
+test render::quiet_ui_tests::quiet_ui_ability_metadata_uses_available_width_and_right_edge ... ok
+test render::quiet_ui_tests::quiet_ui_condition_names_are_short_and_meaningful ... ok
+test render::quiet_ui_tests::quiet_ui_map_hover_can_reveal_a_scrolled_off_profile ... ok
+test render::quiet_ui_tests::quiet_ui_player_stats_use_effective_bonus_units_without_world_changes ... ok
+test render::quiet_ui_tests::quiet_ui_prepaid_activation_remains_available_at_exact_funding ... ok
+test render::quiet_ui_tests::quiet_ui_small_corpse_marker_is_bounded_relative_to_heart_ring ... ok
+test render::quiet_ui_tests::quiet_ui_toolbar_is_exactly_three_evenly_spaced_labels ... ok
+test render::quiet_ui_tests::quiet_ui_two_way_hover_restores_full_retained_and_tile_frames ... ok
+test render::quiet_ui_tests::quiet_ui_unread_ability_and_stat_changes_repaint_all_responsive_modes ... ok
+test render::quiet_ui_tests::quiet_ui_unused_reserves_are_hidden_without_mutating_them ... ok
+test render::quiet_ui_tests::water_squiggle_is_cosmetic_bounded_and_repaints_without_trails ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 701 filtered out; finished in 7.55s
+
+=== quiet_pack_copy_tests:: ===
+
+running 1 test
+test pack::quiet_pack_copy_tests::quiet_pack_has_no_static_jewelry_or_cancel_tutorial_line ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 711 filtered out; finished in 0.25s
+
+=== ability_summary_uses_measured_ellipsis ===
+
+running 1 test
+test render::tests::ability_summary_uses_measured_ellipsis_without_dropping_payment_details ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 711 filtered out; finished in 0.26s
+
+=== long_domain_heading ===
+
+running 1 test
+test render::gameplay_hierarchy_tests::long_domain_heading_and_passive_metadata_fit_fixed_allocations ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 711 filtered out; finished in 0.26s
+
+=== revision51_stat_unit_tests ===
+
+running 1 test
+test pack::revision51_stat_unit_tests::heart_and_equipment_bonuses_use_display_units ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 711 filtered out; finished in 0.00s
+

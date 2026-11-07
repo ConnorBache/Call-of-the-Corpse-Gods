@@ -1,0 +1,122 @@
+{
+  "additional_checks": {
+    "packaging_python_tests": {
+      "failed": 0,
+      "passed": 9
+    },
+    "snapshot_optional_roots": 25,
+    "source_contract": {
+      "authorized_description_amendments": 13,
+      "carried_jewelry_counted": true,
+      "catalog_entries": 72,
+      "checks_native_compilation": false,
+      "checks_runtime_tests": false,
+      "independent_inventory_categories": 5,
+      "new_modules_registered": 17,
+      "release_runtime_verified_by_this_check": false,
+      "revision50_release_enabled": true,
+      "scope": "source-and-data-only",
+      "status": "source_contract_checks_passed"
+    }
+  },
+  "created_utc": "2026-11-07T07:59:31.367851+00:00",
+  "full_workspace": {
+    "counts": {
+      "completed_targets": 202,
+      "failed": 0,
+      "ignored": 42,
+      "passed": 2296
+    },
+    "exit_code": 0,
+    "report": "verification/r51-ui/test-report.json",
+    "unfiltered_workspace_command": "CARGO_PROFILE_TEST_OPT_LEVEL=1 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true CARGO_INCREMENTAL=0 tools/cargo.sh test --workspace --locked --offline --no-fail-fast -j2 -- --test-threads=2"
+  },
+  "github_publication": "No GitHub operation was performed by this worker; publication remains with the coordinating task.",
+  "illumination": {
+    "full_retained_tile_exact": true,
+    "images": [
+      {
+        "file": "illumination-levels-native.png",
+        "sha256": "57188b8a4348ec69bb3329cc92a7bae309d1733290304aee4985a0f221ee27ac",
+        "size": [
+          2200,
+          1200
+        ]
+      },
+      {
+        "file": "darkness-potion-native-comparison.png",
+        "sha256": "485b93ce0462a5bd6b3c191e5537dbf548590676c88df3946086f08bb7c0bfbd",
+        "size": [
+          1920,
+          1200
+        ]
+      }
+    ],
+    "linux_offscreen_opengl_max_channel_delta": 2,
+    "native_scenes": 55,
+    "report": "verification/r51-illumination/VERIFICATION.json",
+    "water_max_channel_delta": 3
+  },
+  "independent_static_pe": {
+    "all_invariant_fields_equal": true,
+    "application_manifest_embedded_unchanged": true,
+    "exit_code": 0,
+    "report": "verification/r51-ui/windows-pe-independent.json"
+  },
+  "limits": [
+    "Cloud Linux only; no user PC accessed.",
+    "Windows cross-compilation and static archive/PE validation are not Windows runtime, physical GPU, monitor-switch or DPI transition verification.",
+    "The full Rust gate has 42 ignored test executions. Additional targeted offscreen SDL/OpenGL checks are reported separately; ignored tests are not claimed as executed.",
+    "The original floor-40 unsupported-behavior notice has not been reproduced. A separately identified DEBUG stale-root save/resume divergence is fixed and regression-tested.",
+    "The source checkpoint depends on the separately identified canonical19 baseline; it is not a standalone copy of all unchanged assets.",
+    "Default calibrated illumination follows the specified curve; legacy blending/maximum-illumination editor controls do not affect the calibrated display path.",
+    "Deterministic archive ordering does not establish byte-reproducible executables: the strip tool may update PE timestamps and checksums."
+  ],
+  "pending_designer_decisions": [
+    "Speed-up destination labels for ordered connections with multiple destinations need the designer's final format.",
+    "Iceblast delivery into a blocker: detonate there versus reject remains undecided. Existing area-target behavior is preserved.",
+    "Ordinary Sparkle fire spreading into Ichor-covered water remains undecided. Direct wet casting already quenches; independent Ichor combustion and Hellfire are preserved."
+  ],
+  "revision": 51,
+  "schema": 1,
+  "source_checkpoint_restore_evidence": "The separately generated checkpoint contains top-level RESTORE-VERIFICATION.json after an independent physical restore; this report itself does not claim that future step.",
+  "source_freeze_qualification": {
+    "affected_python_packaging_tests": {
+      "exit_file": "verification/r51-ui/final-packaging-unit.exit",
+      "failed": 0,
+      "log": "verification/r51-ui/final-packaging-unit.log",
+      "passed": 9
+    },
+    "changed_files": [
+      "tools/package-r51-windows.py"
+    ],
+    "final_snapshot_sha256": "7dfe86d997d3bcca56b381b9ef77ec335fdcc8baa39bf83a5631e04a6880e7be",
+    "full_rust_workspace_invocation_still_running_on_identical_rust_inputs": true,
+    "old_snapshot_sha256": "1310ab2a6462fb2f1006e75adb3e91927f4b94e72c4bda93d9f1007e36141b4a",
+    "reason": "Corrected an overbroad PE receipt claim to list exactly the selected fields and non-debug mapped sections compared. No executable behavior or packaging transformation changed.",
+    "rust_crates_fixtures_manifests_toolchain_and_cargo_runner_unchanged": true,
+    "timestamp_utc": "2026-11-07T07:44:52.104270+00:00"
+  },
+  "source_snapshot_sha256": "7dfe86d997d3bcca56b381b9ef77ec335fdcc8baa39bf83a5631e04a6880e7be",
+  "status": "verified_cloud_candidate_with_open_design_choices",
+  "user_pc_accessed": false,
+  "windows_build": {
+    "exit_code": 0,
+    "original_binary": {
+      "bytes": 120090534,
+      "sha256": "244e97b011ff795a9c90965c7a2cbf6c08c24d2fddd18d9a31bc90e6fa1c2b03"
+    },
+    "report": "verification/r51-ui/build-report.json",
+    "target": "x86_64-pc-windows-gnu"
+  },
+  "windows_package": {
+    "archive_verified": true,
+    "bytes": 22012569,
+    "member_count": 113,
+    "path": "../r51-delivery/revision51-windows-x64.zip",
+    "sha256": "2b3ab21b9e243a2ba4991c1c7c05a63546a3c8b652ad3886d18aee295d8b4cd1",
+    "source_snapshot_sha256": "7dfe86d997d3bcca56b381b9ef77ec335fdcc8baa39bf83a5631e04a6880e7be",
+    "windows_runtime_verified": false
+  },
+  "windows_runtime_verified": false
+}

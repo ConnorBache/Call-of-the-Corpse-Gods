@@ -1,0 +1,12 @@
+{
+  "scope": "Focused Ichor-family fire-immunity tests, before final integrated source freeze",
+  "core_command": "CARGO_PROFILE_TEST_OPT_LEVEL=1 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true CARGO_INCREMENTAL=0 tools/cargo.sh test --locked --offline -j2 -p corpse-core --test revision51_ichor_fire",
+  "core_result": "passed",
+  "core_tests_passed": 9,
+  "core_tests_failed": 0,
+  "core_log": "core-test.log",
+  "desktop_test": "revision51_ichor_fire_prose_covers_all_tiers_and_preserves_legacy",
+  "desktop_result": "pending integrated desktop compile",
+  "workspace_result": "pending integration owner",
+  "platform_gameplay_result": "not performed"
+}

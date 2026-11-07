@@ -1,0 +1,17 @@
+===== illumination_native_gpu_matches_software_at_every_calibration_level =====
+
+running 1 test
+test illumination_render_tests::illumination_native_gpu_matches_software_at_every_calibration_level ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 735 filtered out; finished in 3.34s
+
+===== water_depth_native_gpu_pixel_parity =====
+
+running 1 test
+test water_render_tests::water_depth_native_gpu_pixel_parity ... Water native GPU 1280x800: max channel delta 3
+Water native GPU 1920x1080: max channel delta 3
+Water native GPU 960x1200: max channel delta 3
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 735 filtered out; finished in 2.20s
+

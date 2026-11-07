@@ -1,0 +1,53 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/portals-r35/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 36.66s
+     Running tests/advanced_environment_commands.rs (target/debug/deps/advanced_environment_commands-841103fc8ed0962b)
+
+running 1 test
+test advanced_environment_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.87s
+
+     Running tests/environment_parity.rs (target/debug/deps/environment_parity-fbf7fcd645736dc9)
+
+running 10 tests
+test ichor_fish_catalog_matches_all_depth_bands ... ok
+test static_environment_matches_complete_v48_state ... ok
+test observed_hazards_match_v48 ... ok
+test generated_currents_match_v48 ... ok
+test active_environment_matches_v48 ... ok
+test ordinary_explosion_and_gas_closure_match_v48 ... ok
+test ichor_dispatch_matches_reference ... ok
+test divine_compound_dispatch_matches_reference ... ok
+test supported_offscreen_catchup_matches_v48 ... ok
+test status_dispatch_matches_reference ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.68s
+
+     Running tests/portal_integration_v35.rs (target/debug/deps/portal_integration_v35-135b411b940ba011)
+
+running 22 tests
+test forced_move_crosses_once_and_respects_remote_occupancy ... ok
+test direction_helper_preserves_zero_axes_and_portal_route_orientation ... ok
+test dream_projection_crosses_same_plane_without_moving_sleeping_body ... ok
+test enemy_at_mate_is_attacked_before_transport ... ok
+test diagonal_portal_projectile_preserves_direction_and_segment_range ... ok
+test directed_projectile_reaches_remote_actor_with_actual_range ... ok
+test ally_swap_and_nonattacking_occupancy_use_both_endpoints ... ok
+test actual_throw_attacks_remote_endpoint_and_empty_throw_lands_at_mate ... ok
+test half_here_has_native_plane_portal_view_and_alias_distance ... ok
+test npc_path_uses_local_entry_step_and_remote_arrival ... ok
+test multiple_portal_ray_cycle_is_bounded ... ok
+test optical_route_uses_remaining_distance_and_both_occlusions ... ok
+test projectile_range_without_portals_retains_legacy_euclidean_distance ... ok
+test remote_endpoint_occupant_intercepts_without_duplicate_body ... ok
+test ray_stops_at_walls_before_entry_or_after_exit ... ok
+test underfoot_pickup_sees_the_other_endpoint_without_duplicate_items ... ok
+test normal_enemy_can_melee_player_through_link_without_telefragging ... ok
+test empty_entry_is_one_turn_then_leaving_does_not_bounce ... ok
+test opaque_portal_endpoint_disables_optical_transfer_without_corrupting_save ... ok
+test no_portal_revision35_preserves_simple_revision34_command_results ... ok
+test future_branch_restores_player_and_linked_occupancy_after_crossing ... ok
+test save_fixture_replay_and_temporal_restore_keep_pair_identity ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+

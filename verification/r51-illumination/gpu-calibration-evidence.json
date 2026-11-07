@@ -1,0 +1,497 @@
+[
+  {
+    "terrain": "floor",
+    "illumination": -100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18104
+  },
+  {
+    "terrain": "floor",
+    "illumination": -75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18854
+  },
+  {
+    "terrain": "floor",
+    "illumination": -50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17062
+  },
+  {
+    "terrain": "floor",
+    "illumination": -25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19243
+  },
+  {
+    "terrain": "floor",
+    "illumination": 0.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 20048
+  },
+  {
+    "terrain": "floor",
+    "illumination": 25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19496
+  },
+  {
+    "terrain": "floor",
+    "illumination": 50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17178
+  },
+  {
+    "terrain": "floor",
+    "illumination": 75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17103
+  },
+  {
+    "terrain": "floor",
+    "illumination": 100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 1,
+    "differentChannels": 18118
+  },
+  {
+    "terrain": "floor",
+    "illumination": 80.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 16772
+  },
+  {
+    "terrain": "floor",
+    "illumination": 80.0,
+    "torch": true,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19291
+  },
+  {
+    "terrain": "wall",
+    "illumination": -100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18290
+  },
+  {
+    "terrain": "wall",
+    "illumination": -75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18896
+  },
+  {
+    "terrain": "wall",
+    "illumination": -50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17316
+  },
+  {
+    "terrain": "wall",
+    "illumination": -25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19292
+  },
+  {
+    "terrain": "wall",
+    "illumination": 0.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 20026
+  },
+  {
+    "terrain": "wall",
+    "illumination": 25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19522
+  },
+  {
+    "terrain": "wall",
+    "illumination": 50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17417
+  },
+  {
+    "terrain": "wall",
+    "illumination": 75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17392
+  },
+  {
+    "terrain": "wall",
+    "illumination": 100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 1,
+    "differentChannels": 18270
+  },
+  {
+    "terrain": "wall",
+    "illumination": 80.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17048
+  },
+  {
+    "terrain": "wall",
+    "illumination": 80.0,
+    "torch": true,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19385
+  },
+  {
+    "terrain": "grass",
+    "illumination": -100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18146
+  },
+  {
+    "terrain": "grass",
+    "illumination": -75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18890
+  },
+  {
+    "terrain": "grass",
+    "illumination": -50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17119
+  },
+  {
+    "terrain": "grass",
+    "illumination": -25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19269
+  },
+  {
+    "terrain": "grass",
+    "illumination": 0.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 20075
+  },
+  {
+    "terrain": "grass",
+    "illumination": 25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19534
+  },
+  {
+    "terrain": "grass",
+    "illumination": 50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17231
+  },
+  {
+    "terrain": "grass",
+    "illumination": 75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17155
+  },
+  {
+    "terrain": "grass",
+    "illumination": 100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 1,
+    "differentChannels": 18148
+  },
+  {
+    "terrain": "grass",
+    "illumination": 80.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 16815
+  },
+  {
+    "terrain": "grass",
+    "illumination": 80.0,
+    "torch": true,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19322
+  },
+  {
+    "terrain": "water",
+    "illumination": -100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18151
+  },
+  {
+    "terrain": "water",
+    "illumination": -75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18909
+  },
+  {
+    "terrain": "water",
+    "illumination": -50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17119
+  },
+  {
+    "terrain": "water",
+    "illumination": -25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19283
+  },
+  {
+    "terrain": "water",
+    "illumination": 0.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 20063
+  },
+  {
+    "terrain": "water",
+    "illumination": 25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19528
+  },
+  {
+    "terrain": "water",
+    "illumination": 50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17227
+  },
+  {
+    "terrain": "water",
+    "illumination": 75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17145
+  },
+  {
+    "terrain": "water",
+    "illumination": 100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 1,
+    "differentChannels": 18150
+  },
+  {
+    "terrain": "water",
+    "illumination": 80.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 16803
+  },
+  {
+    "terrain": "water",
+    "illumination": 80.0,
+    "torch": true,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19313
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18135
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 18897
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17094
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19269
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 0.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 20079
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 25.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19525
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 50.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17196
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 75.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 17165
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 100.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 1,
+    "differentChannels": 18155
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 80.0,
+    "torch": false,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 16805
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 80.0,
+    "torch": true,
+    "renderer": "opengl",
+    "acceleratedApi": true,
+    "maxChannelDelta": 2,
+    "differentChannels": 19302
+  }
+]

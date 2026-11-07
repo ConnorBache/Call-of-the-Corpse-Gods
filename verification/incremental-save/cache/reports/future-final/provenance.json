@@ -1,0 +1,37 @@
+[
+  {
+    "path": "incremental-save/cache-work/source/crates/corpse-core/src/temporal.rs",
+    "sha256": "57b3f7d86383dae7d17cca4ad316aa15ff7eb05516af6e1a2f65cf786c8cba17",
+    "bytes": 63749
+  },
+  {
+    "path": "incremental-save/cache-work/baseline/crates/corpse-core/src/temporal.rs",
+    "sha256": "0cdd305d96c8a1d359734b3860886c96627634c70308723dad80340d8d460259",
+    "bytes": 53588
+  },
+  {
+    "path": "incremental-save/cache-work/source/crates/corpse-desktop/examples/cache_opening_bench.rs",
+    "sha256": "d411123a03f79408c4ecf8434dffdea35f22bfe1a1b4077aecf6a67a3780659d",
+    "bytes": 7930
+  },
+  {
+    "path": "incremental-save/cache-work/baseline/crates/corpse-desktop/examples/cache_opening_bench.rs",
+    "sha256": "d411123a03f79408c4ecf8434dffdea35f22bfe1a1b4077aecf6a67a3780659d",
+    "bytes": 7930
+  },
+  {
+    "path": "incremental-save/cache-work/bin/baseline-filtered",
+    "sha256": "a71b4689429d545c55df2295efa6a09c4130ec62d7706e263a168028142d17e2",
+    "bytes": 56872792
+  },
+  {
+    "path": "incremental-save/cache-work/bin/candidate-final-normal",
+    "sha256": "90f902180fa1d29034b2257f0f41f04968aab211fd1c9b67cbbbad0ba9007a9f",
+    "bytes": 56739176
+  },
+  {
+    "path": "incremental-save/cache-work/bin/candidate-final-profiled",
+    "sha256": "41e0cd4d91af866e7501dc352620bb100cb967148782bbdae17737834dfe4f18",
+    "bytes": 57087696
+  }
+]

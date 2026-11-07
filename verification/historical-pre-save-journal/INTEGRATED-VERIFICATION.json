@@ -1,0 +1,107 @@
+{
+  "status": "passed",
+  "simulation_revision": 39,
+  "completed_utc": "2026-10-29T21:44:47.276219+00:00",
+  "workspace": {
+    "label": "workspace",
+    "command": [
+      "sh",
+      "tools/cargo.sh",
+      "test",
+      "--workspace",
+      "--locked",
+      "--all-targets",
+      "--no-fail-fast"
+    ],
+    "exit_code": 0,
+    "seconds": 910.28,
+    "targets": 154,
+    "log": "verification/integration-r39/final-gate/workspace.log",
+    "log_sha256": "b288df3edb0bb926a42d8ea6be902cad2b1f466e24bff277af1f9d3fc2ca6009",
+    "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+    "failed_tests": [],
+    "passed": 951,
+    "failed": 0,
+    "ignored": 1,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "doctests": {
+    "label": "doctests",
+    "command": [
+      "sh",
+      "tools/cargo.sh",
+      "test",
+      "--workspace",
+      "--locked",
+      "--doc",
+      "--no-fail-fast"
+    ],
+    "exit_code": 0,
+    "seconds": 1.417,
+    "targets": 1,
+    "log": "verification/integration-r39/final-gate/doctests.log",
+    "log_sha256": "5d94b93c9cab61aadcf12ec7a4a4655976b34241cb0358166785f32c1a4f41a1",
+    "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+    "failed_tests": [],
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "frozen_input_count": 1077,
+  "source_fingerprint": "3519b868496999a7d6f73d74bb5ee225f974b2540646135d81ceb568314c0f73",
+  "code_build_inputs_unchanged": true,
+  "windows": {
+    "status": "passed",
+    "started_utc": "2026-10-29T21:28:45.599352+00:00",
+    "command": [
+      "sh",
+      "tools/cargo.sh",
+      "build",
+      "--release",
+      "--locked",
+      "--jobs",
+      "2",
+      "--target",
+      "x86_64-pc-windows-gnu",
+      "-p",
+      "corpse-desktop"
+    ],
+    "simulation_revision": 39,
+    "frozen_code_manifest_sha256": "3519b868496999a7d6f73d74bb5ee225f974b2540646135d81ceb568314c0f73",
+    "frozen_code_file_count": 1077,
+    "rust_toolchain": "1.99.1",
+    "target": "x86_64-pc-windows-gnu",
+    "windows_runtime_verified": false,
+    "compiler": "Official Debian Trixie GCC14 POSIX / MinGW-w64 12.0.0",
+    "sdl": "Official SDL2 2.32.10",
+    "finished_utc": "2026-10-29T21:31:30.030054+00:00",
+    "seconds": 164.429,
+    "exit_code": 0,
+    "frozen_code_verified_before_and_after": true,
+    "build_succeeded": true,
+    "original_exe": {
+      "bytes": 170477441,
+      "sha256": "e191713d564635e04721cc72a35f273e4b5906baf166edb33b7d1b4e5229c7be"
+    },
+    "staged_exe": {
+      "path": "/workspace/scratch/69f53637ba6f/shard-r39/staging/windows-r39/corpse-desktop.exe",
+      "bytes": 101687155,
+      "sha256": "559a06d36cf3b13600d6b069a6ffd6f1e0b3ab26d8687e052fb20837ce0e4a0e"
+    },
+    "static_pe_checks_passed": true,
+    "cargo_lock_sha256": "9342120cd87b86ee9b54768431c805d075cd2aaaee0ff142151e2d8555dc5ccb",
+    "limitations": "Unsigned cross-build and static PE/resource checks only. No Windows runtime exercise."
+  },
+  "baseline_source_sha256": "533e381c638bbab6da697f15cd354dcd0e25d4c75bcb1d074d02b5f5d5a72d81",
+  "copy_receipt": "verification/integration-r39/player-text-changes.json",
+  "historical_receipts": "verification/historical-top-level-r38/",
+  "limits": [
+    "Windows executable cross-compiled and statically inspected, not launched on Windows; unsigned.",
+    "Controlled combat/UI regressions are not a new natural-world balance study.",
+    "Generation comparison covered four fixed 40-floor worlds; broader historical r38 stress evidence is preserved, not claimed rerun.",
+    "One existing ignored test remains ignored; doctest command succeeded with zero doctests."
+  ]
+}

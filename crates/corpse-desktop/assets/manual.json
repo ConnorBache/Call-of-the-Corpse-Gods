@@ -1,0 +1,6024 @@
+{
+  "version": 1,
+  "source": "Authored creature prose preserved; native simulation revision32 ordinary, setup, corpse, birth and event eligibility; runtime birth stats",
+  "entries": [
+    {
+      "id": "blorb",
+      "kind": "blorb",
+      "name": "Blorb",
+      "glyph": "b",
+      "color": "#28703c",
+      "description": "A small ball of caustic slime with legs slowly paces about.",
+      "naturalHistory": "These small creatures eat refuse and feces from larger animals. Their slime helps to break it down, and though they're known to be hostile, they aren't known to be particularly dangerous.",
+      "health": 10,
+      "stats": {
+        "offense": 2,
+        "defense": -15,
+        "accuracy": -3,
+        "dodge": -4,
+        "dr": 0,
+        "perception": 18,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Slow (acts every other turn)",
+          "text": "Acts only every other normal turn.",
+          "cost": 0
+        },
+        {
+          "name": "Slime Immunity",
+          "text": "Moves freely through slime.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3
+      ],
+      "conditionalDepths": [
+        1,
+        2,
+        3
+      ],
+      "asset": "blorb",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "rat",
+      "kind": "rat",
+      "name": "Giant Rat",
+      "glyph": "r",
+      "color": "#a59b89",
+      "description": "A huge vermin, the size of a cat, with large yellow incisors.",
+      "naturalHistory": "An ordinary rat, but grown fat on magickal blood. The essence of gods forces them to spring up faster.",
+      "health": 22,
+      "stats": {
+        "offense": 4,
+        "defense": -13,
+        "accuracy": -1,
+        "dodge": 3,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3
+      ],
+      "conditionalDepths": [],
+      "asset": "rat",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "shellback-beetle",
+      "kind": "shellback-beetle",
+      "name": "Shellback Beetle",
+      "glyph": "q",
+      "color": "#c7985b",
+      "description": "A huge, dog sized beetle with a hard, black shell prods its antenna at the ground.",
+      "naturalHistory": "A huge beetle, most notable for its near impenetrable shell, and slow, lumbering pace. It eats foliage in the shallowest depths of the Flesh.",
+      "health": 28,
+      "stats": {
+        "offense": 5,
+        "defense": -12,
+        "accuracy": -2,
+        "dodge": -3,
+        "dr": 2,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Slow (acts every other turn)",
+          "text": "Acts only every other normal turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "conditionalDepths": [
+        2
+      ],
+      "asset": "shellback-beetle",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "hemogoblin",
+      "kind": "hemogoblin",
+      "name": "Hemogoblin",
+      "glyph": "h",
+      "color": "#BA5358",
+      "description": "A goblin made of blood.",
+      "naturalHistory": "Ordinary goblins, corrupted by the Flesh. Their skin has melted away, leaving only blood which they track across the floor.",
+      "health": 34,
+      "stats": {
+        "offense": 7,
+        "defense": -11,
+        "accuracy": -1,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "conditionalDepths": [
+        3
+      ],
+      "asset": "hemogoblin",
+      "family": "blood",
+      "forms": []
+    },
+    {
+      "id": "cave-bat",
+      "kind": "cave-bat",
+      "name": "Cave Bat",
+      "glyph": "^",
+      "color": "#aa91d4",
+      "description": "A small bat flits through the air.",
+      "naturalHistory": "Small flying mammals which populate the high-caves of the Flesh. They suckle from bleeding walls, and from dead creatures.",
+      "health": 10,
+      "stats": {
+        "offense": 2,
+        "defense": -15,
+        "accuracy": -2,
+        "dodge": 5,
+        "dr": 0,
+        "perception": 55,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Always Flying",
+          "text": "Flies continuously.",
+          "cost": 0
+        },
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "conditionalDepths": [
+        4,
+        5,
+        6
+      ],
+      "asset": "cave-bat",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "pale:Jackal",
+      "kind": "pale:Jackal",
+      "name": "Pale Jackal",
+      "glyph": "j",
+      "color": "#b9b8b1",
+      "description": "A small bipedal creature with pale, near translucent skin and sharp teeth.",
+      "naturalHistory": "The only pale which can die of age. They are birthed as a defense mechanism of other pales, but within 10 years are often driven irrational by death psychosis.",
+      "health": 22,
+      "stats": {
+        "offense": 4,
+        "defense": -13,
+        "accuracy": -2,
+        "dodge": 3,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "Can be born from Pale Birther when it has enough Energy."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "conditionalDepths": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "asset": "pale-jackal",
+      "family": "pale",
+      "forms": []
+    },
+    {
+      "id": "needleling",
+      "kind": "needleling",
+      "name": "Needleling",
+      "glyph": "n",
+      "color": "#94c66f",
+      "description": "A dog sized creature with a large needle for a nose. It drips with a green liquid.",
+      "naturalHistory": "Creatures created by the spawn of Kative to spread disease. Despite their appearance, they are almost purely mechanical, their biological components being just a facade, with the exception of their heart.",
+      "health": 16,
+      "stats": {
+        "offense": 3,
+        "defense": -14,
+        "accuracy": -3,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 35,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Weak Venom",
+          "text": "Inflicts stacking Envenomed on successful hits.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "conditionalDepths": [
+        7
+      ],
+      "asset": "needleling",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "bastidion",
+      "kind": "bastidion",
+      "name": "Corpse Fungus",
+      "glyph": "F",
+      "color": "#9fc875",
+      "description": "A large, stationary fungus which emits clouds of toxic gas.",
+      "naturalHistory": "A common fungus in the Flesh. It spreads roots to corpses, which are in no short supply. Though death has perished, a Corpse Fungus's roots can still paralyze a corpse, until the roots are slashed or burned away.",
+      "health": 622,
+      "stats": {
+        "offense": 0,
+        "defense": 87,
+        "accuracy": -5,
+        "dodge": -8,
+        "dr": 8,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Rooted",
+          "text": "Is rooted in place and cannot make ordinary attacks.",
+          "cost": 0
+        },
+        {
+          "name": "Fungal gas",
+          "text": "Emits gas and feeds on visible nearby corpses through roots, preventing their revival while connected.",
+          "cost": 0
+        },
+        {
+          "name": "Gas Immunity",
+          "text": "Is immune to gases and gas explosions.",
+          "cost": 0
+        },
+        {
+          "name": "Final Death",
+          "text": "Never revives, though its remains can feed fungal roots.",
+          "cost": 0
+        },
+        {
+          "name": "Breaking free",
+          "text": "A successful attempt to escape a fungal root severs that binding root and its link. The same fungus cannot immediately restore a severed corpse link. Fire can also sever roots; no separate slashing-weapon action is required.",
+          "cost": null
+        }
+      ],
+      "sources": [
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "bastidion",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "short-saidri",
+      "kind": "short-saidri",
+      "name": "Short-legged Saidribee",
+      "glyph": "b",
+      "color": "#f8d100",
+      "description": "A cat-sized bee hovers in the air, stinger prepared.",
+      "health": 28,
+      "stats": {
+        "offense": 4,
+        "defense": -12,
+        "accuracy": -9,
+        "dodge": 3,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Always Flying",
+          "text": "Flies continuously.",
+          "cost": 0
+        },
+        {
+          "name": "Weak Venom",
+          "text": "Inflicts stacking Envenomed on successful hits.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "conditionalDepths": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "asset": "short-saidri",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "The floating worker of a Saidribee colony. They pollinate and hunt throughout the Flesh, to bring down to their hive queen deeper underneath."
+    },
+    {
+      "id": "pale:Biter",
+      "kind": "pale:Biter",
+      "name": "Pale Chomper",
+      "glyph": "c",
+      "color": "#b9b8b1",
+      "description": "A human-sized biped with pale, near translucent skin and a powerful jaw for a head.",
+      "health": 70,
+      "stats": {
+        "offense": 10,
+        "defense": -5,
+        "accuracy": 1,
+        "dodge": -2,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Bite Again",
+          "text": "Can follow a landed strike with another attack.",
+          "cost": 8
+        },
+        {
+          "name": "Drink Life",
+          "text": "Can heal itself after dealing damage.",
+          "cost": 8
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "Can be born from Greater Pale Birther when it has enough Energy."
+        }
+      ],
+      "ordinaryDepths": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "conditionalDepths": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "asset": "pale-biter",
+      "family": "pale",
+      "forms": [],
+      "naturalHistory": "The most aggressive of the ancient pales. Despite their large mouths, pales do not starve, and are known to survive centuries without food, water or oxygen."
+    },
+    {
+      "id": "dryad",
+      "kind": "dryad",
+      "name": "Dryad",
+      "glyph": "y",
+      "color": "#81CF94",
+      "description": "An ordinarily peaceful creature, the Flesh has twisted its mind into assisting it.",
+      "naturalHistory": "Descended from the God-Trees, these creatures serve to heal and assist those creatures native to the Flesh, and are hostile to those outside.",
+      "health": 64,
+      "stats": {
+        "offense": 0,
+        "defense": -6,
+        "accuracy": 2,
+        "dodge": 3,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Healing Grove",
+          "text": "Can heal an injured ally within sight.",
+          "cost": 5
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "conditionalDepths": [
+        8
+      ],
+      "asset": "dryad",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "hemogoblin-bloodmancer",
+      "kind": "hemogoblin-bloodmancer",
+      "name": "Hemogoblin Bloodmancer",
+      "naturalHistory": "A goblin magus, rendered of its flesh. Having been born of Hemogoblins in the Flesh, this creature was born with magickal abilities.",
+      "glyph": "h",
+      "color": "#E46EAE",
+      "description": "A goblin made of blood wearing a cloak, soaked through with his body-liquid.",
+      "health": 58,
+      "stats": {
+        "offense": 9,
+        "defense": -7,
+        "accuracy": 3,
+        "dodge": 1,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Bloodmancy",
+          "text": "Can alternate pulling prey one tile closer with inflicting Hemophilia.",
+          "cost": 8
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "conditionalDepths": [
+        9,
+        14
+      ],
+      "asset": "hemogoblin-bloodmancer",
+      "family": "blood",
+      "forms": []
+    },
+    {
+      "id": "zillennia:infant",
+      "kind": "zillennia",
+      "name": "Infant Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "health": 358,
+      "stats": {
+        "offense": 46,
+        "defense": 43,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 3,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        4
+      ],
+      "asset": "zillennia-infant",
+      "family": "void",
+      "forms": [],
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one, dangerous as it is, is of diminutive size."
+    },
+    {
+      "id": "lesser-ichor-fish",
+      "kind": "lesser-ichor-fish",
+      "name": "Lesser Ichor-Fish",
+      "glyph": "f",
+      "color": "#b99a48",
+      "description": "A fish made of hardened ichor swims through the terrible liquid.",
+      "health": 28,
+      "stats": {
+        "offense": 7,
+        "defense": -12,
+        "accuracy": 1,
+        "dodge": 3,
+        "dr": 0,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "asset": "lesser-ichor-fish",
+      "family": "ichor",
+      "forms": [],
+      "naturalHistory": "A piranha made of gruesome god-metal. It is a creature alive only to serve its godbeast master, and for no other reason."
+    },
+    {
+      "id": "ichor-fish-standard",
+      "kind": "ichor-fish-standard",
+      "name": "Ichor-Fish",
+      "glyph": "f",
+      "color": "#e5bb4c",
+      "description": "A fish made of hardened ichor swims through the terrible liquid.",
+      "naturalHistory": "A piranha made of gruesome god-metal. It is a creature alive only to serve its godbeast master, and for no other reason.",
+      "health": 52,
+      "stats": {
+        "offense": 15,
+        "defense": -8,
+        "accuracy": 2,
+        "dodge": 3,
+        "dr": 0,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "asset": "ichor-fish-standard",
+      "family": "ichor",
+      "forms": []
+    },
+    {
+      "id": "pale:Breather",
+      "kind": "pale:Breather",
+      "name": "Pale Gasser",
+      "glyph": "h",
+      "color": "#b9b8b1",
+      "description": "A human-sized biped with pale, near translucent skin and a bulbous head covered in pores. It smells terrible.",
+      "naturalHistory": "A disgusting creature of pale origin. It breaths out a gas which similar to vomit and death as a way to defend its kin.",
+      "health": 70,
+      "stats": {
+        "offense": 10,
+        "defense": -5,
+        "accuracy": -2,
+        "dodge": -3,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Caustic Gas Cloud",
+          "text": "Continually emits caustic gas.",
+          "cost": 0
+        },
+        {
+          "name": "Forceful Exhalation",
+          "text": "Can exhale an additional cloud of caustic gas.",
+          "cost": 10
+        },
+        {
+          "name": "Caustic Wound",
+          "text": "Makes prey more vulnerable to caustic gas when its attacks deal damage.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "Can be born from Greater Pale Birther when it has enough Energy."
+        }
+      ],
+      "ordinaryDepths": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "conditionalDepths": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "asset": "pale-breather",
+      "family": "pale",
+      "forms": []
+    },
+    {
+      "id": "zillennia:child",
+      "kind": "zillennia",
+      "name": "Child Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one is smaller than average, but still of incredible eldritch power.",
+      "health": 502,
+      "stats": {
+        "offense": 62,
+        "defense": 67,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 4,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "asset": "zillennia-child",
+      "family": "void",
+      "forms": []
+    },
+    {
+      "id": "pale:Spitter",
+      "kind": "pale:Spitter",
+      "name": "Pale Spitter",
+      "glyph": "p",
+      "color": "#b9b8b1",
+      "description": "A small biped with pale, near translucent skin and a phallic trunk.",
+      "naturalHistory": "An ancient low beast. It's phallic appendage can spew acid and gas to subdue it's enemies.",
+      "health": 34,
+      "stats": {
+        "offense": 10,
+        "defense": -11,
+        "accuracy": 4,
+        "dodge": 1,
+        "dr": 0,
+        "perception": 65,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Distant Spit",
+          "text": "Can spit at nonadjacent prey along a clear projectile path, then spends an action recovering.",
+          "cost": 0
+        },
+        {
+          "name": "Caustic Gas Shot",
+          "text": "Can add caustic gas at its spit target.",
+          "cost": 10
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "Can be born from Greater Pale Birther when it has enough Energy."
+        }
+      ],
+      "ordinaryDepths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "conditionalDepths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "asset": "pale-spitter",
+      "family": "pale",
+      "forms": []
+    },
+    {
+      "id": "pale:Screamer",
+      "kind": "pale:Screamer",
+      "name": "Pale Screamer",
+      "glyph": "s",
+      "color": "#b9b8b1",
+      "description": "A human-sized biped with a mouth drawn from its head to the bottom of its torso. Even when idle, it emits a low hum.",
+      "health": 88,
+      "stats": {
+        "offense": 10,
+        "defense": -2,
+        "accuracy": -2,
+        "dodge": -2,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Scream",
+          "text": "Nearby foes become Disoriented for five turns, losing 5 Accuracy. Allied Damage and Perception boosts are unchanged.",
+          "cost": 15
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "Can be born from Greater Pale Birther when it has enough Energy."
+        }
+      ],
+      "ordinaryDepths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "conditionalDepths": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "asset": "pale-screamer",
+      "family": "pale",
+      "forms": [],
+      "naturalHistory": "A creature of the pale species, most noticeable for its large mouth and piercing scream, which emboldens it's fellows."
+    },
+    {
+      "id": "pale:Birther",
+      "kind": "pale:Birther",
+      "name": "Pale Birther",
+      "glyph": "b",
+      "color": "#b9b8b1",
+      "description": "A human-sized biped with pale, near translucent skin with an engorged stomach and a head which resembles a vagina.",
+      "health": 58,
+      "stats": {
+        "offense": 10,
+        "defense": -7,
+        "accuracy": -4,
+        "dodge": -5,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Birth",
+          "text": "Can summon Pale Jackal.",
+          "cost": 10
+        },
+        {
+          "name": "Birth Twins",
+          "text": "Can summon Pale Jackal.",
+          "cost": 30
+        },
+        {
+          "name": "Slow (acts every other turn)",
+          "text": "Acts only every other normal turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "Can be born from Greater Pale Birther when it has enough Energy."
+        }
+      ],
+      "ordinaryDepths": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "conditionalDepths": [
+        12,
+        15,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "asset": "pale-birther",
+      "family": "pale",
+      "forms": [
+        {
+          "label": "At zero Energy",
+          "description": "A human-sized biped with pale, near translucent skin and a flat stomach. It's head resembles a vagina."
+        }
+      ],
+      "naturalHistory": "A hideous low beast, which spawns other creatures from its vagina like head. It's large midsection deflates as it births its spawn."
+    },
+    {
+      "id": "greater-ichor-fish",
+      "kind": "greater-ichor-fish",
+      "name": "Greater Ichor-Fish",
+      "glyph": "f",
+      "color": "#ffe08a",
+      "description": "A fish made of hardened ichor swims through the terrible liquid.",
+      "health": 76,
+      "stats": {
+        "offense": 25,
+        "defense": -4,
+        "accuracy": 2,
+        "dodge": 2,
+        "dr": 1,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "asset": "greater-ichor-fish",
+      "family": "ichor",
+      "forms": [],
+      "naturalHistory": "A piranha made of gruesome god-metal. It is a creature alive only to serve its godbeast master, and for no other reason."
+    },
+    {
+      "id": "giant-beetle",
+      "kind": "giant-beetle",
+      "name": "Giant Beetle",
+      "glyph": "Q",
+      "color": "#94b1aa",
+      "description": "A giant beetle with buzzing wings hisses continuously.",
+      "naturalHistory": "A predatory beetle the size of a horse, with giant wings. It hunts humanoids which wander into the Flesh.",
+      "health": 64,
+      "stats": {
+        "offense": 14,
+        "defense": -6,
+        "accuracy": -1,
+        "dodge": -2,
+        "dr": 3,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Always Flying",
+          "text": "Flies continuously.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "conditionalDepths": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "asset": "giant-beetle",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "samara",
+      "kind": "samara",
+      "name": "Devil's Samara Tree",
+      "glyph": "T",
+      "color": "#8a5a32",
+      "description": "A large tree with razor-sharp, whirling seeds sprinkling down around it.",
+      "naturalHistory": "A tree with razor-sharp twirling seeds. Their living areas are often vacated due to the natural hazard they create.",
+      "health": 880,
+      "stats": {
+        "offense": 0,
+        "defense": 130,
+        "accuracy": -5,
+        "dodge": -8,
+        "dr": 5,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Rooted",
+          "text": "Is rooted in place and cannot make ordinary attacks.",
+          "cost": 0
+        },
+        {
+          "name": "Razorleaves",
+          "text": "Surrounds itself with razorleaves that damage exposed creatures at turn end.",
+          "cost": 0
+        },
+        {
+          "name": "Everburn",
+          "text": "Keeps existing flames burning indefinitely.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Forest, Meadow."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "samara",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "glim",
+      "kind": "glim",
+      "name": "Glim",
+      "glyph": "g",
+      "color": "#71c995",
+      "description": "A huge quadrupedal creature made of a green slime. Goo pours off its body in endless waves.",
+      "health": 88,
+      "stats": {
+        "offense": 12,
+        "defense": -2,
+        "accuracy": 1,
+        "dodge": -3,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        },
+        {
+          "name": "Slime Immunity",
+          "text": "Moves freely through slime.",
+          "cost": 0
+        },
+        {
+          "name": "Slime-bound",
+          "text": "Can occupy only slime.",
+          "cost": 0
+        },
+        {
+          "name": "Coat adjacent ground with green slime",
+          "text": "Coats adjacent ground with green slime when it moves.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "conditionalDepths": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "asset": "glim",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A creature made of adhesive, flammable slime. It glides through the slime it places on the ground, unable to move otherwise."
+    },
+    {
+      "id": "zillennia:lesser",
+      "kind": "zillennia",
+      "name": "Lesser Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "health": 640,
+      "stats": {
+        "offense": 78,
+        "defense": 90,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 5,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "asset": "zillennia-lesser",
+      "family": "void",
+      "forms": [],
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This creature is large as an elephant, and yet is still small for its species."
+    },
+    {
+      "id": "bear",
+      "kind": "bear",
+      "name": "Bear",
+      "glyph": "B",
+      "color": "#a47c55",
+      "description": "A bear walks along all fours, sniffing the ground for its next meal.",
+      "naturalHistory": "A mammalian beast which roams the Flesh, eating living creatures and carcasses alike.",
+      "health": 100,
+      "stats": {
+        "offense": 20,
+        "defense": 0,
+        "accuracy": 1,
+        "dodge": -2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "conditionalDepths": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "asset": "bear",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "witch",
+      "kind": "witch",
+      "name": "Witch",
+      "glyph": "w",
+      "color": "#B596E8",
+      "description": "A whore whom has forsaken her humanity for devilish power.",
+      "health": 94,
+      "stats": {
+        "offense": 15,
+        "defense": -1,
+        "accuracy": 4,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Witchcraft",
+          "text": "Can cycle through inflicting Slowed, Hemophilia and Poisoned.",
+          "cost": 8
+        },
+        {
+          "name": "Summon",
+          "text": "Summons one Night Crawler or Skin Walker into an unoccupied adjacent land square, with equal probability. Successful summons wait ten world turns before another cast; haste does not shorten the cooldown. Curses remain available between summons. A heartless Witch creates heartless offspring.",
+          "cost": 10
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "conditionalDepths": [
+        33,
+        35,
+        36
+      ],
+      "asset": "witch",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A former human, long since corrupted by the power of the Flesh, and defiled by eldritch creatures. Magick now flows through her blood, allowing her to bring forth great power, and birth terrible creatures."
+    },
+    {
+      "id": "horn-1",
+      "kind": "horn-1",
+      "name": "Unicorn",
+      "glyph": "1",
+      "color": "#9481ae",
+      "description": "A famous magical horse-like creature with one horn.",
+      "health": 88,
+      "stats": {
+        "offense": 16,
+        "defense": -2,
+        "accuracy": 3,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 60,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Hornlight",
+          "text": "Can strike nonadjacent prey with a magical bolt along a clear projectile path.",
+          "cost": 8
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "conditionalDepths": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "asset": "horn-1",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A beautiful creature from another reality which delights in mischief and death."
+    },
+    {
+      "id": "horn-2",
+      "kind": "horn-2",
+      "name": "Bicorn",
+      "glyph": "2",
+      "color": "#ad92bc",
+      "description": "A terrible, brutish bull-like creature with two horns.",
+      "health": 88,
+      "stats": {
+        "offense": 26,
+        "defense": -2,
+        "accuracy": -2,
+        "dodge": -2,
+        "dr": 0,
+        "perception": 60,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "conditionalDepths": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "asset": "horn-2",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A two-horned creature from another reality which wishes to gore all living things."
+    },
+    {
+      "id": "sphinx",
+      "kind": "sphinx",
+      "name": "Sphinx",
+      "glyph": "S",
+      "color": "#ffd34a",
+      "description": "The immortal Sphinx cares only for the chase, and stands guard eternal.",
+      "naturalHistory": "A keeper of secrets and riddles. Sphinxes stand as timeless sentinels over their treasure, and only through guile can they be plundered.",
+      "health": 1000,
+      "stats": {
+        "offense": 150,
+        "defense": 150,
+        "accuracy": 5,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Invincible Guardian",
+          "text": "Is invulnerable and waits after being attacked before hunting its attacker.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "terrain",
+          "text": "Guards an optional chamber."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "sphinx",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "lesser-ichor-shark",
+      "kind": "lesser-ichor-shark",
+      "name": "Lesser Ichor-Shark",
+      "glyph": "F",
+      "color": "#b99a48",
+      "description": "A shark made of hardened ichor swims through the terrible liquid.",
+      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. It's body is made from the same toxic god-liquid in which it swims.",
+      "health": 100,
+      "stats": {
+        "offense": 35,
+        "defense": 0,
+        "accuracy": 3,
+        "dodge": 2,
+        "dr": 1,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "asset": "lesser-ichor-shark",
+      "family": "ichor",
+      "forms": []
+    },
+    {
+      "id": "hemogoblin-inventor",
+      "kind": "hemogoblin-inventor",
+      "name": "Hemogoblin Inventor",
+      "glyph": "h",
+      "color": "#d600ff",
+      "description": "A goblin made of blood carries a bag full of crystals and a map.",
+      "health": 46,
+      "stats": {
+        "offense": 6,
+        "defense": -9,
+        "accuracy": 2,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Mech Pilot",
+          "text": "Flees toward its linked dormant mech and climbs inside.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "conditionalDepths": [],
+      "asset": "hemogoblin-inventor",
+      "family": "blood",
+      "forms": [],
+      "naturalHistory": "A goblin, rended of its flesh, but not it's inventive habits. It creates mechanisms of malice with which to end human life."
+    },
+    {
+      "id": "hemogoblin-mech",
+      "kind": "hemogoblin-mech",
+      "name": "Hemogoblin Mech",
+      "glyph": "H",
+      "color": "#BC8B66",
+      "description": "A huge mechanical beast. The pinnacle of Hemogoblin warfare.",
+      "naturalHistory": "The result of true ingenuity attached to malevolent power and purpose.",
+      "health": 280,
+      "stats": {
+        "offense": 65,
+        "defense": 30,
+        "accuracy": -3,
+        "dodge": -7,
+        "dr": 8,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Dormant Machine",
+          "text": "Needs a pilot before it can move or attack.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Breath",
+          "text": "Can breathe a cone of fire that inflicts Burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "paired",
+          "text": "Appears alongside Hemogoblin Inventor."
+        }
+      ],
+      "ordinaryDepths": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "conditionalDepths": [],
+      "asset": "hemogoblin-mech",
+      "family": "blood",
+      "forms": []
+    },
+    {
+      "id": "zillennia:unqualified",
+      "kind": "zillennia",
+      "name": "Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. As large as a house, and as all consuming as a black hole.",
+      "health": 778,
+      "stats": {
+        "offense": 94,
+        "defense": 113,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 6,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "asset": "zillennia-unqualified",
+      "family": "void",
+      "forms": []
+    },
+    {
+      "id": "tiger",
+      "kind": "tiger",
+      "name": "Tiger",
+      "glyph": "t",
+      "color": "#dfaa62",
+      "description": "A prowling tiger, acutely aware of its target's vision, and how to stay out of it.",
+      "naturalHistory": "A feline-predator, which stalks its prey quietly.",
+      "health": 88,
+      "stats": {
+        "offense": 26,
+        "defense": -2,
+        "accuracy": 4,
+        "dodge": 4,
+        "dr": 0,
+        "perception": 65,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        },
+        {
+          "name": "Stalk",
+          "text": "Circles behind observed prey and waits beside doorways before peeking.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "conditionalDepths": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "asset": "tiger",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "bombardier",
+      "kind": "bombardier",
+      "name": "Bombardier Beetle",
+      "glyph": "x",
+      "color": "#e69b40",
+      "description": "A huge lightning bug which has forsaken its wings for size. Its carapace emits a strange hum.",
+      "naturalHistory": "A beetle that explodes when startled. It is unclear whether this adaptation is biological, or corruptive in nature.",
+      "health": 58,
+      "stats": {
+        "offense": 10,
+        "defense": -7,
+        "accuracy": -2,
+        "dodge": -3,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Explosion Immunity",
+          "text": "Is immune to explosions.",
+          "cost": 0
+        },
+        {
+          "name": "Reservoir Explosion",
+          "text": "Can empty its entire energy reservoir in a nearby explosion.",
+          "cost": "all"
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "conditionalDepths": [
+        19
+      ],
+      "asset": "bombardier",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "long-saidri",
+      "naturalHistory": "A roaming guardian of Saidribee colonies. Its legs support a larger body, which allow for more venom and muscle.",
+      "kind": "long-saidri",
+      "name": "Long-legged Saidribee",
+      "glyph": "b",
+      "color": "#8a5a32",
+      "description": "A 5-foot bipedal creature. Its body is that of a dog sized bee, but with long, slender human-like legs.",
+      "health": 76,
+      "stats": {
+        "offense": 16,
+        "defense": -4,
+        "accuracy": -5,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Venom",
+          "text": "Inflicts stacking Envenomed on successful hits.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "conditionalDepths": [
+        20,
+        22
+      ],
+      "asset": "long-saidri",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "kelpie",
+      "kind": "kelpie",
+      "name": "Kelpie",
+      "glyph": "k",
+      "color": "#5EADAA",
+      "description": "An infamous man-eating water horse, known for dragging its victims to the bottom of the ocean with its kelp like tentacles.",
+      "health": 130,
+      "stats": {
+        "offense": 30,
+        "defense": 5,
+        "accuracy": 3,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Aquatic",
+          "text": "Is restricted to shallow or deep water.",
+          "cost": 0
+        },
+        {
+          "name": "Deep-Water Grasp",
+          "text": "Can hold adjacent prey in place, but only in deep water.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in groups in large, connected pools."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "conditionalDepths": [
+        23,
+        24,
+        25
+      ],
+      "asset": "kelpie",
+      "family": "ichor",
+      "forms": [],
+      "naturalHistory": "A carnivorous horse made of seaweed and vile magick. Kelpie hiding places are only spotted through close observation of the murky red water that follows their feeding."
+    },
+    {
+      "id": "wendigo",
+      "kind": "wendigo",
+      "name": "Wendigo",
+      "glyph": "W",
+      "color": "#B6CBC0",
+      "description": "A cannibalistic human who has long since given themselves to the madness of the Flesh. It looks starved.",
+      "health": 88,
+      "stats": {
+        "offense": 20,
+        "defense": -2,
+        "accuracy": 3,
+        "dodge": 4,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Corpse Feast",
+          "text": "Feeds on previously uneaten corpses to grow stronger and delay their revival, and flees while injured.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "conditionalDepths": [
+        21,
+        22,
+        26
+      ],
+      "asset": "wendigo",
+      "family": "wild",
+      "forms": [
+        {
+          "label": "Growth stage 2",
+          "description": "A cannibalistic human who has long since given themselves to the madness of the Flesh. It looks hungry."
+        },
+        {
+          "label": "Growth stage 3",
+          "description": "A cannibalistic human who has long since given themselves to the madness of the Flesh. It looks to be covered in blood."
+        },
+        {
+          "label": "Growth stage 4",
+          "description": "A cannibalistic human who has long since given themselves to the madness of the Flesh. It looks like it wishes to kill you."
+        },
+        {
+          "label": "Growth stage 5",
+          "description": "A cannibalistic human who has long since given themselves to the madness of the Flesh. It looks like it aims to devour you whole."
+        }
+      ],
+      "naturalHistory": "A human who starved to death, ressurected by the blood of the Flesh. Now he hungers endlessly."
+    },
+    {
+      "id": "zillennia:mature",
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This creature is large, larger than the space it takes up. You see it only through the inability to see around it, as it consumes everything that comes into contact, be it sound, light or flesh.",
+      "kind": "zillennia",
+      "name": "Mature Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "health": 922,
+      "stats": {
+        "offense": 110,
+        "defense": 137,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 7,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "asset": "zillennia-mature",
+      "family": "void",
+      "forms": []
+    },
+    {
+      "id": "ichor-shark",
+      "kind": "ichor-shark",
+      "name": "Ichor Shark",
+      "glyph": "F",
+      "color": "#e5bb4c",
+      "description": "A shark made of hardened ichor swims through the terrible liquid.",
+      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. It's body is made from the same toxic god-liquid in which it swims.",
+      "health": 124,
+      "stats": {
+        "offense": 45,
+        "defense": 4,
+        "accuracy": 4,
+        "dodge": 1,
+        "dr": 2,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "asset": "ichor-shark",
+      "family": "ichor",
+      "forms": []
+    },
+    {
+      "id": "pale:Greater Biter",
+      "naturalHistory": "A grown pale. Large and hungry, it shares the maw of a crocodile, and an unmatched malice.",
+      "kind": "pale:Greater Biter",
+      "name": "Greater Pale Chomper",
+      "glyph": "C",
+      "color": "#f0e8dc",
+      "description": "A towering biped with pale, near translucent skin and a powerful jaw for a head which drips with blood.",
+      "health": 142,
+      "stats": {
+        "offense": 20,
+        "defense": 7,
+        "accuracy": 2,
+        "dodge": -3,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Bite Again",
+          "text": "Can follow a landed strike with another attack.",
+          "cost": 8
+        },
+        {
+          "name": "Drink Life",
+          "text": "Can heal itself after dealing damage.",
+          "cost": 8
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "conditionalDepths": [
+        27
+      ],
+      "asset": "pale-greater-biter",
+      "family": "pale",
+      "forms": []
+    },
+    {
+      "id": "pale:Greater Spitter",
+      "kind": "pale:Greater Spitter",
+      "name": "Greater Pale Spitter",
+      "glyph": "P",
+      "color": "#f0e8dc",
+      "description": "A human-sized biped with pale, near translucent skin and a hardened phallic trunk.",
+      "naturalHistory": "A long, spindly pale, like an imitation of a human, but with a long phallic trunk used to spew terrible projectiles.",
+      "health": 70,
+      "stats": {
+        "offense": 20,
+        "defense": -5,
+        "accuracy": 5,
+        "dodge": 1,
+        "dr": 0,
+        "perception": 65,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Distant Spit",
+          "text": "Can spit at nonadjacent prey along a clear projectile path, then spends an action recovering.",
+          "cost": 0
+        },
+        {
+          "name": "Caustic Gas Shot",
+          "text": "Can add caustic gas at its spit target.",
+          "cost": 10
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "conditionalDepths": [
+        23
+      ],
+      "asset": "pale-greater-spitter",
+      "family": "pale",
+      "forms": []
+    },
+    {
+      "id": "troll",
+      "kind": "troll",
+      "name": "Troll",
+      "glyph": "T",
+      "color": "#77A877",
+      "description": "A huge, brutish biped. It clumsily drags its knuckles along the floor, tearing off skin which rapidly replaces itself.",
+      "health": 220,
+      "stats": {
+        "offense": 55,
+        "defense": 20,
+        "accuracy": -5,
+        "dodge": -5,
+        "dr": 3,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Rapid Regeneration",
+          "text": "Regenerates wounds unusually quickly each normal turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "conditionalDepths": [
+        24,
+        28
+      ],
+      "asset": "troll",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A humanoid grown from the blood walls of the Flesh. Its hands are the size of small men, and it's mouth full of teeth with which to devour the uncorrupted."
+    },
+    {
+      "id": "pale:Greater Breather",
+      "kind": "pale:Greater Breather",
+      "name": "Greater Pale Gasser",
+      "glyph": "H",
+      "color": "#f0e8dc",
+      "description": "A towering biped with pale, near translucent skin and a bulbous head covered in pores. It smells of existential dread.",
+      "health": 142,
+      "stats": {
+        "offense": 20,
+        "defense": 7,
+        "accuracy": -1,
+        "dodge": -4,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Hallucinogenic Gas Cloud",
+          "text": "Continually emits hallucinogenic gas instead of caustic gas. Exposure refreshes Hallucinating to two normal world turns.",
+          "cost": 0
+        },
+        {
+          "name": "Forceful Exhalation",
+          "text": "Can exhale an additional cloud of hallucinogenic gas.",
+          "cost": 10
+        },
+        {
+          "name": "Caustic Wound",
+          "text": "Makes prey more vulnerable to caustic gas when its attacks deal damage.",
+          "cost": 0
+        },
+        {
+          "name": "Hallucinogenic breath",
+          "text": "Hallucinations change perceived creature identities, never simulation statistics or hostility. Repeated exposure refreshes the condition rather than stacking it.",
+          "cost": null
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "conditionalDepths": [
+        25
+      ],
+      "asset": "pale-greater-breather",
+      "family": "pale",
+      "forms": [],
+      "naturalHistory": "A lowbeast biped which emits the smell of death. That is to say, those that smell the stench of the Greater Gasser have the death of their loved ones brought to the forefront of their mind until the hallucinations become too intense, and the soul evaporates."
+    },
+    {
+      "id": "pale:Greater Screamer",
+      "kind": "pale:Greater Screamer",
+      "name": "Greater Pale Screamer",
+      "glyph": "S",
+      "color": "#f0e8dc",
+      "description": "A towering biped with a huge mouth which runs from its head to the bottom of its torso. Even when idle, it emits a loud whine.",
+      "health": 178,
+      "stats": {
+        "offense": 20,
+        "defense": 13,
+        "accuracy": -1,
+        "dodge": -3,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Scream",
+          "text": "Nearby foes become Disoriented for five turns, losing 10 Accuracy. Allied Damage and Perception boosts are unchanged.",
+          "cost": 15
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "conditionalDepths": [
+        26
+      ],
+      "asset": "pale-greater-screamer",
+      "family": "pale",
+      "forms": [],
+      "naturalHistory": "A colossal maw allows the scream of this creature to echo around, disorienting its pray. It's colossal vocal chords are as thick as steel cables."
+    },
+    {
+      "id": "zillennia:greater",
+      "kind": "zillennia",
+      "name": "Greater Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one is gargantuan, even larger than average, and consumes all it touches without discrimination.",
+      "health": 1060,
+      "stats": {
+        "offense": 126,
+        "defense": 160,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 7,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "asset": "zillennia-greater",
+      "family": "void",
+      "forms": []
+    },
+    {
+      "id": "pale:Greater Birther",
+      "kind": "pale:Greater Birther",
+      "name": "Greater Pale Birther",
+      "glyph": "B",
+      "color": "#f0e8dc",
+      "description": "A towering biped with pale, near translucent skin with an engorged stomach and a head which resembles a vagina.",
+      "health": 112,
+      "stats": {
+        "offense": 20,
+        "defense": 2,
+        "accuracy": -4,
+        "dodge": -6,
+        "dr": 0,
+        "perception": 25,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Caustic Gas Immunity",
+          "text": "Is immune to caustic gas damage.",
+          "cost": 0
+        },
+        {
+          "name": "Birth",
+          "text": "Can summon Pale Chomper, Pale Gasser, Pale Spitter, Pale Birther, Pale Screamer.",
+          "cost": 10
+        },
+        {
+          "name": "Birth Twins",
+          "text": "Can summon Pale Chomper, Pale Gasser, Pale Spitter, Pale Birther, Pale Screamer.",
+          "cost": 30
+        },
+        {
+          "name": "Slow (acts every other turn)",
+          "text": "Acts only every other normal turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "conditionalDepths": [
+        27,
+        32
+      ],
+      "asset": "pale-greater-birther",
+      "family": "pale",
+      "forms": [
+        {
+          "label": "At zero Energy",
+          "description": "A towering biped with pale, near translucent skin and a flat stomach. It's head resembles a vagina."
+        }
+      ],
+      "naturalHistory": "A large biped which brings forth other lowbeasts. It deflates as it births its spawn, and when replenishes itself only with the blood of the Flesh."
+    },
+    {
+      "id": "greater-ichor-shark",
+      "kind": "greater-ichor-shark",
+      "name": "Greater Ichor Shark",
+      "glyph": "F",
+      "color": "#ffe08a",
+      "description": "A shark made of hardened ichor swims through the terrible liquid.",
+      "health": 148,
+      "stats": {
+        "offense": 55,
+        "defense": 8,
+        "accuracy": 4,
+        "dodge": -1,
+        "dr": 3,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "asset": "greater-ichor-shark",
+      "family": "ichor",
+      "forms": [],
+      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. It's body is made from the same toxic god-liquid in which it swims."
+    },
+    {
+      "id": "dire-bear",
+      "kind": "dire-bear",
+      "name": "Dire Bear",
+      "glyph": "B",
+      "color": "#000000",
+      "description": "A huge bear, of remarkable size. Each step shakes the ground.",
+      "naturalHistory": "A huge bear, large enough to fit a human torso in its mouth with room to spare. It roams the Flesh, eating monsters and people alike.",
+      "health": 208,
+      "stats": {
+        "offense": 42,
+        "defense": 18,
+        "accuracy": 1,
+        "dodge": -5,
+        "dr": 2,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "conditionalDepths": [
+        29
+      ],
+      "asset": "dire-bear",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "river-drake",
+      "kind": "river-drake",
+      "name": "River Drake",
+      "glyph": "d",
+      "color": "#74c9cb",
+      "description": "A blue draconid, its scales quiver in anticipation of its next meal.",
+      "naturalHistory": "A reptilian which conquers the ecosystems of lakes and rivers.",
+      "health": 136,
+      "stats": {
+        "offense": 25,
+        "defense": 6,
+        "accuracy": 3,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 65,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        },
+        {
+          "name": "Aquatic",
+          "text": "Is restricted to shallow or deep water.",
+          "cost": 0
+        },
+        {
+          "name": "Submerge",
+          "text": "Hides underwater when it enters deep water.",
+          "cost": 0
+        },
+        {
+          "name": "Grasp",
+          "text": "Can hold adjacent prey in place.",
+          "cost": 0
+        },
+        {
+          "name": "Water Jet",
+          "text": "Can strike nonadjacent prey with a water jet and push it one tile away on a hit.",
+          "cost": 8
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in groups in large, connected pools."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "conditionalDepths": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "asset": "river-drake",
+      "family": "ichor",
+      "forms": []
+    },
+    {
+      "id": "horn-3",
+      "kind": "horn-3",
+      "name": "Tricorn",
+      "glyph": "3",
+      "color": "#c3a0cf",
+      "description": "A famous magical horse-like creature with three horns.",
+      "health": 118,
+      "stats": {
+        "offense": 22,
+        "defense": 3,
+        "accuracy": 4,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 60,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Hornlight",
+          "text": "Can strike nonadjacent prey with a magical bolt along a clear projectile path.",
+          "cost": 8
+        },
+        {
+          "name": "Beckon",
+          "text": "Can teleport distant prey closer if a valid landing square is available.",
+          "cost": 12
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "conditionalDepths": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "asset": "horn-3",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A beautiful, three-horned horse of magickal power from another dimension. It's playful nature often results in the death of its victims."
+    },
+    {
+      "id": "killspawn",
+      "kind": "killspawn",
+      "name": "Killspawn",
+      "glyph": "K",
+      "color": "#d78a8d",
+      "description": "A huge, lumbering ogre made of blades. Looking at it, you know it yearns for your death.",
+      "health": 208,
+      "stats": {
+        "offense": 90,
+        "defense": 18,
+        "accuracy": -4,
+        "dodge": -6,
+        "dr": 2,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Slow (acts every other turn)",
+          "text": "Acts only every other normal turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "conditionalDepths": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "asset": "killspawn",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A demon made of metal, spawned fully formed from the God-Obelisks: The Borge. These creatures delight in death, and naught else."
+    },
+    {
+      "id": "zillennia:hulking",
+      "kind": "zillennia",
+      "name": "Hulking Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one is of gargantuan, almost incomprehensible size. To kill it, almost unfathomable.",
+      "health": 1198,
+      "stats": {
+        "offense": 142,
+        "defense": 183,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 8,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        25,
+        26,
+        27,
+        28
+      ],
+      "asset": "zillennia-hulking",
+      "family": "void",
+      "forms": []
+    },
+    {
+      "id": "horn-4",
+      "kind": "horn-4",
+      "name": "Quadricorn",
+      "glyph": "4",
+      "color": "#d3aadc",
+      "description": "A terrible, brutish bull-like creature with four horns.",
+      "health": 118,
+      "stats": {
+        "offense": 38,
+        "defense": 3,
+        "accuracy": -2,
+        "dodge": -3,
+        "dr": 0,
+        "perception": 60,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "conditionalDepths": [
+        31,
+        33
+      ],
+      "asset": "horn-4",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A four-horned creature from another reality which wishes to gore all living things."
+    },
+    {
+      "id": "sabretooth",
+      "naturalHistory": "A pre-historic tiger, revived to defend the Flesh. It's bite is powerful, and it's fangs long.",
+      "kind": "sabretooth",
+      "name": "Sabretooth Tiger",
+      "glyph": "T",
+      "color": "#f0c17a",
+      "description": "A massive tiger with huge, sharp teeth growing from its mouth.",
+      "health": 172,
+      "stats": {
+        "offense": 48,
+        "defense": 12,
+        "accuracy": 4,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 70,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        },
+        {
+          "name": "Stalk",
+          "text": "Circles behind observed prey and waits beside doorways before peeking.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "conditionalDepths": [],
+      "asset": "sabretooth",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "lesser-ichor-leviathan",
+      "kind": "lesser-ichor-leviathan",
+      "name": "Lesser Ichor Leviathan",
+      "glyph": "L",
+      "color": "#b99a48",
+      "description": "A colossal creature made of hardened ichor swims through the terrible liquid.",
+      "naturalHistory": "An incredibly large, whale like predator created by Mercuria the Machine-Godbeast, all to patrol the endless depths of Ichor.",
+      "health": 172,
+      "stats": {
+        "offense": 65,
+        "defense": 12,
+        "accuracy": 3,
+        "dodge": -3,
+        "dr": 3,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "asset": "lesser-ichor-leviathan",
+      "family": "ichor",
+      "forms": []
+    },
+    {
+      "id": "vampire",
+      "kind": "vampire",
+      "name": "Vampire",
+      "glyph": "V",
+      "color": "#D54B5C",
+      "description": "A creature of decadence and excess, who, having grown tired of wine and sex, turned to blood and murder.",
+      "health": 148,
+      "stats": {
+        "offense": 30,
+        "defense": 8,
+        "accuracy": 4,
+        "dodge": 3,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Vampire Form",
+          "text": "Can transform into a flying bat to flee injury or cross gaps.",
+          "cost": 0
+        },
+        {
+          "name": "Life Drain",
+          "text": "Heals when it deals damage.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "conditionalDepths": [
+        32
+      ],
+      "asset": "vampire",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "Human nobles whom perform terrible sacrifices can curry favor with the Flesh, earning themselves a terrible reward. Leech-vampirism changes their mind, just as well as their body, leaving them as one of the most dangerous monsters of the Flesh."
+    },
+    {
+      "id": "banshee",
+      "kind": "banshee",
+      "name": "Banshee",
+      "glyph": "B",
+      "color": "#d600ff",
+      "description": "The eternal spirit of those women who seek shelter in the Flesh from their terrible suitors. Her shriek means death.",
+      "health": 100,
+      "stats": {
+        "offense": 8,
+        "defense": 0,
+        "accuracy": 2,
+        "dodge": 4,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Banshee Shriek",
+          "text": "Periodically reveals its location with a shriek that damages you through armor when it can see you.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37
+      ],
+      "conditionalDepths": [],
+      "asset": "banshee",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "Women under duress who flee to the Flesh for comfort and salvation have their body stripped from them, and replaced with a construct. Their screams of anguish can be fatal to those mortals who hear."
+    },
+    {
+      "id": "maulchild",
+      "kind": "maulchild",
+      "name": "Maulchild",
+      "glyph": "m",
+      "color": "#be97b2",
+      "description": "A large, child-like demon which seeks affection from all creatures.",
+      "health": 88,
+      "stats": {
+        "offense": 0,
+        "defense": -2,
+        "accuracy": -2,
+        "dodge": -2,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Harmless",
+          "text": "Holds adjacent prey instead of making damaging ordinary attacks.",
+          "cost": 0
+        },
+        {
+          "name": "Grasp",
+          "text": "Can hold adjacent prey in place.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "conditionalDepths": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "asset": "maulchild",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A demon of innocent persuasion. It comes with others, and craves affection, holding it's victim still for it's fellows carving knives."
+    },
+    {
+      "id": "zillennia:ancient",
+      "kind": "zillennia",
+      "name": "Ancient Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "health": 1342,
+      "stats": {
+        "offense": 158,
+        "defense": 207,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 9,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        29,
+        30,
+        31,
+        32
+      ],
+      "asset": "zillennia-ancient",
+      "family": "void",
+      "forms": [],
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. Born early in that millenium of godly intercourse, this creature is older than  humanity. It carries with it no desires, or fears. Just an almost unending sea of nothingness."
+    },
+    {
+      "id": "horn-5",
+      "kind": "horn-5",
+      "name": "Pentacorn",
+      "glyph": "5",
+      "color": "#e6b5e5",
+      "description": "A famous magical horse-like creature with five horns.",
+      "health": 148,
+      "stats": {
+        "offense": 28,
+        "defense": 8,
+        "accuracy": 5,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 60,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Hornlight",
+          "text": "Can strike nonadjacent prey with a magical bolt along a clear projectile path.",
+          "cost": 8
+        },
+        {
+          "name": "Beckon",
+          "text": "Can teleport distant prey closer if a valid landing square is available.",
+          "cost": 12
+        },
+        {
+          "name": "Stone Seal",
+          "text": "Can raise a temporary wall beside nearby prey when enough clear ground is available.",
+          "cost": 15
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "conditionalDepths": [
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "asset": "horn-5",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A beautiful horse with five horns from another dimension. It's carries with it a malevolent aura, and a desire to inflict suffering."
+    },
+    {
+      "id": "horn-6",
+      "kind": "horn-6",
+      "name": "Hexacorn",
+      "glyph": "6",
+      "color": "#f4c3f0",
+      "description": "A terrible, brutish bull-like creature with six horns.",
+      "health": 148,
+      "stats": {
+        "offense": 50,
+        "defense": 8,
+        "accuracy": -3,
+        "dodge": -4,
+        "dr": 0,
+        "perception": 60,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "conditionalDepths": [],
+      "asset": "horn-6",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A six-horned creature from another reality which wishes to gore all living things."
+    },
+    {
+      "id": "phoenix",
+      "kind": "phoenix",
+      "name": "Phoenix",
+      "glyph": "P",
+      "color": "#FF963F",
+      "description": "A creature of beautiful flame and rebirth, twisted by the Flesh. Despite its corruption, its resurrection still comes quickly.",
+      "health": 178,
+      "stats": {
+        "offense": 40,
+        "defense": 13,
+        "accuracy": 3,
+        "dodge": 4,
+        "dr": 0,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Always Flying",
+          "text": "Flies continuously.",
+          "cost": 0
+        },
+        {
+          "name": "Everburn",
+          "text": "Keeps existing flames burning indefinitely.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Is immune to fire damage.",
+          "cost": 0
+        },
+        {
+          "name": "Phoenix Rebirth",
+          "text": "Revives at full health, with each failed revival doubling its next revival chance.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [
+        36
+      ],
+      "asset": "phoenix",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A beautiful and noble creature, long-since corrupted by the Flesh and used as a terrible monster to protect its adminstrator."
+    },
+    {
+      "id": "yeti",
+      "naturalHistory": "A creature from the high mountains, now brought low, its habitat mirrored in the places it appears.",
+      "kind": "yeti",
+      "name": "Yeti",
+      "glyph": "Y",
+      "color": "#D7E8F1",
+      "description": "An abominable snowman, which freezes all who dare to come close.",
+      "health": 322,
+      "stats": {
+        "offense": 75,
+        "defense": 37,
+        "accuracy": -2,
+        "dodge": -5,
+        "dr": 5,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Winter's Trail",
+          "text": "Inflicts Slowed when either of your bodies starts a turn adjacent to it.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "conditionalDepths": [],
+      "asset": "yeti",
+      "family": "wild",
+      "forms": []
+    },
+    {
+      "id": "ichor-leviathan",
+      "kind": "ichor-leviathan",
+      "name": "Ichor Leviathan",
+      "glyph": "L",
+      "color": "#e5bb4c",
+      "description": "A colossal creature made of hardened ichor swims through the terrible liquid.",
+      "health": 202,
+      "stats": {
+        "offense": 75,
+        "defense": 17,
+        "accuracy": 3,
+        "dodge": -5,
+        "dr": 4,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "ichor-leviathan",
+      "family": "ichor",
+      "forms": [],
+      "naturalHistory": "An incredibly large, whale like predator created by Mercuria the Machine-Godbeast, all to patrol the endless depths of Ichor."
+    },
+    {
+      "id": "moonspawn",
+      "kind": "moonspawn",
+      "name": "Moonspawn",
+      "glyph": "M",
+      "color": "#d0d6ff",
+      "description": "A bear made of moonlight shines in the darkness.",
+      "health": 232,
+      "stats": {
+        "offense": 58,
+        "defense": 22,
+        "accuracy": 2,
+        "dodge": -3,
+        "dr": 0,
+        "perception": 70,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Moonstep",
+          "text": "Can teleport toward distant prey when a clear landing square is available.",
+          "cost": 10
+        },
+        {
+          "name": "Everburn",
+          "text": "Keeps existing flames burning indefinitely.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Is immune to fire damage.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "moonspawn",
+      "family": "moon",
+      "forms": [],
+      "naturalHistory": "A child of Anavani, created to patrol her final resting place upon the moon. Now it dwells down here, this place undeserving of its beauty."
+    },
+    {
+      "id": "zillennia:timeless",
+      "kind": "zillennia",
+      "name": "Timeless Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "health": 1480,
+      "stats": {
+        "offense": 174,
+        "defense": 230,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 10,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "asset": "zillennia-timeless",
+      "family": "void",
+      "forms": [],
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one does not change. It was created when those two gods locked eyes with each other, and their horrible romance began, before humanity had yet breathed. It cares not for the whims of time. It is likely it is unaware that it's parents lie long dead, and that it is a relic of a different era."
+    },
+    {
+      "id": "valta",
+      "kind": "valta",
+      "name": "Valta",
+      "glyph": "V",
+      "color": "#a4bef8",
+      "description": "A deer made of moonlight shines in the darkness.",
+      "health": 118,
+      "stats": {
+        "offense": 14,
+        "defense": 3,
+        "accuracy": 4,
+        "dodge": 4,
+        "dr": 0,
+        "perception": 85,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Moonstep",
+          "text": "Can teleport toward distant prey when a clear landing square is available.",
+          "cost": 10
+        },
+        {
+          "name": "Moonbeam",
+          "text": "Can charge a moonbeam, then fire it along a clear projectile path.",
+          "cost": 20
+        },
+        {
+          "name": "Everburn",
+          "text": "Keeps existing flames burning indefinitely.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Is immune to fire damage.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "valta",
+      "family": "moon",
+      "forms": [],
+      "naturalHistory": "A moonhaunted of Anavani, one of her companions on the moon. Created for its beauty and its fierce protectiveness."
+    },
+    {
+      "id": "saidri-guardian",
+      "kind": "saidri-guardian",
+      "name": "Saidribee Guardian",
+      "glyph": "B",
+      "color": "#f8d100",
+      "description": "A huge, quadrupedal bee-like creature, with large forelimbs that double as hands, and an intimidating stinger.",
+      "health": 238,
+      "stats": {
+        "offense": 52,
+        "defense": 23,
+        "accuracy": 3,
+        "dodge": -3,
+        "dr": 3,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Guardian Venom",
+          "text": "Inflicts stacking Envenomed on successful hits.",
+          "cost": 0
+        },
+        {
+          "name": "Grasp",
+          "text": "Can hold adjacent prey in place.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "terrain",
+          "text": "Found in special locations in these regions: Dungeon, Cave, Meadow, Forest, Archipelago, Mountain."
+        }
+      ],
+      "ordinaryDepths": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [
+        37,
+        39,
+        40
+      ],
+      "asset": "saidri-guardian",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A guardian of the Saidribee Nest Queen. Fiercely protective, and incredibly dangerous."
+    },
+    {
+      "id": "chimera",
+      "kind": "chimera",
+      "name": "Chimera",
+      "glyph": "C",
+      "color": "#ddb435",
+      "description": "An infamous firebreathing creature with the head of a lion, goat and serpent.",
+      "health": 358,
+      "stats": {
+        "offense": 70,
+        "defense": 43,
+        "accuracy": 2,
+        "dodge": -4,
+        "dr": 4,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Always Flying",
+          "text": "Flies continuously.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Breath",
+          "text": "Can breathe a cone of fire that inflicts Burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [],
+      "asset": "chimera",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A corrupted abomination. Multiple animals, mutated into one despicable creature."
+    },
+    {
+      "id": "cancer",
+      "kind": "cancer",
+      "name": "Cancer",
+      "glyph": "C",
+      "color": "#DC6969",
+      "description": "A terrible crustacean, with claws of force enough to crush metal.",
+      "health": 358,
+      "stats": {
+        "offense": 100,
+        "defense": 43,
+        "accuracy": 1,
+        "dodge": -6,
+        "dr": 20,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Crushing Claws",
+          "text": "Ignores armor when it attacks.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [],
+      "asset": "cancer",
+      "family": "ichor",
+      "forms": [],
+      "naturalHistory": "A monster of myth. Woven into the stars, this crab has the strength to crush almost anything."
+    },
+    {
+      "id": "horn-7",
+      "kind": "horn-7",
+      "name": "Heptacorn",
+      "glyph": "7",
+      "color": "#ffe1fb",
+      "description": "A famous magical horse-like creature with seven horns.",
+      "health": 178,
+      "stats": {
+        "offense": 34,
+        "defense": 13,
+        "accuracy": 5,
+        "dodge": 2,
+        "dr": 0,
+        "perception": 60,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Hornlight",
+          "text": "Can strike nonadjacent prey with a magical bolt along a clear projectile path.",
+          "cost": 8
+        },
+        {
+          "name": "Beckon",
+          "text": "Can teleport distant prey closer if a valid landing square is available.",
+          "cost": 12
+        },
+        {
+          "name": "Stone Seal",
+          "text": "Can raise a temporary wall beside nearby prey when enough clear ground is available.",
+          "cost": 15
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [],
+      "asset": "horn-7",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "The most powerful of the extra-dimensional corn monsters. Beautiful and dangerous, this creature kills with its thoughts."
+    },
+    {
+      "id": "zillennia:transcendent",
+      "kind": "zillennia",
+      "name": "Transcendent Zillennia",
+      "glyph": "Z",
+      "color": "#d6b1e3",
+      "description": "An ancient horror made of nothing. Spawned of the union of Grisha the Ever-Hungry and Dawel the End-Bringer, this creature is most easily seen through its lack of light, and most easily heard through its lack of sound.",
+      "health": 1618,
+      "stats": {
+        "offense": 190,
+        "defense": 253,
+        "accuracy": 3,
+        "dodge": -6,
+        "dr": 11,
+        "perception": 80,
+        "maxEnergy": 120
+      },
+      "mechanics": [
+        {
+          "name": "Ruin Pulse",
+          "text": "Can unleash a burst that damages other nearby creatures within sight.",
+          "cost": 20
+        },
+        {
+          "name": "Mouth of Silence",
+          "text": "Prevents nearby enemies within sight from activating energy-paid abilities.",
+          "cost": 0
+        },
+        {
+          "name": "Darkness Aura",
+          "text": "Darkens nearby ground, with walls blocking its aura.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "A Godbeast encounter. Its form depends on depth."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "zillennia-transcendent",
+      "family": "void",
+      "forms": [],
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. It came into existence before its birth. This creature has never not existed, and yet it is composed of nothing, and so has never existed either. It shall eventually consume all it comes into contact with, as it wanders across the Flesh."
+    },
+    {
+      "id": "greater-ichor-leviathan",
+      "kind": "greater-ichor-leviathan",
+      "name": "Greater Ichor Leviathan",
+      "glyph": "L",
+      "color": "#ffe08a",
+      "description": "A colossal creature made of hardened ichor swims through the terrible liquid.",
+      "health": 226,
+      "stats": {
+        "offense": 85,
+        "defense": 21,
+        "accuracy": 4,
+        "dodge": -6,
+        "dr": 5,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Ichor-bound",
+          "text": "Cannot act outside ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Ichor Siphon",
+          "text": "Heals on successful hits while standing in ichor.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Immunity",
+          "text": "Immune to fire and burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "event",
+          "text": "Emerges after Mercuria's well is opened. Needs ichor to act."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "asset": "greater-ichor-leviathan",
+      "family": "ichor",
+      "forms": [],
+      "naturalHistory": "An incredibly large, whale like predator created by Mercuria the Machine-Godbeast, all to patrol the endless depths of Ichor."
+    },
+    {
+      "id": "ursa-minor",
+      "kind": "ursa-minor",
+      "name": "Ursa Minor",
+      "glyph": "U",
+      "color": "#4F6FB5",
+      "description": "The legendary bear-child of Anavani. Her incestuous brother sleeps soundly, till she calls for aid with her dying breath.",
+      "health": 298,
+      "stats": {
+        "offense": 60,
+        "defense": 33,
+        "accuracy": 2,
+        "dodge": -3,
+        "dr": 4,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Star-Bear's Death Cry",
+          "text": "Wakes its linked companion and calls it to the death site when it dies.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [],
+      "asset": "ursa-minor",
+      "family": "moon",
+      "forms": [],
+      "naturalHistory": "She prowls to feed her mate after having been plucked down from her eternal watch in the sky."
+    },
+    {
+      "id": "ursa-major",
+      "kind": "ursa-major",
+      "name": "Ursa Major",
+      "glyph": "U",
+      "color": "#A978D6",
+      "description": "The elder bear-child of Anavani. His claws are unstoppable, and his maw means death.",
+      "health": 1048,
+      "stats": {
+        "offense": 190,
+        "defense": 158,
+        "accuracy": 2,
+        "dodge": -7,
+        "dr": 12,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Sleeping Star-Bear",
+          "text": "Can be awakened by its linked companion’s death cry.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "paired",
+          "text": "Appears alongside Ursa Minor."
+        }
+      ],
+      "ordinaryDepths": [
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [],
+      "asset": "ursa-major",
+      "family": "moon",
+      "forms": [],
+      "naturalHistory": "Anavani's bear, plucked from his constellation to protect her along the moon. How this fantastic creature finds itself here, no one knows."
+    },
+    {
+      "id": "minotaur",
+      "kind": "minotaur",
+      "name": "Minotaur",
+      "glyph": "M",
+      "color": "#C6815C",
+      "description": "A terrifyingly huge and stupid brute, with the head of a bull and the body of an ogre.",
+      "health": 448,
+      "stats": {
+        "offense": 110,
+        "defense": 58,
+        "accuracy": -5,
+        "dodge": -5,
+        "dr": 8,
+        "perception": 40,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        },
+        {
+          "name": "Committed Charge",
+          "text": "Commits to its displayed direction before choosing another, even when blocked.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [],
+      "asset": "minotaur",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "A creature of the Labyrinth. Now prowls the Flesh, recklessly charging forward at intruders."
+    },
+    {
+      "id": "dragon",
+      "kind": "dragon",
+      "name": "Dragon",
+      "glyph": "D",
+      "color": "#EF6246",
+      "description": "The most famous of all flesh creatures, a terrifying beast of scale and flame.",
+      "health": 952,
+      "stats": {
+        "offense": 220,
+        "defense": 142,
+        "accuracy": 4,
+        "dodge": -6,
+        "dr": 16,
+        "perception": 80,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Fast (extra movement step)",
+          "text": "Takes an extra movement step each turn.",
+          "cost": 0
+        },
+        {
+          "name": "Fire Breath",
+          "text": "Can breathe a cone of fire that inflicts Burning.",
+          "cost": 0
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        }
+      ],
+      "ordinaryDepths": [
+        38,
+        39,
+        40
+      ],
+      "conditionalDepths": [],
+      "asset": "dragon",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "The most dangerous of reptiles, a legendary predator found only in the depths of most magickal caves. And of course, in the Flesh, from whence they are spawned."
+    },
+    {
+      "id": "night-crawler",
+      "kind": "night-crawler",
+      "name": "Night Crawler",
+      "glyph": "n",
+      "color": "#D54B5C",
+      "description": "A knot of tentacles and dagger-like sharp appendages, with one thin reproductive tentacle.",
+      "health": 292,
+      "stats": {
+        "offense": 200,
+        "defense": 32,
+        "accuracy": 140,
+        "dodge": 35,
+        "dr": 0,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Blood drinking",
+          "text": "Melee damage restores health through its existing life-draining trait.",
+          "cost": 0
+        },
+        {
+          "name": "Witch-born",
+          "text": "Witches can summon this species. Summoned creatures have a lighter, fixed combat profile; a heartless Witch produces heartless offspring.",
+          "cost": null
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "May be summoned by a Witch."
+        }
+      ],
+      "ordinaryDepths": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "conditionalDepths": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "asset": "night-crawler",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "Terrible creatures of tentacle and sharp appendage. They skewer their victims with their tentacles, to drink their blood."
+    },
+    {
+      "id": "skin-walker",
+      "kind": "skin-walker",
+      "name": "Skin Walker",
+      "glyph": "s",
+      "color": "#B596E8",
+      "description": "A distorted, naked adult human form with visible genital anatomy, darkened eyes, a lamprey-like mouth, and a long tongue extending to the midsection.",
+      "health": 376,
+      "stats": {
+        "offense": 310,
+        "defense": 46,
+        "accuracy": 148,
+        "dodge": 44,
+        "dr": 0,
+        "perception": 45,
+        "maxEnergy": 50
+      },
+      "mechanics": [
+        {
+          "name": "Stolen appearance",
+          "text": "Appears as a fixed shallow-dungeon creature until an observing player body is within two grid squares, including diagonals. Moving beyond that range restores the same disguise. Its true combat statistics never change.",
+          "cost": 0
+        },
+        {
+          "name": "Witch-born",
+          "text": "Witches can summon this species. Summoned creatures have a lighter, fixed combat profile; a heartless Witch produces heartless offspring.",
+          "cost": null
+        }
+      ],
+      "sources": [
+        {
+          "kind": "ordinary",
+          "text": "May appear in roaming groups."
+        },
+        {
+          "kind": "summoned",
+          "text": "May be summoned by a Witch."
+        }
+      ],
+      "ordinaryDepths": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "conditionalDepths": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "asset": "skin-walker",
+      "family": "wild",
+      "forms": [],
+      "naturalHistory": "Terrible creatures which devour their victims minds, taking their form."
+    },
+    {
+      "id": "saidribee-queen",
+      "kind": "saidribee-queen",
+      "name": "Saidribee Queen",
+      "glyph": "Q",
+      "color": "#F3C66B",
+      "description": "The Queen of a Saidribee Nest.",
+      "naturalHistory": "Queens such as this take care of their nests, spawning new young and weaving royal jelly to nourish them.",
+      "health": 430,
+      "stats": {
+        "offense": 230,
+        "defense": 48,
+        "accuracy": 145,
+        "dodge": 35,
+        "dr": 0,
+        "perception": 55,
+        "maxEnergy": 100
+      },
+      "mechanics": [
+        {
+          "name": "Summon Saidribee",
+          "text": "Summons one Short Saidribee or Saidribee Guardian into a free adjacent land square, in a 2:1 ratio. Successful casts have a ten-world-turn cooldown; haste does not shorten it. Heartless parents create heartless offspring.",
+          "cost": 15
+        }
+      ],
+      "sources": [
+        {
+          "kind": "conditional",
+          "text": "Found only in Nest chambers, on eligible non-Godbeast floors."
+        }
+      ],
+      "ordinaryDepths": [],
+      "conditionalDepths": [
+        28,
+        29,
+        31,
+        32,
+        33,
+        34
+      ],
+      "asset": "saidribee-queen",
+      "family": "saidri",
+      "forms": []
+    }
+  ],
+  "depths": [
+    {
+      "depth": 1,
+      "ordinary": [
+        "blorb",
+        "rat",
+        "shellback-beetle",
+        "hemogoblin",
+        "cave-bat",
+        "pale:Jackal",
+        "needleling",
+        "short-saidri"
+      ],
+      "conditional": [
+        "bastidion"
+      ]
+    },
+    {
+      "depth": 2,
+      "ordinary": [
+        "blorb",
+        "rat",
+        "shellback-beetle",
+        "hemogoblin",
+        "cave-bat",
+        "pale:Jackal",
+        "needleling",
+        "short-saidri"
+      ],
+      "conditional": [
+        "bastidion"
+      ]
+    },
+    {
+      "depth": 3,
+      "ordinary": [
+        "blorb",
+        "rat",
+        "shellback-beetle",
+        "hemogoblin",
+        "cave-bat",
+        "pale:Jackal",
+        "needleling",
+        "short-saidri",
+        "pale:Biter",
+        "dryad"
+      ],
+      "conditional": [
+        "bastidion"
+      ]
+    },
+    {
+      "depth": 4,
+      "ordinary": [
+        "shellback-beetle",
+        "hemogoblin",
+        "cave-bat",
+        "pale:Jackal",
+        "needleling",
+        "short-saidri",
+        "pale:Biter",
+        "dryad",
+        "pale:Spitter",
+        "pale:Screamer"
+      ],
+      "conditional": [
+        "bastidion",
+        "zillennia:infant",
+        "lesser-ichor-fish",
+        "ichor-fish-standard"
+      ]
+    },
+    {
+      "depth": 5,
+      "ordinary": [
+        "hemogoblin",
+        "cave-bat",
+        "pale:Jackal",
+        "needleling",
+        "short-saidri",
+        "pale:Biter",
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer"
+      ],
+      "conditional": [
+        "bastidion",
+        "lesser-ichor-fish",
+        "ichor-fish-standard",
+        "zillennia:child",
+        "greater-ichor-fish"
+      ]
+    },
+    {
+      "depth": 6,
+      "ordinary": [
+        "cave-bat",
+        "pale:Jackal",
+        "needleling",
+        "short-saidri",
+        "pale:Biter",
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "bear"
+      ],
+      "conditional": [
+        "bastidion",
+        "lesser-ichor-fish",
+        "ichor-fish-standard",
+        "zillennia:child",
+        "greater-ichor-fish"
+      ]
+    },
+    {
+      "depth": 7,
+      "ordinary": [
+        "pale:Jackal",
+        "needleling",
+        "short-saidri",
+        "pale:Biter",
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "glim",
+        "bear"
+      ],
+      "conditional": [
+        "bastidion",
+        "lesser-ichor-fish",
+        "ichor-fish-standard",
+        "zillennia:child",
+        "greater-ichor-fish"
+      ]
+    },
+    {
+      "depth": 8,
+      "ordinary": [
+        "short-saidri",
+        "pale:Biter",
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "bear"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "lesser-ichor-fish",
+        "ichor-fish-standard",
+        "zillennia:child",
+        "greater-ichor-fish",
+        "samara"
+      ]
+    },
+    {
+      "depth": 9,
+      "ordinary": [
+        "pale:Biter",
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "bear"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "ichor-fish-standard",
+        "greater-ichor-fish",
+        "samara",
+        "zillennia:lesser"
+      ]
+    },
+    {
+      "depth": 10,
+      "ordinary": [
+        "pale:Biter",
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "bear",
+        "tiger"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "ichor-fish-standard",
+        "greater-ichor-fish",
+        "samara",
+        "zillennia:lesser",
+        "lesser-ichor-shark"
+      ]
+    },
+    {
+      "depth": 11,
+      "ordinary": [
+        "pale:Biter",
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "bear",
+        "tiger"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "ichor-fish-standard",
+        "greater-ichor-fish",
+        "samara",
+        "zillennia:lesser",
+        "lesser-ichor-shark"
+      ]
+    },
+    {
+      "depth": 12,
+      "ordinary": [
+        "dryad",
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "bear",
+        "horn-1",
+        "horn-2",
+        "tiger"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "ichor-fish-standard",
+        "greater-ichor-fish",
+        "samara",
+        "zillennia:lesser",
+        "sphinx",
+        "lesser-ichor-shark"
+      ]
+    },
+    {
+      "depth": 13,
+      "ordinary": [
+        "hemogoblin-bloodmancer",
+        "pale:Breather",
+        "pale:Screamer",
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "bear",
+        "horn-1",
+        "horn-2",
+        "tiger",
+        "bombardier",
+        "long-saidri"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "ichor-fish-standard",
+        "greater-ichor-fish",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:unqualified"
+      ]
+    },
+    {
+      "depth": 14,
+      "ordinary": [
+        "hemogoblin-bloodmancer",
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "bear",
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "tiger",
+        "bombardier",
+        "long-saidri"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "greater-ichor-fish",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:unqualified"
+      ]
+    },
+    {
+      "depth": 15,
+      "ordinary": [
+        "pale:Birther",
+        "giant-beetle",
+        "glim",
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "tiger",
+        "bombardier",
+        "long-saidri"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "greater-ichor-fish",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:unqualified",
+        "ichor-shark"
+      ]
+    },
+    {
+      "depth": 16,
+      "ordinary": [
+        "giant-beetle",
+        "glim",
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "tiger",
+        "bombardier",
+        "long-saidri",
+        "kelpie"
+      ],
+      "conditional": [
+        "bastidion",
+        "greater-ichor-fish",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:unqualified",
+        "ichor-shark"
+      ]
+    },
+    {
+      "depth": 17,
+      "ordinary": [
+        "giant-beetle",
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "tiger",
+        "bombardier",
+        "long-saidri",
+        "kelpie",
+        "wendigo"
+      ],
+      "conditional": [
+        "bastidion",
+        "greater-ichor-fish",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:mature",
+        "ichor-shark"
+      ]
+    },
+    {
+      "depth": 18,
+      "ordinary": [
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "tiger",
+        "bombardier",
+        "long-saidri",
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter"
+      ],
+      "conditional": [
+        "bastidion",
+        "greater-ichor-fish",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:mature",
+        "ichor-shark"
+      ]
+    },
+    {
+      "depth": 19,
+      "ordinary": [
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "tiger",
+        "bombardier",
+        "long-saidri",
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:mature",
+        "ichor-shark"
+      ]
+    },
+    {
+      "depth": 20,
+      "ordinary": [
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "bombardier",
+        "long-saidri",
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Screamer",
+        "dire-bear"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "zillennia:mature",
+        "ichor-shark",
+        "greater-ichor-shark"
+      ]
+    },
+    {
+      "depth": 21,
+      "ordinary": [
+        "horn-1",
+        "horn-2",
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "bombardier",
+        "long-saidri",
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Screamer",
+        "dire-bear"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "ichor-shark",
+        "zillennia:greater",
+        "greater-ichor-shark"
+      ]
+    },
+    {
+      "depth": 22,
+      "ordinary": [
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "long-saidri",
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "dire-bear",
+        "river-drake",
+        "horn-3"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "ichor-shark",
+        "zillennia:greater",
+        "greater-ichor-shark"
+      ]
+    },
+    {
+      "depth": 23,
+      "ordinary": [
+        "hemogoblin-inventor",
+        "hemogoblin-mech",
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "pale:Greater Birther",
+        "dire-bear",
+        "river-drake",
+        "horn-3"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "lesser-ichor-shark",
+        "ichor-shark",
+        "zillennia:greater",
+        "greater-ichor-shark"
+      ]
+    },
+    {
+      "depth": 24,
+      "ordinary": [
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "pale:Greater Birther",
+        "dire-bear",
+        "river-drake",
+        "horn-3",
+        "horn-4",
+        "night-crawler"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "ichor-shark",
+        "zillennia:greater",
+        "greater-ichor-shark"
+      ]
+    },
+    {
+      "depth": 25,
+      "ordinary": [
+        "kelpie",
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "pale:Greater Birther",
+        "dire-bear",
+        "river-drake",
+        "horn-3",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "maulchild",
+        "night-crawler"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "ichor-shark",
+        "greater-ichor-shark",
+        "zillennia:hulking",
+        "lesser-ichor-leviathan"
+      ]
+    },
+    {
+      "depth": 26,
+      "ordinary": [
+        "wendigo",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "pale:Greater Birther",
+        "dire-bear",
+        "river-drake",
+        "horn-3",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "maulchild",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "ichor-shark",
+        "greater-ichor-shark",
+        "zillennia:hulking",
+        "lesser-ichor-leviathan"
+      ]
+    },
+    {
+      "depth": 27,
+      "ordinary": [
+        "witch",
+        "pale:Greater Biter",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "pale:Greater Birther",
+        "dire-bear",
+        "river-drake",
+        "horn-3",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "maulchild",
+        "yeti",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "ichor-shark",
+        "greater-ichor-shark",
+        "zillennia:hulking",
+        "lesser-ichor-leviathan",
+        "night-crawler",
+        "skin-walker"
+      ]
+    },
+    {
+      "depth": 28,
+      "ordinary": [
+        "witch",
+        "pale:Greater Spitter",
+        "troll",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "pale:Greater Birther",
+        "dire-bear",
+        "river-drake",
+        "horn-3",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "maulchild",
+        "yeti",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "ichor-shark",
+        "greater-ichor-shark",
+        "zillennia:hulking",
+        "lesser-ichor-leviathan",
+        "night-crawler",
+        "skin-walker",
+        "saidribee-queen"
+      ]
+    },
+    {
+      "depth": 29,
+      "ordinary": [
+        "witch",
+        "pale:Greater Breather",
+        "pale:Greater Screamer",
+        "pale:Greater Birther",
+        "dire-bear",
+        "river-drake",
+        "horn-3",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "banshee",
+        "maulchild",
+        "horn-5",
+        "yeti",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "greater-ichor-shark",
+        "lesser-ichor-leviathan",
+        "zillennia:ancient",
+        "night-crawler",
+        "skin-walker",
+        "saidribee-queen"
+      ]
+    },
+    {
+      "depth": 30,
+      "ordinary": [
+        "witch",
+        "pale:Greater Breather",
+        "pale:Greater Birther",
+        "river-drake",
+        "horn-3",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "vampire",
+        "banshee",
+        "maulchild",
+        "horn-5",
+        "horn-6",
+        "yeti",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "greater-ichor-shark",
+        "lesser-ichor-leviathan",
+        "zillennia:ancient",
+        "ichor-leviathan",
+        "night-crawler",
+        "skin-walker"
+      ]
+    },
+    {
+      "depth": 31,
+      "ordinary": [
+        "witch",
+        "pale:Greater Breather",
+        "pale:Greater Birther",
+        "river-drake",
+        "horn-3",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "vampire",
+        "banshee",
+        "maulchild",
+        "horn-5",
+        "horn-6",
+        "yeti",
+        "saidri-guardian",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "greater-ichor-shark",
+        "lesser-ichor-leviathan",
+        "zillennia:ancient",
+        "ichor-leviathan",
+        "night-crawler",
+        "skin-walker",
+        "saidribee-queen"
+      ]
+    },
+    {
+      "depth": 32,
+      "ordinary": [
+        "witch",
+        "pale:Greater Birther",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "vampire",
+        "banshee",
+        "maulchild",
+        "horn-5",
+        "horn-6",
+        "phoenix",
+        "yeti",
+        "saidri-guardian",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "pale:Jackal",
+        "bastidion",
+        "pale:Biter",
+        "pale:Breather",
+        "pale:Spitter",
+        "pale:Screamer",
+        "pale:Birther",
+        "samara",
+        "sphinx",
+        "greater-ichor-shark",
+        "lesser-ichor-leviathan",
+        "zillennia:ancient",
+        "ichor-leviathan",
+        "night-crawler",
+        "skin-walker",
+        "saidribee-queen"
+      ]
+    },
+    {
+      "depth": 33,
+      "ordinary": [
+        "witch",
+        "killspawn",
+        "horn-4",
+        "sabretooth",
+        "vampire",
+        "banshee",
+        "maulchild",
+        "horn-5",
+        "horn-6",
+        "phoenix",
+        "yeti",
+        "moonspawn",
+        "saidri-guardian",
+        "minotaur",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "greater-ichor-shark",
+        "lesser-ichor-leviathan",
+        "ichor-leviathan",
+        "zillennia:timeless",
+        "night-crawler",
+        "skin-walker",
+        "saidribee-queen"
+      ]
+    },
+    {
+      "depth": 34,
+      "ordinary": [
+        "witch",
+        "killspawn",
+        "vampire",
+        "banshee",
+        "maulchild",
+        "horn-5",
+        "horn-6",
+        "phoenix",
+        "yeti",
+        "moonspawn",
+        "valta",
+        "saidri-guardian",
+        "minotaur",
+        "night-crawler",
+        "skin-walker"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-leviathan",
+        "ichor-leviathan",
+        "zillennia:timeless",
+        "night-crawler",
+        "skin-walker",
+        "saidribee-queen"
+      ]
+    },
+    {
+      "depth": 35,
+      "ordinary": [
+        "witch",
+        "vampire",
+        "banshee",
+        "horn-5",
+        "horn-6",
+        "phoenix",
+        "yeti",
+        "moonspawn",
+        "valta",
+        "saidri-guardian",
+        "chimera",
+        "cancer",
+        "minotaur",
+        "skin-walker"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-leviathan",
+        "ichor-leviathan",
+        "zillennia:timeless",
+        "greater-ichor-leviathan",
+        "night-crawler",
+        "skin-walker"
+      ]
+    },
+    {
+      "depth": 36,
+      "ordinary": [
+        "witch",
+        "vampire",
+        "banshee",
+        "horn-5",
+        "horn-6",
+        "phoenix",
+        "yeti",
+        "moonspawn",
+        "valta",
+        "saidri-guardian",
+        "chimera",
+        "cancer",
+        "horn-7",
+        "ursa-minor",
+        "ursa-major",
+        "minotaur",
+        "skin-walker"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-leviathan",
+        "ichor-leviathan",
+        "zillennia:timeless",
+        "greater-ichor-leviathan",
+        "night-crawler",
+        "skin-walker"
+      ]
+    },
+    {
+      "depth": 37,
+      "ordinary": [
+        "vampire",
+        "banshee",
+        "horn-5",
+        "horn-6",
+        "phoenix",
+        "moonspawn",
+        "valta",
+        "saidri-guardian",
+        "chimera",
+        "cancer",
+        "horn-7",
+        "ursa-minor",
+        "ursa-major",
+        "minotaur"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-leviathan",
+        "ichor-leviathan",
+        "zillennia:transcendent",
+        "greater-ichor-leviathan"
+      ]
+    },
+    {
+      "depth": 38,
+      "ordinary": [
+        "vampire",
+        "horn-5",
+        "horn-6",
+        "phoenix",
+        "moonspawn",
+        "valta",
+        "saidri-guardian",
+        "chimera",
+        "cancer",
+        "horn-7",
+        "ursa-minor",
+        "ursa-major",
+        "minotaur",
+        "dragon"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "lesser-ichor-leviathan",
+        "ichor-leviathan",
+        "zillennia:transcendent",
+        "greater-ichor-leviathan"
+      ]
+    },
+    {
+      "depth": 39,
+      "ordinary": [
+        "phoenix",
+        "moonspawn",
+        "valta",
+        "saidri-guardian",
+        "chimera",
+        "cancer",
+        "horn-7",
+        "ursa-minor",
+        "ursa-major",
+        "minotaur",
+        "dragon"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "ichor-leviathan",
+        "zillennia:transcendent",
+        "greater-ichor-leviathan"
+      ]
+    },
+    {
+      "depth": 40,
+      "ordinary": [
+        "phoenix",
+        "moonspawn",
+        "valta",
+        "saidri-guardian",
+        "chimera",
+        "cancer",
+        "horn-7",
+        "ursa-minor",
+        "ursa-major",
+        "minotaur",
+        "dragon"
+      ],
+      "conditional": [
+        "bastidion",
+        "samara",
+        "sphinx",
+        "ichor-leviathan",
+        "zillennia:transcendent",
+        "greater-ichor-leviathan"
+      ]
+    }
+  ],
+  "companions": []
+}

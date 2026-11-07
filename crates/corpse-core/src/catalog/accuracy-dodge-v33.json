@@ -1,0 +1,121 @@
+[
+  {
+    "kind": "rat",
+    "reference_depth": 1,
+    "role": "nimble vermin",
+    "accuracy": -1,
+    "dodge": 4
+  },
+  {
+    "kind": "cave-bat",
+    "reference_depth": 1,
+    "role": "small flying skirmisher",
+    "accuracy": -2,
+    "dodge": 7
+  },
+  {
+    "kind": "shellback-beetle",
+    "reference_depth": 1,
+    "role": "slow armored body",
+    "accuracy": -2,
+    "dodge": -7
+  },
+  {
+    "kind": "bear",
+    "reference_depth": 6,
+    "role": "heavy mauler",
+    "accuracy": 6,
+    "dodge": -9
+  },
+  {
+    "kind": "giant-beetle",
+    "reference_depth": 8,
+    "role": "large armored predator",
+    "accuracy": 8,
+    "dodge": 8
+  },
+  {
+    "kind": "tiger",
+    "reference_depth": 10,
+    "role": "precise mobile hunter",
+    "accuracy": 25,
+    "dodge": 38
+  },
+  {
+    "kind": "horn-1",
+    "reference_depth": 12,
+    "role": "precise ranged caster",
+    "accuracy": 41,
+    "dodge": 43
+  },
+  {
+    "kind": "wendigo",
+    "reference_depth": 17,
+    "role": "mobile starving hunter",
+    "accuracy": 100,
+    "dodge": 50
+  },
+  {
+    "kind": "troll",
+    "reference_depth": 19,
+    "role": "huge regenerating brute",
+    "accuracy": 111,
+    "dodge": 16
+  },
+  {
+    "kind": "dire-bear",
+    "reference_depth": 20,
+    "role": "giant mauler",
+    "accuracy": 124,
+    "dodge": 9
+  },
+  {
+    "kind": "horn-3",
+    "reference_depth": 22,
+    "role": "precise ranged caster",
+    "accuracy": 136,
+    "dodge": 75
+  },
+  {
+    "kind": "night-crawler",
+    "reference_depth": 24,
+    "role": "moderately mobile tentacled hunter",
+    "accuracy": 144,
+    "dodge": 74
+  },
+  {
+    "kind": "sabretooth",
+    "reference_depth": 25,
+    "role": "precise prehistoric hunter",
+    "accuracy": 142,
+    "dodge": 78
+  },
+  {
+    "kind": "skin-walker",
+    "reference_depth": 26,
+    "role": "evasive shape-changing hunter",
+    "accuracy": 148,
+    "dodge": 92
+  },
+  {
+    "kind": "vampire",
+    "reference_depth": 30,
+    "role": "evasive undead skirmisher",
+    "accuracy": 158,
+    "dodge": 92
+  },
+  {
+    "kind": "minotaur",
+    "reference_depth": 33,
+    "role": "committed heavy charger",
+    "accuracy": 147,
+    "dodge": 29
+  },
+  {
+    "kind": "saidribee-queen",
+    "reference_depth": 28,
+    "role": "large dedicated summoner",
+    "accuracy": 145,
+    "dodge": 27
+  }
+]

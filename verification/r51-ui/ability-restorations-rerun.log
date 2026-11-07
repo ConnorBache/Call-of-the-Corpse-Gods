@@ -1,0 +1,16 @@
+
+running 11 tests
+test inactive_floor_water_cleanup_uses_same_rule_without_relighting ... ok
+test dream_sparkle_water_contact_does_not_change_waking_sources ... ok
+test shine_r50_to_r51_cache_transition_and_free_toggle_are_exact ... ok
+test restored_floor_sources_and_shine_rebuild_after_future_and_snapshot ... ok
+test water_contact_clears_existing_source_cache_and_spread_fire_but_preserves_hellfire ... ok
+test reveal_normal_actions_expire_and_no_action_or_failed_commands_preserve ... ok
+test paid_abilities_reject_silence_or_insufficient_energy_before_world_mutation ... ok
+test reveal_survives_all_bonus_move_modes_then_ends_after_wait ... ok
+test came_is_unlimited_after_exact_ten_payment_and_preserves_legacy_countdown ... ok
+test future_snapshot_save_load_and_replay_preserve_new_reveal_boundary ... ok
+test sparkle_has_no_terrain_limit_but_water_including_ichor_quenches_immediately ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s
+

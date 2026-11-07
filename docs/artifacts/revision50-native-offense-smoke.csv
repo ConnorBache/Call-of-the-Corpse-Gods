@@ -1,0 +1,3 @@
+kind,scenario,reference_depth,role,status,trials,paired_gross_damage_delta,paired_delta_standard_error,initial_enemy_profiles_identical,initial_combat_seeds_identical,before_gross,after_gross,before_attempts,after_attempts,before_deaths,after_deaths,before_kills,after_kills,before_combat_censors,after_combat_censors,before_aftermath_censors,after_aftermath_censors,before_postdeath_gross,after_postdeath_gross
+rat,adjacent,1,plain-fighter,native_paired,4,-0.055,0.032015621187164243,True,True,0.0825,0.0275,2.25,1.5,0,0,4,4,0,0,0,0,0.0,0.0
+shellback-beetle,adjacent,1,slow-armored,native_paired,4,-0.0575,0.037941841459440705,True,True,0.11750000000000001,0.06,6.25,3.5,0,0,4,4,0,0,0,0,0.0,0.0

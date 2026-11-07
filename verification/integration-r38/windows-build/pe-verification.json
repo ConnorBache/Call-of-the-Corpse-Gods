@@ -1,0 +1,43 @@
+[
+  {
+    "path": "/workspace/scratch/69f53637ba6f/generation-r38/staging/windows-r38/corpse-desktop.exe",
+    "bytes": 101562385,
+    "sha256": "4811ed7a113d4c1aaf780b061f154052aa7bf2261535ca54bca75070d6bd08c2",
+    "imports": [
+      "KERNEL32.dll",
+      "SDL2.dll",
+      "api-ms-win-core-synch-l1-2-0.dll",
+      "bcryptprimitives.dll",
+      "msvcrt.dll",
+      "ntdll.dll"
+    ],
+    "machine": "PE32+ x86-64",
+    "unsigned": true,
+    "windows_runtime_verified": false,
+    "embedded_rgba_count": 84,
+    "embedded_icon_images": 7,
+    "manifest_matches_source": true
+  },
+  {
+    "path": "/workspace/scratch/69f53637ba6f/generation-r38/source/native-windows-sdk/SDL2-2.32.10/x86_64-w64-mingw32/bin/SDL2.dll",
+    "bytes": 1785344,
+    "sha256": "53e8fa7e9ed43c30bd650c39396f0d9d2067d2fff0b926c9433b75202592e4aa",
+    "imports": [
+      "ADVAPI32.dll",
+      "GDI32.dll",
+      "IMM32.dll",
+      "KERNEL32.dll",
+      "OLEAUT32.dll",
+      "SETUPAPI.dll",
+      "SHELL32.dll",
+      "USER32.dll",
+      "VERSION.dll",
+      "WINMM.dll",
+      "msvcrt.dll",
+      "ole32.dll"
+    ],
+    "machine": "PE32+ x86-64",
+    "unsigned": true,
+    "windows_runtime_verified": false
+  }
+]

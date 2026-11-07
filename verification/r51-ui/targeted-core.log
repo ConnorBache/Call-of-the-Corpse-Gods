@@ -1,0 +1,81 @@
+=== revision51_enemy_reroute ===
+
+running 14 tests
+test revision51_enemy_reroute::tests::bounded_full_grid_has_exact_chebyshev_cost_without_per_candidate_searches ... ok
+test revision51_enemy_reroute::tests::actual_hidden_quarry_position_does_not_replace_last_seen ... ok
+test revision51_enemy_reroute::tests::clear_paths_and_legacy_revisions_keep_the_original_step ... ok
+test revision51_enemy_reroute::tests::disconnected_corridor_waits_instead_of_wandering ... ok
+test revision51_enemy_reroute::tests::newly_solid_selected_step_is_rerouted_before_attempt ... ok
+test revision51_enemy_reroute::tests::other_goals_and_action_restrictions_are_not_reinterpreted ... ok
+test revision51_enemy_reroute::tests::habitat_flight_phase_and_slime_capabilities_shape_legal_routes ... ok
+test revision51_enemy_reroute::tests::portals_count_as_one_move_and_all_occupied_aliases_are_blocked ... ok
+test revision51_enemy_reroute::tests::stair_contact_goals_do_not_cut_wall_corners_or_bypass_habitat ... ok
+test revision51_enemy_reroute::tests::sticky_departure_cost_is_counted_and_cannot_bypass_the_struggle ... ok
+test revision51_enemy_reroute::tests::stair_quarry_goal_routes_to_legal_adjacent_contact_without_entering_stairs ... ok
+test revision51_enemy_reroute::tests::unexpected_slow_ally_uses_diagonal_without_a_new_rng_draw ... ok
+test revision51_enemy_reroute::tests::weighted_costs_are_exact_and_stochastic_exits_require_guaranteed_progress ... ok
+test revision51_enemy_reroute::tests::ties_are_stable_and_new_wall_corners_are_respected ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 455 filtered out; finished in 0.06s
+
+=== revision51_stairs ===
+
+running 11 tests
+test revision51_stairs::tests::birther_with_only_stairs_free_defers_without_payment_or_randomness ... ok
+test revision51_stairs::tests::ichor_stops_at_both_stairs_and_cannot_cross_them_legacy_spread_is_retained ... ok
+test revision51_stairs::tests::flood_frontier_save_and_temporal_snapshots_restore_identical_spread ... ok
+test revision51_stairs::tests::opened_frontier_and_fish_spawn_do_not_reintroduce_ichor_or_fish_on_stairs ... ok
+test revision51_stairs::tests::pathfinding_routes_around_stairs_instead_of_selecting_a_rejected_step ... ok
+test revision51_stairs::tests::population_rejects_stairs_before_ids_or_rng_and_legacy_is_unchanged ... ok
+test revision51_stairs::tests::legacy_and_friendly_stair_movement_remain_legal ... ok
+test revision51_stairs::tests::teleport_cannot_choose_the_only_other_square_when_it_is_a_stair ... ok
+test revision51_stairs::tests::temporary_command_cannot_move_onto_stairs_before_or_after_expiry ... ok
+test revision51_stairs::tests::stairs_block_hostile_neutral_flying_phasing_and_forced_movement_without_rng ... ok
+test revision51_stairs::tests::witch_summon_with_only_stairs_free_defers_without_payment_or_randomness ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 458 filtered out; finished in 0.07s
+
+=== revision51_stair_arrival ===
+
+running 6 tests
+test offscreen::revision51_stair_arrival_tests::arrival_checks_walls_diagonal_corners_and_second_stairs ... ok
+test offscreen::revision51_stair_arrival_tests::all_adjacent_blocked_defers_and_retries_after_save_and_temporal_restore ... ok
+test offscreen::revision51_stair_arrival_tests::dead_creatures_on_stairs_do_not_revive_in_precise_or_aggregate_offscreen_simulation ... ok
+test offscreen::revision51_stair_arrival_tests::player_blocks_exit_but_arrivals_use_another_adjacent_square_in_both_directions ... ok
+test offscreen::revision51_stair_arrival_tests::source_approach_preserves_final_stair_action_without_ever_standing_on_stair ... ok
+test offscreen::revision51_stair_arrival_tests::stair_center_is_never_a_fallback_but_revision50_retains_it ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 463 filtered out; finished in 0.04s
+
+=== unique_composite_bow ===
+
+running 7 tests
+test unique_composite_bow::tests::forty_floor_and_event_streams_share_one_budget_and_are_deterministic ... ok
+test unique_composite_bow::tests::legacy_loot_rewards_ids_and_rng_remain_exact ... ok
+test unique_composite_bow::tests::mercuria_cannot_make_another_bow_after_the_existing_bow_is_gone ... ok
+test unique_composite_bow::tests::missing_marker_finds_all_stored_owners_without_removing_old_bows ... ok
+test unique_composite_bow::tests::debug_and_synthetic_deep_starts_share_the_dungeon_budget ... ok
+test unique_composite_bow::tests::pickup_drop_loss_save_and_future_keep_the_spawn_budget ... ok
+test unique_composite_bow::tests::normal_forty_floor_dungeon_has_one_bow_including_sphinx_prizes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 462 filtered out; finished in 8.01s
+
+=== equipment::generated_loot::revision51_tests ===
+
+running 6 tests
+test equipment::generated_loot::revision51_tests::primary_drops_replace_slots_have_unique_identities_and_exact_reproducible_counts ... ok
+test equipment::generated_loot::revision51_tests::primary_generated_worlds_place_exact_counts_safely_and_preserve_normal_accounting ... ok
+test equipment::generated_loot::revision51_tests::primary_policy_does_not_change_legacy_floor_items_ids_or_rng ... ok
+test equipment::generated_loot::revision51_tests::primary_policy_preserves_later_floor_algorithm_for_equal_incoming_bow_budget ... ok
+test equipment::generated_loot::revision51_tests::primary_schedule_has_two_potion_floors_and_all_twelve_seeded_permutations ... ok
+test equipment::generated_loot::revision51_tests::primary_generated_saves_seed_replays_and_debug_restarts_keep_the_same_items ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 463 filtered out; finished in 5.17s
+
+=== potion_darkness_projection ===
+
+running 1 test
+test vision::native_plane_tests::potion_darkness_projection_is_current_plane_only_and_read_only ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 468 filtered out; finished in 0.00s
+

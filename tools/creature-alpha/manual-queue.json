@@ -1,0 +1,1448 @@
+[
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "9d8fec5e8bb346701028f5611c93d90cf4e44ce04c8070510202496242422193",
+    "height": 1254,
+    "id": "banshee",
+    "legacy_rgba_sha256": "a4b27ac6c2fcf09b23877e09f8662dff98c0e39f680d8d02fd69003118520e33",
+    "legacy_webp_sha256": "bf5d7f5b302b67e63bd4f46535a5e3404764e760c2de4732d16d1a87e0c4e2ab",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/banshee.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/banshee.png",
+    "runtime_sha256": "dd69bf86c8d1c8942e6a7b53523e290e20588b5b5abe210340e94560e9d7e161",
+    "source_sha256": "1d88afc5a4c13b648f3faeed39375a17020647575a35c49f049d38e77be2f4c5",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "f97d58c07ac4f6c759761dbc900b1b496c8b4a4aa2c059f75e6d1ad5c829440e",
+    "height": 1254,
+    "id": "bastidion",
+    "legacy_rgba_sha256": "0501f42c1eb37723d2c6b6ee78445ddaaa573c502cdac1f568b31929fdf11883",
+    "legacy_webp_sha256": "55cb8fff662d7ead32731b2a425563216b99b0e8c34e673f6dae672bdf73accd",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/bastidion.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/bastidion.png",
+    "runtime_sha256": "28b8ef497c2581057abeac5c939ca74c58d143193c1ad68d2aaffda7b9e2ba13",
+    "source_sha256": "c8de304cbf0b37a62fe48b298409138dfd2a154d7ef80e46fbeb83b1132fb67e",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "c88c310e2de93d6ca5a61df5fea145a9fe70dd94ac4def4da10daddde8b36346",
+    "height": 1254,
+    "id": "bear",
+    "legacy_rgba_sha256": "ac79fa374e381b56ee9efa570979156c3a75c6a39198c884eb8c0fd2db279e46",
+    "legacy_webp_sha256": "22fab02d19ecb9b7762439d7eb527aa035662ffc530c501b32d384203eaf0959",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/bear.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/bear.png",
+    "runtime_sha256": "808d70f8970295210d470059bf42ef5a0521365ed37c091596eb09a283d57b8e",
+    "source_sha256": "0943b09f6e81c044aebd1d622785f2b799c9dc968233e890e6c64424daa24842",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "906811cb97e7cd73216d086fae1acb29eabaf22abe92d4e1406eb63e92a4c447",
+    "height": 1254,
+    "id": "blorb",
+    "legacy_rgba_sha256": "a4a9d076e57eb402fe4c5a31b9b8ac15f40e6d9caea274de962990d878752626",
+    "legacy_webp_sha256": "e373eaa007211b8777573291a404ab86fdfffb935797b2261283be8016d1c5ef",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/blorb.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/blorb.png",
+    "runtime_sha256": "ee435c1467570bb9e0a51a3e903c62a683302cbd828584ff3baf5417b630d7b6",
+    "source_sha256": "f09c7bb8f24661555b266ad0080f214ab4b691a89472ade5cad9ab222816d5c6",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "c715b6b1ba1ca96ce73d88d744f9d91b1529975e28bd2b055f365476b60cac42",
+    "height": 1254,
+    "id": "bombardier",
+    "legacy_rgba_sha256": "0a1e59996ebd31b463a0ba9362abeed6873389e19528f33b8f3c6ef19f0402a3",
+    "legacy_webp_sha256": "60296957b5eb0ebcb7286ae9af62b57f4d2cbc9116de802fd40d6d310a240ad8",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/bombardier.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/bombardier.png",
+    "runtime_sha256": "78bc152ef4af9a05b2d6d31e9ef03bd704c2cd64b90bdc1d0e1e960223bd8683",
+    "source_sha256": "cf8dbca32cb66775de858de1d5cd20a3eb75e19c2ce961ca1d27b9161d2e620a",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "747fa2220ff313c5f7c33e3935db20ff3998bc48e6de9cfc22d0f3c34c706215",
+    "height": 1254,
+    "id": "cancer",
+    "legacy_rgba_sha256": "ea7c2a4f16f3535b6e6be9f009d2b07bc1d335e53e21210ab9ed7e7e7c254f8f",
+    "legacy_webp_sha256": "f93a17dba39573ff28fa326696c0dd02473e89f1dfb070fb879581b9a7a63d89",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/cancer.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/cancer.png",
+    "runtime_sha256": "f8fec744ca14b35e44b3835bd196129107440e87bd0508ec6ee866abb8bf94f8",
+    "source_sha256": "124b8e446aec28eeef1d1c28161db9faea99e4fa82f6f10fa6ebd4f9ea6068aa",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "59a78f19c9d07b6b05d9992748d0019dede1106d2c9e7c50a5c4df7b30711237",
+    "height": 1254,
+    "id": "cave-bat",
+    "legacy_rgba_sha256": "bad6f030bc848b1ba3ecc368e1f982fb28be90ec37bc46329c24dbd01c613a0e",
+    "legacy_webp_sha256": "cf90dc8e56e44ea99f651669a7880da5dd719e71d8f9965d7f2f8adcbe6889dc",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/cave-bat.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/cave-bat.png",
+    "runtime_sha256": "419687eeb7c8434c6489127ce67b044e1b6f7e234a33354914e9abe842a792e2",
+    "source_sha256": "fa9f38a6b4a6662afd72bfe670935e8b0eba3e7a637c62405012c6efca1af611",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "e46a3bb813a97d10231fc2dc1c88495dee0d760e81218ccc925b7f0c583b4406",
+    "height": 1254,
+    "id": "chimera",
+    "legacy_rgba_sha256": "79e6e58b5a2b2a466f3c1254bc2a73d917738e39892e11498de3dc6eb05b7855",
+    "legacy_webp_sha256": "144207dafbdf1c58b16b30c475c254a65acc0fcfafc05c200814e314facd8ad5",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/chimera.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/chimera.png",
+    "runtime_sha256": "292eff520c9964cbf8f948f5025ba7e638bfae10a30963e7fd874d22661f3bc3",
+    "source_sha256": "bbdfa0a52a556e356da3f53151b96eae5f4608819d734b0fd79673ae47ff49a7",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "9ff60e826c11b67a00b2019cfcd31ea2450cee428f69ddb5425b4cd50de81f5b",
+    "height": 1254,
+    "id": "dire-bear",
+    "legacy_rgba_sha256": "ba3290aee04410806022edd6c7ba9f312af3478cf9905f234259c7343a45961d",
+    "legacy_webp_sha256": "c6d234bad6c441d5357f1a1a0b1bbdf3d6a96dda04c64070e93bc63b369ec329",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/dire-bear.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/dire-bear.png",
+    "runtime_sha256": "c743ae85b02946a4b1e10828ee8fb521dbdc42d00f94fa4265f12f020fd2ebb6",
+    "source_sha256": "b7d92d7e793cf98e68ac1d55d505371d815e2e30340a47420dfade398f0a5844",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "7786ed46069dea5f2b0a05e1d47caa8a3cc2b01697cdcb40e7b76cd89e913887",
+    "height": 1254,
+    "id": "dragon",
+    "legacy_rgba_sha256": "fc4c8055ca043729241040c3492d6366b79ca4bef039a4fe656c62948c51201b",
+    "legacy_webp_sha256": "fe11ae4c249d83e97843098626f651757a62bbd5887010e6f8aac500fbcc20ed",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/dragon.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/dragon.png",
+    "runtime_sha256": "4a46ffa5b1e84f2a5a2878761d2c6862344b6677efc749aa31b6c846434d49ac",
+    "source_sha256": "a4ad1da8d6dff0afeb9716392634119fa54450351e59f9af78ea00dee2e1cb5f",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "2681073e1a33bddd9c089b5aae248c7ba850c4dbba244eb190e202a350c61d5d",
+    "height": 1254,
+    "id": "dryad",
+    "legacy_rgba_sha256": "5d038d075b0a858be60d0641fcc761a31d64f9cf3ef43778acb4b7be633d3906",
+    "legacy_webp_sha256": "90cd49f5212e9b6bace84374b6c6fd7193adb037e79f975ebaab02377e9c24b1",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/dryad.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/dryad.png",
+    "runtime_sha256": "7cfdee03dea1e4320199d796a868254a84f3b30354fde247666550c0a4ffddb1",
+    "source_sha256": "b5740ed86dd2c45cac400a5a8e18fede503043e26af057d7a63b5440c76b50de",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "29224fb5a761de75fe54c6063f5adf4aec0a93f706bedf422b136802252d88d3",
+    "height": 1254,
+    "id": "giant-beetle",
+    "legacy_rgba_sha256": "63f1a59c4f7f65c082cdc164112af7c2f9790105a382c91bc940be46d6d67197",
+    "legacy_webp_sha256": "c18b702509c637f1a5cae93e68125611bcde81185151530624626a2b4c865dcf",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/giant-beetle.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/giant-beetle.png",
+    "runtime_sha256": "5cbb61b8006290ac808279026ba0864bfb8ec8ad9024e06782c5dc1e230899b3",
+    "source_sha256": "fd56c2f464a42b6fd578c43f438e0145cb48bcc3641599ad0b86f41e696ca713",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "febff89035fc910cbee94e34618c84747670a1884ee49957d56591e4a877fe8f",
+    "height": 1254,
+    "id": "glim",
+    "legacy_rgba_sha256": "919445d884f80e487f20f455ac9e9736d54a86f18b52a144f81c17b2102a865a",
+    "legacy_webp_sha256": "2410c9292a1250ee2c6495449532cdf17a0fe2c2d092eef1a355f7324d5d4e10",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/glim.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/glim.png",
+    "runtime_sha256": "bf897924c625f7664066122631f683c7040280cfa2a76c4fd92633dbc1bbf763",
+    "source_sha256": "d5f9f7a7fc934aee070733fbf6bc9a97844e9eb15b5301bd279593ece7ca642f",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "1421afbb76d16038ecbb734391a6b845c14266fd89f45a2837a3d439f8f2f888",
+    "height": 1254,
+    "id": "greater-ichor-fish",
+    "legacy_rgba_sha256": "8061969c079d9f21e326b89abaa2677ec1a89809406eb07265a9d3eed70a30ab",
+    "legacy_webp_sha256": "4768e62acbf8011432422593b9711ced439969d1715df3d7a724d49276aea050",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/greater-ichor-fish.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/greater-ichor-fish.png",
+    "runtime_sha256": "5d35197769a6cb661feb5a8e5dd74009b3d14ec6dad6ef4115d05ec93398134a",
+    "source_sha256": "fae17dece56f89bed1c4e1eca95bc1ba2e3906cb5f945ee6004342b9f9e0ba8e",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "153af4a02964d893ea0b8e860d5cae3533c4fe78c7676b22bd9bba7dfaf46dd0",
+    "height": 1254,
+    "id": "greater-ichor-leviathan",
+    "legacy_rgba_sha256": "294c7ef09b12906c23323df085acd318e11f9b39ab75f092f2e855383c95ecfa",
+    "legacy_webp_sha256": "27482d5f0bc14f56395f569fbb1890522c67f51646077ccbaeafbf0269077e8b",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/greater-ichor-leviathan.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/greater-ichor-leviathan.png",
+    "runtime_sha256": "9565f39be859260a6cb7d19d69593761d9c415b159074245ab5bef18093cea6b",
+    "source_sha256": "032019b4f84f5c415f76189bbdf3431b7e04dbc81878a4a12f880c337af4c353",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "9bd8d2015deb0a9091d4aedf14785e68c56b0ffa061775de36cdf21f9caf278b",
+    "height": 1254,
+    "id": "greater-ichor-shark",
+    "legacy_rgba_sha256": "eedd722b23b61ebe580ca9cbe0bca5b0175277cff9b91a8a81c86b5d63a78b81",
+    "legacy_webp_sha256": "e129381353f316362dd6cd6f9d6f44c5e54f5579a99debb258d647a2495b7701",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/greater-ichor-shark.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/greater-ichor-shark.png",
+    "runtime_sha256": "fdbef6dc71b2416e6052c3fc6732ce55961e0c14d39f1f963688269dcb160fe4",
+    "source_sha256": "39b69c653cf4e4fdd796a72ee4e4322c5e3615abac27895df1dba3ad6bc515c4",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "9312d37e7f365f300792eb405242bdbee4434d902ee52fc9c40ecf09c4e24985",
+    "height": 1254,
+    "id": "half-here",
+    "legacy_rgba_sha256": "aba7bc9551b568e5d44e2ec584a0df0c64c8e3081329039d09c5a85754f3f900",
+    "legacy_webp_sha256": "eebc567067a151c53f3d6a47bbd09425a3364215cbc8f927be749c099e2f2dd3",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/half-here.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/half-here.png",
+    "runtime_sha256": "0d9b18f5abf2d7da236195ab26518b3d76306fecda4ac081544de8fef32e615e",
+    "source_sha256": "5291808e11aa71dfc5f75594f4094e14643cc819c3c65e758e2082e0d121f900",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "e2566c2d26ba3bd7c3483c4307d47401acbcad08df91c274c2ee4c922bae4bb9",
+    "height": 1254,
+    "id": "hemogoblin-bloodmancer",
+    "legacy_rgba_sha256": "fe0c5e875b505ab058d170bc30b9e1c9ba9e1c8a9937fff528dfc7f35762d423",
+    "legacy_webp_sha256": "48ce274c197ad05d59da7b788173b76e24085126f4f455b708d83aa96d3f0140",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/hemogoblin-bloodmancer.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin-bloodmancer.png",
+    "runtime_sha256": "6181a82c0f6a11cc44bfac46af39ebb2123733745f2795b729ac9cbf74f51cbf",
+    "source_sha256": "7da17c2f99b886f453d7f29f21be531499204d2a74ae4b0dc8ec866b1150b1c8",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "c6f3a2107a37c7facd7160c259db504ef3c8c5cc46aa70ee176d7f3aee225dc7",
+    "height": 1254,
+    "id": "hemogoblin-inventor",
+    "legacy_rgba_sha256": "8e0e828ec5d5ec43702e3c04cb8499fe1a70d7e08f55e14a421a6057df33857b",
+    "legacy_webp_sha256": "76ce2197756662d951d47bde1b5433d0b030964872d9f7461e45eab4721bde86",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/hemogoblin-inventor.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin-inventor.png",
+    "runtime_sha256": "d76d0cc44d371242500739e1234c1b06f3dcdd836857ffa487837ec258cfedee",
+    "source_sha256": "703b186e27e3bfcbe7bfc3c30dbbb5bfd42002a72a7b4f39f72e167494af992a",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "5a9172112a889adc53e2fb346da6f48092a1e8145809fb396762233f83381c81",
+    "height": 1254,
+    "id": "hemogoblin-mech",
+    "legacy_rgba_sha256": "00a1602d6e936f279fb5309244a3a445999b846e23d6d4eee9822214fd7aeb9d",
+    "legacy_webp_sha256": "c750df0d042574e04e21e40c778b7a60b8641065d065fb48d5a7a1f8aaa58c0f",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/hemogoblin-mech.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin-mech.png",
+    "runtime_sha256": "142fe173da186529dc66ec2935e96829b153e36836034f3b9487ca7d9c1fd1be",
+    "source_sha256": "7a08a5669183750a721322a80eb978150990188904caa5bba20f8c6f48c795d0",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "56424be031b7cafc0368cdc39113a490b8b9ac616ce0f22075c0bbfbaa5bb3e0",
+    "height": 1254,
+    "id": "hemogoblin",
+    "legacy_rgba_sha256": "71c2317908439dd56b23f1d7aceeaa5bf60ab9e4b782cd0b6af11ac464818562",
+    "legacy_webp_sha256": "b9d61c2057facf05739da694cd0554dba0a10bbc8a9a2d8ee2fefb9ddc72cd18",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/hemogoblin.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin.png",
+    "runtime_sha256": "9dc61fb785482de327358e624328abf20ca06b98bc7dfe34c1f9d796380ef796",
+    "source_sha256": "2fd63f46cbf9f550319ec433ce2a53389c0b94a93f615426ea440f64daafa77e",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "approved",
+    "candidate_sha256": "aa409d303f616b9108f0709868bedbe01f27bdbbccebc0de75d5e006051cd575",
+    "height": 1254,
+    "id": "horn-1",
+    "legacy_rgba_sha256": null,
+    "legacy_webp_sha256": "4ac4a70b48e75be55b72f71bb3eed19ba4868ae0d4c2db5536ef5313bb2d8b3d",
+    "manual_queue_reasons": [
+      "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+      "Resolve lower-signal ambiguous edge pixels with artist-authored masking; no additional automatic dark deletion.",
+      "Threshold support protection is not semantic proof; residual matte/outline ambiguity remains."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/horn-1.png",
+    "reason": "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-1.png",
+    "runtime_sha256": "aa409d303f616b9108f0709868bedbe01f27bdbbccebc0de75d5e006051cd575",
+    "source_sha256": "6a5208c330f5642026d41119987f1cdd183a84ac1af57561879d37a8ed599cbb",
+    "status": "reviewed-partial-cleanup-needs-manual-edge-review",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "58c917b8a0ed4382179e3db2204169dcf6a3971e37ccdc72fe8e705df19bf00d",
+    "height": 1254,
+    "id": "horn-2",
+    "legacy_rgba_sha256": "3a4844d37779fa989c6b9c337eea0bd6e296d586866893119aee6fa9fdc99452",
+    "legacy_webp_sha256": "9b00ea74796041b552a37b053d0595b631fd0965dbe7b8502527f128b219120a",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/horn-2.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-2.png",
+    "runtime_sha256": "913d7c7da806db90a872c02a752d9488e5686c28122333b7b1e39dac28020a59",
+    "source_sha256": "2bd5da78733c3eab5a141b355b92d66192e136a66d2e2f05e4123394e9bae808",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "8f26b75a5e8e780d0bb70cfb6ee3a2884ce1b48de7c5fd05451467a5cb4ec503",
+    "height": 1254,
+    "id": "horn-3",
+    "legacy_rgba_sha256": "bc6d7b788cea8b1b67f3a7a3fd402f28b459d8ef1405aa71d790bb7986b3e0cd",
+    "legacy_webp_sha256": "caf92fa3a89303146a8a313831191bb37b69998c16c3a2b04eb2102cb43f056a",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/horn-3.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-3.png",
+    "runtime_sha256": "349280b82d3dacc64b78d7cabdf5fec8a4b34cee38ca04078d27d4c08b64becf",
+    "source_sha256": "d9dc3469e90133147e0d9de98af78f4582d8accaa0895f61a19f088a677a1cea",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "0c07f18acc952fefd74daf7ef1db72185179aab0d63538ee1f36c2dc01cd3a4a",
+    "height": 1254,
+    "id": "horn-4",
+    "legacy_rgba_sha256": "22f4b0d2805d0845b9c8a4cdb7bd55329690633d6c3e7550604d80705bdb0737",
+    "legacy_webp_sha256": "c13cfedbb655025eb1e97cc7b09742a5cf0647745c08f282ffca2520c83b8767",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/horn-4.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-4.png",
+    "runtime_sha256": "b6d5092016f9c2c74280203db596b5b51800a90baee66832cf41dab46beb7a90",
+    "source_sha256": "5da1f01c166b08d86994feff728f3aa119558d2267cdf76a9a7e3b051d968c80",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "380c3529759acbda20c86738d6172a18674bc76b763d72963e120f949310290c",
+    "height": 1254,
+    "id": "horn-5",
+    "legacy_rgba_sha256": "c450d46d3432cee652eff25b274a2853ab7f8ea813ee717472fd697429d2688a",
+    "legacy_webp_sha256": "868e1f549d11d46c06d20c49dde81d1d93d1c0b39415bd1323ed22baf0d9972d",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/horn-5.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-5.png",
+    "runtime_sha256": "deddcde45c62e276c5a2f23a17c099c38f4d4c09490710f2de6db8a5939b7f6e",
+    "source_sha256": "74f3df35d3f40001aa28c0cdb582ecfb62c639220c3576a039565d9d71d72905",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "rejected-needs-manual-mask",
+    "candidate_sha256": "295daa7df1d29e29011b5e6e5b04a169cbfa657fe857fb0cd6aa744677b18697",
+    "height": 1254,
+    "id": "horn-6",
+    "legacy_rgba_sha256": "42a310958c7af59fb6b0c311c78d943a149649d4fff7b145c8e532dd808f2fb8",
+    "legacy_webp_sha256": "6bee7c189a220a62110e92cfe38c091ee471191620cbf851d96b85b70706fe14",
+    "manual_queue_reasons": [
+      "Rejected: automatic candidate carves legitimate dark shoulder/foreleg joints and chest fur at x560\u2013770,y630\u2013890, right shoulder crease x900\u20131040,y650\u2013840, rear-left leg joint x180\u2013350,y800\u2013930. Keep exact frozen legacy RGBA; no threshold-based further cleanup."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/horn-6.png",
+    "reason": "Rejected: automatic candidate carves legitimate dark shoulder/foreleg joints and chest fur at x560\u2013770,y630\u2013890, right shoulder crease x900\u20131040,y650\u2013840, rear-left leg joint x180\u2013350,y800\u2013930. Keep exact frozen legacy RGBA; no threshold-based further cleanup.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-6.png",
+    "runtime_sha256": "3a766df288f579a82779eb4a99acf3bdcb3aa0c117bd5ab9b25703b4fadecbe0",
+    "source_sha256": "eae405bd1fd602e9d9f6d1918f159a72ed386e743aacf9b68b5d8cb4ba8231bb",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "446a1423979d17b73397be0bb6e1c9e00c9815b60a83cad30ceb7e76188a0762",
+    "height": 1254,
+    "id": "horn-7",
+    "legacy_rgba_sha256": "0e34d505be09326a897fa3dbd26020f3ac6c344145990fd3e25a2d7a5c95efde",
+    "legacy_webp_sha256": "df7ecaac864d1ec2d357e4e2dd4e2847e787edf50ce5eeeed79edaceb73eb4e5",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/horn-7.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-7.png",
+    "runtime_sha256": "053f5f32fb04e882cb58092c277041cce4bcadd619be03730e194aead23f04f9",
+    "source_sha256": "5d15a5a471be1f1f5ed2bd478d630b7be5d87bf860b1ad03864c97fac7cbd325",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "a5613aab78d5448ecbcdf2b43bb133493ac06e644294a3b85397897071db491e",
+    "height": 1254,
+    "id": "ichor-fish-standard",
+    "legacy_rgba_sha256": "413cd8e646e4a8111c1013d6e461b24d33c284f54dc8d214f23f2622b9e60902",
+    "legacy_webp_sha256": "6503d576c8fcb0e357f0340ee2503288326461a7a393ab089d828dcb23d79724",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/ichor-fish-standard.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/ichor-fish-standard.png",
+    "runtime_sha256": "149254d89b5a7342659ebc38aa77fcd6f60c3b7c09280c4ac5f9ec331d126a2e",
+    "source_sha256": "e485399eae0427d4f29902edbfcdb559298a6ca1d35903c451d533a995a72de5",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "46e8a699edf2430d5df12611bd48e983748c51f262682fe7aa94d6ae2bd25f1f",
+    "height": 1254,
+    "id": "ichor-leviathan",
+    "legacy_rgba_sha256": "d8739da069b8403267191ffa045e66296eee78f957aed0bd28c85edf1bc88be5",
+    "legacy_webp_sha256": "ef75d30f0de294025ded3a95976e7431ee2a2a8631d82447c9314a13a009296b",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/ichor-leviathan.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/ichor-leviathan.png",
+    "runtime_sha256": "e1b00050c58ba51966cdb76e49d6cd29909569ad67d4c288b8956b5f0c0cbd92",
+    "source_sha256": "8c3467b2c03dfd2496c379e4dd860d63a5eda95e5448e0680a780f62fe93e3c1",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "696a87961daf8a543d34fd58319c78e23b7cde023d0f3eefadec587d049b23c0",
+    "height": 1254,
+    "id": "ichor-shark",
+    "legacy_rgba_sha256": "1f64b1c6999fc7fda1a07192999b51cfaf9af934ce20ebff7640855e1408697d",
+    "legacy_webp_sha256": "d26087afa57cced8df34103f9366f37eef03a426206edfbd0688f96761ec7beb",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/ichor-shark.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/ichor-shark.png",
+    "runtime_sha256": "84feca277cb6c2c8d480720d7a33442b4376d41a7ae09d186629176868bf531c",
+    "source_sha256": "6681d0274df207bc6a598e25f74540f774c02d0763c98bdb8c03f0338c480752",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "da39814fbfade7f1f8429b59238aeb5f0e5a27106fce03992c6024fbb107d9bd",
+    "height": 1254,
+    "id": "kelpie",
+    "legacy_rgba_sha256": "07b0e48c158761254788288602b30431450e00ccb24899d5a9a5a92cbd56aba5",
+    "legacy_webp_sha256": "93d45d76fe70e06a0d80191100b7f2369289f92c473f5b79faf3ef811028be7e",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/kelpie.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/kelpie.png",
+    "runtime_sha256": "f423720993c3bc813d1d1751766a262a70f704a76960b4d88ab0a962c2c40ef0",
+    "source_sha256": "eddba987094af67cd2cecfd33c44fc317546901f588adb32eeab384e74cceb34",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "d27efa3ec9d6ad78a9af50199fdefc6c7b6d108f74a76445557e469e81971437",
+    "height": 1254,
+    "id": "killspawn",
+    "legacy_rgba_sha256": "ef0a864de62daaeff488910cc908c024ed54dad37a6bf1b7760174af71cd6e1c",
+    "legacy_webp_sha256": "a66879576dfd99e5c73a22b01d5dc9a029a7c5c8e1a1ffef79bfe1e4fabc7e6f",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/killspawn.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/killspawn.png",
+    "runtime_sha256": "b21857e76374f348da281d0d368be16ec432d135668a7bbb90a2bf3ecfef7138",
+    "source_sha256": "9f120e11275f9a00505bf229429d99bd0a2fdb48a17825c465e1027cc8a5c3bf",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "b46a2fdfa39a454fdc8e17cbaff073817d48e9583ae531df55487786c51c7371",
+    "height": 1254,
+    "id": "lesser-ichor-fish",
+    "legacy_rgba_sha256": "21a2b18d09a4f2370ab6d14539371e2c61d7fb77da7a8ad6a58970eac2b39feb",
+    "legacy_webp_sha256": "aeefac5df21664f9e72918f0de15d5d4d18da9e0fff675d7f628eed6cbc4a888",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/lesser-ichor-fish.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/lesser-ichor-fish.png",
+    "runtime_sha256": "04125d551014d841e6566727d9e8c3a93f6f5b855122beb047c122d1cf85ed2d",
+    "source_sha256": "6f939a449dc9a1170d40c0e3b99da68a0b6fc39bb1b9f67f662de6034c32fd34",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "e1ecd4eeab9054e6d65949aba34b7154673dbece589d5733caaba8f204307b48",
+    "height": 1254,
+    "id": "lesser-ichor-leviathan",
+    "legacy_rgba_sha256": "8704f44269e0851021ae640a933a40d940e52a73f835a8c2d048e9b51e4db22c",
+    "legacy_webp_sha256": "b31d98e463284e4a961e6aef607fa6f1a5afae371505dd563cec1fcb1ed368a7",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/lesser-ichor-leviathan.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/lesser-ichor-leviathan.png",
+    "runtime_sha256": "3e7c97e202d300601207c9254cb9bfb2c40b9801f43d541d71b4908d3745fd3a",
+    "source_sha256": "1e77935d17239a2e78193346c5c95112d8af16664e0169a16d03bafb75202cb7",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "b950244d9eb2ba0a670a4febef5fb85c8a88f625b125850817f2cc765c29cd14",
+    "height": 1254,
+    "id": "lesser-ichor-shark",
+    "legacy_rgba_sha256": "7b5c8b8f400100a02e246ba0f906f5fd948b4f95e0cd978ac4d2f3bf910240d3",
+    "legacy_webp_sha256": "9c78f601222371600a49ebb30eda8ae8535742460bb41cf14e53653c0c17cc39",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/lesser-ichor-shark.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/lesser-ichor-shark.png",
+    "runtime_sha256": "f967059bc260aa7638830a70a30c76a4222ffdd2b669be1e2ea50a7880f5abb3",
+    "source_sha256": "dd19dc95c4a4625bbaa56afbb823716725f0d321fa7017a6159950ae8080dd03",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "24f7652a75276f74cd0331a8c7ba5da2deadb94d64865a6921b3286bbaeb2e89",
+    "height": 1254,
+    "id": "long-saidri",
+    "legacy_rgba_sha256": "92efc927d486f43308f9ea808eaa2cba5edfac2d9972bf90f51653ba6cb80e4a",
+    "legacy_webp_sha256": "a69459191eb6e32c791f396152c93c27008eac36f6f85858e4d6f2b4e4da27f0",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/long-saidri.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/long-saidri.png",
+    "runtime_sha256": "e4dd517169f1c6b10d96788eb5464044b1d123cecc9b4e63d023b73ee5b4ddc3",
+    "source_sha256": "50e71c43d290f69d37982bda38e7991e7b481b4b86e318141901a01756f4edf2",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "6c743032409945433dc1fc7116173046141f558a503d419a84a688174ec21eb2",
+    "height": 1254,
+    "id": "maulchild",
+    "legacy_rgba_sha256": "6f12d9738f55e1ad3cdc94387c0b2375c0e6671bcb5505894afd97d9b5a8e8d4",
+    "legacy_webp_sha256": "61f4e56a94daa010fd09dbf3a023c07f4d6b1217e17144cbc6ca2fc3d00c4e85",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/maulchild.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/maulchild.png",
+    "runtime_sha256": "01ca35ab2565777dbc7ac46da2c176b9f1bbf518c7f934a80b5d38e8d00f1b6e",
+    "source_sha256": "81e6d8244fb499bff2f29cc9a7427946dbd63e5ef6c948219b01031e1c7c9317",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "664fa2ab2c93665d12da22d05a9474fa5aa8c8dc9eb12dec8880f599636f375b",
+    "height": 1254,
+    "id": "mini-me",
+    "legacy_rgba_sha256": "f956636c77135a07d216f7ddde5089e313aba2a4387000d25a23f6155d716d74",
+    "legacy_webp_sha256": "9d55c86174fa425a2f1d9c6e18f4c3d82a0beb0f4fa006de178509e0bbbacd17",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/mini-me.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/mini-me.png",
+    "runtime_sha256": "c81d64a28afb70bca59b89540436cac697ed2d4fe5258e67410292bc7c3f0f03",
+    "source_sha256": "8c179a0bfc970bdedb3cd93eb49fd77c0690f5dab77c956e9ddfc88c61972666",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "c7ca3171565bcecc06edb33e90e2310aaab545dd8295b0fbe68658c89de0baa9",
+    "height": 1254,
+    "id": "minotaur",
+    "legacy_rgba_sha256": "839dd14bdeb4ad592337130dd41324113dfc0fade753d92ec536cb55ec018ab1",
+    "legacy_webp_sha256": "f59e298dc951c38a8b9fa210282ac35a6e6317f5b94f48ba909e79a1e478bae3",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/minotaur.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/minotaur.png",
+    "runtime_sha256": "27bdd6d5c5bde2a351b73b979dc8c9b8dbe1373c7104fd4b10f77eeb951e56ce",
+    "source_sha256": "9641f639efe1fee87a63bf690e6bb31c4fe54d01a5e149064b9930adf986d5c2",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "1cdedc4384f42db42359a2883fa0bddb30a33189add9bcfccf5d774701e824af",
+    "height": 1254,
+    "id": "moonspawn",
+    "legacy_rgba_sha256": "31f4d90890494958ccab784780d05bfc23edc4087b111a1c9dbe7a7540403341",
+    "legacy_webp_sha256": "020aebbcb1b9147036237bdb1ace6fbb27c14cea3389382a4c298eab112564a9",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/moonspawn.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/moonspawn.png",
+    "runtime_sha256": "6b8b91a7efe10afdc1ece355c1ceea9feb88c4f5c9261854be0b83b4bdf305d4",
+    "source_sha256": "1086036ddeb85e888a238959611ef0cdb0aa80c817a8853e7fa7c9f4e12b8a11",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "c7520998b43dbec052cad1e74309f12992a9062e55602ecd619623f4aa5151b7",
+    "height": 1254,
+    "id": "needleling",
+    "legacy_rgba_sha256": "29b5ea344c17e26c089b94fd79aeef5cb97ea2a26a100e2abcd60c9e4cb7264a",
+    "legacy_webp_sha256": "bffa556efbd43ef6fab34876d2c8b4b413873eae612d857a16fbbf610ca774ca",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/needleling.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/needleling.png",
+    "runtime_sha256": "74308dda6c3fc5895c03ae299a485c39f57dd70c013efd30f545254cc30650ff",
+    "source_sha256": "bb39b6fa4694220c2c46563abd796fb882975af598e227255044bee284262e1c",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "af7f76a3b021e9912f74700c3ef739dc7244ecb1b98f29ec1c8cf46afb6f191c",
+    "height": 1254,
+    "id": "pale-birther",
+    "legacy_rgba_sha256": "5f072de9f2e52a83f9d78f916058b24140379ad07dd9d2d20447ee5c952df313",
+    "legacy_webp_sha256": "0d568b80801fb589a93924034af9a9a81bedc248d324fe43a391870bb222dc63",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-birther.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-birther.png",
+    "runtime_sha256": "6797e3bec63ebce8c6e96deca2ae6d9eb7df2edbafeb37df1ad98add883223ee",
+    "source_sha256": "929544b55a028d636e22d34382ee8145f7c327680a9e08ef1374358e5cff9fe5",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "97cfe914aa13d3dedd2ab3915e90a1495aaa530796a86b614aa9111f5ce43e2e",
+    "height": 1254,
+    "id": "pale-biter",
+    "legacy_rgba_sha256": "f1d537226f7e554c607ad03f4e3ed0b76ce6517b0046b6bab3875ec241e0c41a",
+    "legacy_webp_sha256": "f9c90447731b2db84acb6a066044760a69854188bd08f64ec046059d8118cf83",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-biter.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-biter.png",
+    "runtime_sha256": "c51c55cd5fd5896307ca93e9b83b72875b1f4c9657e1fcebb30a9a273952f242",
+    "source_sha256": "17faa85f4d1dc3df2b52e06be9a1a0083e295cf01c7bd5aed5597f3a9c07ab35",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "c3b57c16ee8ee43292eefab26ca4dfded237dbc6f50d368c554974728c3ac616",
+    "height": 1254,
+    "id": "pale-breather",
+    "legacy_rgba_sha256": "c4ad1cc8870ab10d7f698f42ea728a14ad6463b4b0c58b500723c77fd63b77e5",
+    "legacy_webp_sha256": "716ea460a6ef75bb9dfe107f570fdb7ea80c2246fb9be31dff298c820eeb472c",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-breather.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-breather.png",
+    "runtime_sha256": "3bbd1fd88b645f825148ecf7ff5257728f735087602024262c6602de1cdf1695",
+    "source_sha256": "686eefe4fcd4f1ec30c62ab5e8a69b0ad1592f64ce722864f3d3a4cd22774ddd",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "4d90ddde6cf034629c2eb44e7c8a1e30468af090bd9978b2b974b8d1bd853e16",
+    "height": 1254,
+    "id": "pale-greater-birther",
+    "legacy_rgba_sha256": "3797f2e60b8ad71eeb9ba6eaa940a2e4917ce20f34971b3cb9baf4b10ec45fc8",
+    "legacy_webp_sha256": "db480403222729fcab60e87275e7e2064bfa6fd93082df8ea4518b08f3c21c2a",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-greater-birther.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-birther.png",
+    "runtime_sha256": "46e62b54c291390f1f9be97e37010dcdc02a7b1e9429b0bb167d34139e7877f5",
+    "source_sha256": "2cfb092ac220c0916c757eed043ca8da8278fbb33ea2c878ee3e5498d5eb4cb4",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "33b2769d4e667ab6607e52ee3f690371611aeb300547acc66f164f1caa325310",
+    "height": 1254,
+    "id": "pale-greater-biter",
+    "legacy_rgba_sha256": "2a17cf3b848d2eb6a5b725b4ac0e4a0e470201780fe98e502bf6ce32b631c8cc",
+    "legacy_webp_sha256": "ca05452a5bcd476231502fcb96d66e3a001538254ea519cd67ffbb4d463f920a",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-greater-biter.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-biter.png",
+    "runtime_sha256": "ed7c29c40db3a5e1cf9dbb44e5161197e9172d9b2e34beac63f4bb1bdd0dfdb7",
+    "source_sha256": "52a8071724f4fb0a08f1b142fb51e893358c4a8821bd5544793b799548f78f37",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "6591529c1ec91835595246c7114311637043e44072bf2888b248099b4492a828",
+    "height": 1254,
+    "id": "pale-greater-breather",
+    "legacy_rgba_sha256": "35dbaa2ca793a7c39d04d0d71127c1b54b81834828447a619695b71281e2b7af",
+    "legacy_webp_sha256": "6bdc1bee1024e28891de0e26c1e5d9a26bbd126899226b13fd76c266cf5aa80c",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-greater-breather.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-breather.png",
+    "runtime_sha256": "93a3206a178519f5a546e3f3dffa77cc157d366e79f0f0573597c14c0421708a",
+    "source_sha256": "58f69e18540cfc7d241e3cda72783ced927a3caf00152b9091aae13cb1ec6ef6",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "d376d6b911485c69aa5e9d99fc565dca1a41294e0d684f986621f0253e583fc7",
+    "height": 1254,
+    "id": "pale-greater-screamer",
+    "legacy_rgba_sha256": "d8ec2b5ba812815cde54fadbe2145909e399d7dd21d59712376be8e09b6eddf9",
+    "legacy_webp_sha256": "63dc867065d24c18af08122087531ee396eff5f6a784851f8e8cda28aac1e3b2",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-greater-screamer.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-screamer.png",
+    "runtime_sha256": "1c2d5e256359c047c68ad56f9c2479337a0843b6d7610cad6d9286cd01c465b1",
+    "source_sha256": "5f0d94bd77c257fe422cd3b461d5cc4b2d5faf265e75bb9df479ccb16dce2100",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "b48380b43f65a91d840343f095aff673219f3112d8f1d0871bdafaad00729fd5",
+    "height": 1254,
+    "id": "pale-greater-spitter",
+    "legacy_rgba_sha256": "1263fa6698b5489cc9ca2830e17ddd3dcbe0af564dcb4ee9daf90a2c9241c20b",
+    "legacy_webp_sha256": "701375cf4c60b3e349a3367e493cc2b0f148669ed8a4e9ad7f8cd2b082589b6e",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-greater-spitter.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-spitter.png",
+    "runtime_sha256": "783430e3d4111686a0ae3fb7f45db668478a164ef62adc0ab62d659e5830ac87",
+    "source_sha256": "8048659529595a77aa7fb79b58451bc6d44dbafa06c97e8b5000f737b18e7624",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "d414fe27032cf15d1d90b9b1ccf503eb24ba151aac471a3b181adc9f054b5642",
+    "height": 1536,
+    "id": "pale-jackal",
+    "legacy_rgba_sha256": "7b9e1c3d0250a561c43db0dca381da7a34a7a2af97b72c40a4975283f6651a3f",
+    "legacy_webp_sha256": "cfb3e4bfd31eafa12451daac23c5342dc469ae7312a42bbd7d0c2bce1453bc7d",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-jackal.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-jackal.png",
+    "runtime_sha256": "a23a65f63f1ed57fc9cc242ee03487bcbce184dd20e6cf0cbf0fb865f721db5a",
+    "source_sha256": "1569576d02fa350f98c1d1453012090f878362f66a17f689797487fb52fbe412",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1024
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "f5e5d0cb122957dc3e936bd0e4a37daaac0090dd545396b77d1a5b266d1b06d6",
+    "height": 1254,
+    "id": "pale-screamer",
+    "legacy_rgba_sha256": "ab06f034ae0dd050dc6bb1ae681211a92f2804227b88346d6516d0509db11069",
+    "legacy_webp_sha256": "819d52bf44baf4bbd4720f0b700da37c4f3580785a0b4b1106b746e5bb3052a3",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-screamer.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-screamer.png",
+    "runtime_sha256": "104097012e5836a692a22762dd7ae66a04032a7fb633f28447cc830624453794",
+    "source_sha256": "5e6811ab48bcc4463a62200b2070bb16bccb3d2092ff611321fcc7638c64129a",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "9bd0e9fff285405d131dc93e2ad4c8f126e623137af912c28011bf158cac73da",
+    "height": 1254,
+    "id": "pale-spitter",
+    "legacy_rgba_sha256": "8495262c49422b5c611a9976c9b71d72b56ad4266d0b7e7303cc16f51cf0f899",
+    "legacy_webp_sha256": "ca6081b4cf87bddc0a53341b102264c2233ac575b3bab356bc746ff2d77891b8",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/pale-spitter.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/pale-spitter.png",
+    "runtime_sha256": "9cd1de6ac1829ae5a213069e827a4fd7de9ebbddc1c5afe6a44162e6a32154b5",
+    "source_sha256": "cc1e12b9dcca7682411b818a343db347f6b9998a0f244ff747c10d96e73a5419",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "approved",
+    "candidate_sha256": "fa382d5c7b3c98c0a3d9cd2ea042164e669415eda2673c555edb456fc3c15638",
+    "height": 1254,
+    "id": "phoenix",
+    "legacy_rgba_sha256": null,
+    "legacy_webp_sha256": "ab07d5a284bcc5231a12e6f9bbfca026614a14408e35806309a9643a40fc66f3",
+    "manual_queue_reasons": [
+      "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+      "Resolve lower-signal ambiguous edge pixels with artist-authored masking; no additional automatic dark deletion.",
+      "Threshold support protection is not semantic proof; residual matte/outline ambiguity remains."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/phoenix.png",
+    "reason": "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/phoenix.png",
+    "runtime_sha256": "fa382d5c7b3c98c0a3d9cd2ea042164e669415eda2673c555edb456fc3c15638",
+    "source_sha256": "1e3d99f86e0cbdb0c5f9f5d7267e0ae86caf22056967be31f97e501fc15f4eff",
+    "status": "reviewed-partial-cleanup-needs-manual-edge-review",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "7da468defd733ab8a1858255383cef584aebda4e241349b9fcbc889c9c95c2a8",
+    "height": 1024,
+    "id": "rat",
+    "legacy_rgba_sha256": "93422fe9e085d645ac50f99e7f5816010521e9ef7ced5e9b84a9868a5edfdc7a",
+    "legacy_webp_sha256": "6d46902774476529c334c13fa50668529bd0d0a5e07c6b54fe3f2c66a1c24b4f",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/rat.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/rat.png",
+    "runtime_sha256": "e2a7f0e98c442da31c62c407e5c4afa0c95239abc33385dfdb1665465e54b32c",
+    "source_sha256": "dcf105538b242140599ff10fe12cfc392f2d5549f69d09d12db88a4db6f4f3fb",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1536
+  },
+  {
+    "candidate_review_status": "approved",
+    "candidate_sha256": "5a10de8cca54f28fa31822e9c330e62f8aeda32b9449a896875f5296b21bf30c",
+    "height": 1024,
+    "id": "river-drake",
+    "legacy_rgba_sha256": null,
+    "legacy_webp_sha256": "81ba79f43b71fa25324cc226f5f6b99fb6008789f52af2053f1448a9499b76f2",
+    "manual_queue_reasons": [
+      "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+      "Resolve lower-signal ambiguous edge pixels with artist-authored masking; no additional automatic dark deletion.",
+      "Threshold support protection is not semantic proof; residual matte/outline ambiguity remains."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/river-drake.png",
+    "reason": "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/river-drake.png",
+    "runtime_sha256": "5a10de8cca54f28fa31822e9c330e62f8aeda32b9449a896875f5296b21bf30c",
+    "source_sha256": "348b528e4381d76a0d3603cd4c92615ef11f6b3c7fc435d897cadc43874fa8f4",
+    "status": "reviewed-partial-cleanup-needs-manual-edge-review",
+    "width": 1536
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "77d24f11c58b9b8d3d1881f1f912abd13bad9e05b6d62919c4453e07cd5b039c",
+    "height": 1254,
+    "id": "sabretooth",
+    "legacy_rgba_sha256": "615c160ccdfadd1eb7efefa2b6c8fb07328b435fe8e030a51476612ddf42bf01",
+    "legacy_webp_sha256": "5d09f037b39ac950c1b274bed7ecfa05683cba03401cd034a15c47595f4beacd",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/sabretooth.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/sabretooth.png",
+    "runtime_sha256": "99c7d82d14bae8148779be134a3b7fe5d9f859f6756bd11780253eb042f75606",
+    "source_sha256": "fff1fc94dce2f91dc5a2f34ea4818026be71bf1d9c8987b4b2422bc5987efc07",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "84654045dd7885944f15c6c03a5122a905e00c54e3481018109a9cc0193fe6ba",
+    "height": 1254,
+    "id": "saidri-guardian",
+    "legacy_rgba_sha256": "89d90d9c149fbe3b20a48c777d4decbdbc9dbde13031e289fc847e00613454c9",
+    "legacy_webp_sha256": "6a0fdf368534f4ba2ee190279ffe6067fb58a0a1444834d70a69fa329d224e56",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/saidri-guardian.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/saidri-guardian.png",
+    "runtime_sha256": "5e8956b95bdd30c9dc8a59c276c8addd73cebe1fc7975228819506cffa09af72",
+    "source_sha256": "ea494a156e3fd9ccacd47f0920e685d1a5a015f2aebfbb3a8a148d9595ed3fca",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "b5d7aee22574208cfdf1ce61b169ccdac869c54e1f4cb3e1bb8c0bcb85de163a",
+    "height": 1254,
+    "id": "samara",
+    "legacy_rgba_sha256": "c07d21791168bef2b71e7ae5d769fb28bc2f5613c755a71bd6bda0db1cacbdc3",
+    "legacy_webp_sha256": "e27d31b22369f28f1be159d0392285990e6bd8479e4f5c5c3bee8c7742bcb4d3",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/samara.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/samara.png",
+    "runtime_sha256": "53d2cf44d254f06d5c15731ce0c8c2590c53a75be918a85b9f1e75985288b26f",
+    "source_sha256": "0cde43db8c95b460fa3db78ed1af94140cf4f0a16fbd3b50f6fce8f10575729e",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "e6b7e3bc6fb06adecb791162548593d89228cdbe04330fe4176e2566db528a14",
+    "height": 1254,
+    "id": "shellback-beetle",
+    "legacy_rgba_sha256": "3185043bcb1cec2cb1edca5e5775d0759b5800338f3600e1e2b441d9f20a3b0d",
+    "legacy_webp_sha256": "899b0a234e6cc0ed6dea6dad0ef8fea78dbae6b2ecd834fa8679874e57bc0386",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/shellback-beetle.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/shellback-beetle.png",
+    "runtime_sha256": "1a0fb92804bfd69756f5e80f88c58c6cff6aa60de54be148a97365ca66616396",
+    "source_sha256": "aa3f247743ba2fcd985611abd3302ef4c580375d224f3310f657672ebca934f2",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "ff818dadd39d66c6517ba21173bf88b7e8359ec59f366bf11213e85e1c2604e4",
+    "height": 1254,
+    "id": "short-saidri",
+    "legacy_rgba_sha256": "1e8e76d6cc561fa9139b8e78d6b929930db0780bbf51e8b5b417ea449e45258e",
+    "legacy_webp_sha256": "c7a4ccfdc820bb77ddef4936f553bb5533ce0a6308ce6fb4fe45917e6acdfe7e",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/short-saidri.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/short-saidri.png",
+    "runtime_sha256": "24aa1da6c4e68dc4f6d70689b4abb82c0249cbc5599af205f10d33e9c3684385",
+    "source_sha256": "6a22c9b9f42946ca06fa560e1d49efaea5e75cad998fa41843989b46eb3870af",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "2fce3e3466b07a3bbb7f5b7e878156647cf80088391eb46d23da025a5e7e5d78",
+    "height": 1254,
+    "id": "sphinx",
+    "legacy_rgba_sha256": "241c822e14ea262904c1a2267e99130dd550ebca2ea05fbf6973dd50a403a845",
+    "legacy_webp_sha256": "7ad86803dad98dbd281c001dcc14d840d6696d368229a25f22ac5f92a888fca6",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/sphinx.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/sphinx.png",
+    "runtime_sha256": "9cc169391812e9b905c69c6ffffe5993025238c7a7f37b7b192ca3b27dece6f2",
+    "source_sha256": "edf5de40d87499a91be7e25768ea58dd4bcfd3d8d33ce432299e66601570b64b",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "a4e0879fa78f770d5945727a2639dcad849928ba2af7e30574e6b7da741a9001",
+    "height": 1254,
+    "id": "tiger",
+    "legacy_rgba_sha256": "7e86e5e0061874f8c4bd3a600e4bc0f023b630f5b3ab005bc4cc33611b9dfcf6",
+    "legacy_webp_sha256": "fece22f5cacff650a94b15401d6bdf56c84cc706b4458f3351f3f688f76eca7d",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/tiger.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/tiger.png",
+    "runtime_sha256": "522a9cdbe8b1faa2206882b400101f0887ae539d4a19e32ad578b2d09951ad06",
+    "source_sha256": "af13ad68d27c71e12ae4625a13859df94f38faed233f5d7bbde6e3c06c4c6987",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "389058b4f12afd71e84ebf0d2e5a0be2e2aabe7ed1607f37930198a42d5a58f4",
+    "height": 1254,
+    "id": "troll",
+    "legacy_rgba_sha256": "7168a2910f0655e3cc98c3c74f8b7b37bd79bbc2cccda143a71a2b4f47be96f4",
+    "legacy_webp_sha256": "457df49fb5fe2989e893eae1affa91f9809f25d6f4195c029640f25bbcbf1d00",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/troll.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/troll.png",
+    "runtime_sha256": "d52d29b7161ab49271f4228ae0a0c00002cd2ba08d20e6f4e4c8d55e1206056e",
+    "source_sha256": "a0d8a4ae1dde0e985d0b45bba39b5769ddf6bae51456c752c8d73f810a05e3b5",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "56357c40580bea80148b35f326e3b3d3a6f3dfa9a00436b8319fd490b4bdb25d",
+    "height": 1254,
+    "id": "ursa-major",
+    "legacy_rgba_sha256": "099f73e70af91d44d5b09b8307eb5488d8b22fd5019fe7c96bc5cd45070d0d01",
+    "legacy_webp_sha256": "46dbe170455d09b608421b44f3a191c842c50545a0e341a790494ae776674cf1",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/ursa-major.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/ursa-major.png",
+    "runtime_sha256": "812ab6331549d96be124c907a593da505ea047e2c64708255cca111401d8345b",
+    "source_sha256": "20f33c5c53af2c24d88df57ba2ebbdbf6eec96f5e945eb0ec62cde6a2cca2307",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "602573dea2e83ebbac262b30aedc4d86ee395431c20c2f9fd97e45163a4d953d",
+    "height": 1254,
+    "id": "ursa-minor",
+    "legacy_rgba_sha256": "c53462a89cc38444dc068a8966362b055c2d4061259738043f5e4d17d950b2fe",
+    "legacy_webp_sha256": "ac927c56b1ce805cc7d6dc880dbc5e1249a555f820a3a519fd4ab0382bd62d46",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/ursa-minor.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/ursa-minor.png",
+    "runtime_sha256": "a65fdbf8544aebf26eb7e0c9fd0520d1c628801d5ec1c69897625c1d2fe38e6a",
+    "source_sha256": "45e4725345b9db674fb5e11cefbf67e08e0241490baeca3013d13ee298646462",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "51925319caf97604c20de64ad7d80dca2290ab536357459db7dedc4cd60f83b4",
+    "height": 1254,
+    "id": "valta",
+    "legacy_rgba_sha256": "1f0b494b922c2299af9b0b963d69f8b65e4c0447cac42a1d167b48c4756a24d0",
+    "legacy_webp_sha256": "5d7b494de87ca40e185f63a8c8ac4407f7ec13708bc412db6c356a0e5bb38641",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/valta.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/valta.png",
+    "runtime_sha256": "45460090fd632c6ca93a1ef5693bad67f365f7ba93105a1637ceec5dbe97c047",
+    "source_sha256": "1847b38a5892ae3ae880e3eb10ad8027897520706079a6e58ca966ca33754a4b",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "4b41ad35e9254e7bb85f119b856dbaa96d8024081ea53de72d88e1a20baad6e5",
+    "height": 1254,
+    "id": "wendigo",
+    "legacy_rgba_sha256": "909c32604ddbf39aee2171e9a5017fbc0bf70a8b73488f5c7fb152f13124be55",
+    "legacy_webp_sha256": "06c8416ed7a1588e15bb7b1fea7db9942db3c1c7dd8533cdb5d5a6ee0f06d576",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/wendigo.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/wendigo.png",
+    "runtime_sha256": "91f496b55ce8becc504178e0685d8b4113433442b790b2f576d80b620da0aa3b",
+    "source_sha256": "b34810201b6421e83e6e924fa89c3e4ce23d868687b9afcd083ea7b9c6cec1d4",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "9646405c87f0dd88b2f82661bac08662460fcaff45381d5225a0ca261a715e1e",
+    "height": 1254,
+    "id": "witch",
+    "legacy_rgba_sha256": "61541379f8913c71dc1e4e6b457a20e01fc8057dfad0eb3b804d1b04a405b7f2",
+    "legacy_webp_sha256": "aec51ea8451ab3ba647943208c293d55c9360ee72db93aee6b29f0d1ff32a05b",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/witch.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/witch.png",
+    "runtime_sha256": "590b9df3bb45624000b72b45c7283bedd45b518bdd6ca2be328df108b5e16a0a",
+    "source_sha256": "88c4037f5c2bd9f0217e8236129578dbe123bc6c90ddba4949b4fe375c875d8c",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "aed26ffe1be536e64d89a924e2f0d43725db780c84ab3648c310d5348d280c9e",
+    "height": 1254,
+    "id": "yeti",
+    "legacy_rgba_sha256": "7b041f5452b44f950a40121995a3743a5411631faf465906c59d3e62a855892e",
+    "legacy_webp_sha256": "83be3d826a971152656cec93d011bf43e0101c640024375453cec45b990d8dd9",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/yeti.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/yeti.png",
+    "runtime_sha256": "ed8de2efe394c985b790b33dcba86b2511971935827f18a509520ea8d35452f1",
+    "source_sha256": "ead86b355ee0f9ab16247bbb5ea8dcf0870f229b6daf506d4dc322229b154120",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "5009b36068782a14f41c6baca31143332e1b27124f330ed124cb5e68537f05a3",
+    "height": 1254,
+    "id": "zillennia-ancient",
+    "legacy_rgba_sha256": "27fd1af18807e89d78dcbfbc3fc2aec448c18fde46e9553565f23cbc14ef6e11",
+    "legacy_webp_sha256": "e223a4d2686dcab541eb29822542a7763a066ee7a6c66755d1dd1322d64e48fe",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-ancient.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-ancient.png",
+    "runtime_sha256": "5134234ee8d355dce59c1f25404486cfeb8320dc0336d6d5cda11736584f8c5a",
+    "source_sha256": "5ffbf7feee145bdbfe7642591a64d121aef79dc6e6c3f72afcff493317a5ea03",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "8c26a50216a43d226d41b50c800828a0ba2874c97d088e65c7763b5c02fa5207",
+    "height": 1254,
+    "id": "zillennia-child",
+    "legacy_rgba_sha256": "5f115aed82fd6bc9673c448635b9948ad44b22507b1caddf2bf67212356a647c",
+    "legacy_webp_sha256": "e999c7f490be649869113a92eb209b1dc81af5e49f7c131f533b6ec91f5b532d",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-child.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-child.png",
+    "runtime_sha256": "3d158b52c947b8e1b6afa7bf1001568a0c4ed6130c3c2847540d5a871b22d2bc",
+    "source_sha256": "864e1ebe108e34a6fdc13a51d2ce7713813ca327de7f971f60d29c329abfb418",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "42dcfea85cdf85de044258a8ba0a776acaafa57d34059edce1bad04d80520f1e",
+    "height": 1254,
+    "id": "zillennia-greater",
+    "legacy_rgba_sha256": "f96f3339fc575be801fb1af5d9d67f78fff2860ad1e26e3f3ab022c38f1ab268",
+    "legacy_webp_sha256": "0d5833ec76dadc078e9ec2bbfd1c2ece8fd11dd92b7fee0ae79ce25d62203ac6",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-greater.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-greater.png",
+    "runtime_sha256": "a589668d16381173a22d40304f3c581660d993df57395565726f82b6c09e2c56",
+    "source_sha256": "612a1d420819de075547b9d5e3c8cb686cf3eb24fcbd34893586afd8b1d29237",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "de0cbdbc14259f037d776d9e04f037a8b1ce57a6fd1054721314631d8b2c8a32",
+    "height": 1254,
+    "id": "zillennia-hulking",
+    "legacy_rgba_sha256": "9886b901077db1f855358f5c53b7184c942927b6dc244dd38683938304146ca5",
+    "legacy_webp_sha256": "97929ff185eb14abdf3313e8b1bc2b73aad179670b5d772f88feaec3a5b26a0e",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-hulking.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-hulking.png",
+    "runtime_sha256": "9385dc30a6d73328fc29d0d33fd0734cd54c0fae69250ea89152fe556b44cbad",
+    "source_sha256": "35085ad040f3bafb1ff63dbb7651b5aa96e6a7d34004e8d26931b28c6a7de847",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "325ae87692764fbe0b4c64601119b0f72f0a6cb4e3848490e9294e2ca8fb5d10",
+    "height": 1254,
+    "id": "zillennia-infant",
+    "legacy_rgba_sha256": "038148e2db1c680ce51485a703eccd705aa6a79910643ede68cc43b26b75c007",
+    "legacy_webp_sha256": "d9cea4cc593bda1b986f48312774295ad3e1b25beb548cebe635d274e835ea62",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-infant.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-infant.png",
+    "runtime_sha256": "261a6bf2b7f496d901431a358c73814c2024599d78c137d63a9fa0f05ce377dc",
+    "source_sha256": "74ffd90b235665b2cebc52ff02f55cce765e6e811b61417c23f0da878f8230d4",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "0d6f979422b8a075b074a7a22bdc3c6fcaa475a59755f0347b75e26f30257bdd",
+    "height": 1254,
+    "id": "zillennia-lesser",
+    "legacy_rgba_sha256": "523fdef61ecf6682dc5ffbf100fa0499bdde6622aa9fd15b0587e0bbf858f0ff",
+    "legacy_webp_sha256": "b22d04952a244188cad2b55f9df87409ff28d35b0a668f37b1c4ad03fbf1d19e",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-lesser.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-lesser.png",
+    "runtime_sha256": "575db378be3886e740d9ba830b61d0846bccd534aad766c1dd8495c1c0c021b6",
+    "source_sha256": "ed766d2ef4e02b735ddf02743ba5afc161ffd57491b7567d6ee616849c2d7f08",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "dd443f6ff855b49620fb78daf2dcbafe083e10e13be82a0c585ea19cca08b310",
+    "height": 1254,
+    "id": "zillennia-mature",
+    "legacy_rgba_sha256": "36483493a9610faf4c05b6a0707ac9775834752636b3e4da45d2d04b64997e0d",
+    "legacy_webp_sha256": "894502b684d58728fc8bbd009c6db545556252b3af8d839c8e852145c206bc29",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-mature.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-mature.png",
+    "runtime_sha256": "ede141f1592cfedc33bb3ac8d9e01082374d5f86487211f37716ef63a97588d9",
+    "source_sha256": "31e461b09f1bc19934d560aba4b7036f912ac3d24952608df21ae23dcfc70f98",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "212146f34485ebcf34e61cb7a99a364037b4a228b95c1d3d4df4c953779a57d0",
+    "height": 1254,
+    "id": "zillennia-timeless",
+    "legacy_rgba_sha256": "dc99120c1153b55891c9aa4783e92dc67b4aefd006653638573996037968b8b3",
+    "legacy_webp_sha256": "506bd413a4566c28d190247261b69e856359b7915df42a55ad39647a49e367ae",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-timeless.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-timeless.png",
+    "runtime_sha256": "15f584dab820ed894fa1a64ebf132511fb010e0a1cb1b4958320a344a323f3e0",
+    "source_sha256": "a16c5329f72c8f32c7455106a421f1e62b15a64b8460c5b398e45c9718962569",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "aedfd10c6f36e9d76535424a900446391bdb793e359bf6576a25c8a7e7fb332b",
+    "height": 1254,
+    "id": "zillennia-transcendent",
+    "legacy_rgba_sha256": "20a38873e3cdc4f0893e208c6ea6bc6349da87e264f4ad4aa4e719d68c1981bf",
+    "legacy_webp_sha256": "3bf09dbd84efff004b8e890603ff5b321fa4f286c58c93e969574ab6168ad149",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-transcendent.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-transcendent.png",
+    "runtime_sha256": "844fd74f36c9665e797ca7b7179009744bc0cc7b2b4cf1e9599ced9f0b49e213",
+    "source_sha256": "8ba20ae2c0d5fa7e1c29f84e64457d1014d36698a73fc84e5325baac55bbba0b",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "d59f86d794efe364b2619cc76861eaa558730d2eb86d975da4738ba81a77a245",
+    "height": 1254,
+    "id": "zillennia-unqualified",
+    "legacy_rgba_sha256": "5010043d0ef4d680039ed6dc8b02b5116aface1a9238d052ed6c5aeea4517417",
+    "legacy_webp_sha256": "5ad86479215fe5321872a03a636b328e830cb8ba5298fd147d82e6c491e5b967",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/zillennia-unqualified.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/zillennia-unqualified.png",
+    "runtime_sha256": "43c0758c178207ac091eb88a2f7f79fa8a9bd481a91dff8cf0c7f09dd619d702",
+    "source_sha256": "6b8d23b2e43d4df5b88cb8166a0590b71c6ee05f8635717c5723f549678af0e7",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  }
+]

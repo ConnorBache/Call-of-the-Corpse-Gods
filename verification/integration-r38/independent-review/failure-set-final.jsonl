@@ -1,0 +1,7 @@
+{"seed":"生成-é-🌱-35","baseline_error":"Required generated item invalid/occupied on floor35","candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"生成-é-🌱-37","baseline_error":"Authored geometry leaves an inaccessible room","candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"r37-event-count-0047","baseline_error":"Required generated item invalid/occupied on floor20","candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-56","baseline_error":"Required generated item invalid/occupied on floor15","candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"qa-mixed-33cdd108d7485523","baseline_error":"Required generated item invalid/occupied on floor15","candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"生成-é-🌱-115","baseline_error":"Required generated item invalid/occupied on floor30","candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"qa-mixed-3faf6c43aaa5d7eb","baseline_error":"Required generated item invalid/occupied on floor30","candidate":{"Ok":{"floors":40,"errors":[]}}}

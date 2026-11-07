@@ -1,0 +1,118 @@
+[
+  {
+    "path": "crates/corpse-core/examples/creature_lookup_bench.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/examples/timing_test.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/src/creature_index.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/src/creature_trie.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/src/deadline_map.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/src/health_dirty.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/src/lighting_cache.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/src/timing.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-core/src/turn_schedule.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "crates/corpse-desktop/src/timing_test.rs",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/DIRTY-SCHEDULING-FIRST-PASS.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/DIRTY-SCHEDULING-TIMING-REPORT.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/LIGHTING-CACHE-CONTRACT.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/creature-identity-index.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/creature-index-verification.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/desktop-timing-test.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/dirty-contract.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/hover-exit-sequencing-review.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "docs/timing-profiling.md",
+    "mode": "0o600"
+  },
+  {
+    "path": "tools/run-timing.ps1",
+    "mode": "0o600"
+  },
+  {
+    "path": "tools/run-timing.sh",
+    "mode": "0o600"
+  },
+  {
+    "path": "tools/summarize-timing.py",
+    "mode": "0o600"
+  },
+  {
+    "path": "tools/windows-linker.sh",
+    "mode": "0o744"
+  },
+  {
+    "path": "verification/historical-pre-save-journal/SOURCE-MANIFEST.json",
+    "mode": "0o600"
+  },
+  {
+    "path": "verification/r39-compact/independent/compare_rgba.py",
+    "mode": "0o755"
+  },
+  {
+    "path": "verification/save-rewind/reproduction/benchmark_quiet.sh",
+    "mode": "0o755"
+  },
+  {
+    "path": "verification/save-rewind/reproduction/benchmark_quiet_stage2.sh",
+    "mode": "0o755"
+  },
+  {
+    "path": "verification/save-rewind/reproduction/run_test_targets.py",
+    "mode": "0o755"
+  },
+  {
+    "path": "verification/save-rewind/reproduction/summarize_quiet.py",
+    "mode": "0o755"
+  }
+]

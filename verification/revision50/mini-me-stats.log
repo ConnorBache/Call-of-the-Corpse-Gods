@@ -1,0 +1,52 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.19s
+     Running tests/mini_me_commands.rs (target/debug/deps/mini_me_commands-028828f851a16280)
+
+running 1 test
+test mini_me_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 43.07s
+
+     Running tests/revision50_catalog.rs (target/debug/deps/revision50_catalog-c6980e45bf1396ba)
+
+running 2 tests
+test revision50_preserves_all_72_names_and_authorized_descriptions ... ok
+test revision50_identity_map_is_complete_unique_and_keeps_old_catalog ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/revision50_mini_me.rs (target/debug/deps/revision50_mini_me-d6315fb701f9127a)
+
+running 3 tests
+test real_activation_spends_own_reserve_and_creates_stats_only_ally ... ok
+test missing_reserve_and_blocked_spawn_never_create_or_charge ... ok
+test actual_wait_and_dismiss_keep_copy_independent_without_ability_upkeep ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

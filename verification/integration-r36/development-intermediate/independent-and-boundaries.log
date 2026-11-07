@@ -1,0 +1,15 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-core)
+error[E0282]: type annotations needed
+  --> crates/corpse-core/src/projectiles.rs:59:19
+   |
+59 | ...   let pass=|p| {let Some(at)=crate::portals::cell(f,p.x as f64,p.y as f64)else{return false}; !matches!(f.tiles[at].as_str(),"wa...
+   |                 ^                                       - type must be known at this point
+   |
+help: consider giving this closure parameter an explicit type
+   |
+59 |         let pass=|p: /* Type */| {let Some(at)=crate::portals::cell(f,p.x as f64,p.y as f64)else{return false}; !matches!(f.tiles[at].as_str(),"wall"|"tree")&&!crate::environment::blocks_sight(f,at)};
+   |                    ++++++++++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `corpse-core` (lib) due to 1 previous error

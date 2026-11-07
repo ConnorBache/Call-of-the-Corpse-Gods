@@ -1,0 +1,12 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 39.34s
+     Running unittests src/lib.rs (target/debug/deps/corpse_core-22ef95f16f60b69b)
+
+running 3 tests
+test non_euclidean_generation::proposal_tests::proposal_threshold_and_removed_source_eligibility_are_literal ... ok
+test non_euclidean_generation::proposal_tests::last_two_always_form_one_pair_and_terminal_singletons_reject ... ok
+test non_euclidean_generation::proposal_tests::source_removal_changes_destination_eligibility_and_forced_chain_is_preserved ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 72 filtered out; finished in 0.00s
+

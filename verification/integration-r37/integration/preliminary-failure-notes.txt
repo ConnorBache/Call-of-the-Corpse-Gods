@@ -1,0 +1,14 @@
+Preliminary test failures were retained rather than hidden.
+
+1. A persistence test initially compared a whole floor after Revert/Future, then incorrectly expected Future to restore the pre-Revert closing state. Future captures the state at activation. The test now captures, mutates the actual terrain overlays and checks their restoration. No production temporal code was changed for these test corrections.
+2. Desktop DEBUG tests found revision 37 missing from the debug constructor/profile admission arrays. Those arrays were updated and the no-choice entry flow was rerun. The final aggregate gate supersedes this narrow check.
+3. The independent generated-Corn turn check found the new cornDimensionResident marker absent from command admission. The marker is now admitted and retained across resurrection; actual generated player commands/save-resume are covered by regression tests.
+4. Generation tests and renderer capture found sparse Corn topology and a reserved Sphinx reward location modified by new terrain. Corn placement became atomic with density minima; Sphinx rooms/rewards are protected; the original failing seed was retested rather than replaced silently.
+5. Runtime tests found permanent-burning snow behavior initially differed from the existing water exemption. It was corrected to match water.
+6. Review rejected mirrored ordered shortcuts and then identified reversal stalls even with consecutive pairs. Ordered-pair walking now has a tested local within-pair step; random links, shared occupancy and physical projectiles retain their behavior.
+
+Final pass/fail status is established only by the frozen aggregate gate, independent final review and build receipts, not these preliminary runs.
+
+Final aggregate attempt at17:55 UTC was interrupted during compilation by execution-runtime reset; no test summaries or failure verdict were produced. Its running receipt and log are preserved under interrupted-gate. Same frozen source resumed in final-gate at18:14 UTC; only the terminal final receipt is authoritative.
+
+Completed first aggregate gate:900 passed,2 failed,1 ignored. Both failures were stale test assertions that revision37 must be rejected. Only two test files changed: unsupported boundary moved to38, with explicit37 acceptance assertions. Production source unchanged. Full gate rerun under new test-inclusive freeze; first complete gate retained in stale-boundary-gate.

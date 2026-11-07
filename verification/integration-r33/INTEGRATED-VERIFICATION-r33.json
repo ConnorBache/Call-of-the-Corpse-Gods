@@ -1,0 +1,99 @@
+{
+  "label": "Revision 33 integrated native preview, 26 October 2026",
+  "simulation_revision": 33,
+  "accepted_gate": {
+    "passed": true,
+    "workspace_all_targets": {
+      "label": "workspace-all-targets",
+      "command": "sh tools/cargo.sh test --workspace --locked --all-targets",
+      "exit_code": 0,
+      "seconds": 817.516,
+      "passed": 659,
+      "failed": 0,
+      "ignored": 1,
+      "failed_tests": [],
+      "ignored_tests": [
+        "manual::tests::benchmark_animated_manual_warm_frames"
+      ],
+      "log": "verification/integration-r33/final-workspace-all-targets.log",
+      "log_sha256": "e7cc131309e780287d0353ccb1d0216943d0670ea5ceda02d434b978147268fe",
+      "count_method": "Only actual test NAME ... STATUS lines; summary lines are not tests."
+    },
+    "workspace_doc": {
+      "label": "workspace-doc",
+      "command": "sh tools/cargo.sh test --workspace --locked --doc",
+      "exit_code": 0,
+      "seconds": 1.286,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "failed_tests": [],
+      "ignored_tests": [],
+      "log": "verification/integration-r33/final-workspace-doc.log",
+      "log_sha256": "e4dca9bddba980c24ce79fa7a5fb46a458298492c575617e11977c5a1d9134a0",
+      "count_method": "Only actual test NAME ... STATUS lines; summary lines are not tests."
+    },
+    "individual_test_total_passed": 659,
+    "individual_test_total_failed": 0,
+    "individual_test_total_ignored": 1,
+    "count_method": "Only individual test NAME ... STATUS lines, not summary lines."
+  },
+  "test_profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "toolchain": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "freeze": {
+    "input_files": 1124,
+    "canonical_manifest_sha256": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+    "code_build_test_tool_profile_inputs_unchanged_during_accepted_gate": true,
+    "manifest_before": "verification/integration-r33/frozen-inputs-before.json",
+    "manifest_after": "verification/integration-r33/frozen-inputs-after.json",
+    "test_only_refreeze": "verification/integration-r33/test-only-refreeze.json",
+    "presentation_refreeze": "verification/integration-r33/presentation-final-refreeze.json",
+    "release_documentation_is_outside_compile_freeze": true
+  },
+  "bestiary_pages": 82,
+  "embedded_art_plates": 84,
+  "original_natural_histories_unchanged": 79,
+  "original_master_and_runtime_plate_hashes_unchanged": 162,
+  "independent_complete_40_floor_worlds": 4,
+  "fixed_r33_census": {
+    "requested": 32,
+    "completed": 32,
+    "failed": 0,
+    "substituted": 0,
+    "survival_run": false
+  },
+  "windows": {
+    "crossbuild_passed": true,
+    "runtime_verified": false,
+    "unsigned": true,
+    "delivery_exe_sha256": "52d966bbff805a48a2f3b956f46e8b17c11323de87a50b5bc8600ab70cf64624",
+    "delivery_exe_bytes": 97131201,
+    "embedded_runtime_plates_byte_exact": 84,
+    "evidence": "verification/integration-r33/windows-crossbuild-receipt.json"
+  },
+  "receipts": {
+    "gate": "verification/integration-r33/final-gate-receipt.json",
+    "art_lore": "verification/integration-r33/art-lore-audit.json",
+    "reference_provenance": "verification/integration-r33/reference-provenance-reconciliation.json",
+    "native_screenshots": "verification/integration-r33/screens-manifest.json",
+    "accuracy_dodge": "verification/accuracy-dodge-v33-final-receipt.json",
+    "debug_floor": "verification/debug-floor-v33/verification.json",
+    "post_analysis_delta": "verification/integration-r33/post-analysis-presentation-delta.json",
+    "presentation_combat_equivalence": "verification/integration-r33/presentation-combat-smoke-receipt.json",
+    "far_bow_state_equivalence": "verification/integration-r33/skin-log-state-comparison.json"
+  },
+  "historical_r31": "docs/integrated-verification-r31-historical.json",
+  "limits": [
+    "No Windows runtime or new physical SDL input certification.",
+    "Controlled encounter matrices and generation census are not full survival or universal balance guarantees.",
+    "Queen/Witch surviving-brood aftermath remains censored.",
+    "Historical alpha-edge review debt is not globally resolved.",
+    "Release docs finalized after tests; package manifest is a separate artifact."
+  ]
+}

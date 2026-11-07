@@ -1,0 +1,43 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r51-ui-work/source/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 1m 47s
+     Running tests/revision51_ichor_fire.rs (target/debug/deps/revision51_ichor_fire-294be6f66ba6e433)
+
+running 9 tests
+test identity_fallback_is_exact_and_revisioned ... ok
+test inherited_burning_does_not_spread_or_melt_ice ... ok
+test hazard_fire_hellfire_and_existing_burning_are_harmless_for_every_tier ... ok
+test firebolt_ignition_respects_current_and_legacy_immunity ... ok
+test save_snapshot_future_and_replay_retain_revisioned_protection ... ok
+test every_tier_rejects_all_fire_packet_routes_only_in_revision51 ... ok
+test offscreen_burning_and_hellfire_use_same_immunity_for_every_tier ... ok
+test fire_immunity_does_not_block_other_damage_or_general_mercurial_creatures ... ok
+test incineration_drunk_or_thrown_and_breath_aoe_cannot_ignite_any_tier ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+

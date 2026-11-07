@@ -1,0 +1,67 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 1m 06s
+     Running tests/revision50_combat_rings.rs (../r50-optimized-target/debug/deps/revision50_combat_rings-8daf9b20ba76d20d)
+
+running 14 tests
+test allies_never_heal_player_and_actor_local_transference_heals_only_attacker ... ok
+test exact_offscreen_status_resistance_does_not_use_absent_player_rings ... ok
+test fire_and_poison_statuses_keep_duration_and_only_normal_turn_ticks ... ok
+test fire_resistance_does_not_prevent_ignition_or_change_terrain_or_other_actors ... ok
+test flight_crosses_chasms_water_and_currents_but_not_fire_gas_or_attacks ... ok
+test half_here_shares_combat_ring_owner_and_minime_decoys_inherit_none ... FAILED
+test fire_resistance_halves_final_packets_including_fractions_and_keeps_immunity ... ok
+test new_identities_are_fixed_worn_revision_gated_and_count_distinct_items ... ok
+test raw_save_and_snapshot_preserve_powers_and_independent_grants ... ok
+test removing_last_flight_ring_settles_fall_immediately_but_preserves_other_flight ... ok
+test reverse_entropy_still_blocks_hostile_transference ... ok
+test poison_and_corrosion_resistances_are_distinct_and_do_not_mitigate_other_kinds ... ok
+test transference_heals_actual_melee_hp_loss_adds_fight_long_and_never_stacks ... FAILED
+test transference_caps_hp_and_ignores_ranged_misses_and_zero_damage ... ok
+
+failures:
+
+---- half_here_shares_combat_ring_owner_and_minime_decoys_inherit_none stdout ----
+
+thread 'half_here_shares_combat_ring_owner_and_minime_decoys_inherit_none' (131) panicked at crates/corpse-core/tests/revision50_combat_rings.rs:33:40:
+48.5 != 48.65
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- transference_heals_actual_melee_hp_loss_adds_fight_long_and_never_stacks stdout ----
+
+thread 'transference_heals_actual_melee_hp_loss_adds_fight_long_and_never_stacks' (138) panicked at crates/corpse-core/tests/revision50_combat_rings.rs:34:91:
+called `Result::unwrap()` on an `Err` value: EngineError("unknown heart species Ring test actor")
+
+
+failures:
+    half_here_shares_combat_ring_owner_and_minime_decoys_inherit_none
+    transference_heals_actual_melee_hp_loss_adds_fight_long_and_never_stacks
+
+test result: FAILED. 12 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `-p corpse-core --test revision50_combat_rings`

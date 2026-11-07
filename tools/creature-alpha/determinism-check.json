@@ -1,0 +1,23 @@
+{
+  "assets": [
+    {
+      "id": "phoenix",
+      "matches_reviewed_rgba": true,
+      "repeated_candidate_sha256": "fa382d5c7b3c98c0a3d9cd2ea042164e669415eda2673c555edb456fc3c15638"
+    },
+    {
+      "id": "horn-1",
+      "matches_reviewed_rgba": true,
+      "repeated_candidate_sha256": "aa409d303f616b9108f0709868bedbe01f27bdbbccebc0de75d5e006051cd575"
+    },
+    {
+      "id": "river-drake",
+      "matches_reviewed_rgba": true,
+      "repeated_candidate_sha256": "5a10de8cca54f28fa31822e9c330e62f8aeda32b9449a896875f5296b21bf30c"
+    }
+  ],
+  "numpy": "2.2.6",
+  "opencv": "4.12.0",
+  "runs": 2,
+  "seed": 0
+}

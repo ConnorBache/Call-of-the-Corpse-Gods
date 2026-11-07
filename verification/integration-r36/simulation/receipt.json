@@ -1,0 +1,158 @@
+{
+  "recorded_at": "2026-10-28T15:24:47.977479+00:00",
+  "global_freeze_input_count": 1057,
+  "global_freeze_sha256": "f0b38fb5e06763c1cae69d2fc0a72c8cc647cd612ca75b50ba5c2ae1eff2ec03",
+  "evidence_provenance": "Transcription of retained exec/write_stdin output; original process output was not tee-captured into local files. No tests were rerun during this evidence-only task.",
+  "source_mutation_in_evidence_task": false,
+  "modified_simulation_files": [
+    {
+      "path": "crates/corpse-core/src/ai.rs",
+      "sha256": "9c216407fdb318d3f6133fc8e694abcab4543213cecc41d45bedd1f6bf93cc9e",
+      "bytes": 24406,
+      "baseline_sha256": "4d8b72ce10dcbe23be1e5ad105bb43b8ef217996adacb9b43c69995f507d4116",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/creature_feeding.rs",
+      "sha256": "c657eb670510184df5f69bdcdec13017d112d99929b72778b469822abc2a8f81",
+      "bytes": 11391,
+      "baseline_sha256": "96b8f5b126d36626c6fd276bdc5f2f8f066d48c79d23f648b5c1e419e2fe713a",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/engine.rs",
+      "sha256": "dc9c4ff0a946af6199803ae6db2bebdd29841ce73527ef95b82a18da066e6e9c",
+      "bytes": 145841,
+      "baseline_sha256": "0d2780d5797dc54e43628c3347c9352736b71124f47452a38e6b0dac132402e7",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/monster_caster.rs",
+      "sha256": "66508e7d329e9883374fa19388486c524be49dd06b7d02acf2a90dfc033139bf",
+      "bytes": 6072,
+      "baseline_sha256": "9a892e753fcec0c2f6a168b90726815b6035c85be2609610fc9056d13140ad3a",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/monster_grab.rs",
+      "sha256": "d0bbed66123718c9baf0d2ce166ea4fa5c92a0b56b09c16bcf9c02bf00285f5b",
+      "bytes": 12221,
+      "baseline_sha256": "d5cef8b70d6c2cb8e633a2c06cfc7360781d00d0e4bd51832a5d221bc6b8f8a0",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/monster_horn.rs",
+      "sha256": "2f3896d59e29512cbfa6e0d25e9cfd3cb0030610f23432f388fcc7eee21bdfe6",
+      "bytes": 22626,
+      "baseline_sha256": "53d851c1b1175bf702244a04c96b00344075f284fa55cdd5b3690623f11e9af9",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/monster_inventor.rs",
+      "sha256": "c0f6fd41c4730e995777a999865eae6fbcdee8a86515c14aff283571e31d5b69",
+      "bytes": 21175,
+      "baseline_sha256": "3636527273490fce56aeb4c3315fd41f6e483c4610d7573006e481771660769b",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/monster_moon.rs",
+      "sha256": "eb01c4ea0929ab93c29fdaa3a8b46365068963df519a5ac5b2dc5caf39986abe",
+      "bytes": 6043,
+      "baseline_sha256": "3aa8f669df9c29967cf8b00dcf37dd5eb981dc8a7aa5f289581bcba6c8e26877",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/monster_spells.rs",
+      "sha256": "8058a72efdac9e1ce73b58611fb13a721e3106aca8ede3889a902fd24857eeff",
+      "bytes": 11420,
+      "baseline_sha256": "dd7a7be57fc5841f7b13eaee775bfa917105737abce77693b619f5e21b5e151a",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/monster_vampire.rs",
+      "sha256": "080f4df19d1b08e9666231c1f92f2bd0a589621cd85f0b1954dd6e51dc707df6",
+      "bytes": 6533,
+      "baseline_sha256": "3d0b98ce7d2b07051241e93d4c321c4ac5f35a57c640f823e1368b1abd34a2c4",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/movement.rs",
+      "sha256": "d0b4d03923b8325e2614cda8ac96d168b58d72400b57a1dc8d966fff6838cd0d",
+      "bytes": 9769,
+      "baseline_sha256": "b901b926aac75c9b83a597681680862cf87ca16a3a67c896801e369a254f8cd4",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/offscreen.rs",
+      "sha256": "04c5b3b81dabcf1d40c5a9f26d312e3dfc2a725664dbe0bf67439dc1fc132528",
+      "bytes": 52262,
+      "baseline_sha256": "424a59deb499755c968a009f081fb3df6d5f21a0ebc79e3141539e02819bd586",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/portals.rs",
+      "sha256": "73c0ea622e00a4e41719c67c71b241e2873283aedfa528b65424d9842b8570db",
+      "bytes": 13709,
+      "baseline_sha256": "b4b09796566a3d291a2e234fd714495bf5485e23cab0f5d4a97ebc681d5a4e00",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/projectiles.rs",
+      "sha256": "0c76d863a038b2190a17d962114d585c9d38c63ece5b73a0ccaf205bf358b6d8",
+      "bytes": 13810,
+      "baseline_sha256": "2cde0ec0dff2048f2e7663a637806db40162efca3e15d872f8d213985dcdc763",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/src/travel.rs",
+      "sha256": "80618aa98a4f2f211d8ab0864ef822dbc2e155f3c2bdcb1c60fb451c181720bd",
+      "bytes": 46578,
+      "baseline_sha256": "8ae55f8212d7ed195121db8fba3088125cc2080f4aa7337b6ee4c039afd17426",
+      "change": "modified"
+    },
+    {
+      "path": "crates/corpse-core/tests/non_euclidean_physics_r36.rs",
+      "sha256": "4357a6986824763a57587f954d9a3e24e430ba62021ee7ce7268833cce3788d8",
+      "bytes": 15410,
+      "baseline_sha256": null,
+      "change": "added"
+    }
+  ],
+  "executed_checks": [
+    {
+      "command": "CARGO_INCREMENTAL=0 CARGO_PROFILE_TEST_OPT_LEVEL=2 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true tools/cargo.sh test -p corpse-core --test non_euclidean_physics_r36 --locked -- --nocapture",
+      "session_id": 28677,
+      "status": "passed",
+      "tests": 17,
+      "scope": "latest simulation source before lead freeze, not full workspace",
+      "transcript": "physics-17.tool-transcript.log"
+    },
+    {
+      "command": "CARGO_INCREMENTAL=0 CARGO_PROFILE_TEST_OPT_LEVEL=2 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true tools/cargo.sh test -p corpse-core --lib offscreen_stochastic --locked -- --nocapture",
+      "session_id": 71220,
+      "status": "passed",
+      "tests": 1,
+      "scope": "earlier implementation snapshot, later aggregate gate required",
+      "transcript": "offscreen-stochastic.tool-transcript.log"
+    },
+    {
+      "command": "CARGO_INCREMENTAL=0 CARGO_PROFILE_TEST_OPT_LEVEL=2 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true tools/cargo.sh test -p corpse-core --test non_euclidean_physics_r36 --test horn_caster_traces --test caster_spell_traces --test moon_traces --test passive_monster_traces --locked -- --nocapture",
+      "session_id": 30806,
+      "status": "passed",
+      "tests": 19,
+      "scope": "earlier snapshot before final actual-range guards/water-jet edits",
+      "transcript": "npc-legacy-focused.tool-transcript.log"
+    }
+  ],
+  "limitations": [
+    "Partial targets do not establish final frozen workspace pass.",
+    "Windows runtime not exercised.",
+    "Inherited final source hashes include any lead comment-only adjustments before global freeze."
+  ],
+  "freeze_verification": {
+    "checked_at": "2026-10-28T15:25:00.354884+00:00",
+    "inputs_checked": 1057,
+    "changed_inputs": [],
+    "fingerprint": "f0b38fb5e06763c1cae69d2fc0a72c8cc647cd612ca75b50ba5c2ae1eff2ec03"
+  }
+}

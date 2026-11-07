@@ -1,0 +1,41 @@
+    Blocking waiting for file lock on build directory
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.78s
+     Running tests/revision50_environment_admission.rs (target/debug/deps/revision50_environment_admission-5dede4c932380760)
+
+running 6 tests
+test shared_player_endpoint_is_admitted_but_foreign_owner_is_not ... ok
+test valid_revision50_power_does_not_mask_an_unknown_later_power ... ok
+test explicit_caster_marker_is_inert_admission_only_at_revision50 ... ok
+test revision50_power_admission_is_not_backported_to_legacy_revisions ... ok
+test all_integrated_revision50_player_powers_pass_environment_admission ... ok
+test new_player_powers_do_not_admit_unrelated_hostile_or_allied_npcs ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+

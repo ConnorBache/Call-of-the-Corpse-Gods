@@ -1,0 +1,1436 @@
+[
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Night Crawler",
+        "abilities": [
+          "enemy:beast:lifesteal"
+        ],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 7.0,
+        "name": "Night Crawler",
+        "abilities": [
+          "enemy:beast:lifesteal"
+        ],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 8.0,
+        "name": "Skin Walker",
+        "abilities": [],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "skinWalkerDisguise": 2.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      }
+    ],
+    "summoned_candidates": {
+      "night-crawler": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      },
+      "skin-walker": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      }
+    },
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.2074785937961672,
+    "mean_completed_cost": 0.2074785937961672,
+    "mean_combat_cost": 0.2074785937961672,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.2074785937961672,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 10.811023622047244,
+    "mean_combat_commands": 10.811023622047244,
+    "mean_world_turns": 10.811023622047244,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 8.913385826771654,
+    "mean_player_attack_attempts": 10.173228346456693,
+    "mean_player_landed_attacks": 10.173228346456693,
+    "mean_attacks_to_kill_conditional_on_kill": 10.173228346456693,
+    "mean_world_turns_to_kill_conditional_on_kill": 10.811023622047244,
+    "mean_enemy_attacks_over_killed_lifespan": 8.913385826771654,
+    "mean_gross_damage_fraction": 0.2225967040323876,
+    "mean_largest_damage_packet_fraction": 0.04001620934822354,
+    "max_damage_packet_fraction": 0.0639386189258312,
+    "mean_gross_combat_damage_fraction": 0.2225967040323876,
+    "gross_combat_standard_error": 0.01678921714184998,
+    "gross_total_standard_error": 0.01678921714184998,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.2225967040323876,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.2225967040323876,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.2225967040323876,
+    "mean_capped_actual_damage_fraction": 0.2225967040323876,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 127,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.1865714285714286,
+    "p90_cost": 0.42406741573033746,
+    "p95_cost": 0.5339352051835857,
+    "max_cost": 0.786926770708283,
+    "markers": {
+      "forced_player_displacement": 81
+    },
+    "marker_trials": {
+      "forced_player_displacement": 81
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 411.27559055118104
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "all_initial_unblessed",
+    "variant": "before",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  },
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Night Crawler",
+        "abilities": [
+          "enemy:beast:lifesteal"
+        ],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 64.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 64.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 7.0,
+        "name": "Night Crawler",
+        "abilities": [
+          "enemy:beast:lifesteal"
+        ],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 64.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 64.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 8.0,
+        "name": "Skin Walker",
+        "abilities": [],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 144.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 144.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "skinWalkerDisguise": 2.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.22320469516174385,
+    "mean_completed_cost": 0.22320469516174385,
+    "mean_combat_cost": 0.22320469516174385,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.22320469516174385,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 11.078740157480315,
+    "mean_combat_commands": 11.078740157480315,
+    "mean_world_turns": 11.078740157480315,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 9.188976377952756,
+    "mean_player_attack_attempts": 10.440944881889763,
+    "mean_player_landed_attacks": 10.188976377952756,
+    "mean_attacks_to_kill_conditional_on_kill": 10.440944881889763,
+    "mean_world_turns_to_kill_conditional_on_kill": 11.078740157480315,
+    "mean_enemy_attacks_over_killed_lifespan": 9.188976377952756,
+    "mean_gross_damage_fraction": 0.23911020697276736,
+    "mean_largest_damage_packet_fraction": 0.040129900462049575,
+    "max_damage_packet_fraction": 0.0639386189258312,
+    "mean_gross_combat_damage_fraction": 0.23911020697276736,
+    "gross_combat_standard_error": 0.017696958446822803,
+    "gross_total_standard_error": 0.017696958446822803,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.23911020697276736,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.23911020697276736,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.23911020697276736,
+    "mean_capped_actual_damage_fraction": 0.23911020697276736,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 127,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.21878025851938898,
+    "p90_cost": 0.4397053087757312,
+    "p95_cost": 0.6217800511508952,
+    "max_cost": 0.786926770708283,
+    "markers": {
+      "forced_player_displacement": 81
+    },
+    "marker_trials": {
+      "forced_player_displacement": 81
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 443.0551181102361
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "all_initial_unblessed",
+    "variant": "after",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  },
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Witch",
+        "abilities": [
+          "enemy:beast:witch"
+        ],
+        "stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": 3.0
+        },
+        "max_hp": 298.0
+      }
+    ],
+    "summoned_candidates": {
+      "night-crawler": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      },
+      "skin-walker": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      }
+    },
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.24961695435123027,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.24961695435123027,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.23146252582746968,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 12.181102362204724,
+    "mean_combat_commands": 12.181102362204724,
+    "mean_world_turns": 14.181102362204724,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 10.15748031496063,
+    "mean_player_attack_attempts": 4.653543307086614,
+    "mean_player_landed_attacks": 3.6535433070866143,
+    "mean_attacks_to_kill_conditional_on_kill": 4.362903225806452,
+    "mean_world_turns_to_kill_conditional_on_kill": 13.82258064516129,
+    "mean_enemy_attacks_over_killed_lifespan": 9.701612903225806,
+    "mean_gross_damage_fraction": 0.2666715520329176,
+    "mean_largest_damage_packet_fraction": 0.039940347413500166,
+    "max_damage_packet_fraction": 0.06625766871165645,
+    "mean_gross_combat_damage_fraction": 0.2666715520329176,
+    "gross_combat_standard_error": 0.02260901161376693,
+    "gross_total_standard_error": 0.02260901161376693,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.2666715520329176,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.24758402126347737,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.24758402126347737,
+    "mean_capped_actual_damage_fraction": 0.2663462141611727,
+    "mean_enemy_energy_consumed": 39.826771653543304,
+    "kills": 124,
+    "deaths": 4,
+    "combat_deaths": 4,
+    "residual_deaths": 0,
+    "censored": 123,
+    "combat_censored": 0,
+    "aftermath_censored": 123,
+    "kill_rate": 0.9763779527559056,
+    "death_rate": 0.031496062992125984,
+    "censor_rate": 0.968503937007874,
+    "p50_cost": 0.177224669603524,
+    "p90_cost": 0.5769999999999996,
+    "p95_cost": 0.7929339735894352,
+    "max_cost": 1.0,
+    "markers": {
+      "enemy_energy_consumed": 582,
+      "forced_player_displacement": 723,
+      "yeti_slow_extra_turn": 254
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 127,
+      "forced_player_displacement": 127,
+      "yeti_slow_extra_turn": 127
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Night Crawler#6": 31,
+      "living_actor_after_target_death:Night Crawler#6,Night Crawler#7": 21,
+      "living_actor_after_target_death:Night Crawler#6,Skin Walker#7": 17,
+      "living_actor_after_target_death:Skin Walker#6": 22,
+      "living_actor_after_target_death:Skin Walker#6,Night Crawler#7": 15,
+      "living_actor_after_target_death:Skin Walker#6,Skin Walker#7": 17
+    },
+    "mean_damage_packets": {
+      "Blood loss": 68.992125984252,
+      "Poison": 13.559055118110221,
+      "physical_attack": 415.72440944881896
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "all_initial_unblessed",
+    "variant": "before",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  },
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Witch",
+        "abilities": [
+          "enemy:beast:witch"
+        ],
+        "stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": 3.0
+        },
+        "max_hp": 298.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.2628313260253851,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.2628313260253851,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.23885836101808042,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 12.094488188976378,
+    "mean_combat_commands": 12.094488188976378,
+    "mean_world_turns": 14.094488188976378,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 10.165354330708661,
+    "mean_player_attack_attempts": 4.661417322834645,
+    "mean_player_landed_attacks": 3.62992125984252,
+    "mean_attacks_to_kill_conditional_on_kill": 4.341463414634147,
+    "mean_world_turns_to_kill_conditional_on_kill": 13.699186991869919,
+    "mean_enemy_attacks_over_killed_lifespan": 9.59349593495935,
+    "mean_gross_damage_fraction": 0.27979497440157824,
+    "mean_largest_damage_packet_fraction": 0.04074167339354858,
+    "max_damage_packet_fraction": 0.06625766871165645,
+    "mean_gross_combat_damage_fraction": 0.27979497440157824,
+    "gross_combat_standard_error": 0.02329757972738029,
+    "gross_total_standard_error": 0.02329757972738029,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.27979497440157824,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.25475667321610557,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.25475667321610557,
+    "mean_capped_actual_damage_fraction": 0.27952024256362973,
+    "mean_enemy_energy_consumed": 39.59055118110236,
+    "kills": 123,
+    "deaths": 4,
+    "combat_deaths": 4,
+    "residual_deaths": 0,
+    "censored": 123,
+    "combat_censored": 0,
+    "aftermath_censored": 123,
+    "kill_rate": 0.968503937007874,
+    "death_rate": 0.031496062992125984,
+    "censor_rate": 0.968503937007874,
+    "p50_cost": 0.20032579185520327,
+    "p90_cost": 0.6076249999999996,
+    "p95_cost": 0.7929339735894352,
+    "max_cost": 1.0,
+    "markers": {
+      "enemy_energy_consumed": 579,
+      "forced_player_displacement": 712,
+      "yeti_slow_extra_turn": 254
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 127,
+      "forced_player_displacement": 127,
+      "yeti_slow_extra_turn": 127
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Night Crawler#6": 31,
+      "living_actor_after_target_death:Night Crawler#6,Night Crawler#7": 21,
+      "living_actor_after_target_death:Night Crawler#6,Skin Walker#7": 17,
+      "living_actor_after_target_death:Skin Walker#6": 25,
+      "living_actor_after_target_death:Skin Walker#6,Night Crawler#7": 12,
+      "living_actor_after_target_death:Skin Walker#6,Skin Walker#7": 17
+    },
+    "mean_damage_packets": {
+      "Blood loss": 68.40944881889766,
+      "Poison": 13.401574803149591,
+      "physical_attack": 439.96850393700805
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "all_initial_unblessed",
+    "variant": "after",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  },
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Night Crawler",
+        "abilities": [
+          "enemy:beast:lifesteal"
+        ],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 7.0,
+        "name": "Skin Walker",
+        "abilities": [],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "skinWalkerDisguise": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 8.0,
+        "name": "Skin Walker",
+        "abilities": [],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 30.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "skinWalkerDisguise": 2.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      }
+    ],
+    "summoned_candidates": {
+      "night-crawler": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      },
+      "skin-walker": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      }
+    },
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.4000286177437305,
+    "mean_completed_cost": 0.4000286177437305,
+    "mean_combat_cost": 0.4000286177437305,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.395266940106776,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 12.929133858267717,
+    "mean_combat_commands": 12.929133858267717,
+    "mean_world_turns": 12.929133858267717,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 11.26771653543307,
+    "mean_player_attack_attempts": 12.236220472440944,
+    "mean_player_landed_attacks": 12.236220472440944,
+    "mean_attacks_to_kill_conditional_on_kill": 12.214285714285714,
+    "mean_world_turns_to_kill_conditional_on_kill": 12.904761904761905,
+    "mean_enemy_attacks_over_killed_lifespan": 11.182539682539682,
+    "mean_gross_damage_fraction": 0.4227192814107721,
+    "mean_largest_damage_packet_fraction": 0.053523807669009243,
+    "max_damage_packet_fraction": 0.07425742574257425,
+    "mean_gross_combat_damage_fraction": 0.4227192814107721,
+    "gross_combat_standard_error": 0.018006266973125056,
+    "gross_total_standard_error": 0.018006266973125056,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.4227192814107721,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.41761614645598233,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.41761614645598233,
+    "mean_capped_actual_damage_fraction": 0.4224380665626281,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 126,
+    "deaths": 1,
+    "combat_deaths": 1,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 0.9921259842519685,
+    "death_rate": 0.007874015748031496,
+    "censor_rate": 0.0,
+    "p50_cost": 0.4011274638633372,
+    "p90_cost": 0.6623979848866499,
+    "p95_cost": 0.7124693877551019,
+    "max_cost": 1.0,
+    "markers": {
+      "forced_player_displacement": 88
+    },
+    "marker_trials": {
+      "forced_player_displacement": 88
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 737.3149606299211
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "ordinary_unblessed",
+    "variant": "before",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  },
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Night Crawler",
+        "abilities": [
+          "enemy:beast:lifesteal"
+        ],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 64.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 140.0,
+          "dodge": 64.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 7.0,
+        "name": "Skin Walker",
+        "abilities": [],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 144.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 144.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "skinWalkerDisguise": 1.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      },
+      {
+        "id": 8.0,
+        "name": "Skin Walker",
+        "abilities": [],
+        "stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 144.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 200.0,
+          "defense": 24.0,
+          "accuracy": 144.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 45.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "skinWalkerDisguise": 2.0,
+          "witchSummoned": 1.0
+        },
+        "max_hp": 244.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.47212597418196434,
+    "mean_completed_cost": 0.47212597418196434,
+    "mean_combat_cost": 0.47212597418196434,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.4270085360778588,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 14.748031496062993,
+    "mean_combat_commands": 14.748031496062993,
+    "mean_world_turns": 14.748031496062993,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 13.32283464566929,
+    "mean_player_attack_attempts": 14.05511811023622,
+    "mean_player_landed_attacks": 12.039370078740157,
+    "mean_attacks_to_kill_conditional_on_kill": 12.82905982905983,
+    "mean_world_turns_to_kill_conditional_on_kill": 13.504273504273504,
+    "mean_enemy_attacks_over_killed_lifespan": 11.811965811965813,
+    "mean_gross_damage_fraction": 0.49985363278924116,
+    "mean_largest_damage_packet_fraction": 0.053942228294353585,
+    "max_damage_packet_fraction": 0.07425742574257425,
+    "mean_gross_combat_damage_fraction": 0.49985363278924116,
+    "gross_combat_standard_error": 0.02286628573469739,
+    "gross_total_standard_error": 0.02286628573469739,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.49985363278924116,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.4505811856505084,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.4505811856505084,
+    "mean_capped_actual_damage_fraction": 0.49820471433944474,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 117,
+    "deaths": 10,
+    "combat_deaths": 10,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 0.9212598425196851,
+    "death_rate": 0.07874015748031496,
+    "censor_rate": 0.0,
+    "p50_cost": 0.4386288659793811,
+    "p90_cost": 0.8136123348017621,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "forced_player_displacement": 88
+    },
+    "marker_trials": {
+      "forced_player_displacement": 88
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 878.7874015748034
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "ordinary_unblessed",
+    "variant": "after",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  },
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Witch",
+        "abilities": [
+          "enemy:beast:witch"
+        ],
+        "stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": 3.0
+        },
+        "max_hp": 298.0
+      }
+    ],
+    "summoned_candidates": {
+      "night-crawler": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      },
+      "skin-walker": {
+        "offense": null,
+        "defense": null,
+        "accuracy": 140.0,
+        "dodge": 30.0,
+        "dr": null,
+        "gas_passive": null,
+        "gas_boost": null,
+        "gas_shot": null,
+        "max_hp": null
+      }
+    },
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.5825840386589851,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.5825840386589851,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.4534863186566096,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 16.26771653543307,
+    "mean_combat_commands": 16.26771653543307,
+    "mean_world_turns": 18.25984251968504,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 15.32283464566929,
+    "mean_player_attack_attempts": 7.322834645669292,
+    "mean_player_landed_attacks": 3.3070866141732282,
+    "mean_attacks_to_kill_conditional_on_kill": 5.814432989690721,
+    "mean_world_turns_to_kill_conditional_on_kill": 16.412371134020617,
+    "mean_enemy_attacks_over_killed_lifespan": 11.75257731958763,
+    "mean_gross_damage_fraction": 0.6133984577038284,
+    "mean_largest_damage_packet_fraction": 0.05012127014986943,
+    "max_damage_packet_fraction": 0.07567185289957568,
+    "mean_gross_combat_damage_fraction": 0.6133984577038284,
+    "gross_combat_standard_error": 0.03334234322038505,
+    "gross_total_standard_error": 0.03334234322038505,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.6133984577038284,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.4754165424041499,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.4754165424041499,
+    "mean_capped_actual_damage_fraction": 0.6083467612808956,
+    "mean_enemy_energy_consumed": 41.74803149606299,
+    "kills": 97,
+    "deaths": 32,
+    "combat_deaths": 32,
+    "residual_deaths": 0,
+    "censored": 95,
+    "combat_censored": 0,
+    "aftermath_censored": 95,
+    "kill_rate": 0.7637795275590551,
+    "death_rate": 0.25196850393700787,
+    "censor_rate": 0.7480314960629921,
+    "p50_cost": 0.6033957158962796,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "enemy_energy_consumed": 606,
+      "forced_player_displacement": 768,
+      "yeti_slow_extra_turn": 254
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 127,
+      "forced_player_displacement": 127,
+      "yeti_slow_extra_turn": 127
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Night Crawler#6": 13,
+      "living_actor_after_target_death:Night Crawler#6,Night Crawler#7": 13,
+      "living_actor_after_target_death:Night Crawler#6,Skin Walker#7": 15,
+      "living_actor_after_target_death:Skin Walker#6": 14,
+      "living_actor_after_target_death:Skin Walker#6,Night Crawler#7": 23,
+      "living_actor_after_target_death:Skin Walker#6,Skin Walker#7": 17
+    },
+    "mean_damage_packets": {
+      "Blood loss": 102.09448818897634,
+      "Poison": 20.66141732283462,
+      "physical_attack": 952.0472440944878
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "ordinary_unblessed",
+    "variant": "before",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  },
+  {
+    "kind": "witch",
+    "revision": 33.0,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Witch",
+        "abilities": [
+          "enemy:beast:witch"
+        ],
+        "stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 15.0,
+          "defense": 33.0,
+          "accuracy": 145.0,
+          "dodge": 90.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": 3.0
+        },
+        "max_hp": 298.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "escape",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 127,
+    "profiles": 127,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.6037993142723782,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.6037993142723782,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.4703422411851795,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 16.173228346456693,
+    "mean_combat_commands": 16.173228346456693,
+    "mean_world_turns": 18.165354330708663,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 15.338582677165354,
+    "mean_player_attack_attempts": 7.244094488188976,
+    "mean_player_landed_attacks": 3.283464566929134,
+    "mean_attacks_to_kill_conditional_on_kill": 5.863157894736842,
+    "mean_world_turns_to_kill_conditional_on_kill": 16.357894736842105,
+    "mean_enemy_attacks_over_killed_lifespan": 11.905263157894737,
+    "mean_gross_damage_fraction": 0.6352037314856438,
+    "mean_largest_damage_packet_fraction": 0.05039891362953045,
+    "max_damage_packet_fraction": 0.07567185289957568,
+    "mean_gross_combat_damage_fraction": 0.6352037314856438,
+    "gross_combat_standard_error": 0.03336840064887524,
+    "gross_total_standard_error": 0.03336840064887524,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.6352037314856438,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.4924012819717826,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.4924012819717826,
+    "mean_capped_actual_damage_fraction": 0.6294203046108242,
+    "mean_enemy_energy_consumed": 41.74803149606299,
+    "kills": 95,
+    "deaths": 35,
+    "combat_deaths": 35,
+    "residual_deaths": 0,
+    "censored": 92,
+    "combat_censored": 0,
+    "aftermath_censored": 92,
+    "kill_rate": 0.7480314960629921,
+    "death_rate": 0.2755905511811024,
+    "censor_rate": 0.7244094488188977,
+    "p50_cost": 0.6418795180722894,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "enemy_energy_consumed": 606,
+      "forced_player_displacement": 763,
+      "yeti_slow_extra_turn": 254
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 127,
+      "forced_player_displacement": 127,
+      "yeti_slow_extra_turn": 127
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Night Crawler#6": 13,
+      "living_actor_after_target_death:Night Crawler#6,Night Crawler#7": 13,
+      "living_actor_after_target_death:Night Crawler#6,Skin Walker#7": 15,
+      "living_actor_after_target_death:Skin Walker#6": 14,
+      "living_actor_after_target_death:Skin Walker#6,Night Crawler#7": 22,
+      "living_actor_after_target_death:Skin Walker#6,Skin Walker#7": 15
+    },
+    "mean_damage_packets": {
+      "Blood loss": 103.01574803149606,
+      "Poison": 20.629921259842494,
+      "physical_attack": 987.9212598425194
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "track": "ordinary_unblessed",
+    "variant": "after",
+    "profile_revision": 32,
+    "reference_depth": 27,
+    "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "binary_sha256": "15d206fef5127c29cee0d963b49213d8d42efec45906ae3de76d1bbee3b54b29"
+  }
+]

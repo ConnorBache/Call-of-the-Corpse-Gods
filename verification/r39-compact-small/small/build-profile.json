@@ -1,0 +1,24 @@
+{
+  "profile": "release",
+  "overrides": {
+    "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+    "CARGO_PROFILE_RELEASE_OPT_LEVEL": "z",
+    "CARGO_PROFILE_RELEASE_LTO": "fat",
+    "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+    "CARGO_PROFILE_RELEASE_DEBUG": "0"
+  },
+  "target": "x86_64-pc-windows-gnu",
+  "rust": "1.99.1",
+  "command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--jobs",
+    "2",
+    "--target",
+    "x86_64-pc-windows-gnu",
+    "-p",
+    "corpse-desktop"
+  ]
+}

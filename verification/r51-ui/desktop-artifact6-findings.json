@@ -1,0 +1,16 @@
+{
+  "stage": "intermediate pre-calibration desktop artifact 6",
+  "passed": 684,
+  "failed": 5,
+  "ignored": 35,
+  "log": "verification/r51-ui/desktop-artifact6-all.log",
+  "exit": 101,
+  "limits": "Not a final workspace pass; later keyboard/Beckoning/calibration changes excluded.",
+  "findings": {
+    "ability_ui": "Two explicit HP/Damage copy amendments were not reflected in legacy-catalog test oracle. Test-only amendment saved; rerun pending.",
+    "inspection_ui": "Frozen heart rewards expected Offense/Defense labels. Independent unit conversion and quiet habitat condition oracle saved; rerun pending.",
+    "pack": "Unidentified potion effect list expected old labels. Test-only amendment saved; rerun pending.",
+    "render": "Legacy fixed-character truncation expectation conflicts with measured timer-preserving fit. Test-only expected label saved; rerun pending.",
+    "blood_water": "Fixture expected crimson ordinary water without marking blood; calibration worker owns explicit blood+neighbor clean-water correction. No confirmed production regression."
+  }
+}

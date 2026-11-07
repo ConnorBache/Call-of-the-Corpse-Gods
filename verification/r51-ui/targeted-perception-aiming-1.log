@@ -1,0 +1,23 @@
+
+running 9 tests
+test perception_ui::tests::revision51_perception_contour_uses_creature_distance_stealth_and_light ... ok
+test perception_ui::tests::revision51_perception_hidden_wall_and_light_do_not_change_detached_preview ... ok
+test perception_ui::tests::revision51_perception_known_wall_blocks_but_unknown_ray_never_closes ... ok
+test perception_ui::tests::revision51_perception_labels_legacy_gate_and_heart_preview ... ok
+test perception_ui::tests::revision51_perception_portals_only_use_known_links ... ok
+test perception_ui::tests::revision51_perception_gpu_quads_and_native_captures ... ok
+test perception_ui::tests::revision51_perception_special_senses_and_moving_light_are_omitted ... ok
+test perception_ui::tests::revision51_perception_range_is_hover_only_with_stable_card_geometry ... ok
+test perception_ui::tests::revision51_perception_two_way_hover_cancel_scroll_resize_and_repaint ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 715 filtered out; finished in 2.96s
+
+
+running 3 tests
+test aiming_effect_tests::r51_aim_gpu_commands_and_native_captures ... ok
+test aiming_effect_tests::r51_aim_mouse_keyboard_items_cancel_and_equipment_are_pure ... ok
+test aiming_effect_tests::r51_aim_full_retained_tile_cancel_animation_and_resize_match ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 721 filtered out; finished in 2.50s
+
+perception_exit=0 aiming_exit=0

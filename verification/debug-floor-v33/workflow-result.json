@@ -1,0 +1,81 @@
+{
+  "seed": "0-5-11:debug-floor-preview",
+  "floor": 12.0,
+  "mode": "Avatar",
+  "level": 7.0,
+  "priorHearts": 156,
+  "priorBlessings": 149.0,
+  "consumedHearts": 156,
+  "remainingHearts": 0,
+  "inventorySlots": 4.0,
+  "maxHp": 352.0,
+  "stats": {
+    "offense": 54.0,
+    "defense": 42.0,
+    "accuracy": 76.0,
+    "dodge": 35.0,
+    "dr": 22.0,
+    "perception": 307.0,
+    "maxEnergy": 128.0,
+    "maxHp": 0.0
+  },
+  "entered": true,
+  "stashEntries": 60,
+  "choices": [
+    {
+      "level": 2.0,
+      "offered": [
+        "shrail-fury-crafting",
+        "ursa-waking-nightmare",
+        "morae-turning-the-wheel"
+      ],
+      "selected": "shrail-fury-crafting"
+    },
+    {
+      "level": 3.0,
+      "offered": [
+        "shrail-i-hit-back",
+        "ursa-sudden-sleep",
+        "morae-all-seeing-eyes"
+      ],
+      "selected": "shrail-i-hit-back"
+    },
+    {
+      "level": 4.0,
+      "offered": [
+        "shrail-rage-at-the-dying-of-the-light",
+        "ursa-dream-of-time-gone-by",
+        "morae-sever-fate"
+      ],
+      "selected": "shrail-rage-at-the-dying-of-the-light"
+    },
+    {
+      "level": 5.0,
+      "offered": [
+        "shrail-beat-to-death",
+        "ursa-waking-nightmare",
+        "morae-turning-the-wheel"
+      ],
+      "selected": "shrail-beat-to-death"
+    },
+    {
+      "level": 6.0,
+      "offered": [
+        "shrail-fight-long",
+        "ursa-dream-of-time-gone-by",
+        "morae-bonded-by-unseen-threads"
+      ],
+      "selected": "shrail-fight-long"
+    },
+    {
+      "level": 7.0,
+      "offered": [
+        "eclipsed:0",
+        "ursa-dream-craft",
+        "morae-bonded-by-unseen-threads"
+      ],
+      "selected": "eclipsed:0"
+    }
+  ],
+  "normalSaveReplacementRejected": true
+}

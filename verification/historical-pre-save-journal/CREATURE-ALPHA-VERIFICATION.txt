@@ -1,0 +1,135 @@
+Creature alpha pipeline source update
+Verification date 2026 October 26
+
+The source pipeline now separates foreground segmentation, local alpha-matte
+repair and explicit review before artwork can be promoted. This is not a claim
+that all creature artwork is fixed. No plates are claimed fully resolved.
+
+Artwork status
+
+All 81 source plates, covering 79 bestiary pages, were audited. Current status:
+
+- 3 reviewed PARTIAL cleanups: Phoenix, Unicorn (horn-1) and River Drake.
+  Residual uncertain rims, pockets and weak details remain for manual masking.
+- 77 frozen legacy references: decoded RGBA pixels retain the historical native
+  presentation exactly. This preserves existing output; it does not repair or
+  validate its silhouette, dark anatomy or matte.
+- 1 authored-alpha image: Vampire retains its original RGBA pixels exactly.
+  Existing transparency is preserved, not newly cleaned or certified correct.
+
+All 80 originally opaque plates still require manual work: 77 full silhouette
+reviews and 3 residual edge reviews. There was no batch automatic promotion.
+The Horn-6 automatic proposal was rejected for removing dark anatomy. All
+Zillennia stages remain queued; black bodies and thin tendrils are legitimate
+artwork, not background merely because they are dark.
+
+What changed
+
+Opaque-source proposals use seeded foreground/background color models and a
+spatial graph cut, with reviewed masks and asset-specific negative-space seeds.
+Dark interior protection and detached-detail protection are enabled by default.
+Color similarity and numerical scores are not semantic proof of a correct mask.
+Phoenix has an explicit asset-specific exception; it must not be generalized to
+dark-bodied creatures.
+
+Local matte correction is limited to reviewed edge support. Accepted changes
+must reconstruct the source over its original matte within two byte levels and
+must not delete reviewed foreground support. Unsupported cases remain unchanged
+and flagged. No output blur or feathering is used. Segmentation can still
+misclassify anatomy, so the review gate is essential. Retaining uncertain pixels
+avoids destructive guessing, but can leave visible matte; preservation is not
+the same as true extraction correctness.
+
+Outputs and review
+
+The runtime assets under crates/corpse-desktop/assets/creatures-rgba are actual
+lossless RGBA PNGs with original dimensions. The renderer consumes their alpha
+directly, without runtime color-key removal or smoothing; nearest-neighbor
+sampling is unchanged. Original PNG masters remain unchanged.
+
+Phoenix, Unicorn and River Drake have been reviewed on red, white, gray and
+black backgrounds. The delivery pairs each partial RGBA PNG with one compact
+comparison.
+Comparison backgrounds are flattened review aids, not the transparent artwork.
+All copies match the accepted files byte for byte. The RGBA dimensions remain
+1254 by 1254 for Phoenix and Unicorn, and 1536 by 1024 for River Drake.
+
+Using the pipeline
+
+From the source root, install tools/creature-alpha/requirements.txt in a virtual
+environment, then use:
+
+  python tools/creature-alpha/pipeline.py audit
+  python tools/creature-alpha/pipeline.py build
+  python tools/creature-alpha/pipeline.py verify
+
+Audit writes candidates and comparisons only under art-review; it does not
+replace masters or approve candidates. For a narrower audit, add
+--only phoenix horn-1 river-drake. Build accepts only explicit hash-bound review
+decisions, otherwise retaining the frozen legacy or authored-alpha reference.
+
+Review tools/creature-alpha/manual-queue.json for unresolved work and
+crates/corpse-desktop/assets/creature-alpha-manifest.json for per-plate status
+and hashes. See docs/creature-alpha.md for review gates and test commands.
+
+Verification and release boundaries
+
+The final locked Rust workspace suite passed: 481 tests passed, none failed,
+1 timing-only benchmark ignored, across 107 result groups with no filtered
+tests. Exit status was zero; elapsed time was 431.457 seconds. The ignored warm
+benchmark was run separately and passed. The final run used Rust 1.99.1, test
+optimization level 2, debug assertions and overflow checks enabled. All 1104
+captured source/resource hashes stayed unchanged during the run.
+
+Python validation passed: 10 pipeline tests, 11 edge-matte tests and 9
+additional
+independent approval-gate tests. A separate rebuild without the optional
+art-review tree reproduced all 81 runtime PNGs, the manifest and manual queue
+exactly. Source hashes, dimensions, runtime hashes and review-mask identity were
+checked. All 81 original PNG masters and 241 simulation source/catalog files
+remain byte-identical to the restored source.
+
+For Phoenix, 3159 fractional-alpha/RGB corrections are confined to the reviewed
+one-pixel boundary band. Maximum same-matte reconstruction error is 0.467 of one
+byte level; no fully opaque RGB or reviewed binary-foreground support was lost.
+Unicorn and River Drake have no retained RGB changes and use binary alpha.
+These checks establish bounded behavior, not complete semantic mask correctness.
+
+Seven native page captures completed successfully. Timeless Zillennia's final
+page matches its baseline pixel for pixel. Existing navigation/footer controls
+and protected titles remain unchanged in the compared pages. Linux compilation,
+rendering and tests are verified; no gameplay or balance changes were made.
+
+Storage and diagnostic performance
+
+Exact RGBA increases embedded creature data from 10834900 WebP bytes to
+77240808 PNG bytes: an additional 66405908 bytes, approximately 7.13 times the
+previous size. The runtime consumes exact alpha instead of reconstructing it.
+
+The optimized-test warm-render diagnostic measured 8.48 to 11.96 milliseconds
+per frame at 1280 by 800, and 16.55 to 20.64 at 1920 by 1080, across four
+representative pages with 24 frames per case. No warm-frame segmentation or
+decode occurs. A separate I/O-excluded, five-repetition decode diagnostic used
+unoptimized dependency libraries: old WebP to final PNG medians were Phoenix
+622 to 302 ms, Timeless 586 to 302 ms, Vampire 813 to 277 ms, and River Drake
+562 to 143 ms. These are diagnostic observations, not release-build performance
+claims. Different-profile baseline frame timings do not establish a speedup.
+
+Delivered files
+
+Source ZIP: corpse-gods-r31-creature-alpha-pipeline-source.zip
+For each of phoenix, unicorn and river-drake, the delivery includes:
+  corpse-gods-NAME-partial-cleanup-comparison.png
+  corpse-gods-NAME-partial-cleanup-rgba.png
+Report: corpse-gods-creature-alpha-pipeline-report.txt
+
+The source retains masks, provenance, the 80-item manual-work queue, audit
+summary, regression tests and original masters. It excludes toolchains, build
+outputs, rejected image experiments and internal QA notes. SOURCE-MANIFEST.json
+covers the current packaged files; 
+verification/original-bestiary-redesign-source-manifest.json preserves the historical 997-entry restored manifest.
+Older verification notes describe their historical checkpoints, not new results.
+
+This is a source-package update only. The original Windows executable is
+unchanged. No newly built Windows binary or Windows runtime behavior is verified
+by this work.

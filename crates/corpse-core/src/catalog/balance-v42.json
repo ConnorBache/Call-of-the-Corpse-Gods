@@ -1,0 +1,466 @@
+[
+  {
+    "kind": "banshee",
+    "offense": 407.5,
+    "dodge": 96.0
+  },
+  {
+    "kind": "bear",
+    "offense": 33.0,
+    "dodge": -9
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "offense": 7.5,
+    "dodge": 11
+  },
+  {
+    "kind": "blorb",
+    "offense": 2,
+    "dodge": -11.0
+  },
+  {
+    "kind": "bombardier",
+    "offense": 10,
+    "dodge": -3
+  },
+  {
+    "kind": "cancer",
+    "offense": 311.25,
+    "dodge": 42.0
+  },
+  {
+    "kind": "cave-bat",
+    "offense": 2.688,
+    "dodge": 0.0
+  },
+  {
+    "kind": "chimera",
+    "offense": 808.875,
+    "dodge": 44.0
+  },
+  {
+    "kind": "dire-bear",
+    "offense": 152.0,
+    "dodge": 9.0
+  },
+  {
+    "kind": "dragon",
+    "offense": 738.844,
+    "dodge": 62.0
+  },
+  {
+    "kind": "dryad",
+    "offense": 0,
+    "dodge": -13.0
+  },
+  {
+    "kind": "flesh-administrator",
+    "offense": 418.75,
+    "dodge": 83.0
+  },
+  {
+    "kind": "giant-beetle",
+    "offense": 55.0,
+    "dodge": 8
+  },
+  {
+    "kind": "glim",
+    "offense": 79.0,
+    "dodge": 4.0
+  },
+  {
+    "kind": "greater-birther:pale:Birther",
+    "offense": 7.25,
+    "dodge": 76
+  },
+  {
+    "kind": "greater-birther:pale:Biter",
+    "offense": 7.25,
+    "dodge": 79
+  },
+  {
+    "kind": "greater-birther:pale:Breather",
+    "offense": 7.25,
+    "dodge": 78,
+    "gas_passive": 8.75,
+    "gas_boost": 20.0
+  },
+  {
+    "kind": "greater-birther:pale:Screamer",
+    "offense": 7.25,
+    "dodge": 79
+  },
+  {
+    "kind": "greater-birther:pale:Spitter",
+    "offense": 7.25,
+    "dodge": 82,
+    "gas_shot": 25.0
+  },
+  {
+    "kind": "greater-ichor-fish",
+    "offense": 42.5,
+    "dodge": -12.333333333333334
+  },
+  {
+    "kind": "greater-ichor-leviathan",
+    "offense": 355.688,
+    "dodge": 41.0
+  },
+  {
+    "kind": "greater-ichor-shark",
+    "offense": 136.25,
+    "dodge": 19.0
+  },
+  {
+    "kind": "hemogoblin",
+    "offense": 7,
+    "dodge": -5.0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "offense": -1.219,
+    "dodge": -1.3333333333333335
+  },
+  {
+    "kind": "hemogoblin-inventor",
+    "offense": 6,
+    "dodge": 48.0
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "offense": 78.969,
+    "dodge": 28.0
+  },
+  {
+    "kind": "horn-1",
+    "offense": 30.625,
+    "dodge": 43.0
+  },
+  {
+    "kind": "horn-2",
+    "offense": 93.375,
+    "dodge": 28.0
+  },
+  {
+    "kind": "horn-3",
+    "offense": 81.25,
+    "dodge": 75.0
+  },
+  {
+    "kind": "horn-4",
+    "offense": 279.5,
+    "dodge": 33.0
+  },
+  {
+    "kind": "horn-5",
+    "offense": 175.0,
+    "dodge": 94.0
+  },
+  {
+    "kind": "horn-6",
+    "offense": 513.938,
+    "dodge": 44.0
+  },
+  {
+    "kind": "horn-7",
+    "offense": 232.75,
+    "dodge": 108.0
+  },
+  {
+    "kind": "ichor-fish",
+    "offense": 50,
+    "dodge": -0.666666666666667
+  },
+  {
+    "kind": "ichor-fish-standard",
+    "offense": 41.375,
+    "dodge": -7.666666666666667
+  },
+  {
+    "kind": "ichor-leviathan",
+    "offense": 258.875,
+    "dodge": 37.0
+  },
+  {
+    "kind": "ichor-shark",
+    "offense": 97.438,
+    "dodge": 13.0
+  },
+  {
+    "kind": "kelpie",
+    "offense": 144.375,
+    "dodge": 29.0
+  },
+  {
+    "kind": "killspawn",
+    "offense": 351.5,
+    "dodge": 31.0
+  },
+  {
+    "kind": "lesser-ichor-fish",
+    "offense": 50,
+    "dodge": -0.666666666666667
+  },
+  {
+    "kind": "lesser-ichor-leviathan",
+    "offense": 175.281,
+    "dodge": 33.0
+  },
+  {
+    "kind": "lesser-ichor-shark",
+    "offense": 74.375,
+    "dodge": 17.0
+  },
+  {
+    "kind": "long-saidri",
+    "offense": 124.875,
+    "dodge": 27.0
+  },
+  {
+    "kind": "maulchild",
+    "offense": 0,
+    "dodge": 81.0
+  },
+  {
+    "kind": "minotaur",
+    "offense": 436.188,
+    "dodge": 29.0
+  },
+  {
+    "kind": "moonspawn",
+    "offense": 316.062,
+    "dodge": 46.0
+  },
+  {
+    "kind": "needleling",
+    "offense": 16,
+    "dodge": -5.0
+  },
+  {
+    "kind": "night-crawler",
+    "offense": 162.5,
+    "dodge": 74
+  },
+  {
+    "kind": "pale:Birther",
+    "offense": 10,
+    "dodge": 3.0
+  },
+  {
+    "kind": "pale:Biter",
+    "offense": 7.844,
+    "dodge": -10.0
+  },
+  {
+    "kind": "pale:Breather",
+    "offense": 10,
+    "dodge": -5.333333333333334,
+    "gas_passive": 8.75,
+    "gas_boost": 20.0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "offense": 20,
+    "dodge": 75.0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "offense": 96.594,
+    "dodge": 26.0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "offense": 20,
+    "dodge": 69.0,
+    "gas_passive": 17.5,
+    "gas_boost": 80.0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "offense": 20.0,
+    "dodge": 63
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "offense": 20,
+    "dodge": 62.0,
+    "gas_shot": 25.0
+  },
+  {
+    "kind": "pale:Jackal",
+    "offense": 5,
+    "dodge": -4.0
+  },
+  {
+    "kind": "pale:Screamer",
+    "offense": 10,
+    "dodge": -12.666666666666668
+  },
+  {
+    "kind": "pale:Spitter",
+    "offense": -2.0,
+    "dodge": -9.666666666666668,
+    "gas_shot": 6.25
+  },
+  {
+    "kind": "phoenix",
+    "offense": 352.812,
+    "dodge": 56.0
+  },
+  {
+    "kind": "queen:saidri-guardian",
+    "offense": 167.5,
+    "dodge": 39
+  },
+  {
+    "kind": "queen:short-saidri",
+    "offense": -4.25,
+    "dodge": -4
+  },
+  {
+    "kind": "rat",
+    "offense": 11,
+    "dodge": -3.0
+  },
+  {
+    "kind": "river-drake",
+    "offense": 293.0,
+    "dodge": 30.0
+  },
+  {
+    "kind": "sabretooth",
+    "offense": 414.625,
+    "dodge": 78.0
+  },
+  {
+    "kind": "saidri-guardian",
+    "offense": 400.0,
+    "dodge": 39.0
+  },
+  {
+    "kind": "saidribee-queen",
+    "offense": 230,
+    "dodge": 27.0
+  },
+  {
+    "kind": "shellback-beetle",
+    "offense": 5.0,
+    "dodge": -14.0
+  },
+  {
+    "kind": "short-saidri",
+    "offense": -1.125,
+    "dodge": -11.0
+  },
+  {
+    "kind": "skin-walker",
+    "offense": 207.5,
+    "dodge": 92
+  },
+  {
+    "kind": "tiger",
+    "offense": 59.0,
+    "dodge": 38.0
+  },
+  {
+    "kind": "troll",
+    "offense": 138.875,
+    "dodge": 16.0
+  },
+  {
+    "kind": "ursa-major",
+    "offense": 378.406,
+    "dodge": 47.0
+  },
+  {
+    "kind": "ursa-minor",
+    "offense": 323.938,
+    "dodge": 53.0
+  },
+  {
+    "kind": "valta",
+    "offense": 140.0,
+    "dodge": 102
+  },
+  {
+    "kind": "vampire",
+    "offense": 296.562,
+    "dodge": 92.0
+  },
+  {
+    "kind": "wendigo",
+    "offense": 160.188,
+    "dodge": 50.0
+  },
+  {
+    "kind": "witch",
+    "offense": 15,
+    "dodge": 90.0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "offense": 95.0,
+    "dodge": 64
+  },
+  {
+    "kind": "witch:skin-walker",
+    "offense": 95.0,
+    "dodge": 78
+  },
+  {
+    "kind": "yeti",
+    "offense": 199.25,
+    "dodge": 35.0
+  },
+  {
+    "kind": "zillennia:ancient",
+    "offense": 246.25,
+    "dodge": 86.0
+  },
+  {
+    "kind": "zillennia:child",
+    "offense": 0,
+    "dodge": -8.333333333333334
+  },
+  {
+    "kind": "zillennia:greater",
+    "offense": 92.625,
+    "dodge": 61.0
+  },
+  {
+    "kind": "zillennia:hulking",
+    "offense": 153.312,
+    "dodge": 77.0
+  },
+  {
+    "kind": "zillennia:infant",
+    "offense": 0,
+    "dodge": -16.666666666666668
+  },
+  {
+    "kind": "zillennia:lesser",
+    "offense": 0.0,
+    "dodge": 25.0
+  },
+  {
+    "kind": "zillennia:mature",
+    "offense": 60.938,
+    "dodge": 49.0
+  },
+  {
+    "kind": "zillennia:timeless",
+    "offense": 301.375,
+    "dodge": 91.0
+  },
+  {
+    "kind": "zillennia:transcendent",
+    "offense": 380.938,
+    "dodge": 107.0
+  },
+  {
+    "kind": "zillennia:unqualified",
+    "offense": 33.25,
+    "dodge": 39.0
+  }
+]

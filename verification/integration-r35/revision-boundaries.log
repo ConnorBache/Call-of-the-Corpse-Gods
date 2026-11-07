@@ -1,0 +1,26 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/portals-r35/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 1.47s
+     Running tests/flavor_placement.rs (target/debug/deps/flavor_placement-e797b88a34a79562)
+
+running 6 tests
+test authored_setup_windows_follow_members_and_keep_disabled_recipes_disabled ... ok
+test corpse_revival_cannot_introduce_out_of_band_witches ... ok
+test dynamic_water_watcher_stencil_never_leaks_frozen_depth_species ... ok
+test final_windows_cover_every_leader_and_pair_without_legacy_changes ... ok
+test all_depths_keep_deterministic_exact_reward_feasibility ... ok
+test generated_live_sources_obey_relocated_windows_regression_seed_zero ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.47s
+
+     Running tests/physical_balance.rs (target/debug/deps/physical_balance-bf5456064e837339)
+
+running 6 tests
+test reference_depth_is_independent_of_spawn_window ... ok
+test pale_identity_and_ichor_event_construction_receive_tuning ... ok
+test revision_overlay_preserves_abilities_rewards_and_frozen_catalog ... ok
+test revised_stat_scale_does_not_rebudget_population ... ok
+test native_late_profile_trades_and_cancer_ignore_armor ... ok
+test native_dispatch_rat_whole_encounter_and_fast_cadence ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.92s
+

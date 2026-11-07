@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "checked_utc": "2026-10-28T20:35:46.820026+00:00",
+  "old_full_freeze": "b3101ade2273fac5104394cc0f962cdd7f06177af6dadf7bdf3ae55e2ce50798",
+  "new_full_freeze": "e8335b59bbbd5dbc7e602be641a4b2774736390a7dc7434e9c48c64f78b70f14",
+  "full_input_count": 1072,
+  "changed_files": [
+    {
+      "path": "crates/corpse-core/tests/ordinary_roster.rs",
+      "before_sha256": "8792b350831c9a752965ddd6c50b2f3fe9de86b5b0f61b175062ffb1b5e78c4a",
+      "after_sha256": "66606f58cb0df6c02110548e4024c4e65249e1a720b864843bcc4e3af5a13563",
+      "exact_single_assertion_substitution": true,
+      "old": "Some(&37.0)",
+      "new": "Some(&38.0)"
+    },
+    {
+      "path": "crates/corpse-desktop/src/pack.rs",
+      "before_sha256": "6a53b627b134e1ca960b3067bb0f90e6ac53e6ed74bcfccebb37b86cfebaad48",
+      "after_sha256": "b6797a807140c9dcf7a136e07fa8d9dc26683057986b351324be3aae5c727ce6",
+      "exact_single_assertion_substitution": true,
+      "old": "assert!(describe_item(&r,&mask).contains(\"while carried\"));",
+      "new": "assert!(describe_item(&r,&mask).contains(\"Grants Teleport while in your inventory.\"));"
+    }
+  ],
+  "core_qa_input_count": 144,
+  "core_qa_fingerprint": "de9b799d5fe9fe5897450c2872b6823e84717aebf48bce28c9fe2abccf7e2886",
+  "all_core_inputs_unchanged": true,
+  "no_generation_rerun_needed": true,
+  "scope": "Only an integration-test revision assertion and an assertion inside desktop #[cfg(test)] mod tests changed. Production behavior and the 144 QA core inputs unchanged."
+}

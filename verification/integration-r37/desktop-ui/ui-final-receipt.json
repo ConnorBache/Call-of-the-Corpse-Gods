@@ -1,0 +1,34 @@
+{
+  "r37_focused_tests": {
+    "passed": 10,
+    "failed": 0,
+    "captures_exercised": true,
+    "log": "r37-focused-final-tests.log"
+  },
+  "source_frozen": true,
+  "rendering": "live native software Painter; no Windows runtime claim",
+  "generated_provenance": "Generated geometry, full reveal, level-1 observer, no turns. Original seed fully regenerated after item-overlap fix; Corn uses additional documented seed because original has no accepted Corn dimension under final density constraints.",
+  "captures": [
+    {
+      "file": "sub-biomes-corn-dimension-floor31-generated-debug.png",
+      "bytes": 686613,
+      "sha256": "2983aada639c3a771f419ca8dba570c341b2960de665c7d759c79c609e5dfc58"
+    },
+    {
+      "file": "sub-biomes-hellfire-floor25-generated-debug.png",
+      "bytes": 680071,
+      "sha256": "bbaef8edff7a5d889cdf90e8c9e5687ec5d06727a3b39c140f1beae72ad7b168"
+    },
+    {
+      "file": "sub-biomes-mountainous-floor22-generated-debug.png",
+      "bytes": 662740,
+      "sha256": "3ff54b5495b3f00b2d64052395ec50dbabcc12ea035f956b48320a58dc587a9c"
+    },
+    {
+      "file": "sub-biomes-terrain-controlled.png",
+      "bytes": 347622,
+      "sha256": "d297c3de4a86aa642ebd4e8c694f9254f643e773397ccb399922469022e6bf90"
+    }
+  ],
+  "final_workspace_gate_captures": true
+}

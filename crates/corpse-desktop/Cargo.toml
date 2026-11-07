@@ -1,0 +1,19 @@
+[package]
+name = "corpse-desktop"
+version = "0.1.0"
+edition = "2021"
+[dependencies]
+corpse-core = { path = "../corpse-core" }
+sdl2 = "0.38"
+png = "0.17"
+fontdue = "0.9"
+serde_json = { workspace = true }
+serde = { workspace = true }
+getrandom = "0.3"
+image-webp = "=0.2.4"
+crc32fast = "=1.5.2"
+
+[features]
+# Opt-in isolated experimental executable; normal builds retain existing paths.
+append-recording-trial = []
+runtime-timing = ["corpse-core/runtime-timing"]

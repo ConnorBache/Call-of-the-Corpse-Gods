@@ -1,0 +1,18 @@
+
+running 13 tests
+test appearance_profile::compiled::global_tone_raw_tests::compiled_global_tone_missing_wrong_type_and_signed_zero ... ok
+test appearance_profile::compiled_tests::compiled_appearance_construction_audit ... ignored, lead-controlled construction/retained-data diagnostic, outside frame timing
+test appearance_profile::compiled_tests::compiled_clone_edit_reset_named_never_stale ... ok
+test appearance_profile::compiled_tests::compiled_material_exact_inheritance_and_case_sensitive_customization ... ok
+test appearance_profile::compiled_tests::compiled_scalars_exact_raw_lookup_and_default_equality ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::dark_blue_telepathy ... ok
+test color::tests::srgb_roundtrip ... ok
+test source_all_lighting_controls_and_conservative_rays_match ... ok
+test source_deterministic_flicker_matches ... ok
+test unknown_origin_never_expands_and_future_source_payloads_are_inert ... ok
+
+test result: ok. 12 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.86s
+

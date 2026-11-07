@@ -1,0 +1,19 @@
+
+running 14 tests
+test decoration_is_deterministic_and_observed_wall_memory_does_not_leak_hidden_changes ... ok
+test exactly_one_hundred_normal_turns_then_ten_stationary_turns_reset_without_buffs ... ok
+test hunting_detection_interrupts_before_idle_food_action ... ok
+test actual_haste_dispatch_and_spawn_sleep_use_world_turns_not_commands ... ok
+test autonomous_ally_can_feed_but_following_and_combat_take_priority ... ok
+test rooted_aquatic_unreachable_and_rally_cases_cannot_teleport_or_override_orders ... ok
+test thirst_uses_real_blood_only_and_drinks_from_land_without_drowning_or_depleting ... ok
+test slow_feeds_every_normal_turn_and_haste_never_advances_the_meal_clock ... ok
+test revision35_hungry_route_crosses_portal_once_and_respects_remote_occupant ... ok
+test damage_threat_movement_source_loss_and_paralysis_restart_full_meal ... ok
+test actual_generation_keeps_wall_geometry_and_seeds_only_real_river_food_in_r33 ... ok
+test serialization_snapshot_both_temporal_routes_and_legacy_gate_keep_ecology_consistent ... ok
+test reachable_wall_uses_adjacent_safe_cell_and_never_walks_through_wall ... ok
+test offscreen_exact_clock_completes_and_restarts_meals_without_player_hunger ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

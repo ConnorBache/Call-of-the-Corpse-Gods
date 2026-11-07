@@ -1,0 +1,83 @@
+[
+  {
+    "kind": "birther:pale:Jackal",
+    "reference_depth": 6,
+    "target_mean_loss": 0.25,
+    "target_gross_damage": 0.25,
+    "defense": -9,
+    "offense": 25,
+    "accuracy": 9,
+    "dodge": 11,
+    "dr": 0,
+    "qualification": "Fixed birth-only offspring profile; three casts spend50energy and produce2+1+1 immediate children. Child descendants and native statuses are included in isolated payload trials. Percentages are rough guidelines. Greater brood remains intentionally more dangerous; no gas nerf solely to close a seven-point gap.",
+    "validation_model": "native-three-cast-children"
+  },
+  {
+    "kind": "greater-birther:pale:Biter",
+    "reference_depth": 23,
+    "target_mean_loss": 0.38,
+    "target_gross_damage": 0.38,
+    "defense": -10,
+    "offense": 59,
+    "accuracy": 131,
+    "dodge": 79,
+    "dr": 0,
+    "qualification": "Fixed birth-only offspring profile; three casts spend50energy and produce2+1+1 immediate children. Child descendants and native statuses are included in isolated payload trials. Percentages are rough guidelines. Greater brood remains intentionally more dangerous; no gas nerf solely to close a seven-point gap.",
+    "validation_model": "native-three-cast-children"
+  },
+  {
+    "kind": "greater-birther:pale:Breather",
+    "reference_depth": 23,
+    "target_mean_loss": 0.38,
+    "target_gross_damage": 0.38,
+    "defense": -10,
+    "offense": 59,
+    "accuracy": 128,
+    "dodge": 78,
+    "dr": 0,
+    "qualification": "Fixed birth-only offspring profile; three casts spend50energy and produce2+1+1 immediate children. Child descendants and native statuses are included in isolated payload trials. Percentages are rough guidelines. Greater brood remains intentionally more dangerous; no gas nerf solely to close a seven-point gap.",
+    "validation_model": "native-three-cast-children",
+    "gas_passive": 35,
+    "gas_boost": 80
+  },
+  {
+    "kind": "greater-birther:pale:Spitter",
+    "reference_depth": 23,
+    "target_mean_loss": 0.38,
+    "target_gross_damage": 0.38,
+    "defense": -13,
+    "offense": 59,
+    "accuracy": 134,
+    "dodge": 82,
+    "dr": 0,
+    "qualification": "Fixed birth-only offspring profile; three casts spend50energy and produce2+1+1 immediate children. Child descendants and native statuses are included in isolated payload trials. Percentages are rough guidelines. Greater brood remains intentionally more dangerous; no gas nerf solely to close a seven-point gap.",
+    "validation_model": "native-three-cast-children",
+    "gas_shot": 100
+  },
+  {
+    "kind": "greater-birther:pale:Birther",
+    "reference_depth": 23,
+    "target_mean_loss": 0.38,
+    "target_gross_damage": 0.38,
+    "defense": -11,
+    "offense": 59,
+    "accuracy": 126,
+    "dodge": 76,
+    "dr": 0,
+    "qualification": "Fixed birth-only offspring profile; three casts spend50energy and produce2+1+1 immediate children. Child descendants and native statuses are included in isolated payload trials. Percentages are rough guidelines. Greater brood remains intentionally more dangerous; no gas nerf solely to close a seven-point gap.",
+    "validation_model": "native-three-cast-children"
+  },
+  {
+    "kind": "greater-birther:pale:Screamer",
+    "reference_depth": 23,
+    "target_mean_loss": 0.38,
+    "target_gross_damage": 0.38,
+    "defense": -8,
+    "offense": 59,
+    "accuracy": 128,
+    "dodge": 79,
+    "dr": 0,
+    "qualification": "Fixed birth-only offspring profile; three casts spend50energy and produce2+1+1 immediate children. Child descendants and native statuses are included in isolated payload trials. Percentages are rough guidelines. Greater brood remains intentionally more dangerous; no gas nerf solely to close a seven-point gap.",
+    "validation_model": "native-three-cast-children"
+  }
+]

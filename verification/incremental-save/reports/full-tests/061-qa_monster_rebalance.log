@@ -1,0 +1,19 @@
+
+running 14 tests
+test qa_failed_birth_does_not_spend_energy_rng_or_start_timer ... ok
+test qa_offscreen_catch_up_preserves_absolute_world_turn_deadline ... ok
+test qa_greater_birther_descendant_inherits_heartlessness_and_own_timer ... ok
+test qa_single_open_cell_allows_five_paid_single_casts_not_free_unbounded_births ... ok
+test qa_summoned_hearts_remain_existing_reward_risk_not_silently_removed ... ok
+test qa_three_casts_require_twenty_world_turns_and_use_finite_resource_budget ... ok
+test qa_unseen_sleep_refills_energy_but_active_detection_does_not ... ok
+test qa_heartless_parents_and_revived_parents_birth_heartless_children_only_in32 ... ok
+test qa_player_mini_me_toggle_does_not_gain_monster_birth_cooldown ... ok
+test qa_legacy_birth_is_not_retroactively_cooled_down ... ok
+test qa_every_catalog_heart_has_exact_additive_growth_and_six_hp_per_defense ... ok
+test qa_summon_timer_survives_storage_snapshot_and_future_restore ... ok
+test qa_actual_revert_and_see_future_commands_restore_summons_and_timer ... ok
+test qa_actual_dispatch_haste_save_resume_replay_share_world_turn_timer ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.21s
+

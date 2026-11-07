@@ -1,0 +1,105 @@
+{
+  "scope": "32 identical heart-audit seed identities; all_initial_unblessed entrance profiles",
+  "rows": [
+    {
+      "depth": 24,
+      "worlds": 32,
+      "r32": {
+        "offense": 140.9375,
+        "defense": 210.9375,
+        "accuracy": 104.125,
+        "dodge": 130.84375,
+        "dr": 61.625,
+        "max_hp": 1365.625
+      },
+      "r33": {
+        "offense": 137.3125,
+        "defense": 206.5625,
+        "accuracy": 100.375,
+        "dodge": 125.8125,
+        "dr": 61.03125,
+        "max_hp": 1339.375
+      }
+    },
+    {
+      "depth": 26,
+      "worlds": 32,
+      "r32": {
+        "offense": 154.03125,
+        "defense": 268.78125,
+        "accuracy": 109.375,
+        "dodge": 139.15625,
+        "dr": 66.8125,
+        "max_hp": 1712.6875
+      },
+      "r33": {
+        "offense": 149.09375,
+        "defense": 264.4375,
+        "accuracy": 105.96875,
+        "dodge": 133.40625,
+        "dr": 65.84375,
+        "max_hp": 1686.625
+      }
+    },
+    {
+      "depth": 28,
+      "worlds": 32,
+      "r32": {
+        "offense": 176.90625,
+        "defense": 316.71875,
+        "accuracy": 113.5625,
+        "dodge": 141.28125,
+        "dr": 71.21875,
+        "max_hp": 2000.3125
+      },
+      "r33": {
+        "offense": 171.75,
+        "defense": 307.8125,
+        "accuracy": 108.28125,
+        "dodge": 133.40625,
+        "dr": 69.375,
+        "max_hp": 1946.875
+      }
+    },
+    {
+      "depth": 30,
+      "worlds": 32,
+      "r32": {
+        "offense": 201.53125,
+        "defense": 364.59375,
+        "accuracy": 116.59375,
+        "dodge": 143.0,
+        "dr": 76.46875,
+        "max_hp": 2287.5625
+      },
+      "r33": {
+        "offense": 194.8125,
+        "defense": 357.03125,
+        "accuracy": 110.90625,
+        "dodge": 133.40625,
+        "dr": 74.84375,
+        "max_hp": 2242.1875
+      }
+    },
+    {
+      "depth": 40,
+      "worlds": 32,
+      "r32": {
+        "offense": 397.03125,
+        "defense": 527.875,
+        "accuracy": 163.65625,
+        "dodge": 171.5,
+        "dr": 99.78125,
+        "max_hp": 3267.25
+      },
+      "r33": {
+        "offense": 384.25,
+        "defense": 507.46875,
+        "accuracy": 153.5,
+        "dodge": 158.15625,
+        "dr": 97.0625,
+        "max_hp": 3144.8125
+      }
+    }
+  ]
+}

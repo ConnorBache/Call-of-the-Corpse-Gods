@@ -1,0 +1,86 @@
+{
+  "status": "PASS: cross-build and static package verification",
+  "windows_runtime_verified": false,
+  "power_loss_verified": false,
+  "artifact": "incremental-save/package/corpse-gods-native-r39-incremental-save-windows-final.zip",
+  "archive_bytes": 19717928,
+  "archive_sha256": "ac425fdcff13279b5e06152da039057e671c93a0c6f4d9c3ac7dbbaefe3e3293",
+  "under_20000000_bytes": true,
+  "members": 106,
+  "pe_inspection": {
+    "exe_imports": [
+      "api-ms-win-core-synch-l1-2-0.dll",
+      "bcryptprimitives.dll",
+      "KERNEL32.dll",
+      "msvcrt.dll",
+      "ntdll.dll",
+      "SDL2.dll"
+    ],
+    "sdl2_imports": [
+      "ADVAPI32.dll",
+      "GDI32.dll",
+      "IMM32.dll",
+      "KERNEL32.dll",
+      "msvcrt.dll",
+      "ole32.dll",
+      "OLEAUT32.dll",
+      "SETUPAPI.dll",
+      "SHELL32.dll",
+      "USER32.dll",
+      "VERSION.dll",
+      "WINMM.dll"
+    ],
+    "tool": "x86_64-w64-mingw32-objdump",
+    "version": "GNU objdump (GNU Binutils) 2.44"
+  },
+  "strip": {
+    "all_loadable_pe_section_bytes_unchanged": true,
+    "arguments": [
+      "--strip-all"
+    ],
+    "tool": "x86_64-w64-mingw32-strip",
+    "tool_sha256": "6ffeb58cbfb392060c66bd8d5f1c11683177dd2eb182ad3eb460e815ea86ee89",
+    "version": "GNU strip (GNU Binutils) 2.44"
+  },
+  "source_profile": "reports/windows-build-profile.json",
+  "asset_verification": "reports/windows-assets-static.json",
+  "build_log": "reports/windows-build-retry.log",
+  "initial_environment_failure": "Initial linker execution failed because unpacked script lacked its archived executable mode; build-local sh dispatcher retry succeeded. Parent later restored original source modes without content changes.",
+  "qa_correction": "Static verification initially asserted asInvoker; actual unchanged application resource is DPI-only. Corrected test to assert exact source manifest bytes and PerMonitorV2. All checks then passed.",
+  "commands": {
+    "build": "PATH=\"$ROOT/toolchain/bin:$ROOT/native-windows-sdk/sysroot/usr/bin:$PATH\" CARGO_HOME=\"$ROOT/cargo\" CARGO_TARGET_DIR=\"$ROOT/windows-target\" CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=\"$ROOT/qa/windows-linker-dispatch.sh\" SDL2_LIB_DIR=\"$ROOT/native-windows-sdk/SDL2-2.32.10/x86_64-w64-mingw32/lib\" WINDRES=\"$ROOT/native-windows-sdk/sysroot/usr/bin/x86_64-w64-mingw32-windres\" CARGO_PROFILE_RELEASE_OPT_LEVEL=s CARGO_PROFILE_RELEASE_LTO=fat CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1 CARGO_PROFILE_RELEASE_DEBUG=0 CARGO_PROFILE_RELEASE_STRIP=symbols CARGO_INCREMENTAL=0 cargo build --manifest-path \"$ROOT/source/Cargo.toml\" --release --locked --offline --jobs 1 --target x86_64-pc-windows-gnu -p corpse-desktop --bin corpse-desktop",
+    "assets": "python3 incremental-save/qa/verify_windows_assets.py incremental-save/windows-target/x86_64-pc-windows-gnu/release/corpse-desktop.exe",
+    "package": "python3 incremental-save/source/tools/package-compact-windows.py --binary \"$ROOT/windows-target/x86_64-pc-windows-gnu/release/corpse-desktop.exe\" --art-manifest incremental-save/source/crates/corpse-desktop/assets/creature-runtime-manifest.json --output incremental-save/package/corpse-gods-native-r39-incremental-save-windows.zip --label r39-compact --build-profile-json incremental-save/reports/windows-build-profile.json --sdk \"$ROOT/native-windows-sdk\""
+  },
+  "root_variable": "absolute path to incremental-save",
+  "verification_tools": [
+    {
+      "path": "qa/verify_windows_assets.py",
+      "sha256": "1bea0dc49bc1dd194d124db7652e6097ca63aaea5b1448ee6879b4d3683fd9f7"
+    },
+    {
+      "path": "qa/windows-linker-dispatch.sh",
+      "sha256": "3017159e25a8f075ce09567fa95475bfa7aac08e1d93c4ad7adda5d328650dc2"
+    },
+    {
+      "path": "source/tools/package-compact-windows.py",
+      "sha256": "7f8c752bfea9fe4723108ee078d230a65cb582d62e02b7ce41a47114e7e95fb8"
+    }
+  ],
+  "release_status": "FINAL: full regression gate passed and final archive includes current verification and saves/recovery notes",
+  "provisional_artifact": "incremental-save/package/corpse-gods-native-r39-incremental-save-windows.zip",
+  "full_workspace_gate": {
+    "targets": 164,
+    "passing_executions": 1306,
+    "failed": 0,
+    "ignored": 13,
+    "source": "reports/full-test-summary.json",
+    "sha256": "7dc42198dbe14ab6135731b5f939c8d301e188575727bb709c47ac3271d39e75",
+    "counts_include_repeated_module_harnesses": true
+  },
+  "finalizer": {
+    "path": "qa/finalize_windows_package.py",
+    "sha256": "06b6790e35dee97a1e654b7e667d54dfe3aae02553ba6a643df5e13048ee2c8f",
+    "command": "python3 incremental-save/qa/finalize_windows_package.py --base incremental-save/package/corpse-gods-native-r39-incremental-save-windows.zip --output incremental-save/package/corpse-gods-native-r39-incremental-save-windows-final.zip --notes incremental-save/package/SAVES-AND-RECOVERY.txt --gate-note incremental-save/package/VERIFICATION.txt"
+  }
+}

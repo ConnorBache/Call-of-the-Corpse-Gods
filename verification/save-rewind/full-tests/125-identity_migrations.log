@@ -1,0 +1,10 @@
+
+running 5 tests
+test bastidion_source_vectors ... ok
+test generated_grant_order_is_stable ... ok
+test display_order_normalization_matches_source ... ok
+test divine_source_vectors ... ok
+test integer_health_source_vectors ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+

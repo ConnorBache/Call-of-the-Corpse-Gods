@@ -1,0 +1,99 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/sub-biomes-r37/source/corpse-gods-native/crates/corpse-core)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 32.38s
+     Running `target/debug/examples/sub_biome_survey_r37 sub-biome-review-1 sub-biome-review-2 sub-biomes-review-r37`
+FOREST sub-biome-review-1 11 cells4 trees3 grass1
+FOREST sub-biome-review-1 12 cells12 trees5 grass7
+FOREST sub-biome-review-1 13 cells12 trees6 grass6
+FOREST sub-biome-review-1 14 cells74 trees22 grass52
+FOREST sub-biome-review-1 15 cells66 trees34 grass32
+FOREST sub-biome-review-1 17 cells11 trees1 grass10
+FOREST sub-biome-review-1 18 cells21 trees1 grass20
+FLOOR sub-biome-review-1 18 mounttrue ice11 hellfire0 speed0
+FOREST sub-biome-review-1 19 cells16 trees1 grass15
+FOREST sub-biome-review-1 20 cells19 trees2 grass17
+FLOOR sub-biome-review-1 20 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-1 21 mounttrue ice20 hellfire0 speed2
+FLOOR sub-biome-review-1 22 mounttrue ice2 hellfire0 speed2
+FLOOR sub-biome-review-1 23 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-1 24 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-1 25 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-1 26 mounttrue ice1 hellfire6 speed2
+FLOOR sub-biome-review-1 27 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-1 28 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-1 29 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-1 30 mountfalse ice0 hellfire0 speed2
+CORN sub-biome-review-1 31 cells81 residents8 portals4 speed2 random2 safetrue optionaltrue
+FLOOR sub-biome-review-1 31 mounttrue ice2 hellfire0 speed4
+FLOOR sub-biome-review-1 32 mountfalse ice0 hellfire0 speed2
+FOREST sub-biome-review-1 33 cells20 trees11 grass9
+FLOOR sub-biome-review-1 33 mounttrue ice7 hellfire0 speed2
+FLOOR sub-biome-review-1 34 mounttrue ice23 hellfire0 speed2
+FLOOR sub-biome-review-1 35 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-1 36 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-1 37 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-1 38 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-1 39 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-1 40 mountfalse ice0 hellfire6 speed2
+FOREST sub-biome-review-2 2 cells22 trees0 grass22
+FOREST sub-biome-review-2 4 cells17 trees4 grass13
+FOREST sub-biome-review-2 5 cells44 trees23 grass21
+FOREST sub-biome-review-2 11 cells60 trees23 grass37
+FOREST sub-biome-review-2 13 cells17 trees10 grass7
+FOREST sub-biome-review-2 14 cells69 trees30 grass39
+FOREST sub-biome-review-2 15 cells12 trees7 grass5
+FLOOR sub-biome-review-2 19 mounttrue ice30 hellfire0 speed0
+FOREST sub-biome-review-2 20 cells5 trees1 grass4
+FLOOR sub-biome-review-2 20 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-2 21 mounttrue ice20 hellfire0 speed2
+FLOOR sub-biome-review-2 22 mounttrue ice24 hellfire0 speed2
+FLOOR sub-biome-review-2 23 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-2 24 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-2 25 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biome-review-2 26 mounttrue ice1 hellfire6 speed2
+FLOOR sub-biome-review-2 27 mounttrue ice14 hellfire6 speed2
+FLOOR sub-biome-review-2 28 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 29 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 30 mounttrue ice7 hellfire6 speed2
+FLOOR sub-biome-review-2 31 mounttrue ice1 hellfire6 speed2
+FLOOR sub-biome-review-2 32 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 33 mounttrue ice3 hellfire6 speed2
+FLOOR sub-biome-review-2 34 mounttrue ice11 hellfire6 speed2
+FLOOR sub-biome-review-2 35 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 36 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 37 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 38 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 39 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biome-review-2 40 mountfalse ice0 hellfire6 speed2
+FOREST sub-biomes-review-r37 11 cells7 trees0 grass7
+FOREST sub-biomes-review-r37 12 cells5 trees0 grass5
+FOREST sub-biomes-review-r37 14 cells11 trees2 grass9
+FOREST sub-biomes-review-r37 15 cells10 trees0 grass10
+FOREST sub-biomes-review-r37 16 cells9 trees2 grass7
+FOREST sub-biomes-review-r37 17 cells17 trees6 grass11
+FOREST sub-biomes-review-r37 18 cells63 trees35 grass28
+FLOOR sub-biomes-review-r37 18 mounttrue ice10 hellfire0 speed0
+FOREST sub-biomes-review-r37 19 cells29 trees13 grass16
+FOREST sub-biomes-review-r37 20 cells125 trees71 grass54
+FLOOR sub-biomes-review-r37 20 mountfalse ice0 hellfire0 speed2
+FOREST sub-biomes-review-r37 21 cells44 trees15 grass29
+FLOOR sub-biomes-review-r37 21 mounttrue ice16 hellfire0 speed2
+FLOOR sub-biomes-review-r37 22 mounttrue ice42 hellfire0 speed2
+FLOOR sub-biomes-review-r37 23 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biomes-review-r37 24 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biomes-review-r37 25 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biomes-review-r37 26 mounttrue ice1 hellfire6 speed2
+FLOOR sub-biomes-review-r37 27 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biomes-review-r37 28 mounttrue ice28 hellfire6 speed2
+FLOOR sub-biomes-review-r37 29 mounttrue ice10 hellfire6 speed2
+FLOOR sub-biomes-review-r37 30 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biomes-review-r37 31 mounttrue ice3 hellfire0 speed2
+FLOOR sub-biomes-review-r37 32 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biomes-review-r37 33 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biomes-review-r37 34 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biomes-review-r37 35 mountfalse ice0 hellfire0 speed2
+FLOOR sub-biomes-review-r37 36 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biomes-review-r37 37 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biomes-review-r37 38 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biomes-review-r37 39 mountfalse ice0 hellfire6 speed2
+FLOOR sub-biomes-review-r37 40 mountfalse ice0 hellfire6 speed2

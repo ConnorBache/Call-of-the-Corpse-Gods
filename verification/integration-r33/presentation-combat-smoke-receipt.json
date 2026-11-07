@@ -1,0 +1,163 @@
+{
+  "passed": true,
+  "native_cases": 12,
+  "species": [
+    "night-crawler",
+    "skin-walker",
+    "vampire"
+  ],
+  "rng_seeds": [
+    1,
+    7,
+    41,
+    127
+  ],
+  "method": "Same source probe linked separately against pre-guard and post-guard core rlibs; actual dispatch for approach/melee up to128 commands and20 post-kill Wait commands. Synthetic fixed700HP/Offense200/Defense100/Accuracy110/Dodge110/DR10 player; not a balance measurement.",
+  "excluded_comparison_fields": [
+    "log",
+    "logArchive.messages",
+    "runStats.death.reason"
+  ],
+  "all_other_state_equal": true,
+  "combat_summary_csv_byte_exact": true,
+  "driver": "verification/integration-r33/presentation-combat-smoke.rs",
+  "driver_sha256": "c09d99c274605e6a467c3f006c0c2537c8e12466e862ace5ea824a3ec75c3b71",
+  "rows": [
+    {
+      "case": "night-crawler-1",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 2889104680.0,
+      "player_hp": 332.59999999999945,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "e759eb47cef579776e5e94f6550d240abefbd8ad3753b2a8e47aa6937ba08e6b",
+      "after_sha256": "e759eb47cef579776e5e94f6550d240abefbd8ad3753b2a8e47aa6937ba08e6b"
+    },
+    {
+      "case": "night-crawler-127",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 3763214131.0,
+      "player_hp": 196.00000000000003,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "7ecf78253e1ab40b337b6f900f512121d1fb268ce1c88175c413d9fa22089b94",
+      "after_sha256": "7ecf78253e1ab40b337b6f900f512121d1fb268ce1c88175c413d9fa22089b94"
+    },
+    {
+      "case": "night-crawler-41",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 1104988983.0,
+      "player_hp": 235.00000000000003,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "2fddcc14acc03ae51f30cf22e1eacae66d12839a2e8a6b14fb55143767e80c85",
+      "after_sha256": "2fddcc14acc03ae51f30cf22e1eacae66d12839a2e8a6b14fb55143767e80c85"
+    },
+    {
+      "case": "night-crawler-7",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 2686943208.0,
+      "player_hp": 337.59999999999945,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "a6c6382b42cbdccf230bb20b7b4ab369ec942223eb33104470480a6ab7a17172",
+      "after_sha256": "a6c6382b42cbdccf230bb20b7b4ab369ec942223eb33104470480a6ab7a17172"
+    },
+    {
+      "case": "skin-walker-1",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 2889104680.0,
+      "player_hp": 113.60000000000008,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "138ca170627b5bd598dc57ac3c0bb3c41ee9bf66403715b6e9c2591b0b89f55e",
+      "after_sha256": "138ca170627b5bd598dc57ac3c0bb3c41ee9bf66403715b6e9c2591b0b89f55e"
+    },
+    {
+      "case": "skin-walker-127",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 2434933796.0,
+      "player_hp": 91.60000000000007,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "93c915f7d89dbbba78d06eb5217cdf65d6a283cda13b9a0b0a33342b07b5d6bd",
+      "after_sha256": "93c915f7d89dbbba78d06eb5217cdf65d6a283cda13b9a0b0a33342b07b5d6bd"
+    },
+    {
+      "case": "skin-walker-41",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 824660975.0,
+      "player_hp": 139.60000000000008,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "a841452dc5a05c0fea91409daaf5fd810a6e71719e6e8332b3040e280e1a47a3",
+      "after_sha256": "a841452dc5a05c0fea91409daaf5fd810a6e71719e6e8332b3040e280e1a47a3"
+    },
+    {
+      "case": "skin-walker-7",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 2686943208.0,
+      "player_hp": 120.60000000000008,
+      "target_hp": 0.0,
+      "status": "playing",
+      "before_sha256": "f85bafca9fbf6adce11f1aabc03bcde7c61e815afe88f478d038f3f2730b78fc",
+      "after_sha256": "f85bafca9fbf6adce11f1aabc03bcde7c61e815afe88f478d038f3f2730b78fc"
+    },
+    {
+      "case": "vampire-1",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 2440533925.0,
+      "player_hp": 0.0,
+      "target_hp": 326.748,
+      "status": "dead",
+      "before_sha256": "0bd9d176422561eb3e143a329aad615e43158d6494eeea88d209ca9b1ea7431e",
+      "after_sha256": "0bd9d176422561eb3e143a329aad615e43158d6494eeea88d209ca9b1ea7431e"
+    },
+    {
+      "case": "vampire-127",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 688691379.0,
+      "player_hp": 0.0,
+      "target_hp": 330.24800000000005,
+      "status": "dead",
+      "before_sha256": "b2ddc7c2b98fafdf1775fb1615d94981ecda58027c28df253aac6637d29a0f51",
+      "after_sha256": "b2ddc7c2b98fafdf1775fb1615d94981ecda58027c28df253aac6637d29a0f51"
+    },
+    {
+      "case": "vampire-41",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 354426826.0,
+      "player_hp": 0.0,
+      "target_hp": 346.072,
+      "status": "dead",
+      "before_sha256": "0920acbfea6823e47fc10d0f45035d5ab7a2462998ebd4014552e242afe786c3",
+      "after_sha256": "0920acbfea6823e47fc10d0f45035d5ab7a2462998ebd4014552e242afe786c3"
+    },
+    {
+      "case": "vampire-7",
+      "top_level_changed": [],
+      "all_non_narration_state_equal": true,
+      "rng": 2117862049.0,
+      "player_hp": 0.0,
+      "target_hp": 335.572,
+      "status": "dead",
+      "before_sha256": "50947ca33f9d9bf6e13071b336b83c5103c1630e50bc1527badb297438156575",
+      "after_sha256": "50947ca33f9d9bf6e13071b336b83c5103c1630e50bc1527badb297438156575"
+    }
+  ],
+  "rlib_before_sha256": "9def2cbb120709786cfd111ba48bc2a03eb89c79bf4291ad30f890d3f28860fe",
+  "rlib_after_sha256": "28c0eed414e4ece71b31eac93a5697ffad8c51ab8b3813866aa383299e9a7bac",
+  "final_input_fingerprint": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "post_guard_probe_linked_from_final_opt2_gate": true
+}

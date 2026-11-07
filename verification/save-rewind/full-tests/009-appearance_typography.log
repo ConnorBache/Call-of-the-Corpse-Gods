@@ -1,0 +1,9 @@
+
+running 4 tests
+test bundled_family_order_and_unavailable_faces_are_explicit ... ok
+test explicit_height_overrides_derived_track_and_compact_baseline_survives ... ok
+test default_role_reset_preserves_selector_specific_weight_and_size ... ok
+test frozen_source_role_override_rules_match_for_every_role ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

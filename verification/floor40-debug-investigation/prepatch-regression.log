@@ -1,0 +1,16 @@
+
+running 2 tests
+
+thread 'debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic' (33) panicked at crates/corpse-core/tests/debug_floor40_fire_admission.rs:21:17:
+assertion failed: !link.active
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic ... FAILED
+test legacy_debug_checkpoint_still_round_trips ... ok
+
+failures:
+
+failures:
+    debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.44s
+

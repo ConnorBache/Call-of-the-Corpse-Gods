@@ -1,0 +1,25 @@
+
+running 19 tests
+test actual_death_seeds_real_cell_once_without_rng_corpse_or_heart ... ok
+test death_on_upstairs_seeds_above_immediately_without_extra_layer ... ok
+test half_here_endpoint_falls_out_without_killing_airborne_owner ... ok
+test collapse_removes_fixtures_objects_and_corpses_without_rewards ... ok
+test explicit_dive_while_flying_is_still_a_fall_and_ordinary_gap_is_unchanged ... ok
+test lost_flight_npcs_are_removed_between_pulses_on_active_and_hidden_floors ... ok
+test object_fallback_to_collapse_gap_is_discarded_not_transferred ... ok
+test parity_simultaneous_eight_neighbor_layers_no_rng_and_walls_erode ... ok
+test moving_into_entrance_wins_without_extra_world_turn ... ok
+test collapse_fall_terminal_even_on_floor40_and_preserves_flight_until_falling ... ok
+test only_defeated_boss_and_intact_floor_one_entrance_win ... ok
+test stairs_seed_only_the_reached_upper_floor_and_progress_offscreen ... ok
+test actual_haste_action_does_not_advance_collapse_clock ... ok
+test hidden_boss_death_keeps_global_collapse_and_announces_it_once ... ok
+test save_replay_restart_and_both_time_abilities_restore_frontiers_and_boss ... ok
+test playtest_floor40_keeps_boss_and_unranked_origin ... ok
+test older_revisions_keep_pit_and_do_not_spawn_administrator ... ok
+test new_floor40_has_exactly_one_reachable_boss_without_extra_ordinary_budget ... ok
+test complete_physical_ascent_from_forty_reaches_the_door_before_wave has been running for over 60 seconds
+test complete_physical_ascent_from_forty_reaches_the_door_before_wave ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 84.67s
+

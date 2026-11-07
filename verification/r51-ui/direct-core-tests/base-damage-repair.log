@@ -1,0 +1,13 @@
+
+running 8 tests
+test reduction_precedes_variance_mitigation_and_only_final_damage_rounding ... ok
+test synthetic_shared_avatar_secondary_attack_uses_live_owner_baseline ... ok
+test copied_attack_bases_follow_frozen_mini_me_and_live_clay_semantics ... ok
+test enemy_attacks_and_explicit_ability_packets_are_not_scaled ... ok
+test revision51_scales_only_fixed_components_and_preserves_bonus_coefficients ... ok
+test existing_copy_snapshots_and_enemy_weapon_conditions_survive_save_and_rewind ... ok
+test committed_bows_and_throw_types_apply_fixed_reduction_once ... ok
+test main_generic_and_haste_player_attacks_use_revisioned_base_without_extra_rng ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+

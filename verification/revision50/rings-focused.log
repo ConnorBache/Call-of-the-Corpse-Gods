@@ -1,0 +1,69 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 1m 10s
+     Running tests/revision50_ring_lighting.rs (../r50-optimized-target/debug/deps/revision50_ring_lighting-d5a8dc720ae58de0)
+
+running 5 tests
+test light_is_additive_without_falloff_and_excludes_entire_wearer_tile ... ok
+test light_and_stealth_restore_and_remain_revision_gated ... ok
+test light_respects_walls_doors_portals_and_same_tick_cache_changes ... ok
+test light_stays_in_the_wearers_plane ... ok
+test stealth_only_multiplies_negative_actor_light_once ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/revision50_rings.rs (../r50-optimized-target/debug/deps/revision50_rings-3eea758bb15b64c6)
+
+running 11 tests
+test duplicate_fixed_powers_do_not_stack_or_remove_separate_tinker_grants ... ok
+test actor_local_equipment_does_not_leak_to_minime_decoys_or_ordinary_actors ... ok
+test exact_inactive_catchup_uses_actor_rings_without_healing_absent_player ... ok
+test existing_drown_and_creature_regeneration_multipliers_still_apply ... ok
+test half_here_uses_owner_rings_and_one_regeneration_tick_with_water_endpoint ... ok
+test identity_requires_authored_effect_ring_wearing_and_revision ... ok
+test normal_combat_regenerates_but_haste_bonus_movement_does_not ... FAILED
+test regeneration_never_refills_player_or_blessing_energy_and_caps_hp ... ok
+test reverse_entropy_still_suppresses_a_hostile_ring_wearer ... ok
+test ring_identity_and_power_survive_raw_save_and_snapshot_restore ... ok
+test regeneration_is_point_four_percent_only_when_worn_and_keeps_legacy_rate ... ok
+
+failures:
+
+---- normal_combat_regenerates_but_haste_bonus_movement_does_not stdout ----
+
+thread 'normal_combat_regenerates_but_haste_bonus_movement_does_not' (114) panicked at crates/corpse-core/tests/revision50_rings.rs:29:40:
+44.4 != 50.4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    normal_combat_regenerates_but_haste_bonus_movement_does_not
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `-p corpse-core --test revision50_rings`

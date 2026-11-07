@@ -1,0 +1,18 @@
+{
+  "production_build_freeze": "6b38787754521be07384f5642690b7c1b4bd169846ca108d18ab2284762c7c85",
+  "production_and_assets_unchanged": true,
+  "test_only_delta": [
+    {
+      "path": "crates/corpse-core/tests/ordinary_roster.rs",
+      "build_freeze_sha256": "4415e347478c48f97a298c0603be4348b8a351aee0460d973740a7ad68a3738c",
+      "current_sha256": "fedc19f3c046223545e7f36ab4265c3fc61ba13c2e03b63fbcbb04470dadc799"
+    },
+    {
+      "path": "crates/corpse-core/tests/witch_skinwalker_v33.rs",
+      "build_freeze_sha256": "11fd706abd8af792e2326b4e0b24be44bd83d473570a8b3887b70c9e2489cc5b",
+      "current_sha256": "38cbbbc3b84186c240316543f53d9c96e9f69215e53db949ba280b62d7dda14c"
+    }
+  ],
+  "reason": "Two stale new-run default33 assertions updated to34; ordinary roster additionally covers34 save/load, lazy generation and replay restart. Legacy33 temporal expectations retained.",
+  "verification": "Completed full no-fail-fast sweep plus passing corrected-target reruns."
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "caption": "Dreamwalking: blue waking-world presentation, sleeping body, Flying and temporary Wake Up.",
+    "provenance": "Actual native Linux SDL application-renderer screenshot of a controlled floor-1 UI test scene; not a naturally played floor or Windows runtime capture.",
+    "sha256": "7cd1f75d8f1591ef39d0b03ad1a29f6f148ee003eaef52bb5c3dee37ff18bdec",
+    "file": "dreamwalking.png"
+  },
+  {
+    "caption": "Ahvamitt inspection and carried-mask Teleport control.",
+    "provenance": "Actual native Linux SDL application-renderer screenshot of a controlled floor-1 UI test scene; not a naturally played encounter or Windows runtime capture.",
+    "sha256": "b03c0816c839651214180ece677f82ba1ec4a31da22767fc2600d5a1f635dcb9",
+    "file": "ahvamitt-teleport.png"
+  },
+  {
+    "caption": "Generated floor 10 with Epidite and countdown 30.",
+    "provenance": "Actual native renderer of a generated DEBUG floor. Authored geometry unchanged; capture copy moves player near tower, fully reveals map and hides pending offers. No simulation turns; not a survival playthrough or Windows runtime capture.",
+    "sha256": "e3067ce8aa75ab2459613ece5043ba6e8e92f1047789a5bb048d1a0969fde1b3",
+    "file": "DEBUG-generated-epidite-floor10.png"
+  }
+]

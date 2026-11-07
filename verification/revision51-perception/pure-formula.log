@@ -1,0 +1,10 @@
+
+running 5 tests
+test rules::tests::darkness_decision_is_explicit_and_both_policies_are_tested ... ok
+test rules::tests::inclusive_tile_and_creature_boundaries ... ok
+test rules::tests::range_modifiers_are_not_rounded_away ... ok
+test rules::tests::positive_light_bypasses_distance_at_one_not_small_fraction ... ok
+test rules::tests::stealth_adds_before_doubling_without_changing_terrain ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

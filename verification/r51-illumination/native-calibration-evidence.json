@@ -1,0 +1,2092 @@
+[
+  {
+    "terrain": "floor",
+    "illumination": -100.0,
+    "ambient": -100.0,
+    "torch": false,
+    "foreground": [
+      7,
+      6,
+      6
+    ],
+    "background": [
+      2,
+      1,
+      2
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 4088283816,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "foreground": [
+      27,
+      25,
+      24
+    ],
+    "background": [
+      7,
+      6,
+      6
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3611341105,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": -50.0,
+    "ambient": -50.0,
+    "torch": false,
+    "foreground": [
+      54,
+      50,
+      49
+    ],
+    "background": [
+      14,
+      11,
+      13
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2885352731,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "foreground": [
+      88,
+      81,
+      79
+    ],
+    "background": [
+      22,
+      18,
+      21
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2369946673,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "foreground": [
+      135,
+      125,
+      122
+    ],
+    "background": [
+      34,
+      28,
+      32
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2317105829,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": 25.0,
+    "ambient": 25.0,
+    "torch": false,
+    "foreground": [
+      203,
+      188,
+      183
+    ],
+    "background": [
+      51,
+      42,
+      48
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 39442704,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "foreground": [
+      242,
+      224,
+      218
+    ],
+    "background": [
+      70,
+      57,
+      66
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 540088772,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": 75.0,
+    "ambient": 75.0,
+    "torch": false,
+    "foreground": [
+      248,
+      230,
+      224
+    ],
+    "background": [
+      92,
+      76,
+      86
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 712966913,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "foreground": [
+      251,
+      232,
+      226
+    ],
+    "background": [
+      116,
+      95,
+      109
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 871686041,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "foreground": [
+      249,
+      230,
+      225
+    ],
+    "background": [
+      96,
+      79,
+      91
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 1150741974,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "floor",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "foreground": [
+      255,
+      229,
+      217
+    ],
+    "background": [
+      105,
+      78,
+      78
+    ],
+    "zeroBackground": [
+      34,
+      28,
+      32
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2350802902,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": -100.0,
+    "ambient": -100.0,
+    "torch": false,
+    "foreground": [
+      6,
+      6,
+      5
+    ],
+    "background": [
+      3,
+      3,
+      3
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 1781671549,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "foreground": [
+      25,
+      22,
+      21
+    ],
+    "background": [
+      12,
+      10,
+      11
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3766820030,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": -50.0,
+    "ambient": -50.0,
+    "torch": false,
+    "foreground": [
+      50,
+      45,
+      41
+    ],
+    "background": [
+      24,
+      21,
+      21
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3325990566,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "foreground": [
+      82,
+      73,
+      67
+    ],
+    "background": [
+      38,
+      34,
+      34
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3204044663,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "foreground": [
+      126,
+      112,
+      103
+    ],
+    "background": [
+      59,
+      52,
+      53
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2267425588,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": 25.0,
+    "ambient": 25.0,
+    "torch": false,
+    "foreground": [
+      189,
+      168,
+      155
+    ],
+    "background": [
+      89,
+      78,
+      80
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3645331687,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "foreground": [
+      238,
+      212,
+      195
+    ],
+    "background": [
+      121,
+      107,
+      109
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 431441852,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": 75.0,
+    "ambient": 75.0,
+    "torch": false,
+    "foreground": [
+      247,
+      220,
+      202
+    ],
+    "background": [
+      159,
+      140,
+      143
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3794765946,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "foreground": [
+      250,
+      222,
+      204
+    ],
+    "background": [
+      201,
+      177,
+      180
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3523170080,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "foreground": [
+      248,
+      220,
+      203
+    ],
+    "background": [
+      167,
+      147,
+      150
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3492751742,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "wall",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "foreground": [
+      255,
+      219,
+      194
+    ],
+    "background": [
+      182,
+      144,
+      129
+    ],
+    "zeroBackground": [
+      59,
+      52,
+      53
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3007228266,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": -100.0,
+    "ambient": -100.0,
+    "torch": false,
+    "foreground": [
+      6,
+      9,
+      5
+    ],
+    "background": [
+      1,
+      2,
+      2
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3533192912,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "foreground": [
+      23,
+      37,
+      20
+    ],
+    "background": [
+      4,
+      8,
+      6
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 480493864,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": -50.0,
+    "ambient": -50.0,
+    "torch": false,
+    "foreground": [
+      45,
+      74,
+      41
+    ],
+    "background": [
+      7,
+      16,
+      12
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3534785631,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "foreground": [
+      73,
+      120,
+      66
+    ],
+    "background": [
+      12,
+      25,
+      20
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 743531971,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "foreground": [
+      113,
+      184,
+      102
+    ],
+    "background": [
+      18,
+      39,
+      31
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 534020502,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": 25.0,
+    "ambient": 25.0,
+    "torch": false,
+    "foreground": [
+      148,
+      242,
+      134
+    ],
+    "background": [
+      27,
+      59,
+      47
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 4236272120,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "foreground": [
+      153,
+      249,
+      138
+    ],
+    "background": [
+      37,
+      80,
+      64
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2296536834,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": 75.0,
+    "ambient": 75.0,
+    "torch": false,
+    "foreground": [
+      154,
+      251,
+      139
+    ],
+    "background": [
+      49,
+      105,
+      84
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3104307728,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "foreground": [
+      155,
+      252,
+      140
+    ],
+    "background": [
+      61,
+      133,
+      105
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2398512239,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "foreground": [
+      154,
+      251,
+      139
+    ],
+    "background": [
+      51,
+      111,
+      88
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2757050609,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "grass",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "foreground": [
+      171,
+      249,
+      122
+    ],
+    "background": [
+      58,
+      111,
+      78
+    ],
+    "zeroBackground": [
+      18,
+      39,
+      31
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 1768105009,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": -100.0,
+    "ambient": -100.0,
+    "torch": false,
+    "foreground": [
+      3,
+      4,
+      6
+    ],
+    "background": [
+      1,
+      1,
+      3
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 100806656,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "foreground": [
+      11,
+      15,
+      26
+    ],
+    "background": [
+      4,
+      4,
+      11
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2777444096,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": -50.0,
+    "ambient": -50.0,
+    "torch": false,
+    "foreground": [
+      23,
+      30,
+      52
+    ],
+    "background": [
+      7,
+      9,
+      23
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 433118683,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "foreground": [
+      37,
+      49,
+      84
+    ],
+    "background": [
+      12,
+      14,
+      37
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2104500263,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "foreground": [
+      57,
+      76,
+      129
+    ],
+    "background": [
+      18,
+      22,
+      57
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 576990466,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": 25.0,
+    "ambient": 25.0,
+    "torch": false,
+    "foreground": [
+      86,
+      114,
+      194
+    ],
+    "background": [
+      27,
+      33,
+      86
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2199805401,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "foreground": [
+      106,
+      141,
+      240
+    ],
+    "background": [
+      37,
+      45,
+      117
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2787762275,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": 75.0,
+    "ambient": 75.0,
+    "torch": false,
+    "foreground": [
+      109,
+      146,
+      247
+    ],
+    "background": [
+      49,
+      59,
+      154
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2008804530,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "foreground": [
+      111,
+      147,
+      250
+    ],
+    "background": [
+      61,
+      75,
+      194
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2582252923,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "foreground": [
+      110,
+      146,
+      248
+    ],
+    "background": [
+      51,
+      62,
+      162
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3853939871,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "water",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "foreground": [
+      124,
+      148,
+      220
+    ],
+    "background": [
+      59,
+      65,
+      146
+    ],
+    "zeroBackground": [
+      18,
+      22,
+      57
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 1577417224,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -100.0,
+    "ambient": -100.0,
+    "torch": false,
+    "foreground": [
+      3,
+      6,
+      7
+    ],
+    "background": [
+      2,
+      3,
+      4
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 66503425,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "foreground": [
+      12,
+      22,
+      29
+    ],
+    "background": [
+      8,
+      11,
+      16
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2728999994,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -50.0,
+    "ambient": -50.0,
+    "torch": false,
+    "foreground": [
+      25,
+      44,
+      58
+    ],
+    "background": [
+      15,
+      23,
+      33
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 1889722370,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "foreground": [
+      40,
+      72,
+      95
+    ],
+    "background": [
+      25,
+      37,
+      53
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 848118382,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "foreground": [
+      62,
+      111,
+      146
+    ],
+    "background": [
+      38,
+      57,
+      82
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2848476913,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 25.0,
+    "ambient": 25.0,
+    "torch": false,
+    "foreground": [
+      93,
+      167,
+      219
+    ],
+    "background": [
+      57,
+      86,
+      123
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 1061049789,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "foreground": [
+      104,
+      186,
+      244
+    ],
+    "background": [
+      78,
+      117,
+      168
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 1847821629,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 75.0,
+    "ambient": 75.0,
+    "torch": false,
+    "foreground": [
+      106,
+      189,
+      249
+    ],
+    "background": [
+      103,
+      154,
+      221
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2887489861,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "foreground": [
+      107,
+      191,
+      251
+    ],
+    "background": [
+      112,
+      168,
+      242
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 3089304477,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "foreground": [
+      106,
+      190,
+      250
+    ],
+    "background": [
+      106,
+      159,
+      229
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2261905944,
+    "fullRetainedTileEqual": true
+  },
+  {
+    "terrain": "shallow-water",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "foreground": [
+      120,
+      192,
+      221
+    ],
+    "background": [
+      120,
+      161,
+      202
+    ],
+    "zeroBackground": [
+      38,
+      57,
+      82
+    ],
+    "directChance": 100.0,
+    "seed": "00-09-10:native-parity-v1",
+    "position": [
+      8.0,
+      6.0
+    ],
+    "presentationMs": 0,
+    "nativeFrame": [
+      1280,
+      800
+    ],
+    "crop": [
+      51,
+      81
+    ],
+    "cropRgbaCrc32": 2994756452,
+    "fullRetainedTileEqual": true
+  }
+]

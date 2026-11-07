@@ -1,0 +1,33 @@
+{
+  "binary": {
+    "bytes": 117415986,
+    "sha256": "e54af4aec5d4067380b1bfc76f1036444b63546be2cde8ea45dc0814d3337070"
+  },
+  "command": "CARGO_TARGET_DIR=../r50-windows-target CARGO_INCREMENTAL=0 sh tools/cargo.sh build --release --locked --offline --jobs 2 --target x86_64-pc-windows-gnu -p corpse-desktop",
+  "environment": [
+    "PATH=../native-windows-sdk/sysroot/usr/bin:$PATH",
+    "CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=tools/windows-linker.sh",
+    "SDL2_LIB_DIR=../native-windows-sdk/SDL2-2.32.10/x86_64-w64-mingw32/lib"
+  ],
+  "exit_code": 0,
+  "exit_code_file": {
+    "bytes": 2,
+    "path": "verification/revision50/final-verified/windows-build.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "host": "Linux x86_64",
+  "kind": "r50-build-report",
+  "limits": "Successful cross-compilation only; no Windows execution.",
+  "log": {
+    "bytes": 40225,
+    "path": "verification/revision50/final-verified/windows-build.log",
+    "sha256": "b5f64c9fc4bd24bf00d2983388fd9756efdbb13487eba7099801a08f9b950ba4"
+  },
+  "profile": "release",
+  "revision": 50,
+  "rust_toolchain": "1.99.1",
+  "schema": 1,
+  "source_snapshot_sha256": "2d8baa52ba161f402c8e932ce7f573bd55a9b9a619e63a63677cf563f3d478bb",
+  "target": "x86_64-pc-windows-gnu",
+  "windows_runtime_verified": false
+}

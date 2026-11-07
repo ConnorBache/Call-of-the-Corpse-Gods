@@ -1,0 +1,412 @@
+Here is the complete text of Revision 50, including all 72 blessings and the general rule changes.
+
+# THE CALL OF THE CORPSE GODS
+
+## Consolidated Blessing Roster — Revision 50
+
+72 abilities; 12 gods with 6 each. All slots have confirmed names.
+
+Source baseline: blessing-abilities.txt (revision 46). Unchanged descriptions are preserved from revision 46.
+
+# GENERAL RULE CHANGES
+
+## Equipment
+
+- No weapon or armor equipping. Bows use Apply directly.
+- Ring/amulet wearing has no equipment-slot cap.
+- Worn jewelry does not take backpack slots.
+- All general god-specific Craft blessings have been removed. Kative retains Cogworks, Clay Army, Tinker and item-related abilities.
+
+## Backpack
+
+Base backpack categories:
+
+| Category               | Capacity |
+| ---------------------- | -------- |
+| Rings/amulets (shared) | 5        |
+| Potions                | 5        |
+| Hearts                 | 5        |
+| Trinkets               | 7        |
+| Total                  | 22       |
+
+Carrying-capacity blessings:
+
+- Tools of the Trade adds 5 ring-only slots and 5 potion slots.
+- Bottomless Pack adds 2 amulet-only slots and 5 potion slots.
+- Appropriate adds 3 ring-only and 3 amulet-only slots.
+
+When all three carrying-capacity blessings are owned, the backpack provides 5 shared jewelry slots, 8 ring-only slots, 5 amulet-only slots, 15 potion slots, 5 heart slots, and 7 trinket slots (45 slots total).
+
+Potions and hearts consumed with Tools of the Trade do not take an action.
+
+## Amulets
+
+- Amulets offer powerful activated effects similar to Brogue scrolls, wands and staves.
+- Amulets have their own energy. Once exhausted, activating them consumes the player's energy.
+- Amulets have cooldowns.
+- Appropriate reduces amulet cooldowns by 50%.
+
+## Rings
+
+- Rings supply less-important passive powers.
+- Rings have qualitative tiers that become rarer at higher tiers.
+- There is no limit on how many rings can be worn simultaneously.
+
+## Energy
+
+- No player energy regeneration: energy is a finite pacing resource intended to keep the player moving.
+- Separate energy bars per blessing and a smaller shared player bar were proposed, but their final mechanics are not yet specified; no energy regeneration is intended.
+
+# REPLACEMENT SUMMARY
+
+| God      | Changes                                                                                                                |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Shrail   | Unyielding Assault → Execute; I Hit Back → Grappler; Beat to Death → Unstoppable Force; Fury Crafting → Masochism      |
+| Pelian   | Never Without a Fight → Fated Duel; Zeal Craft → Relentless Pursuit                                                    |
+| Isheilah | Missed Me updated; Tools of the Trade updated; Guile Craft → Spellslinger                                              |
+| Numo     | Implant Thought updated                                                                                                |
+| Etill    | No changed abilities                                                                                                   |
+| Ursa     | Waking Nightmare → Waking Nightmares (redesigned); Dream Craft → Oblivious                                             |
+| Lichor   | No changed abilities                                                                                                   |
+| Dawel    | No changed abilities; Step Through Shadows preserved                                                                   |
+| Grisha   | Uncast → Witch-Hatred; Boundless Hunger preserved                                                                      |
+| Anavani  | Make Kneel → Commandment                                                                                               |
+| Kative   | Divine Craftsman → Cogworks; Adaptive Armor → Clay Army; Artifice Craft → Appropriate; Dilute Potion → Bottomless Pack |
+| Morae    | No changed abilities                                                                                                   |
+
+# FULL ABILITY ROSTER
+
+## SHRAIL, THE GODTHORN
+
+1\. Rage at the Dying of the Light
+
+When active, whenever you would die, instead be reduced to 1 HP and spend X energy. X starts at 0. After the first free rescue, the cost becomes 1 and doubles after each subsequent rescue. Levelling up reduces this cost back to 0.
+
+2\. Execute
+
+When active, you kill enemies in one hit if they have less than 25% of their HP remaining. Every time you do so, spend 20 energy.
+
+3\. Grappler
+
+Enemies cannot move when they are adjacent to you and this ability is active. When you move, they move with you.
+
+4\. Fight Long
+
+Heal 1/5 the damage you deal in melee.
+
+5\. Unstoppable Force
+
+When active, when you attack an enemy, you also move into their tile. They are pushed back if possible, or switch places with you if not.
+
+6\. Masochism
+
+When you drop below 100%, 75%, 50%, or 25% HP, you gain haste for 10 turns.
+
+## PELIAN, THE KING OF DESIRE
+
+1\. You Shall Never Be Rid of Me
+
+When active, if you die, instead come back with full health and this ability is disabled until you level up.
+
+2\. I Came For You
+
+Select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward.
+
+3\. Fated Duel
+
+When activated, select an adjacent enemy. Create a square of 5 tiles around that enemy. Until you leave that area, no other enemy can attack you. This costs 3 energy per turn to keep active.
+
+4\. Never Surrender
+
+Spend 8 energy and add your defense to your DR the first time you take damage every turn.
+
+5\. Bulwark of Mind
+
+Spend 20 energy and select a visible, unoccupied square. Enemies cannot enter it for 10 turns.
+
+6\. Relentless Pursuit
+
+Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.
+
+Implementation: The path follows the moving target, routes around obstacles when possible, and may pass through another enemy only when the target would otherwise be inaccessible.
+
+## ISHEILAH, THE TRICKSTER
+
+1\. Missed Me
+
+Gain one maximum reaction. Reactions refresh when you wait. When active, if you have a reaction and an enemy would attack you in melee, you instead move one tile away from them and spend a reaction.
+
+2\. Tools of the Trade
+
+Consuming potions and hearts does not consume your action. Increase your ring carrying capacity by 5 and your potion carrying capacity by 5.
+
+3\. Make Slippery
+
+Select an enemy, when they try to move, they don't and you spend 8 energy.
+
+4\. Quick Hand
+
+Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.
+
+5\. Are You Sure About That?
+
+Gain a reaction. Reactions refresh when you wait. When active, if an enemy misses you, resolve the attack against a random enemy in your melee range and spend a reaction.
+
+6\. Spellslinger
+
+You can activate an amulet without spending your turn, once per turn.
+
+## NUMO, THE PROGENITOR
+
+1\. Implant Thought
+
+Spend 15 energy and your action. Select a visible enemy and another creature adjacent to it. The selected enemy immediately attacks the chosen creature.
+
+2\. Distract
+
+Spend 10 energy. Target enemy will miss their next attack.
+
+3\. Mind Read
+
+While active, you have telepathy within 20. While inactive, you have telepathy within 5.
+
+4\. Mind Slave
+
+Spend 100 energy. Target enemy with 20% health or less becomes a perfect ally.
+
+5\. Weave of Time
+
+You can freely travel along your time weave, which you leave behind as you move.
+
+6\. Remember
+
+Spend 5 energy. You gain the traits of a target enemy for 5 rounds.
+
+## ETILL, THE OCEAN-BLACK
+
+1\. Phase Through
+
+While active, spend 5 energy every turn. You can move through walls and are flying. If this ability is deactivated while within a wall, you die of crushing.
+
+2\. Rushing Torrent
+
+While active, spend 15 energy every turn, and you are hasted.
+
+3\. Drown
+
+You regenerate 3 times as fast in water, items don't float away from you and you do triple damage in water.
+
+4\. Float Away
+
+When active, if an enemy damages you, fly until your next turn and move 1 tile away.
+
+5\. Half Here
+
+Activate to put down a half clone within line of sight that shares your health pool, doesn't move, but provides you sight from that location. Deactivate to remove it.
+
+6\. Riptide
+
+When activating this ability, select an enemy and a rallying point. The enemy is moved toward the rally point and they cannot move until the ability is deactivated. This ability costs 15 energy to activate and 10 to keep active every turn.
+
+## URSA, THE SLEEPING MOTHER
+
+1\. Waking Nightmares
+
+Spend a nightmare to create a hallucination of yourself at a visible unoccupied square. Enemies treat the hallucination as you until it is struck, at which point it disappears. You gain a nightmare every 100 turns.
+
+2\. Sudden Sleep
+
+As an action, spend 20 energy, render yourself paralyzed for 50 turns, and regain all your health.
+
+3\. Dream of Time Gone By
+
+Activate this ability for 50 energy. When you deactivate this ability, you return to the square where you activated it.
+
+4\. Sleep Walk
+
+If you have 0 energy, you are hasted.
+
+5\. Dream-See
+
+You have telepathy with sleeping creatures. When active, you have telepathy with all creatures that are not obstructed.
+
+6\. Oblivious
+
+Enemies you cannot see cannot affect you.
+
+## LICHOR, THE GUSHING ONE
+
+1\. Overflowing
+
+You have 5 blood, and a maximum of 55 blood. Whenever you would die, you are instead reduced to 1 HP and lose a blood. Gain a blood by taking 50 damage.
+
+2\. Bleed Them
+
+Your attacks inflict bleed proportional to your offense.
+
+3\. Blood Letting
+
+When activating this ability, take 10 damage and cleanse yourself of all status conditions.
+
+4\. Hardened Blood
+
+Gain extra DR equal to your missing HP divided by 10, rounded up.
+
+5\. Blood Weapon
+
+Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.
+
+6\. The Number of Blood
+
+Every 5 turns, automatically hit and do double damage.
+
+## DAWEL, THE MOUTHLESS
+
+1\. Step Through Shadows
+
+When no enemies can see you, you are hasted.
+
+2\. Silent Strike
+
+Attacking enemies who cannot see you deals 6x damage instead of 3x damage.
+
+3\. Unspeak
+
+When activating this ability, select an enemy. They cannot use abilities which cost energy. This costs energy equal to their highest energy cost ability every turn.
+
+4\. Reverse Entropy
+
+While active, enemies do not heal, regain energy, or revive, plants do not grow and neither gas nor fire spreads within 10.
+
+5\. Shadow in the Dark
+
+While your light level is negative, double your light level. While active, spend 2 energy per turn and decrease the light level effecting you by 20
+
+6\. Not There
+
+While active, enemies cannot target you with ranged attacks or abilities when outside 5 blocks. Costs 3 energy per turn.
+
+## GRISHA, THE DEVOURER
+
+1\. Boundless Hunger
+
+You have no max energy.
+
+2\. Entropy
+
+You are immune to the effects of caustic gas, and have a cloud of caustic gas originating from you. When this is active, caustic gas does not originate from you.
+
+3\. Erase Metaphysical
+
+While this is active, spend 10 energy when you hit an enemy. One of their abilities or traits is removed at random. Do not spend the 10 if they have none.
+
+4\. Death Swift
+
+When you kill an enemy, gain haste for 3 turns.
+
+5\. Black Pit
+
+When active, the ground you walk on turns into chasm when you walk off. It begins to regenerate when this ability is deactivated. This costs 5 energy per turn.
+
+6\. Witch-Hatred
+
+You have telepathy to all "Magickal Caster" enemies, and always kill them in one hit.
+
+## ANAVANI, OF THE MOON
+
+1\. Shine
+
+You emit light 100 which decreases by 10 every square away from you. You gain additional accuracy equal to the illumination of enemies. When active, this ability does not illuminate you.
+
+2\. Ascend
+
+You are always flying. Mark 'falling areas' on the map where there is a chasm above you. You may spend 50 energy while below such a chasm to fly up to the higher level.
+
+3\. Nova
+
+You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.
+
+4\. Sparkle
+
+Spend 20 energy and select a visible square. Place a permanent fire and light source there.
+
+5\. Star Power
+
+You are immune to fire and always burning. You can activate this ability to stop burning.
+
+6\. Commandment
+
+Passive: When you attack an enemy, they are pushed back one tile. Active: Spend 20 energy when you attack, and enemies are instead pushed back as far as possible.
+
+## KATIVE, THE CRAFTSMAN
+
+1\. Cogworks
+
+This ability can be toggled to mode one, two or three, or activated.
+
+Mode 1: When activated, create a 3x3 pit in an area not occupied by any creatures. Costs 20 energy.
+
+Mode 2: When activated, create a 5x1 wall with 200 HP, oriented perpendicular to the direction thrown. Costs 20 energy.
+
+Mode 3: Select a terrain modification you have made and remove it. Energy cost not specified.
+
+Implementation: Preview the placement in the sight display; color both the pit and wall in Kative's colors. When an enemy tries to move through a wall, it attacks the wall instead.
+
+2\. Mini-Me
+
+Activate for 30 energy to create the level 1 version of you with the same equipment, but none of the equipment is enchanted or enhanced. This version of you is a perfect ally. Deactivating kills this creature.
+
+3\. Clay Army
+
+When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier's attacks are an exact copy of yours.
+
+Implementation: Clay Soldiers are treated as unbreakable walls for pathfinding and collision.
+
+4\. Appropriate
+
+Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Amulet cooldowns are reduced by 50%.
+
+5\. Tinker
+
+Spend 100 energy to bless a weapon, armor, ring or amulet with a random ability from a random god you do not embody. The ability works only while the item is equipped. Each item can be tinkered once; granted abilities never duplicate another generated item grant.
+
+6\. Bottomless Pack
+
+When you use a potion, you can use it again at half efficacy. Increase your amulet carrying capacity by 2 and your potion carrying capacity by 5.
+
+## MORAE, THE SACRIFICE
+
+1\. Fortune Teller
+
+You can have up to 3 fortunes. Spend a fortune to give yourself lucky, ensuring you hit with your next attack, or an enemy creature unlucky, ensuring they miss.
+
+2\. Bonded By Unseen Threads
+
+On activation, select an enemy, when you take damage, they take half.
+
+3\. Turning the Wheel
+
+While this is active, enemies cannot attack you. It costs 20 energy per turn.
+
+4\. Sever Fate
+
+Spend 30 energy and select an enemy below half HP. They become neutral to you until you deal damage to them.
+
+5\. See The Future
+
+Spend all your energy to save your current state. Deactivating will return you there, undoing all that has been done.
+
+6\. All-Seeing Eyes
+
+Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.
+
+# IMPORTANT UNRESOLVED IMPLEMENTATION DETAILS
+
+1. Cogworks: Mode 3 removal energy cost was not given. Modes 1 and 2 each cost 20.
+2. Fated Duel: "Square of 5 tiles around" needs precise grid geometry, such as 5×5.
+3. Missed Me: Needs a rule when no legal retreat square exists.
+4. Grappler: Needs a conflict rule when multiple adjacent enemies move along with the player.
+5. Masochism: Needs a rule for threshold retriggers following healing and whether simultaneous thresholds stack.
+6. Mini-Me and Tinker: Their descriptions still reference equipment and enhancement systems that require adaptation to the removal of weapon and armor equipping.
+
+Roster validation: 12 gods × 6 abilities = 72. All 72 ability identities are confirmed; implementation details remain as noted above.

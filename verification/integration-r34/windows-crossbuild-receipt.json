@@ -1,0 +1,71 @@
+{
+  "label": "corpse-gods-r34-windows-x64",
+  "simulation_revision": 34,
+  "crate_version": "0.1.0",
+  "build_succeeded": true,
+  "command": "sh native-windows-sdk/build-after-freeze.sh; cargo build --release --locked --target x86_64-pc-windows-gnu -p corpse-desktop",
+  "rust_toolchain": "1.99.1",
+  "target": "x86_64-pc-windows-gnu",
+  "compiler": "Official Debian Trixie GCC 14 POSIX / MinGW-w64 12.0.0",
+  "sdl": "Official SDL2 2.32.10",
+  "frozen_code_manifest_sha256": "6b38787754521be07384f5642690b7c1b4bd169846ca108d18ab2284762c7c85",
+  "frozen_code_file_count": 911,
+  "frozen_code_verified_before_and_after": true,
+  "cargo_lock_sha256": "9342120cd87b86ee9b54768431c805d075cd2aaaee0ff142151e2d8555dc5ccb",
+  "build_started": "2026-10-27T23:08:22+00:00",
+  "build_finished": "2026-10-27T23:09:47+00:00",
+  "reported_duration": "1m 24s",
+  "compiler_warning_count": 72,
+  "original_exe": {
+    "bytes": 161559211,
+    "sha256": "930c3db9af34b82a52332b2a949779f45f1de7cffac88bc769cd9965ebac4833"
+  },
+  "delivery_exe": {
+    "bytes": 97312495,
+    "sha256": "c1fb3f610ca1edc8925f8b061f21f381f5a05dfbc5e157955949f18ea6be2d74",
+    "format": "PE32+ x86-64",
+    "imports": [
+      "bcryptprimitives.dll",
+      "api-ms-win-core-synch-l1-2-0.dll",
+      "SDL2.dll",
+      "KERNEL32.dll",
+      "msvcrt.dll",
+      "ntdll.dll"
+    ],
+    "unsigned": true
+  },
+  "SDL2_dll": {
+    "bytes": 1785344,
+    "sha256": "53e8fa7e9ed43c30bd650c39396f0d9d2067d2fff0b926c9433b75202592e4aa",
+    "format": "PE32+ x86-64",
+    "imports": [
+      "ADVAPI32.dll",
+      "GDI32.dll",
+      "IMM32.dll",
+      "KERNEL32.dll",
+      "msvcrt.dll",
+      "ole32.dll",
+      "OLEAUT32.dll",
+      "SETUPAPI.dll",
+      "SHELL32.dll",
+      "USER32.dll",
+      "VERSION.dll",
+      "WINMM.dll"
+    ]
+  },
+  "required_bundled_dlls": [
+    "SDL2.dll"
+  ],
+  "strip_command": "x86_64-w64-mingw32-strip --strip-unneeded; delivery copy only, original retained",
+  "checks": {
+    "embedded_manifest_matches_source": true,
+    "embedded_icon_images_match_source": true,
+    "icon_images": 7,
+    "embedded_rgba_count": 84,
+    "all_embedded_rgba_match_source": true
+  },
+  "superseded_attempt": "Initial build finished before final validation refreeze; its output was not staged. Final incremental build recompiled core against the definitive freeze.",
+  "windows_runtime_verified": false,
+  "limitations": "Cross-built and statically inspected only. No Windows launch, rendering, input, audio or save behavior verified; no Windows runtime host or Wine available. Unsigned native preview.",
+  "full_native_gate": "Recorded separately by the parent; this receipt is not a full test-suite result."
+}

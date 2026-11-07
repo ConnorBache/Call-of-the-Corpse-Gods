@@ -1,0 +1,11 @@
+
+running 6 tests
+test light_and_stealth_restore_and_remain_revision_gated ... ok
+test additive_light_reduces_absolute_darkness_aura_and_does_not_duplicate_shared_bodies ... ok
+test light_is_additive_without_falloff_and_excludes_entire_wearer_tile ... ok
+test light_stays_in_the_wearers_plane ... ok
+test stealth_only_multiplies_negative_actor_light_once ... ok
+test light_respects_walls_doors_portals_and_same_tick_cache_changes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

@@ -1,0 +1,14 @@
+
+running 1 test
+test manual::tests::benchmark_animated_manual_warm_frames ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 251 filtered out; finished in 3.18s
+
+MANUAL_WARM 1280x800 blorb depth=1 mean_ms=6.390 frames=24
+MANUAL_WARM 1280x800 wendigo depth=15 mean_ms=5.685 frames=24
+MANUAL_WARM 1280x800 bastidion depth=40 mean_ms=6.563 frames=24
+MANUAL_WARM 1280x800 zillennia:transcendent depth=40 mean_ms=9.348 frames=24
+MANUAL_WARM 1920x1080 blorb depth=1 mean_ms=10.949 frames=24
+MANUAL_WARM 1920x1080 wendigo depth=15 mean_ms=8.495 frames=24
+MANUAL_WARM 1920x1080 bastidion depth=40 mean_ms=10.364 frames=24
+MANUAL_WARM 1920x1080 zillennia:transcendent depth=40 mean_ms=16.233 frames=24

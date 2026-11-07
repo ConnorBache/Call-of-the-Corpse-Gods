@@ -1,0 +1,1292 @@
+{
+  "state": "passed",
+  "completed": [
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::corpse_core",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/corpse_core-c5176256c434b1cf",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "corpse_core",
+      "exit_code": 0,
+      "seconds": 8.448158502578735,
+      "log": "save-journal-r39/reports/stage2/full-tests/000-corpse_core.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::divine_rescues",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/divine_rescues-44ad56f3a6714fcf",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "divine_rescues",
+      "exit_code": 0,
+      "seconds": 0.10373425483703613,
+      "log": "save-journal-r39/reports/stage2/full-tests/001-divine_rescues.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::startup_recovery_r38",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/startup_recovery_r38-75ce6883661d4f32",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "startup_recovery_r38",
+      "exit_code": 0,
+      "seconds": 32.01063871383667,
+      "log": "save-journal-r39/reports/stage2/full-tests/002-startup_recovery_r38.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::remember_hazards",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/remember_hazards-69deb5eb80cdecd2",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "remember_hazards",
+      "exit_code": 0,
+      "seconds": 5.505657911300659,
+      "log": "save-journal-r39/reports/stage2/full-tests/003-remember_hazards.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::fury_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/fury_commands-46178a4bb562f19b",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "fury_commands",
+      "exit_code": 0,
+      "seconds": 2.2610931396484375,
+      "log": "save-journal-r39/reports/stage2/full-tests/004-fury_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::advanced_environment_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/advanced_environment_commands-b162d9458f39ee7b",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "advanced_environment_commands",
+      "exit_code": 0,
+      "seconds": 4.5865325927734375,
+      "log": "save-journal-r39/reports/stage2/full-tests/005-advanced_environment_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::horn_caster_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/horn_caster_traces-4ddcc2474fa5fb4e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "horn_caster_traces",
+      "exit_code": 0,
+      "seconds": 42.2436637878418,
+      "log": "save-journal-r39/reports/stage2/full-tests/006-horn_caster_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::monster_balance_v32",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/monster_balance_v32-808ce36e5081b6b1",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "monster_balance_v32",
+      "exit_code": 0,
+      "seconds": 0.01661539077758789,
+      "log": "save-journal-r39/reports/stage2/full-tests/007-monster_balance_v32.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::vision_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/vision_parity-fe308a47ffc939cb",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "vision_parity",
+      "exit_code": 0,
+      "seconds": 0.37726616859436035,
+      "log": "save-journal-r39/reports/stage2/full-tests/008-vision_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop/Cargo.toml::appearance_typography",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/appearance_typography-7a83a2e44bedb4ef",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop",
+      "target": "appearance_typography",
+      "exit_code": 0,
+      "seconds": 0.06428027153015137,
+      "log": "save-journal-r39/reports/stage2/full-tests/009-appearance_typography.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::crafting_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/crafting_parity-9b78845ec4c2e26f",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "crafting_parity",
+      "exit_code": 0,
+      "seconds": 0.39513158798217773,
+      "log": "save-journal-r39/reports/stage2/full-tests/010-crafting_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::exhausted_offers",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/exhausted_offers-25f27a3a592b70a3",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "exhausted_offers",
+      "exit_code": 0,
+      "seconds": 1.0484154224395752,
+      "log": "save-journal-r39/reports/stage2/full-tests/011-exhausted_offers.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::generation_validation_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/generation_validation_parity-56fe8ebedc18067d",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "generation_validation_parity",
+      "exit_code": 0,
+      "seconds": 0.15373635292053223,
+      "log": "save-journal-r39/reports/stage2/full-tests/012-generation_validation_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::thrown_potions",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/thrown_potions-2cf0e436a60dfffc",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "thrown_potions",
+      "exit_code": 0,
+      "seconds": 20.324580669403076,
+      "log": "save-journal-r39/reports/stage2/full-tests/013-thrown_potions.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::portal_integration_v35",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/portal_integration_v35-86c38eb99bb64c8d",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "portal_integration_v35",
+      "exit_code": 0,
+      "seconds": 0.6219155788421631,
+      "log": "save-journal-r39/reports/stage2/full-tests/014-portal_integration_v35.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::shard_weapon_independent_r39",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/shard_weapon_independent_r39-f5c467ecc5ebf717",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "shard_weapon_independent_r39",
+      "exit_code": 0,
+      "seconds": 0.06371688842773438,
+      "log": "save-journal-r39/reports/stage2/full-tests/015-shard_weapon_independent_r39.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::bombardier_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/bombardier_traces-d34b7b585bfdb235",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "bombardier_traces",
+      "exit_code": 0,
+      "seconds": 8.397632598876953,
+      "log": "save-journal-r39/reports/stage2/full-tests/016-bombardier_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::non_euclidean_physics_r36",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/non_euclidean_physics_r36-5ba553a1b75165eb",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "non_euclidean_physics_r36",
+      "exit_code": 0,
+      "seconds": 0.08045625686645508,
+      "log": "save-journal-r39/reports/stage2/full-tests/017-non_euclidean_physics_r36.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::divine_reactions",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/divine_reactions-7ed66b85a7336649",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "divine_reactions",
+      "exit_code": 0,
+      "seconds": 0.6500067710876465,
+      "log": "save-journal-r39/reports/stage2/full-tests/018-divine_reactions.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::load_migrations",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/load_migrations-d0bc8e8fd1b9df54",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "load_migrations",
+      "exit_code": 0,
+      "seconds": 5.855844259262085,
+      "log": "save-journal-r39/reports/stage2/full-tests/019-load_migrations.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::remember_all_passives",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/remember_all_passives-dd0d94597f0b964a",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "remember_all_passives",
+      "exit_code": 0,
+      "seconds": 24.914348363876343,
+      "log": "save-journal-r39/reports/stage2/full-tests/020-remember_all_passives.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::actor_presentation_logs_v33",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/actor_presentation_logs_v33-e70e2669ec1c4732",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "actor_presentation_logs_v33",
+      "exit_code": 0,
+      "seconds": 0.08073735237121582,
+      "log": "save-journal-r39/reports/stage2/full-tests/021-actor_presentation_logs_v33.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::starter_modes",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/starter_modes-83e15ed56b3226db",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "starter_modes",
+      "exit_code": 0,
+      "seconds": 2.49060320854187,
+      "log": "save-journal-r39/reports/stage2/full-tests/022-starter_modes.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::hazard_potions",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/hazard_potions-9ba159ddfc589fdb",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "hazard_potions",
+      "exit_code": 0,
+      "seconds": 3.6117374897003174,
+      "log": "save-journal-r39/reports/stage2/full-tests/023-hazard_potions.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::visibility_projection_cache",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/visibility_projection_cache-cf523363db2a1e1a",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "visibility_projection_cache",
+      "exit_code": 0,
+      "seconds": 0.1164848804473877,
+      "log": "save-journal-r39/reports/stage2/full-tests/024-visibility_projection_cache.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::shard_ground_r39",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/shard_ground_r39-81cd16886b66af94",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "shard_ground_r39",
+      "exit_code": 0,
+      "seconds": 0.9134385585784912,
+      "log": "save-journal-r39/reports/stage2/full-tests/025-shard_ground_r39.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::equipment_grant_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/equipment_grant_commands-37f2849326840ac8",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "equipment_grant_commands",
+      "exit_code": 0,
+      "seconds": 1.17337965965271,
+      "log": "save-journal-r39/reports/stage2/full-tests/026-equipment_grant_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::mini_me_starter_combinations",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/mini_me_starter_combinations-5626801253f22ff8",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "mini_me_starter_combinations",
+      "exit_code": 0,
+      "seconds": 87.5774598121643,
+      "log": "save-journal-r39/reports/stage2/full-tests/027-mini_me_starter_combinations.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::portal_generation_v35",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/portal_generation_v35-e57aae0639329b44",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "portal_generation_v35",
+      "exit_code": 0,
+      "seconds": 2.203427791595459,
+      "log": "save-journal-r39/reports/stage2/full-tests/028-portal_generation_v35.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::foundation",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/foundation-db475c6373707e03",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "foundation",
+      "exit_code": 0,
+      "seconds": 2.5072038173675537,
+      "log": "save-journal-r39/reports/stage2/full-tests/029-foundation.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::generation_sweep_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/generation_sweep_parity-9690213ca16dddec",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "generation_sweep_parity",
+      "exit_code": 0,
+      "seconds": 8.133058071136475,
+      "log": "save-journal-r39/reports/stage2/full-tests/030-generation_sweep_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::non_euclidean_integration_r36",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/non_euclidean_integration_r36-97b08d18eaafcf68",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "non_euclidean_integration_r36",
+      "exit_code": 0,
+      "seconds": 8.341934442520142,
+      "log": "save-journal-r39/reports/stage2/full-tests/031-non_euclidean_integration_r36.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::cosmetic_blood_trails",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/cosmetic_blood_trails-4dcdef180ea90db9",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "cosmetic_blood_trails",
+      "exit_code": 0,
+      "seconds": 0.1371750831604004,
+      "log": "save-journal-r39/reports/stage2/full-tests/032-cosmetic_blood_trails.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::blood_weapon_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/blood_weapon_commands-0dbae946b13b567c",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "blood_weapon_commands",
+      "exit_code": 0,
+      "seconds": 1.497746229171753,
+      "log": "save-journal-r39/reports/stage2/full-tests/033-blood_weapon_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::remember",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/remember-7878cfd441e7aeca",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "remember",
+      "exit_code": 0,
+      "seconds": 6.358723402023315,
+      "log": "save-journal-r39/reports/stage2/full-tests/034-remember.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::divine_environment",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/divine_environment-7a6b2e2fa6f71cf5",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "divine_environment",
+      "exit_code": 0,
+      "seconds": 1.1590471267700195,
+      "log": "save-journal-r39/reports/stage2/full-tests/035-divine_environment.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop/Cargo.toml::appearance",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/appearance-bf89af9554136712",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop",
+      "target": "appearance",
+      "exit_code": 0,
+      "seconds": 2.618055820465088,
+      "log": "save-journal-r39/reports/stage2/full-tests/036-appearance.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::journal_projection",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/journal_projection-ddcace141c641e29",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "journal_projection",
+      "exit_code": 0,
+      "seconds": 6.978329420089722,
+      "log": "save-journal-r39/reports/stage2/full-tests/037-journal_projection.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::stalking_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/stalking_traces-0ba07dbee0c0693c",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "stalking_traces",
+      "exit_code": 0,
+      "seconds": 18.186918020248413,
+      "log": "save-journal-r39/reports/stage2/full-tests/038-stalking_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::floor_one_entrance",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/floor_one_entrance-b351961057461b56",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "floor_one_entrance",
+      "exit_code": 0,
+      "seconds": 5.530270576477051,
+      "log": "save-journal-r39/reports/stage2/full-tests/039-floor_one_entrance.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop/Cargo.toml::appearance_entities",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/appearance_entities-d7b1aac3851b6071",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop",
+      "target": "appearance_entities",
+      "exit_code": 0,
+      "seconds": 0.45567774772644043,
+      "log": "save-journal-r39/reports/stage2/full-tests/040-appearance_entities.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::half_here_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/half_here_traces-b4a42e9e6b6b7967",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "half_here_traces",
+      "exit_code": 0,
+      "seconds": 5.386370658874512,
+      "log": "save-journal-r39/reports/stage2/full-tests/041-half_here_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::portal_consumers_v35",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/portal_consumers_v35-b46314b5dda950eb",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "portal_consumers_v35",
+      "exit_code": 0,
+      "seconds": 0.07899188995361328,
+      "log": "save-journal-r39/reports/stage2/full-tests/042-portal_consumers_v35.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::unspeak",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/unspeak-76dcb02e020a157e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "unspeak",
+      "exit_code": 0,
+      "seconds": 1.361222505569458,
+      "log": "save-journal-r39/reports/stage2/full-tests/043-unspeak.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::equipment_abilities",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/equipment_abilities-e6e46454d9313eb9",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "equipment_abilities",
+      "exit_code": 0,
+      "seconds": 0.2630894184112549,
+      "log": "save-journal-r39/reports/stage2/full-tests/044-equipment_abilities.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::non_euclidean_generation_v36",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/non_euclidean_generation_v36-091d41ccbcf6911a",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "non_euclidean_generation_v36",
+      "exit_code": 0,
+      "seconds": 11.149779796600342,
+      "log": "save-journal-r39/reports/stage2/full-tests/045-non_euclidean_generation_v36.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::consumption_passives",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/consumption_passives-d7139ef721e4ba20",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "consumption_passives",
+      "exit_code": 0,
+      "seconds": 0.7767481803894043,
+      "log": "save-journal-r39/reports/stage2/full-tests/046-consumption_passives.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::mini_me_offscreen",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/mini_me_offscreen-710ef7da10f57938",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "mini_me_offscreen",
+      "exit_code": 0,
+      "seconds": 12.904443740844727,
+      "log": "save-journal-r39/reports/stage2/full-tests/047-mini_me_offscreen.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::setups_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/setups_parity-685522ee42aa2918",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "setups_parity",
+      "exit_code": 0,
+      "seconds": 1.7924072742462158,
+      "log": "save-journal-r39/reports/stage2/full-tests/048-setups_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::temporal_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/temporal_commands-4b7be1cca42b9b6c",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "temporal_commands",
+      "exit_code": 0,
+      "seconds": 10.607048988342285,
+      "log": "save-journal-r39/reports/stage2/full-tests/049-temporal_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::blood_letting",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/blood_letting-1139b74121cbcd5b",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "blood_letting",
+      "exit_code": 0,
+      "seconds": 0.5977590084075928,
+      "log": "save-journal-r39/reports/stage2/full-tests/050-blood_letting.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::phantasmii_generation_r34",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/phantasmii_generation_r34-31f0ce8db8e3a478",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "phantasmii_generation_r34",
+      "exit_code": 0,
+      "seconds": 1.0191595554351807,
+      "log": "save-journal-r39/reports/stage2/full-tests/051-phantasmii_generation_r34.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::generation_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/generation_parity-dde7c63a659121c1",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "generation_parity",
+      "exit_code": 0,
+      "seconds": 2.0335516929626465,
+      "log": "save-journal-r39/reports/stage2/full-tests/052-generation_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::reaction_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/reaction_commands-bb90d2a462d8a7b2",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "reaction_commands",
+      "exit_code": 0,
+      "seconds": 2.250854015350342,
+      "log": "save-journal-r39/reports/stage2/full-tests/053-reaction_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::environment_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/environment_parity-378e4cb105aad6c1",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "environment_parity",
+      "exit_code": 0,
+      "seconds": 4.275693655014038,
+      "log": "save-journal-r39/reports/stage2/full-tests/054-environment_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::divine_combat",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/divine_combat-321136d7e919903d",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "divine_combat",
+      "exit_code": 0,
+      "seconds": 0.12920236587524414,
+      "log": "save-journal-r39/reports/stage2/full-tests/055-divine_combat.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::flesh_finale",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/flesh_finale-5832a9ba3f6a809d",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "flesh_finale",
+      "exit_code": 0,
+      "seconds": 84.70021772384644,
+      "log": "save-journal-r39/reports/stage2/full-tests/056-flesh_finale.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::sphinx_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/sphinx_traces-f4d5bdf4de130f13",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "sphinx_traces",
+      "exit_code": 0,
+      "seconds": 25.483717918395996,
+      "log": "save-journal-r39/reports/stage2/full-tests/057-sphinx_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::half_here_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/half_here_commands-f37ccdefdba07f16",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "half_here_commands",
+      "exit_code": 0,
+      "seconds": 0.5089032649993896,
+      "log": "save-journal-r39/reports/stage2/full-tests/058-half_here_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::inventory_trace",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/inventory_trace-a36665a13a5ab2b2",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "inventory_trace",
+      "exit_code": 0,
+      "seconds": 0.4210333824157715,
+      "log": "save-journal-r39/reports/stage2/full-tests/059-inventory_trace.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::tree_tap_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/tree_tap_commands-2c0fc673bb50c880",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "tree_tap_commands",
+      "exit_code": 0,
+      "seconds": 0.8600552082061768,
+      "log": "save-journal-r39/reports/stage2/full-tests/060-tree_tap_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::mini_me_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/mini_me_commands-64f4d234a937660f",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "mini_me_commands",
+      "exit_code": 0,
+      "seconds": 28.5322208404541,
+      "log": "save-journal-r39/reports/stage2/full-tests/061-mini_me_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::combat_starters",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/combat_starters-f21792d3bae71894",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "combat_starters",
+      "exit_code": 0,
+      "seconds": 1.7018461227416992,
+      "log": "save-journal-r39/reports/stage2/full-tests/062-combat_starters.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::nest_pockets_v33",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/nest_pockets_v33-c5cb1e114056a901",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "nest_pockets_v33",
+      "exit_code": 0,
+      "seconds": 1.3393244743347168,
+      "log": "save-journal-r39/reports/stage2/full-tests/063-nest_pockets_v33.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::ruin_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/ruin_traces-bacf396b0d5ff3de",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "ruin_traces",
+      "exit_code": 0,
+      "seconds": 36.77376198768616,
+      "log": "save-journal-r39/reports/stage2/full-tests/064-ruin_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::epidite_r34",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/epidite_r34-a7b67f309f752b71",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "epidite_r34",
+      "exit_code": 0,
+      "seconds": 1.147470474243164,
+      "log": "save-journal-r39/reports/stage2/full-tests/065-epidite_r34.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::population",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/population-40606323024f9e60",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "population",
+      "exit_code": 0,
+      "seconds": 6.759183406829834,
+      "log": "save-journal-r39/reports/stage2/full-tests/066-population.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::generation_geometry_r38",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/generation_geometry_r38-9fba1f7886399291",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "generation_geometry_r38",
+      "exit_code": 0,
+      "seconds": 17.19148898124695,
+      "log": "save-journal-r39/reports/stage2/full-tests/067-generation_geometry_r38.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-fixtures/Cargo.toml::corpse-fixtures",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/corpse_fixtures-f2c972ca12ac5237",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-fixtures",
+      "target": "corpse-fixtures",
+      "exit_code": 0,
+      "seconds": 0.008349418640136719,
+      "log": "save-journal-r39/reports/stage2/full-tests/068-corpse-fixtures.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::phantasmii_dreamwalking_r34",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/phantasmii_dreamwalking_r34-56432a807abca3be",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "phantasmii_dreamwalking_r34",
+      "exit_code": 0,
+      "seconds": 0.7474651336669922,
+      "log": "save-journal-r39/reports/stage2/full-tests/069-phantasmii_dreamwalking_r34.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::inventor_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/inventor_traces-6721c99014d1f25e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "inventor_traces",
+      "exit_code": 0,
+      "seconds": 7.912478685379028,
+      "log": "save-journal-r39/reports/stage2/full-tests/070-inventor_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::terrain_runtime_r37",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/terrain_runtime_r37-e32769697738473d",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "terrain_runtime_r37",
+      "exit_code": 0,
+      "seconds": 1.1812410354614258,
+      "log": "save-journal-r39/reports/stage2/full-tests/071-terrain_runtime_r37.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::sub_biomes_generation_r37",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/sub_biomes_generation_r37-bbec98632d5b3f8e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "sub_biomes_generation_r37",
+      "exit_code": 0,
+      "seconds": 8.454193115234375,
+      "log": "save-journal-r39/reports/stage2/full-tests/072-sub_biomes_generation_r37.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::qa_monster_rebalance",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/qa_monster_rebalance-9dec4d7522b98a68",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "qa_monster_rebalance",
+      "exit_code": 0,
+      "seconds": 1.3465189933776855,
+      "log": "save-journal-r39/reports/stage2/full-tests/073-qa_monster_rebalance.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::descent_potions",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/descent_potions-8728f3b8f486dda0",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "descent_potions",
+      "exit_code": 0,
+      "seconds": 1.0381407737731934,
+      "log": "save-journal-r39/reports/stage2/full-tests/074-descent_potions.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::avatar_trace",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/avatar_trace-cb6e7fb168515be9",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "avatar_trace",
+      "exit_code": 0,
+      "seconds": 0.5053279399871826,
+      "log": "save-journal-r39/reports/stage2/full-tests/075-avatar_trace.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::flavor_placement",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/flavor_placement-fd54e98cb5029193",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "flavor_placement",
+      "exit_code": 0,
+      "seconds": 2.134831666946411,
+      "log": "save-journal-r39/reports/stage2/full-tests/076-flavor_placement.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::slime_leaves",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/slime_leaves-ae76ee17aa9d2869",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "slime_leaves",
+      "exit_code": 0,
+      "seconds": 16.76249384880066,
+      "log": "save-journal-r39/reports/stage2/full-tests/077-slime_leaves.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::half_here",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/half_here-339d18c02acf9444",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "half_here",
+      "exit_code": 0,
+      "seconds": 0.36461687088012695,
+      "log": "save-journal-r39/reports/stage2/full-tests/078-half_here.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::playtest_start",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/playtest_start-4b3baa4d6a8484e2",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "playtest_start",
+      "exit_code": 0,
+      "seconds": 3.400053024291992,
+      "log": "save-journal-r39/reports/stage2/full-tests/079-playtest_start.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::dream_craft",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/dream_craft-8fe9eee428e72fe4",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "dream_craft",
+      "exit_code": 0,
+      "seconds": 3.865809440612793,
+      "log": "save-journal-r39/reports/stage2/full-tests/080-dream_craft.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::revision_39_startup",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/revision_39_startup-2c912639a6a694ba",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "revision_39_startup",
+      "exit_code": 0,
+      "seconds": 26.9286847114563,
+      "log": "save-journal-r39/reports/stage2/full-tests/081-revision_39_startup.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::travel_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/travel_traces-d393da2b437b5ecb",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "travel_traces",
+      "exit_code": 0,
+      "seconds": 16.377508640289307,
+      "log": "save-journal-r39/reports/stage2/full-tests/082-travel_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::pathfinding_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/pathfinding_parity-68d3f7b920f1ddae",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "pathfinding_parity",
+      "exit_code": 0,
+      "seconds": 0.023800134658813477,
+      "log": "save-journal-r39/reports/stage2/full-tests/083-pathfinding_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::mini_me",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/mini_me-c2558b592241a079",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "mini_me",
+      "exit_code": 0,
+      "seconds": 0.828681468963623,
+      "log": "save-journal-r39/reports/stage2/full-tests/084-mini_me.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::native_environment_hooks",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/native_environment_hooks-578d4c290c89d49e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "native_environment_hooks",
+      "exit_code": 0,
+      "seconds": 0.37107300758361816,
+      "log": "save-journal-r39/reports/stage2/full-tests/085-native_environment_hooks.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::entrance_observation",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/entrance_observation-fd55885ca34c9ad6",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "entrance_observation",
+      "exit_code": 0,
+      "seconds": 0.02354121208190918,
+      "log": "save-journal-r39/reports/stage2/full-tests/086-entrance_observation.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::cleanup_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/cleanup_parity-52c0036e32e57a0b",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "cleanup_parity",
+      "exit_code": 0,
+      "seconds": 1.0818290710449219,
+      "log": "save-journal-r39/reports/stage2/full-tests/087-cleanup_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::sub_biome_persistence_r37",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/sub_biome_persistence_r37-de4da6b71c74be84",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "sub_biome_persistence_r37",
+      "exit_code": 0,
+      "seconds": 0.048606157302856445,
+      "log": "save-journal-r39/reports/stage2/full-tests/088-sub_biome_persistence_r37.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::ascend_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/ascend_commands-c7a82a7ca6d3ffcd",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "ascend_commands",
+      "exit_code": 0,
+      "seconds": 2.170193672180176,
+      "log": "save-journal-r39/reports/stage2/full-tests/089-ascend_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::propagation_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/propagation_parity-5a8f0ddc8d8e3da5",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "propagation_parity",
+      "exit_code": 0,
+      "seconds": 0.03047323226928711,
+      "log": "save-journal-r39/reports/stage2/full-tests/090-propagation_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::generation_environment_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/generation_environment_parity-7e39c4381f908c11",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "generation_environment_parity",
+      "exit_code": 0,
+      "seconds": 1.0248730182647705,
+      "log": "save-journal-r39/reports/stage2/full-tests/091-generation_environment_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::phantasmii_integration_r34",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/phantasmii_integration_r34-fb2ce9a11b950391",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "phantasmii_integration_r34",
+      "exit_code": 0,
+      "seconds": 1.7860116958618164,
+      "log": "save-journal-r39/reports/stage2/full-tests/092-phantasmii_integration_r34.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::debug_floor_v33",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/debug_floor_v33-7d7c404405937eaa",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "debug_floor_v33",
+      "exit_code": 0,
+      "seconds": 5.992952585220337,
+      "log": "save-journal-r39/reports/stage2/full-tests/093-debug_floor_v33.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop/Cargo.toml::appearance_lighting",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/appearance_lighting-e3a7de94064003f7",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop",
+      "target": "appearance_lighting",
+      "exit_code": 0,
+      "seconds": 0.5480706691741943,
+      "log": "save-journal-r39/reports/stage2/full-tests/094-appearance_lighting.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::fire_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/fire_parity-4d08ab16c262912a",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "fire_parity",
+      "exit_code": 0,
+      "seconds": 0.05211997032165527,
+      "log": "save-journal-r39/reports/stage2/full-tests/095-fire_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::integration_r33_worlds",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/integration_r33_worlds-d7251556ac939306",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "integration_r33_worlds",
+      "exit_code": 0,
+      "seconds": 2.7982583045959473,
+      "log": "save-journal-r39/reports/stage2/full-tests/096-integration_r33_worlds.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::movement_fuzz",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/movement_fuzz-853f7233c229a89e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "movement_fuzz",
+      "exit_code": 0,
+      "seconds": 18.904844045639038,
+      "log": "save-journal-r39/reports/stage2/full-tests/097-movement_fuzz.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::silenced_abilities",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/silenced_abilities-9ee4cb33162b9fa2",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "silenced_abilities",
+      "exit_code": 0,
+      "seconds": 1.4778392314910889,
+      "log": "save-journal-r39/reports/stage2/full-tests/098-silenced_abilities.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::dream_anchor",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/dream_anchor-a0c59b171c790093",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "dream_anchor",
+      "exit_code": 0,
+      "seconds": 1.43888521194458,
+      "log": "save-journal-r39/reports/stage2/full-tests/099-dream_anchor.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::grab_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/grab_traces-44cab9c298519c8b",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "grab_traces",
+      "exit_code": 0,
+      "seconds": 14.030844688415527,
+      "log": "save-journal-r39/reports/stage2/full-tests/100-grab_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::zillennia_ground_r33",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/zillennia_ground_r33-c44c828ec3903a01",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "zillennia_ground_r33",
+      "exit_code": 0,
+      "seconds": 0.3081493377685547,
+      "log": "save-journal-r39/reports/stage2/full-tests/101-zillennia_ground_r33.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::caster_spell_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/caster_spell_traces-545fbca6d6d7b466",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "caster_spell_traces",
+      "exit_code": 0,
+      "seconds": 27.7210214138031,
+      "log": "save-journal-r39/reports/stage2/full-tests/102-caster_spell_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::mind_control",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/mind_control-1a3a0e3221853980",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "mind_control",
+      "exit_code": 0,
+      "seconds": 2.0427279472351074,
+      "log": "save-journal-r39/reports/stage2/full-tests/103-mind_control.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::physical_balance",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/physical_balance-cafda5396cf9b727",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "physical_balance",
+      "exit_code": 0,
+      "seconds": 4.510572910308838,
+      "log": "save-journal-r39/reports/stage2/full-tests/104-physical_balance.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::rescue_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/rescue_commands-d4525ba4da915c42",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "rescue_commands",
+      "exit_code": 0,
+      "seconds": 1.2534034252166748,
+      "log": "save-journal-r39/reports/stage2/full-tests/105-rescue_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::accuracy_dodge_v33",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/accuracy_dodge_v33-f29d9c5bc2d736a1",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "accuracy_dodge_v33",
+      "exit_code": 0,
+      "seconds": 0.05352330207824707,
+      "log": "save-journal-r39/reports/stage2/full-tests/106-accuracy_dodge_v33.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::sub_biome_generated_turn_r37",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/sub_biome_generated_turn_r37-49d196d72378dd4a",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "sub_biome_generated_turn_r37",
+      "exit_code": 0,
+      "seconds": 5.508125305175781,
+      "log": "save-journal-r39/reports/stage2/full-tests/107-sub_biome_generated_turn_r37.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::passive_monster_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/passive_monster_traces-93cca3f6cf4d3870",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "passive_monster_traces",
+      "exit_code": 0,
+      "seconds": 35.57916188240051,
+      "log": "save-journal-r39/reports/stage2/full-tests/108-passive_monster_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::generated_walks",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/generated_walks-b26722305a160314",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "generated_walks",
+      "exit_code": 0,
+      "seconds": 29.281434535980225,
+      "log": "save-journal-r39/reports/stage2/full-tests/109-generated_walks.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::integration_r33_debug",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/integration_r33_debug-8a39cac052dbec48",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "integration_r33_debug",
+      "exit_code": 0,
+      "seconds": 36.934521198272705,
+      "log": "save-journal-r39/reports/stage2/full-tests/110-integration_r33_debug.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::ally_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/ally_commands-fef0fc8f192109b2",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "ally_commands",
+      "exit_code": 0,
+      "seconds": 4.211137771606445,
+      "log": "save-journal-r39/reports/stage2/full-tests/111-ally_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::projectile_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/projectile_parity-4f8df90d5be4eb1a",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "projectile_parity",
+      "exit_code": 0,
+      "seconds": 2.0313875675201416,
+      "log": "save-journal-r39/reports/stage2/full-tests/112-projectile_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::world_generation_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/world_generation_parity-0062adcce2941681",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "world_generation_parity",
+      "exit_code": 0,
+      "seconds": 1.3950612545013428,
+      "log": "save-journal-r39/reports/stage2/full-tests/113-world_generation_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::death_transfer_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/death_transfer_traces-879555ad866290da",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "death_transfer_traces",
+      "exit_code": 0,
+      "seconds": 3.5989222526550293,
+      "log": "save-journal-r39/reports/stage2/full-tests/114-death_transfer_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::final_toggles",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/final_toggles-aea3b5221b437167",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "final_toggles",
+      "exit_code": 0,
+      "seconds": 2.600318431854248,
+      "log": "save-journal-r39/reports/stage2/full-tests/115-final_toggles.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::moon_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/moon_traces-3b01e49e2fc0f04c",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "moon_traces",
+      "exit_code": 0,
+      "seconds": 16.998141288757324,
+      "log": "save-journal-r39/reports/stage2/full-tests/116-moon_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::travel",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/travel-eada622c5e52d180",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "travel",
+      "exit_code": 0,
+      "seconds": 1.9785234928131104,
+      "log": "save-journal-r39/reports/stage2/full-tests/117-travel.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::shine_slippery",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/shine_slippery-ab79c6b456856c98",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "shine_slippery",
+      "exit_code": 0,
+      "seconds": 1.1379568576812744,
+      "log": "save-journal-r39/reports/stage2/full-tests/118-shine_slippery.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::mercuria_lever_traces",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/mercuria_lever_traces-8cb662d8b3aec63e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "mercuria_lever_traces",
+      "exit_code": 0,
+      "seconds": 26.93049907684326,
+      "log": "save-journal-r39/reports/stage2/full-tests/119-mercuria_lever_traces.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::replay_seed",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/replay_seed-b9df97602c0546c7",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "replay_seed",
+      "exit_code": 0,
+      "seconds": 3.100874423980713,
+      "log": "save-journal-r39/reports/stage2/full-tests/120-replay_seed.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::topology_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/topology_parity-7132e396b502f2cb",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "topology_parity",
+      "exit_code": 0,
+      "seconds": 0.7774031162261963,
+      "log": "save-journal-r39/reports/stage2/full-tests/121-topology_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::generated_avatar_play",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/generated_avatar_play-f027d7d798453926",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "generated_avatar_play",
+      "exit_code": 0,
+      "seconds": 10.63359785079956,
+      "log": "save-journal-r39/reports/stage2/full-tests/122-generated_avatar_play.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::nova_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/nova_commands-c22661e18b5d9c2e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "nova_commands",
+      "exit_code": 0,
+      "seconds": 1.4609379768371582,
+      "log": "save-journal-r39/reports/stage2/full-tests/123-nova_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::stealth_passives",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/stealth_passives-4a540c5a2c51ee36",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "stealth_passives",
+      "exit_code": 0,
+      "seconds": 1.871443271636963,
+      "log": "save-journal-r39/reports/stage2/full-tests/124-stealth_passives.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::identity_migrations",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/identity_migrations-e40022d1138f31de",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "identity_migrations",
+      "exit_code": 0,
+      "seconds": 0.3511638641357422,
+      "log": "save-journal-r39/reports/stage2/full-tests/125-identity_migrations.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::ordinary_roster",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/ordinary_roster-84d17be75929728e",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "ordinary_roster",
+      "exit_code": 0,
+      "seconds": 18.870317459106445,
+      "log": "save-journal-r39/reports/stage2/full-tests/126-ordinary_roster.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::godbeast_interactions",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/godbeast_interactions-dbb161e5c221e509",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "godbeast_interactions",
+      "exit_code": 0,
+      "seconds": 1.407240629196167,
+      "log": "save-journal-r39/reports/stage2/full-tests/127-godbeast_interactions.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::borge_event",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/borge_event-5978506091806e9c",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "borge_event",
+      "exit_code": 0,
+      "seconds": 0.5599651336669922,
+      "log": "save-journal-r39/reports/stage2/full-tests/128-borge_event.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::actor_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/actor_parity-9688757ed1130e8c",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "actor_parity",
+      "exit_code": 0,
+      "seconds": 3.991297721862793,
+      "log": "save-journal-r39/reports/stage2/full-tests/129-actor_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::expanded_consumables",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/expanded_consumables-6bb32ab299620d11",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "expanded_consumables",
+      "exit_code": 0,
+      "seconds": 3.8902289867401123,
+      "log": "save-journal-r39/reports/stage2/full-tests/130-expanded_consumables.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::ahvamitt_r34",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/ahvamitt_r34-691e0283e4a86c89",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "ahvamitt_r34",
+      "exit_code": 0,
+      "seconds": 0.1027076244354248,
+      "log": "save-journal-r39/reports/stage2/full-tests/131-ahvamitt_r34.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::enemy_traits",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/enemy_traits-f812586420298ea6",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "enemy_traits",
+      "exit_code": 0,
+      "seconds": 0.6456947326660156,
+      "log": "save-journal-r39/reports/stage2/full-tests/132-enemy_traits.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::profile",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/profile-d61e9648645e2240",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "profile",
+      "exit_code": 0,
+      "seconds": 0.21091842651367188,
+      "log": "save-journal-r39/reports/stage2/full-tests/133-profile.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::witch_skinwalker_v33",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/witch_skinwalker_v33-18e65d31e0026f31",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "witch_skinwalker_v33",
+      "exit_code": 0,
+      "seconds": 0.13242506980895996,
+      "log": "save-journal-r39/reports/stage2/full-tests/134-witch_skinwalker_v33.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::creature_feeding_v33",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/creature_feeding_v33-2de2bc50621dec17",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "creature_feeding_v33",
+      "exit_code": 0,
+      "seconds": 0.10122823715209961,
+      "log": "save-journal-r39/reports/stage2/full-tests/135-creature_feeding_v33.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::maintained_links",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/maintained_links-e323cc8a3902a44a",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "maintained_links",
+      "exit_code": 0,
+      "seconds": 0.10030865669250488,
+      "log": "save-journal-r39/reports/stage2/full-tests/136-maintained_links.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::tinker_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/tinker_commands-ba653ceaeaa69f16",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "tinker_commands",
+      "exit_code": 0,
+      "seconds": 9.617215394973755,
+      "log": "save-journal-r39/reports/stage2/full-tests/137-tinker_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::bonded_commands",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/bonded_commands-416a5d313d035c94",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "bonded_commands",
+      "exit_code": 0,
+      "seconds": 1.0361719131469727,
+      "log": "save-journal-r39/reports/stage2/full-tests/138-bonded_commands.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::shard_weapon_r39",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/shard_weapon_r39-9017ea56d45976a1",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "shard_weapon_r39",
+      "exit_code": 0,
+      "seconds": 0.03986811637878418,
+      "log": "save-journal-r39/reports/stage2/full-tests/139-shard_weapon_r39.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::monster_chill",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/monster_chill-65a982c6826f4e54",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "monster_chill",
+      "exit_code": 0,
+      "seconds": 7.095674514770508,
+      "log": "save-journal-r39/reports/stage2/full-tests/140-monster_chill.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core/Cargo.toml::geology_parity",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/geology_parity-eba90cfa596d2c6c",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-core",
+      "target": "geology_parity",
+      "exit_code": 0,
+      "seconds": 3.9831464290618896,
+      "log": "save-journal-r39/reports/stage2/full-tests/141-geology_parity.log"
+    },
+    {
+      "key": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop/Cargo.toml::corpse-desktop",
+      "executable": "/workspace/scratch/69f53637ba6f/save-journal-r39/stage2-target/debug/deps/corpse_desktop-fa06a3c1fd01ba7d",
+      "cwd": "/workspace/scratch/69f53637ba6f/save-journal-r39/source/crates/corpse-desktop",
+      "target": "corpse-desktop",
+      "exit_code": 0,
+      "seconds": 21.83152937889099,
+      "log": "save-journal-r39/reports/stage2/full-tests/142-corpse-desktop.log"
+    }
+  ]
+}

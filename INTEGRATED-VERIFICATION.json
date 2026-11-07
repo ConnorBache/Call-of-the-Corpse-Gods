@@ -1,0 +1,18 @@
+{
+  "revision": 39,
+  "scope": "Incremental durable saves, tracked commands, exact closing-edge cache guard",
+  "current_report": "docs/verification/incremental-save-engineering-report.md",
+  "test_summary": "verification/incremental-save/reports/full-test-summary.json",
+  "targets": 164,
+  "totals": {
+    "passed": 1306,
+    "failed": 0,
+    "ignored": 13,
+    "measured": 0,
+    "filtered": 0
+  },
+  "profile": "opt-level1/debug0/debug assertions true/overflow checks true; all workspace targets, including example test harnesses; duplicate module tests across harnesses count as executions, not unique cases",
+  "windows_runtime_verified": false,
+  "power_loss_verified": false,
+  "historical_receipt": "verification/historical-pre-incremental-save/INTEGRATED-VERIFICATION.json"
+}

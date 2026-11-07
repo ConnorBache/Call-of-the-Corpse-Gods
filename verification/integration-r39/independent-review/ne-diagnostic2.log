@@ -1,0 +1,27 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-core)
+error[E0609]: no field `dream_ground` on type `generated::Item`
+   --> crates/corpse-core/src/inventory.rs:122:18
+    |
+122 |             item.dream_ground=Field::Missing;
+    |                  ^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `blessed`, `id`, `name`, `kind`, `glyph` ... and 23 others
+
+error[E0609]: no field `dream_ground` on type `generated::Item`
+   --> crates/corpse-core/src/projectiles.rs:338:60
+    |
+338 |         if shard && crate::dreamwalking::active(r) {thrown.dream_ground=true.into();}
+    |                                                            ^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `blessed`, `id`, `name`, `kind`, `glyph` ... and 23 others
+
+error[E0609]: no field `dream_ground` on type `&generated::Item`
+   --> crates/corpse-core/src/dreamwalking.rs:114:42
+    |
+114 |     crate::borge::is_shard(item) && item.dream_ground.value_or(false)
+    |                                          ^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `blessed`, `id`, `name`, `kind`, `glyph` ... and 23 others
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `corpse-core` (lib) due to 3 previous errors

@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "command": "sh tools/cargo.sh test -p corpse-desktop borge_shard -- --nocapture",
+  "new_ui_tests": 4,
+  "legacy_ui_tests": 1,
+  "windows_runtime_tested": false,
+  "new_player_facing_strings": 0,
+  "files": [
+    {
+      "path": "crates/corpse-desktop/src/pack.rs",
+      "sha256": "a8354774d3fef00e7559d1bf85583d80f189768e343572b8e3aa0c81244b20bd"
+    },
+    {
+      "path": "crates/corpse-desktop/src/dream_ui.rs",
+      "sha256": "a6eb60036e01f9421339ef7368accc24987c18a5285013ba57944da5f288a937"
+    },
+    {
+      "path": "crates/corpse-desktop/src/observe.rs",
+      "sha256": "f92093602d5d26d8f9a0dde101723b6a371cd9ac8b58efac65bfe9ee65424f7e"
+    },
+    {
+      "path": "docs/shard-ui-r39.md",
+      "sha256": "8373e399e4a204e9fc37619d5424c325aff757e8a10acd92199999488b38858c"
+    }
+  ],
+  "passed": 5,
+  "failed": 0
+}

@@ -1,0 +1,19 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 51.60s
+     Running tests/revision_39_startup.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/revision_39_startup-da16db3469a619ae)
+
+running 2 tests
+test new_runs_and_debug_admit_revision39_but_reject40 ... ok
+test revision39_keeps_generation_and_required_content_identical_to38 ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.51s
+
+     Running tests/shard_ground_r39.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shard_ground_r39-7a298f6ae92b3485)
+
+running 2 tests
+test waking_zillennia_cannot_erase_a_dream_dropped_shard ... ok
+test marker_roundtrips_only_on_r39_ground_or_observation_shard ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+

@@ -1,0 +1,11 @@
+{
+  "status": "source_contract_checks_passed",
+  "scope": "source-and-data-only",
+  "catalog_entries": 72,
+  "authorized_description_amendments": 9,
+  "new_modules_registered": 17,
+  "checks_native_compilation": false,
+  "checks_runtime_tests": false,
+  "revision50_release_enabled": true,
+  "release_runtime_verified_by_this_check": false
+}

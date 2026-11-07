@@ -1,0 +1,15 @@
+{
+  "scope": "Darkness-rendering edits; shared files may also contain independent R51 work",
+  "files": {
+    "crates/corpse-core/src/vision.rs": "3fae23bbb1b45c7db4e062944922b2cfb4b65a01bc8ec87f3e227a1e0646c0b0",
+    "crates/corpse-desktop/src/appearance_light.rs": "ea82187e46d09bdda3e29af1058ff8804c9b4fad72e14b706f8c2df579c65e27",
+    "crates/corpse-desktop/src/color.rs": "0f020c487847859299dc06f32420a0f5fc736a8d9d62efb04ae9b7dbec790ae0",
+    "crates/corpse-desktop/src/color_profile.rs": "a5a45f165aed018fcbd56f8c5608ef1437c5aa960b09d978840111efa5ad3e14",
+    "crates/corpse-desktop/src/main.rs": "55b22e61a49a1db03c73b667a64b988ef1edd6fc579ea9a0138df79d88a97887",
+    "crates/corpse-desktop/src/darkness_render_tests.rs": "98d2cfa43656246f51fbab7a193af6cdbd9a999934145c80ac83fa270ca534f1",
+    "crates/corpse-desktop/tests/appearance_entities.rs": "ae51dd3ade562f9c76da6e68b278005e2412f3515e9561cb7782effd0df0cd29",
+    "crates/corpse-desktop/tests/appearance_lighting.rs": "06d2dff1b8687adf01c1ab1c2d4674ca0e5db3dde33185f65a671ab022072f04",
+    "docs/revision51-darkness-rendering.md": "0634c905f4cd199049595a1d14fda8976168a2d7af80f77c99fab144b3875953",
+    "docs/complexity-ledger.md": "0caf44d74fc16c2d676918d5f6d253eeb366dd848c941a252a61f7bec2345b8b"
+  }
+}

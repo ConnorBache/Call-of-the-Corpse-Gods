@@ -1,0 +1,15 @@
+
+running 10 tests
+test disconnected_if_both_avoided_is_rejected_even_if_individually_bypassable ... ok
+test unsuitable_maps_omit_instead_of_rewriting_or_forcing_a_portal ... ok
+test every_actor_profile_and_population_pool_remains_revision34 ... ok
+test depth_gate_determinism_and_legacy_nonmutation ... ok
+test unreachable_decorative_components_do_not_receive_endpoints ... ok
+test startup35_adds_portals_without_rebudgeting_actors_or_ground ... ok
+test optional_metadata_roundtrips_and_malformed_waking_or_dream_pairs_reject ... ok
+test seven_pairs_keep_all_endpoints_optional_with_ordered_colors ... ok
+test never_occupies_stairs_fixture_actor_loot_or_required_single_width_route ... ok
+test generated_six_biomes_and_multiple_seeds_preserve_walking_routes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.18s
+

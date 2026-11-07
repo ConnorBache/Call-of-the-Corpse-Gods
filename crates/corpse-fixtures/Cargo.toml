@@ -1,0 +1,8 @@
+[package]
+name = "corpse-fixtures"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+[dependencies]
+corpse-core = { path = "../corpse-core" }
+serde_json.workspace = true

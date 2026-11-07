@@ -1,0 +1,152 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `corpse-core` (lib test) generated 2 warnings (run `cargo fix --lib -p corpse-core --tests` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 1m 32s
+     Running unittests src/lib.rs (../r50-optimized-target/debug/deps/corpse_core-c5176256c434b1cf)
+
+running 114 tests
+test revision50_ability_energy::tests::invalid_missing_partial_and_stale_leave_state_unchanged ... ok
+test revision50_ability_energy::tests::malformed_later_reserve_prevents_entire_refill ... ok
+test revision50_ability_energy::tests::level_refill_serializes_and_does_not_refill_player_energy ... ok
+test revision50_ability_energy::tests::revision_gating_and_real_level_up ... ok
+test revision50_ability_energy::tests::own_first_and_exhausted_fallback ... ok
+test mini_me::revision50_stats_tests::owner_phase_through_does_not_allow_spawning_stats_only_copy_in_wall ... ok
+test offscreen::revision50_ring_tests::aggregate_regen_keeps_suppression_water_creature_and_endpoint_rules ... ok
+test revision50_amulet_effects::tests::acid_has_range_eight_and_refreshes_six_turn_penalty ... ok
+test revision50_amulet_effects::tests::blinking_visible_empty_within_ten_and_arrival_fire ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_acid_damage_and_attached_dr_loss ... ok
+test revision50_amulet_effects::tests::cold_immunity_is_enforced_at_shared_damage_packet_boundary ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_iceblast_damage_and_attached_slow ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_poison_source_without_curing_existing_poison ... ok
+test revision50_amulet_effects::tests::iceblast_closed_corner_shields_and_corrosion_compounds_sustain ... ok
+test revision50_amulet_effects::tests::firebolt_ignites_blocking_tree_but_never_hits_beyond_it ... ok
+test mini_me::revision50_stats_tests::freezes_effective_stats_without_inheriting_powers_items_or_statuses ... ok
+test revision50_amulet_effects::tests::inactive_floor_uses_the_same_poison_and_corrosion_normal_clock ... ok
+test revision50_amulet_effects::tests::lightning_continues_beyond_aim_pierces_allies_and_stops_at_wall ... ok
+test revision50_amulet_effects::tests::firebolt_is_eighty_not_twenty_and_ignites_path_and_first_target ... ok
+test mini_me::revision50_stats_tests::commit_rejects_power_bearing_r50_copy_without_mutation ... ok
+test revision50_amulet_effects::tests::iceblast_thirty_hits_player_and_allies_while_immunity_blocks_damage_and_slow ... ok
+test revision50_amulet_effects::tests::invalid_dispatch_does_not_start_clocks_or_claim_free_credit ... ok
+test offscreen::revision50_ring_tests::stationary_approximation_uses_elapsed_ticks_and_preserves_legacy_rate ... ok
+test revision50_amulet_effects::tests::poison_is_six_per_normal_tick_for_twenty_and_refreshes_without_rate_stacking ... ok
+test revision50_amulets::tests::appropriate_reduces_cost_ten_and_can_make_zero_cost ... ok
+test revision50_amulets::tests::global_free_credit_and_stale_commit_remain_atomic ... ok
+test revision50_amulets::tests::initialization_is_once_only_and_unknown_or_invalid_specs_fail ... ok
+test revision50_amulets::tests::own_energy_then_exhausted_player_fallback_without_cooldowns ... ok
+test revision50_amulet_effects::tests::dispatch_free_activation_then_other_amulet_consumes_turn ... ok
+test revision50_amulet_effects::tests::named_resistances_apply_to_final_packets_and_acid_penalty ... ok
+test revision50_amulet_effects::tests::preview_cannot_leak_unseen_live_terrain_or_consume_rng ... ok
+test revision50_amulet_effects::tests::spatial_ray_cycles_are_bounded_and_duplicate_actor_is_hit_once ... ok
+test revision50_control_amulets::tests::beckoning_pulls_nearest_adjacent_and_breaks_roots ... ok
+test revision50_control_amulets::tests::direct_magic_honors_fated_duel_but_hazards_keep_existing_rules ... ok
+test revision50_control_amulets::tests::beckoning_failure_has_no_resource_or_state_mutation ... ok
+test revision50_control_amulets::tests::discord_curses_respect_willpower_and_distinct_shared_owners ... ok
+test revision50_control_amulets::tests::discord_haste_moves_only_without_ticking_status ... ok
+test revision50_control_amulets::tests::discord_is_mutual_preserves_allegiance_and_expires_after_six_ticks ... ok
+test revision50_control_amulets::tests::free_command_spends_cost_but_not_status_or_world_clocks ... ok
+test revision50_control_amulets::tests::obstruction_exact_perpendicular_unlimited_range_and_safe_expiry ... ok
+test revision50_control_amulets::tests::obstruction_rejects_occupied_stairs_portals_bounds_and_unknown_orientation ... ok
+test revision50_control_amulets::tests::target_plane_visibility_range_and_revision_are_enforced ... ok
+test revision50_control_amulets::tests::offscreen_discord_does_not_act_on_last_paralyzed_turn ... ok
+test revision50_grappler::tests::blocked_front_keeps_entire_chain_and_other_lane_moves ... ok
+test revision50_control_amulets::tests::roots_tick_four_times_block_only_movement_and_break_on_fire ... ok
+test revision50_grappler::tests::chains_move_front_first_independent_of_input_order ... ok
+test revision50_control_amulets::tests::obstruction_only_center_must_be_visible_and_unknown_outer_cell_does_not_change_preview ... ok
+test revision50_grappler::tests::outside_occupant_blocks_chain ... ok
+test revision50_grappler::tests::carried_actor_uses_forced_movement_and_restores_condition ... ok
+test revision50_grappler::tests::lock_filters_dead_allied_neutral_distant_and_old_revision ... ok
+test revision50_grappler::tests::diagonal_wall_prevents_squeezing_despite_forced_flag ... ok
+test revision50_control_amulets::tests::obstruction_preview_does_not_probe_hidden_creature ... ok
+test revision50_control_amulets::tests::offscreen_normal_ticks_expire_terrain_and_control_statuses ... ok
+test revision50_inventory::tests::base_and_combined_capacity ... ok
+test revision50_inventory::tests::independent_categories_and_shared_jewelry ... ok
+test revision50_inventory::tests::bow_apply_admission_does_not_require_equipping ... ok
+test revision50_inventory::tests::legacy_capacity_unchanged ... ok
+test revision50_inventory::tests::jewelry_wearing_does_not_displace_existing_items ... ok
+test revision50_amulet_effects::tests::saved_item_energy_and_poison_rate_replay_identically ... ok
+test revision50_inventory::tests::pickup_respects_categories_and_leaves_unclassified_items ... ok
+test revision50_inventory::tests::weapons_and_armor_cannot_be_equipped ... ok
+test revision50_inventory::tests::worn_jewelry_excluded_and_unequip_requires_space ... ok
+test revision50_player_attack::tests::baseline_matches_authored_greatsword_not_shortsword ... ok
+test revision50_player_attack::tests::base_reads_live_effective_offense_without_attack_side_effects ... ok
+test revision50_player_attack::tests::explicit_bow_and_thrown_item_bases_stay_item_defined ... ok
+test revision50_amulet_effects::tests::invalid_target_and_partial_payment_leave_energy_rng_and_ledger_untouched ... ok
+test revision50_nightmares::independent_clock_tests::explicit_owner_activation_uses_own_visibility_charge_identity_and_plane ... ok
+test revision50_control_amulets::tests::temporary_terrain_and_statuses_roundtrip_and_rewind_together ... ok
+test revision50_pursuit::runtime_tests::runtime_failed_activation_is_atomic_and_legacy_is_unchanged ... ok
+test revision50_pursuit::tests::bonus_is_once_per_turn_and_survives_serialization ... ok
+test revision50_pursuit::tests::enemy_route_only_as_fallback ... ok
+test revision50_pursuit::tests::long_clear_route_beats_short_enemy_route ... ok
+test revision50_pursuit::tests::target_motion_and_obstacle_changes_are_replanned ... ok
+test revision50_nightmares::independent_clock_tests::independent_recharge_clock_and_charges_are_independent_and_persisted ... ok
+test revision50_pursuit::runtime_tests::runtime_fallback_crosses_enemy_only_when_clear_route_is_impossible ... ok
+test revision50_pursuit::runtime_tests::runtime_enemy_free_detour_precedes_occupied_shortcut ... ok
+test revision50_terrain::tests::clay_attacks_use_live_stats_without_abilities ... ok
+test revision50_pursuit::runtime_tests::runtime_move_bonus_is_once_and_not_for_attack_or_wrong_direction ... ok
+test revision50_pursuit::runtime_tests::runtime_portal_entry_and_arrival_both_appear_and_earn_credit ... ok
+test revision50_terrain::tests::clay_black_pit_departure_overlap_rolls_back_move_and_events ... ok
+test revision50_terrain::tests::clay_end_turn_attacks_any_adjacent_creature_and_cleans_sources ... ok
+test revision50_terrain::tests::clay_requires_committable_one_cell_move ... ok
+test revision50_terrain::tests::clay_grappler_cannot_entomb_dragged_creature_in_departure_cell ... ok
+test revision50_terrain::tests::clay_placement_moves_and_leaves_unbreakable_wall ... ok
+test revision50_pursuit::runtime_tests::runtime_target_follows_movement_and_death ... ok
+test revision50_terrain::tests::clay_placement_uses_its_reserve_before_shared_energy ... ok
+test revision50_terrain::tests::clay_rejected_move_is_atomic ... ok
+test revision50_terrain::tests::clay_preview_hides_invisible_occupants_but_activation_rejects ... ok
+test revision50_terrain::tests::legacy_and_removal_without_selection_are_rejected ... ok
+test revision50_terrain::tests::pit_requires_all_nine_cells_unoccupied ... ok
+test revision50_terrain::tests::clay_rejected_runtime_move_preserves_outer_presentation_batch ... ok
+test revision50_terrain::tests::clay_source_cleanup_tracks_original_floor_on_reaction_error ... ok
+test revision50_terrain::tests::clay_transient_ids_obey_registry_and_terminal_turns_stop ... ok
+test revision50_terrain::tests::hidden_occupant_does_not_change_preview_but_blocks_commit ... ok
+test revision50_terrain::tests::mode_selection_is_free_and_rejects_invalid_values ... ok
+test revision50_terrain::tests::cogworks_cannot_remove_clay_soldiers ... ok
+test revision50_terrain::tests::wall_is_five_cells_perpendicular_to_throw ... ok
+test revision50_terrain::tests::paid_commit_and_free_removal_round_trip ... ok
+test revision50_terrain::tests::rejected_payment_does_not_mutate ... ok
+test revision50_terrain::tests::runtime_occupied_pit_and_pending_wall_fail_atomically ... ok
+test revision50_wave_teleport::tests::flood_hits_once_and_pushes_two_without_extra_rng ... ok
+test revision50_wave_teleport::tests::flood_duel_guard_skips_damage_and_push_without_curing_status_or_shielding_ground ... ok
+test revision50_wave_teleport::tests::quench_preserves_permanent_flame ... ok
+test revision50_wave_teleport::tests::teleport_no_destination_consumes_no_rng_or_position ... ok
+test revision50_wave_teleport::tests::teleport_rejects_self_and_wrong_plane_without_rng ... ok
+test revision50_wave_teleport::tests::teleport_still_admits_an_independent_mini_me ... ok
+test tinker::revision50_tests::existing_jewelry_powers_do_not_block_tinker_and_legacy_stays_unchanged ... ok
+test revision50_wave_teleport::tests::teleport_dispatch_rejects_immutable_endpoints_before_payment ... FAILED
+test revision50_terrain::tests::runtime_pit_and_free_removal_preserve_save_state ... ok
+test revision50_wave_teleport::tests::teleport_selection_is_repeatable_unexplored_and_unoccupied ... ok
+test tinker::revision50_tests::tinker_preserves_original_power_and_costs_exactly_one_payment ... ok
+test tinker::revision50_tests::all_existing_grants_are_excluded_from_generation ... ok
+test revision50_wave_teleport::tests::wave_is_fifteen_cells_and_never_overwrites_stop_tile ... ok
+test revision50_nightmares::independent_clock_tests::shared_bodies_decoys_dead_and_legacy_actors_do_not_recharge ... ok
+
+failures:
+
+---- revision50_wave_teleport::tests::teleport_dispatch_rejects_immutable_endpoints_before_payment stdout ----
+
+thread 'revision50_wave_teleport::tests::teleport_dispatch_rejects_immutable_endpoints_before_payment' (176) panicked at crates/corpse-core/src/revision50_wave_teleport.rs:240:93:
+called `Result::unwrap()` on an `Err` value: EngineError("condition r50ClaySoldier on ")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    revision50_wave_teleport::tests::teleport_dispatch_rejects_immutable_endpoints_before_payment
+
+test result: FAILED. 113 passed; 1 failed; 0 ignored; 0 measured; 240 filtered out; finished in 0.09s
+
+error: test failed, to rerun pass `-p corpse-core --lib`

@@ -1,0 +1,12 @@
+{
+  "manifest_date": "2026-10-15",
+  "toolchain": "1.99.1",
+  "target": "x86_64-pc-windows-gnu",
+  "available": true,
+  "url": "https://static.rust-lang.org/dist/2026-10-15/rust-std-1.99.1-x86_64-pc-windows-gnu.tar.gz",
+  "hash": "6546651238a3ac092b763511be524ca6eda6103e5d47342416923be1b3ce837c",
+  "xz_url": "https://static.rust-lang.org/dist/2026-10-15/rust-std-1.99.1-x86_64-pc-windows-gnu.tar.xz",
+  "xz_hash": "b17e3bc962ff24b3bc47a750d838defed85b280746250e3a3ad029e6c1a29dd7",
+  "components": [],
+  "extensions": []
+}

@@ -1,0 +1,13 @@
+
+running 8 tests
+test input_validation_has_no_silent_clamping ... ok
+test floor_one_has_zero_prior_budget_and_exact_opening ... ok
+test playtest_cannot_enter_normal_high_scores_even_if_imported_as_genuine ... ok
+test full_collection_matches_actual_prior_generated_ordinary_hearts ... ok
+test save_replay_restart_and_snapshot_preserve_profile ... ok
+test floor_forty_is_valid_without_target_rewards ... ok
+test all_vessels_and_both_temporal_abilities_retain_synthetic_origin ... ok
+test identical_seed_floor_and_mode_reproduce_complete_state ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.52s
+

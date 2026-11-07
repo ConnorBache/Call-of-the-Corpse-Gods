@@ -1,0 +1,11 @@
+
+running 6 tests
+test distant_tap_excludes_planned_stair_footprint_in_r38 ... ok
+test invalid_recovery_inputs_are_rejected_without_attempting_geometry ... ok
+test seed_0047_tap_survives_stair_painting_and_cleanup ... ok
+test recovery_window_keeps_stairs_domain_and_godbeast_plan ... ok
+test protected_room_failure_retries_a_safe_candidate_in_r38 ... ok
+test late_mountain_chasms_preserve_hazard_free_stair_routes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 17.17s
+

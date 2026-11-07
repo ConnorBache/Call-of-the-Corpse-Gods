@@ -1,0 +1,12 @@
+vampire all_initial_unblessed joint_mean before gross 0.3945886213307088 kills 128 deaths 0 censor 0 error 
+vampire all_initial_unblessed joint_mean after gross 0.4559498850119059 kills 119 deaths 9 censor 0 error 
+vampire all_initial_unblessed accuracy_p10 before gross 0.3731928380782918 kills 32 deaths 0 censor 0 error 
+vampire all_initial_unblessed accuracy_p10 after gross 0.4710715080071175 kills 32 deaths 0 censor 0 error 
+vampire all_initial_unblessed accuracy_p90 before gross 0.4407951598962836 kills 32 deaths 0 censor 0 error 
+vampire all_initial_unblessed accuracy_p90 after gross 0.4407951598962836 kills 32 deaths 0 censor 0 error 
+vampire all_initial_unblessed dodge_p10 before gross 0.5650991001945525 kills 32 deaths 0 censor 0 error 
+vampire all_initial_unblessed dodge_p10 after gross 0.5650991001945525 kills 32 deaths 0 censor 0 error 
+vampire all_initial_unblessed dodge_p90 before gross 0.0889992596248766 kills 32 deaths 0 censor 0 error 
+vampire all_initial_unblessed dodge_p90 after gross 0.2670286278381046 kills 32 deaths 0 censor 0 error 
+vampire ordinary_unblessed joint_mean before gross 0.5644439005324692 kills 115 deaths 13 censor 0 error 
+vampire ordinary_unblessed joint_mean after gross 0.7787205882101056 kills 68 deaths 60 censor 0 error 

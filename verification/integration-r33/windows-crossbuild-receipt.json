@@ -1,0 +1,40 @@
+{
+  "revision": "r33-final-skin-name-guard",
+  "build_succeeded": true,
+  "command": "CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=2 CARGO_TARGET_DIR=target/windows-r33 CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=$PWD/tools/windows-linker.sh SDL2_LIB_DIR=$SDK/SDL2-2.32.10/x86_64-w64-mingw32/lib PATH=$SDK/sysroot/usr/bin:$PATH sh tools/cargo.sh build --release --locked --target x86_64-pc-windows-gnu -p corpse-desktop",
+  "rust_toolchain": "1.99.1",
+  "duration_reported": "2m 21s",
+  "build_log": "build.log",
+  "compiler_warning_count": 72,
+  "cargo_lock_sha256": "9342120cd87b86ee9b54768431c805d075cd2aaaee0ff142151e2d8555dc5ccb",
+  "frozen_input_count": 1124,
+  "frozen_input_canonical_json_sha256": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "frozen_inputs_unchanged_after_build": true,
+  "original_exe": {
+    "path": "monster-hooks/source/corpse-gods-native/target/windows-r33/x86_64-pc-windows-gnu/release/corpse-desktop.exe",
+    "bytes": 159937180,
+    "sha256": "6ca49156af689aec04594482eb829ab8ddd386e13de3f0064d155cdc8a316e86"
+  },
+  "delivery_exe": {
+    "path": "monster-hooks/verification/windows/corpse-desktop.exe",
+    "bytes": 97131201,
+    "sha256": "52d966bbff805a48a2f3b956f46e8b17c11323de87a50b5bc8600ab70cf64624"
+  },
+  "strip_command": "x86_64-w64-mingw32-strip --strip-unneeded (copy only; original retained)",
+  "checks": {
+    "embedded_manifest_matches_source": true,
+    "embedded_icon_images_match_source": true,
+    "icon_images": 7,
+    "unsigned": true
+  },
+  "all_84_runtime_pngs_embedded_byte_for_byte": true,
+  "required_bundled_dlls": [
+    "SDL2.dll"
+  ],
+  "other_imports": "Standard Windows system DLLs only in executable and SDL2.dll; see PE inspection JSONs.",
+  "windows_runtime_verified": false,
+  "wine_available": false,
+  "signing": "Unsigned; no certificate directory present.",
+  "limitations": "Cross-compiled and statically inspected only. No Windows launch/rendering/input/audio/save behavior verification; no Windows runtime host available.",
+  "package_status": "Waiting for final QA documentation before packaging."
+}

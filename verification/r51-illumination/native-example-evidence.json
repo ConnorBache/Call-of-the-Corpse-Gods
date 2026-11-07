@@ -1,0 +1,1087 @@
+[
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "floor",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      27,
+      25,
+      24
+    ],
+    "background": [
+      7,
+      6,
+      6
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2446709395,
+    "centerRgbaCrc32": 3251157074
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "floor",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      88,
+      81,
+      79
+    ],
+    "background": [
+      22,
+      18,
+      21
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 979503706,
+    "centerRgbaCrc32": 929483660
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "floor",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      135,
+      125,
+      122
+    ],
+    "background": [
+      34,
+      28,
+      32
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 381079808,
+    "centerRgbaCrc32": 1608069021
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "floor",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      242,
+      224,
+      218
+    ],
+    "background": [
+      70,
+      57,
+      66
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3286774777,
+    "centerRgbaCrc32": 2860849023
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "floor",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      251,
+      232,
+      226
+    ],
+    "background": [
+      116,
+      95,
+      109
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2924093901,
+    "centerRgbaCrc32": 3154425072
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "floor",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      249,
+      230,
+      225
+    ],
+    "background": [
+      96,
+      79,
+      91
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2494390186,
+    "centerRgbaCrc32": 4124162060
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "floor",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "directChance": 100.0,
+    "foreground": [
+      255,
+      229,
+      217
+    ],
+    "background": [
+      105,
+      78,
+      78
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 291910692,
+    "centerRgbaCrc32": 2766487462
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "floor",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      251,
+      232,
+      226
+    ],
+    "background": [
+      116,
+      95,
+      109
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2101007803,
+    "centerRgbaCrc32": 3154425072
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "floor",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      242,
+      224,
+      218
+    ],
+    "background": [
+      70,
+      57,
+      66
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1807039727,
+    "centerRgbaCrc32": 2860849023
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "floor",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      251,
+      232,
+      226
+    ],
+    "background": [
+      116,
+      95,
+      109
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2101007803,
+    "centerRgbaCrc32": 3154425072
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "wall",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      25,
+      22,
+      21
+    ],
+    "background": [
+      12,
+      10,
+      11
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2712694274,
+    "centerRgbaCrc32": 1748228881
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "wall",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      82,
+      73,
+      67
+    ],
+    "background": [
+      38,
+      34,
+      34
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2772741473,
+    "centerRgbaCrc32": 1242808753
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "wall",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      126,
+      112,
+      103
+    ],
+    "background": [
+      59,
+      52,
+      53
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1890220404,
+    "centerRgbaCrc32": 2464255869
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "wall",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      238,
+      212,
+      195
+    ],
+    "background": [
+      121,
+      107,
+      109
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 179606077,
+    "centerRgbaCrc32": 3772161828
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "wall",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      250,
+      222,
+      204
+    ],
+    "background": [
+      201,
+      177,
+      180
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4098891602,
+    "centerRgbaCrc32": 1845787691
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "wall",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      248,
+      220,
+      203
+    ],
+    "background": [
+      167,
+      147,
+      150
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1301274979,
+    "centerRgbaCrc32": 903967388
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "wall",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "directChance": 100.0,
+    "foreground": [
+      255,
+      219,
+      194
+    ],
+    "background": [
+      182,
+      144,
+      129
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2974048913,
+    "centerRgbaCrc32": 3080895255
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "wall",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      250,
+      222,
+      204
+    ],
+    "background": [
+      201,
+      177,
+      180
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 446893720,
+    "centerRgbaCrc32": 1845787691
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "wall",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      238,
+      212,
+      195
+    ],
+    "background": [
+      121,
+      107,
+      109
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2071196699,
+    "centerRgbaCrc32": 3772161828
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "wall",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      250,
+      222,
+      204
+    ],
+    "background": [
+      201,
+      177,
+      180
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 446893720,
+    "centerRgbaCrc32": 1845787691
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "grass",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      23,
+      37,
+      20
+    ],
+    "background": [
+      4,
+      8,
+      6
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3825922310,
+    "centerRgbaCrc32": 2935352966
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "grass",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      73,
+      120,
+      66
+    ],
+    "background": [
+      12,
+      25,
+      20
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 885370902,
+    "centerRgbaCrc32": 200553103
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "grass",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      113,
+      184,
+      102
+    ],
+    "background": [
+      18,
+      39,
+      31
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3749725338,
+    "centerRgbaCrc32": 2393819050
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "grass",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      153,
+      249,
+      138
+    ],
+    "background": [
+      37,
+      80,
+      64
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1770710863,
+    "centerRgbaCrc32": 4188243951
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "grass",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      155,
+      252,
+      140
+    ],
+    "background": [
+      61,
+      133,
+      105
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1800226805,
+    "centerRgbaCrc32": 1996042258
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "grass",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      154,
+      251,
+      139
+    ],
+    "background": [
+      51,
+      111,
+      88
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2725204134,
+    "centerRgbaCrc32": 2844284597
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "grass",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "directChance": 100.0,
+    "foreground": [
+      171,
+      249,
+      122
+    ],
+    "background": [
+      58,
+      111,
+      78
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 84546849,
+    "centerRgbaCrc32": 4000648775
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "grass",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      155,
+      252,
+      140
+    ],
+    "background": [
+      61,
+      133,
+      105
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3609414552,
+    "centerRgbaCrc32": 1996042258
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "grass",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      153,
+      249,
+      138
+    ],
+    "background": [
+      37,
+      80,
+      64
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1752716267,
+    "centerRgbaCrc32": 4188243951
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "grass",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      155,
+      252,
+      140
+    ],
+    "background": [
+      61,
+      133,
+      105
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3609414552,
+    "centerRgbaCrc32": 1996042258
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "water",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      11,
+      15,
+      26
+    ],
+    "background": [
+      4,
+      4,
+      11
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 573252032,
+    "centerRgbaCrc32": 845801021
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "water",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      37,
+      49,
+      84
+    ],
+    "background": [
+      12,
+      14,
+      37
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3624314186,
+    "centerRgbaCrc32": 1784494102
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "water",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      57,
+      76,
+      129
+    ],
+    "background": [
+      18,
+      22,
+      57
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4054208739,
+    "centerRgbaCrc32": 2247392057
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "water",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      106,
+      141,
+      240
+    ],
+    "background": [
+      37,
+      45,
+      117
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 301004564,
+    "centerRgbaCrc32": 3459945387
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "water",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      111,
+      147,
+      250
+    ],
+    "background": [
+      61,
+      75,
+      194
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3661155111,
+    "centerRgbaCrc32": 4138335560
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "water",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      110,
+      146,
+      248
+    ],
+    "background": [
+      51,
+      62,
+      162
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 410861240,
+    "centerRgbaCrc32": 2807661624
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "water",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "directChance": 100.0,
+    "foreground": [
+      124,
+      148,
+      220
+    ],
+    "background": [
+      59,
+      65,
+      146
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1577033087,
+    "centerRgbaCrc32": 1479216101
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "water",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      111,
+      147,
+      250
+    ],
+    "background": [
+      61,
+      75,
+      194
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3281322687,
+    "centerRgbaCrc32": 4138335560
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "water",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      106,
+      141,
+      240
+    ],
+    "background": [
+      37,
+      45,
+      117
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2599163136,
+    "centerRgbaCrc32": 3459945387
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "water",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      111,
+      147,
+      250
+    ],
+    "background": [
+      61,
+      75,
+      194
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3281322687,
+    "centerRgbaCrc32": 4138335560
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "shallow-water",
+    "illumination": -75.0,
+    "ambient": -75.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      12,
+      22,
+      29
+    ],
+    "background": [
+      8,
+      11,
+      16
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4045061042,
+    "centerRgbaCrc32": 396546810
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "shallow-water",
+    "illumination": -25.0,
+    "ambient": -25.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      40,
+      72,
+      95
+    ],
+    "background": [
+      25,
+      37,
+      53
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3219788769,
+    "centerRgbaCrc32": 1601872500
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "shallow-water",
+    "illumination": 0.0,
+    "ambient": 0.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      62,
+      111,
+      146
+    ],
+    "background": [
+      38,
+      57,
+      82
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4163457830,
+    "centerRgbaCrc32": 1487400087
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "shallow-water",
+    "illumination": 50.0,
+    "ambient": 50.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      104,
+      186,
+      244
+    ],
+    "background": [
+      78,
+      117,
+      168
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 244824858,
+    "centerRgbaCrc32": 116233883
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "shallow-water",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      107,
+      191,
+      251
+    ],
+    "background": [
+      112,
+      168,
+      242
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 498707479,
+    "centerRgbaCrc32": 361819123
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "shallow-water",
+    "illumination": 80.0,
+    "ambient": 80.0,
+    "torch": false,
+    "directChance": 100.0,
+    "foreground": [
+      106,
+      190,
+      250
+    ],
+    "background": [
+      106,
+      159,
+      229
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4015143385,
+    "centerRgbaCrc32": 2992061837
+  },
+  {
+    "sheet": "diagnostic-level-subset.png",
+    "terrain": "shallow-water",
+    "illumination": 80.0,
+    "ambient": 0.0,
+    "torch": true,
+    "directChance": 100.0,
+    "foreground": [
+      120,
+      192,
+      221
+    ],
+    "background": [
+      120,
+      161,
+      202
+    ],
+    "nativeCropWidth": 102,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3467461334,
+    "centerRgbaCrc32": 124697578
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "shallow-water",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      107,
+      191,
+      251
+    ],
+    "background": [
+      112,
+      168,
+      242
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4171843310,
+    "centerRgbaCrc32": 361819123
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "shallow-water",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      104,
+      186,
+      244
+    ],
+    "background": [
+      78,
+      117,
+      168
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 989064480,
+    "centerRgbaCrc32": 116233883
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "shallow-water",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      107,
+      191,
+      251
+    ],
+    "background": [
+      112,
+      168,
+      242
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4171843310,
+    "centerRgbaCrc32": 361819123
+  }
+]

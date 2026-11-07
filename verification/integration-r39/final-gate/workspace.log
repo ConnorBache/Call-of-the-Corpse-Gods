@@ -1,0 +1,2686 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-core)
+warning: fields `category`, `group`, `step`, and `description` are never read
+  --> crates/corpse-desktop/tests/../src/appearance_profile.rs:15:9
+   |
+13 | pub struct Control {
+   |            ------- fields in this struct
+14 |     pub path: String,
+15 |     pub category: String,
+   |         ^^^^^^^^
+16 |     pub group: Option<String>,
+   |         ^^^^^
+...
+22 |     pub step: Option<f64>,
+   |         ^^^^
+...
+25 |     pub description: Option<String>,
+   |         ^^^^^^^^^^^
+   |
+   = note: `Control` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `next` and `label` are never used
+  --> crates/corpse-desktop/tests/../src/appearance_store.rs:24:12
+   |
+23 | impl DisplayMode {
+   | ---------------- methods in this implementation
+24 |     pub fn next(self) -> Self {
+   |            ^^^^
+...
+45 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+
+warning: method `working` is never used
+   --> crates/corpse-desktop/tests/../src/appearance_store.rs:399:12
+    |
+225 | impl Store {
+    | ---------- method in this implementation
+...
+399 |     pub fn working(&self) -> &Profile {
+    |            ^^^^^^^
+
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:1614:17
+     |
+1614 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `TOP` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:4:11
+  |
+4 | pub const TOP: i32 = 278;
+  |           ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `ROW` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:5:11
+  |
+5 | pub const ROW: i32 = 34;
+  |           ^^^
+
+warning: constant `CAPACITY` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:6:11
+  |
+6 | pub const CAPACITY: usize = 12;
+  |           ^^^^^^^^
+
+warning: function `feature_color` is never used
+  --> crates/corpse-desktop/src/appearance_material.rs:55:8
+   |
+55 | pub fn feature_color(profile: &Profile, key: &str, fallback: Rgb) -> Rgb {
+   |        ^^^^^^^^^^^^^
+
+warning: method `reset_group` is never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:317:12
+    |
+151 | impl Profile {
+    | ------------ method in this implementation
+...
+317 |     pub fn reset_group(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^^^^^^^
+
+warning: field `saved_preset_id` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:111:9
+    |
+105 | pub struct Status {
+    |            ------ field in this struct
+...
+111 |     pub saved_preset_id: Option<String>,
+    |         ^^^^^^^^^^^^^^^
+    |
+    = note: `Status` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: methods `edited`, `begin_gesture`, `reset_group`, and `preferences` are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:396:12
+    |
+225 | impl Store {
+    | ---------- methods in this implementation
+...
+396 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+444 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+512 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+648 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: function `cosmetic_seed` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:27:8
+   |
+27 | pub fn cosmetic_seed(seed: &str, depth: u32) -> u32 {
+   |        ^^^^^^^^^^^^^
+
+warning: function `materials_animated` is never used
+  --> crates/corpse-desktop/src/entity_profile.rs:93:8
+   |
+93 | pub fn materials_animated(p: &Profile) -> bool {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: fields `ordinary` and `conditional` are never read
+  --> crates/corpse-desktop/src/manual.rs:43:9
+   |
+42 | pub struct Depth {
+   |            ----- fields in this struct
+43 |     pub ordinary: Vec<String>,
+   |         ^^^^^^^^
+44 |     pub conditional: Vec<String>,
+   |         ^^^^^^^^^^^
+
+warning: constant `CLOSE` is never used
+  --> crates/corpse-desktop/src/pack.rs:24:7
+   |
+24 | const CLOSE: Rect = Rect(929, 135, 36, 32);
+   |       ^^^^^
+
+warning: constant `CANCEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:25:7
+   |
+25 | const CANCEL: Rect = Rect(881, 202, 80, 32);
+   |       ^^^^^^
+
+warning: constant `ROW` is never used
+  --> crates/corpse-desktop/src/pack.rs:26:7
+   |
+26 | const ROW: i32 = 30;
+   |       ^^^
+
+warning: constant `EDGE` is never used
+  --> crates/corpse-desktop/src/pack.rs:27:7
+   |
+27 | const EDGE: [u8; 3] = [53, 55, 68];
+   |       ^^^^
+
+warning: constant `PANEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:28:7
+   |
+28 | const PANEL: [u8; 3] = [11, 13, 21];
+   |       ^^^^^
+
+warning: constant `SELECTED` is never used
+  --> crates/corpse-desktop/src/pack.rs:29:7
+   |
+29 | const SELECTED: [u8; 3] = [53, 51, 68];
+   |       ^^^^^^^^
+
+warning: variant `Fire` is never constructed
+  --> crates/corpse-desktop/src/render.rs:41:5
+   |
+40 | pub enum Animation {
+   |          --------- variant in this enum
+41 |     Fire { phase: f64 },
+   |     ^^^^
+   |
+   = note: `Animation` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `dead` and `gods` are never read
+   --> crates/corpse-desktop/src/render.rs:136:9
+    |
+105 | pub struct View {
+    |            ---- fields in this struct
+...
+136 |     pub dead: bool,
+    |         ^^^^
+...
+140 |     pub gods: String,
+    |         ^^^^
+
+warning: constant `TOOLBAR_LABELS` is never used
+    --> crates/corpse-desktop/src/render.rs:2589:11
+     |
+2589 | pub const TOOLBAR_LABELS: [&str; 9] = [
+     |           ^^^^^^^^^^^^^^
+
+warning: associated items `ALL` and `parse` are never used
+  --> crates/corpse-desktop/src/typography_ui.rs:16:15
+   |
+15 | impl Role {
+   | --------- associated items in this implementation
+16 |     pub const ALL: [Self; 8] = [
+   |               ^^^
+...
+38 |     pub fn parse(key: &str) -> Option<Self> {
+   |            ^^^^^
+
+warning: function `chronicle_metrics` is never used
+   --> crates/corpse-desktop/src/typography_ui.rs:123:8
+    |
+123 | pub fn chronicle_metrics(
+    |        ^^^^^^^^^^^^^^^^^
+
+warning: `corpse-desktop` (test "appearance") generated 3 warnings
+warning: `corpse-desktop` (bin "corpse-desktop" test) generated 22 warnings
+warning: fields `category`, `group`, `step`, and `description` are never read
+  --> crates/corpse-desktop/src/appearance_profile.rs:15:9
+   |
+13 | pub struct Control {
+   |            ------- fields in this struct
+14 |     pub path: String,
+15 |     pub category: String,
+   |         ^^^^^^^^
+16 |     pub group: Option<String>,
+   |         ^^^^^
+...
+22 |     pub step: Option<f64>,
+   |         ^^^^
+...
+25 |     pub description: Option<String>,
+   |         ^^^^^^^^^^^
+   |
+   = note: `Control` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: function `get_mut` is never used
+  --> crates/corpse-desktop/src/appearance_profile.rs:50:4
+   |
+50 | fn get_mut<'a>(v: &'a mut Value, path: &str) -> Option<&'a mut Value> {
+   |    ^^^^^^^
+
+warning: multiple associated items are never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:161:12
+    |
+151 | impl Profile {
+    | ------------ associated items in this implementation
+...
+161 |     pub fn parse(raw: &str) -> Result<Self, String> {
+    |            ^^^^^
+...
+252 |     pub fn boolean(&self, path: &str) -> bool {
+    |            ^^^^^^^
+...
+258 |     pub fn json(&self) -> String {
+    |            ^^^^
+...
+271 |     pub fn set(&self, path: &str, value: Value) -> Result<Self, String> {
+    |            ^^^
+...
+287 |     pub fn reset(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^
+...
+317 |     pub fn reset_group(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^^^^^^^
+...
+326 |     pub fn named(&self, name: &str) -> Self {
+    |            ^^^^^
+
+warning: method `label` is never used
+  --> crates/corpse-desktop/src/appearance_store.rs:45:12
+   |
+23 | impl DisplayMode {
+   | ---------------- method in this implementation
+...
+45 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+
+warning: field `profile` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:101:5
+    |
+100 | struct History {
+    |        ------- field in this struct
+101 |     profile: Profile,
+    |     ^^^^^^^
+    |
+    = note: `History` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Status` is never constructed
+   --> crates/corpse-desktop/src/appearance_store.rs:105:12
+    |
+105 | pub struct Status {
+    |            ^^^^^^
+
+warning: multiple methods are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:396:12
+    |
+225 | impl Store {
+    | ---------- methods in this implementation
+...
+396 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+399 |     pub fn working(&self) -> &Profile {
+    |            ^^^^^^^
+...
+406 |     pub fn presets(&self) -> &[Preset] {
+    |            ^^^^^^^
+...
+409 |     pub fn status(&self) -> Status {
+    |            ^^^^^^
+...
+431 |     pub fn open(&mut self) {
+    |            ^^^^
+...
+444 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+483 |     fn edit(&mut self, next: Profile) {
+    |        ^^^^
+...
+495 |     pub fn set(&mut self, path: &str, value: Value) -> Result<(), String> {
+    |            ^^^
+...
+504 |     pub fn reset_property(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^^
+...
+512 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+527 |     pub fn reset_all(&mut self) {
+    |            ^^^^^^^^^
+...
+535 |     pub fn undo(&mut self) {
+    |            ^^^^
+...
+545 |     pub fn redo(&mut self) {
+    |            ^^^^
+...
+555 |     pub fn preview(&mut self, value: Profile) {
+    |            ^^^^^^^
+...
+560 |     pub fn begin_preview(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+563 |     pub fn commit_preview(&mut self) {
+    |            ^^^^^^^^^^^^^^
+...
+568 |     pub fn cancel_preview(&mut self) {
+    |            ^^^^^^^^^^^^^^
+...
+571 |     pub fn compare(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^
+...
+579 |     fn require(&self, id: &str) -> Result<&Preset, String> {
+    |        ^^^^^^^
+...
+586 |     fn unique(&self, name: &str, except: Option<&str>) -> Result<String, String> {
+    |        ^^^^^^
+...
+648 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+654 |     pub fn save_preset(&mut self, name: &str) -> Result<String, String> {
+    |            ^^^^^^^^^^^
+...
+674 |     pub fn update_preset(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+689 |     pub fn load_preset(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+696 |     pub fn duplicate_preset(&mut self, id: &str, name: &str) -> Result<String, String> {
+    |            ^^^^^^^^^^^^^^^^
+...
+713 |     pub fn rename_preset(&mut self, id: &str, name: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+726 |     pub fn delete_preset(&mut self, id: &str, confirmed: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+745 |     pub fn set_default(&mut self, id: Option<&str>) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+753 |     pub fn import_json(&mut self, text: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+759 |     pub fn export_json(&self) -> String {
+    |            ^^^^^^^^^^^
+...
+762 |     pub fn import_file(&mut self, path: &Path) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+765 |     pub fn export_file(&self, path: &Path) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: constant `CATEGORIES` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:12:11
+   |
+12 | pub const CATEGORIES: [&str; 10] = [
+   |           ^^^^^^^^^^
+
+warning: variants `Changed`, `ReducedMotion`, `Close`, `Copy`, and `Paste` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:27:5
+   |
+25 | pub enum Action {
+   |          ------ variants in this enum
+26 |     None,
+27 |     Changed,
+   |     ^^^^^^^
+28 |     ReducedMotion(bool),
+   |     ^^^^^^^^^^^^^
+29 |     Fullscreen,
+30 |     Close,
+   |     ^^^^^
+31 |     Copy(String),
+   |     ^^^^
+32 |     Paste,
+   |     ^^^^^
+   |
+   = note: `Action` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variants `Search`, `Value`, `PresetName`, and `FilePath` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:36:5
+   |
+35 | enum Focus {
+   |      ----- variants in this enum
+36 |     Search,
+   |     ^^^^^^
+37 |     Value(usize),
+   |     ^^^^^
+38 |     PresetName,
+   |     ^^^^^^^^^^
+39 |     FilePath,
+   |     ^^^^^^^^
+   |
+   = note: `Focus` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: variants `Delete` and `Overwrite` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:44:5
+   |
+43 | enum Confirmation {
+   |      ------------ variants in this enum
+44 |     Delete(String),
+   |     ^^^^^^
+45 |     Overwrite(String),
+   |     ^^^^^^^^^
+   |
+   = note: `Confirmation` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `category`, `group`, and `preset` are never read
+  --> crates/corpse-desktop/src/appearance_ui.rs:52:5
+   |
+47 | pub struct SettingsView {
+   |            ------------ fields in this struct
+...
+52 |     category: usize,
+   |     ^^^^^^^^
+53 |     group: usize,
+   |     ^^^^^
+...
+60 |     preset: usize,
+   |     ^^^^^^
+
+warning: function `integrated_layout` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:66:4
+   |
+66 | fn integrated_layout(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^^^^^
+
+warning: function `integrated_role` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:83:4
+   |
+83 | fn integrated_role(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^^^
+
+warning: function `retained_only` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:96:4
+   |
+96 | fn retained_only(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^
+
+warning: function `partially_applied` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:139:4
+    |
+139 | fn partially_applied(path: &str) -> bool {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: function `changed_notice` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:152:4
+    |
+152 | fn changed_notice(path: &str) -> &'static str {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `display` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:162:4
+    |
+162 | fn display(v: Option<&Value>) -> String {
+    |    ^^^^^^^
+
+warning: function `button` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:169:4
+    |
+169 | fn button(p: &mut Painter, label: &str, x: i32, y: i32, w: i32, active: bool) {
+    |    ^^^^^^
+
+warning: function `field` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:180:4
+    |
+180 | fn field(p: &mut Painter, label: &str, value: &str, x: i32, y: i32, w: i32, active: bool) {
+    |    ^^^^^
+
+warning: multiple methods are never used
+    --> crates/corpse-desktop/src/appearance_ui.rs:220:12
+     |
+ 192 | impl SettingsView {
+     | ----------------- methods in this implementation
+...
+ 220 |     pub fn open(&mut self) {
+     |            ^^^^
+...
+ 231 |     pub fn import_file(&mut self, path: &Path) -> Action {
+     |            ^^^^^^^^^^^
+...
+ 252 |     fn finish(&mut self, result: Result<(), String>, success: &str) -> Action {
+     |        ^^^^^^
+...
+ 264 |     fn groups(&self) -> Vec<&str> {
+     |        ^^^^^^
+...
+ 281 |     fn filtered(&self) -> Vec<usize> {
+     |        ^^^^^^^^
+...
+ 307 |     fn change_category(&mut self, n: usize) {
+     |        ^^^^^^^^^^^^^^^
+...
+ 318 |     fn focus(&mut self, focus: Focus) {
+     |        ^^^^^
+...
+ 328 |     fn select_control(&mut self, relative: usize) {
+     |        ^^^^^^^^^^^^^^
+...
+ 335 |     fn selected_control(&self) -> Option<&'static Control> {
+     |        ^^^^^^^^^^^^^^^^
+...
+ 338 |     fn edit_selected(&mut self, direction: i32) -> Action {
+     |        ^^^^^^^^^^^^^
+...
+ 364 |     fn commit_input(&mut self) -> Action {
+     |        ^^^^^^^^^^^^
+...
+ 435 |     fn page_rows(&self) -> usize {
+     |        ^^^^^^^^^
+...
+ 442 |     pub fn scroll(&mut self, delta: i32) {
+     |            ^^^^^^
+...
+ 447 |     pub fn key(&mut self, key: Keycode, mods: Mod) -> Action {
+     |            ^^^
+...
+ 552 |     fn toggle_reduced(&mut self) -> Action {
+     |        ^^^^^^^^^^^^^^
+...
+ 568 |     fn selected_preset(&self) -> Result<String, String> {
+     |        ^^^^^^^^^^^^^^^
+...
+ 575 |     fn preset_action(&mut self, n: usize) -> Action {
+     |        ^^^^^^^^^^^^^
+...
+ 620 |     fn confirm_action(&mut self) -> Action {
+     |        ^^^^^^^^^^^^^^
+...
+ 636 |     pub fn click(&mut self, x: i32, y: i32) -> Action {
+     |            ^^^^^
+...
+ 724 |     fn preset_click(&mut self, x: i32, y: i32) -> Action {
+     |        ^^^^^^^^^^^^
+...
+ 790 |     pub fn paint(&self, p: &mut Painter) {
+     |            ^^^^^
+...
+ 912 |     fn paint_controls(&self, p: &mut Painter) {
+     |        ^^^^^^^^^^^^^^
+...
+1043 |     fn paint_presets(&self, p: &mut Painter) {
+     |        ^^^^^^^^^^^^^
+
+warning: function `vary` is never used
+  --> crates/corpse-desktop/src/color.rs:81:8
+   |
+81 | pub fn vary(fg: Rgb, bg: Rgb, tile: &str, x: f64, y: f64, seed: u32) -> (Rgb, Rgb) {
+   |        ^^^^
+
+warning: function `desaturate` is never used
+   --> crates/corpse-desktop/src/color.rs:151:4
+    |
+151 | fn desaturate(c: Rgb, t: f64) -> Rgb {
+    |    ^^^^^^^^^^
+
+warning: function `memory` is never used
+   --> crates/corpse-desktop/src/color.rs:155:8
+    |
+155 | pub fn memory(c: Rgb) -> Rgb {
+    |        ^^^^^^
+
+warning: function `environment` is never used
+   --> crates/corpse-desktop/src/color.rs:171:8
+    |
+171 | pub fn environment(c: Rgb, bg: bool, light: Light, emissive: bool, tile: &str) -> Rgb {
+    |        ^^^^^^^^^^^
+
+warning: function `shadow_gamma` is never used
+   --> crates/corpse-desktop/src/color.rs:226:8
+    |
+226 | pub fn shadow_gamma(distance: f64, light: Light, tile: &str) -> f64 {
+    |        ^^^^^^^^^^^^
+
+warning: function `shadow` is never used
+   --> crates/corpse-desktop/src/color.rs:242:8
+    |
+242 | pub fn shadow(c: Rgb, gamma: f64) -> Rgb {
+    |        ^^^^^^
+
+warning: function `translucent_ink` is never used
+   --> crates/corpse-desktop/src/color.rs:262:8
+    |
+262 | pub fn translucent_ink(fg: Rgb, bg: Rgb, min: f64, alpha: f64) -> Rgb {
+    |        ^^^^^^^^^^^^^^^
+
+warning: function `ramp` is never used
+   --> crates/corpse-desktop/src/color.rs:277:4
+    |
+277 | fn ramp(dark: Rgb, normal: Rgb, bright: Rgb, amount: f64) -> Rgb {
+    |    ^^^^
+
+warning: function `offset` is never used
+   --> crates/corpse-desktop/src/color.rs:284:4
+    |
+284 | fn offset(anchor: Rgb, actual: Rgb, reference: Rgb) -> Rgb {
+    |    ^^^^^^
+
+warning: function `illuminated` is never used
+   --> crates/corpse-desktop/src/color.rs:289:8
+    |
+289 | pub fn illuminated(fg: Rgb, bg: Rgb, tile: &str, light: Light, stone_floor: bool) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^^
+
+warning: function `map_colors` is never used
+   --> crates/corpse-desktop/src/color.rs:335:8
+    |
+335 | pub fn map_colors(fg: Rgb, bg: Rgb, c: Context<'_>) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^
+
+warning: function `map_colors_emissive` is never used
+   --> crates/corpse-desktop/src/color.rs:338:8
+    |
+338 | pub fn map_colors_emissive(mut fg: Rgb, mut bg: Rgb, c: Context<'_>, emissive: bool) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: function `terrain_style` is never used
+   --> crates/corpse-desktop/src/color.rs:375:8
+    |
+375 | pub fn terrain_style(
+    |        ^^^^^^^^^^^^^
+
+warning: function `light_field` is never used
+   --> crates/corpse-desktop/src/color.rs:453:8
+    |
+453 | pub fn light_field(observation: &corpse_core::vision::TerrainObservation) -> Vec<Light> {
+    |        ^^^^^^^^^^^
+
+warning: function `vary` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:60:8
+   |
+60 | pub fn vary(p: &Profile, fg: Rgb, bg: Rgb, tile: &str, x: f64, y: f64, seed: u32) -> (Rgb, Rgb) {
+   |        ^^^^
+
+warning: function `terrain_style` is never used
+   --> crates/corpse-desktop/src/color_profile.rs:499:8
+    |
+499 | pub fn terrain_style(
+    |        ^^^^^^^^^^^^^
+
+warning: constant `BOUNDS` is never used
+  --> crates/corpse-desktop/src/inspection_ui.rs:18:11
+   |
+18 | pub const BOUNDS: (i32, i32, i32, i32) = (24, 138, 520, 572);
+   |           ^^^^^^
+
+warning: function `close_hit` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1375:8
+     |
+1375 | pub fn close_hit(x: i32, y: i32) -> bool {
+     |        ^^^^^^^^^
+
+warning: function `hover_bounds` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1432:4
+     |
+1432 | fn hover_bounds(
+     |    ^^^^^^^^^^^^
+
+warning: function `paint_hover` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1456:8
+     |
+1456 | pub fn paint_hover(report: &Report, p: &mut Painter, x: i32, y: i32) {
+     |        ^^^^^^^^^^^
+
+warning: fields `depths` and `companions` are never read
+  --> crates/corpse-desktop/src/manual.rs:49:9
+   |
+47 | pub struct Catalog {
+   |            ------- fields in this struct
+48 |     pub entries: Vec<Entry>,
+49 |     pub depths: Vec<Depth>,
+   |         ^^^^^^
+50 |     pub companions: Vec<String>,
+   |         ^^^^^^^^^^
+
+warning: methods `paint` and `paint_at_depth` are never used
+   --> crates/corpse-desktop/src/manual.rs:129:12
+    |
+ 61 | impl Manual {
+    | ----------- methods in this implementation
+...
+129 |     pub fn paint(&mut self, p: &mut Painter) {
+    |            ^^^^^
+...
+138 |     pub fn paint_at_depth(&mut self, p: &mut Painter, _time_ms: f64, depth: usize) {
+    |            ^^^^^^^^^^^^^^
+
+warning: associated function `at` is never used
+   --> crates/corpse-desktop/src/manual.rs:284:8
+    |
+283 | impl Theme {
+    | ---------- associated function in this implementation
+284 |     fn at(depth: usize) -> Self { Self::at_depth(depth as f64) }
+    |        ^^
+
+warning: function `actor_cell` is never used
+   --> crates/corpse-desktop/src/observe.rs:248:4
+    |
+248 | fn actor_cell(
+    |    ^^^^^^^^^^
+
+warning: constant `BOUNDS` is never used
+  --> crates/corpse-desktop/src/pack.rs:21:11
+   |
+21 | pub const BOUNDS: (i32, i32, i32, i32) = (73, 131, 900, 579);
+   |           ^^^^^^
+
+warning: constant `LIST` is never used
+  --> crates/corpse-desktop/src/pack.rs:22:7
+   |
+22 | const LIST: Rect = Rect(85, 249, 480, 449);
+   |       ^^^^
+
+warning: constant `DETAIL` is never used
+  --> crates/corpse-desktop/src/pack.rs:23:7
+   |
+23 | const DETAIL: Rect = Rect(577, 249, 384, 449);
+   |       ^^^^^^
+
+warning: methods `bounds` and `set_read_only` are never used
+   --> crates/corpse-desktop/src/pack.rs:224:12
+    |
+173 | impl PackView {
+    | ------------- methods in this implementation
+...
+224 |     pub fn bounds(&self) -> (i32, i32, i32, i32) {
+    |            ^^^^^^
+...
+270 |     pub fn set_read_only(&mut self, read_only: bool) {
+    |            ^^^^^^^^^^^^^
+
+warning: methods `map_glyph` and `game` are never used
+    --> crates/corpse-desktop/src/render.rs:709:12
+     |
+ 178 | impl Painter {
+     | ------------ methods in this implementation
+...
+ 709 |     pub fn map_glyph(&mut self, ch: char, x: i32, y: i32, w: i32, h: i32, c: Rgb) {
+     |            ^^^^^^^^^
+...
+1524 |     pub fn game(&mut self, v: &View, notice: &str, inventory: bool) {
+     |            ^^^^
+
+warning: function `map_layout` is never used
+    --> crates/corpse-desktop/src/render.rs:2139:8
+     |
+2139 | pub fn map_layout(w: usize, h: usize) -> (i32, i32, i32, i32) {
+     |        ^^^^^^^^^^
+
+warning: function `toolbar_action` is never used
+    --> crates/corpse-desktop/src/render.rs:2620:8
+     |
+2620 | pub fn toolbar_action(x: i32, y: i32) -> Option<usize> {
+     |        ^^^^^^^^^^^^^^
+
+warning: function `hover_description` is never used
+  --> crates/corpse-desktop/src/statuses_ui.rs:81:8
+   |
+81 | pub fn hover_description(status: &Status) -> String {
+   |        ^^^^^^^^^^^^^^^^^
+
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-desktop)
+warning: `corpse-desktop` (bin "corpse-desktop") generated 72 warnings (19 duplicates)
+   Compiling corpse-fixtures v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-fixtures)
+    Finished `test` profile [optimized] target(s) in 5m 26s
+     Running unittests src/lib.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/corpse_core-22ef95f16f60b69b)
+
+running 82 tests
+test combat::tests::chance_clamps_before_range ... ok
+test combat::tests::mitigation_before_scale_rounding ... ok
+test combat::tests::negative_rounding ... ok
+test combat::tests::packets_round_up ... ok
+test combat_audit::tests::disabled_by_default_and_take_disables ... ok
+test corpses::tests::hazard_boundaries ... ok
+test abilities::dream_plane_tests::ahvamitt_allegiance_is_protected_before_cost_without_disabling_other_powers ... ok
+test abilities::dream_plane_tests::silence_aura_and_maintained_unspeak_do_not_cross_planes ... ok
+test abilities::dream_plane_tests::sleeping_body_has_no_owner_toggles_but_half_here_keeps_them ... ok
+test abilities::dream_plane_tests::dream_plane_sparkle_and_bulwark_mutate_only_the_dream_floor ... ok
+test divine_environment::tests::dream_plane_black_pit_and_water_queries_use_each_endpoint_floor ... ok
+test divine_environment::tests::dream_plane_riptide_and_reverse_entropy_keep_endpoint_planes ... ok
+test divine_reactions::dream_plane_tests::sleeping_body_reactions_are_inert_and_deflection_stays_on_its_endpoint_plane ... ok
+test abilities::dream_plane_tests::matching_plane_and_legacy_targeting_still_work_and_cross_plane_link_can_stop ... ok
+test environment::presentation_parity::dream_plane_projection_cannot_consume_a_physical_bodys_gas_blast_pool ... ok
+test equipment::catalog_tests::authored_bow_and_arrow_bundle ... ok
+test equipment::catalog_tests::every_equipment_definition_parses ... ok
+test environment::presentation_parity::dream_plane_physical_half_here_burst_keeps_owner_credit_without_changing_its_plane ... ok
+test gas_reactions::tests::expiration_is_not_a_bridge ... ok
+test gas_reactions::tests::minimum_identity_survives_rank_and_zero ... ok
+test inventory::heart_items::tests::exact_all_authored_heart_rewards ... ok
+test equipment::generated_loot::tests::exact_loot_and_reward_draws ... ok
+test environment::presentation_parity::dream_plane_explosion_geometry_uses_the_blast_layer_not_the_players_plane ... ok
+test inventory::item_magic::display_tests::exact_potion_display ... ok
+test events::presentation_identity_tests::exact_actor_labels_keep_distinct_disguises_without_changing_event_geometry ... ok
+test mini_me::plane_tests::r34_mini_me_serializes_creation_plane_and_never_copies_body_or_nightmare ... ok
+test abilities::dream_plane_tests::every_actor_target_rejects_another_plane_before_cost_or_mutation ... ok
+test mini_me::plane_tests::r34_mini_me_spawn_occupancy_ignores_only_opposite_plane_actors ... ok
+test monster_chill::tests::dream_plane_chill_chooses_native_yeti_and_preserves_half_here_shared_slow ... ok
+test monster_grab::tests::dream_plane_grabs_cannot_apply_or_survive_a_plane_change ... ok
+test inventory::item_magic::tests::exact_magic_detection_memory ... ok
+test inventory::water_tests::exact_float_item_rng_and_quantities ... ok
+test monster_horn::plane_tests::r34_dream_projection_uncast_and_aura_use_dream_geometry ... ok
+test monster_horn::plane_tests::r34_horn_destination_occupancy_uses_actor_or_context_plane ... ok
+test monster_horn::plane_tests::r34_stone_seal_expires_on_creation_plane_after_caster_changes_plane ... ok
+test monster_horn::plane_tests::r34_target_permission_silence_and_sleeping_body_are_plane_local ... ok
+test monster_horn::plane_tests::r34_uncast_requires_a_same_plane_observing_endpoint_not_union_visibility ... ok
+test monster_grab::venom_tests::terminal_venom_matches_frozen_reference ... ok
+test monster_inventor::tests::dream_plane_fire_cone_never_applies_burning_or_rng_to_other_plane_victims ... ok
+test inventory::tests::reference_inventory_boundaries ... ok
+test monster_bombardier::tests::bombardier_matches_frozen_reference ... ok
+test divine_environment::tests::phase_loss_matches_frozen_reference ... ok
+test environment::presentation_parity::explosion_presentation_matches_reference ... ok
+test monster_inventor::tests::duplicate_pilot_identity_rejects_without_mutation ... ok
+test abilities::reaction_attack_reference::retained_reaction_sources_and_offhand ... ok
+test monster_spells::tests::dream_plane_dryad_heals_only_a_native_endpoint ... ok
+test monster_moon::tests::moon_matches_frozen_reference ... ok
+test monster_grab::tests::grabs_match_frozen_reference ... ok
+test monster_statuses::plane_tests::r34_inflicted_dot_keeps_source_credit_after_caster_changes_plane ... ok
+test monster_statuses::plane_tests::r34_source_less_status_uses_contact_plane_and_legacy_is_unchanged ... ok
+test monster_statuses::parity::status_and_lifecycle_reference ... ok
+test movement::tests::corner_wall_but_not_tree ... ok
+test movement::tests::safe_route_beats_short_hazard ... ok
+test non_euclidean_generation::proposal_tests::assignment_uses_diagonal_neighbors_and_forced_next_source_but_never_cuts_wall_corners ... ok
+test non_euclidean_generation::proposal_tests::last_two_always_form_one_pair_and_terminal_singletons_reject ... ok
+test non_euclidean_generation::proposal_tests::proposal_threshold_and_removed_source_eligibility_are_literal ... ok
+test non_euclidean_generation::proposal_tests::source_removal_changes_destination_eligibility_and_forced_chain_is_preserved ... ok
+test monster_inventor::tests::inventor_matches_frozen_reference ... ok
+test offscreen::portal_traversal_tests::credited_returning_ally_traverses_portal_once_with_remote_occupancy ... ok
+test monster_statuses::plane_tests::r34_status_infliction_rejects_cross_plane_without_mutation ... ok
+test progression::tests::exact_authored_weighted_choices ... ok
+test offscreen::portal_traversal_tests::offscreen_pursuit_traverses_once_and_does_not_overlap_remote_occupant ... ok
+test offscreen::portal_traversal_tests::offscreen_stochastic_pursuit_replans_both_returns_without_telefrag ... ok
+test monster_spells::tests::caster_spells_match_frozen_reference ... ok
+test startup::recovery_tests_r38::custom_generators_keep_single_attempt_contract ... ok
+test startup::recovery_tests_r38::retry_classification_does_not_mask_configuration_or_invariants ... ok
+test temporal::legacy_undefined_tests::missing_patch_value_restores_undefined_not_null ... ok
+test vision::native_plane_tests::hidden_other_plane_cells_do_not_expose_current_terrain_hazards_or_sources ... ok
+test vision::native_plane_tests::native_memory_all_seeing_and_senses_need_a_native_endpoint_not_a_sleeping_body ... ok
+test vision::native_plane_tests::native_memory_mask_excludes_opposite_clone_only_visibility ... ok
+test vision::native_plane_tests::opposite_half_here_observes_native_geometry_hazards_and_lights_without_mutation ... ok
+test vision::native_plane_tests::player_plane_wins_when_both_half_here_views_see_the_tile ... ok
+test vision::tests::dark_impossible ... ok
+test vision::tests::destination_wall_visible ... ok
+test startup::recovery_tests_r38::final_safety_gate_rejects_hazard_only_transition_routes ... ok
+test monster_ruin::tests::ruin_matches_frozen_reference ... ok
+test startup::recovery_tests_r38::failed_population_trial_leaves_no_ids_metrics_loot_or_ability_grants ... ok
+test monster_horn::tests::horn_caster_matches_frozen_reference ... ok
+test monster_sphinx::tests::sphinx_ai_matches_frozen_reference ... ok
+test monster_stalking::tests::stalking_matches_frozen_reference ... ok
+test abilities::remember_passive_reference::copies_authored_divine_passives ... ok
+test startup::recovery_tests_r38::finite_exhaustion_and_fatal_failure_are_atomic ... ok
+
+test result: ok. 82 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.18s
+
+     Running tests/accuracy_dodge_v33.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/accuracy_dodge_v33-e74e649320b60268)
+
+running 5 tests
+test witch_profiles_are_fixed_separate_and_identity_not_appearance_selects_stats ... ok
+test meaningful_counters_keep_the_global_formula_and_no_universal_invulnerability ... ok
+test specialization_is_only_accuracy_dodge_and_only_new_revision33_actors ... ok
+test native_witch_birth_uses_newborn_not_natural_or_disguise_profile ... ok
+test saved_grown_state_and_temporal_snapshots_are_not_retuned ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/actor_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/actor_parity-216e108a2d2976b0)
+
+running 1 test
+test actor_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.27s
+
+     Running tests/actor_presentation_logs_v33.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/actor_presentation_logs_v33-3ba3b7a5d3dd8129)
+
+running 6 tests
+test distinct_actors_status_damage_death_and_attacking_subjects_do_not_leak ... ok
+test legacy_labels_and_true_death_provenance_are_preserved ... ok
+test half_here_reveal_and_hallucination_use_shared_read_only_identity ... ok
+test revert_and_future_restore_observed_identity_and_existing_labels ... ok
+test actual_bow_hit_and_miss_use_far_disguise_and_near_true_name ... ok
+test save_and_replay_preserve_display_labels_without_changing_real_identity ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/advanced_environment_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/advanced_environment_commands-841103fc8ed0962b)
+
+running 1 test
+test advanced_environment_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.94s
+
+     Running tests/ahvamitt_r34.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/ahvamitt_r34-c386c41ee0cb6345)
+
+running 6 tests
+test seven_bag_is_one_of_each_before_final_boss_and_legacy33_is_unchanged ... ok
+test carried_mask_teleports_deterministically_and_drop_repickup_cannot_reset_cooldown ... ok
+test actual_attack_attempt_keeps_ahvamitt_alive_and_no_ordinary_attack_roll_is_needed ... ok
+test two_attacks_relocate_then_third_gives_one_mask_and_disappears ... ok
+test random_destinations_are_standable_vacant_and_do_not_mutate_a_dream_body_anchor ... ok
+test reward_disappearance_revert_and_future_restore_the_exact_branch ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/ally_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/ally_commands-abf49ccbcf052cb2)
+
+running 1 test
+test ally_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.68s
+
+     Running tests/ascend_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/ascend_commands-cf26804f304943aa)
+
+running 1 test
+test ascend_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.59s
+
+     Running tests/avatar_trace.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/avatar_trace-eef0858b86bb2d95)
+
+running 3 tests
+test unsupported_command_is_transactional ... ok
+test avatar_player_terminal_death_matches_reference ... ok
+test avatar_reference_trace_non_temporal_state ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+
+     Running tests/blood_letting.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/blood_letting-addb8e555ae9891a)
+
+running 1 test
+test blood_letting_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/blood_weapon_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/blood_weapon_commands-b13302ca927f00fb)
+
+running 1 test
+test blood_weapon_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.03s
+
+     Running tests/bombardier_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/bombardier_traces-7aafe5ca06695786)
+
+running 1 test
+test bombardier_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.50s
+
+     Running tests/bonded_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/bonded_commands-8578dc71908523d3)
+
+running 1 test
+test bonded_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+
+     Running tests/borge_event.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/borge_event-28ac8b46c3cb39a2)
+
+running 20 tests
+test altar_is_a_fixed_fixture_like_existing_godbeast_hardware ... ok
+test blocked_ordinary_melee_geometry_preserves_the_shard ... ok
+test all_25_body_cells_have_obelisk_feature_and_altar_survives_hazard_memory ... ok
+test exact_heart_not_same_species_one_shard_and_no_food_stats_when_offered ... ok
+test actual_stair_travel_preserves_the_marked_heart_and_event ... ok
+test one_heart_cannot_be_pledged_to_two_borge_events_after_actor_travel ... ok
+test equipped_shard_kills_any_adjacent_creature_including_sphinx_and_allies ... ok
+test marked_heart_is_still_food_and_cannot_reselect_after_consumption_or_empty_floor ... ok
+test seven_exact_milestones_four_authored_types_and_legacy_plan_unchanged ... ok
+test provenance_survives_actor_floor_transfer_carry_drop_save_and_snapshot ... ok
+test malformed_provenance_and_half_initialized_event_are_rejected_at_load ... ok
+test strongest_is_alive_eligible_and_stable_hp_dr_defense_id_tiebreak ... ok
+test bumping_obelisk_interacts_before_collision_in_normal_and_haste_phases ... ok
+test shard_invalid_targets_do_not_consume_and_phoenix_cannot_revive_no_accuracy_roll ... ok
+test verdania_is_existing_tree_with_legacy_internal_identity_and_r33_display ... ok
+test shard_administrator_uses_existing_terminal_boss_hook_not_immunity_or_corpse ... ok
+test offering_is_atomic_across_actual_revert_future_and_save ... ok
+test save_replay_and_both_time_abilities_preserve_consumption_and_permanent_death ... ok
+test generated_borge_has_25_solid_cells_clear_accessible_ring_altar_and_stairs ... ok
+test generated_floor40_and_nonmilestones_never_add_an_extra_godbeast ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+     Running tests/caster_spell_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/caster_spell_traces-1e08b4daa825fa74)
+
+running 1 test
+test caster_spell_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.36s
+
+     Running tests/cleanup_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/cleanup_parity-4d89cc1f44c22781)
+
+running 1 test
+test protected_stairs_and_full_cleanup_match_v48 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+     Running tests/combat_starters.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/combat_starters-fa4b4c9d022f45bb)
+
+running 1 test
+test starter_combat_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s
+
+     Running tests/consumption_passives.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/consumption_passives-5e36b4dd966cde79)
+
+running 1 test
+test consumption_passives_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+
+     Running tests/cosmetic_blood_trails.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/cosmetic_blood_trails-159e3f76874ea9bc)
+
+running 5 tests
+test temporal_snapshot_restores_stain_layer_without_sharing_future_mutation ... ok
+test repeated_movement_preserves_prior_stains_without_rng ... ok
+test normal_and_movement_only_steps_share_cosmetic_hook_without_other_changes ... ok
+test family_footprints_only_change_existing_cosmetic_layer ... ok
+test no_trails_for_mech_nonfamily_dead_or_nonfloor_tiles ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/crafting_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/crafting_parity-fc1f99267c14b4cc)
+
+running 1 test
+test crafts_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/creature_feeding_v33.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/creature_feeding_v33-fd4ba5e637e2f691)
+
+running 14 tests
+test exactly_one_hundred_normal_turns_then_ten_stationary_turns_reset_without_buffs ... ok
+test decoration_is_deterministic_and_observed_wall_memory_does_not_leak_hidden_changes ... ok
+test autonomous_ally_can_feed_but_following_and_combat_take_priority ... ok
+test hunting_detection_interrupts_before_idle_food_action ... ok
+test reachable_wall_uses_adjacent_safe_cell_and_never_walks_through_wall ... ok
+test rooted_aquatic_unreachable_and_rally_cases_cannot_teleport_or_override_orders ... ok
+test thirst_uses_real_blood_only_and_drinks_from_land_without_drowning_or_depleting ... ok
+test revision35_hungry_route_crosses_portal_once_and_respects_remote_occupant ... ok
+test actual_haste_dispatch_and_spawn_sleep_use_world_turns_not_commands ... ok
+test damage_threat_movement_source_loss_and_paralysis_restart_full_meal ... ok
+test serialization_snapshot_both_temporal_routes_and_legacy_gate_keep_ecology_consistent ... ok
+test slow_feeds_every_normal_turn_and_haste_never_advances_the_meal_clock ... ok
+test offscreen_exact_clock_completes_and_restarts_meals_without_player_hunger ... ok
+test actual_generation_keeps_wall_geometry_and_seeds_only_real_river_food_in_r33 ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/death_transfer_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/death_transfer_traces-0a6a007248151781)
+
+running 1 test
+test death_transfer_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.51s
+
+     Running tests/debug_floor_v33.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/debug_floor_v33-ab23ab96085ddc07)
+
+running 5 tests
+test strict_floor_bounds_and_floor_one_starter_only ... ok
+test temporal_abilities_cannot_skip_preparation_or_duplicate_reconstruction ... ok
+test actual_prior_hearts_loot_stats_and_target_are_exact_and_no_backtrack_duplicates ... ok
+test overflow_is_retained_with_fixed_twenty_slots_and_target_forty_valid ... ok
+test same_seed_and_repeated_load_never_accumulate_and_choices_are_real ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.47s
+
+     Running tests/descent_potions.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/descent_potions-2f511aad78fefae0)
+
+running 1 test
+test descent_potions_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+
+     Running tests/divine_combat.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/divine_combat-d54cb826b27fd1c0)
+
+running 2 tests
+test narrow_hit_and_healing_boundaries ... ok
+test source_stat_pool_and_prime_vectors ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/divine_environment.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/divine_environment-589d51b0ed1befb0)
+
+running 1 test
+test divine_environment_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.87s
+
+     Running tests/divine_reactions.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/divine_reactions-289b8f56bc1cbe12)
+
+running 2 tests
+test reaction_and_packet_boundaries ... ok
+test source_nightmare_and_surrender_predicates ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running tests/divine_rescues.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/divine_rescues-2944494fa0a0d1ff)
+
+running 1 test
+test source_ordered_rescues_and_damage_bank ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/dream_anchor.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/dream_anchor-18d2ebde50099ad3)
+
+running 1 test
+test dream_anchor_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.97s
+
+     Running tests/dream_craft.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/dream_craft-2bfabd8f73095bb5)
+
+running 1 test
+test dream_craft_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.50s
+
+     Running tests/enemy_traits.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/enemy_traits-e8df287eedea75bf)
+
+running 1 test
+test source_intrinsic_and_presentation_normalization ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+     Running tests/entrance_observation.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/entrance_observation-d5ed15474827065f)
+
+running 1 test
+test remembered_entrance_does_not_reveal_hidden_tile_changes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/environment_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/environment_parity-fbf7fcd645736dc9)
+
+running 10 tests
+test ichor_fish_catalog_matches_all_depth_bands ... ok
+test static_environment_matches_complete_v48_state ... ok
+test generated_currents_match_v48 ... ok
+test observed_hazards_match_v48 ... ok
+test ordinary_explosion_and_gas_closure_match_v48 ... ok
+test active_environment_matches_v48 ... ok
+test ichor_dispatch_matches_reference ... ok
+test divine_compound_dispatch_matches_reference ... ok
+test supported_offscreen_catchup_matches_v48 ... ok
+test status_dispatch_matches_reference ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.83s
+
+     Running tests/epidite_r34.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/epidite_r34-020bd3edb0af3149)
+
+running 5 tests
+test binary_blessing_doubles_stats_exp_energy_preserves_identity_provenance_quantity_and_stacks ... ok
+test pulse_ignores_dream_targets_and_new_death_hearts_wait_for_next_flash ... ok
+test flash_every_thirty_world_turns_uses_los_bypasses_dr_and_blesses_only_exposed_ground ... ok
+test actual_dispatch_and_offscreen_ticks_advance_the_saved_clock ... ok
+test generation_tower_and_clock_blessed_state_roundtrip ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/equipment_abilities.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/equipment_abilities-45bf20ae787170ad)
+
+running 1 test
+test source_equipment_projection_and_load_reconciliation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/equipment_grant_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/equipment_grant_commands-b0d71ea1229af064)
+
+running 1 test
+test equipment_grant_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s
+
+     Running tests/exhausted_offers.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/exhausted_offers-3de6b62a6b027486)
+
+running 1 test
+test exhausted_offers_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.79s
+
+     Running tests/expanded_consumables.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/expanded_consumables-dbc43ffab8c7f9cb)
+
+running 1 test
+test expanded_consumables_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.33s
+
+     Running tests/final_toggles.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/final_toggles-5e8814c98d0dec4f)
+
+running 1 test
+test final_toggles_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+
+     Running tests/fire_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/fire_parity-2ecb7d1f75116641)
+
+running 1 test
+test fire_exposure_matches_64_v48_cases ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/flavor_placement.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/flavor_placement-e797b88a34a79562)
+
+running 6 tests
+test authored_setup_windows_follow_members_and_keep_disabled_recipes_disabled ... ok
+test corpse_revival_cannot_introduce_out_of_band_witches ... ok
+test dynamic_water_watcher_stencil_never_leaks_frozen_depth_species ... ok
+test final_windows_cover_every_leader_and_pair_without_legacy_changes ... ok
+test all_depths_keep_deterministic_exact_reward_feasibility ... ok
+test generated_live_sources_obey_relocated_windows_regression_seed_zero ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+
+     Running tests/flesh_finale.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/flesh_finale-e816a2bf3ad0fd8b)
+
+running 19 tests
+test half_here_endpoint_falls_out_without_killing_airborne_owner ... ok
+test death_on_upstairs_seeds_above_immediately_without_extra_layer ... ok
+test collapse_removes_fixtures_objects_and_corpses_without_rewards ... ok
+test actual_death_seeds_real_cell_once_without_rng_corpse_or_heart ... ok
+test object_fallback_to_collapse_gap_is_discarded_not_transferred ... ok
+test lost_flight_npcs_are_removed_between_pulses_on_active_and_hidden_floors ... ok
+test explicit_dive_while_flying_is_still_a_fall_and_ordinary_gap_is_unchanged ... ok
+test parity_simultaneous_eight_neighbor_layers_no_rng_and_walls_erode ... ok
+test collapse_fall_terminal_even_on_floor40_and_preserves_flight_until_falling ... ok
+test moving_into_entrance_wins_without_extra_world_turn ... ok
+test only_defeated_boss_and_intact_floor_one_entrance_win ... ok
+test actual_haste_action_does_not_advance_collapse_clock ... ok
+test stairs_seed_only_the_reached_upper_floor_and_progress_offscreen ... ok
+test hidden_boss_death_keeps_global_collapse_and_announces_it_once ... ok
+test save_replay_restart_and_both_time_abilities_restore_frontiers_and_boss ... ok
+test playtest_floor40_keeps_boss_and_unranked_origin ... ok
+test older_revisions_keep_pit_and_do_not_spawn_administrator ... ok
+test new_floor40_has_exactly_one_reachable_boss_without_extra_ordinary_budget ... ok
+test complete_physical_ascent_from_forty_reaches_the_door_before_wave ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.51s
+
+     Running tests/floor_one_entrance.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/floor_one_entrance-184fb8d250c4aaf0)
+
+running 8 tests
+test identity_validation_does_not_reinterpret_legacy_stairs ... ok
+test connected_bottom_center_door_is_distinct_and_idempotent ... ok
+test corridor_avoids_fixtures_and_invalid_install_is_atomic ... ok
+test ordinary_required_cell_fixtures_are_reconciled_but_machines_are_not ... ok
+test legacy_revisions_keep_original_entrance_geometry ... ok
+test populated_floor_one_keeps_the_north_arrival_safe_and_unoccupied ... ok
+test revision31_start_save_replay_and_temporal_restore_keep_identity ... ok
+test normal_generation_all_domains_has_safe_connected_entry ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.03s
+
+     Running tests/foundation.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/foundation-167eb14df9d741c2)
+
+running 19 tests
+test history_retains_five ... ok
+test avatar_schema_roundtrip ... ok
+test enemy_health_migration_reference_vectors ... ok
+test future_restore_costs_parity ... ok
+test malformed_geometry_rejects_without_panic ... ok
+test future_activation_native_anchor_parity ... ok
+test optional_null_absence ... ok
+test migration_history_rebase_reference ... ok
+test legacy_history_import_revert_parity ... ok
+test snapshot_shares_floor_blocks ... ok
+test rng_reference_vectors ... ok
+test packed_save_roundtrip ... ok
+test snapshot_failure_does_not_drop_archive ... ok
+test native_inverse_export_continuation ... ok
+test stale_geometry_metadata_is_ignored ... ok
+test native_ring_revert_parity ... ok
+test malformed_save_reference_validation ... ok
+test save_after_revert_continues_exactly ... ok
+test engine_history_full_trace ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.75s
+
+     Running tests/fury_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/fury_commands-d5a23e0cee766999)
+
+running 1 test
+test fury_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+
+     Running tests/generated_avatar_play.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/generated_avatar_play-3699473e4a8a7f66)
+
+running 1 test
+test actual_generated_avatar_first_actions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.06s
+
+     Running tests/generated_walks.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/generated_walks-8e66dd2de43191bf)
+
+running 1 test
+test generated_walks_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.01s
+
+     Running tests/generation_environment_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/generation_environment_parity-2b50d7fc83c586ed)
+
+running 1 test
+test native_vents_lighting_fire_safety_match_v48 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/generation_geometry_r38.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/generation_geometry_r38-98cd582bc238d377)
+
+running 6 tests
+test distant_tap_excludes_planned_stair_footprint_in_r38 ... ok
+test invalid_recovery_inputs_are_rejected_without_attempting_geometry ... ok
+test seed_0047_tap_survives_stair_painting_and_cleanup ... ok
+test protected_room_failure_retries_a_safe_candidate_in_r38 ... ok
+test recovery_window_keeps_stairs_domain_and_godbeast_plan ... ok
+test late_mountain_chasms_preserve_hazard_free_stair_routes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.19s
+
+     Running tests/generation_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/generation_parity-e255c7f9d9290da0)
+
+running 12 tests
+test heart_budgets_match_v48 ... ok
+test geological_fields_match_v48_float32_bits_and_rng ... ok
+test passage_cells_and_paths_match_v48 ... ok
+test unsupported_floor_configuration_is_rejected ... ok
+test domain_plan_matches_v48 ... ok
+test recorded_loot_acceptance_and_fallback_match_v48 ... ok
+test encounter_budgets_match_v48 ... ok
+test legacy_loot_allocations_match_v48 ... ok
+test room_loops_match_v48_including_bent_and_rejected_candidates ... ok
+test full_room_accretion_matches_v48_stages_graph_and_rng ... ok
+test room_masks_match_v48_including_order_and_rng ... ok
+test stair_spines_match_v48_current_legacy_and_clamped ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+
+     Running tests/generation_sweep_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/generation_sweep_parity-e016e0c5e3668bc8)
+
+running 1 test
+test complete_generation_depth_and_seed_sweep_matches_frozen_hashes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.63s
+
+     Running tests/generation_validation_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/generation_validation_parity-288f81ac4a392da4)
+
+running 1 test
+test stage_evidence_and_generation_validator_match_v48 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/geology_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/geology_parity-6aa5db4ff625c608)
+
+running 2 tests
+test geological_plans_match_v48_all_domains ... ok
+test geology_constrained_accretion_loops_and_materialization_match_v48 ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+
+     Running tests/godbeast_interactions.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/godbeast_interactions-323b55b1e23ef02c)
+
+running 1 test
+test exact_source_event_interactions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+     Running tests/grab_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/grab_traces-c60faf2028f2b189)
+
+running 1 test
+test grab_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.18s
+
+     Running tests/half_here.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/half_here-15a632f2b69d8568)
+
+running 3 tests
+test exact_endpoint_stat_ownership ... ok
+test exact_shared_endpoint_falls ... ok
+test exact_half_here_lifecycle_projection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/half_here_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/half_here_commands-36af8b6647ee1056)
+
+running 1 test
+test half_here_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+     Running tests/half_here_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/half_here_traces-41dae9a478095a7e)
+
+running 1 test
+test half_here_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.84s
+
+     Running tests/hazard_potions.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/hazard_potions-7e59cca5229b403e)
+
+running 1 test
+test hazard_potions_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.19s
+
+     Running tests/horn_caster_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/horn_caster_traces-3bf13df942680f38)
+
+running 1 test
+test horn_caster_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.23s
+
+     Running tests/identity_migrations.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/identity_migrations-1031bac13c26d4ca)
+
+running 5 tests
+test bastidion_source_vectors ... ok
+test generated_grant_order_is_stable ... ok
+test display_order_normalization_matches_source ... ok
+test divine_source_vectors ... ok
+test integer_health_source_vectors ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/integration_r33_debug.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/integration_r33_debug-d4cef0f50b96070c)
+
+running 8 tests
+test live_stash_take_after_drop_then_revert_keeps_every_source_item_exactly_once ... ok
+test live_stash_put_after_drop_then_revert_cannot_duplicate_reconstructed_item ... ok
+test live_stash_equip_after_world_turn_then_revert_is_a_consistent_transaction ... ok
+test future_restore_returns_pack_and_stash_to_one_consistent_branch ... ok
+test live_stash_then_explicit_save_load_revert_preserves_source_item_uniqueness ... ok
+test pending_haste_stash_edits_and_saved_resume_revert_both_restore_one_branch ... ok
+test reconstructed_loot_leaves_tree_taps_but_keeps_initial_honey_and_no_unearned_shard ... ok
+test floor_forty_blessed_all_gods_use_live_offer_queues_then_explicit_exhaustion ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.17s
+
+     Running tests/integration_r33_worlds.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/integration_r33_worlds-d5b9b0c863f8779c)
+
+running 5 tests
+test borge_exact_skin_heart_and_honey_keep_independent_provenance_and_optional_previews ... ok
+test actual_world_40_floors_seed_legacy_regression ... ok
+test actual_world_40_floors_seed_forty_two ... ok
+test actual_world_40_floors_seed_one ... ok
+test actual_world_with_all_water_nest_window_preserves_connected_floors ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.19s
+
+     Running tests/inventor_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/inventor_traces-369bd6306cdf9ee8)
+
+running 1 test
+test inventor_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.30s
+
+     Running tests/inventory_trace.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/inventory_trace-461fd63e9b192b4a)
+
+running 4 tests
+test unsupported_inventory_effect_is_transactional ... ok
+test progression_reference_trace ... ok
+test consumable_reference_trace ... ok
+test inventory_reference_trace ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests/load_migrations.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/load_migrations-95c84c6f60aa5e0b)
+
+running 4 tests
+test empty_haste_marker_survives_load_and_free_command ... ok
+test malformed_nested_state_is_rejected_and_old_simulation_stays_gated ... ok
+test source_ordered_load_cases ... ok
+test every_divine_equipment_loss_load_matches_source ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.77s
+
+     Running tests/maintained_links.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/maintained_links-021a6a5eac09ea96)
+
+running 1 test
+test source_relationship_cleanup ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/mercuria_lever_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/mercuria_lever_traces-3225b6bf8dfc2fd5)
+
+running 1 test
+test mercuria_lever_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.83s
+
+     Running tests/mind_control.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/mind_control-b5a24af94041bc3a)
+
+running 1 test
+test mind_control_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.58s
+
+     Running tests/mini_me.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/mini_me-17062fed0557c727)
+
+running 2 tests
+test dismissal_preserves_unaffected_shared_blocks ... ok
+test exact_source_clone_construction ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+
+     Running tests/mini_me_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/mini_me_commands-9a758bd7dace2a7a)
+
+running 1 test
+test mini_me_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.84s
+
+     Running tests/mini_me_offscreen.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/mini_me_offscreen-4383acf3efe475f8)
+
+running 1 test
+test mini_me_offscreen_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.58s
+
+     Running tests/mini_me_starter_combinations.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/mini_me_starter_combinations-959c3c8df5b81ba0)
+
+running 1 test
+test mini_me_starter_combinations_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 46.28s
+
+     Running tests/monster_balance_v32.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/monster_balance_v32-05a5b3af3aab8c21)
+
+running 2 tests
+test fixed_brood_profiles_do_not_retune_natural_or_loaded_creatures ... ok
+test revision32_overlay_is_finite_birth_only_and_preserves_rewards_and_traits ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/monster_chill.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/monster_chill-ad962dce86fee1dc)
+
+running 2 tests
+test source_passive_offscreen_boundaries ... ok
+test source_chill_boundaries ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests/moon_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/moon_traces-12d920f336aea854)
+
+running 1 test
+test moon_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.62s
+
+     Running tests/movement_fuzz.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/movement_fuzz-b5fbfd9be5dcfad8)
+
+running 1 test
+test movement_fuzz_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.92s
+
+     Running tests/native_environment_hooks.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/native_environment_hooks-9f767feff458f2cc)
+
+running 21 tests
+test blood_deposits_at_half_here_damaged_body_not_owner_pool ... ok
+test diffusion_is_bounded_water_only_deterministic_and_respects_frozen_cells ... ok
+test hidden_water_never_leaks_live_blood_through_observed_or_unseen_hazards ... ok
+test exposed_enemy_status_does_not_change_real_stats_ai_hostility_or_health ... ok
+test offscreen_world_turns_expire_status_and_diffuse_sources ... ok
+test hallucination_exposure_refreshes_exactly_two_world_turns_without_damage_or_confusion ... ok
+test haste_movement_does_not_tick_hallucinations_or_diffusion ... ok
+test ordinary_movement_is_not_a_water_blood_trail ... ok
+test kelpie_spawn_source_is_mild_and_persists_at_spawn_after_movement_and_death ... ok
+test authored_river_sources_exclude_lakes_dry_cells_and_ichor_and_persist_independently ... ok
+test reflected_hit_back_blood_uses_the_reflected_victims_water_tile ... ok
+test only_actual_positive_hp_damage_in_water_deposits_including_forced_and_dot_packets ... ok
+test successful_escape_breaks_binding_root_only_failed_or_blocked_attempt_does_not ... ok
+test greater_breather_uses_hallucinogenic_for_passive_and_boost_and_is_immune ... ok
+test scream_disorients_accuracy_only_refreshes_and_expires_allied_boost_unchanged ... ok
+test source_registration_never_adds_legacy_fields_and_water_memory_distinguishes_zero ... ok
+test severed_fungus_corpse_pair_cannot_reacquire_but_unrelated_link_and_fire_survive ... ok
+test water_and_status_round_trip_and_temporal_snapshots ... ok
+test legacy_revisions_keep_no_blood_caustic_breath_and_offense_weakening ... ok
+test hallucination_gas_schema_provenance_and_hazard_memory_round_trip ... ok
+test revert_and_see_the_future_restore_new_layers_and_world_turn_status_clocks ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/nest_pockets_v33.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/nest_pockets_v33-5d3ca8d9b6d09b43)
+
+running 11 tests
+test habitat_relocation_preserves_whole_hordes_and_machine_actors ... ok
+test queen_three_casts_are_energy_gated_world_clocked_and_heartless ... ok
+test honey_floor_inventory_effective_max_full_and_blocked_actions ... ok
+test queen_failed_blocked_silenced_or_legacy_casts_do_not_mutate ... ok
+test queen_cooldown_children_save_and_replay_are_deterministic ... ok
+test honey_save_revert_future_and_replay_preserve_exact_once_consumption ... ok
+test seeded_nest_atomic_startup_reserves_populations_and_reward ... ok
+test pocket_depth_theme_habitat_and_legacy_guards ... ok
+test rare_all_water_window_seed155_gets_bounded_platform_nest_without_domain_override ... ok
+test seeded_nests_have_connected_rooms_stairs_and_guaranteed_reward ... ok
+test nest_guarantee_holds_across_seeded_natural_domains ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+
+     Running tests/non_euclidean_generation_v36.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/non_euclidean_generation_v36-7afda5066d1e56d4)
+
+running 11 tests
+test physical_contiguity_and_one_good_stochastic_branch_do_not_prove_safety ... ok
+test a_pocket_must_not_turn_previously_optional_portals_into_the_only_escape ... ok
+test unsuitable_floor_omits_instead_of_altering_graph_or_terrain ... ok
+test stairs_fixtures_portals_population_and_loot_are_never_rewritten ... ok
+test startup_adds_only_metadata_without_rebudgeting_or_spending_simulation_rng ... ok
+test depth_revision_determinism_idempotence_and_unchanged_terrain ... ok
+test save_roundtrip_structural_boundaries_and_dream_validation ... ok
+test all_six_domains_keep_geometry_and_every_accepted_pocket_is_traversable ... ok
+test cell_partition_and_all_stochastic_outcomes_have_paths_out ... ok
+test sampled_distribution_and_bounded_retry_receipt ... ok
+test populated_floor_sample_records_actual_exclusions_and_retries ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.46s
+
+     Running tests/non_euclidean_integration_r36.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/non_euclidean_integration_r36-d2b83b1f7034fa5e)
+
+running 13 tests
+test pockets_do_not_create_an_optical_viewpoint_or_reduce_visual_distance ... ok
+test half_here_keeps_its_creation_plane_and_does_not_project_pocket_sight ... ok
+test linked_enemy_occupancy_attacks_without_telefrag_or_random_return ... ok
+test invalid_throw_and_interception_before_fork_do_not_draw_a_random_exit ... ok
+test dream_transition_does_not_move_or_attack_the_waking_body ... ok
+test read_only_queries_and_blocked_sibling_do_not_consume_a_lottery_draw ... ok
+test entering_each_source_arrives_once_at_shared_destination_without_rng ... ok
+test shared_underfoot_items_are_transferred_once_not_cloned ... ok
+test actual_empty_throw_samples_once_and_places_one_real_item_at_the_chosen_exit ... ok
+test reverse_transition_consumes_exactly_one_serialized_draw_and_exercises_both_exits ... ok
+test absent_pockets_preserve_revision35_commands_and_actor_tuning ... ok
+test save_replay_revert_and_future_preserve_topology_and_random_outcome ... ok
+test debug_floor_twenty_and_forty_keep_exact_revision35_rewards_choices_and_costs ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.60s
+
+     Running tests/non_euclidean_physics_r36.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/non_euclidean_physics_r36-00f740b7a4074ad8)
+
+running 17 tests
+test local_origin_shot_does_not_draw_and_blocked_return_origin_cannot_reroll ... ok
+test legacy_throw_keeps_second_raster_trajectory_check ... ok
+test collision_or_blocked_exit_stops_before_fork_without_rng ... ok
+test possible_shot_search_never_supplies_remote_optical_knowledge ... ok
+test legacy_charged_moonbeam_out_of_range_still_discharges_without_attack ... ok
+test half_here_keeps_native_pocket_plane_after_dreamwalk ... ok
+test actual_throw_transfers_one_item_and_invalid_potion_does_not_draw ... ok
+test npc_path_admits_both_outcomes_and_commits_only_actual_movement ... ok
+test preview_stops_at_random_entry_and_committed_trace_draws_once ... ok
+test real_horn_ai_admits_possible_shot_but_commits_fair_miss_and_recovery ... ok
+test adjacent_sibling_step_is_not_a_zero_cost_transfer ... ok
+test thrown_potion_hits_shared_occupant_once_without_sampling_return ... ok
+test actual_npc_ranged_launch_resolves_fork_not_preview_stop ... ok
+test real_witch_fork_miss_advances_phase_spends_and_sets_same_cooldown ... ok
+test stochastic_path_rejects_an_unwalkable_sibling ... ok
+test linked_source_origins_are_deterministic_but_reverse_origin_is_not_previewed ... ok
+test witch_over_range_random_branch_is_a_paid_cooled_down_miss ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/nova_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/nova_commands-4c2417e1c05c67a6)
+
+running 1 test
+test nova_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s
+
+     Running tests/ordinary_roster.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/ordinary_roster-09b7d6802db76d0d)
+
+running 6 tests
+test ichor_bands_expand_with_same_uniform_draw_and_templates ... ok
+test shipped_manual_matches_runtime_eligibility ... ok
+test widened_windows_preserve_recipe_rules ... ok
+test deterministic_distribution_sample_all_depths ... ok
+test widened_population_places_on_all_generated_depths ... ok
+test save_lazy_generation_and_replay_keep_revision ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.03s
+
+     Running tests/passive_monster_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/passive_monster_traces-1c5aaae9dcbdde06)
+
+running 1 test
+test passive_monster_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.68s
+
+     Running tests/pathfinding_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/pathfinding_parity-79d010f1fe8cdde4)
+
+running 1 test
+test forty_reference_fields_and_stable_steps ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/phantasmii_dreamwalking_r34.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/phantasmii_dreamwalking_r34-73112d502238bea4)
+
+running 10 tests
+test blood_costs_still_apply_in_dream ... ok
+test dream_floor_mutations_do_not_change_waking_floor_and_restore_on_error ... ok
+test half_here_keeps_creation_plane_across_sleep_and_wake ... ok
+test nightmares_hidden_awake_seen_dream_and_leave_nothing ... ok
+test projection_overlaps_normal_enemy_without_attack ... ok
+test plane_attacks_and_body_damage_notify_without_waking ... ok
+test begin_body_anchor_and_wake_are_persistent ... ok
+test real_dispatch_wait_keeps_body_and_projection_valid ... ok
+test rejected_travel_and_consumption_are_turnless ... ok
+test debug_seed_replay_rejects_unrecorded_stash_edits_with_session_guidance ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+     Running tests/phantasmii_generation_r34.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/phantasmii_generation_r34-90e7187cea314130)
+
+running 7 tests
+test revision34_bag_has_seven_distinct_designs_at_unchanged_seven_milestones ... ok
+test eight_fixed_next_band_body_profiles_have_no_inherited_combat_traits ... ok
+test revision34_natural_actor_profiles_are_still_revision33_and_legacy_shell_is_explicit ... ok
+test shard_pickup_is_dream_only_one_real_stack_and_unlocks_without_consuming ... ok
+test persistent_four_on_all_forty_floors_and_three_quest_items_only_at_altar ... ok
+test generated_event_is_walkable_and_population_additions_do_not_rebudget_ordinary_content ... ok
+test debug_reconstruction_leaves_prior_dream_quest_and_nightmares_unearned ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.79s
+
+     Running tests/phantasmii_integration_r34.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/phantasmii_integration_r34-078f2f04d1eccf33)
+
+running 16 tests
+test body_melee_damages_shared_pool_without_waking_or_cross_plane_projection_hit ... ok
+test lethal_sleeping_body_packets_resolve_shared_death_exactly_once ... ok
+test nightmare_actual_kill_dissolves_without_corpse_loot_or_rewards ... ok
+test dream_sparkle_real_dispatch_never_changes_waking_terrain_fire_or_lights ... ok
+test report_eight_nightmare_numerical_profiles ... ok
+test staircase_bumps_cancel_coordinates_and_time_in_normal_and_haste_paths ... ok
+test early_wake_keeps_partial_shards_and_reentry_still_requires_the_altar ... ok
+test waking_fire_keeps_provenance_and_hits_waking_actor_not_overlapping_projection ... ok
+test dream_created_half_here_remains_dream_side_after_real_wake_and_load ... ok
+test synthetic_dream_controls_cannot_bypass_terminal_choice_debug_or_paralysis_gates ... ok
+test quest_fixture_replay_reproduces_events_and_complete_dream_state ... ok
+test save_load_and_actual_revert_restore_both_layers_and_half_here_creation_plane ... ok
+test actual_see_future_restores_dream_layer_and_half_here_plane_after_waking ... ok
+test fixture_replay_with_revert_preserves_both_layers_and_half_here_plane ... ok
+test dagger_altar_three_shard_stack_unlock_save_and_toggle_are_real_commands ... ok
+test nested_dream_floor_geometry_environment_and_transient_context_corruption_is_rejected ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests/physical_balance.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/physical_balance-bf5456064e837339)
+
+running 6 tests
+test reference_depth_is_independent_of_spawn_window ... ok
+test pale_identity_and_ichor_event_construction_receive_tuning ... ok
+test revision_overlay_preserves_abilities_rewards_and_frozen_catalog ... ok
+test revised_stat_scale_does_not_rebudget_population ... ok
+test native_late_profile_trades_and_cancer_ignore_armor ... ok
+test native_dispatch_rat_whole_encounter_and_fast_cadence ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.52s
+
+     Running tests/playtest_start.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/playtest_start-3747c24994300956)
+
+running 8 tests
+test input_validation_has_no_silent_clamping ... ok
+test playtest_cannot_enter_normal_high_scores_even_if_imported_as_genuine ... ok
+test floor_one_has_zero_prior_budget_and_exact_opening ... ok
+test full_collection_matches_actual_prior_generated_ordinary_hearts ... ok
+test identical_seed_floor_and_mode_reproduce_complete_state ... ok
+test save_replay_restart_and_snapshot_preserve_profile ... ok
+test floor_forty_is_valid_without_target_rewards ... ok
+test all_vessels_and_both_temporal_abilities_retain_synthetic_origin ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.06s
+
+     Running tests/population.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/population-e3d11ff1515f27a3)
+
+running 7 tests
+test exact_actor_templates_and_draws ... ok
+test exact_composition_streams_all_depths ... ok
+test ground_placement_metrics_falls_and_normalization ... ok
+test complete_population_and_heatmaps ... ok
+test complete_new_run_three_modes_with_reference_geometry ... ok
+test complete_spawn_floor_and_sphinx ... ok
+test complete_native_new_run_three_modes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.18s
+
+     Running tests/portal_consumers_v35.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/portal_consumers_v35-ce089d82dc58aaea)
+
+running 8 tests
+test reverse_entropy_aura_uses_linked_range_but_not_other_plane ... ok
+test endpoint_ranges_feed_half_here_and_counterattacks ... ok
+test native_plane_yeti_and_silence_reach_the_linked_endpoint ... ok
+test linked_grab_survives_until_endpoint_separation ... ok
+test horn_bolt_uses_portal_range_and_hits_the_actual_remote_actor ... ok
+test dryad_heals_through_portal_without_changing_recipient_identity ... ok
+test mini_me_cannot_spawn_on_an_occupied_link_alias ... ok
+test directed_fire_cone_reaches_remote_space_without_cross_plane_damage ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/portal_generation_v35.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/portal_generation_v35-bbc46fe36245bf07)
+
+running 10 tests
+test disconnected_if_both_avoided_is_rejected_even_if_individually_bypassable ... ok
+test unsuitable_maps_omit_instead_of_rewriting_or_forcing_a_portal ... ok
+test unreachable_decorative_components_do_not_receive_endpoints ... ok
+test every_actor_profile_and_population_pool_remains_revision34 ... ok
+test startup35_adds_portals_without_rebudgeting_actors_or_ground ... ok
+test depth_gate_determinism_and_legacy_nonmutation ... ok
+test optional_metadata_roundtrips_and_malformed_waking_or_dream_pairs_reject ... ok
+test never_occupies_stairs_fixture_actor_loot_or_required_single_width_route ... ok
+test seven_pairs_keep_all_endpoints_optional_with_ordered_colors ... ok
+test generated_six_biomes_and_multiple_seeds_preserve_walking_routes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.34s
+
+     Running tests/portal_integration_v35.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/portal_integration_v35-135b411b940ba011)
+
+running 22 tests
+test direction_helper_preserves_zero_axes_and_portal_route_orientation ... ok
+test diagonal_portal_projectile_preserves_direction_and_segment_range ... ok
+test directed_projectile_reaches_remote_actor_with_actual_range ... ok
+test forced_move_crosses_once_and_respects_remote_occupancy ... ok
+test enemy_at_mate_is_attacked_before_transport ... ok
+test dream_projection_crosses_same_plane_without_moving_sleeping_body ... ok
+test ally_swap_and_nonattacking_occupancy_use_both_endpoints ... ok
+test half_here_has_native_plane_portal_view_and_alias_distance ... ok
+test multiple_portal_ray_cycle_is_bounded ... ok
+test npc_path_uses_local_entry_step_and_remote_arrival ... ok
+test projectile_range_without_portals_retains_legacy_euclidean_distance ... ok
+test actual_throw_attacks_remote_endpoint_and_empty_throw_lands_at_mate ... ok
+test optical_route_uses_remaining_distance_and_both_occlusions ... ok
+test ray_stops_at_walls_before_entry_or_after_exit ... ok
+test underfoot_pickup_sees_the_other_endpoint_without_duplicate_items ... ok
+test remote_endpoint_occupant_intercepts_without_duplicate_body ... ok
+test empty_entry_is_one_turn_then_leaving_does_not_bounce ... ok
+test normal_enemy_can_melee_player_through_link_without_telefragging ... ok
+test opaque_portal_endpoint_disables_optical_transfer_without_corrupting_save ... ok
+test no_portal_revision35_preserves_simple_revision34_command_results ... ok
+test future_branch_restores_player_and_linked_occupancy_after_crossing ... ok
+test save_fixture_replay_and_temporal_restore_keep_pair_identity ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+     Running tests/profile.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/profile-edb685b7a3fe965a)
+
+running 7 tests
+test legacy_summaries_omit_optional_ending ... ok
+test finale_summary_and_archive_preserve_exact_ending ... ok
+test collapse_loss_keeps_exact_recorded_reason ... ok
+test profile_identity_and_corruption ... ok
+test profile_validates_optional_ending ... ok
+test profile_preserves_extension_record_fields ... ok
+test profile_source_parity ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/projectile_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/projectile_parity-eb5b2f28d2bcc460)
+
+running 1 test
+test projectiles_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+
+     Running tests/propagation_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/propagation_parity-1d1475e3a792894a)
+
+running 1 test
+test all_64_frozen_v48_diffusion_fixtures ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/qa_monster_rebalance.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/qa_monster_rebalance-1758eac081d638f8)
+
+running 14 tests
+test qa_failed_birth_does_not_spend_energy_rng_or_start_timer ... ok
+test qa_offscreen_catch_up_preserves_absolute_world_turn_deadline ... ok
+test qa_greater_birther_descendant_inherits_heartlessness_and_own_timer ... ok
+test qa_single_open_cell_allows_five_paid_single_casts_not_free_unbounded_births ... ok
+test qa_summoned_hearts_remain_existing_reward_risk_not_silently_removed ... ok
+test qa_heartless_parents_and_revived_parents_birth_heartless_children_only_in32 ... ok
+test qa_three_casts_require_twenty_world_turns_and_use_finite_resource_budget ... ok
+test qa_unseen_sleep_refills_energy_but_active_detection_does_not ... ok
+test qa_player_mini_me_toggle_does_not_gain_monster_birth_cooldown ... ok
+test qa_legacy_birth_is_not_retroactively_cooled_down ... ok
+test qa_every_catalog_heart_has_exact_additive_growth_and_six_hp_per_defense ... ok
+test qa_summon_timer_survives_storage_snapshot_and_future_restore ... ok
+test qa_actual_revert_and_see_future_commands_restore_summons_and_timer ... ok
+test qa_actual_dispatch_haste_save_resume_replay_share_world_turn_timer ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+
+     Running tests/reaction_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/reaction_commands-caa7d984eebb9b2d)
+
+running 1 test
+test reaction_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.49s
+
+     Running tests/remember.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/remember-8e846c22af17463a)
+
+running 2 tests
+test unknown_remember_target_trait_is_atomic ... ok
+test remember_exact_trace ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.82s
+
+     Running tests/remember_all_passives.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/remember_all_passives-6ed6573f7384d8eb)
+
+running 2 tests
+test copied_trait_admission_is_frozen_and_explicit ... ok
+test remember_all_passives_exact_trace ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.00s
+
+     Running tests/remember_hazards.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/remember_hazards-9441b52544da611b)
+
+running 1 test
+test remember_hazards_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.48s
+
+     Running tests/replay_seed.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/replay_seed-2a328ad632487bed)
+
+running 3 tests
+test replay_revision_rejects_before_generation ... ok
+test replay_steps_preserve_events_and_rejection_cursor ... ok
+test seeded_replay_initial_state_matches_reference ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.33s
+
+     Running tests/rescue_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/rescue_commands-536b32f22e881c41)
+
+running 1 test
+test rescue_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+
+     Running tests/revision_39_startup.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/revision_39_startup-da16db3469a619ae)
+
+running 2 tests
+test new_runs_and_debug_admit_revision39_but_reject40 ... ok
+test revision39_keeps_generation_and_required_content_identical_to38 ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.74s
+
+     Running tests/ruin_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/ruin_traces-6d0a93957731e1e0)
+
+running 1 test
+test ruin_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.25s
+
+     Running tests/setups_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/setups_parity-0477f6d7744cbdf3)
+
+running 1 test
+test authored_stamps_packing_and_godbeast_rooms_match_v48 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.29s
+
+     Running tests/shard_ground_r39.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shard_ground_r39-7a298f6ae92b3485)
+
+running 2 tests
+test waking_zillennia_cannot_erase_a_dream_dropped_shard ... ok
+test marker_roundtrips_only_on_r39_ground_or_observation_shard ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+
+     Running tests/shard_weapon_independent_r39.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shard_weapon_independent_r39-478025afbba7b049)
+
+running 17 tests
+test dream_plane_target_is_not_harmed_from_waking_plane ... ok
+test ordinary_death_never_gets_shard_stone_sentence ... ok
+test mainhand_ordinary_kill_does_not_spend_offhand_shard_or_add_stone_text ... ok
+test erase_metaphysical_cannot_erase_the_shards_permanent_death_marker ... ok
+test player_counterstrike_uses_its_equipped_mainhand_shard ... ok
+test deflected_melee_or_thrown_shard_hits_actual_target_once_without_false_corpse_log ... ok
+test nightmare_shard_death_has_no_stone_suffix_without_you_kill_chronicle ... ok
+test shard_strike_preserves_active_nova_after_attack ... ok
+test saved_permanent_death_and_snapshot_restore_keep_item_identity_consistent ... ok
+test successful_hit_only_policy_preserves_melee_miss_and_recovers_thrown_miss ... ok
+test dream_throw_miss_ignores_waking_actor_preserves_anchor_and_recovers_only_in_dream ... ok
+test thrown_shard_hits_only_dream_actor_overlapping_waking_actor ... ok
+test thrown_shard_crosses_random_non_euclidean_branch_and_resolves_one_hit ... ok
+test two_shards_and_assault_do_not_reuse_consumed_weapon_or_spend_unused_hand ... ok
+test thrown_shard_through_portal_kills_resolved_actor_once_and_leaves_no_shard ... ok
+test successful_shard_hit_bypasses_sphinx_immunity_and_death_rescue_and_revival ... ok
+test command_boundary_equipped_attack_and_dream_throw_replay_deterministically ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/shard_weapon_r39.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shard_weapon_r39-cec96357b0a676ef)
+
+running 7 tests
+test empty_throw_into_chasm_recovers_on_nearby_surface_without_falling ... ok
+test blocked_or_invalid_commands_do_not_consume_item_or_rng ... ok
+test historical_revision_retains_guaranteed_use_and_disallows_throw ... ok
+test misses_preserve_the_unique_weapon_and_thrown_miss_can_be_picked_up ... ok
+test ordinary_non_shard_kill_has_no_stone_text ... ok
+test targeted_apply_is_not_an_accuracy_bypass_and_throw_hit_is_supported ... ok
+test actual_melee_hit_permakills_consumes_and_pairs_stone_with_kill_chronicle ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/shine_slippery.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shine_slippery-5d9492ca221eb0cb)
+
+running 1 test
+test shine_slippery_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.99s
+
+     Running tests/silenced_abilities.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/silenced_abilities-016a326496d79430)
+
+running 1 test
+test silenced_abilities_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.16s
+
+     Running tests/slime_leaves.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/slime_leaves-e0e51fc6eca7115a)
+
+running 1 test
+test slime_leaves_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.02s
+
+     Running tests/sphinx_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/sphinx_traces-883235afdcaa2a16)
+
+running 1 test
+test sphinx_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.03s
+
+     Running tests/stalking_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/stalking_traces-a31b86ed2e60e0ae)
+
+running 1 test
+test stalking_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.95s
+
+     Running tests/starter_modes.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/starter_modes-6dc66a42810972b1)
+
+running 1 test
+test starter_modes_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.13s
+
+     Running tests/startup_recovery_r38.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/startup_recovery_r38-8351d1c26a4e86da)
+
+running 3 tests
+test historical_failed_seed_is_not_silently_repaired ... ok
+test generation_batching_does_not_change_result_or_recovery_metadata ... ok
+test known_tap_stair_seed_generates_all_required_content_without_changing_budget ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.86s
+
+     Running tests/stealth_passives.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/stealth_passives-7b5628e9a69c0a9a)
+
+running 1 test
+test stealth_passives_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+
+     Running tests/sub_biome_generated_turn_r37.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/sub_biome_generated_turn_r37-3e31fcf1c9808989)
+
+running 1 test
+test generated_corn_floor_wait_and_save_resume_execute_identically ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.91s
+
+     Running tests/sub_biome_persistence_r37.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/sub_biome_persistence_r37-7e84b225b4d2c9be)
+
+running 3 tests
+test rejects_short_null_or_legacy_new_layers ... ok
+test persisted_overlays_and_knowledge_roundtrip_without_new_rng ... ok
+test revert_and_future_restore_melted_snow_and_permanent_fire_flags ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/sub_biomes_generation_r37.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/sub_biomes_generation_r37-2874f87314bc4a57)
+
+running 6 tests
+test hellfire_starts_at25_and_replaces_only_interior_walls ... ok
+test terrain_is_population_driven_and_historical_revisions_are_untouched ... ok
+test speedup_links_are_ordered_deterministic_and_route_safe ... ok
+test corn_circles_have_eight_residents_and_highest_depth_eligible_odd_horns ... ok
+test actual_population_sweep_has_safe_links_and_preserves_every_ice_spawn ... ok
+test generated_corn_floor_accepts_a_turn_and_exact_save_resume ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.78s
+
+     Running tests/temporal_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/temporal_commands-6cecfcc0edeb22c9)
+
+running 1 test
+test actual_temporal_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.22s
+
+     Running tests/terrain_runtime_r37.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/terrain_runtime_r37-8710dc1a928e857f)
+
+running 17 tests
+test direct_fire_and_burning_body_melt_snow_without_burning_underlying_fuel ... ok
+test flying_body_does_not_touch_snow_and_everburn_is_not_removed ... ok
+test ordered_exception_does_not_change_random_links_or_projectile_transfer ... ok
+test occupied_destination_does_not_attempt_ice_footing ... ok
+test ordered_local_step_preserves_shared_enemy_occupancy ... ok
+test ordered_strip_forward_reverse_side_entry_and_two_cell_progress ... ok
+test ice_exempts_flight_ice_species_forced_displacement_and_legacy ... ok
+test ordered_strip_every_interior_start_can_walk_both_directions ... ok
+test haste_move_contact_quenches_before_normal_turn ... ok
+test hellfire_persists_ignites_entrants_and_spreads_ordinary_fire ... ok
+test npc_slips_and_failed_or_successful_moves_replay_identically ... ok
+test snow_quenches_a_spreading_fire_contact_and_records_puddle ... ok
+test offscreen_burning_creature_melts_and_quenches_snow ... ok
+test hellfire_cannot_be_quenched_by_water_or_fire_state_reset ... ok
+test snapshot_and_serialization_preserve_terrain_and_rng ... ok
+test ordered_pathfields_execute_exact_predicted_cost_for_npc_from_every_cell ... ok
+test slip_uses_one_serialized_coin_only_on_valid_departure ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s
+
+     Running tests/thrown_potions.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/thrown_potions-3094c4c561413cc0)
+
+running 1 test
+test thrown_potions_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.90s
+
+     Running tests/tinker_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/tinker_commands-5a8d00a6e166f34b)
+
+running 1 test
+test tinker_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.48s
+
+     Running tests/topology_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/topology_parity-135941c09f4265cd)
+
+running 1 test
+test measured_topology_monotone_repair_and_landmark_gates_match_v48 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+
+     Running tests/travel.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/travel-773f1d8cc8e55f82)
+
+running 4 tests
+test exact_movement_terrain_hooks ... ok
+test exact_forced_fall_cohorts ... ok
+test exact_collapse_and_corpse_placement ... ok
+test exact_travel_departure_arrival_and_ally_stairs ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.06s
+
+     Running tests/travel_traces.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/travel_traces-d0fc317f9bc0e548)
+
+running 1 test
+test travel_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.74s
+
+     Running tests/tree_tap_commands.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/tree_tap_commands-0b28b24b20d60c28)
+
+running 1 test
+test tree_tap_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/unspeak.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/unspeak-a52b2fbcaef28855)
+
+running 1 test
+test unspeak_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.04s
+
+     Running tests/vision_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/vision_parity-b4ece74d08517e1d)
+
+running 1 test
+test perception_matches_twenty_reference_scenes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/witch_skinwalker_v33.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/witch_skinwalker_v33-ef9b0ccdbd7ee6cd)
+
+running 11 tests
+test half_here_reveals_from_observing_body_only ... ok
+test disguise_reverses_at_chebyshev_two_and_preserves_true_state ... ok
+test uncast_cancels_one_witch_attempt_without_double_charging_or_summon_cooldown ... ok
+test revived_skinwalker_retains_disguise_and_unspeak_prices_witch_summons ... ok
+test witch_spends_only_successful_summons_and_keeps_curses_between ... ok
+test new_species_have_bounded_revisioned_population_and_real_hearts ... ok
+test failed_summons_are_atomic_and_heartless_is_inherited ... ok
+test queen_is_conditional_only_with_explicit_guardian_heart_and_trait_cost ... ok
+test new_state_survives_save_snapshot_revert_and_future ... ok
+test new_creatures_execute_native_turns_and_offscreen_catchup_without_identity_changes ... ok
+test revision33_replays_native_summons_exactly ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/world_generation_parity.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/world_generation_parity-7c7519003bf246fa)
+
+running 1 test
+test complete_native_generation_matches_v48_every_floor_field ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+
+     Running tests/zillennia_ground_r33.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/zillennia_ground_r33-725de2e5bf228c58)
+
+running 11 tests
+test living_occupancy_blocks_contact_instead_of_erasing_or_killing_anybody ... ok
+test float_away_displacement_also_resolves_ground_contact ... ok
+test ordinary_arrival_clears_all_loose_items_but_not_corpses_loot_inventory_or_adjacent_tiles ... ok
+test cleared_cover_spares_existing_gas_and_empty_contact_is_a_true_noop ... ok
+test initial_current_tile_clears_without_motion_and_dead_zillennia_do_not_clear ... ok
+test forced_current_and_haste_paths_clear_only_arrival_tiles ... ok
+test water_ichor_topology_structures_and_environment_are_untouched ... ok
+test real_startup_population_clears_a_deep_zillennia_spawn_tile ... ok
+test offscreen_catchup_preserves_knowledge_until_the_cell_is_observed_again ... ok
+test quality_cutoff_is_greater_not_current_depth_and_legacy_is_unchanged ... ok
+test save_revert_future_and_replay_restore_the_same_erasure_state ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running unittests examples/accuracy_npc_arena.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/accuracy_npc_arena-d4ae96587b7822e4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/debug_floor.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/debug_floor-c360ef08be8d2c05)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/foundation_bench.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/foundation_bench-d331cd38b2ccbbb5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/generated_bench.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/generated_bench-a856ee429b929876)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/generated_commands_bench.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/generated_commands_bench-7fb97c2da446fc43)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/heart_progression_audit.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/heart_progression_audit-1fc72939cfb78b70)
+
+running 1 test
+test tests::heart_only_and_unblessed_follow_real_rewards_and_level_thresholds ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/nest_preview.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/nest_preview-8cba257b82ae1fc4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/physical_trade_arena.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/physical_trade_arena-db96ed4e4a3fc8d4)
+
+running 17 tests
+test tests::empty_or_accuracy_only_candidates_preserve_authored_queen_hp ... ok
+test tests::grass_sensitivity_uses_ordinary_fuel_not_permanent_fire ... ok
+test tests::audit_records_unlogged_ruin_after_mitigation_before_hp_cap ... ok
+test tests::escape_moves_out_of_hazard_and_does_not_wait_for_remote_gas ... ok
+test tests::chase_moves_toward_distant_caster ... ok
+test tests::explicit_summoned_candidates_change_only_newborn_numbers ... ok
+test tests::escape_reports_trapped_instead_of_claiming_settled_lifetime ... ok
+test tests::linked_pair_keeps_minor_first_and_major_sleeping ... ok
+test tests::miss_attempts_count_and_capped_damage_counter_is_separate ... ok
+test tests::preserves_traits_and_short_sword ... ok
+test tests::rejects_stranded_aquatics ... ok
+test tests::support_counterpart_preserves_frontliner ... ok
+test tests::three_cast_payload_uses_native_twins_and_excludes_parent ... ok
+test tests::dispatch_executes_yeti_slow ... ok
+test tests::lifetime_expectation_is_explicitly_kill_conditional ... ok
+test tests::audit_does_not_change_state_rng_or_events ... ok
+test tests::deterministic_real_dispatch ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests examples/review_sub_biome_r37.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/review_sub_biome_r37-ccafd67b310dab12)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/sub_biome_survey_r37.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/sub_biome_survey_r37-c8751ffd7e355bdf)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/trace_core.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/trace_core-c04fdf8d0d15bc91)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/update_manual_depths.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/update_manual_depths-659d2e7e69613419)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/corpse_desktop-9925816a96528e99)
+
+running 250 tests
+test ability_ui::ahvamitt_ui_tests::ahvamitt_ui_carried_mask_grants_one_teleport_row_and_preserves_cooldown_when_dropped ... ok
+test ability_ui::authored_copy_r38_tests::authored_copy_r38_queen_catalog_matches_runtime ... ok
+test appearance_store::display_mode_tests::combined_display_write_failure_keeps_both_previous_values ... ok
+test ability_ui::authored_copy_r38_tests::authored_copy_r38_mask_and_teleport_are_separate_and_readiness_survives ... ok
+test ability_ui::ahvamitt_ui_tests::ahvamitt_ui_exact_flavor_and_interaction_preview_without_bestiary_entry ... ok
+test appearance_store::display_mode_tests::failed_persistence_keeps_previous_mode_and_file ... ok
+test ability_ui::authored_copy_r38_tests::authored_copy_r38_dream_descriptions_are_exact ... ok
+test appearance_store::display_mode_tests::invalid_explicit_mode_rejects_entire_load_without_mutation ... ok
+test appearance_store::display_mode_tests::resolution_bounds_limit_framebuffer_allocation ... ok
+test appearance_store::display_mode_tests::missing_resolution_is_compatible_and_invalid_is_transactional ... ok
+test appearance_store::display_mode_tests::resolution_roundtrip_and_old_preferences_preserve_it ... ok
+test appearance_store::display_mode_tests::legacy_boolean_migrates_and_explicit_mode_takes_precedence ... ok
+test appearance_ui::tests::deleting_preset_requires_confirmation_and_cancel_is_safe ... ok
+test ability_ui::tests::crafted_rows_share_command_order_and_native_execution ... ok
+test ability_ui::tests::active_targeted_toggle_deactivates_before_target_prompt ... ok
+test appearance_ui::tests::comparing_original_keeps_editor_values_at_edited_snapshot ... ok
+test appearance_ui::tests::failed_display_preference_save_does_not_claim_success ... ok
+test appearance_ui::tests::borderless_display_control_uses_full_label_hit_area_and_persists ... ok
+test ability_ui::tests::adaptive_armor_all_types_survive_detail_projection ... ok
+test appearance_ui::tests::invalid_value_stays_editable_and_does_not_change_profile ... ok
+test chronicle::tests::bounded_recent_window ... ok
+test chronicle::tests::consecutive_and_provenance_only ... ok
+test chronicle::tests::source_priority_order ... ok
+test appearance_ui::tests::hide_discards_preview_and_exits_comparison ... ok
+test appearance_ui::tests::exact_edit_cancel_undo_and_repeat_do_not_move_panel ... ok
+test appearance_ui::tests::export_copy_and_pasted_import_use_edited_snapshot ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::dark_blue_telepathy ... ok
+test color::tests::srgb_roundtrip ... ok
+test appearance_ui::tests::search_and_group_navigation_remain_bounded ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test appearance_store::display_mode_tests::every_mode_round_trips_and_survives_preset_and_motion_writes ... ok
+test creature_abilities_ui::tests::revision33_queen_summon_metadata_reports_actual_cost_and_world_cooldown ... ok
+test creature_abilities_ui::tests::revision33_deeper_zillennia_ground_erasure_is_observation_only_prose ... ok
+test color_profile::tests::default_profile_preserves_600_frozen_color_cases ... ok
+test creature_presentation::tests::v33_hallucination_in_half_here_body_changes_shared_observation_only ... ok
+test creature_presentation::tests::v33_hallucinations_are_repeatable_per_tick_and_do_not_reveal_hidden_state ... ok
+test ability_ui::ahvamitt_ui_tests::ahvamitt_ui_actual_renderer_review ... ok
+test creature_presentation::tests::v33_clean_water_blood_and_ichor_are_distinct_without_state_changes ... ok
+test debug_floor_ui::tests::debug_god_picker_keeps_distinct_ids_and_exact_seed_suffix ... ok
+test creature_presentation::tests::borge_mark_uses_visible_projected_identity_without_fog_leak ... ok
+test display_ui::tests::borderless_locks_to_desktop_and_preserves_window_selection ... ok
+test display_ui::tests::cancel_does_not_apply_and_keyboard_mouse_share_actions ... ok
+test display_ui::tests::empty_invalid_duplicate_inputs_are_safe_and_bounded ... ok
+test display_ui::tests::input_bounds_are_exclusive_and_gaps_do_nothing ... ok
+test appearance_ui::tests::fixed_editor_paints_all_pages_and_extreme_settings_without_moving_controls ... ok
+test creature_presentation::tests::v33_telepathy_keeps_disguise_and_fog_does_not_admit_hidden_actor ... ok
+test creature_presentation::tests::v33_disguise_map_list_hover_inspector_and_rng_are_consistent ... ok
+test creature_presentation::tests::v33_hallucinogenic_cloud_has_actual_gas_field_tint ... ok
+test dream_ui::integration_tests::dream_ui_awake_hides_nightmares_and_shards_without_changing_state ... ok
+test dream_ui::integration_tests::dream_ui_map_inspection_path_and_targeting_use_the_detached_dream_layer ... ok
+test dream_ui::integration_tests::dream_ui_half_here_retains_its_dream_perspective_after_waking ... ok
+test dream_ui::integration_tests::dream_ui_nightmares_are_excluded_from_bestiary_and_disguises ... ok
+test dream_ui::integration_tests::dream_ui_nightmare_sensing_does_not_reveal_remote_terrain_or_hidden_normal_creatures ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+test dream_ui::tests::cosmetic_flicker_is_repeatable_and_exempts_dream_entities ... ok
+test dream_ui::tests::override_replaces_every_normal_world_color_but_preserves_identity ... ok
+test effects::tests::explosions_hold_until_tick_changes ... ok
+test effects::tests::flash_boundaries ... ok
+test dream_ui::integration_tests::dream_ui_permanent_toggle_replaces_temporary_row_without_duplicates ... ok
+test dream_ui::integration_tests::dream_ui_actual_renderer_flickers_without_mutation_and_exports_review ... ok
+test dream_ui::integration_tests::borge_shard_r39_dream_ground_visibility_inspection_and_ink ... ok
+test hazards_ui::tests::portal_ui_hazard_warning_uses_known_arrival_not_hidden_live_state ... ok
+test dream_ui::integration_tests::dream_ui_overlap_preserves_disguise_and_override_beats_custom_palette ... ok
+test hazards_ui::tests::r37_speed_up_middle_pair_warning_uses_actual_arrival ... ok
+test hazards_ui::tests::non_euclidean_ui_hazard_warning_checks_both_known_exits_not_hidden_state ... ok
+test dream_ui::integration_tests::dream_ui_plane_overlap_statuses_row_and_body_are_consistent ... ok
+test inspection_ui::hover_tests::resource_projection_preserves_clone_sphinx_and_infinity ... ok
+test inspection_ui::hover_tests::source_hover_geometry_80_cases ... ok
+test inspection_ui::tests::detected_items_keep_snapshot_identity_and_per_item_deduplication ... ok
+test inspection_ui::bow_tests::source_141_bow_hover_forecasts ... ok
+test inspection_ui::tests::hidden_live_terrain_items_actors_never_enrich_memory ... ok
+test inspection_ui::tests::sound_only_marker_replaces_all_prior_scene_information ... ok
+test inspection_ui::appearance_tests::authored_inspector_scroll_disclosure_and_hover_share_resolved_geometry ... ok
+test inspection_ui::tests::source_58_terrain_reports ... ok
+test inspection_ui::tests::source_gas_exposure_copy ... ok
+test debug_floor_ui::tests::no_choice_starter_loadout_can_enter_and_reopen_without_healing ... ok
+test manual::tests::all_authored_entries_and_art_exist ... ok
+test manual::tests::all_bestiary_entries_preserve_owner_supplied_natural_history ... ok
+test hazards_ui::tests::frozen_warning_projection ... ok
+test manual::tests::aspects_and_depth_styles_are_deterministic ... ok
+test manual::tests::background_darkens_monotonically_with_readable_text ... ok
+test manual::tests::balanced_entries_show_current_birth_stats_without_editing_authored_assets ... ok
+test manual::tests::bastidion_uses_actual_birth_template_at_every_depth ... ok
+test manual::tests::benchmark_animated_manual_warm_frames ... ignored, opt-in optimized paint timing; not a correctness assertion
+test manual::tests::character_dependent_companions_never_invent_stats ... ok
+test inspection_ui::hover_tests::hover_is_detached_bounded_and_has_no_disclosure_hitbox ... ok
+test manual::tests::concise_labels_keep_authored_effects_and_unique_sources ... ok
+test manual::tests::depth_windows ... ok
+test inspection_ui::tests::drawer_paint_bounds_scroll_disclosure_and_repeat_open ... ok
+test manual::tests::export_solid_visual_palette_map ... ok
+test manual::tests::export_visual_background_review ... ok
+test ability_ui::tests::frozen_ability_rows ... ok
+test manual::tests::fractional_visual_floors_interpolate_without_tier_switches ... ok
+test manual::tests::mouse_controls_cover_pages_and_creature_navigation ... ok
+test manual::tests::roster_is_unique_and_sorted_by_first_appearance ... ok
+test manual::tests::clean_art_pages_have_no_animated_decal_pass ... ok
+test manual::tests::first_appearance_controls_solid_page_color_not_combat_reference ... ok
+test manual::tests::selected_art_consumes_png_alpha_without_runtime_keying ... ok
+test manual::tests::summoned_duplicates_are_excluded_only_from_bestiary ... ok
+test manual::tests::setting_name_is_capitalized_and_bold_even_across_wrapped_lines ... ok
+test manual::tests::trimming_preserves_every_authored_rgba_pixel_including_black ... ok
+test manual::tests::whole_roster_visual_palette_never_backtracks ... ok
+test manual::tests::zillennia_pages_show_their_current_depth_quality_actor ... ok
+test menu_ui::tests::common_aspect_ratios_keep_every_hit_region_on_screen ... ok
+test menu_ui::tests::complete_large_hit_regions_and_no_gap_activation ... ok
+test manual::tests::artwork_never_overlaps_title_navigation_or_footer ... ok
+test menu_ui::tests::settings_is_accessible_from_the_main_menu ... ok
+test menu_ui::tests::title_has_every_authored_letter ... ok
+test modal_ui::tests::default_geometry_and_changed_css_baselines_are_preserved ... ok
+test modal_ui::tests::frozen_source_pack_and_authored_hover_placements_match ... ok
+test modal_ui::tests::measured_wrapping_preserves_newlines_and_breaks_long_words ... ok
+test modal_ui::tests::profile_extremes_keep_fixed_tracks_and_modal_containment ... ok
+test manual::tests::setting_bold_changes_actual_pixels_without_changing_layout ... ok
+test menu_ui::tests::selection_never_moves_composition_and_disabled_continue_is_gray ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_aliases_keep_actor_and_item_identity_single ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_generated_debug_capture ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_actual_renderer_controlled_capture ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_aliases_remain_in_the_viewed_plane ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_no_projected_sight_and_legacy_gate ... ok
+test observe::epidite_ui_tests::epidite_ui_blessed_hearts_have_one_label_and_doubled_observed_rewards ... ok
+test observe::epidite_ui_tests::epidite_ui_countdown_is_direct_observation_not_fog_or_render_time ... ok
+test inspection_ui::tests::source_creature_flavor_scene_resources_conditions_and_forecasts ... ok
+test observe::epidite_ui_tests::epidite_ui_actual_renderer_subscript_and_review ... ok
+test observe::flesh_palette::tests::flesh_colors_preserve_user_edits_and_semantic_glyphs ... ok
+test observe::flesh_palette::tests::organic_ridges_are_stable_and_only_touch_authored_ground ... ok
+test observe::feeding_observation_tests::bloody_wall_inspection_map_and_fog_use_observed_overlay_only ... ok
+test observe::tests::ability_total_survives_scrolling ... ok
+test observe::tests::compound_identity_and_annotations_survive_projection ... ok
+test observe::pocket_biome_observation_tests::localized_nest_flowers_and_permafrost_render_without_replacing_stairs_or_leaking_fog ... ok
+test observe::tests::export_flesh_visual_review ... ok
+test observe::tests::hidden_live_terrain_and_actors_are_not_emitted ... ok
+test observe::tests::entrance_uses_blue_omega_without_changing_stair_identity ... ok
+test observe::tests::palette_is_authored ... ok
+test non_euclidean_ui::tests::non_euclidean_ui_marker_preserves_terrain_and_known_exits_without_rng ... ok
+test observe::tests::source_renderer_avatar_scene_projection ... ok
+test observe::tests::native_blood_river_remains_water_and_ichor_stays_distinct ... ok
+test observe::epidite_ui_tests::epidite_ui_single_digit_boundary_and_exact_hover_clock ... ok
+test observe::tests::unknown_cells_never_gain_flesh_or_blood_details ... ok
+test observe::tests::source_actor_ink_across_ambient_and_distance ... ok
+test pack::completed_engine_action_tests::potions_expose_the_implemented_throw_target_action ... ok
+test pack::completed_engine_action_tests::tree_tap_exposes_use_without_admitting_unknown_tools ... ok
+test pack::tests::ahvamitt_ui_mask_uses_teleport_command_and_no_unsupported_apply_action ... ok
+test pack::tests::available_throw_does_not_disclose_unknown_potion_contents ... ok
+test pack::tests::borge_heart_provenance_is_visible_and_refreshes_without_changing_reward ... ok
+test pack::tests::borge_shard_has_targeted_use_either_hand_and_no_throw ... ok
+test pack::tests::borge_shard_r39_ordinary_projectile_preview_is_pure_and_dream_weapon_exception_holds ... ok
+test pack::tests::borge_shard_r39_throw_mouse_keyboard_cancel_and_equipment_refresh ... ok
+test pack::tests::borge_shard_r39_weapon_actions_preserve_legacy_actions ... ok
+test pack::tests::bow_apply_is_gated_by_equipment_and_arrows ... ok
+test pack::tests::crafting_selection_cancel_stale_and_valid_paths ... ok
+test pack::tests::dream_ui_dagger_apply_and_pack_refresh_restrict_consumables_not_equipment ... ok
+test pack::tests::equipment_selection_and_slot_commands_follow_source ... ok
+test pack::appearance_tests::custom_profile_reflows_input_rows_buttons_and_paint_without_run_changes ... ok
+test pack::tests::read_only_pack_consumes_inputs_without_actions ... ok
+test pack::tests::reorder_never_crosses_sections_or_changes_simulation ... ok
+test observe::tests::source_renderer_generated_scene_projection ... ok
+test pack::tests::supported_tinker_targets_once_without_spending_during_selection ... ok
+test pack::tests::tinker_availability_and_session_invalidation_follow_source ... ok
+test pack::tests::use_command_runs_through_temporal_engine_and_refreshes_selection ... ok
+test pack::tests::verdania_labels_are_revision_gated_without_changing_sap_effect ... ok
+test pack::tests::visually_stacked_items_keep_original_member_and_slots ... ok
+test observe::tests::source_semantic_features_and_fixture_ink ... ok
+test pack::tests::paint_and_repeated_open_close_are_fixed_nonmutating_and_clipped ... ok
+test portal_ui::tests::portal_ui_generated_floor_capture ... ok
+test pack::tests::source_grouping_and_descriptions_64_cases ... ok
+test portal_ui::tests::portal_ui_ascii_italic_pair_color_and_legacy_gate ... ok
+test portal_ui::tests::portal_ui_unknown_mate_stays_unknown ... ok
+test render::gameplay_hierarchy_tests::export_gameplay_hierarchy_review ... ok
+test portal_ui::tests::portal_ui_ground_item_alias_observed_only_and_single_identity ... ok
+test portal_ui::tests::portal_ui_remote_actor_alias_inspection_and_one_list_entry ... ok
+test render::gameplay_hierarchy_tests::long_domain_heading_and_passive_metadata_fit_fixed_allocations ... ok
+test render::gameplay_hierarchy_tests::memory_preserves_geometry_without_revealing_black_space ... ok
+test portal_ui::tests::portal_ui_actual_renderer_italic_is_distinct_and_capture ... ok
+test render::gameplay_hierarchy_tests::hidden_world_edits_cannot_change_painted_frame ... ok
+test render::tests::blessing_hits_exclude_button_gaps ... ok
+test render::gameplay_hierarchy_tests::measured_wrap_bounds_long_tokens_and_chronicle_fade_is_continuous ... ok
+test render::tests::ability_summary_uses_measured_ellipsis_and_compact_counters ... ok
+test render::tests::downscaled_thin_rectangles_survive_with_clipping ... ok
+test render::tests::continue_disabled_never_receives_active_menu_highlight ... ok
+test render::tests::entrance_omega_has_a_real_bundled_glyph_not_missing_character_box ... ok
+test render::tests::fire_is_deterministic_animated ... ok
+test render::tests::floor_fits ... ok
+test render::tests::embers_are_crisp_deterministic_drawable_resolution_particles ... ok
+test render::tests::cosmetic_frames_preserve_complete_hud_and_chronicle ... ok
+test render::tests::native_resolution_rasterizes_fonts_and_ascii_at_device_size ... ok
+test render::tests::toolbar_hits_match_painted_rectangles ... ok
+test manual::tests::all_actual_layouts_keep_prose_in_page_and_headings_with_body ... ok
+test render::tests::paint_menu_manual ... ok
+test render::gameplay_hierarchy_tests::sidebar_content_never_moves_map_or_toolbar ... ok
+test session_store::envelope_tests::utc_calendar_matches_epoch_and_leap_day ... ok
+test session_store::tests::source_archive_gate_preserves_eligible_resume_and_excludes_fixtures ... ok
+test startup_ui::tests::accepted_error_is_reported_once_and_allows_retry ... ok
+test startup_ui::tests::leaving_form_invalidates_success_even_after_reopening ... ok
+test startup_ui::tests::repeat_start_is_bounded_and_cancelled_result_never_commits ... ok
+test startup_ui::tests::valid_success_is_delivered_once_and_disconnection_is_visible ... ok
+test statuses_ui::tests::native_disoriented_and_hallucinating_labels_expire_without_internal_penalty_labels ... ok
+test statuses_ui::tests::new_actor_or_replaced_session_does_not_inherit_meter_certainty ... ok
+test render::tests::path_tints_are_white_restrained_and_preserve_glyph_ink ... ok
+test statuses_ui::tests::source_meter_baselines_unknown_expiration_reapplication ... ok
+test session_store::envelope_tests::provenance_survives_native_save_and_plain_source_import ... ok
+test statuses_ui::tests::unknown_internal_keys_never_become_conditions ... ok
+test sub_biomes_ui::tests::r37_melted_snow_puddle_is_described_even_over_ice ... ok
+test manual::tests::every_entry_fits_without_discarding_authored_text ... ok
+test sub_biomes_ui::tests::r37_sub_biomes_actual_renderer_generated_capture ... ok
+test sub_biomes_ui::tests::r37_hellfire_palette_is_distinct_and_cosmetic ... ok
+test sub_biomes_ui::tests::r37_terrain_remembers_last_seen_layers_without_hidden_updates ... ok
+test sub_biomes_ui::tests::r37_terrain_observation_and_inspection_are_detached ... ok
+test targeting_ui::tests::non_euclidean_ui_projectile_preview_stops_at_stochastic_entry ... ok
+test targeting_ui::tests::non_euclidean_ui_projectile_unknown_exit_cannot_leak_or_change_preview ... ok
+test targeting_ui::tests::non_euclidean_ui_stochastic_firing_origin_is_not_a_promised_branch ... ok
+test targeting_ui::tests::hidden_terrain_and_interceptors_cannot_change_preview ... ok
+test targeting_ui::tests::r37_speed_up_projectile_preview_never_reads_unknown_exit ... ok
+test sub_biomes_ui::tests::r37_sub_biomes_actual_renderer_controlled_capture ... ok
+test targeting_ui::tests::portal_ui_target_preview_crosses_and_preserves_hidden_state ... ok
+test session_store::autosave_tests::accepted_state_is_saved_and_terminal_death_removes_resume ... ok
+test terminal_ui::tests::export_finale_review ... ok
+test terminal_ui::tests::export_modern_collapse_loss_review ... ok
+test terminal_ui::tests::finale_labels_keep_exact_designer_wording ... ok
+test terminal_ui::tests::legacy_victory_retains_original_labels ... ok
+test targeting_ui::tests::source_275_knowledge_limited_projectile_rays ... ok
+test tests::continue_keeps_active_progress_instead_of_loading_stale_save ... ok
+test terminal_ui::tests::terminal_summary_is_detached_and_handles_victory ... ok
+test tests::controls_dispatch_exact_direction ... ok
+test terminal_ui::tests::collapse_loss_paints_exact_reason ... ok
+test tests::continue_requires_live_run_and_never_revives_terminal_run ... ok
+test tests::menu_pointer_matches_seven_buttons_and_excludes_gaps ... ok
+test terminal_ui::tests::collapse_victory_paints_exact_heading ... ok
+test travel_ui::tests::controller_advances_replans_and_cancels_without_simulation_writes ... ok
+test tests::debug_continue_resumes_only_preserved_normal_run ... ok
+test session_store::debug_isolation_tests::debug_never_replaces_continue_or_highscores_even_on_force_and_death ... ok
+test travel_ui::tests::non_euclidean_ui_deterministic_entry_known_arrival_and_unknown_exit ... ok
+test travel_ui::tests::controller_stops_on_harm_displacement_hazard_and_blocker ... ok
+test travel_ui::tests::deep_water_never_enters_player_paths_even_with_flight_or_drown ... ok
+test travel_ui::tests::hidden_live_changes_cannot_rewrite_historical_routes ... ok
+test travel_ui::tests::non_euclidean_ui_routes_stop_at_random_choice_and_never_draw_rng ... ok
+test travel_ui::tests::r37_speed_up_known_route_and_unknown_destination ... ok
+test travel_ui::tests::r37_speed_up_middle_pair_does_not_bounce_in_preview ... ok
+test travel_ui::tests::portal_ui_known_pair_route_arrival_and_unknown_mate ... ok
+test travel_ui::tests::source_displaced_phase_graphs_preserve_stable_ties_and_cycle_termination ... ok
+test travel_ui::tests::portal_ui_arrival_alias_completes_without_bounce ... ok
+test travel_ui::tests::source_observed_threat_changes_keep_reason_priority ... ok
+test wait_ui::tests::damage_precedes_threats_and_time ... ok
+test wait_ui::tests::threat_reasons_keep_source_actor_order ... ok
+test travel_ui::tests::source_player_routes_preserve_knowledge_hazards_and_phase ... ok
+test tests::manual_render_test_matches_live_and_respects_fractional_visual_override ... ok
+test statuses_ui::tests::source_185_observed_status_and_scheduler_cases ... ok
+test creature_abilities_ui::tests::source_1024_dynamic_creature_ability_reports ... ok
+test embedded_assets::tests::all_distribution_plates_are_embedded_and_decode ... ok
+test manual::tests::transparent_trim_preserves_every_occupied_pixel ... ok
+
+test result: ok. 249 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 8.68s
+
+     Running tests/appearance.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/appearance-f7c63e5242038903)
+
+running 30 tests
+test appearance_store::display_mode_tests::resolution_bounds_limit_framebuffer_allocation ... ok
+test appearance_store::display_mode_tests::combined_display_write_failure_keeps_both_previous_values ... ok
+test default_directory_preparation_is_explicit_and_path_is_per_user ... ok
+test appearance_store::display_mode_tests::missing_resolution_is_compatible_and_invalid_is_transactional ... ok
+test appearance_store::display_mode_tests::failed_persistence_keeps_previous_mode_and_file ... ok
+test corrupt_storage_is_left_untouched_on_load ... ok
+test appearance_store::display_mode_tests::invalid_explicit_mode_rejects_entire_load_without_mutation ... ok
+test entity_reset_restores_inheritance_without_losing_numeric_tuning ... ok
+test defaults_and_control_catalog_are_exact_and_immutable ... ok
+test appearance_store::display_mode_tests::legacy_boolean_migrates_and_explicit_mode_takes_precedence ... ok
+test appearance_store::display_mode_tests::resolution_roundtrip_and_old_preferences_preserve_it ... ok
+test atomic_export_import_and_empty_parent_path ... ok
+test failed_storage_rolls_back_library_and_keeps_work_exportable ... ok
+test malformed_native_preferences_roll_back_all_fields ... ok
+test inherited_materials_change_only_unedited_child_fields ... ok
+test malformed_import_and_failed_property_edits_do_not_mutate ... ok
+test import_export_preserves_unknown_fields_and_is_undoable ... ok
+test native_float_input_equal_to_default_is_a_true_noop ... ok
+test gestures_undo_redo_and_redo_invalidation ... ok
+test preview_export_commit_discard_close_and_original_comparison ... ok
+test unsafe_depth_and_oversized_values_are_rejected ... ok
+test working_edits_are_not_silently_persisted_without_save ... ok
+test appearance_store::display_mode_tests::every_mode_round_trips_and_survives_preset_and_motion_writes ... ok
+test preset_crud_startup_and_preferences_roundtrip ... ok
+test source_validation_edit_reset_fixtures_match ... ok
+test near_limit_export_uses_compact_json_and_can_be_imported_again ... ok
+test history_character_budget_retains_nearest_changes ... ok
+test source_store_transition_fixtures_match ... ok
+test history_is_bounded_and_reset_is_reversible ... ok
+test preset_count_and_total_library_budget_are_transactional ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.25s
+
+     Running tests/appearance_entities.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/appearance_entities-b71422265a606b16)
+
+running 11 tests
+test color::tests::dark_blue_telepathy ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::srgb_roundtrip ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test source_stationary_and_animated_pulses_match ... ok
+test source_material_inheritance_matches ... ok
+test color_profile::tests::default_profile_preserves_600_frozen_color_cases ... ok
+test source_feature_colors_fallbacks_and_grading_match ... ok
+test source_observed_fog_transition_and_all_seeing_match ... ok
+test source_entity_inheritance_parent_and_tuning_match ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running tests/appearance_lighting.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/appearance_lighting-1433eebd95b04985)
+
+running 8 tests
+test color::tests::dark_blue_telepathy ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::srgb_roundtrip ... ok
+test source_deterministic_flicker_matches ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test unknown_origin_never_expands_and_future_source_payloads_are_inert ... ok
+test source_all_lighting_controls_and_conservative_rays_match ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running tests/appearance_typography.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/appearance_typography-69a89bcb6af239a4)
+
+running 4 tests
+test bundled_family_order_and_unavailable_faces_are_explicit ... ok
+test explicit_height_overrides_derived_track_and_compact_baseline_survives ... ok
+test default_role_reset_preserves_selector_specific_weight_and_size ... ok
+test frozen_source_role_override_rules_match_for_every_role ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests examples/freeze_legacy_alpha.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/examples/freeze_legacy_alpha-526304aba671bd54)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/corpse_fixtures-0a95b7af2e8cc062)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

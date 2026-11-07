@@ -1,0 +1,9 @@
+
+running 4 tests
+test empty_haste_marker_survives_load_and_free_command ... ok
+test malformed_nested_state_is_rejected_and_old_simulation_stays_gated ... ok
+test source_ordered_load_cases ... ok
+test every_divine_equipment_loss_load_matches_source ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.83s
+

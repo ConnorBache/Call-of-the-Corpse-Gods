@@ -1,0 +1,16 @@
+night-crawler all_initial_unblessed joint_mean before gross 0.24000028230511622 kills 128 deaths 0 censor 0 error 
+night-crawler all_initial_unblessed joint_mean after gross 0.2624875073070524 kills 128 deaths 0 censor 0 error 
+night-crawler ordinary_unblessed joint_mean before gross 0.33548656281021033 kills 128 deaths 0 censor 0 error 
+night-crawler ordinary_unblessed joint_mean after gross 0.46501198207341815 kills 109 deaths 19 censor 0 error 
+skin-walker all_initial_unblessed joint_mean before gross 0.2384158234521973 kills 128 deaths 0 censor 0 error 
+skin-walker all_initial_unblessed joint_mean after gross 0.3232404359190797 kills 123 deaths 5 censor 0 error 
+skin-walker ordinary_unblessed joint_mean before gross 0.3130559311820851 kills 128 deaths 0 censor 0 error 
+skin-walker ordinary_unblessed joint_mean after gross 0.6439354235571071 kills 88 deaths 40 censor 0 error 
+vampire all_initial_unblessed joint_mean before gross 0.3945886213307088 kills 128 deaths 0 censor 0 error 
+vampire all_initial_unblessed joint_mean after gross 0.4559498850119059 kills 119 deaths 9 censor 0 error 
+vampire ordinary_unblessed joint_mean before gross 0.5644439005324692 kills 115 deaths 13 censor 0 error 
+vampire ordinary_unblessed joint_mean after gross 0.7787205882101056 kills 68 deaths 60 censor 0 error 
+saidribee-queen all_initial_unblessed joint_mean before gross 0.3794174651669911 kills 105 deaths 24 censor 104 error 
+saidribee-queen all_initial_unblessed joint_mean after gross 0.3794174651669911 kills 105 deaths 24 censor 104 error 
+saidribee-queen ordinary_unblessed joint_mean before gross 0.37609538075581816 kills 115 deaths 14 censor 114 error 
+saidribee-queen ordinary_unblessed joint_mean after gross 0.37609538075581816 kills 115 deaths 14 censor 114 error 

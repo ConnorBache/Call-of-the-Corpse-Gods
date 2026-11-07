@@ -1,0 +1,24 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/generation-r38/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 24.52s
+     Running tests/startup_recovery_r38.rs (target/debug/deps/startup_recovery_r38-8351d1c26a4e86da)
+
+running 3 tests
+test historical_failed_seed_is_not_silently_repaired ... ok
+
+thread 'known_tap_stair_seed_generates_all_required_content_without_changing_budget' (63) panicked at crates/corpse-core/tests/startup_recovery_r38.rs:19:9:
+assertion `left == right` failed: floor 4
+  left: 8.0
+ right: 10.0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test known_tap_stair_seed_generates_all_required_content_without_changing_budget ... FAILED
+test generation_batching_does_not_change_result_or_recovery_metadata ... ok
+
+failures:
+
+failures:
+    known_tap_stair_seed_generates_all_required_content_without_changing_budget
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.87s
+
+error: test failed, to rerun pass `-p corpse-core --test startup_recovery_r38`

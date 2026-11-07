@@ -1,0 +1,832 @@
+{
+  "width": 79,
+  "height": 29,
+  "tiles": [
+    {
+      "index": 289,
+      "color": "rgb(91,93,105)",
+      "background": "rgb(46,42,41)",
+      "knowledge": "direct",
+      "fg": [
+        91,
+        93,
+        105
+      ],
+      "bg": [
+        46,
+        42,
+        41
+      ]
+    },
+    {
+      "index": 290,
+      "color": "rgb(109,110,121)",
+      "background": "rgb(56,49,43)",
+      "knowledge": "direct",
+      "fg": [
+        109,
+        110,
+        121
+      ],
+      "bg": [
+        56,
+        49,
+        43
+      ]
+    },
+    {
+      "index": 368,
+      "color": "rgb(181,177,189)",
+      "background": "rgb(76,65,47)",
+      "knowledge": "direct",
+      "fg": [
+        181,
+        177,
+        189
+      ],
+      "bg": [
+        76,
+        65,
+        47
+      ]
+    },
+    {
+      "index": 369,
+      "color": "rgb(99,107,119)",
+      "background": "rgb(84,74,71)",
+      "knowledge": "direct",
+      "fg": [
+        99,
+        107,
+        119
+      ],
+      "bg": [
+        84,
+        74,
+        71
+      ]
+    },
+    {
+      "index": 370,
+      "color": "rgb(101,109,121)",
+      "background": "rgb(86,76,71)",
+      "knowledge": "direct",
+      "fg": [
+        101,
+        109,
+        121
+      ],
+      "bg": [
+        86,
+        76,
+        71
+      ]
+    },
+    {
+      "index": 447,
+      "color": "rgb(255,215,75)",
+      "background": "rgb(79,67,47)",
+      "knowledge": "direct",
+      "fg": [
+        255,
+        215,
+        75
+      ],
+      "bg": [
+        79,
+        67,
+        47
+      ]
+    },
+    {
+      "index": 448,
+      "color": "rgb(101,109,121)",
+      "background": "rgb(86,76,71)",
+      "knowledge": "direct",
+      "fg": [
+        101,
+        109,
+        121
+      ],
+      "bg": [
+        86,
+        76,
+        71
+      ]
+    },
+    {
+      "index": 449,
+      "color": "rgb(103,111,122)",
+      "background": "rgb(89,77,72)",
+      "knowledge": "direct",
+      "fg": [
+        103,
+        111,
+        122
+      ],
+      "bg": [
+        89,
+        77,
+        72
+      ]
+    },
+    {
+      "index": 526,
+      "color": "rgb(227,168,99)",
+      "background": "rgb(90,64,34)",
+      "knowledge": "direct",
+      "fg": [
+        227,
+        168,
+        99
+      ],
+      "bg": [
+        90,
+        64,
+        34
+      ]
+    },
+    {
+      "index": 527,
+      "color": "rgb(101,109,121)",
+      "background": "rgb(87,76,71)",
+      "knowledge": "direct",
+      "fg": [
+        101,
+        109,
+        121
+      ],
+      "bg": [
+        87,
+        76,
+        71
+      ]
+    },
+    {
+      "index": 528,
+      "color": "rgb(103,111,122)",
+      "background": "rgb(89,77,72)",
+      "knowledge": "direct",
+      "fg": [
+        103,
+        111,
+        122
+      ],
+      "bg": [
+        89,
+        77,
+        72
+      ]
+    },
+    {
+      "index": 529,
+      "color": "rgb(104,111,122)",
+      "background": "rgb(89,78,72)",
+      "knowledge": "direct",
+      "fg": [
+        104,
+        111,
+        122
+      ],
+      "bg": [
+        89,
+        78,
+        72
+      ]
+    },
+    {
+      "index": 530,
+      "color": "rgb(255,216,75)",
+      "background": "rgb(84,72,49)",
+      "knowledge": "direct",
+      "fg": [
+        255,
+        216,
+        75
+      ],
+      "bg": [
+        84,
+        72,
+        49
+      ]
+    },
+    {
+      "index": 531,
+      "color": "rgb(196,192,203)",
+      "background": "rgb(86,74,50)",
+      "knowledge": "direct",
+      "fg": [
+        196,
+        192,
+        203
+      ],
+      "bg": [
+        86,
+        74,
+        50
+      ]
+    },
+    {
+      "index": 605,
+      "color": "rgb(140,140,150)",
+      "background": "rgb(66,58,45)",
+      "knowledge": "direct",
+      "fg": [
+        140,
+        140,
+        150
+      ],
+      "bg": [
+        66,
+        58,
+        45
+      ]
+    },
+    {
+      "index": 606,
+      "color": "rgb(93,102,115)",
+      "background": "rgb(78,69,67)",
+      "knowledge": "direct",
+      "fg": [
+        93,
+        102,
+        115
+      ],
+      "bg": [
+        78,
+        69,
+        67
+      ]
+    },
+    {
+      "index": 607,
+      "color": "rgb(103,111,122)",
+      "background": "rgb(89,77,72)",
+      "knowledge": "direct",
+      "fg": [
+        103,
+        111,
+        122
+      ],
+      "bg": [
+        89,
+        77,
+        72
+      ]
+    },
+    {
+      "index": 608,
+      "color": "rgb(104,111,122)",
+      "background": "rgb(89,78,72)",
+      "knowledge": "direct",
+      "fg": [
+        104,
+        111,
+        122
+      ],
+      "bg": [
+        89,
+        78,
+        72
+      ]
+    },
+    {
+      "index": 609,
+      "color": "rgb(235,224,174)",
+      "background": "rgb(136,109,97)",
+      "knowledge": "direct",
+      "fg": [
+        235,
+        224,
+        174
+      ],
+      "bg": [
+        136,
+        109,
+        97
+      ]
+    },
+    {
+      "index": 610,
+      "color": "rgb(196,192,203)",
+      "background": "rgb(88,75,50)",
+      "knowledge": "direct",
+      "fg": [
+        196,
+        192,
+        203
+      ],
+      "bg": [
+        88,
+        75,
+        50
+      ]
+    },
+    {
+      "index": 684,
+      "color": "rgb(136,136,146)",
+      "background": "rgb(65,57,44)",
+      "knowledge": "direct",
+      "fg": [
+        136,
+        136,
+        146
+      ],
+      "bg": [
+        65,
+        57,
+        44
+      ]
+    },
+    {
+      "index": 685,
+      "color": "rgb(93,102,115)",
+      "background": "rgb(77,69,66)",
+      "knowledge": "direct",
+      "fg": [
+        93,
+        102,
+        115
+      ],
+      "bg": [
+        77,
+        69,
+        66
+      ]
+    },
+    {
+      "index": 686,
+      "color": "rgb(102,110,122)",
+      "background": "rgb(88,76,71)",
+      "knowledge": "direct",
+      "fg": [
+        102,
+        110,
+        122
+      ],
+      "bg": [
+        88,
+        76,
+        71
+      ]
+    },
+    {
+      "index": 687,
+      "color": "rgb(104,111,122)",
+      "background": "rgb(89,78,72)",
+      "knowledge": "direct",
+      "fg": [
+        104,
+        111,
+        122
+      ],
+      "bg": [
+        89,
+        78,
+        72
+      ]
+    },
+    {
+      "index": 688,
+      "color": "rgb(255,216,76)",
+      "background": "rgb(85,73,49)",
+      "knowledge": "direct",
+      "fg": [
+        255,
+        216,
+        76
+      ],
+      "bg": [
+        85,
+        73,
+        49
+      ]
+    },
+    {
+      "index": 689,
+      "color": "rgb(196,192,203)",
+      "background": "rgb(88,75,50)",
+      "knowledge": "direct",
+      "fg": [
+        196,
+        192,
+        203
+      ],
+      "bg": [
+        88,
+        75,
+        50
+      ]
+    },
+    {
+      "index": 763,
+      "color": "rgb(122,123,133)",
+      "background": "rgb(61,54,44)",
+      "knowledge": "direct",
+      "fg": [
+        122,
+        123,
+        133
+      ],
+      "bg": [
+        61,
+        54,
+        44
+      ]
+    },
+    {
+      "index": 764,
+      "color": "rgb(89,98,111)",
+      "background": "rgb(73,65,63)",
+      "knowledge": "direct",
+      "fg": [
+        89,
+        98,
+        111
+      ],
+      "bg": [
+        73,
+        65,
+        63
+      ]
+    },
+    {
+      "index": 765,
+      "color": "rgb(96,104,117)",
+      "background": "rgb(80,71,68)",
+      "knowledge": "direct",
+      "fg": [
+        96,
+        104,
+        117
+      ],
+      "bg": [
+        80,
+        71,
+        68
+      ]
+    },
+    {
+      "index": 842,
+      "color": "rgb(106,108,119)",
+      "background": "rgb(55,48,43)",
+      "knowledge": "direct",
+      "fg": [
+        106,
+        108,
+        119
+      ],
+      "bg": [
+        55,
+        48,
+        43
+      ]
+    },
+    {
+      "index": 843,
+      "color": "rgb(83,92,107)",
+      "background": "rgb(65,60,59)",
+      "knowledge": "direct",
+      "fg": [
+        83,
+        92,
+        107
+      ],
+      "bg": [
+        65,
+        60,
+        59
+      ]
+    },
+    {
+      "index": 844,
+      "color": "rgb(89,98,111)",
+      "background": "rgb(73,66,63)",
+      "knowledge": "direct",
+      "fg": [
+        89,
+        98,
+        111
+      ],
+      "bg": [
+        73,
+        66,
+        63
+      ]
+    },
+    {
+      "index": 921,
+      "color": "rgb(91,93,105)",
+      "background": "rgb(46,42,41)",
+      "knowledge": "direct",
+      "fg": [
+        91,
+        93,
+        105
+      ],
+      "bg": [
+        46,
+        42,
+        41
+      ]
+    },
+    {
+      "index": 922,
+      "color": "rgb(109,110,121)",
+      "background": "rgb(56,49,43)",
+      "knowledge": "direct",
+      "fg": [
+        109,
+        110,
+        121
+      ],
+      "bg": [
+        56,
+        49,
+        43
+      ]
+    }
+  ],
+  "drawn": [
+    {
+      "glyph": "#",
+      "x": 787.5,
+      "y": 53,
+      "color": "rgb(91,93,105)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 802.5,
+      "y": 53,
+      "color": "rgb(109,110,121)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 787.5,
+      "y": 68,
+      "color": "rgb(181,177,189)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 802.5,
+      "y": 68,
+      "color": "rgb(99,107,119)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 817.5,
+      "y": 68,
+      "color": "rgb(101,109,121)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "*",
+      "x": 787.5,
+      "y": 82.5,
+      "color": "rgb(255,215,75)",
+      "alpha": 1,
+      "font": "bold 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 802.5,
+      "y": 83,
+      "color": "rgb(101,109,121)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 817.5,
+      "y": 83,
+      "color": "rgb(103,111,122)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "+",
+      "x": 787.5,
+      "y": 98,
+      "color": "rgb(227,168,99)",
+      "alpha": 1,
+      "font": "bold 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 802.5,
+      "y": 98,
+      "color": "rgb(101,109,121)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 817.5,
+      "y": 98,
+      "color": "rgb(103,111,122)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 832.5,
+      "y": 98,
+      "color": "rgb(104,111,122)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "*",
+      "x": 847.5,
+      "y": 97.5,
+      "color": "rgb(255,216,75)",
+      "alpha": 1,
+      "font": "bold 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 862.5,
+      "y": 98,
+      "color": "rgb(196,192,203)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 787.5,
+      "y": 113,
+      "color": "rgb(140,140,150)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 802.5,
+      "y": 113,
+      "color": "rgb(93,102,115)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 817.5,
+      "y": 113,
+      "color": "rgb(103,111,122)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 832.5,
+      "y": 113,
+      "color": "rgb(104,111,122)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 862.5,
+      "y": 113,
+      "color": "rgb(196,192,203)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 787.5,
+      "y": 128,
+      "color": "rgb(136,136,146)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 802.5,
+      "y": 128,
+      "color": "rgb(93,102,115)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 817.5,
+      "y": 128,
+      "color": "rgb(102,110,122)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 832.5,
+      "y": 128,
+      "color": "rgb(104,111,122)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "*",
+      "x": 847.5,
+      "y": 127.5,
+      "color": "rgb(255,216,76)",
+      "alpha": 1,
+      "font": "bold 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 862.5,
+      "y": 128,
+      "color": "rgb(196,192,203)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 787.5,
+      "y": 143,
+      "color": "rgb(122,123,133)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 802.5,
+      "y": 143,
+      "color": "rgb(89,98,111)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 817.5,
+      "y": 143,
+      "color": "rgb(96,104,117)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 787.5,
+      "y": 158,
+      "color": "rgb(106,108,119)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 802.5,
+      "y": 158,
+      "color": "rgb(83,92,107)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": ".",
+      "x": 817.5,
+      "y": 158,
+      "color": "rgb(89,98,111)",
+      "alpha": 0.88,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 787.5,
+      "y": 173,
+      "color": "rgb(91,93,105)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "#",
+      "x": 802.5,
+      "y": 173,
+      "color": "rgb(109,110,121)",
+      "alpha": 0.96,
+      "font": "normal 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "@",
+      "x": 847.5,
+      "y": 113,
+      "color": "rgb(235,224,174)",
+      "alpha": 1,
+      "font": "bold 17px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    },
+    {
+      "glyph": "3",
+      "x": 853,
+      "y": 108,
+      "color": "#ffe0a0",
+      "alpha": 1,
+      "font": "normal 7px \"Brogue CE ASCII\", \"Inconsolata\", \"Corpse Glyph Mono\", \"Corpse Glyph Symbols\", \"Corpse Glyph CJK\", \"IBM Plex Mono\", monospace"
+    }
+  ]
+}

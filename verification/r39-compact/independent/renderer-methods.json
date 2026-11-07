@@ -1,0 +1,12 @@
+{
+  "method_names": [
+    "native_x",
+    "native_y",
+    "inside_native_clip",
+    "native_pixel",
+    "picture"
+  ],
+  "source_file": "compact-r39/source/corpse-gods-native/crates/corpse-desktop/src/render.rs",
+  "source_sha256": "9d488af346bccfe01b0b229c8aaf41ce05690bb51ad039c71639d88dc79dd81a",
+  "note": "Verbatim production sampling/compositing methods compiled in isolated minimal state harness; not full SDL executable."
+}

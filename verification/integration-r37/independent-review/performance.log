@@ -1,0 +1,16 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/sub-biomes-r37/source/corpse-gods-native/crates/corpse-core)
+    Finished `release` profile [optimized + debuginfo] target(s) in 52.83s
+     Running `/workspace/scratch/69f53637ba6f/sub-biomes-r37/review-target/release/examples/review_sub_biome_r37 sub-biome-review-1 sub-biome-review-2 r37-independent-0 r37-independent-1`
+GEN seed=sub-biome-review-1 elapsed_ms=1970.597
+CORN seed=sub-biome-review-1 depth=31 cells=81 residents=8 portals=4 speed_cells=8 random_cells=15 links=30
+PERF seed=sub-biome-review-1 depth=31 links=30 route40_cold_ms=0.667 route40_warm_ms=0.730 ray40_ms=2.726
+TURN seed=sub-biome-review-1 depth=31 ms=75.400 took_turn=true deterministic=true
+GEN seed=sub-biome-review-2 elapsed_ms=1760.427
+GEN seed=r37-independent-0 elapsed_ms=1735.750
+CORN seed=r37-independent-0 depth=36 cells=81 residents=8 portals=4 speed_cells=10 random_cells=21 links=28
+PERF seed=r37-independent-0 depth=36 links=28 route40_cold_ms=0.871 route40_warm_ms=0.978 ray40_ms=13.403
+TURN seed=r37-independent-0 depth=36 ms=115.598 took_turn=true deterministic=true
+GEN seed=r37-independent-1 elapsed_ms=1884.945
+CORN seed=r37-independent-1 depth=34 cells=81 residents=8 portals=4 speed_cells=8 random_cells=32 links=36
+PERF seed=r37-independent-1 depth=34 links=36 route40_cold_ms=1.287 route40_warm_ms=1.212 ray40_ms=7.098
+TURN seed=r37-independent-1 depth=34 ms=53.269 took_turn=true deterministic=true

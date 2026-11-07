@@ -1,0 +1,2693 @@
+{
+  "source_snapshot_sha256": "f19312126dd8d9cfac9eb449f9bf543b65ee6c41e53780b81ee4e9433e25b59c",
+  "manifest_sha256": "ab666673627051ab574838ed73255b0e2906ab4ca68cc000c1f70f1c726088a3",
+  "backup_files_verified": 785,
+  "source_snapshot_files": 1372,
+  "matching_compile_inputs": [
+    {
+      "bytes": 10447,
+      "path": "Cargo.lock",
+      "sha256": "a9651c6cfa3831870ca0cb4175d242c1bf3b1c02eab80f9ba7a6743b3e76ce57"
+    },
+    {
+      "bytes": 374,
+      "path": "Cargo.toml",
+      "sha256": "77d7c6e04d0819c3529885967118e74fd64f96a68e3ba6830a62280b1af65e32"
+    },
+    {
+      "bytes": 230,
+      "path": "crates/corpse-core/Cargo.toml",
+      "sha256": "734639a311916a3a6dee0028fc1b404786d215f9e7e6721d9da499f5651ad976"
+    },
+    {
+      "bytes": 34878,
+      "path": "crates/corpse-core/catalog/abilities-v48.json",
+      "sha256": "7863437f8c2a82b786bb6afbee3b6d299fd039137e175c5aec13fe53ad7a7b57"
+    },
+    {
+      "bytes": 33393,
+      "path": "crates/corpse-core/catalog/abilities-v50.json",
+      "sha256": "df77f5a63dffbb5419a3a0a978bce31d5185a50bb65525a024182033647b72ba"
+    },
+    {
+      "bytes": 2664,
+      "path": "crates/corpse-core/catalog/ability-description-amendments-v50.json",
+      "sha256": "4cf424d93f520d3d533846dfde553cf084d1b090144b280dc4e757bf96e3ceaf"
+    },
+    {
+      "bytes": 10805,
+      "path": "crates/corpse-core/catalog/ability-identities-v50.json",
+      "sha256": "446a6845f58a154f26f996ab8202005c7174275f463fcf95c1ee9b78137ed450"
+    },
+    {
+      "bytes": 20319,
+      "path": "crates/corpse-core/catalog/enemy-traits-v48.json",
+      "sha256": "bd12955ecc7dcb15c8766c605ca7fad9da116b2bdd30f78e455f3042d4748767"
+    },
+    {
+      "bytes": 1192,
+      "path": "crates/corpse-core/catalog/equipment-v48.json",
+      "sha256": "1386d08b281d4f5a2a3b357be227b20576ef8384ec843fe668d9db997d2ac149"
+    },
+    {
+      "bytes": 48374,
+      "path": "crates/corpse-core/catalog/heart-items-v48.json",
+      "sha256": "44e84333abc9c943e25f481a174592256222b0d575c37c07f4948f5bcfc8269d"
+    },
+    {
+      "bytes": 4073,
+      "path": "crates/corpse-core/catalog/heart-types-v48.json",
+      "sha256": "4745e71c20b300cd775177a03ecfea17c4b91183989b1fa4bd217548aae51a74"
+    },
+    {
+      "bytes": 1033,
+      "path": "crates/corpse-core/catalog/starter-pools-v48.json",
+      "sha256": "a44f84487bff3f59cce65fe896c7e8ba9007a4ef71fd83b46e3522a9f4b68e5b"
+    },
+    {
+      "bytes": 1699,
+      "path": "crates/corpse-core/catalog/validation-identities-v48.json",
+      "sha256": "14df6f31ae0f028f343d9e8bd867cc3a2d60632499b3df35884db908da693382"
+    },
+    {
+      "bytes": 22333,
+      "path": "crates/corpse-core/data/generation-bestiary-v48.json",
+      "sha256": "7fa930bbf9f7da56bba9d80583ca4f81ad764c5ad791932eecc819d3a8c2e593"
+    },
+    {
+      "bytes": 5000,
+      "path": "crates/corpse-core/data/geology-archetypes-v48.json",
+      "sha256": "d4b2320c35c6bd48863871c3de1dd565e8eb1953f776b139b8e3320630438351"
+    },
+    {
+      "bytes": 26241,
+      "path": "crates/corpse-core/data/setup-catalog-v48.json",
+      "sha256": "9a7acd28d4c50b8a90856200cb39f7ccd76aae864815e9e1ee1d991bfe322c5c"
+    },
+    {
+      "bytes": 5381,
+      "path": "crates/corpse-core/examples/accuracy_npc_arena.rs",
+      "sha256": "eb2772701b4e8fb12273c809110b0bf07cc4c04f00ec8b892ab7f60e7be429e1"
+    },
+    {
+      "bytes": 2985,
+      "path": "crates/corpse-core/examples/creature_lookup_bench.rs",
+      "sha256": "2582d94ca123605fad0759db64c8bbef75e93e1fbca8cb8e8d5981b7d00cb493"
+    },
+    {
+      "bytes": 3404,
+      "path": "crates/corpse-core/examples/debug_floor.rs",
+      "sha256": "7be81de47e12820878ee5dc77fa17ee0c7a491dc7f74a4d91c969d99aebc488d"
+    },
+    {
+      "bytes": 2715,
+      "path": "crates/corpse-core/examples/foundation_bench.rs",
+      "sha256": "992ab04c3289d8e6f1182ff546a76f47a272dc08787c90626a921f3b7b2abe11"
+    },
+    {
+      "bytes": 2578,
+      "path": "crates/corpse-core/examples/generated_bench.rs",
+      "sha256": "7d6329ede3392c3447e0a854442abda2933ada82a920b9e9adb8f3ec336a8320"
+    },
+    {
+      "bytes": 3382,
+      "path": "crates/corpse-core/examples/generated_commands_bench.rs",
+      "sha256": "acfb5538d271a13ae04bdac9a29a24a6daa2ac3ffc6250ab2855bfeff24894e6"
+    },
+    {
+      "bytes": 8335,
+      "path": "crates/corpse-core/examples/heart_progression_audit.rs",
+      "sha256": "966e21a0d9e973c5777edf3efc744048b5b9c05c784e5a7267b2b873b7b46dbc"
+    },
+    {
+      "bytes": 8967,
+      "path": "crates/corpse-core/examples/native_future_alloc.rs",
+      "sha256": "f5c0cfb54e33fb3ce12fe4e0e8fff4818fade9f7ed8bd565b2d471459cc3107e"
+    },
+    {
+      "bytes": 1098,
+      "path": "crates/corpse-core/examples/nest_preview.rs",
+      "sha256": "2e2f0eee1d2fc49c11e54b25b504a04ceff317ec868bc10ee31c1381b580376b"
+    },
+    {
+      "bytes": 48470,
+      "path": "crates/corpse-core/examples/physical_trade_arena.rs",
+      "sha256": "be514d50a9a18f959e38f641977b498bd5dc6103740114efd439fbb7be577562"
+    },
+    {
+      "bytes": 4967,
+      "path": "crates/corpse-core/examples/review_sub_biome_r37.rs",
+      "sha256": "b2a00317b02ae53966283deb11c59146d04f71bbb5b3fac57a2b53fbc5d3b157"
+    },
+    {
+      "bytes": 41468,
+      "path": "crates/corpse-core/examples/revision50_offense_arena.rs",
+      "sha256": "0ad8301146d05c1a7bb5cdf0aa88917fc1ca98101da9a636ba93ce756302e2ee"
+    },
+    {
+      "bytes": 1976,
+      "path": "crates/corpse-core/examples/sub_biome_survey_r37.rs",
+      "sha256": "b5aca48678193e028db211f3d13a389c95913ec95ff0ac223910e1251fae5b54"
+    },
+    {
+      "bytes": 7462,
+      "path": "crates/corpse-core/examples/timing_test.rs",
+      "sha256": "1ac032bd055f17d18e5efec90b9abb1dabacd909b7991b4b0bf98d07edaf2e14"
+    },
+    {
+      "bytes": 907,
+      "path": "crates/corpse-core/examples/trace_core.rs",
+      "sha256": "fbebea6e9dab674f6e096d294fd2f3cf61ee1d0e4c9a7dabc7218a92fd33642e"
+    },
+    {
+      "bytes": 3560,
+      "path": "crates/corpse-core/examples/update_manual_depths.rs",
+      "sha256": "909894f1d07b8cac75abb1eb2c6db80e0c53b3cd6b9c460beeff144e52e7adf1"
+    },
+    {
+      "bytes": 4030,
+      "path": "crates/corpse-core/examples/visibility_bench.rs",
+      "sha256": "6b4c622358cfad3ac62a3720f92ad8bae73e9739300d18354a7e477bcf49b020"
+    },
+    {
+      "bytes": 64732,
+      "path": "crates/corpse-core/src/abilities.rs",
+      "sha256": "692a25240381cecd5c6ab0856145bafe36efd1bc8b486952033764870117b5d6"
+    },
+    {
+      "bytes": 1785,
+      "path": "crates/corpse-core/src/accuracy_dodge.rs",
+      "sha256": "148870a46ee957b4d90c4a375258ff545d4e59195f038eb74567704a929463ec"
+    },
+    {
+      "bytes": 845,
+      "path": "crates/corpse-core/src/actor_equipment.rs",
+      "sha256": "48925597743e74b4ab6783b705f8221a31021df9fb0ee4ce9c36e92ae4b5b237"
+    },
+    {
+      "bytes": 2001,
+      "path": "crates/corpse-core/src/actor_presentation.rs",
+      "sha256": "8da8cd2832cd531637517568321c4da8547fbcae293fadd50f24518514556655"
+    },
+    {
+      "bytes": 5858,
+      "path": "crates/corpse-core/src/ahvamitt.rs",
+      "sha256": "869cc5265efb03ab8271ef08a98af4ce01293ff41e16939ad648d6d08082e791"
+    },
+    {
+      "bytes": 25602,
+      "path": "crates/corpse-core/src/ai.rs",
+      "sha256": "f5249a9195d08a37a73eb970e5abdb19eb89bd169e1434e83e6013f5fe334fa1"
+    },
+    {
+      "bytes": 7429,
+      "path": "crates/corpse-core/src/attack_text.rs",
+      "sha256": "a0bb6153d93f8093ab4f87632d835bbb2c1a4889ec5611a892b5aff83deb3a1e"
+    },
+    {
+      "bytes": 6824,
+      "path": "crates/corpse-core/src/attack_text_revision46.rs",
+      "sha256": "d78805545e78d8b3c0d5ea18bde597ed71dd13e4cfa2ffce8c92f3c1b5686ade"
+    },
+    {
+      "bytes": 2671,
+      "path": "crates/corpse-core/src/balance42.rs",
+      "sha256": "35603dfbd271a26c7a2acdfe1364c78ba118e1cd5dc461dc9fb42737f6007d03"
+    },
+    {
+      "bytes": 11485,
+      "path": "crates/corpse-core/src/borge.rs",
+      "sha256": "03da133ca5cc34c27bcdce471e37a4444cd497e4e90cabf157bde8df29e2c2c6"
+    },
+    {
+      "bytes": 12473,
+      "path": "crates/corpse-core/src/capture_pilot.rs",
+      "sha256": "ff3ad23bec82e80c081091945eacaf84c58943e865f68d6a5570e94895670137"
+    },
+    {
+      "bytes": 2283,
+      "path": "crates/corpse-core/src/catalog/accuracy-dodge-v33.json",
+      "sha256": "447397fd85f7fc01b9c08ed4ef57b33cd590b14d9c98f85e21552b99412583b7"
+    },
+    {
+      "bytes": 7403,
+      "path": "crates/corpse-core/src/catalog/balance-v42.json",
+      "sha256": "f91ddd923d5e77e472f268c2869870d0128f2e9d16bcc76e7f7221e3ed41a380"
+    },
+    {
+      "bytes": 9108,
+      "path": "crates/corpse-core/src/catalog/flavor-placement-v32.json",
+      "sha256": "dd6e4d6c45018c37fad88e9739d6849175df5c57d3b07a49e6310ac0aa7f3c67"
+    },
+    {
+      "bytes": 1584,
+      "path": "crates/corpse-core/src/catalog/new-creatures-v33.json",
+      "sha256": "6434ebf5238bfbae4294dcb233cc81ed3484a49dad45282eb4ce1c3aa93012e2"
+    },
+    {
+      "bytes": 4843,
+      "path": "crates/corpse-core/src/catalog/ordinary-roster-v48.json",
+      "sha256": "bd4af5a0e7ed3bf36010537d330a2b3bf21967e0b68fbc3da78f7061911e78b1"
+    },
+    {
+      "bytes": 16838,
+      "path": "crates/corpse-core/src/catalog/physical-balance-v31.json",
+      "sha256": "b2b8ba02d7c6905103ee46373f045032a27fe77932b4ad83278b0667c1b18f20"
+    },
+    {
+      "bytes": 44997,
+      "path": "crates/corpse-core/src/catalog/physical-balance-v32.json",
+      "sha256": "17056d95a626da329e014cf342f4131259b28dd6f8ab5c14186d91ff3fe87bb2"
+    },
+    {
+      "bytes": 390965,
+      "path": "crates/corpse-core/src/catalog/population-v48.json",
+      "sha256": "7b4ba8f5c049ad3886696dad2b412bd736a8271878721d13dcfa7226999a6a67"
+    },
+    {
+      "bytes": 3780,
+      "path": "crates/corpse-core/src/catalog/summoned-balance-v32.json",
+      "sha256": "049a4631e91a114ddfb484b8fc0cfccb432549496c796336f5c561827e5fc15f"
+    },
+    {
+      "bytes": 288,
+      "path": "crates/corpse-core/src/catalog/witch-accuracy-dodge-v33.json",
+      "sha256": "5578e5f5749e7f5c2ffe4b1d49d64b4f60cb1f996744020a04b08ffe69670b2e"
+    },
+    {
+      "bytes": 9792,
+      "path": "crates/corpse-core/src/combat.rs",
+      "sha256": "c4793d725807301eda19e0eea1f2d9cd594d13e05fd6a7f138f95ceeaef3ea7c"
+    },
+    {
+      "bytes": 1559,
+      "path": "crates/corpse-core/src/combat_audit.rs",
+      "sha256": "99bba1a7640970dd82009f4430bc670a656125375896c887b8ebe8520e60a7ad"
+    },
+    {
+      "bytes": 4946,
+      "path": "crates/corpse-core/src/corpse_placement.rs",
+      "sha256": "8e1667a6fa5d3b5f22e8db1595c1dfb5b47c5df3ebc8d2efff862e98bd887c8e"
+    },
+    {
+      "bytes": 5476,
+      "path": "crates/corpse-core/src/corpses.rs",
+      "sha256": "871f6975d5aebe1bd687bb20a17c7e25d7a3420da9571473b2cb7d6cf35d137a"
+    },
+    {
+      "bytes": 9065,
+      "path": "crates/corpse-core/src/crafting.rs",
+      "sha256": "5be7f878c4a5f4b644d14f186d48aed548c38a0b841ad15644396054f00d7ada"
+    },
+    {
+      "bytes": 11941,
+      "path": "crates/corpse-core/src/creature_feeding.rs",
+      "sha256": "ecf55f8b78fb6bd849d9eef0989d4d5f64c6e9945eb1d7a1d412586cfab25b9d"
+    },
+    {
+      "bytes": 15643,
+      "path": "crates/corpse-core/src/creature_index.rs",
+      "sha256": "9c7e43131c4f14c39256a355c627e8f2d7686a1078bee1d476736567dcbb8072"
+    },
+    {
+      "bytes": 17036,
+      "path": "crates/corpse-core/src/creature_trie.rs",
+      "sha256": "5276d953e5ca3d6ab6b0a671248cda9f4f0c33803129b9530938012aca91df92"
+    },
+    {
+      "bytes": 5744,
+      "path": "crates/corpse-core/src/currents.rs",
+      "sha256": "653a97d82a3d8df4b81231cfbde0c43149abf96c1ea98bc5a00de3fe5d3670b4"
+    },
+    {
+      "bytes": 16440,
+      "path": "crates/corpse-core/src/deadline_map.rs",
+      "sha256": "6fea3518a857cc684af72e5662889b91ad3a852fbd9937d178f77f0693033068"
+    },
+    {
+      "bytes": 15979,
+      "path": "crates/corpse-core/src/debug_floor.rs",
+      "sha256": "91402fbc351c6fee1c70479ea1c1f421fd63131cdb773cd9183bdab4cc891ecf"
+    },
+    {
+      "bytes": 5097,
+      "path": "crates/corpse-core/src/divine_combat.rs",
+      "sha256": "74ccca2bda2d25e013de1a07540c41c007495d23d8b35b98e6ebabc954adc16d"
+    },
+    {
+      "bytes": 10949,
+      "path": "crates/corpse-core/src/divine_environment.rs",
+      "sha256": "9b58b290256d832b591e446e8506598372a7872fd2d9571c994adb6ec76b7b52"
+    },
+    {
+      "bytes": 9009,
+      "path": "crates/corpse-core/src/divine_reactions.rs",
+      "sha256": "80c1527ac84670f5d803703a0e0b99f3ba12131bf20ec767a37809fbb8b8b0c8"
+    },
+    {
+      "bytes": 3319,
+      "path": "crates/corpse-core/src/divine_rescues.rs",
+      "sha256": "9e134fa00b0a77be62982aea68e73a7a373805dbc1a05c2593d740d4affdf572"
+    },
+    {
+      "bytes": 12123,
+      "path": "crates/corpse-core/src/dreamwalking.rs",
+      "sha256": "8f754b90136b05bfcdd642ad5321516160888b1645bfe1ad025e6277112596cd"
+    },
+    {
+      "bytes": 8686,
+      "path": "crates/corpse-core/src/enemy_traits.rs",
+      "sha256": "eeb1edea60c2a0d7b6ff030f3ca7bffff3d636c63ee60ed1778c3244b52bb5cd"
+    },
+    {
+      "bytes": 190799,
+      "path": "crates/corpse-core/src/engine.rs",
+      "sha256": "ed047c3cf9458ca89c4f74c74026657a4cb24fd6e7217860510a85653b91210e"
+    },
+    {
+      "bytes": 15843,
+      "path": "crates/corpse-core/src/entrance.rs",
+      "sha256": "7444bd01611f7eb94d530210e3e97ffb58cf66ca6ca13f1b7e900fbe9bcc43e1"
+    },
+    {
+      "bytes": 92921,
+      "path": "crates/corpse-core/src/environment.rs",
+      "sha256": "0d9bf478feab984e1587df07b82491e8a9516643093899802064309e59552ea4"
+    },
+    {
+      "bytes": 4836,
+      "path": "crates/corpse-core/src/epidite.rs",
+      "sha256": "f5e903705645c2b400ceb9cc18eaf972981bed5e0731fb6c14c1996c68bcaf1a"
+    },
+    {
+      "bytes": 20562,
+      "path": "crates/corpse-core/src/equipment.rs",
+      "sha256": "d46606566a9433641f73651f0c60d453e6513f1fde6cc84824c61bea7df35c34"
+    },
+    {
+      "bytes": 7816,
+      "path": "crates/corpse-core/src/equipment_abilities.rs",
+      "sha256": "e4aaf2d960ab4ebcaa4733844b11e42fdee31b80b2a112f5c67807df09a31016"
+    },
+    {
+      "bytes": 11736,
+      "path": "crates/corpse-core/src/equipment_generation.rs",
+      "sha256": "60508a37f373bd6d71a9c1c5567f707e0256d792416d0de857333333c8b34ef6"
+    },
+    {
+      "bytes": 5494,
+      "path": "crates/corpse-core/src/equipment_generation_revision43_tests.rs",
+      "sha256": "22800582a80c7eb582c9a2ccd19eea7a9fd64cf4cb55d23c05f75a5acdba8ac2"
+    },
+    {
+      "bytes": 2743,
+      "path": "crates/corpse-core/src/equipment_generation_revision50.rs",
+      "sha256": "c405fb23b318e8e20a5a02f6a542ce028838fd8cedf283940777a43a66b750c3"
+    },
+    {
+      "bytes": 10052,
+      "path": "crates/corpse-core/src/equipment_generation_revision50_tests.rs",
+      "sha256": "e2c96e3fea4478bcb142e546ff8d28761d6af58090cd0394429c1a0f64a05d1f"
+    },
+    {
+      "bytes": 9147,
+      "path": "crates/corpse-core/src/events.rs",
+      "sha256": "48cff848bad9a615c3ffdd4ac4b14bf8024f9618091f9ad26bdf9df5df56ca49"
+    },
+    {
+      "bytes": 18337,
+      "path": "crates/corpse-core/src/finale.rs",
+      "sha256": "3c6c13f140f2c9a44d98561b0613657f931d3509e9e36c42812e731f0b14ef6a"
+    },
+    {
+      "bytes": 25299,
+      "path": "crates/corpse-core/src/fire_adapter.rs",
+      "sha256": "6ff24c61425918c6936a7a0d1eb8559db2a012526a0c8a0ed2ed72321d9c39f8"
+    },
+    {
+      "bytes": 4343,
+      "path": "crates/corpse-core/src/flavor_placement.rs",
+      "sha256": "5e66cf772c52a8be433f4af70fb1855d9b0b2e4ee17e644124747f3feebd1023"
+    },
+    {
+      "bytes": 6518,
+      "path": "crates/corpse-core/src/fungi.rs",
+      "sha256": "15e730d9511d63634caba7fb2342d2936250a01318a5e488a5c3355611bb8340"
+    },
+    {
+      "bytes": 17207,
+      "path": "crates/corpse-core/src/future_anchor.rs",
+      "sha256": "348d4eccedf6e5de6f1e7f141dae1b90d47b7dd92240ebd37d36a1efa1a006c1"
+    },
+    {
+      "bytes": 2929,
+      "path": "crates/corpse-core/src/future_anchor_clone.rs",
+      "sha256": "296422f8ec2c3dd08e459a2308a314885a31c4c3f0c6f8262311d6b36be3facf"
+    },
+    {
+      "bytes": 6240,
+      "path": "crates/corpse-core/src/future_anchor_finite.rs",
+      "sha256": "0ef8b27f0bee3892470d0cd27ad10b6241129e8e28a3b09a352cda165b1228da"
+    },
+    {
+      "bytes": 3363,
+      "path": "crates/corpse-core/src/gas_reactions.rs",
+      "sha256": "b795594055302c1a22b9132cb514d9d2bcaef6b42514e17e8115519716cf8bb3"
+    },
+    {
+      "bytes": 4752,
+      "path": "crates/corpse-core/src/generation/budgets.rs",
+      "sha256": "d2ae32c172bc4ed00060db767ad6f142f770e707b6aa1e16aa992a25ff17c526"
+    },
+    {
+      "bytes": 1260,
+      "path": "crates/corpse-core/src/generation/catalog.rs",
+      "sha256": "f7169bfad8ce20772ed3da55835fee2995c3420ce83ff5ea36a74a785697cf87"
+    },
+    {
+      "bytes": 9459,
+      "path": "crates/corpse-core/src/generation/cleanup.rs",
+      "sha256": "59762a9231e72e4d35ad9957f811151d5290dca82021e555771390cdf5d946c6"
+    },
+    {
+      "bytes": 11397,
+      "path": "crates/corpse-core/src/generation/connectivity.rs",
+      "sha256": "f0f0613ccba0ae9042efbfa1860376975909991a99ea79bfadb3dfd59642e50e"
+    },
+    {
+      "bytes": 8188,
+      "path": "crates/corpse-core/src/generation/environment.rs",
+      "sha256": "439dbc1ad0e1d485d0393ed5a87c6a4db76ce651d27a70cb57c020fed313b301"
+    },
+    {
+      "bytes": 1427,
+      "path": "crates/corpse-core/src/generation/fields.rs",
+      "sha256": "90832c8768f877a39a6262119568f8f71a60d284d12b8b395f06cfb7b54f6b38"
+    },
+    {
+      "bytes": 18336,
+      "path": "crates/corpse-core/src/generation/fire.rs",
+      "sha256": "a5063a40cec72a64af485ce90df9184f71a44883dd5b8adfff3a70a46abfb94e"
+    },
+    {
+      "bytes": 41479,
+      "path": "crates/corpse-core/src/generation/geology.rs",
+      "sha256": "79771513e990e576ae55d1d4d4844ba49363c83d8f6ecc05e8f354db0f122548"
+    },
+    {
+      "bytes": 5500,
+      "path": "crates/corpse-core/src/generation/godbeast_room.rs",
+      "sha256": "57e8be80f0c8ceed51ac92c665b0eb7ff530a31fac676ce651614ae41cf07a5b"
+    },
+    {
+      "bytes": 8694,
+      "path": "crates/corpse-core/src/generation/landmark_quality.rs",
+      "sha256": "fec3d5ec672d02a36fc7a3446cbc6a1e5824a49fef711b85f4a539ff9affe878"
+    },
+    {
+      "bytes": 26755,
+      "path": "crates/corpse-core/src/generation/layout.rs",
+      "sha256": "815a7e919954f015a77def3804e258c415fd9d56810133e56cf8530e384c7f81"
+    },
+    {
+      "bytes": 9448,
+      "path": "crates/corpse-core/src/generation/lighting.rs",
+      "sha256": "c865f9905ab8f858f96a6b03e73aaba2da3d849e83fb1785d2f6d90258bb55e2"
+    },
+    {
+      "bytes": 11268,
+      "path": "crates/corpse-core/src/generation/loops.rs",
+      "sha256": "6d6f9736faee4f0e7d7931f24db86bb8a373ede1cd24c6b87f7174d3692d55f7"
+    },
+    {
+      "bytes": 967,
+      "path": "crates/corpse-core/src/generation/mod.rs",
+      "sha256": "56d4d8a4095209fac99444c0b55cc207f9b475b78a1c870b92762c82508835d3"
+    },
+    {
+      "bytes": 12037,
+      "path": "crates/corpse-core/src/generation/pipeline.rs",
+      "sha256": "a6ffb7ba8857b1771e2c31af7df2678623fd74d6ab171dc8c3f47b9a7b39b487"
+    },
+    {
+      "bytes": 5743,
+      "path": "crates/corpse-core/src/generation/plans.rs",
+      "sha256": "788fa10028f858dc55d84dacc5c64de1a9dbfc908128d9c95a4687ecd68995d2"
+    },
+    {
+      "bytes": 5077,
+      "path": "crates/corpse-core/src/generation/protection.rs",
+      "sha256": "4f9a07ebea2b3f910513b429d0d3f786bc00c1d6357977a517601d526f8ef4db"
+    },
+    {
+      "bytes": 10153,
+      "path": "crates/corpse-core/src/generation/rooms.rs",
+      "sha256": "ad3adf1f9321ab231b06aa5b142c2ad9d8c0594068d43005fe8e9f6f0feba428"
+    },
+    {
+      "bytes": 11263,
+      "path": "crates/corpse-core/src/generation/setup_stamps.rs",
+      "sha256": "57a7ef432ab44de46acc1dab3335071b4f6b98d7e8f9a1ce0859475b8eae48bf"
+    },
+    {
+      "bytes": 29645,
+      "path": "crates/corpse-core/src/generation/setups.rs",
+      "sha256": "af66c22eed67ef52d49846d84a73372552188ce8b7849cd608ca282a1c25f19e"
+    },
+    {
+      "bytes": 6210,
+      "path": "crates/corpse-core/src/generation/stairs.rs",
+      "sha256": "6dba845905c9173a8c8e791d9ff8595c4b66703563e62d97f0020ccd8b9ad6ea"
+    },
+    {
+      "bytes": 10043,
+      "path": "crates/corpse-core/src/generation/terrain.rs",
+      "sha256": "10b8211cbd8aa5da5f6404e6cbfb22c8615b11c7ef84f05aaaba8c1ac08bc8e5"
+    },
+    {
+      "bytes": 32266,
+      "path": "crates/corpse-core/src/generation/topology.rs",
+      "sha256": "7ff64d46bd3622b04d62f2347d4d9c0b13fcf40095c00c61a20f188e24c188ac"
+    },
+    {
+      "bytes": 20049,
+      "path": "crates/corpse-core/src/generation/world.rs",
+      "sha256": "38e5a146b94cc8f7173883d869111a07553a9e8c11fcee8bbb83e11e3672ff55"
+    },
+    {
+      "bytes": 4722,
+      "path": "crates/corpse-core/src/godbeast_interactions.rs",
+      "sha256": "260f16aec6f7b2cd44af0919c410e8e43a378ba3a59dcfb13631bc8f07b8a8b8"
+    },
+    {
+      "bytes": 6213,
+      "path": "crates/corpse-core/src/half_here.rs",
+      "sha256": "16c12ca495bb3b798c0d6279c9d68072d42310adb68f7767fb3811d128bbfab6"
+    },
+    {
+      "bytes": 10244,
+      "path": "crates/corpse-core/src/hazard_memory.rs",
+      "sha256": "36b0764cd612e95ea1e4f43589326a12e8730879c30db833ef0561a475138689"
+    },
+    {
+      "bytes": 9223,
+      "path": "crates/corpse-core/src/health_dirty.rs",
+      "sha256": "2d93d4f1cb6904124a08b838639f22f1c721720de50973786a3b12bb683abfd3"
+    },
+    {
+      "bytes": 5453,
+      "path": "crates/corpse-core/src/heart_items.rs",
+      "sha256": "419f80eb1db8615e76e3c4960f992b3f9c2e2ea0f67418bef5d7e7c89e8b038c"
+    },
+    {
+      "bytes": 15493,
+      "path": "crates/corpse-core/src/ichor.rs",
+      "sha256": "86de2813bed6bee20ca15ee9aa35491c67e3a8611bf3e32557cb13fc5852bfbd"
+    },
+    {
+      "bytes": 22388,
+      "path": "crates/corpse-core/src/inventory.rs",
+      "sha256": "42236a3885b2300ce2475f64570f1cf4506f96f14dc9e035da8c96825edb94ae"
+    },
+    {
+      "bytes": 12306,
+      "path": "crates/corpse-core/src/item_magic.rs",
+      "sha256": "9026099556c774837fda97565dc512ca8cc56e8d60e3680fc19c4c312def9eaf"
+    },
+    {
+      "bytes": 5872,
+      "path": "crates/corpse-core/src/item_placement.rs",
+      "sha256": "b521cb2a8c516832e945c502047645a999398ad13e5c236151b78ba066a1b24c"
+    },
+    {
+      "bytes": 3189,
+      "path": "crates/corpse-core/src/lib.rs",
+      "sha256": "208dcd48bdbff14099549db2e39715f11123b8726a9ce2f72adce2f026da6d4d"
+    },
+    {
+      "bytes": 6191,
+      "path": "crates/corpse-core/src/lifecycle.rs",
+      "sha256": "bf30b2ee112b2ab6da21fc8b51998c3c675c957f267ad96774c5c2e5e345b347"
+    },
+    {
+      "bytes": 21475,
+      "path": "crates/corpse-core/src/lighting_cache.rs",
+      "sha256": "8e43b2db16dbcd2776839fdbb96deb866fdcbfd516dd4b99b6998a0b7a329cc8"
+    },
+    {
+      "bytes": 5580,
+      "path": "crates/corpse-core/src/maintained_links.rs",
+      "sha256": "74f08bbe112a83754b4c409565ef6a54bb77dbda97d2e86b7589b5acc755f635"
+    },
+    {
+      "bytes": 19264,
+      "path": "crates/corpse-core/src/migration_pipeline.rs",
+      "sha256": "cd80d1860923eeba46c40082cf2d8d10a72e0524513a7be4ca703f4dd96618e8"
+    },
+    {
+      "bytes": 13292,
+      "path": "crates/corpse-core/src/migrations.rs",
+      "sha256": "3ffd5e4ee200076d3dbb29c3a1909e7b920ff3bf7777abd6d859744faf1c5e9d"
+    },
+    {
+      "bytes": 16227,
+      "path": "crates/corpse-core/src/mini_me.rs",
+      "sha256": "ec43a22c5f572b5a81047def0625703a2b3906a0947d461ea14c11e5e396552e"
+    },
+    {
+      "bytes": 6191,
+      "path": "crates/corpse-core/src/model.rs",
+      "sha256": "75402897b4f95540a2705726e7b01df5761b64cdbbe4b75c3dd2732fb5e2e3cc"
+    },
+    {
+      "bytes": 54773,
+      "path": "crates/corpse-core/src/model_generated.rs",
+      "sha256": "a435c3d2cb796c8dca6e3ab1db8c2486c52a6cb577cf78847a5df0d84af7f4cc"
+    },
+    {
+      "bytes": 2755,
+      "path": "crates/corpse-core/src/monster_bombardier.rs",
+      "sha256": "2a78340991e148d1a652fe6945e604223e23f8077d7f963f22ab5c1109bb6b99"
+    },
+    {
+      "bytes": 6072,
+      "path": "crates/corpse-core/src/monster_caster.rs",
+      "sha256": "66508e7d329e9883374fa19388486c524be49dd06b7d02acf2a90dfc033139bf"
+    },
+    {
+      "bytes": 4331,
+      "path": "crates/corpse-core/src/monster_chill.rs",
+      "sha256": "de191110b87bd412ceb6aff4de48bb9edc7c1a69b1061c284f9d1cced47ed8e9"
+    },
+    {
+      "bytes": 12657,
+      "path": "crates/corpse-core/src/monster_grab.rs",
+      "sha256": "60fe864abcf15737778fce78fbb77414764400bf1a5edc95d01ce1465fcd01e2"
+    },
+    {
+      "bytes": 23310,
+      "path": "crates/corpse-core/src/monster_horn.rs",
+      "sha256": "05f2f4f174dac931061913adc539e314702953ffd8574f9dc2a1dde91ed3c302"
+    },
+    {
+      "bytes": 21513,
+      "path": "crates/corpse-core/src/monster_inventor.rs",
+      "sha256": "5bd291d795f9cbb4dfa3ec69559b107df00fcfdc79f43e773b87dea09279625a"
+    },
+    {
+      "bytes": 6091,
+      "path": "crates/corpse-core/src/monster_moon.rs",
+      "sha256": "cff18ac0a1dabb231002176067433a23f7524ab7e4509ca75457d5bf04e0706c"
+    },
+    {
+      "bytes": 5866,
+      "path": "crates/corpse-core/src/monster_ruin.rs",
+      "sha256": "3cc4a7435fc1547bf7f6c91ab1406c5363d6d80105d9ea9aa22e47d8366526d4"
+    },
+    {
+      "bytes": 12225,
+      "path": "crates/corpse-core/src/monster_spells.rs",
+      "sha256": "152db0bafa90fccb387d8d5d884ad733308115fea8ded6f72617b2da5ce02171"
+    },
+    {
+      "bytes": 5439,
+      "path": "crates/corpse-core/src/monster_sphinx.rs",
+      "sha256": "f4f22f4ea00bdce95ddbf7e758ea3961178c59b1c7b0b93f580d8a7d90f34f36"
+    },
+    {
+      "bytes": 8441,
+      "path": "crates/corpse-core/src/monster_stalking.rs",
+      "sha256": "9f77d79ef469551588e797febab4e7de98ad11ddd5c40d8ced90d70d9b275687"
+    },
+    {
+      "bytes": 11965,
+      "path": "crates/corpse-core/src/monster_statuses.rs",
+      "sha256": "1238c8482f57a6e641f4f70cca21f24688fcd397e129ea678ea86e1b959b13a8"
+    },
+    {
+      "bytes": 6597,
+      "path": "crates/corpse-core/src/monster_vampire.rs",
+      "sha256": "1a6b0da8ec9072f5c7682bc44c1ecf544930038c578cff98c490c2a866a86fb6"
+    },
+    {
+      "bytes": 3591,
+      "path": "crates/corpse-core/src/monster_wendigo.rs",
+      "sha256": "30c95a1eb355836a2dca2578be74af0dbd47e4656578a0919e01ab287ff3e646"
+    },
+    {
+      "bytes": 11472,
+      "path": "crates/corpse-core/src/movement.rs",
+      "sha256": "1706168cbf57e558f9239ec76414d989f1212ac2ecf29d83e7e0cf5385091b6c"
+    },
+    {
+      "bytes": 12054,
+      "path": "crates/corpse-core/src/mutation_journal.rs",
+      "sha256": "06eef912abd5247fc767e43d3143b24bcc3ac9eab6ace3ebca30bb873d9b8953"
+    },
+    {
+      "bytes": 4224,
+      "path": "crates/corpse-core/src/new_creatures.rs",
+      "sha256": "7d2119bab96d4e7b25c7150e9d5ec32b0c7894315ecc754e14e41dc62137a381"
+    },
+    {
+      "bytes": 25594,
+      "path": "crates/corpse-core/src/non_euclidean_generation.rs",
+      "sha256": "3e938b316bedcfd3b3fa2f2c96593ab9e6728e7ade509a851ca04ac753cfa520"
+    },
+    {
+      "bytes": 63493,
+      "path": "crates/corpse-core/src/offscreen.rs",
+      "sha256": "8e7398579e8874f0433ee51b5e438c6b89c091ad334278fea7fc66f20841cc86"
+    },
+    {
+      "bytes": 8088,
+      "path": "crates/corpse-core/src/optical_cache.rs",
+      "sha256": "ab73cb639373b58aeb7a71f7050b812e089f842d388ff036c98dbedb5f363a55"
+    },
+    {
+      "bytes": 6611,
+      "path": "crates/corpse-core/src/ordinary_roster.rs",
+      "sha256": "aa51cc87dfe4e38833e391a7eb2ce9a91122f83f964fa2c4eaabe5b54eb17060"
+    },
+    {
+      "bytes": 6462,
+      "path": "crates/corpse-core/src/phantasmii_generation.rs",
+      "sha256": "5eb863ede08eac725cb639b841eaff6c44d5ebbe2075b7407d81b112cc3e0c22"
+    },
+    {
+      "bytes": 5838,
+      "path": "crates/corpse-core/src/physical_balance.rs",
+      "sha256": "22700f51f95394afb1eb1d31960bc09d7762ed883e2ac039d40c3a62de449d72"
+    },
+    {
+      "bytes": 12074,
+      "path": "crates/corpse-core/src/playtest.rs",
+      "sha256": "99921fe1f20d752c762ce03709f2b48ed1d0d43b6f3e89266e2b40df07d4a987"
+    },
+    {
+      "bytes": 16542,
+      "path": "crates/corpse-core/src/pocket_biomes.rs",
+      "sha256": "eb2841563475e23d7db9142f85a07423ab7d55488dbae5ac365f689b72e1521a"
+    },
+    {
+      "bytes": 45129,
+      "path": "crates/corpse-core/src/population.rs",
+      "sha256": "381ce2fe49bd3e702bc6e1c54b06abf4370397643009716d8878b68bf345bdcc"
+    },
+    {
+      "bytes": 14634,
+      "path": "crates/corpse-core/src/portals.rs",
+      "sha256": "6758a7978ec9e22f53fcc86bb71621450a7eb46d13447d734a7b7a2612a45458"
+    },
+    {
+      "bytes": 8687,
+      "path": "crates/corpse-core/src/portals_generation.rs",
+      "sha256": "2e8b7ec50843c135e13d76a64f50f657de4937576b2f5fb9f8d6e33eb7a5ceb7"
+    },
+    {
+      "bytes": 10016,
+      "path": "crates/corpse-core/src/potions.rs",
+      "sha256": "d39930067578c3f498dedeff6b82b6c2547b22aebb4c4476e1e12dec2b2a4539"
+    },
+    {
+      "bytes": 8313,
+      "path": "crates/corpse-core/src/profile.rs",
+      "sha256": "3df58a2c0b58af6d335532055a43192a135292294ad7e0534a26b6137c78da1c"
+    },
+    {
+      "bytes": 14538,
+      "path": "crates/corpse-core/src/progression.rs",
+      "sha256": "47149424ebb32d7d3292069a9a6706334e9a95c22735f3b107f4491f44bfd140"
+    },
+    {
+      "bytes": 17594,
+      "path": "crates/corpse-core/src/projectiles.rs",
+      "sha256": "70d65364757e2ffa62eabf37a745d94bb237bda7b9115e00cdd3e38809cf726d"
+    },
+    {
+      "bytes": 9509,
+      "path": "crates/corpse-core/src/propagation.rs",
+      "sha256": "07943c7dddc9a4460bfb998a566b5280ed27a250c683a32cb4a4e8bf16e9b05e"
+    },
+    {
+      "bytes": 8636,
+      "path": "crates/corpse-core/src/replay.rs",
+      "sha256": "54cc33b731f698803e616f06ec6785f5e266ab0a55eb648cd09e0fa70f793d36"
+    },
+    {
+      "bytes": 6359,
+      "path": "crates/corpse-core/src/replay_policy_tests.rs",
+      "sha256": "7e6e3b738414578888fefa36eefef36a5a5689f00e01a0d27cd2bd20d9f9915f"
+    },
+    {
+      "bytes": 4223,
+      "path": "crates/corpse-core/src/resources.rs",
+      "sha256": "900961b2e2688cc066218c68f2fe26b05ff5402ddddbc68ab182567864886ec9"
+    },
+    {
+      "bytes": 13064,
+      "path": "crates/corpse-core/src/revision50.rs",
+      "sha256": "80f2b84e2a0e6ccba540355aa0adebac16b1f7baa224d5233a9b8ae429582350"
+    },
+    {
+      "bytes": 13748,
+      "path": "crates/corpse-core/src/revision50_ability_energy.rs",
+      "sha256": "9c3f1325333e095ce7cae4f574812561b80cc2ba39fb6944d69fec91ded4d855"
+    },
+    {
+      "bytes": 40313,
+      "path": "crates/corpse-core/src/revision50_amulet_effects.rs",
+      "sha256": "f80fb9889b520a88473353b3eb5ccf2b64adffe1ce960a1f67d5299d603eef46"
+    },
+    {
+      "bytes": 14689,
+      "path": "crates/corpse-core/src/revision50_amulets.rs",
+      "sha256": "f091f581e51dd2b1987e85e4e9e99f60011d1fcd2c45b245c7fba0e278cd17cf"
+    },
+    {
+      "bytes": 14078,
+      "path": "crates/corpse-core/src/revision50_combat.rs",
+      "sha256": "265c7fd31f9aa651fde7009322e92d0357dd1c1a9dd0b680be56a81844866a34"
+    },
+    {
+      "bytes": 37839,
+      "path": "crates/corpse-core/src/revision50_control_amulets.rs",
+      "sha256": "c112780c7c6e37b01bcf1398008954647c2854b47ea54bd4117e5e228cb7fb43"
+    },
+    {
+      "bytes": 7868,
+      "path": "crates/corpse-core/src/revision50_debug_loadout_tests.rs",
+      "sha256": "b42068b3f8b7a74dd385b34b0bca054009a62ea58a7367624909dff14f664af0"
+    },
+    {
+      "bytes": 8329,
+      "path": "crates/corpse-core/src/revision50_grappler.rs",
+      "sha256": "37f2dc89c8a895fd59569ee397221b1bc00ce2b67b7693a6356d171e3ee35932"
+    },
+    {
+      "bytes": 18310,
+      "path": "crates/corpse-core/src/revision50_inventory.rs",
+      "sha256": "63522c17be940097f686ce737013d4e255786c1540c2c7ca8dacf8eb1b9e3120"
+    },
+    {
+      "bytes": 5497,
+      "path": "crates/corpse-core/src/revision50_item_knowledge.rs",
+      "sha256": "64fdc7aca0c4553c6fb269fd3895c796044ab394ed6cc007e3ce528e9c7318ea"
+    },
+    {
+      "bytes": 9344,
+      "path": "crates/corpse-core/src/revision50_nightmares.rs",
+      "sha256": "99dedb7df4e00ead34d0788dfa87b109e02d98ce93770ec92f3377bfd981e506"
+    },
+    {
+      "bytes": 3542,
+      "path": "crates/corpse-core/src/revision50_player_attack.rs",
+      "sha256": "3b784c832995623391f45329106facbc75408182b233e2a9ca89dc85cd9c9049"
+    },
+    {
+      "bytes": 6619,
+      "path": "crates/corpse-core/src/revision50_playtest_loadout_tests.rs",
+      "sha256": "1e5620fc8d2b1084954186de962140e1c02857a91bbea08f0775a5bc2574e7fb"
+    },
+    {
+      "bytes": 14744,
+      "path": "crates/corpse-core/src/revision50_potions.rs",
+      "sha256": "33d251e29021a3ed86a1b2e19a391837c8c9a33c1e4a13b0c6f36b74035f206b"
+    },
+    {
+      "bytes": 29006,
+      "path": "crates/corpse-core/src/revision50_potions_tests.rs",
+      "sha256": "4695f7a20811e0c3de4fcab7847e790564fb1e88392a897a6eff0d1b6a8e9316"
+    },
+    {
+      "bytes": 15590,
+      "path": "crates/corpse-core/src/revision50_pursuit.rs",
+      "sha256": "9c96d67e6cd6db0994d1ba1c4efeed6cdc9cbe53437039ca8303b1bcd5e59798"
+    },
+    {
+      "bytes": 8661,
+      "path": "crates/corpse-core/src/revision50_rings.rs",
+      "sha256": "21115fbf35f5828beab617c85af96d5e1027f1d9f784d3be1de63624dc9e592c"
+    },
+    {
+      "bytes": 42088,
+      "path": "crates/corpse-core/src/revision50_terrain.rs",
+      "sha256": "5a30fc0917337da24d832e9dffa218ba514d18c840597f2dd1c3c18a78e7e50a"
+    },
+    {
+      "bytes": 11137,
+      "path": "crates/corpse-core/src/revision50_wall_tests.rs",
+      "sha256": "b5a30f61ad52f366a62dbbf79eae4d1b7f897890dec04ce6198a0ac9f2b1d1c0"
+    },
+    {
+      "bytes": 19526,
+      "path": "crates/corpse-core/src/revision50_wave_teleport.rs",
+      "sha256": "6d062c14b9350d3845cc43eee9a3ac3aafc6c6913725f647fd6127fe34a96473"
+    },
+    {
+      "bytes": 1635,
+      "path": "crates/corpse-core/src/rng.rs",
+      "sha256": "6171e07fc69852b73e3fbde1363f23f1761cb2ecf45391d0b2c07f59cd873dec"
+    },
+    {
+      "bytes": 1574,
+      "path": "crates/corpse-core/src/royal_honey.rs",
+      "sha256": "ccba9f117d1faa1958eaaaa5c01c2b8f3cc81692ec365bde6b2cf359bc21dd47"
+    },
+    {
+      "bytes": 3581,
+      "path": "crates/corpse-core/src/saidribee_queen.rs",
+      "sha256": "3ac336dbcaadeab87c21b035729b1fe3ff8688bac5db794f71ca886754c46589"
+    },
+    {
+      "bytes": 11897,
+      "path": "crates/corpse-core/src/scalar_light_culling_tests.rs",
+      "sha256": "f41f0f34752e8f85d7a16a2a8b5a65e5b4b3e9c1635cab2fd413c4915cdddf52"
+    },
+    {
+      "bytes": 11743,
+      "path": "crates/corpse-core/src/shore_currents.rs",
+      "sha256": "9424fe81cf52a840422b1a6aeff44202c99bb7c77aac8c2247f2cbae4733a2b1"
+    },
+    {
+      "bytes": 2782,
+      "path": "crates/corpse-core/src/snapshot_clone.rs",
+      "sha256": "2778adda9928a76d6a75f63711ee2eab3693e758964e7069f4c686d200bcdd22"
+    },
+    {
+      "bytes": 10083,
+      "path": "crates/corpse-core/src/spawn_heatmap.rs",
+      "sha256": "46236bcf2424c8c7927beef6446ba9c4201250d51aa8a7f92f3b8413f57342f3"
+    },
+    {
+      "bytes": 9366,
+      "path": "crates/corpse-core/src/sphinx_generation.rs",
+      "sha256": "cc4496945392b6a929cc19b58bbeaec783d35ff0f0f2362d7f359bcdc32de325"
+    },
+    {
+      "bytes": 33233,
+      "path": "crates/corpse-core/src/startup.rs",
+      "sha256": "335b6eb222329f25bfff8cbb82f4dcdddd5bd7d473935326efb9ed40b8d8189b"
+    },
+    {
+      "bytes": 13170,
+      "path": "crates/corpse-core/src/storage.rs",
+      "sha256": "ea943dc7ee1de5c93f9a8477a9cb90ad3b35998f9fca3aebebd39b52438e2a13"
+    },
+    {
+      "bytes": 16566,
+      "path": "crates/corpse-core/src/sub_biomes_generation.rs",
+      "sha256": "4e6d1f860747661a2f1e65598b1d8f9cc7f982e10554cf51aca1fe221af2e58f"
+    },
+    {
+      "bytes": 771,
+      "path": "crates/corpse-core/src/sub_biomes_validation.rs",
+      "sha256": "dc722c6a53b415aa44492af91ffc98673d07cba576e3641c32d43681b5431868"
+    },
+    {
+      "bytes": 76592,
+      "path": "crates/corpse-core/src/temporal.rs",
+      "sha256": "e50ff3bc2ef9871f0c78b5c716c6ef46437b9a41f79f6991e17b3ee247400f20"
+    },
+    {
+      "bytes": 5029,
+      "path": "crates/corpse-core/src/terrain_runtime.rs",
+      "sha256": "554ab49dd29fc89be72418673ae9af801b755f51d222465be4d7ce27344b63fe"
+    },
+    {
+      "bytes": 16576,
+      "path": "crates/corpse-core/src/timeweave.rs",
+      "sha256": "a2e88b9e1364c828e14d6c82e28f19168868109a48f2c99d1ce3516852feef43"
+    },
+    {
+      "bytes": 7462,
+      "path": "crates/corpse-core/src/timeweave_history_tests.rs",
+      "sha256": "71f895a75b88f98a3ad658ee1464c0ba89711d24c0bd3eaa8f807d72717eab99"
+    },
+    {
+      "bytes": 5566,
+      "path": "crates/corpse-core/src/timing.rs",
+      "sha256": "9fe7581250b7de531799fa765e7e5cd1ccd80399796c32d4f66ec435cc0f8c4d"
+    },
+    {
+      "bytes": 10664,
+      "path": "crates/corpse-core/src/tinker.rs",
+      "sha256": "340afc9d52436156cb140546324b9b9fecab1639aa656bc7fb714a65d4172b16"
+    },
+    {
+      "bytes": 49094,
+      "path": "crates/corpse-core/src/travel.rs",
+      "sha256": "a85b879c567f5b4c5cd52f3fa5e50170c248d8b2fd4f242129a904e21074791b"
+    },
+    {
+      "bytes": 16063,
+      "path": "crates/corpse-core/src/turn_schedule.rs",
+      "sha256": "2a110bf373b55d16de43f22a7677b7903fbbaa3e2edb923c800461d8ce4a28b7"
+    },
+    {
+      "bytes": 45372,
+      "path": "crates/corpse-core/src/validation.rs",
+      "sha256": "441159c9e0eaeb00606afe90c1d5656dfa55cc56a195c8cbbe35a5aee3cf2c06"
+    },
+    {
+      "bytes": 63272,
+      "path": "crates/corpse-core/src/vision.rs",
+      "sha256": "0d84d5758cef4bbae490aad806503f45ca2772ca170ebf5c9176047c5c0db345"
+    },
+    {
+      "bytes": 6652,
+      "path": "crates/corpse-core/src/water_blood.rs",
+      "sha256": "b8f9d3614d9354c7ffebf32bbdc195382445cbbeab73ae1c78e8d5e3632c1783"
+    },
+    {
+      "bytes": 5271,
+      "path": "crates/corpse-core/src/witch.rs",
+      "sha256": "7ef78b1f5432821132875e4088160f269216c80681198bb0c3c30b1ca0fe4a33"
+    },
+    {
+      "bytes": 4320,
+      "path": "crates/corpse-core/src/zillennia_ground.rs",
+      "sha256": "3d11512a99a62a2cc556bcc158a521d0a58ef6b081fac4b9950f5208ea946c34"
+    },
+    {
+      "bytes": 6334,
+      "path": "crates/corpse-core/tests/accuracy_dodge_v33.rs",
+      "sha256": "3ad9d8d830cd81c130af3385a31efda5f09537cb73ddf9dc815e95e4cea1eff9"
+    },
+    {
+      "bytes": 2808,
+      "path": "crates/corpse-core/tests/actor_parity.rs",
+      "sha256": "c0f47d36f9901d2bf47f360d963b75bcaba7397a0dfe9f08f75aa2ec03829599"
+    },
+    {
+      "bytes": 8713,
+      "path": "crates/corpse-core/tests/actor_presentation_logs_v33.rs",
+      "sha256": "6da972afb785fb9936d114f51c0b8deb1048d50034625cce339c234f59be5635"
+    },
+    {
+      "bytes": 3236,
+      "path": "crates/corpse-core/tests/advanced_environment_commands.rs",
+      "sha256": "a62e74d0a01198900ed7a0e75172527888cb22186ccc82c6b388bb0afeba63fb"
+    },
+    {
+      "bytes": 6415,
+      "path": "crates/corpse-core/tests/ahvamitt_r34.rs",
+      "sha256": "146881cdfbf1494672ac8d43314aefeaed4c4717576087d56abeada292afc887"
+    },
+    {
+      "bytes": 6154,
+      "path": "crates/corpse-core/tests/ally_commands.rs",
+      "sha256": "72f518f74fcdaacbbbd8c9f7ad1348b47938ba161a07826bf5fcf0208fac455c"
+    },
+    {
+      "bytes": 3208,
+      "path": "crates/corpse-core/tests/ascend_commands.rs",
+      "sha256": "9b8493d13e96b53001ef84446df057ad5daaab03b4ddb530b4a58906dbc88bb6"
+    },
+    {
+      "bytes": 2874,
+      "path": "crates/corpse-core/tests/avatar_trace.rs",
+      "sha256": "e54fb05cb18fd5bc69f82f180ee18360b7e6e9f363c3d7d21f4250e01aace604"
+    },
+    {
+      "bytes": 9127,
+      "path": "crates/corpse-core/tests/balance42.rs",
+      "sha256": "fce462a2893c8b6f5b21d2506c0166a51a10e53eabd20c7b3879e01e219b58b2"
+    },
+    {
+      "bytes": 7222,
+      "path": "crates/corpse-core/tests/bleeding_revision44.rs",
+      "sha256": "043d8ef0b223a3659fcdb3cb4a0f908ccb3f69efbcae9f3545af329533d38da6"
+    },
+    {
+      "bytes": 3204,
+      "path": "crates/corpse-core/tests/blood_letting.rs",
+      "sha256": "d96fad2691d51a888ee1d15a4b99867e33c6e0756027ffe4ac0e8af9f00046d9"
+    },
+    {
+      "bytes": 3220,
+      "path": "crates/corpse-core/tests/blood_weapon_commands.rs",
+      "sha256": "f1596100e57a69ac9652406c7917c1ca86f30bb99e049784bdc5ac6a6fb95f9e"
+    },
+    {
+      "bytes": 5710,
+      "path": "crates/corpse-core/tests/bombardier_traces.rs",
+      "sha256": "b04bb82719f6e7ae95092cb9aff27b6d2bd68e025ddadee780a14e68760512ff"
+    },
+    {
+      "bytes": 3208,
+      "path": "crates/corpse-core/tests/bonded_commands.rs",
+      "sha256": "5ebec8a9cf537b6f84cf11a74c4cb4eb75898ef73135b055bd13dcca4be895b2"
+    },
+    {
+      "bytes": 20335,
+      "path": "crates/corpse-core/tests/borge_event.rs",
+      "sha256": "ca4cf1131a236bf481337d78dec2692bc1cff6448e119b83e3eae15f9f9d1038"
+    },
+    {
+      "bytes": 8785,
+      "path": "crates/corpse-core/tests/capture_pilot_gas.rs",
+      "sha256": "32459e7dd73287107e34976f5d44701eb7c24c366e819f8d3273dab1f0ddf6e9"
+    },
+    {
+      "bytes": 5724,
+      "path": "crates/corpse-core/tests/caster_spell_traces.rs",
+      "sha256": "21a3977f6beeff6f34bbf26f44dc6027e6bcf0c1d4ab0936f094f01752a75aaf"
+    },
+    {
+      "bytes": 9741,
+      "path": "crates/corpse-core/tests/chronicle_noise_revision46.rs",
+      "sha256": "87b3c58298b746a4218182487d056a1e43784b92b49641ee81eecbce35dc9d2d"
+    },
+    {
+      "bytes": 2755,
+      "path": "crates/corpse-core/tests/cleanup_parity.rs",
+      "sha256": "323d9e8ce29f20c509c3a38e1dedf9f3ea5851f10b3211ffc6f7310478aa5049"
+    },
+    {
+      "bytes": 2252,
+      "path": "crates/corpse-core/tests/combat_starters.rs",
+      "sha256": "17abbf68705065d220184fd0e0580a1bc43c74284611006547739a2b0ea6d665"
+    },
+    {
+      "bytes": 3218,
+      "path": "crates/corpse-core/tests/consumption_passives.rs",
+      "sha256": "aee027c730f635ef44b931b4d5721151377300d01a8738df79e5940d357fc983"
+    },
+    {
+      "bytes": 4661,
+      "path": "crates/corpse-core/tests/cosmetic_blood_trails.rs",
+      "sha256": "2bbdeb3be74e1d140bd1db35a26d98515313a70d5595919f0312addb2e2bc46a"
+    },
+    {
+      "bytes": 3189,
+      "path": "crates/corpse-core/tests/crafting_parity.rs",
+      "sha256": "ab5469326a32d6ff51c05f93e5ff6bcd8bcb3a1122e6eed0317028fb45f089e0"
+    },
+    {
+      "bytes": 16161,
+      "path": "crates/corpse-core/tests/creature_feeding_v33.rs",
+      "sha256": "9eacdc96990587240caa687dbfb577cb5c79a4e456c8984e0aa235535f788221"
+    },
+    {
+      "bytes": 4802,
+      "path": "crates/corpse-core/tests/death_transfer_traces.rs",
+      "sha256": "9a4af265db55160fda561ae82b6b56215529bfadb121635c83de7253e08b7b45"
+    },
+    {
+      "bytes": 7229,
+      "path": "crates/corpse-core/tests/debug_floor_v33.rs",
+      "sha256": "b0906643e2ca6f044acbeb832ba7233564bcc1d69a4103f8d2f7a26a49c865f5"
+    },
+    {
+      "bytes": 3208,
+      "path": "crates/corpse-core/tests/descent_potions.rs",
+      "sha256": "0c8214b1147cebba8991fbdd90991b0213a5e30f20a4914088a55f8f94b45a57"
+    },
+    {
+      "bytes": 3303,
+      "path": "crates/corpse-core/tests/divine_combat.rs",
+      "sha256": "9ce6153b05f7652647f35e699a4e7934a6cc5a8d1cac88ea3699e3504172d3b2"
+    },
+    {
+      "bytes": 3214,
+      "path": "crates/corpse-core/tests/divine_environment.rs",
+      "sha256": "d1a71244d22b8742fd8a15d760424a47ea74cfd109ae86c2938254b85502c2c0"
+    },
+    {
+      "bytes": 4191,
+      "path": "crates/corpse-core/tests/divine_reactions.rs",
+      "sha256": "da030ce7da4078c9bb8e92100f55be9487442dc73198bcc45fcd27d8ae261353"
+    },
+    {
+      "bytes": 2308,
+      "path": "crates/corpse-core/tests/divine_rescues.rs",
+      "sha256": "8cb1c7c1e3b524e1f9ec084451c998a388127078dc58c59b2bd9fbe8c48542be"
+    },
+    {
+      "bytes": 3202,
+      "path": "crates/corpse-core/tests/dream_anchor.rs",
+      "sha256": "3f5aad8ace8054e82d3a37443e0ae08f52cf26e4273e0a80583aa690bb59eb50"
+    },
+    {
+      "bytes": 3200,
+      "path": "crates/corpse-core/tests/dream_craft.rs",
+      "sha256": "3a67a3645b20d74fdd24ec354d764e690419146ef058f5f6600c31c0db415419"
+    },
+    {
+      "bytes": 2026,
+      "path": "crates/corpse-core/tests/enemy_traits.rs",
+      "sha256": "5958e106f1e20d6d22a0d8363992201cb29ec981196224a08e7ca6429330f655"
+    },
+    {
+      "bytes": 1381,
+      "path": "crates/corpse-core/tests/entrance_observation.rs",
+      "sha256": "beb0f20be389c6a68e422404cafef2e3981b74903b9618abea534eb6da97c2a9"
+    },
+    {
+      "bytes": 9878,
+      "path": "crates/corpse-core/tests/environment_parity.rs",
+      "sha256": "ad2b88e9d15c0e0d238b17c39fdd9df81ae0404994a5e8a445665d2a2bbad3cf"
+    },
+    {
+      "bytes": 7544,
+      "path": "crates/corpse-core/tests/epidite_r34.rs",
+      "sha256": "86f31b7e4e3fa05c94ff267fd210e73c9a474d75e9e30f9f347c9855cbc99493"
+    },
+    {
+      "bytes": 1944,
+      "path": "crates/corpse-core/tests/equipment_abilities.rs",
+      "sha256": "4be15b332a47cc8023e99926d6fb526f089251e5d39d71ec29d29170918114fa"
+    },
+    {
+      "bytes": 3226,
+      "path": "crates/corpse-core/tests/equipment_grant_commands.rs",
+      "sha256": "a9003069fdbd357c648d3c562aaed3bf2fa1f68a1f22ac3712ef86a6747ca67c"
+    },
+    {
+      "bytes": 3210,
+      "path": "crates/corpse-core/tests/exhausted_offers.rs",
+      "sha256": "6cd326c56af38d3d29560d3c3db3fcff3fb41bcc94fc11f1c01fcafeb19c8277"
+    },
+    {
+      "bytes": 3294,
+      "path": "crates/corpse-core/tests/expanded_consumables.rs",
+      "sha256": "a8345084d6e045abce490678e4bd9a106e503e2f03b3389c62e54904dc5192f2"
+    },
+    {
+      "bytes": 3204,
+      "path": "crates/corpse-core/tests/final_toggles.rs",
+      "sha256": "da4db32c6b1d228556acebda1f3c188c1332744a756bd29a8a4e4bccab58309d"
+    },
+    {
+      "bytes": 3297,
+      "path": "crates/corpse-core/tests/fire_parity.rs",
+      "sha256": "b191426e205ceaa825531e5dcd322588db54a81e5e3696c1d79fbc0f53637e09"
+    },
+    {
+      "bytes": 11385048,
+      "path": "crates/corpse-core/tests/fixtures/cleanup-v48.json",
+      "sha256": "b6fb1ca7fad6fd1f9d929e3ea6333e02635f2d3cc77065b332fc8249e35371df"
+    },
+    {
+      "bytes": 17834610,
+      "path": "crates/corpse-core/tests/fixtures/divine-compound-v48.json",
+      "sha256": "40659a8a18afa6db8163c6fd8350bd6e621d2e3d43f9ac7a8ce41f237fac25d5"
+    },
+    {
+      "bytes": 5903105,
+      "path": "crates/corpse-core/tests/fixtures/divine-environment-v48.json",
+      "sha256": "f7e39dfbb1c5156a55a172ea13699e50f5957465632735859e63161d4b167709"
+    },
+    {
+      "bytes": 9062201,
+      "path": "crates/corpse-core/tests/fixtures/environment-active-v48.json",
+      "sha256": "32261756f5d0c3df571634799160500a40d38172563d7b95d44ed3976ba2c453"
+    },
+    {
+      "bytes": 940944,
+      "path": "crates/corpse-core/tests/fixtures/environment-static-v48.json",
+      "sha256": "952be7429c8dd53b81df61f6a4e244eb964d5283dcb5376c2e97d20bee7c2a18"
+    },
+    {
+      "bytes": 11831253,
+      "path": "crates/corpse-core/tests/fixtures/explosion-v48.json",
+      "sha256": "e44832650a4179581e0d2f638b2f6e5d26c2f304510c005342542e3654a9be19"
+    },
+    {
+      "bytes": 987975,
+      "path": "crates/corpse-core/tests/fixtures/fire-v48.json",
+      "sha256": "de970d06e6e24eb626d1096605d1ac1d2f35cc6140294b3d9a45ab665f955bd4"
+    },
+    {
+      "bytes": 15939518,
+      "path": "crates/corpse-core/tests/fixtures/generation-environment-v48.json",
+      "sha256": "ae078f922faf0f54fedce6bd82e68e1ed6188f4db89bd2022882acff28b80dd3"
+    },
+    {
+      "bytes": 16903,
+      "path": "crates/corpse-core/tests/fixtures/generation-sweep-v48.json",
+      "sha256": "00792cac58554cd974acb86e3923c0a464da14b652b512af57174208e914dee4"
+    },
+    {
+      "bytes": 9605089,
+      "path": "crates/corpse-core/tests/fixtures/generation-v48.json",
+      "sha256": "c880cbed23e10f79b5403c4ab880199796c22b8cdecc3ae291e0a807f2069e3c"
+    },
+    {
+      "bytes": 903634,
+      "path": "crates/corpse-core/tests/fixtures/generation-validation-v48.json",
+      "sha256": "816144c699dd645f8c06e1df6ae883b3160297c763fbc3e66ecd731639ff17e7"
+    },
+    {
+      "bytes": 16122534,
+      "path": "crates/corpse-core/tests/fixtures/geology-v48.json",
+      "sha256": "86e03c9f9d6b7860f072a629dd61bb98b3ca28543c9fd3355601b3163359cb64"
+    },
+    {
+      "bytes": 7088479,
+      "path": "crates/corpse-core/tests/fixtures/ichor-dispatch-v48.json",
+      "sha256": "0e629f1c5acc1f997c33d1d045e05495cfb19937289c79878ed3384231f7f312"
+    },
+    {
+      "bytes": 52673,
+      "path": "crates/corpse-core/tests/fixtures/ichor-v48.json",
+      "sha256": "16ee48be78cb39778061bdd3171443f9a367ad3b6cb85aff383cea1a8cabf156"
+    },
+    {
+      "bytes": 890494,
+      "path": "crates/corpse-core/tests/fixtures/monster-clocks-v48.json",
+      "sha256": "15298464bc7004902cca4417f5fa2ad82abc667a193f620a579e0634dd268100"
+    },
+    {
+      "bytes": 24589155,
+      "path": "crates/corpse-core/tests/fixtures/offscreen-v48.json",
+      "sha256": "7077727db93803c2e4be0dd375faa5dfcae7a8c91c50f0c4b9dd97881083f961"
+    },
+    {
+      "bytes": 259998,
+      "path": "crates/corpse-core/tests/fixtures/propagation-v48.json",
+      "sha256": "e79cb51cf434d298f898a9ce4db529307d397b25cb069136b11fc818c688a0d8"
+    },
+    {
+      "bytes": 18092771,
+      "path": "crates/corpse-core/tests/fixtures/setups-v48.json",
+      "sha256": "5ffb52fc9af50a891e7054dc245dfb6f7d884421aaa98e25cacf5beb46063f62"
+    },
+    {
+      "bytes": 22488247,
+      "path": "crates/corpse-core/tests/fixtures/status-dispatch-v48.json",
+      "sha256": "92163ad383622b7eff579a342669876c8a3aab3a2039afd27001d81ee0ce946a"
+    },
+    {
+      "bytes": 11481847,
+      "path": "crates/corpse-core/tests/fixtures/topology-v48.json",
+      "sha256": "b000f8004baaf8f3daeadfffdd5034e9b6712d49cbe78115322f925e6c98a642"
+    },
+    {
+      "bytes": 2329332,
+      "path": "crates/corpse-core/tests/fixtures/world-generation-v48.json",
+      "sha256": "f83bcddbb25818d3b1e9dada3be6a5ece4c604621be6105999aa54ca51b07aa3"
+    },
+    {
+      "bytes": 5803,
+      "path": "crates/corpse-core/tests/flavor_placement.rs",
+      "sha256": "c6d225c170352a36df1c7c6d8f82013a8a132f7010ea1b4811aa2a8a2e633172"
+    },
+    {
+      "bytes": 16126,
+      "path": "crates/corpse-core/tests/flesh_finale.rs",
+      "sha256": "a921e7ca50347a4b638a75c73ed58fbf26ed20c15bac3a4e950b05af06ed085c"
+    },
+    {
+      "bytes": 11273,
+      "path": "crates/corpse-core/tests/floor_one_entrance.rs",
+      "sha256": "af9851d310b7bd833d783f8481aad3c4221dde4b0a1bab1e851eab360c88783d"
+    },
+    {
+      "bytes": 12375,
+      "path": "crates/corpse-core/tests/foundation.rs",
+      "sha256": "31f2387ab485d8ef6c1a3969d9f0c5183f58b22615b6066c0a705de530755d11"
+    },
+    {
+      "bytes": 4812,
+      "path": "crates/corpse-core/tests/fury43.rs",
+      "sha256": "97823b9453656bba9c9a9e54dc2493ea49dd189ab8cc173da78299babff00d69"
+    },
+    {
+      "bytes": 3204,
+      "path": "crates/corpse-core/tests/fury_commands.rs",
+      "sha256": "9b16e1af9f6b5b996f975250007c804dc80ef53f05879c25f4de65f67a4bb038"
+    },
+    {
+      "bytes": 1683,
+      "path": "crates/corpse-core/tests/generated_avatar_play.rs",
+      "sha256": "f906acf1fe9b86b50215ed5debe64e2b92c0ff0c5f9d3abca7128aabdcac2448"
+    },
+    {
+      "bytes": 3579,
+      "path": "crates/corpse-core/tests/generated_walks.rs",
+      "sha256": "3c2c64bfc4370139df2c360e6628628bfa3fc5313686fc8887c1b1719d95a037"
+    },
+    {
+      "bytes": 3404,
+      "path": "crates/corpse-core/tests/generation_environment_parity.rs",
+      "sha256": "f3d017af9cf28937a953ffb9ff58ce4ac89bd978f5481b21c03545a97489d739"
+    },
+    {
+      "bytes": 5037,
+      "path": "crates/corpse-core/tests/generation_geometry_r38.rs",
+      "sha256": "ba1dc55d8b1990bbd492b22774ae926e4c4e2940999454ce78286602004bbabc"
+    },
+    {
+      "bytes": 9756,
+      "path": "crates/corpse-core/tests/generation_parity.rs",
+      "sha256": "987d137f293936f1fd142f506fb71e52c5b4fc8b46ec3352783cc05bc66fb75b"
+    },
+    {
+      "bytes": 2579,
+      "path": "crates/corpse-core/tests/generation_sweep_parity.rs",
+      "sha256": "d1346e350993ed1d8a7389cde9fd623a59adb40cc61c6690bb8e15d9a5f81373"
+    },
+    {
+      "bytes": 2217,
+      "path": "crates/corpse-core/tests/generation_validation_parity.rs",
+      "sha256": "e5c8af7788221385999a47db3c1b24b393cdbf8c4f9902ede4d1b4ac8ccf7877"
+    },
+    {
+      "bytes": 5269,
+      "path": "crates/corpse-core/tests/geology_parity.rs",
+      "sha256": "2c014dfce6feb9922c15a864f793b6b187759bf5d494af32eb1894cef97f9b99"
+    },
+    {
+      "bytes": 1390,
+      "path": "crates/corpse-core/tests/godbeast_interactions.rs",
+      "sha256": "9e3821a6e2e3d62dbf047743db167d9aa2f7014fd1af01042f0fa2f94d78abac"
+    },
+    {
+      "bytes": 5668,
+      "path": "crates/corpse-core/tests/grab_traces.rs",
+      "sha256": "a393316dd63558d595930831acbad5a7b82c5628e77fc9a6193ab19aefbba6b2"
+    },
+    {
+      "bytes": 3558,
+      "path": "crates/corpse-core/tests/half_here.rs",
+      "sha256": "72aeba583256e54f8bb9cd8416c2a0dff0a41b150cfd1155bbca669df5f4b561"
+    },
+    {
+      "bytes": 3214,
+      "path": "crates/corpse-core/tests/half_here_commands.rs",
+      "sha256": "d26f6ec639aa46de9bd33a2303acde7422112befaf46b6ab704e1185bba46397"
+    },
+    {
+      "bytes": 5295,
+      "path": "crates/corpse-core/tests/half_here_traces.rs",
+      "sha256": "5994191e20df432a8fd1c07a57df1a32960960e180bb7eabe845e544a1f4ed5f"
+    },
+    {
+      "bytes": 3206,
+      "path": "crates/corpse-core/tests/hazard_potions.rs",
+      "sha256": "799bf812f60bc0496a2e5902b63fe4970e76f74084550aed040f7450319ae906"
+    },
+    {
+      "bytes": 5717,
+      "path": "crates/corpse-core/tests/horn_caster_traces.rs",
+      "sha256": "ef0c76ff8a7e06387e34b56ef7eeef92aef4b2e754db11d2efb7ccab4c019e66"
+    },
+    {
+      "bytes": 4057,
+      "path": "crates/corpse-core/tests/identity_migrations.rs",
+      "sha256": "d4657f1ff08a11407d073ae28cd1dbc9c68c7dd093a774e25c7663b707f3d343"
+    },
+    {
+      "bytes": 8102,
+      "path": "crates/corpse-core/tests/integration_r33_debug.rs",
+      "sha256": "78f3f15a556545f7147882bf221b361a6a5fcc6af1a7a6925f0a06337cc2ef0a"
+    },
+    {
+      "bytes": 9080,
+      "path": "crates/corpse-core/tests/integration_r33_worlds.rs",
+      "sha256": "1cb673366f9aa12f60ad4a88471363154a8d1751c2bd73377657aef11f40082f"
+    },
+    {
+      "bytes": 5696,
+      "path": "crates/corpse-core/tests/inventor_traces.rs",
+      "sha256": "9d83ddccc1cd00f30b9539ebef190089c79a82d083436d0b42be410ba83a257e"
+    },
+    {
+      "bytes": 5126,
+      "path": "crates/corpse-core/tests/inventory_trace.rs",
+      "sha256": "975fdd2b203a2a9634ecb4db1127c1456b173da3f956542562eaa97cee3a5c2d"
+    },
+    {
+      "bytes": 10903,
+      "path": "crates/corpse-core/tests/item_fall_revision43.rs",
+      "sha256": "050d3dce78a900eae235f72bb5ec377772fa279ad64b4a5c6ab61946342d07c2"
+    },
+    {
+      "bytes": 1979,
+      "path": "crates/corpse-core/tests/jewelry_revision43.rs",
+      "sha256": "b2a01389f9c5b72654975062cd45dcabb0873ae110446f50952d5e7e7055037c"
+    },
+    {
+      "bytes": 9046,
+      "path": "crates/corpse-core/tests/journal_projection.rs",
+      "sha256": "d2dd9264ff88723473c47a0201f6227d0e7bde39a652804b5ce80c2870788c82"
+    },
+    {
+      "bytes": 5289,
+      "path": "crates/corpse-core/tests/load_migrations.rs",
+      "sha256": "9e751a65d81be6d216b77a6163d458eb70364b8e9ab5e42fa004f3f21cbeadc8"
+    },
+    {
+      "bytes": 1964,
+      "path": "crates/corpse-core/tests/maintained_links.rs",
+      "sha256": "80c8ab41f8be06d48813a657837dbfe4f19f147f16b5d623328a15cbf7a1f224"
+    },
+    {
+      "bytes": 5790,
+      "path": "crates/corpse-core/tests/mercuria_lever_traces.rs",
+      "sha256": "5b2f53664e77dd1fd6bf2c8114676628d158952d447f6128ca71d14bf3e47c67"
+    },
+    {
+      "bytes": 3202,
+      "path": "crates/corpse-core/tests/mind_control.rs",
+      "sha256": "7856fdc579da0b115902e9919e995ff2d356bd6a90b5f1453627a457f790a628"
+    },
+    {
+      "bytes": 1550,
+      "path": "crates/corpse-core/tests/mini_me.rs",
+      "sha256": "2c13b32a1976e1999061f6acc7e22156214907ba525e2a52ebc2678fc015ac80"
+    },
+    {
+      "bytes": 3472,
+      "path": "crates/corpse-core/tests/mini_me_commands.rs",
+      "sha256": "ff4ed28a7d2c88f26fdd4faa279d25f0eb242e602cc57cb36dbddd127e02ad5d"
+    },
+    {
+      "bytes": 3474,
+      "path": "crates/corpse-core/tests/mini_me_offscreen.rs",
+      "sha256": "f5740773c068ddc9968859aec9a7c4527dfe74469977d5867cc9dc0a092f0365"
+    },
+    {
+      "bytes": 3498,
+      "path": "crates/corpse-core/tests/mini_me_starter_combinations.rs",
+      "sha256": "93a96b089fe4dbf4c1e1e456780399c008238ca77fd5a501fb9be822a0a473bb"
+    },
+    {
+      "bytes": 3000,
+      "path": "crates/corpse-core/tests/monster_balance_v32.rs",
+      "sha256": "b48d2314c253937bbe0d1c94df24d63ac67b3954abfc78b93d69f70f128ca89b"
+    },
+    {
+      "bytes": 1128,
+      "path": "crates/corpse-core/tests/monster_chill.rs",
+      "sha256": "7efda8f1b87fb9d05643858c672bfbe4ba2d369aee2c70893372b419ba45ee40"
+    },
+    {
+      "bytes": 5668,
+      "path": "crates/corpse-core/tests/moon_traces.rs",
+      "sha256": "3b82602c0dcd4a407ecee16c27b3f81ffaf12f206027729ba675a1dd3865982d"
+    },
+    {
+      "bytes": 3500,
+      "path": "crates/corpse-core/tests/movement_fuzz.rs",
+      "sha256": "97d8f620d5698acac6553439e683902b3674bcb798882b39b100e6899d0d7b9d"
+    },
+    {
+      "bytes": 23290,
+      "path": "crates/corpse-core/tests/native_environment_hooks.rs",
+      "sha256": "eb2850bfaa9a16e3691913cb0fc9fc8615bd6d14db43f1301c98a2ad8ffddc27"
+    },
+    {
+      "bytes": 14524,
+      "path": "crates/corpse-core/tests/nest_pockets_v33.rs",
+      "sha256": "3f33047b40793f8b2c343844423c31b00bda1548a06f1e5d9fcf9cd7fbcbc5c1"
+    },
+    {
+      "bytes": 15554,
+      "path": "crates/corpse-core/tests/non_euclidean_generation_v36.rs",
+      "sha256": "cdfaeba711731587aed260ddf9e234cefd2106609aa3cf0ec10b29587689982f"
+    },
+    {
+      "bytes": 14610,
+      "path": "crates/corpse-core/tests/non_euclidean_integration_r36.rs",
+      "sha256": "807637dce2f9828bc02fee2885ead60fb5ad697c8d988e975669d0f27f12d10c"
+    },
+    {
+      "bytes": 15419,
+      "path": "crates/corpse-core/tests/non_euclidean_physics_r36.rs",
+      "sha256": "ae82538ad8bf85f78c895271f74165a8f90a6876947048efb68a3852aba23d81"
+    },
+    {
+      "bytes": 3204,
+      "path": "crates/corpse-core/tests/nova_commands.rs",
+      "sha256": "4b89f459510d154eed615cc662b44195904cfa786b32388b88059b3098f1ee15"
+    },
+    {
+      "bytes": 14269,
+      "path": "crates/corpse-core/tests/nova_revision45.rs",
+      "sha256": "b6d0fff616923f06d84aac91b33db7b359cff55b19e2f00e4f6097856f5d707f"
+    },
+    {
+      "bytes": 9817,
+      "path": "crates/corpse-core/tests/ordinary_roster.rs",
+      "sha256": "50fd6cfde355852641806b4203b835d325e36c8a7b23ae31621f2fd5a589ae22"
+    },
+    {
+      "bytes": 5798,
+      "path": "crates/corpse-core/tests/passive_monster_traces.rs",
+      "sha256": "1f459bad50be8cac20e5d0e26583c1a20e7c9f5d661b10eaa1efecbd9bd32d86"
+    },
+    {
+      "bytes": 1848,
+      "path": "crates/corpse-core/tests/pathfinding_parity.rs",
+      "sha256": "505b1193ef9cd297a078025f6f6e2bdc9af120b184393db69e113657d0976add"
+    },
+    {
+      "bytes": 5934,
+      "path": "crates/corpse-core/tests/phantasmii_dreamwalking_r34.rs",
+      "sha256": "8acc49c58e0f18ad77ba04c64251e0a6da720aa7e6e1e49a3bb51da0023b2d99"
+    },
+    {
+      "bytes": 9329,
+      "path": "crates/corpse-core/tests/phantasmii_generation_r34.rs",
+      "sha256": "77a80e210339a2af9116cc80b59b2573e1976c6474ceafbc784b77842e4954dc"
+    },
+    {
+      "bytes": 24810,
+      "path": "crates/corpse-core/tests/phantasmii_integration_r34.rs",
+      "sha256": "56c57a8c6eac9beb78ca624983cbfe4f122887ac2b7afd0eaa386e3e2e03879c"
+    },
+    {
+      "bytes": 11888,
+      "path": "crates/corpse-core/tests/physical_balance.rs",
+      "sha256": "021e77126b7b396428edd2c3b46a4bcb366b0601f5f83d893c05516a320c5281"
+    },
+    {
+      "bytes": 6437,
+      "path": "crates/corpse-core/tests/playtest_start.rs",
+      "sha256": "92ded03bd496c31b0c58d8588712b931403bd8fada916e3ddb78af39ee484006"
+    },
+    {
+      "bytes": 10084,
+      "path": "crates/corpse-core/tests/population.rs",
+      "sha256": "5245c7219f978da22c2e9d1548e29bdf4fcf5664e8d0dad37ae0cc49fd692de1"
+    },
+    {
+      "bytes": 5781,
+      "path": "crates/corpse-core/tests/portal_consumers_v35.rs",
+      "sha256": "9580c9a0adda5c221a74a9cd45a6b490e31f1256723ed62b5e16615078d15573"
+    },
+    {
+      "bytes": 8190,
+      "path": "crates/corpse-core/tests/portal_generation_v35.rs",
+      "sha256": "b588abb0191324d1c9a9904b63bd78d760fba05d1910a3314be6587abf0c7457"
+    },
+    {
+      "bytes": 14217,
+      "path": "crates/corpse-core/tests/portal_integration_v35.rs",
+      "sha256": "8ccaf344e0384b53b2a24e7239985c079f66536c2e9f86abefb081d540ec4ce9"
+    },
+    {
+      "bytes": 6304,
+      "path": "crates/corpse-core/tests/profile.rs",
+      "sha256": "2095cb8efbaf458a74c81e9adb598f0554521eb3c42d20530b6f6b63f9c92039"
+    },
+    {
+      "bytes": 3200,
+      "path": "crates/corpse-core/tests/projectile_parity.rs",
+      "sha256": "fdab757e4cf30eecc6766666cce1b65af9ea0bc12c774c0ce268b4eb42382e44"
+    },
+    {
+      "bytes": 2952,
+      "path": "crates/corpse-core/tests/propagation_parity.rs",
+      "sha256": "0689469fb60c9bea87a245875e71f543afd225a692a717ac32bd3f908fbb0084"
+    },
+    {
+      "bytes": 17121,
+      "path": "crates/corpse-core/tests/qa_monster_rebalance.rs",
+      "sha256": "c8ba61c9d2b6908525de7deea9a8a6e36b0e2ab8e6c92ed3e329c671aa8a6c4e"
+    },
+    {
+      "bytes": 3212,
+      "path": "crates/corpse-core/tests/reaction_commands.rs",
+      "sha256": "cef4e9391f462d87552c7ef9bad5008f229465c7a263ba8fb0e5300b79bc3597"
+    },
+    {
+      "bytes": 4141,
+      "path": "crates/corpse-core/tests/remember.rs",
+      "sha256": "67baba20428888f8078f436518c86615177c1edf1a4cbdda11af8a85a1409eaa"
+    },
+    {
+      "bytes": 4803,
+      "path": "crates/corpse-core/tests/remember_all_passives.rs",
+      "sha256": "68acd78d559a58337f11fb871d584391f6feb6569771080f2f1e960dcee379fe"
+    },
+    {
+      "bytes": 3210,
+      "path": "crates/corpse-core/tests/remember_hazards.rs",
+      "sha256": "8c5c612ad7d52922ac7b5a875dd47ad93526158202109e63972112c18b44df1c"
+    },
+    {
+      "bytes": 3337,
+      "path": "crates/corpse-core/tests/replay_seed.rs",
+      "sha256": "7f7a331119afa52cec5712ad38a538dc7d6a695629100e09ab8f1dad56a54d0a"
+    },
+    {
+      "bytes": 3208,
+      "path": "crates/corpse-core/tests/rescue_commands.rs",
+      "sha256": "54beb40238ebb65f590b9779e2ef3f959487bcad3d7f95d7d42eff5f44aec1a5"
+    },
+    {
+      "bytes": 2959,
+      "path": "crates/corpse-core/tests/revision43_admission.rs",
+      "sha256": "e59146034b62a96e5b31e1593dd57e89c3ab8923d0d13ab559692b9d6c0669ac"
+    },
+    {
+      "bytes": 5509,
+      "path": "crates/corpse-core/tests/revision43_hallucination.rs",
+      "sha256": "4b3da885bf07f6d7fe5adc78a4411db5201b02c2903df4321c1e55aee89bc6c6"
+    },
+    {
+      "bytes": 3101,
+      "path": "crates/corpse-core/tests/revision43_wording.rs",
+      "sha256": "1d94da454bae015a8989567ef40470f9b6e548b5076bdad901e8e6501108cc2f"
+    },
+    {
+      "bytes": 2969,
+      "path": "crates/corpse-core/tests/revision44_admission.rs",
+      "sha256": "1dcb89dce13dfe75360a96c6c7179e12f0fee351c8d12a1382709f5a7a39adc2"
+    },
+    {
+      "bytes": 7916,
+      "path": "crates/corpse-core/tests/revision45_admission.rs",
+      "sha256": "548064ae9155d2377afdae2a68c02b6cc958a15a8eb151fa81c95aae738e5998"
+    },
+    {
+      "bytes": 7930,
+      "path": "crates/corpse-core/tests/revision46_admission.rs",
+      "sha256": "9d2989d354f221008c8b22f7dc1c9423b260e064a41e114fbe5c2e49c3631485"
+    },
+    {
+      "bytes": 2571,
+      "path": "crates/corpse-core/tests/revision50_ability_energy.rs",
+      "sha256": "20352efbcac7ca93ba7550b3293bb0b7088ce5cacac827e202141f1340833ac4"
+    },
+    {
+      "bytes": 18462,
+      "path": "crates/corpse-core/tests/revision50_admission.rs",
+      "sha256": "47070b40e586765321bf795855be16e3397e3537ec579d55236b1e70020f7179"
+    },
+    {
+      "bytes": 7048,
+      "path": "crates/corpse-core/tests/revision50_amulet_energy.rs",
+      "sha256": "3e4d10fd35f0b77753d34f4fab60f0d439a801679f6a639604afec9f993ff4d0"
+    },
+    {
+      "bytes": 7464,
+      "path": "crates/corpse-core/tests/revision50_bastidion.rs",
+      "sha256": "e101ca19855cb97c4b5c563b7d02174f972452b41a4a3b6aeb545954fda5b0e2"
+    },
+    {
+      "bytes": 4826,
+      "path": "crates/corpse-core/tests/revision50_caster_births.rs",
+      "sha256": "beb5efc3f69012761054a8fcaf1d200df28249d2e895f98ca84d3c9f021b3877"
+    },
+    {
+      "bytes": 3067,
+      "path": "crates/corpse-core/tests/revision50_catalog.rs",
+      "sha256": "ff8546c6323944e9c18bc4782f12f49d8ef9e708e00ab82e2e76ccdb971b87ad"
+    },
+    {
+      "bytes": 15043,
+      "path": "crates/corpse-core/tests/revision50_combat.rs",
+      "sha256": "ce6ddc9a2935425d799eb66b8892f0ec76e5e5478d85c35af6a4cb0112920593"
+    },
+    {
+      "bytes": 18158,
+      "path": "crates/corpse-core/tests/revision50_combat_rings.rs",
+      "sha256": "5b875e1562fa92189fb648ba87c2578ebf830a753cb7b322756bf54248918dd9"
+    },
+    {
+      "bytes": 12264,
+      "path": "crates/corpse-core/tests/revision50_energy_lifecycle.rs",
+      "sha256": "71cc4097a54305cdcb135c29ef8ad9da4f96f45b69139418a09abfb7a67c4a4c"
+    },
+    {
+      "bytes": 3644,
+      "path": "crates/corpse-core/tests/revision50_environment_admission.rs",
+      "sha256": "bd1e636da2beb8410e9a72b71f97c035a888c2838f8f64830716dafcfc0794aa"
+    },
+    {
+      "bytes": 5035,
+      "path": "crates/corpse-core/tests/revision50_future_reserve_guard.rs",
+      "sha256": "035f04779408df95fe755f6c687f12b57700b6d42b83e3b1878ffa8e21abeb86"
+    },
+    {
+      "bytes": 12709,
+      "path": "crates/corpse-core/tests/revision50_ice_immunity.rs",
+      "sha256": "7fa4a20b58faf1ad1135bd61f57a523214cb523f66e2f24e2063f9d17184552e"
+    },
+    {
+      "bytes": 6445,
+      "path": "crates/corpse-core/tests/revision50_inventory_boundaries.rs",
+      "sha256": "4bcbf496940932477c37657e5050d662ec3e6448bccb64ca9765334c596b1259"
+    },
+    {
+      "bytes": 5826,
+      "path": "crates/corpse-core/tests/revision50_item_knowledge.rs",
+      "sha256": "0dafc7fb8dbb216a8dbd8aaf1545fcba5c4989a0f6e91dbcbf6735c4a5354a49"
+    },
+    {
+      "bytes": 9536,
+      "path": "crates/corpse-core/tests/revision50_mini_me.rs",
+      "sha256": "0deff762523da491257c1bf16b4c2fdc3267ae86aea65c7998e646acc5b296b0"
+    },
+    {
+      "bytes": 8307,
+      "path": "crates/corpse-core/tests/revision50_nightmares.rs",
+      "sha256": "fa0a076a2b7e03527cdf08a4061566fd1d14d197e42f4f9e8c7878e085f4ad2c"
+    },
+    {
+      "bytes": 10829,
+      "path": "crates/corpse-core/tests/revision50_player_attack.rs",
+      "sha256": "5a252ced987e2970c0951447d30efcd8259b0640ca7f162a2f391e70e39c967c"
+    },
+    {
+      "bytes": 4387,
+      "path": "crates/corpse-core/tests/revision50_player_power_admission.rs",
+      "sha256": "f8523088e3cbbb1c351ff4f40ac6aa20527d13bbffe36937bf31d35c814b36cd"
+    },
+    {
+      "bytes": 16197,
+      "path": "crates/corpse-core/tests/revision50_preserved_edges.rs",
+      "sha256": "ad59b3c14c72f22a58ba9b2af4553abfd1aca873ecd5e40d1103f65155f4e8c9"
+    },
+    {
+      "bytes": 15300,
+      "path": "crates/corpse-core/tests/revision50_reaping.rs",
+      "sha256": "f845f66779166b68b5d91b6c70eea535b1df7fcf53af33e1f22cfcdfa8817782"
+    },
+    {
+      "bytes": 10620,
+      "path": "crates/corpse-core/tests/revision50_release_boundaries.rs",
+      "sha256": "419bf2364e4b45a72437edba6550c86987635cd27e97752d97bb3bca3ed7c8e0"
+    },
+    {
+      "bytes": 2221,
+      "path": "crates/corpse-core/tests/revision50_reserve_finish.rs",
+      "sha256": "7243bf3b51cb6c35e369551816bb1a385128bb207cdee469fed690a8c1f53634"
+    },
+    {
+      "bytes": 6943,
+      "path": "crates/corpse-core/tests/revision50_ring_lighting.rs",
+      "sha256": "e067b4bcc913e615a96a975ccf7ad02f0868354002af0e3173a2a0f5380f9964"
+    },
+    {
+      "bytes": 12059,
+      "path": "crates/corpse-core/tests/revision50_rings.rs",
+      "sha256": "4efa380393affee70da1102164c73750f39cc84fe3f9e3395b4c5e06e7914aa7"
+    },
+    {
+      "bytes": 23632,
+      "path": "crates/corpse-core/tests/revision50_runtime_paths.rs",
+      "sha256": "378be16ec2c2edff72b40ed47afef88b111186c223124a4144ec8c62f689cee3"
+    },
+    {
+      "bytes": 28328,
+      "path": "crates/corpse-core/tests/revision50_stat_status_rings.rs",
+      "sha256": "3bcc31d3ae72d28be14b523777b822a340f0fc01b419e76ad8c9e755f6856c39"
+    },
+    {
+      "bytes": 5999,
+      "path": "crates/corpse-core/tests/revision50_tinker_history.rs",
+      "sha256": "25ab2a01fd00d20c8e2b83553cea0de620d63aea4587e6ff3223ec0545938f6e"
+    },
+    {
+      "bytes": 1425,
+      "path": "crates/corpse-core/tests/revision_39_startup.rs",
+      "sha256": "e6f9643d61e103296edf56e4199050c75fdf02b119737e61d5fa46f038b5a05b"
+    },
+    {
+      "bytes": 5670,
+      "path": "crates/corpse-core/tests/ruin_traces.rs",
+      "sha256": "34f15fc778a604fac07c6a0f1028c0658fc820b10a048eb915e5a9c96cf853b4"
+    },
+    {
+      "bytes": 3123,
+      "path": "crates/corpse-core/tests/setups_parity.rs",
+      "sha256": "50a109d4cee3bea23b0603bcfbeb0f6e51106f282e56803b67e313a8ae077c2a"
+    },
+    {
+      "bytes": 2091,
+      "path": "crates/corpse-core/tests/shard_ground_r39.rs",
+      "sha256": "9a679b73aaf9e2f9b1fc2e64c361d1841c636a284bd89f41049ab9a368f901f2"
+    },
+    {
+      "bytes": 17109,
+      "path": "crates/corpse-core/tests/shard_weapon_independent_r39.rs",
+      "sha256": "1bbce7956bfe229c25ab01900ba294fa0aeef00f7688a6ad1ef1b20c7b494ff7"
+    },
+    {
+      "bytes": 6311,
+      "path": "crates/corpse-core/tests/shard_weapon_r39.rs",
+      "sha256": "2cb2f03d3f5867fa2785d3695ea09975ce88f52ad981931f700aacb2aaad49a6"
+    },
+    {
+      "bytes": 17567,
+      "path": "crates/corpse-core/tests/shine_revision46.rs",
+      "sha256": "34a2e176e27e5b69633075eb9fe4e8fd852ab18189413a5c412a79690da1456a"
+    },
+    {
+      "bytes": 3206,
+      "path": "crates/corpse-core/tests/shine_slippery.rs",
+      "sha256": "d9087443b6dc87c659466e827f7c0e193971a1f15cf259cbeae4318ddd555be8"
+    },
+    {
+      "bytes": 3214,
+      "path": "crates/corpse-core/tests/silenced_abilities.rs",
+      "sha256": "3ab6d3f294b8a56be41fdd5cb23f6c7f10f9324b3931cce2704be5df5c86cc87"
+    },
+    {
+      "bytes": 6159,
+      "path": "crates/corpse-core/tests/slime_leaves.rs",
+      "sha256": "9923d4f08dbbb39565b2f32a65c20208a549c34c950cf381d744c1ea179959cd"
+    },
+    {
+      "bytes": 11691,
+      "path": "crates/corpse-core/tests/snapshot_overwrite_trial.rs",
+      "sha256": "ae4f0be973fc5bbe9bec286b58cfd848c8adaf207be3f14280fe269534f13b7d"
+    },
+    {
+      "bytes": 5682,
+      "path": "crates/corpse-core/tests/sphinx_traces.rs",
+      "sha256": "61addf5bc14fc2df251b5be850423657eea0997de91c5f3f41cf237199168188"
+    },
+    {
+      "bytes": 5696,
+      "path": "crates/corpse-core/tests/stalking_traces.rs",
+      "sha256": "9ea147cff9eb903e69dbbf6f65dcdfb97d783250d67d3b992e28fc32e616ac74"
+    },
+    {
+      "bytes": 3204,
+      "path": "crates/corpse-core/tests/starter_modes.rs",
+      "sha256": "8111b7e5733a06932769874d4c65253671f850b539df9a8e96b9cb193eb896ca"
+    },
+    {
+      "bytes": 3794,
+      "path": "crates/corpse-core/tests/startup_recovery_r38.rs",
+      "sha256": "2e923cdb0d7ccb97283dc1d89d499d98e881a4afc5c73f952c9601abff1fbeb2"
+    },
+    {
+      "bytes": 3210,
+      "path": "crates/corpse-core/tests/stealth_passives.rs",
+      "sha256": "360d9f87d049e601038b3fb8a79089ac73987d0ffa24cfb3922baa48f8cadf32"
+    },
+    {
+      "bytes": 1786,
+      "path": "crates/corpse-core/tests/sub_biome_generated_turn_r37.rs",
+      "sha256": "0620828ab05accc4b452c326fbf25c46c82c9039f3231728c4bd9150c7a7d592"
+    },
+    {
+      "bytes": 2774,
+      "path": "crates/corpse-core/tests/sub_biome_persistence_r37.rs",
+      "sha256": "4117adabf3c11e9eb6b45c9733925e20e3cbecc9b18f638bba361e74ae2d2936"
+    },
+    {
+      "bytes": 6364,
+      "path": "crates/corpse-core/tests/sub_biomes_generation_r37.rs",
+      "sha256": "f639aaf876183c5e9455f022464573a3f85bd78ae51a9068d04f388b41e28098"
+    },
+    {
+      "bytes": 5855,
+      "path": "crates/corpse-core/tests/temporal_commands.rs",
+      "sha256": "74fd1e2f0b159c4103f46a273dabd5929de8933711b6a81501db567d490fe8ae"
+    },
+    {
+      "bytes": 14188,
+      "path": "crates/corpse-core/tests/terrain_runtime_r37.rs",
+      "sha256": "8a30039737af4cc31da7a9a24e54718acd75a627aa9a6e80940940400d68198f"
+    },
+    {
+      "bytes": 3206,
+      "path": "crates/corpse-core/tests/thrown_potions.rs",
+      "sha256": "16a4c4a066912dd4a41e2139a2f764414600879f6bbd975c6875a2736745e703"
+    },
+    {
+      "bytes": 2361,
+      "path": "crates/corpse-core/tests/timeweave_replay.rs",
+      "sha256": "5953bf658b680a27614d1e0a0ea8626b28b8cc7958a5972218017962411b6e1a"
+    },
+    {
+      "bytes": 3580,
+      "path": "crates/corpse-core/tests/tinker_commands.rs",
+      "sha256": "4d2d129eac6cb7b58b7806c999c2fbebb15489502fe33e93ac515bfa70ccfe25"
+    },
+    {
+      "bytes": 2815,
+      "path": "crates/corpse-core/tests/topology_parity.rs",
+      "sha256": "77855fe147861bb7adcb622617f3fbfb66b2b9cde783da776f052c44a249e59c"
+    },
+    {
+      "bytes": 4883,
+      "path": "crates/corpse-core/tests/travel.rs",
+      "sha256": "c3e75822f8602b5e70b69debc0058fcba2e4bcb77c34d96819b8a43640fc7177"
+    },
+    {
+      "bytes": 4778,
+      "path": "crates/corpse-core/tests/travel_traces.rs",
+      "sha256": "c70e992ed1acf498d7f5298337c0654d6f386a2c89fc9d3549072502c686cd6e"
+    },
+    {
+      "bytes": 3212,
+      "path": "crates/corpse-core/tests/tree_tap_commands.rs",
+      "sha256": "2f097134d00697cc15a64e879a9ae75e62cf9457e07efc3006459f9142df2f74"
+    },
+    {
+      "bytes": 3191,
+      "path": "crates/corpse-core/tests/unspeak.rs",
+      "sha256": "c4446fff472bb9d2692e3d6337f0fcf7f8a640fd70fab29e9eb8fe0de3cbed30"
+    },
+    {
+      "bytes": 3107,
+      "path": "crates/corpse-core/tests/visibility_projection_cache.rs",
+      "sha256": "282d47217001468776ed12358eb6eaa26b2fc9a0dceb3e5f5514f40aeb4d071d"
+    },
+    {
+      "bytes": 1894,
+      "path": "crates/corpse-core/tests/vision_parity.rs",
+      "sha256": "3e7c72465c37cd441d4dbefde34041972e3ff844f78d2b1076ab9932e669e63f"
+    },
+    {
+      "bytes": 8136,
+      "path": "crates/corpse-core/tests/weave_catalog.rs",
+      "sha256": "c62ca8c7a995507e538a211b8b2fa51549e7758723be6e24277c7fffffa508fa"
+    },
+    {
+      "bytes": 13466,
+      "path": "crates/corpse-core/tests/witch_skinwalker_v33.rs",
+      "sha256": "e31ba7133cb6348a07a9f5c1e0c070e233906f5c30d832cb1e16a8e0306548a6"
+    },
+    {
+      "bytes": 1652,
+      "path": "crates/corpse-core/tests/world_generation_parity.rs",
+      "sha256": "d452ed927036607bf8009bd0fa2dd0135d576e1f36cfc77764569b300ee85e22"
+    },
+    {
+      "bytes": 13470,
+      "path": "crates/corpse-core/tests/zillennia_ground_r33.rs",
+      "sha256": "56e93f2c7e8500f8baff6c38da895ee8ec338712a4ba59933060647a6217ecf7"
+    },
+    {
+      "bytes": 59556,
+      "path": "crates/corpse-desktop/src/ability_ui.rs",
+      "sha256": "dfdbe7be20daa713c3003051e93d2d161d4d24a840462c8fdfb64b092514bb30"
+    },
+    {
+      "bytes": 6855,
+      "path": "crates/corpse-desktop/src/alpha_one_oracle_tests.rs",
+      "sha256": "4f26dfdb1a4e282d2376fb7a9d0552298af709bea171bea970e45dcd043be28d"
+    },
+    {
+      "bytes": 10452,
+      "path": "crates/corpse-desktop/src/appearance_compiled.rs",
+      "sha256": "048179f79408c0c200be1c47e455607aeb3aee013cacb58267dc5e9edcfde9e0"
+    },
+    {
+      "bytes": 4936,
+      "path": "crates/corpse-desktop/src/appearance_compiled_tests.rs",
+      "sha256": "00eff82aa7c5750072728950bb50979190113a09342c77e5f90e451c1bfa79eb"
+    },
+    {
+      "bytes": 3812,
+      "path": "crates/corpse-desktop/src/appearance_ground_tests.rs",
+      "sha256": "3f204e6b7f4db9c95e7a771bbe2b8f42e5339d47e9cecfb304f03212fb389e93"
+    },
+    {
+      "bytes": 12382,
+      "path": "crates/corpse-desktop/src/appearance_light.rs",
+      "sha256": "0f03a2de0f098709f4f997404c1582a1d42ad2b6f613f5f548f1669feee460f9"
+    },
+    {
+      "bytes": 8241,
+      "path": "crates/corpse-desktop/src/appearance_material.rs",
+      "sha256": "9c54f4de49d870c6ed26784b0ad6218bc12799df2850e1e16e12980e67362431"
+    },
+    {
+      "bytes": 14399,
+      "path": "crates/corpse-desktop/src/appearance_profile.rs",
+      "sha256": "d0c9b7982740ff1d865aea8b90de36f02e0f48b38a31711a2551f8186f6e6658"
+    },
+    {
+      "bytes": 36699,
+      "path": "crates/corpse-desktop/src/appearance_store.rs",
+      "sha256": "66402b0230ddd13000d138e84d24313db34e614a576332b875fdf17b9cc3e6f1"
+    },
+    {
+      "bytes": 46947,
+      "path": "crates/corpse-desktop/src/appearance_ui.rs",
+      "sha256": "b6d498624d8a5b2d2df6a3c0af50fc61e8c776c74d5c5f27c5ba666d606255cd"
+    },
+    {
+      "bytes": 7645,
+      "path": "crates/corpse-desktop/src/append_play_sequence_tests.rs",
+      "sha256": "aa79c9b2ab3b20c76f0539a6a448e91a5f924c6587003309c48777fc68fdb5bd"
+    },
+    {
+      "bytes": 15662,
+      "path": "crates/corpse-desktop/src/append_recording_tests.rs",
+      "sha256": "462878b65f3c5db671c57f889f52b9c959baedfc4324966e8f4e74d2fe6cc9a0"
+    },
+    {
+      "bytes": 1845,
+      "path": "crates/corpse-desktop/src/ascii_mask.rs",
+      "sha256": "c53575a058d31cccbc6f789214171468d170a2fe7c43c65d5f67c6e63c603a01"
+    },
+    {
+      "bytes": 2192,
+      "path": "crates/corpse-desktop/src/authored_copy_r38_tests.rs",
+      "sha256": "5b58742ed0bc094978f8a801360a806c5c8aaecaa7c647a49aa2d251595f7bb7"
+    },
+    {
+      "bytes": 9274,
+      "path": "crates/corpse-desktop/src/chronicle.rs",
+      "sha256": "efe5933e7d21d376cb3a8f2cd6b8356dcbe41cc67a0ef63e1f0398b7eb80c22f"
+    },
+    {
+      "bytes": 5081,
+      "path": "crates/corpse-desktop/src/chronicle_fade_cache.rs",
+      "sha256": "98a0e9d0213f8521b44d4f085aa48b87e2e33019bb7faa58b65aa7734a2ba0d7"
+    },
+    {
+      "bytes": 11946,
+      "path": "crates/corpse-desktop/src/chronicle_fade_cache_tests.rs",
+      "sha256": "19c5aadeb4b4dab73553fe40d60bfbd529e8995825dc40d1907a1313468b6a73"
+    },
+    {
+      "bytes": 5283,
+      "path": "crates/corpse-desktop/src/chronicle_overlay.rs",
+      "sha256": "75b8793410e90adcb3a08f064adf2dec03004d45cfd1e61c00c4f097a08b05c5"
+    },
+    {
+      "bytes": 7077,
+      "path": "crates/corpse-desktop/src/cogworks_ui.rs",
+      "sha256": "fcacab320b7296a192498d282e146b4d22aa13eda856ced12ecd52e86d52738e"
+    },
+    {
+      "bytes": 18100,
+      "path": "crates/corpse-desktop/src/color.rs",
+      "sha256": "48ad3b7d3e8a6f2ba13d6121b63cb61daec403afb19a7dadb890596ed5dd236b"
+    },
+    {
+      "bytes": 21614,
+      "path": "crates/corpse-desktop/src/color_profile.rs",
+      "sha256": "6314d97d6d7bef1a49620d9213ff70c8dfb065df9093da1e36ce56b7c42fbafc"
+    },
+    {
+      "bytes": 3413,
+      "path": "crates/corpse-desktop/src/compact_dialog_tests.rs",
+      "sha256": "77a47c23c9467abe9cd6ec9493029d36a0821d552bb74f6ea7587cce70d2b90a"
+    },
+    {
+      "bytes": 2951,
+      "path": "crates/corpse-desktop/src/corpse_marker_tests.rs",
+      "sha256": "de55468f00308757ff4da6e28af557706ce9679e6e92669633a06d1ea91f5696"
+    },
+    {
+      "bytes": 49110,
+      "path": "crates/corpse-desktop/src/creature_abilities_ui.rs",
+      "sha256": "0deb823ddbc5c2ce773e6c1ae7cfdd56480d2e6e091b2646b9e5aba24c0a8661"
+    },
+    {
+      "bytes": 9744,
+      "path": "crates/corpse-desktop/src/creature_presentation.rs",
+      "sha256": "fe0db0b44c426fd19da07b7ca46d33fea72339545c50193cdb64b5b6a17469eb"
+    },
+    {
+      "bytes": 12116,
+      "path": "crates/corpse-desktop/src/debug_floor_ui.rs",
+      "sha256": "6ea3a94bd7b388810509413a061fe29b6e6e33e319f4acc1501385e70711dab8"
+    },
+    {
+      "bytes": 9321,
+      "path": "crates/corpse-desktop/src/display_ui.rs",
+      "sha256": "998b26ae644b841b342bdf6e56ad0755885be58301f2416e17f48043ce5f19e9"
+    },
+    {
+      "bytes": 16245,
+      "path": "crates/corpse-desktop/src/dream_ui.rs",
+      "sha256": "a6eb60036e01f9421339ef7368accc24987c18a5285013ba57944da5f288a937"
+    },
+    {
+      "bytes": 6442,
+      "path": "crates/corpse-desktop/src/effects.rs",
+      "sha256": "9ef2540a148b6a6b68ad9fe8d6dfa65326e050d86948de6b346dd77b01b4c036"
+    },
+    {
+      "bytes": 6318,
+      "path": "crates/corpse-desktop/src/embedded_assets.rs",
+      "sha256": "713dc661aca27b96a389122bf1502a62c9e9cbafb145364d2ff4f021382f83dd"
+    },
+    {
+      "bytes": 13103,
+      "path": "crates/corpse-desktop/src/enemy_list.rs",
+      "sha256": "bfac921904559fa8d95496b6a5e3a0a80fe5a19cc811b022dcaf8a9f81cb1f87"
+    },
+    {
+      "bytes": 3382,
+      "path": "crates/corpse-desktop/src/entity_profile.rs",
+      "sha256": "6c6832c77d474f7b562be47ba532f33f4bcf97d4f76456228003de0d6bcb6418"
+    },
+    {
+      "bytes": 4785,
+      "path": "crates/corpse-desktop/src/flesh_palette.rs",
+      "sha256": "e7f15312ac72f08898c91627f4fce7c3061fc490aadff24fdccf99b96efe4651"
+    },
+    {
+      "bytes": 9868,
+      "path": "crates/corpse-desktop/src/gpu_render.rs",
+      "sha256": "d55d865c2fed06895b4c79e519d729f924c3ee288b80fd2a93f4256a30198c42"
+    },
+    {
+      "bytes": 15712,
+      "path": "crates/corpse-desktop/src/gpu_render_tests.rs",
+      "sha256": "b547744e6f459b76127707fb8e53fa607e7c7b4fac8f0aab3e2a0224549f4bd4"
+    },
+    {
+      "bytes": 4370,
+      "path": "crates/corpse-desktop/src/ground_compiled.rs",
+      "sha256": "1dbdb425e6b6c303c6ccd8dd8267f54b84136a81f1e5ab6734a3a1095b2495c8"
+    },
+    {
+      "bytes": 11288,
+      "path": "crates/corpse-desktop/src/hallucination_ui.rs",
+      "sha256": "f33a21d93e23076c3d555f4086f19f1ff200664526e3fbddbc91eb43e80c5da8"
+    },
+    {
+      "bytes": 19255,
+      "path": "crates/corpse-desktop/src/hazards_ui.rs",
+      "sha256": "7f62796468a72907b09180f34089238b066f389aab8959f247df8f5626d075ba"
+    },
+    {
+      "bytes": 12173,
+      "path": "crates/corpse-desktop/src/hover_reuse_bench.rs",
+      "sha256": "38b92e1914bce0f70bd261a38260d986ea4fb5b573ea2e5ab88466ea2a7c68d9"
+    },
+    {
+      "bytes": 34730,
+      "path": "crates/corpse-desktop/src/incremental_log.rs",
+      "sha256": "79ea24cd2874b41a808cbe1ffc51a87a328b25c5099f38af5364fd16de549b40"
+    },
+    {
+      "bytes": 22860,
+      "path": "crates/corpse-desktop/src/incremental_store.rs",
+      "sha256": "cfb4651891c53af96d33c2300c66cdfb3f4039cedb06ae74f5c73f3e89caad24"
+    },
+    {
+      "bytes": 28394,
+      "path": "crates/corpse-desktop/src/incremental_store_tests.rs",
+      "sha256": "e2fe5dc29e41d1857a5a62e3a790b767dc61fef52050f10d3b615b2a3c578f38"
+    },
+    {
+      "bytes": 129050,
+      "path": "crates/corpse-desktop/src/inspection_ui.rs",
+      "sha256": "27bd9fcc82c4cbb3699b749fb1303e04ebe07229019ff01cb91b2f921f98a09b"
+    },
+    {
+      "bytes": 192421,
+      "path": "crates/corpse-desktop/src/main.rs",
+      "sha256": "6eb83bb060f074f7ffbfbdb5fe63f7235783881bff0a5b14e907dea713088caa"
+    },
+    {
+      "bytes": 64702,
+      "path": "crates/corpse-desktop/src/manual.rs",
+      "sha256": "aaed88906cfbf3f4343c2e5eacf3fec6c1df2d51580d51096ba5e240e3e21ab7"
+    },
+    {
+      "bytes": 23854,
+      "path": "crates/corpse-desktop/src/manual_background.rs",
+      "sha256": "596160ee836830f18d00ef20c05d62cd7fcbb0abb85805676b0b9d8c1c9b1c04"
+    },
+    {
+      "bytes": 5885,
+      "path": "crates/corpse-desktop/src/manual_direction.rs",
+      "sha256": "5f2648f8c95e92fa33f5520bcba15f0c4061f06b7bef4ddf1439dea932762cba"
+    },
+    {
+      "bytes": 15677,
+      "path": "crates/corpse-desktop/src/manual_environment.rs",
+      "sha256": "b7a5f9b4731491fe841b4b3d808ad9ab488aee5a81bb574ff89224b054ec4982"
+    },
+    {
+      "bytes": 7573,
+      "path": "crates/corpse-desktop/src/menu_anatomy.rs",
+      "sha256": "546e2688adf1ffc4149cc02c756c644a9cef5291517ac389bb07f72038209519"
+    },
+    {
+      "bytes": 3676,
+      "path": "crates/corpse-desktop/src/menu_cache_tests.rs",
+      "sha256": "6951a38689b350390e6240aeaea6f755af714a3171d8e3a9d7d59d6b7546c116"
+    },
+    {
+      "bytes": 2226,
+      "path": "crates/corpse-desktop/src/menu_heartbeat.rs",
+      "sha256": "0e048e5aff262c56b8eef5caf192c39dd09d05d1744e3ddcfd889d899f91bf95"
+    },
+    {
+      "bytes": 5188,
+      "path": "crates/corpse-desktop/src/menu_raster.rs",
+      "sha256": "cbe72d88087019cb7e0eb21e2d881a95094cb3f12fcd87d4216a8ab50491e69f"
+    },
+    {
+      "bytes": 10749,
+      "path": "crates/corpse-desktop/src/menu_ui.rs",
+      "sha256": "691d1e8c2895cac23714a38d761352e81e33f8fdf511569434e26869f1ca5701"
+    },
+    {
+      "bytes": 7851,
+      "path": "crates/corpse-desktop/src/metadata_operation_tests.rs",
+      "sha256": "429c8a3b5c5262c6ce997ceef542b4556362d74af7bc0c3cd419c05d2134aaf5"
+    },
+    {
+      "bytes": 3587,
+      "path": "crates/corpse-desktop/src/mixed_metadata_fault_tests.rs",
+      "sha256": "0138439e67d3b4b7f4d80a51a4d53f2fa83e82a0800b888af7b44fb13b8f30b3"
+    },
+    {
+      "bytes": 12671,
+      "path": "crates/corpse-desktop/src/modal_ui.rs",
+      "sha256": "c80f3772d12246a742016507f4932c5de3479090adae5845198478a5f5c954b6"
+    },
+    {
+      "bytes": 23678,
+      "path": "crates/corpse-desktop/src/non_euclidean_ui.rs",
+      "sha256": "cc7663bf049cc4ebb2ba2227cccdc372b8b7153a1edf10e127c6c7f8cf3da490"
+    },
+    {
+      "bytes": 135928,
+      "path": "crates/corpse-desktop/src/observe.rs",
+      "sha256": "f51dc8027dabda530b04499c856bfbaba4957b1c2d6a1b13dcf14c1158281c9f"
+    },
+    {
+      "bytes": 7865,
+      "path": "crates/corpse-desktop/src/observe_breakdown_tests.rs",
+      "sha256": "e10c2dabbab74bf7c4c004bf2d3f2d5ba08d3b23899569f76adab500c13b8a5a"
+    },
+    {
+      "bytes": 2288,
+      "path": "crates/corpse-desktop/src/observe_profile_hooks.rs",
+      "sha256": "d904fa9a9888e3a4cea3f58079115086588fbd6d11019ce68624c3018ff1ab2c"
+    },
+    {
+      "bytes": 7851,
+      "path": "crates/corpse-desktop/src/overlay_damage.rs",
+      "sha256": "48f5a4072ddaf5f5c9a7bfadee6aed2399c5898cca3c412852ca2c2153f9e7e3"
+    },
+    {
+      "bytes": 144995,
+      "path": "crates/corpse-desktop/src/pack.rs",
+      "sha256": "3a99d1022f150e0f2fdd08643cf2caebd31d70bb8c4ef0c217bf135be0005ba8"
+    },
+    {
+      "bytes": 4644,
+      "path": "crates/corpse-desktop/src/pack_occlusion.rs",
+      "sha256": "0556c0356ec4fce1e2fbeab260a409912aabd5b37ec4b58dcc76ed2ca4591d63"
+    },
+    {
+      "bytes": 10047,
+      "path": "crates/corpse-desktop/src/pack_occlusion_tests.rs",
+      "sha256": "736a12f35f2f20dffc662325d409c7b38127e29573c8c28344e44f2b553029da"
+    },
+    {
+      "bytes": 1727,
+      "path": "crates/corpse-desktop/src/paint_bulk_tests.rs",
+      "sha256": "488847ed9820476f19925313889d17dac6117a79bc92f622c44ff4af26992104"
+    },
+    {
+      "bytes": 8889,
+      "path": "crates/corpse-desktop/src/paint_parity_tests.rs",
+      "sha256": "2d29d63ec3946d3c24a510df7ff73bf02564242323362a6edf3e93be6d3ad1d7"
+    },
+    {
+      "bytes": 30778,
+      "path": "crates/corpse-desktop/src/paint_profile_bench.rs",
+      "sha256": "6a72638de6537d9e73b91701ec959d2e8ede605cb68c9bba748f850298b45eca"
+    },
+    {
+      "bytes": 11400,
+      "path": "crates/corpse-desktop/src/portal_ui.rs",
+      "sha256": "be06a530d5bd43dbc56af461c947532fa60878000394af5225764dbd183cab21"
+    },
+    {
+      "bytes": 4811,
+      "path": "crates/corpse-desktop/src/profiles.rs",
+      "sha256": "37586f99ae683ab5b00ca18a5414570c7c0e01df170296c12a7d2e4944faccdc"
+    },
+    {
+      "bytes": 5941,
+      "path": "crates/corpse-desktop/src/recording_attachment.rs",
+      "sha256": "5b7db00b21e30dbf37a946ad504128a86ddc113fd561758f6337a3b1aeaa2a20"
+    },
+    {
+      "bytes": 4930,
+      "path": "crates/corpse-desktop/src/recording_resume.rs",
+      "sha256": "a06d45f6b33b15506fcae518c68f8a69377c209b87a32ffcb27fff159c0f3989"
+    },
+    {
+      "bytes": 8621,
+      "path": "crates/corpse-desktop/src/recording_resume_tests.rs",
+      "sha256": "1e2d6f8b2c2eb9c9459c8c31339b80d82d559c983a38605924d86506cf3c9600"
+    },
+    {
+      "bytes": 167960,
+      "path": "crates/corpse-desktop/src/render.rs",
+      "sha256": "ffdd2b16f11072ecfa988c472235ef4c3e4db8cbd3521182202bc1256fa2c056"
+    },
+    {
+      "bytes": 3364,
+      "path": "crates/corpse-desktop/src/render_background.rs",
+      "sha256": "d53de9aec71e783559184e1589711e31801174c84c2147fd90c42b2c9d402e4a"
+    },
+    {
+      "bytes": 7097,
+      "path": "crates/corpse-desktop/src/render_background_tests.rs",
+      "sha256": "048a089564d5871f46abadb31887216a5c4d5e5f2183a262317c57666edd94a3"
+    },
+    {
+      "bytes": 20647,
+      "path": "crates/corpse-desktop/src/render_damage.rs",
+      "sha256": "5aa351b2153bf3539365e4704dfc6853bc13b86c97cf4310c1be4784eeb724aa"
+    },
+    {
+      "bytes": 3389,
+      "path": "crates/corpse-desktop/src/render_damage_coalescing_tests.rs",
+      "sha256": "2e394ab029ebd0d271e650889235d29495a50b0d71d976f9094db2b5e1e0c89e"
+    },
+    {
+      "bytes": 3217,
+      "path": "crates/corpse-desktop/src/render_damage_metadata_bench.rs",
+      "sha256": "d601a22eb32e83f263ab811928d1de8a4725f0641b123a82a16452769e820e85"
+    },
+    {
+      "bytes": 5419,
+      "path": "crates/corpse-desktop/src/render_damage_tests.rs",
+      "sha256": "164d30643af875e590d83520634889d8dfffa6087ed17ff67d7b4a8818c03247"
+    },
+    {
+      "bytes": 7061,
+      "path": "crates/corpse-desktop/src/replays.rs",
+      "sha256": "e34c00b47fd51e5005959ea9c570197219d565b66748b780ce42b2d99c8476a6"
+    },
+    {
+      "bytes": 16470,
+      "path": "crates/corpse-desktop/src/resolution_bench.rs",
+      "sha256": "a865d0a4ca4b567c92ccba79a6da2df3c33d3d758f90ce5e90378d81028371af"
+    },
+    {
+      "bytes": 4002,
+      "path": "crates/corpse-desktop/src/responsive_geometry_tests.rs",
+      "sha256": "866446bc5c3d6e366cc426d08b028a4255bdf22355779a0a6fcf6a79dba88c69"
+    },
+    {
+      "bytes": 6011,
+      "path": "crates/corpse-desktop/src/retained_overlay_tests.rs",
+      "sha256": "ac09085e9ea3c9b79201482159cef91bedc84aa60bffaa5e2fbb19ed27eaf5ba"
+    },
+    {
+      "bytes": 6719,
+      "path": "crates/corpse-desktop/src/retained_pack_tests.rs",
+      "sha256": "52c617bb07a42bfbbfeec04570fbcdd610f45cd3a22e7a7f157a5353fbae3d01"
+    },
+    {
+      "bytes": 11077,
+      "path": "crates/corpse-desktop/src/retained_paint_bench.rs",
+      "sha256": "09f97795919f2f9109887b6b0ff9c07d1f4750e4b2fd187f5396595a30c539ed"
+    },
+    {
+      "bytes": 926,
+      "path": "crates/corpse-desktop/src/revision42_resume_tests.rs",
+      "sha256": "cbf7764c91ebdc517968878cb4649a8c2ffb4ebf8b29bd925bb74cc47150f748"
+    },
+    {
+      "bytes": 3613,
+      "path": "crates/corpse-desktop/src/revision43_protocol_tests.rs",
+      "sha256": "8b79523813e2e134604a3ab6f37be5c659ddefe35457046100ddfb206118ae1e"
+    },
+    {
+      "bytes": 3615,
+      "path": "crates/corpse-desktop/src/revision44_protocol_tests.rs",
+      "sha256": "dc59f0ee6544a8e0eb1e7f40ceceef642b2b4fa4f9707289e23c08c558d07f73"
+    },
+    {
+      "bytes": 5919,
+      "path": "crates/corpse-desktop/src/revision45_protocol_tests.rs",
+      "sha256": "5974816d1bcf6aa662cb99639bd7b702a641745c4a7ebedea2e33b7bc12eaa57"
+    },
+    {
+      "bytes": 6033,
+      "path": "crates/corpse-desktop/src/revision46_protocol_tests.rs",
+      "sha256": "eb4da094ef98b34c9e9d4e8f78a85a9cb9f5a7c07f211e5a65455b80219747f6"
+    },
+    {
+      "bytes": 6876,
+      "path": "crates/corpse-desktop/src/revision50_item_knowledge_tests.rs",
+      "sha256": "ea60e1d454721e9e6cd3c1c339b887e3599106c063c9b9b8cddb83bd35179046"
+    },
+    {
+      "bytes": 10579,
+      "path": "crates/corpse-desktop/src/revision50_jewelry_capture_tests.rs",
+      "sha256": "653f1c0f90c51094c2f833ce54a84618409fd452d2a2a0d9434e56311bfb8395"
+    },
+    {
+      "bytes": 13010,
+      "path": "crates/corpse-desktop/src/revision50_protocol_tests.rs",
+      "sha256": "9feca4961dc78c97a8d1b5599c04760acabe21c11b8d5e8e7b9b4357720b3d9f"
+    },
+    {
+      "bytes": 7909,
+      "path": "crates/corpse-desktop/src/seed_replay_provenance_tests.rs",
+      "sha256": "b2ea428c193b3ca0f6cdf2f8e61debcbb144fbabf88df8626563b6f684fc3732"
+    },
+    {
+      "bytes": 29522,
+      "path": "crates/corpse-desktop/src/session_store.rs",
+      "sha256": "97bd4c442813a18329dd319e3e873f713766738435f15cf9758565e94164aaca"
+    },
+    {
+      "bytes": 5763,
+      "path": "crates/corpse-desktop/src/snapshot_replay_compat_tests.rs",
+      "sha256": "5a1826bd92809bbf86316d88ca99fd291d7557b2081f97bc274967c59e48a734"
+    },
+    {
+      "bytes": 6272,
+      "path": "crates/corpse-desktop/src/sparse_ascii_tests.rs",
+      "sha256": "f9faa328d8119c76121fdab1348d96b108d7d63e7911ad54fdd81a77218f1554"
+    },
+    {
+      "bytes": 3304,
+      "path": "crates/corpse-desktop/src/startup_ui.rs",
+      "sha256": "51de05f8751bc956fb63418bf1bdabd595c7cb384ee5907918b689a8b63c34e4"
+    },
+    {
+      "bytes": 25154,
+      "path": "crates/corpse-desktop/src/statuses_ui.rs",
+      "sha256": "99a65840a8be16c1c2e9e1d9fa387224917649b75f28636a296f200e2fd3e1a8"
+    },
+    {
+      "bytes": 8260,
+      "path": "crates/corpse-desktop/src/sub_biomes_ui.rs",
+      "sha256": "87f6dfad3e64d127a9dc07bbadcb8b3a559a2e1a7c811bb2ee072d7750bd4113"
+    },
+    {
+      "bytes": 23973,
+      "path": "crates/corpse-desktop/src/targeting_ui.rs",
+      "sha256": "308716f7a75fffaafd5664b56489c8f6cd69624330ff35deb48377d70917b918"
+    },
+    {
+      "bytes": 9293,
+      "path": "crates/corpse-desktop/src/terminal_ui.rs",
+      "sha256": "75540aa941711c3112119085b8e633add46b735bc9aab891d7827a7b33aac5cb"
+    },
+    {
+      "bytes": 4332,
+      "path": "crates/corpse-desktop/src/tile_action_frame_tests.rs",
+      "sha256": "c2063dad059054b748f9cc9eb6d5bace69e437ec98c85d48683ce3936c668482"
+    },
+    {
+      "bytes": 3006,
+      "path": "crates/corpse-desktop/src/tile_animated_action_tests.rs",
+      "sha256": "5c75a5d55dea018e30920e391d16b773f87534e7b4d1c375971c9eca28205bc7"
+    },
+    {
+      "bytes": 18484,
+      "path": "crates/corpse-desktop/src/tile_damage.rs",
+      "sha256": "c93862af50d5a2aa4fc70414273b3f51f1ed081a8d46147ab427f197c727ced6"
+    },
+    {
+      "bytes": 13849,
+      "path": "crates/corpse-desktop/src/tile_damage_tests.rs",
+      "sha256": "78af14d0b56c03dbd9b6c8b82a3dae7c356b180449ce49041bc8f3cb09317484"
+    },
+    {
+      "bytes": 21346,
+      "path": "crates/corpse-desktop/src/tile_overlay.rs",
+      "sha256": "ec4aa148b09e7bbb6f424a8134acb352d9440c6149db3967615866a0087f70d2"
+    },
+    {
+      "bytes": 4685,
+      "path": "crates/corpse-desktop/src/tile_paint_attribution_tests.rs",
+      "sha256": "4da6f2570d0a5ced1d9a0978b7c62e6ba004616beb09365224ceea42186841fd"
+    },
+    {
+      "bytes": 7193,
+      "path": "crates/corpse-desktop/src/tile_sdl_timing_tests.rs",
+      "sha256": "b8a1148f46e3e1a18759f886157c373ba7d29330d6e11ac3e7b2869b34f4df7c"
+    },
+    {
+      "bytes": 60943,
+      "path": "crates/corpse-desktop/src/timeweave_action_tests.rs",
+      "sha256": "79c0e545135ffd0c70fe84f41df4194548a7f1b7b3025a88adfc450488bb7cdc"
+    },
+    {
+      "bytes": 6028,
+      "path": "crates/corpse-desktop/src/timeweave_scene_qa_tests.rs",
+      "sha256": "66aa7633fe4e21c62fbeaf768839f97fbf898ea95406d32fa69d164d1f319f55"
+    },
+    {
+      "bytes": 3388,
+      "path": "crates/corpse-desktop/src/timeweave_ui.rs",
+      "sha256": "7c89751685fe81a91d78cedc2e557c707b848a6663ae79b36232ba054ce93efb"
+    },
+    {
+      "bytes": 11397,
+      "path": "crates/corpse-desktop/src/timing_test.rs",
+      "sha256": "859f47d9185f0de71e8d42f97e76210564f8cf3164d4924c786a96f114f4ad03"
+    },
+    {
+      "bytes": 12797,
+      "path": "crates/corpse-desktop/src/tracked_engine.rs",
+      "sha256": "26fcd9191b94898799a4a6d05959477a98aac2b4624eca2b2fe80515234200d3"
+    },
+    {
+      "bytes": 7508,
+      "path": "crates/corpse-desktop/src/tracked_metadata.rs",
+      "sha256": "5488c749c07c1a5297e53f15fd71f4cce25953eeecc9a8ff973fb3533628979e"
+    },
+    {
+      "bytes": 4848,
+      "path": "crates/corpse-desktop/src/tracked_metadata_tests.rs",
+      "sha256": "1726c0459d9ba68fe675763267e1516ab7a96f52cd0a01750610ce7f8ffdc57c"
+    },
+    {
+      "bytes": 41596,
+      "path": "crates/corpse-desktop/src/travel_ui.rs",
+      "sha256": "39da5308a3a6aa138a905c7bf65e2ea93f20ea11e8f7050c1cbd13f6aeb605b3"
+    },
+    {
+      "bytes": 6787,
+      "path": "crates/corpse-desktop/src/typography_ui.rs",
+      "sha256": "d61bc8ac1b7ea91a7357f2310c8f8c7c87ed3df52df45d4c0184f724e6b41030"
+    },
+    {
+      "bytes": 10872,
+      "path": "crates/corpse-desktop/src/visual_requests_revision50_tests.rs",
+      "sha256": "337019251d3f8aec8665dbf85dfbb7b6cd0183bd6beadc50b9ba7802f375222c"
+    },
+    {
+      "bytes": 4346,
+      "path": "crates/corpse-desktop/src/wait_ui.rs",
+      "sha256": "19554b9d1128e72524666a37b065d6dd8c48aba4c24a20d2c8a0efdfc045b78c"
+    },
+    {
+      "bytes": 4520,
+      "path": "crates/corpse-desktop/src/world_features.rs",
+      "sha256": "9fd9464baaf7aaaa4d245d030107136ec855812c18a6f7add6bf4f6d47e92151"
+    },
+    {
+      "bytes": 51,
+      "path": "rust-toolchain.toml",
+      "sha256": "ca67e66659a82661386e5a08471c913cb8b3f7c7ce37592207d3f513589a41c2"
+    }
+  ]
+}

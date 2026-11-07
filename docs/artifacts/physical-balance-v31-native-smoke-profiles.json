@@ -1,0 +1,47 @@
+[
+  {
+    "kind": "bear",
+    "reference_depth": 12.0,
+    "cohort_row_index": 6639,
+    "stats": [
+      46.0,
+      45.0,
+      42.0,
+      14.0,
+      16.0,
+      370.0
+    ],
+    "modeled_mean": 0.2814691248648648,
+    "modeled_death_rate": 0.0
+  },
+  {
+    "kind": "dire-bear",
+    "reference_depth": 25.0,
+    "cohort_row_index": 2861,
+    "stats": [
+      138.0,
+      150.0,
+      109.0,
+      51.0,
+      33.0,
+      1000.0
+    ],
+    "modeled_mean": 0.55124015,
+    "modeled_death_rate": 0.0
+  },
+  {
+    "kind": "cancer",
+    "reference_depth": 38.0,
+    "cohort_row_index": 6183,
+    "stats": [
+      376.0,
+      267.0,
+      129.0,
+      94.0,
+      53.0,
+      1702.0
+    ],
+    "modeled_mean": 0.6390867239952996,
+    "modeled_death_rate": 0.0
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "stage": "focused perception verification passed on desktop compile artifact 6; subsequent illumination color calibration is separate",
+  "test_filter": "revision51_perception",
+  "passed": 9,
+  "failed": 0,
+  "test_binary": "target/debug/deps/corpse_desktop-1e13fa2e6b813f30",
+  "test_seconds": 2.96,
+  "capture_fixture": "avatar-room-v1 with controlled open terrain, zero light, player at20,14, rat at23,14 and Perception0; real R51 visibility; no all-seeing/reveal",
+  "capture_review": "Fresh six captures match the previously reviewed pixels byte-for-byte by SHA-256. Reviewed base 1280x800, wide 1920x1080, portrait 960x1200, map hover and negative tile inspection: thin contour legible, labels unclipped, unhovered sidebar range absent.",
+  "hardware_verified": false,
+  "full_workspace_suite_run": false,
+  "captures": [
+    {
+      "file": "perception-1280x800.png",
+      "sha256": "8bd4741a59450ae514715ab2b7bd339a4a8588582ad2ed7bd89edcf3286f634f"
+    },
+    {
+      "file": "perception-1920x1080.png",
+      "sha256": "9f838249eb23530bca94605617fcd3230bc88e2e698ab905e3a653c99394c89f"
+    },
+    {
+      "file": "perception-960x1200.png",
+      "sha256": "6f7b6510e51c02b9db82ae3cdcdd05e7d8fd22171ce5a788bf2b96179cbc4135"
+    },
+    {
+      "file": "perception-1537x911.png",
+      "sha256": "07f658f3443bd85dcc33adb9a08774e00622b361f783df319c18e972794110d3"
+    },
+    {
+      "file": "perception-map-hover.png",
+      "sha256": "0542c94e44d85c0f34448a5acf2f53fef9b4897e06a61bac9bcd73926940af9a"
+    },
+    {
+      "file": "perception-tile-inspection.png",
+      "sha256": "e7fc2a587fc62ace10f724d997f5351a45853ab8b7064690faa29ffa68a160e2"
+    }
+  ],
+  "ignored": 0,
+  "test_binary_sha256": "ff0feea2c3dfd35b6dbedf379a5be0ae8699cb80361fc9f0b815559ba5c24c76",
+  "test_log": "verification/r51-ui/targeted-perception-aiming-1.log",
+  "artifact_manifest": "verification/r51-ui/desktop-compile-6-artifact.sha256",
+  "fixture_correction": "Canonical cave-bat fixture correction verified by the passing labels/legacy/heart-preview test.",
+  "capture_limit": "These captures precede the separately requested illumination color-curve calibration. Future color changes require fresh captures; contour rules are unchanged by that separate work.",
+  "verification_scope": "Nine focused desktop tests, including software full/retained/tile equivalence and GPU command-only checks. Not a full-workspace or hardware GPU/Windows verification."
+}

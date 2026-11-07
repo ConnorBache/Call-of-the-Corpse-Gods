@@ -1,0 +1,272 @@
+=== revision51_ability_restorations ===
+
+running 11 tests
+test dream_sparkle_water_contact_does_not_change_waking_sources ... ok
+test came_is_unlimited_after_exact_ten_payment_and_preserves_legacy_countdown ... FAILED
+test inactive_floor_water_cleanup_uses_same_rule_without_relighting ... ok
+test paid_abilities_reject_silence_or_insufficient_energy_before_world_mutation ... ok
+test restored_floor_sources_and_shine_rebuild_after_future_and_snapshot ... ok
+test reveal_normal_actions_expire_and_no_action_or_failed_commands_preserve ... ok
+test reveal_survives_all_bonus_move_modes_then_ends_after_wait ... ok
+test shine_r50_to_r51_cache_transition_and_free_toggle_are_exact ... ok
+test future_snapshot_save_load_and_replay_preserve_new_reveal_boundary ... ok
+test water_contact_clears_existing_source_cache_and_spread_fire_but_preserves_hellfire ... ok
+test sparkle_has_no_terrain_limit_but_water_including_ichor_quenches_immediately ... ok
+
+failures:
+
+---- came_is_unlimited_after_exact_ten_payment_and_preserves_legacy_countdown stdout ----
+
+thread 'came_is_unlimited_after_exact_ten_payment_and_preserves_legacy_countdown' (42) panicked at crates/corpse-core/tests/revision51_ability_restorations.rs:83:81:
+called `Result::unwrap()` on an `Err` value: AlreadyInitialized
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    came_is_unlimited_after_exact_ten_payment_and_preserves_legacy_countdown
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+
+=== revision51_player_base_damage ===
+
+running 8 tests
+test copied_attack_bases_follow_frozen_mini_me_and_live_clay_semantics ... ok
+test enemy_attacks_and_explicit_ability_packets_are_not_scaled ... ok
+test existing_copy_snapshots_and_enemy_weapon_conditions_survive_save_and_rewind ... FAILED
+test main_generic_and_haste_player_attacks_use_revisioned_base_without_extra_rng ... FAILED
+test reduction_precedes_variance_mitigation_and_only_final_damage_rounding ... ok
+test revision51_scales_only_fixed_components_and_preserves_bonus_coefficients ... ok
+test committed_bows_and_throw_types_apply_fixed_reduction_once ... ok
+test shared_avatar_counter_uses_live_owner_baseline ... FAILED
+
+failures:
+
+---- existing_copy_snapshots_and_enemy_weapon_conditions_survive_save_and_rewind stdout ----
+
+thread 'existing_copy_snapshots_and_enemy_weapon_conditions_survive_save_and_rewind' (97) panicked at crates/corpse-core/tests/revision51_player_base_damage.rs:187:58:
+called `Result::unwrap()` on an `Err` value: StorageError("Missing floor actor/ground block")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- main_generic_and_haste_player_attacks_use_revisioned_base_without_extra_rng stdout ----
+
+thread 'main_generic_and_haste_player_attacks_use_revisioned_base_without_extra_rng' (98) panicked at crates/corpse-core/tests/revision51_player_base_damage.rs:90:47:
+assertion `left == right` failed
+  left: 2151050974.0
+ right: 372467569.0
+
+---- shared_avatar_counter_uses_live_owner_baseline stdout ----
+
+thread 'shared_avatar_counter_uses_live_owner_baseline' (101) panicked at crates/corpse-core/tests/revision51_player_base_damage.rs:204:87:
+called `Result::unwrap()` on an `Err` value: InvalidReserve
+
+
+failures:
+    existing_copy_snapshots_and_enemy_weapon_conditions_survive_save_and_rewind
+    main_generic_and_haste_player_attacks_use_revisioned_base_without_extra_rng
+    shared_avatar_counter_uses_live_owner_baseline
+
+test result: FAILED. 5 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+=== revision51_damage_rounding ===
+
+running 13 tests
+test revision51_attack_rng_is_unchanged_and_ordinary_health_delta_is_integer ... ok
+test revision51_bonded_packets_round_their_half_independently ... ok
+test revision51_explosion_aoe_rounds_each_victim_and_preserves_immunity ... ok
+test revision51_fractional_healing_and_curse_duration_remain_unchanged ... ok
+test revision51_gas_vulnerability_and_resistance_round_once ... ok
+test revision51_nearest_boundaries_and_legacy_primitives ... ok
+test revision51_offscreen_status_packets_round_without_changing_the_clock ... ok
+test revision51_poison_tick_hemophilia_and_blood_weapon_use_matching_values ... ok
+test revision51_resistance_precedes_the_only_round_and_keeps_legacy_fractions ... ok
+test revision51_all_packet_kinds_and_exact_packets_use_nearest ... ok
+test revision51_shared_body_resistance_rounds_once_for_the_owner ... ok
+test revision51_terminal_strike_stays_lethal_below_half_hp_and_displays_integer ... ok
+test revision51_save_snapshot_and_fixture_replay_preserve_damage_policy ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+=== revision51_fungus_feasts ===
+
+running 10 tests
+test dead_feast_pools_include_ordinary_pairs_followers_and_banshees ... FAILED
+test hidden_root_memory_does_not_change_direction_until_observed_again ... ok
+test impossible_layout_omits_fungus_and_both_victims_without_generation_failure ... ok
+test legacy_fungus_generation_keeps_horizontal_canned_corpses_and_no_initial_roots ... ok
+test no_late_fungi_or_godbeast_corpse_substitutions_when_no_deeper_species_exists ... ok
+test out_of_depth_means_first_eligible_two_or_three_floors_later ... ok
+test placement_finds_nearest_clear_cells_when_old_horizontal_slots_are_blocked ... ok
+test root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_intersections ... ok
+test separate_fungi_never_share_generated_victim_cells ... ok
+test generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots ... FAILED
+
+failures:
+
+---- dead_feast_pools_include_ordinary_pairs_followers_and_banshees stdout ----
+
+thread 'dead_feast_pools_include_ordinary_pairs_followers_and_banshees' (181) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:182:9:
+assertion failed: pools[1].iter().any(|kind| kind == "hemogoblin-inventor")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots stdout ----
+
+thread 'generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots' (182) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:27:9:
+assertion `left == right` failed: floor 13
+  left: true
+ right: false
+
+
+failures:
+    dead_feast_pools_include_ordinary_pairs_followers_and_banshees
+    generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots
+
+test result: FAILED. 8 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+=== revision50_bastidion ===
+
+running 9 tests
+test amulet_only_cooldown_clarification_preserves_mask_and_enemy_lockouts ... ok
+test dead_fungus_cannot_revive_even_after_all_roots_are_removed ... ok
+test r50_live_emission_overrides_every_saved_gas_and_legacy_keeps_exact_mapping ... ok
+test r50_offscreen_save_snapshot_and_future_replay_emit_hallucinogenic_gas ... ok
+test r50_root_connections_keep_volume_and_recolor_old_saved_roots ... ok
+test rooted_corpses_never_revive_during_normal_or_haste_turns_and_severing_frees_them ... ok
+test rooted_corpses_remain_dead_offscreen_after_save_and_both_temporal_restores ... ok
+test solitary_inventor_and_mech_feast_corpses_validate_and_revive_safely_after_release ... ok
+test r50_population_all_aliases_depths_and_seeds_skip_random_gas_selection ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.34s
+
+=== revision51_root_cleanup ===
+
+running 9 tests
+test an_inactive_first_pair_cannot_be_revived_by_a_duplicate_saved_active_pair ... ok
+test every_target_gets_one_shortest_direct_olive_path_without_capping_acquisition ... ok
+test hidden_root_memory_is_retained_until_observation_without_live_stale_glyphs ... ok
+test fungal_source_death_clears_roots_immediately_before_another_environment_tick ... ok
+test legacy_roots_keep_old_color_and_severed_material ... ok
+test moved_or_revived_targets_and_moved_sources_sever_old_paths_instead_of_rerouting ... ok
+test native_root_review_exports_actual_simulation_states_when_requested ... ok
+test severing_removes_the_entire_orphan_branch_but_preserves_shared_live_cells_and_history ... ok
+test loaded_stale_material_and_duplicate_pairs_are_cleaned_idempotently_without_rng ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+=== revision51_speed_up_tiles ===
+
+running 7 tests
+test revision51_replacement_deactivates_tile_links_and_exact_restoration_reactivates ... ok
+test revision51_speed_up_admission_and_ids_are_revision_safe ... ok
+test revision51_speed_up_generation_replaces_ground_without_changing_assignments ... ok
+test revision51_speed_up_lighting_and_visibility_are_local_and_not_opaque ... FAILED
+test revision51_black_pit_restores_speed_up_on_the_authored_three_updates ... ok
+test revision51_speed_up_preserves_movement_projectiles_and_local_reversal ... ok
+test revision51_speed_up_saves_memory_replay_and_temporal_state_exactly ... FAILED
+
+failures:
+
+---- revision51_speed_up_lighting_and_visibility_are_local_and_not_opaque stdout ----
+
+thread 'revision51_speed_up_lighting_and_visibility_are_local_and_not_opaque' (322) panicked at crates/corpse-core/tests/revision51_speed_up_tiles.rs:108:5:
+assertion failed: corpse_core::environment::blocks_sight(r.floor().unwrap(), at)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- revision51_speed_up_saves_memory_replay_and_temporal_state_exactly stdout ----
+
+thread 'revision51_speed_up_saves_memory_replay_and_temporal_state_exactly' (324) panicked at crates/corpse-core/tests/revision51_speed_up_tiles.rs:82:58:
+called `Result::unwrap()` on an `Err` value: StorageError("Revert is unavailable under revision41 rules")
+
+
+failures:
+    revision51_speed_up_lighting_and_visibility_are_local_and_not_opaque
+    revision51_speed_up_saves_memory_replay_and_temporal_state_exactly
+
+test result: FAILED. 5 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+=== revision51_ichor_fire ===
+
+running 9 tests
+test every_tier_rejects_all_fire_packet_routes_only_in_revision51 ... ok
+test firebolt_ignition_respects_current_and_legacy_immunity ... ok
+test fire_immunity_does_not_block_other_damage_or_general_mercurial_creatures ... ok
+test identity_fallback_is_exact_and_revisioned ... ok
+test hazard_fire_hellfire_and_existing_burning_are_harmless_for_every_tier ... ok
+test inherited_burning_does_not_spread_or_melt_ice ... ok
+test incineration_drunk_or_thrown_and_breath_aoe_cannot_ignite_any_tier ... ok
+test offscreen_burning_and_hellfire_use_same_immunity_for_every_tier ... ok
+test save_snapshot_future_and_replay_retain_revisioned_protection ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+
+=== debug_floor40_fire_admission ===
+
+running 1 test
+test debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic ... FAILED
+
+failures:
+
+---- debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic stdout ----
+
+thread 'debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic' (392) panicked at crates/corpse-core/tests/debug_floor40_fire_admission.rs:26:13:
+Unblessed, turn 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.34s
+
+=== shine_revision46 ===
+
+running 11 tests
+test bounded_shine_lighting_timings ... ok
+test direct_same_tick_toggles_revision_switches_and_nonemitter_moves_rebuild_exactly ... ok
+test dream_planes_and_sleeping_body_never_reintroduce_suppressed_light ... ok
+test hidden_suppressed_sources_leak_neither_origin_footprint_nor_visibility_through_portals ... ok
+test missing_and_all_legacy_revisions_keep_self_only_exclusion ... ok
+test offscreen_independent_shine_refusal_is_unchanged_and_loaded_floor_queries_are_revision_aware ... ok
+test overlapping_sources_and_darkness_survive_independent_suppression ... ok
+test active_shine_accuracy_still_uses_external_target_light_for_melee_and_ranged ... ok
+test suppression_removes_self_terrain_other_actor_and_appearance_emission ... ok
+test zero_energy_toggle_is_free_in_normal_and_haste_and_shared_body_resumes ... ok
+test save_load_snapshot_future_timeweave_and_replay_keep_suppression_and_revision ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
+
+=== revision50_preserved_edges ===
+
+running 12 tests
+test dream_sparkle_uses_only_its_current_plane_on_noncombustible_terrain ... ok
+test haste_and_came_and_pursuit_moves_finish_actions_without_world_turns ... ok
+test future_save_load_and_seed_replay_restore_reveal_then_expire_it_once ... ok
+test ordinary_consumption_and_action_abilities_expire_reveal ... ok
+test legacy_sparkle_keeps_terrain_filter_and_ordinary_fire_keeps_it_in_r50 ... ok
+test preexisting_future_and_raw_save_preserve_reveal ... ok
+test reveal_persists_through_explicitly_no_action_commands_and_failed_actions ... ok
+test reveal_stays_active_through_final_observation_of_a_bonus_action ... ok
+test sparkle_admits_occupied_squares_and_reveal_shows_hidden_creatures ... ok
+test sparkle_rejects_unseen_invalid_and_unfunded_targets_without_mutation ... ok
+test weave_movement_expires_reveal_and_snapshot_restoration_keeps_original_boundary ... ok
+test sparkle_accepts_every_visible_terrain_and_ignites_immediately ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.74s
+
+=== revision50_activation_upkeep ===
+
+running 12 tests
+test bonded_reactivation_pays_activation_again_but_not_same_turn_upkeep ... ok
+test haste_dispatch_activation_is_paid_once_before_next_normal_upkeep ... ok
+test immediate_upkeep_split_exact_funding_and_repeated_toggles ... ok
+test legacy_toggle_cost_and_unpriced_r50_powers_remain_unchanged ... ok
+test future_restores_paid_turn_with_the_paid_reserve ... ok
+test offscreen_catchup_honors_credit_then_charges_next_normal_tick ... ok
+test restored_bonded_combines_activation_and_first_upkeep_atomically ... ok
+test priced_immediate_modes_pay_before_action_and_preserve_serialized_credit ... ok
+test restored_telepathy_modes_pay_one_immediately_and_preserve_same_turn_credit ... ok
+test silence_and_insufficient_energy_reject_before_payment ... ok
+test unspeak_retarget_pays_difference_without_extending_coverage ... ok
+test restored_i_came_for_you_charges_ten_and_rejects_unfunded_or_silenced ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+

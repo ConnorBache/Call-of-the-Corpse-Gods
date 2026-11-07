@@ -1,0 +1,9 @@
+
+running 4 tests
+test exact_movement_terrain_hooks ... ok
+test exact_collapse_and_corpse_placement ... ok
+test exact_forced_fall_cohorts ... ok
+test exact_travel_departure_arrival_and_ally_stairs ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.50s
+

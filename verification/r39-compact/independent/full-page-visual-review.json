@@ -1,0 +1,32 @@
+{
+  "status": "passed_visual_inspection",
+  "scope": "Lead-produced actual Linux release headless full-page render-test; independent image inspection. Not interactive SDL nor Windows execution.",
+  "findings": "Artwork loaded correctly, complete visible silhouettes, no obvious new black matte rectangles/halos, deleted anatomy or clipped artwork. Transcendent black body retained against existing page contrast field.",
+  "pages": [
+    {
+      "name": "vampire",
+      "path": "compact-r39/render-qa/vampire.png",
+      "sha256": "b67ddae5c66f81bd7031b9cf88b703a71ca860ef4ec2d2454453613f5edc1dca"
+    },
+    {
+      "name": "witch",
+      "path": "compact-r39/render-qa/witch.png",
+      "sha256": "6fedb2aa3db160bc51e479d0a71d8ba2e74f9b84db3762c9441c4523640082e6"
+    },
+    {
+      "name": "kelpie",
+      "path": "compact-r39/render-qa/kelpie.png",
+      "sha256": "1b45b9ed7081ad766c8de26122d0e438401f1643da50240869cded9b3c052b73"
+    },
+    {
+      "name": "saidribee-queen",
+      "path": "compact-r39/render-qa/saidribee-queen.png",
+      "sha256": "96e604d6c604851527a2d3ade25a5052a337cad1f0b8b79123e1986d425f21cd"
+    },
+    {
+      "name": "zillennia-transcendent",
+      "path": "compact-r39/render-qa/zillennia-transcendent.png",
+      "sha256": "45211d65016cfd94b474c44b762ecf103c09c226fcab0ede30eab6c2741dafc0"
+    }
+  ]
+}

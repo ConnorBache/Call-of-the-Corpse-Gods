@@ -1,0 +1,73 @@
+{
+  "scope": "Actual opt-s Linux renderer; baseline menu/start/game exact; eight q90 manual pages exactly match opt-z frames; PNG encoding operational. Not Windows runtime.",
+  "rows": [
+    {
+      "name": "menu",
+      "exit": 0,
+      "full_frame_rgba_exact": true
+    },
+    {
+      "name": "start",
+      "exit": 0,
+      "full_frame_rgba_exact": true
+    },
+    {
+      "name": "game",
+      "exit": 0,
+      "full_frame_rgba_exact": true
+    },
+    {
+      "name": "night-crawler",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    },
+    {
+      "name": "skin-walker",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    },
+    {
+      "name": "phoenix",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    },
+    {
+      "name": "vampire",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    },
+    {
+      "name": "witch",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    },
+    {
+      "name": "kelpie",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    },
+    {
+      "name": "saidribee-queen",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    },
+    {
+      "name": "zillennia:transcendent",
+      "exit": 0,
+      "opt_z_frame_rgba_exact": true
+    }
+  ],
+  "hashes": {
+    "night-crawler.png": "ab9e0570a7063553acae5a626767196193557180896f515431566db497a56808",
+    "saidribee-queen.png": "be428e4233c82b9f1fdc5dd7e0034c987e71bd7fc1d9bd131b9ef4c793e15bb6",
+    "vampire.png": "5e4b81d6912d2a1662aa28fe13f264cf135eb770716104b4758110d6580e3625",
+    "skin-walker.png": "8afa04849c06fac211d65425ea67f31ddf46ae0753a474b66a237895971405da",
+    "menu.png": "b36aca437ab8d992a76c868e723b0b8fa1ee8d1a8ceecf5dd0fef48f33fe9be8",
+    "kelpie.png": "c859fc8e5ad9d4d30ff8d902fc3555c3c52db2da5c98e63facf8b9050d3abe97",
+    "game.png": "0aca1e3dfe6d3a0d4516e8a034a9f6c96d29ed5c5f007f970a1b36e4d252b4de",
+    "zillennia-transcendent.png": "5e41c8649fcc817f52a3af8b734c0527487c6ea68a89aac072942d0f070cf9bb",
+    "start.png": "809f51130a9dc8eab498bf6a61f38755892af644661c701e036e2282c77d3269",
+    "phoenix.png": "3df52f185c7866ebfcf98a68ae7e459e411e68ea2fe776fce022af37e65743fd",
+    "witch.png": "54888cec32919c091136ff552322c80fb0be7c2c8ad57c0954b5e1627f31a0a1"
+  }
+}

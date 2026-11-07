@@ -1,0 +1,65 @@
+{
+  "profile_source": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+  "profile_metric": "ordinary_unblessed.entry",
+  "trials_per_case": 128,
+  "scope": "New-species and Witch checks only; frozen r32 player profiles, not a full r33 progression fit.",
+  "observations": [
+    {
+      "kind": "night-crawler",
+      "scenario": "adjacent",
+      "revision": 33.0,
+      "mean_gross_combat_damage_fraction": 0.3553835274586667,
+      "gross_combat_standard_error": 0.013972496389513698,
+      "kills": 128,
+      "deaths": 0,
+      "censored": 0,
+      "combat_censored": 0,
+      "aftermath_censored": 0,
+      "all_primary_lifespans_observed": true,
+      "all_settlements_observed": true
+    },
+    {
+      "kind": "skin-walker",
+      "scenario": "adjacent",
+      "revision": 33.0,
+      "mean_gross_combat_damage_fraction": 0.33646187122483145,
+      "gross_combat_standard_error": 0.008461537711814494,
+      "kills": 128,
+      "deaths": 0,
+      "censored": 0,
+      "combat_censored": 0,
+      "aftermath_censored": 0,
+      "all_primary_lifespans_observed": true,
+      "all_settlements_observed": true
+    },
+    {
+      "kind": "witch",
+      "scenario": "chase",
+      "revision": 33.0,
+      "mean_gross_combat_damage_fraction": 0.6157338708625221,
+      "gross_combat_standard_error": 0.03233779584440148,
+      "kills": 92,
+      "deaths": 36,
+      "censored": 92,
+      "combat_censored": 0,
+      "aftermath_censored": 92,
+      "all_primary_lifespans_observed": false,
+      "all_settlements_observed": false
+    },
+    {
+      "kind": "witch",
+      "scenario": "three-cast-children",
+      "revision": 33.0,
+      "mean_gross_combat_damage_fraction": 0.4083291719804773,
+      "gross_combat_standard_error": 0.016667956692920996,
+      "kills": 128,
+      "deaths": 0,
+      "censored": 0,
+      "combat_censored": 0,
+      "aftermath_censored": 0,
+      "all_primary_lifespans_observed": true,
+      "all_settlements_observed": true
+    }
+  ],
+  "warning": "Witch chase aftermath is mostly censored; do not treat its gross value as a complete-lifespan fit. Three-cast payload excludes parent and intervening exposure."
+}

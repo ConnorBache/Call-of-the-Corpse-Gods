@@ -1,0 +1,26 @@
+{
+  "core": {
+    "targets": 136,
+    "passed": 683,
+    "failed": 0,
+    "ignored": 2
+  },
+  "desktop": {
+    "targets": 5,
+    "passed": 317,
+    "failed": 0,
+    "ignored": 5
+  },
+  "core_doctests": {
+    "passed": 0,
+    "failed": 0
+  },
+  "profile": {
+    "opt_level": 1,
+    "debug_assertions": true,
+    "overflow_checks": true,
+    "debuginfo": 0
+  },
+  "merged_rgba_exact_frames": 100,
+  "windows_runtime_verified": false
+}

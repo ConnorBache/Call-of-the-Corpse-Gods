@@ -1,0 +1,15 @@
+{
+  "first_attempt_fingerprint": "820a0de5df997b0f189e4737d104c039f76fe9d2282cb8cb9ae92659f2f39d4d",
+  "accepted_refreeze_fingerprint": "02e583c161f32e46c1161b0e308c1b487da64f7621daf524a5e1750b5a259ac7",
+  "changed_paths": [
+    "crates/corpse-core/tests/ordinary_roster.rs"
+  ],
+  "runtime_build_inputs_unchanged": true,
+  "reason": "Correct stale r32 test expectations for r33 defaults/manual and extend explicit save/lazy/replay compatibility coverage to revisions32 and33. No gameplay, assets, catalog or build-script changes.",
+  "focused_tests": {
+    "passed": 6,
+    "failed": 0,
+    "log": "verification/integration-r33/ordinary-roster-contract-correction.log"
+  },
+  "failed_gate_retained": "verification/integration-r33/attempt-1-stale-r32-tests"
+}

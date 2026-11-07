@@ -1,0 +1,11 @@
+{
+  "path": "corpse-gods-native-r39-incremental-save-windows-final.zip",
+  "bytes": 19717928,
+  "sha256": "ac425fdcff13279b5e06152da039057e671c93a0c6f4d9c3ac7dbbaefe3e3293",
+  "archive_verified": true,
+  "windows_runtime_verified": false,
+  "power_loss_verified": false,
+  "scope": "Current incremental-save cross-build and static/archive checks; no Windows runtime claim",
+  "receipt": "verification/incremental-save/windows-package-verification.json",
+  "historical_receipt": "verification/historical-pre-incremental-save/COMPACT-VERIFICATION.json"
+}

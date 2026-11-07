@@ -1,0 +1,3 @@
+{
+  "reason": "Cross-build passed on initial r38 candidate; subsequent independent stress found unsafe late sub-biome route removal. Retained as historical evidence, not final release binary verification."
+}

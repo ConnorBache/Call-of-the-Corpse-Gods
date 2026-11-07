@@ -1,0 +1,71 @@
+{
+  "scope": "Six genuine generated Avatar runs; same472commands; two warmup traces, six measured repetitions per seed. Setup excluded; temporal Engine dispatch included. Rendering excluded.",
+  "results": [
+    {
+      "name": "generated-walk-0",
+      "seed": "00-09-10:independent-native-walk-0",
+      "floors": 10,
+      "commands": 80,
+      "timing": {
+        "samples": 480,
+        "median_us": 13241.184,
+        "p95_us": 18422.858
+      }
+    },
+    {
+      "name": "generated-walk-1",
+      "seed": "00-09-10:independent-native-walk-1",
+      "floors": 10,
+      "commands": 72,
+      "timing": {
+        "samples": 432,
+        "median_us": 10732.773,
+        "p95_us": 13178.227
+      }
+    },
+    {
+      "name": "generated-walk-2",
+      "seed": "00-09-10:independent-native-walk-2",
+      "floors": 10,
+      "commands": 80,
+      "timing": {
+        "samples": 480,
+        "median_us": 8752.554,
+        "p95_us": 11912.073
+      }
+    },
+    {
+      "name": "generated-walk-3",
+      "seed": "00-09-10:independent-native-walk-3",
+      "floors": 10,
+      "commands": 80,
+      "timing": {
+        "samples": 480,
+        "median_us": 9326.669,
+        "p95_us": 15531.065
+      }
+    },
+    {
+      "name": "generated-walk-4",
+      "seed": "00-09-10:independent-native-walk-4",
+      "floors": 10,
+      "commands": 80,
+      "timing": {
+        "samples": 480,
+        "median_us": 9590.474,
+        "p95_us": 13144.324
+      }
+    },
+    {
+      "name": "generated-walk-5",
+      "seed": "00-09-10:independent-native-walk-5",
+      "floors": 10,
+      "commands": 80,
+      "timing": {
+        "samples": 480,
+        "median_us": 14720.785,
+        "p95_us": 22546.634
+      }
+    }
+  ]
+}

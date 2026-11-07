@@ -1,0 +1,42 @@
+[
+  {
+    "path": "crates/corpse-desktop/src/hazards_ui.rs",
+    "sha256": "2d6b23b81e46eb9d26d49a70ba3d6bee00912472a6a0f3b3ddf3bc45b9366cee",
+    "bytes": 17212
+  },
+  {
+    "path": "crates/corpse-desktop/src/inspection_ui.rs",
+    "sha256": "c95c27966ae3bbb3fdd8a711efff5f35a4e10937d77562ce548ecbcbc4afb1e0",
+    "bytes": 106262
+  },
+  {
+    "path": "crates/corpse-desktop/src/main.rs",
+    "sha256": "3a4f3e8bb932f77b887356b11adc71b42a040bf288341c88ac7af11de51121e6",
+    "bytes": 134435
+  },
+  {
+    "path": "crates/corpse-desktop/src/non_euclidean_ui.rs",
+    "sha256": "aff861003c5077617296b37d3ee666f8c70cdfd183e5c42eb74adb5cfae02cde",
+    "bytes": 14620
+  },
+  {
+    "path": "crates/corpse-desktop/src/observe.rs",
+    "sha256": "d57c6c491fc5b5202532c62917680319439daf4b3082cd5de29f2c38337bf0c6",
+    "bytes": 88498
+  },
+  {
+    "path": "crates/corpse-desktop/src/render.rs",
+    "sha256": "9d488af346bccfe01b0b229c8aaf41ce05690bb51ad039c71639d88dc79dd81a",
+    "bytes": 117188
+  },
+  {
+    "path": "crates/corpse-desktop/src/targeting_ui.rs",
+    "sha256": "65b333b239a36ca579a3d8c62fbf04f79a972591269b22eb3ad4efb9f82c807e",
+    "bytes": 13410
+  },
+  {
+    "path": "crates/corpse-desktop/src/travel_ui.rs",
+    "sha256": "81b1fc7376bc80df8d340794ea6595d0a3a7186e0808dc2fa30b8f259bd793db",
+    "bytes": 38885
+  }
+]

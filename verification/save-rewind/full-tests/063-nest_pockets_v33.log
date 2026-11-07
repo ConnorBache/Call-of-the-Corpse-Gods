@@ -1,0 +1,16 @@
+
+running 11 tests
+test habitat_relocation_preserves_whole_hordes_and_machine_actors ... ok
+test queen_three_casts_are_energy_gated_world_clocked_and_heartless ... ok
+test honey_floor_inventory_effective_max_full_and_blocked_actions ... ok
+test queen_failed_blocked_silenced_or_legacy_casts_do_not_mutate ... ok
+test seeded_nest_atomic_startup_reserves_populations_and_reward ... ok
+test queen_cooldown_children_save_and_replay_are_deterministic ... ok
+test honey_save_revert_future_and_replay_preserve_exact_once_consumption ... ok
+test pocket_depth_theme_habitat_and_legacy_guards ... ok
+test rare_all_water_window_seed155_gets_bounded_platform_nest_without_domain_override ... ok
+test seeded_nests_have_connected_rooms_stairs_and_guaranteed_reward ... ok
+test nest_guarantee_holds_across_seeded_natural_domains ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.33s
+

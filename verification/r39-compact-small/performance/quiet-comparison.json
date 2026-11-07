@@ -1,0 +1,424 @@
+{
+  "scope": "Sequential Linux release benchmarks after all builds and full gate completed; shared cloud host not controlled hardware. Six generated initial-floor traces (472commands) preserve canonical parity. Warm fullmanual pages include depths1/15/40 at1280x800 and1920x1080,24frames each after2warmups. Not Windows or end-to-end FPS; no claim about worstcase deep-floor simulation.",
+  "records": [
+    {
+      "profile": "baseline",
+      "core_binary_sha256": "19f4a03aa5b636691c4fede7f2cbbea1f94365b76c05d9cb96fdeb49690129e9",
+      "core": {
+        "scope": "Six genuine generated Avatar runs; same472commands; two warmup traces, six measured repetitions per seed. Setup excluded; temporal Engine dispatch included. Rendering excluded.",
+        "results": [
+          {
+            "name": "generated-walk-0",
+            "seed": "00-09-10:independent-native-walk-0",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 7571.948,
+              "p95_us": 9734.51
+            }
+          },
+          {
+            "name": "generated-walk-1",
+            "seed": "00-09-10:independent-native-walk-1",
+            "floors": 10,
+            "commands": 72,
+            "timing": {
+              "samples": 432,
+              "median_us": 6669.968,
+              "p95_us": 9011.082
+            }
+          },
+          {
+            "name": "generated-walk-2",
+            "seed": "00-09-10:independent-native-walk-2",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 5399.943,
+              "p95_us": 7153.38
+            }
+          },
+          {
+            "name": "generated-walk-3",
+            "seed": "00-09-10:independent-native-walk-3",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 5985.459,
+              "p95_us": 7841.097999999999
+            }
+          },
+          {
+            "name": "generated-walk-4",
+            "seed": "00-09-10:independent-native-walk-4",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 6069.475,
+              "p95_us": 7511.653
+            }
+          },
+          {
+            "name": "generated-walk-5",
+            "seed": "00-09-10:independent-native-walk-5",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 8499.701000000001,
+              "p95_us": 11355.785
+            }
+          }
+        ]
+      },
+      "warm": [
+        {
+          "resolution": "1280x800",
+          "id": "blorb",
+          "depth": 1,
+          "mean_ms": 3.2
+        },
+        {
+          "resolution": "1280x800",
+          "id": "wendigo",
+          "depth": 15,
+          "mean_ms": 2.498
+        },
+        {
+          "resolution": "1280x800",
+          "id": "bastidion",
+          "depth": 40,
+          "mean_ms": 3.165
+        },
+        {
+          "resolution": "1280x800",
+          "id": "zillennia:transcendent",
+          "depth": 40,
+          "mean_ms": 4.463
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "blorb",
+          "depth": 1,
+          "mean_ms": 5.261
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "wendigo",
+          "depth": 15,
+          "mean_ms": 4.219
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "bastidion",
+          "depth": 40,
+          "mean_ms": 5.157
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "zillennia:transcendent",
+          "depth": 40,
+          "mean_ms": 7.275
+        }
+      ]
+    },
+    {
+      "profile": "z",
+      "core_binary_sha256": "72eface630fef7e40af366e183cc8a09f9afa8733dbfd7961796cbe175492e80",
+      "core": {
+        "scope": "Six genuine generated Avatar runs; same472commands; two warmup traces, six measured repetitions per seed. Setup excluded; temporal Engine dispatch included. Rendering excluded.",
+        "results": [
+          {
+            "name": "generated-walk-0",
+            "seed": "00-09-10:independent-native-walk-0",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 13241.184,
+              "p95_us": 18422.858
+            }
+          },
+          {
+            "name": "generated-walk-1",
+            "seed": "00-09-10:independent-native-walk-1",
+            "floors": 10,
+            "commands": 72,
+            "timing": {
+              "samples": 432,
+              "median_us": 10732.773,
+              "p95_us": 13178.227
+            }
+          },
+          {
+            "name": "generated-walk-2",
+            "seed": "00-09-10:independent-native-walk-2",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 8752.554,
+              "p95_us": 11912.073
+            }
+          },
+          {
+            "name": "generated-walk-3",
+            "seed": "00-09-10:independent-native-walk-3",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 9326.669,
+              "p95_us": 15531.065
+            }
+          },
+          {
+            "name": "generated-walk-4",
+            "seed": "00-09-10:independent-native-walk-4",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 9590.474,
+              "p95_us": 13144.324
+            }
+          },
+          {
+            "name": "generated-walk-5",
+            "seed": "00-09-10:independent-native-walk-5",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 14720.785,
+              "p95_us": 22546.634
+            }
+          }
+        ]
+      },
+      "warm": [
+        {
+          "resolution": "1280x800",
+          "id": "blorb",
+          "depth": 1,
+          "mean_ms": 6.39
+        },
+        {
+          "resolution": "1280x800",
+          "id": "wendigo",
+          "depth": 15,
+          "mean_ms": 5.685
+        },
+        {
+          "resolution": "1280x800",
+          "id": "bastidion",
+          "depth": 40,
+          "mean_ms": 6.563
+        },
+        {
+          "resolution": "1280x800",
+          "id": "zillennia:transcendent",
+          "depth": 40,
+          "mean_ms": 9.348
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "blorb",
+          "depth": 1,
+          "mean_ms": 10.949
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "wendigo",
+          "depth": 15,
+          "mean_ms": 8.495
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "bastidion",
+          "depth": 40,
+          "mean_ms": 10.364
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "zillennia:transcendent",
+          "depth": 40,
+          "mean_ms": 16.233
+        }
+      ]
+    },
+    {
+      "profile": "s",
+      "core_binary_sha256": "48d766bd3fab9f95b50594251507a2ec5fbcd4487511f3e83272edc1fee46cce",
+      "core": {
+        "scope": "Six genuine generated Avatar runs; same472commands; two warmup traces, six measured repetitions per seed. Setup excluded; temporal Engine dispatch included. Rendering excluded.",
+        "results": [
+          {
+            "name": "generated-walk-0",
+            "seed": "00-09-10:independent-native-walk-0",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 9693.748,
+              "p95_us": 12992.422
+            }
+          },
+          {
+            "name": "generated-walk-1",
+            "seed": "00-09-10:independent-native-walk-1",
+            "floors": 10,
+            "commands": 72,
+            "timing": {
+              "samples": 432,
+              "median_us": 7884.766,
+              "p95_us": 11263.251
+            }
+          },
+          {
+            "name": "generated-walk-2",
+            "seed": "00-09-10:independent-native-walk-2",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 6235.94,
+              "p95_us": 8213.494
+            }
+          },
+          {
+            "name": "generated-walk-3",
+            "seed": "00-09-10:independent-native-walk-3",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 6967.607,
+              "p95_us": 9552.724
+            }
+          },
+          {
+            "name": "generated-walk-4",
+            "seed": "00-09-10:independent-native-walk-4",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 7094.852,
+              "p95_us": 9378.95
+            }
+          },
+          {
+            "name": "generated-walk-5",
+            "seed": "00-09-10:independent-native-walk-5",
+            "floors": 10,
+            "commands": 80,
+            "timing": {
+              "samples": 480,
+              "median_us": 11375.661,
+              "p95_us": 20486.477
+            }
+          }
+        ]
+      },
+      "warm": [
+        {
+          "resolution": "1280x800",
+          "id": "blorb",
+          "depth": 1,
+          "mean_ms": 3.069
+        },
+        {
+          "resolution": "1280x800",
+          "id": "wendigo",
+          "depth": 15,
+          "mean_ms": 2.477
+        },
+        {
+          "resolution": "1280x800",
+          "id": "bastidion",
+          "depth": 40,
+          "mean_ms": 3.455
+        },
+        {
+          "resolution": "1280x800",
+          "id": "zillennia:transcendent",
+          "depth": 40,
+          "mean_ms": 4.828
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "blorb",
+          "depth": 1,
+          "mean_ms": 5.299
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "wendigo",
+          "depth": 15,
+          "mean_ms": 4.083
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "bastidion",
+          "depth": 40,
+          "mean_ms": 5.365
+        },
+        {
+          "resolution": "1920x1080",
+          "id": "zillennia:transcendent",
+          "depth": 40,
+          "mean_ms": 7.74
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "profile": "baseline",
+      "median_core_ratio_vs_baseline": 1.0,
+      "core_ratio_range": [
+        1.0,
+        1.0
+      ],
+      "max_core_median_ms": 8.499701000000002,
+      "median_warm_ratio_vs_baseline": 1.0,
+      "warm_ms_range": [
+        2.498,
+        7.275
+      ]
+    },
+    {
+      "profile": "z",
+      "median_core_ratio_vs_baseline": 1.614989778315211,
+      "core_ratio_range": [
+        1.5582211823688041,
+        1.7487156541487077
+      ],
+      "max_core_median_ms": 14.720785,
+      "median_warm_ratio_vs_baseline": 2.077390485233227,
+      "warm_ms_range": [
+        5.685,
+        16.233
+      ]
+    },
+    {
+      "profile": "s",
+      "median_core_ratio_vs_baseline": 1.1755347459600447,
+      "core_ratio_range": [
+        1.1548158934270232,
+        1.3383601376095464
+      ],
+      "max_core_median_ms": 11.375661000000001,
+      "median_warm_ratio_vs_baseline": 1.023778244329351,
+      "warm_ms_range": [
+        2.477,
+        7.74
+      ]
+    }
+  ]
+}

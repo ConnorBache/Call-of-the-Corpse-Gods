@@ -1,0 +1,4 @@
+import fs from 'node:fs';import {floatCarriedItem} from '../../release-v48/source/call-of-the-corpse-gods/dist/src/water.js';
+const base=JSON.parse(fs.readFileSync(new URL('../fixtures/avatar-room-v1.json',import.meta.url)));base.floors[0].tiles[base.player.y*79+base.player.x]='water';const cases=[];const fields=['rng','inventory','ground','nextId','log','logKinds','logArchive','metrics'];for(const rng of [1,2,42,123456,2147483647,4294967295])for(const empty of [false,true]){const r=structuredClone(base);r.rng=rng;if(empty)r.inventory=[];const result=floatCarriedItem(r);cases.push({rng,empty,result,after:Object.fromEntries(fields.map(k=>[k,r[k]]))})}atomicWrite(new URL('../fixtures/water-inventory-v48.json',import.meta.url),JSON.stringify({base,cases}));
+
+function atomicWrite(path,contents){const file=path instanceof URL?path:new URL(path,import.meta.url);const temp=new URL(file.href+".tmp");fs.writeFileSync(temp,contents);fs.renameSync(temp,file);}

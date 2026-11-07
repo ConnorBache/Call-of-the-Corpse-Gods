@@ -1,0 +1,12 @@
+
+running 7 tests
+test blocked_or_invalid_commands_do_not_consume_item_or_rng ... ok
+test historical_revision_retains_guaranteed_use_and_disallows_throw ... ok
+test misses_preserve_the_unique_weapon_and_thrown_miss_can_be_picked_up ... ok
+test ordinary_non_shard_kill_has_no_stone_text ... ok
+test targeted_apply_is_not_an_accuracy_bypass_and_throw_hit_is_supported ... ok
+test empty_throw_into_chasm_recovers_on_nearby_surface_without_falling ... ok
+test actual_melee_hit_permakills_consumes_and_pairs_stone_with_kill_chronicle ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

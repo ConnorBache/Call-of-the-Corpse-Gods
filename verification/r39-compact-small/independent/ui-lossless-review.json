@@ -1,0 +1,51 @@
+{
+  "status": "passed",
+  "count": 4,
+  "comparison": "All RGBA bytes including hiddenRGB, baseline originalPNG read from frozen r39 sourceZIP. Pillow, FFmpeg and exact production image-webp0.2.4 decode identically. Original sourcePNGs unchanged.",
+  "rows": [
+    {
+      "name": "BrogueCE-ASCII",
+      "dimensions": [
+        2048,
+        1392
+      ],
+      "every_rgba_byte_exact_all_three_decoders": true,
+      "source_png_sha256": "d06f4915b58f6bf3b2f294d9ffed60c27cabc72abad7c3421772f080e56fffe3",
+      "encoded_sha256": "3277454d3da3796f398a8643d7ee88414a2849be70aa92eec2902f511612eff1",
+      "rgba_sha256": "b5cb90a1160f19125d2450e5e44081ee969d47bb573db500834a0c160da187a3"
+    },
+    {
+      "name": "bestiary-ink-splash-broad",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "every_rgba_byte_exact_all_three_decoders": true,
+      "source_png_sha256": "8c48d258f8b091227b66b6bf3afc16d1345b316ee893d078b412b89bf9947548",
+      "encoded_sha256": "57a5a972b442a5a7e58ec3a151f76b7b07dee756412c216f55392d987308c65d",
+      "rgba_sha256": "5c253d6b81aee7e14e658d9c55e6287fd47de9e6369faaeb6039dc10a410da4d"
+    },
+    {
+      "name": "menu-logo",
+      "dimensions": [
+        1070,
+        1470
+      ],
+      "every_rgba_byte_exact_all_three_decoders": true,
+      "source_png_sha256": "9321b31aa3c5ffc3460a7257f12f49251cf85f35e71bf631a41456ff44b0cdcf",
+      "encoded_sha256": "900d88752458eaa11cca357f73067f26073575a3a69fd314927b0479b35ffecc",
+      "rgba_sha256": "9e4bf900f395fa66a3c68cea76111659ff30d16e9c397d49192c143e66ff4530"
+    },
+    {
+      "name": "window-icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "every_rgba_byte_exact_all_three_decoders": true,
+      "source_png_sha256": "d268e5bb4f44af9f2dd11c51980426336f2fba6c9b722ceda4be5b88afc6da9e",
+      "encoded_sha256": "c5b5275abeefbcb4db0d09310691cf367247233838c906fd59b72807682e6c44",
+      "rgba_sha256": "06e7d3af16b84edba73f6e9180cb795932fe3c588f825cbd807a18a4d3c64279"
+    }
+  ]
+}

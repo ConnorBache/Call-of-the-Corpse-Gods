@@ -1,0 +1,117 @@
+[
+  {
+    "name": "SDL2-devel-2.32.10-mingw.tar.gz.http-headers.txt",
+    "bytes": 6516,
+    "sha256": "73f44899336e1a4f0c7598b097a4f27e981819b0a12dc4a4850747d059212103"
+  },
+  {
+    "name": "SDL2-devel-2.32.10-mingw.tar.gz.json",
+    "bytes": 393,
+    "sha256": "f0430a0b68c2932a0bdd8a166ea7959ea2a00885f47ea48a71fab2f4ede0f459"
+  },
+  {
+    "name": "SETUP-AND-VALIDATION.md",
+    "bytes": 3931,
+    "sha256": "0df20711c3c601d531f27c5320975efe1c70785993dd2185efd2b99b1b9546df"
+  },
+  {
+    "name": "binutils-mingw-w64-x86-64_2.44-3+12+b1_amd64.deb.http-headers.txt",
+    "bytes": 834,
+    "sha256": "7f4ab5cf17081d4d64b7775f7e6084cf44f627fb3f97fef38cb5b9a56e972dd1"
+  },
+  {
+    "name": "binutils-mingw-w64-x86-64_2.44-3+12+b1_amd64.deb.json",
+    "bytes": 439,
+    "sha256": "5a0022f34e8eb110397989659e5ba6cd08158f98c80b88b1c9ef426d0c4154c4"
+  },
+  {
+    "name": "debian-control-metadata.json",
+    "bytes": 1553,
+    "sha256": "4b99761c9e383d2f91069c186a5f061a24c4b5c220860808703963eead663812"
+  },
+  {
+    "name": "gcc-mingw-w64-base_14.2.0-19+27+b1_amd64.deb.http-headers.txt",
+    "bytes": 831,
+    "sha256": "b5e96454562bacb0838719f9edcfefa76208821b25dce0a086d608c4bb6b39fb"
+  },
+  {
+    "name": "gcc-mingw-w64-base_14.2.0-19+27+b1_amd64.deb.json",
+    "bytes": 421,
+    "sha256": "20773deebfb5c9a22ce90d92d21474105f6b4e148aae3c88b832f6c3bd25e967"
+  },
+  {
+    "name": "gcc-mingw-w64-x86-64-posix-runtime_14.2.0-19+27+b1_amd64.deb.http-headers.txt",
+    "bytes": 835,
+    "sha256": "e8156b10004a3861bf2f937482de9e081358f688658d0cf6fdf85d98de10a56a"
+  },
+  {
+    "name": "gcc-mingw-w64-x86-64-posix-runtime_14.2.0-19+27+b1_amd64.deb.json",
+    "bytes": 471,
+    "sha256": "ae8391fa942a3a9fbb339bc92c158b0b653e1413abdf116d54a61d3d4d582982"
+  },
+  {
+    "name": "gcc-mingw-w64-x86-64-posix_14.2.0-19+27+b1_amd64.deb.http-headers.txt",
+    "bytes": 834,
+    "sha256": "340493105f9a0b595fe8783afb2f2406741e6ebaad35bddf9c570206bbff52c1"
+  },
+  {
+    "name": "gcc-mingw-w64-x86-64-posix_14.2.0-19+27+b1_amd64.deb.json",
+    "bytes": 447,
+    "sha256": "f51724c4ce04d6d9f181ac02deb431cd548e1690231a067a5491ebd9bc27e7aa"
+  },
+  {
+    "name": "mingw-w64-common_12.0.0-5_all.deb.http-headers.txt",
+    "bytes": 836,
+    "sha256": "c7cc08bea84d0b58256b6b3f94b7e0dd4bce2cea7f9f992148e76f366151b8f3"
+  },
+  {
+    "name": "mingw-w64-common_12.0.0-5_all.deb.json",
+    "bytes": 387,
+    "sha256": "4a9dca72fcc38a7bc74139073ba42bc3210710268cc6fbdd4f4d0350852142e2"
+  },
+  {
+    "name": "mingw-w64-x86-64-dev_12.0.0-5_all.deb.http-headers.txt",
+    "bytes": 833,
+    "sha256": "5dce46c806110c951a41a1b418d04389a9351237ec4709ef6c5caff0459edb58"
+  },
+  {
+    "name": "mingw-w64-x86-64-dev_12.0.0-5_all.deb.json",
+    "bytes": 399,
+    "sha256": "53230209d84f7adb6bf5b856f7589695f8da801aa61274142dd3305a35fdfb7c"
+  },
+  {
+    "name": "pinned-archives-manifest.json",
+    "bytes": 2194,
+    "sha256": "d8e86a6288fc0ac085b259d050e58e086c015ad05abc5794cf3e6d3ae691bdf4"
+  },
+  {
+    "name": "rust-target-manifest.json",
+    "bytes": 525,
+    "sha256": "b39bd3f346229ee5e46bcddcb6e2c123955be3358f3820cfac5c4be8bb7d64c0"
+  },
+  {
+    "name": "rust-target-published.sha256",
+    "bytes": 111,
+    "sha256": "461d98af3f3e0cbf8d7d823525671a49eb9efdab38baa24333593714201ee546"
+  },
+  {
+    "name": "rustup-target-install.log",
+    "bytes": 37,
+    "sha256": "831ad8906cd548d1be0b512110752469e0a5b4f23e8ea459eb4bf438761bef31"
+  },
+  {
+    "name": "sdl-official-asset-verification.json",
+    "bytes": 364,
+    "sha256": "a84eb8eb5f317b36e019f84cd7e6dcc25185afbfdd130ce84dc75aefb8b74992"
+  },
+  {
+    "name": "sdl-official-release.json",
+    "bytes": 20518,
+    "sha256": "cd61e2a84717fc7361547795818701aa462c6d422b1f503081e3848c024098fb"
+  },
+  {
+    "name": "toolchain-validation.txt",
+    "bytes": 5666,
+    "sha256": "36d639485d7cd2fcf7986ef1dfc4ca517e2da7664b856c423d236fb4d436a55f"
+  }
+]

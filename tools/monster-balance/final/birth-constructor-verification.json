@@ -1,0 +1,4471 @@
+{
+  "status": "passed",
+  "measured": "Actual shipping birth constructors; no candidate overrides; setup-only one-command checks not balance evidence",
+  "profiles_verified": [
+    "birther:pale:Jackal",
+    "greater-birther:pale:Birther",
+    "greater-birther:pale:Biter",
+    "greater-birther:pale:Breather",
+    "greater-birther:pale:Screamer",
+    "greater-birther:pale:Spitter"
+  ],
+  "trials": 32,
+  "casts_per_trial": 3,
+  "immediate_children_per_trial": 4,
+  "checks": [
+    {
+      "parent": "pale:Birther",
+      "seed": 3998834962,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 4015612581,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 3965279724,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 3982057343,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 3931724486,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 3948502105,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 3898169248,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 3914946867,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 4133055914,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 4149833533,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 1588998287,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 1572220668,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 1622553525,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 1605775906,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 1521887811,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Birther",
+      "seed": 1505110192,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Jackal",
+          "abilities": [
+            "enemy:pale:gas-immunity"
+          ],
+          "stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0
+          },
+          "effective_stats": {
+            "offense": 25.0,
+            "defense": -9.0,
+            "accuracy": 9.0,
+            "dodge": 11.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 100.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 0.0
+          },
+          "max_hp": 46.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 3998834962,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 4015612581,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 3965279724,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 3982057343,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 3931724486,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 3948502105,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 3898169248,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 3914946867,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 4133055914,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 4149833533,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 1588998287,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 1572220668,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 1622553525,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 1605775906,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Screamer",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:scream"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -8.0,
+            "accuracy": 128.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -8.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 15.0
+          },
+          "max_hp": 52.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 1521887811,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Biter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:bite-repeat",
+            "enemy:pale:lifesteal"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 131.0,
+            "dodge": 79.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 8.0
+          },
+          "max_hp": 40.0
+        }
+      ]
+    },
+    {
+      "parent": "pale:Greater Birther",
+      "seed": 1505110192,
+      "initial_actors": [
+        {
+          "id": 6.0,
+          "name": "Pale Breather",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:breath",
+            "enemy:pale:breath-boost",
+            "enemy:pale:gas-vulnerability"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -10.0,
+            "accuracy": 128.0,
+            "dodge": 78.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -4.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasPassiveVolume": 35.0,
+            "monsterGasBoostVolume": 80.0
+          },
+          "max_hp": 40.0
+        },
+        {
+          "id": 7.0,
+          "name": "Pale Spitter",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:spit",
+            "enemy:pale:gas-shot"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -13.0,
+            "accuracy": 134.0,
+            "dodge": 82.0,
+            "dr": 0.0,
+            "perception": 65.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": 2.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 10.0,
+            "monsterGasShotVolume": 100.0
+          },
+          "max_hp": 22.0
+        },
+        {
+          "id": 8.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        },
+        {
+          "id": 9.0,
+          "name": "Pale Birther",
+          "abilities": [
+            "enemy:pale:gas-immunity",
+            "enemy:pale:birth",
+            "enemy:pale:double-birth",
+            "enemy:pale:slow"
+          ],
+          "stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0
+          },
+          "effective_stats": {
+            "offense": 59.0,
+            "defense": -11.0,
+            "accuracy": 126.0,
+            "dodge": 76.0,
+            "dr": 0.0,
+            "perception": 25.0,
+            "maxEnergy": 50.0,
+            "maxHp": 0.0
+          },
+          "conditions": {
+            "stealth": -3.0,
+            "paleTraitsInitialized": 1.0,
+            "maxAbilityCost": 30.0
+          },
+          "max_hp": 34.0
+        }
+      ]
+    }
+  ]
+}

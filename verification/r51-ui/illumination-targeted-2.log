@@ -1,0 +1,76 @@
+===== color::light_ui =====
+
+running 2 tests
+test color::light_ui::tests::calibration_knots_floor_pixels_smooth_monotone_tails ... ok
+test color::light_ui::tests::neutral_preserves_hues_and_warm_preserves_luminance ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 733 filtered out; finished in 0.00s
+
+===== illumination =====
+
+running 9 tests
+test darkness_render_tests::illumination_native_examples_same_tiles_levels_sources_and_potion_expiry ... ok
+test illumination_render_tests::illumination_actual_creature_item_player_and_backgrounds_are_graded_once ... ok
+test illumination_render_tests::illumination_custom_source_controls_are_opt_in_and_neutral_flicker_is_visible ... ok
+test illumination_render_tests::illumination_entities_effects_custom_profiles_and_unbounded_observations ... ok
+test illumination_render_tests::illumination_native_calibration_pixels_and_all_incremental_paths ... ok
+test illumination_render_tests::illumination_native_gpu_matches_software_at_every_calibration_level ... ignored, Explicit isolated SDL process: SDL_VIDEODRIVER=offscreen, --test-threads=1; Linux software GL is not Windows hardware certification
+test illumination_render_tests::illumination_transient_effects_use_the_same_detached_grading ... ok
+test illumination_render_tests::illumination_unknown_and_telepathic_cells_never_reveal_hidden_light ... ok
+test illumination_render_tests::illumination_water_depth_hues_and_luminance_remain_distinct_at_all_knots ... ok
+
+test result: ok. 8 passed; 0 failed; 1 ignored; 0 measured; 726 filtered out; finished in 24.13s
+
+===== darkness_render_tests::darkness_materials_glow_dilution_profiles_and_ring_exclusion =====
+
+running 1 test
+test darkness_render_tests::darkness_materials_glow_dilution_profiles_and_ring_exclusion ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 734 filtered out; finished in 1.03s
+
+===== revision50_creature_identity_black_outline_native_pixels_varied_floors =====
+
+running 1 test
+test render::creature_identity_tests::revision50_creature_identity_black_outline_native_pixels_varied_floors ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 734 filtered out; finished in 9.80s
+
+===== same_clock_global_light_snapshot_identity_invalidates_equal_base_cells =====
+
+running 1 test
+test render::tile_damage::tests::same_clock_global_light_snapshot_identity_invalidates_equal_base_cells ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 734 filtered out; finished in 1.67s
+
+===== water_depth_native_captures_separate_shallows_and_preserve_readable_tint =====
+
+running 1 test
+test water_render_tests::water_depth_native_captures_separate_shallows_and_preserve_readable_tint ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 734 filtered out; finished in 4.41s
+
+===== aiming_effect_tests =====
+
+running 4 tests
+test aiming_effect_tests::r51_aim_context_changes_cancel_actions_and_ink_but_pack_selection_survives ... ok
+test aiming_effect_tests::r51_aim_full_retained_tile_cancel_animation_and_resize_match ... ok
+test aiming_effect_tests::r51_aim_gpu_commands_and_native_captures ... ok
+test aiming_effect_tests::r51_aim_mouse_keyboard_items_cancel_and_equipment_are_pure ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 731 filtered out; finished in 7.24s
+
+===== perception_ui =====
+
+running 9 tests
+test perception_ui::tests::revision51_perception_contour_uses_creature_distance_stealth_and_light ... ok
+test perception_ui::tests::revision51_perception_gpu_quads_and_native_captures ... ok
+test perception_ui::tests::revision51_perception_hidden_wall_and_light_do_not_change_detached_preview ... ok
+test perception_ui::tests::revision51_perception_known_wall_blocks_but_unknown_ray_never_closes ... ok
+test perception_ui::tests::revision51_perception_labels_legacy_gate_and_heart_preview ... ok
+test perception_ui::tests::revision51_perception_portals_only_use_known_links ... ok
+test perception_ui::tests::revision51_perception_range_is_hover_only_with_stable_card_geometry ... ok
+test perception_ui::tests::revision51_perception_special_senses_and_moving_light_are_omitted ... ok
+test perception_ui::tests::revision51_perception_two_way_hover_cancel_scroll_resize_and_repaint ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 726 filtered out; finished in 3.57s
+

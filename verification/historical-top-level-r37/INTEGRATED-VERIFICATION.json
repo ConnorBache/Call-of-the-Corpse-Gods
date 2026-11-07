@@ -1,0 +1,275 @@
+{
+  "status": "passed",
+  "simulation_revision": 37,
+  "completed_utc": "2026-10-28T18:43:23.640882+00:00",
+  "workspace": {
+    "label": "workspace",
+    "command": [
+      "sh",
+      "tools/cargo.sh",
+      "test",
+      "--workspace",
+      "--locked",
+      "--all-targets",
+      "--no-fail-fast"
+    ],
+    "exit_code": 0,
+    "seconds": 537.321,
+    "targets": 148,
+    "log": "verification/integration-r37/final-gate/workspace.log",
+    "log_sha256": "80e68db26a082d5982ecac98d298ac649f2ade5300fe568ea34526dc52de0f28",
+    "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+    "failed_tests": [],
+    "passed": 902,
+    "failed": 0,
+    "ignored": 1,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "doctests": {
+    "label": "doctests",
+    "command": [
+      "sh",
+      "tools/cargo.sh",
+      "test",
+      "--workspace",
+      "--locked",
+      "--doc",
+      "--no-fail-fast"
+    ],
+    "exit_code": 0,
+    "seconds": 1.509,
+    "targets": 1,
+    "log": "verification/integration-r37/final-gate/doctests.log",
+    "log_sha256": "6133a1bf9c3f09bb12ef60e947f49e4fc1d6e24085305bee5ebf457f4702c9ce",
+    "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+    "failed_tests": [],
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "frozen_code_manifest_sha256": "a852faae4f33ecaf333dade0c4b0ff71dcd3bd5016301cf5a11f92d54522774b",
+  "frozen_input_count": 1068,
+  "frozen_inputs_verified_before_and_after": true,
+  "profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "windows_crossbuild_verified": true,
+  "windows_runtime_verified": false,
+  "windows_executable_unsigned": true,
+  "windows_exe_sha256": "8804151ba91f74643bb865a1ad806302ed8c8062530ac0f8b61da6ee08865a2c",
+  "windows_exe_bytes": 101577448,
+  "preservation_verified": true,
+  "preserved_authored_files": 316,
+  "preserved_historical_verification_files": 219,
+  "preserved_historical_top_level_r36_files": 3,
+  "generation_samples": {
+    "seeds": [
+      "sub-biome-review-1",
+      "sub-biome-review-2",
+      "sub-biomes-review-r37"
+    ],
+    "floorsGenerated": 120,
+    "generationErrors": 0,
+    "cornEligibleFloors": 36,
+    "acceptedCornFloors": 1,
+    "cornChambers": [
+      {
+        "seed": "sub-biome-review-1",
+        "depth": "31",
+        "cells": "81",
+        "residents": "8",
+        "portalPairs": "4",
+        "orderedAreas": "2",
+        "randomPockets": "2",
+        "traversable": "true",
+        "allPortalEndpointsOptional": "true"
+      }
+    ],
+    "forestFloors": 28,
+    "forestsWithVegetation": 28,
+    "forestTrees": 328,
+    "forestGrass": 493,
+    "mountainFloors": 23,
+    "iceCells": 287,
+    "hellfireCells": 204,
+    "speedupAreas": 128,
+    "notes": [
+      "Optional features are omitted when protected geometry, density or route proof rejects placement. Counts are accepted, not requested.",
+      "Forest footprints contain actual vegetation. Existing vent/fire components receive no newly added floor fuel.",
+      "Corn acceptance: at least 8 residents, 3 local portal pairs, 1 ordered area and 1 random CA pocket.",
+      "No gameplay RNG consumed by this survey."
+    ]
+  },
+  "independent_review": {
+    "checked_utc": "2026-10-28T17:59:36.264653+00:00",
+    "core_source_fingerprint": "ee90c75d8f952dd586ef16921388630b8aae8d054d04a712a263edb986b7fbf2",
+    "core_input_count": 268,
+    "source_drift": [],
+    "unique_seeds": 4,
+    "unique_generated_floors": 160,
+    "repeated_deterministic_floor_generations": 320,
+    "corn_chambers_checked": 3,
+    "generation": [
+      {
+        "seed": "sub-biome-review-1",
+        "elapsed_ms": 1970.597
+      },
+      {
+        "seed": "sub-biome-review-2",
+        "elapsed_ms": 1760.427
+      },
+      {
+        "seed": "r37-independent-0",
+        "elapsed_ms": 1735.75
+      },
+      {
+        "seed": "r37-independent-1",
+        "elapsed_ms": 1884.945
+      }
+    ],
+    "corn_chambers": [
+      {
+        "seed": "sub-biome-review-1",
+        "depth": 31.0,
+        "cells": 81.0,
+        "residents": 8.0,
+        "portals": 4.0,
+        "speed_cells": 8.0,
+        "random_cells": 15.0,
+        "links": 30.0
+      },
+      {
+        "seed": "r37-independent-0",
+        "depth": 36.0,
+        "cells": 81.0,
+        "residents": 8.0,
+        "portals": 4.0,
+        "speed_cells": 10.0,
+        "random_cells": 21.0,
+        "links": 28.0
+      },
+      {
+        "seed": "r37-independent-1",
+        "depth": 34.0,
+        "cells": 81.0,
+        "residents": 8.0,
+        "portals": 4.0,
+        "speed_cells": 8.0,
+        "random_cells": 32.0,
+        "links": 36.0
+      }
+    ],
+    "performance": [
+      {
+        "seed": "sub-biome-review-1",
+        "depth": 31.0,
+        "links": 30.0,
+        "route40_cold_ms": 0.667,
+        "route40_warm_ms": 0.73,
+        "ray40_ms": 2.726
+      },
+      {
+        "seed": "r37-independent-0",
+        "depth": 36.0,
+        "links": 28.0,
+        "route40_cold_ms": 0.871,
+        "route40_warm_ms": 0.978,
+        "ray40_ms": 13.403
+      },
+      {
+        "seed": "r37-independent-1",
+        "depth": 34.0,
+        "links": 36.0,
+        "route40_cold_ms": 1.287,
+        "route40_warm_ms": 1.212,
+        "ray40_ms": 7.098
+      }
+    ],
+    "full_wait_commands": [
+      {
+        "seed": "sub-biome-review-1",
+        "depth": 31.0,
+        "ms": 75.4,
+        "took_turn": "true",
+        "deterministic": "true"
+      },
+      {
+        "seed": "r37-independent-0",
+        "depth": 36.0,
+        "ms": 115.598,
+        "took_turn": "true",
+        "deterministic": "true"
+      },
+      {
+        "seed": "r37-independent-1",
+        "depth": 34.0,
+        "ms": 53.269,
+        "took_turn": "true",
+        "deterministic": "true"
+      }
+    ],
+    "real_command_save_resume_regression": {
+      "passed": 1,
+      "failed": 0,
+      "commands": [
+        "Wait",
+        "Move(+1,0)",
+        "Wait"
+      ]
+    },
+    "scope": "Independent optimized Linux core generation, route and ray helper queries, real turn command/save/resume. Not full workspace suite, desktop frame benchmark, worst-case performance proof, Windows runtime test or final archive verification.",
+    "fixture_controls": "Move player into an unoccupied generated Corn chamber cell; give high HP to survive deep encounters. Keep actual generated actors, geometry, state and full-floor simulation. No runtime code changes.",
+    "resolved_issue": "Generated cornDimensionResident marker initially rejected all turn commands. Lead registered the marker and preserved it through corpse/revival; actual generated commands now pass."
+  },
+  "renderer_capture": {
+    "actual_native_rasterizer": true,
+    "interactive_window_verification": false,
+    "windows_runtime_verification": false,
+    "provenance": "Generated full-world geometry, full reveal, level-1 controlled observer, no turns; not a balanced DEBUG progression loadout. Separate controlled terrain demonstration.",
+    "artifacts": [
+      {
+        "path": "sub-biomes-corn-dimension-floor31-generated-debug.png",
+        "bytes": 686613,
+        "sha256": "2983aada639c3a771f419ca8dba570c341b2960de665c7d759c79c609e5dfc58"
+      },
+      {
+        "path": "sub-biomes-hellfire-floor25-generated-debug.png",
+        "bytes": 680071,
+        "sha256": "bbaef8edff7a5d889cdf90e8c9e5687ec5d06727a3b39c140f1beae72ad7b168"
+      },
+      {
+        "path": "sub-biomes-mountainous-floor22-generated-debug.png",
+        "bytes": 662740,
+        "sha256": "3ff54b5495b3f00b2d64052395ec50dbabcc12ea035f956b48320a58dc587a9c"
+      },
+      {
+        "path": "sub-biomes-terrain-controlled.png",
+        "bytes": 347622,
+        "sha256": "d297c3de4a86aa642ebd4e8c694f9254f643e773397ccb399922469022e6bf90"
+      }
+    ]
+  },
+  "evidence_sha256": {
+    "final-gate/final-gate-receipt.json": "a7f18db8113848507674a178ca94a1729e2ca54e04da8ddfb78ddcd0ce272c9c",
+    "windows-build/windows-crossbuild-receipt.json": "06d915ca0b2522b915fc6f43206018c07d36fab50c1891e01faaf472e19f5a6f",
+    "independent-review/receipt.json": "527678df2f319129dd73b81a82829cfe57c4ef7e9e15cb45efadef7251b6c089",
+    "generation/accepted-generation-summary.json": "fc99a3bc2717cd20f63f9db1520ff99a598277f890ca64b57e3c5e07e6fbf42d",
+    "desktop-ui/ui-final-receipt.json": "857be7fc6f6191d795b2f1ae7d96fb78c4c3a301f0120d330d6f6dc88e140c99",
+    "desktop-ui/new-player-text-provenance.json": "486ac662a739168ba8ff621d469f0aad5794b7e05a6dc08ad8b1805e152717a3",
+    "source-freeze.json": "bd68dfcaef29c55d68b0e86227148b462fdd183cd01889457d858859edfcb1f2"
+  },
+  "known_limits": [
+    "Windows runtime untested; unsigned cross-build only.",
+    "Safe generation may omit optional terrain or Corn proposals.",
+    "Corn chambers add ordinary heart-bearing residents and therefore rewards.",
+    "Screenshots retain existing fixed-layout sidebar clipping; wider viewport only scales logical canvas.",
+    "Large full-world QA JSON snapshots are evidence, not supported player-save imports."
+  ]
+}

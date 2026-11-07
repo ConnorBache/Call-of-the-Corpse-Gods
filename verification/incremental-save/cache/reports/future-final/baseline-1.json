@@ -1,0 +1,79 @@
+{
+  "implementation": "candidate",
+  "profile": "normal collector-off",
+  "scope": "warm metadata, one command then immediate encode; no durable disk flush",
+  "cases": [
+    {
+      "case": "generated_10_floors-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 2246716,
+      "command_inclusive": {
+        "n": 3,
+        "median_ms": 10.240185,
+        "p95_ms": 10.304613,
+        "samples_ms": [
+          10.304613,
+          10.240185,
+          9.241244
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 3,
+        "median_ms": 13.239287000000001,
+        "p95_ms": 13.598686,
+        "samples_ms": [
+          13.239287000000001,
+          13.598686,
+          12.701030000000001
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 3,
+        "median_ms": 23.544384,
+        "p95_ms": 23.839178,
+        "samples_ms": [
+          23.544384,
+          23.839178,
+          21.942558000000002
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 15578695,
+      "command_inclusive": {
+        "n": 3,
+        "median_ms": 19.495361,
+        "p95_ms": 27.500963,
+        "samples_ms": [
+          14.958392,
+          27.500963,
+          19.495361
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 3,
+        "median_ms": 42.194105,
+        "p95_ms": 59.766916,
+        "samples_ms": [
+          37.007381,
+          42.194105,
+          59.766916
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 3,
+        "median_ms": 69.695596,
+        "p95_ms": 79.26297699999999,
+        "samples_ms": [
+          51.966197,
+          69.695596,
+          79.26297699999999
+        ]
+      },
+      "profile_reports": []
+    }
+  ]
+}

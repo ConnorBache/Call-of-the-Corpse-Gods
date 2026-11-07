@@ -1,0 +1,296 @@
+{
+  "profile": "optimized-tests",
+  "sample": "generated geometry; no initial actor or ground inputs",
+  "floors": 144,
+  "elapsedSeconds": 7.396270953,
+  "rows": [
+    {
+      "depth": 20,
+      "domain": "Dungeon",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 113,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 22,
+        "assignmentRejections": 14,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 68,
+        "acceptedGroups": 31,
+        "acceptedTwoSourceGroups": 6
+      }
+    },
+    {
+      "depth": 20,
+      "domain": "Cave",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 34,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 17,
+        "assignmentRejections": 9,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 99,
+        "acceptedGroups": 44,
+        "acceptedTwoSourceGroups": 11
+      }
+    },
+    {
+      "depth": 20,
+      "domain": "Meadow",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 36,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 19,
+        "assignmentRejections": 11,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 77,
+        "acceptedGroups": 34,
+        "acceptedTwoSourceGroups": 9
+      }
+    },
+    {
+      "depth": 20,
+      "domain": "Forest",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 32,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 15,
+        "assignmentRejections": 7,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 95,
+        "acceptedGroups": 42,
+        "acceptedTwoSourceGroups": 11
+      }
+    },
+    {
+      "depth": 20,
+      "domain": "Archipelago",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 106,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 40,
+        "assignmentRejections": 32,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 89,
+        "acceptedGroups": 40,
+        "acceptedTwoSourceGroups": 9
+      }
+    },
+    {
+      "depth": 20,
+      "domain": "Mountain",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 225,
+        "shapeCandidates": 5,
+        "assignmentAttempts": 10,
+        "assignmentRejections": 5,
+        "safetyRejections": 0,
+        "acceptedPockets": 5,
+        "acceptedCells": 37,
+        "acceptedGroups": 17,
+        "acceptedTwoSourceGroups": 3
+      }
+    },
+    {
+      "depth": 30,
+      "domain": "Dungeon",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 159,
+        "shapeCandidates": 7,
+        "assignmentAttempts": 24,
+        "assignmentRejections": 17,
+        "safetyRejections": 0,
+        "acceptedPockets": 7,
+        "acceptedCells": 83,
+        "acceptedGroups": 37,
+        "acceptedTwoSourceGroups": 9
+      }
+    },
+    {
+      "depth": 30,
+      "domain": "Cave",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 39,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 18,
+        "assignmentRejections": 10,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 83,
+        "acceptedGroups": 38,
+        "acceptedTwoSourceGroups": 7
+      }
+    },
+    {
+      "depth": 30,
+      "domain": "Meadow",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 65,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 19,
+        "assignmentRejections": 11,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 70,
+        "acceptedGroups": 33,
+        "acceptedTwoSourceGroups": 4
+      }
+    },
+    {
+      "depth": 30,
+      "domain": "Forest",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 51,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 23,
+        "assignmentRejections": 15,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 75,
+        "acceptedGroups": 34,
+        "acceptedTwoSourceGroups": 7
+      }
+    },
+    {
+      "depth": 30,
+      "domain": "Archipelago",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 201,
+        "shapeCandidates": 6,
+        "assignmentAttempts": 7,
+        "assignmentRejections": 1,
+        "safetyRejections": 0,
+        "acceptedPockets": 6,
+        "acceptedCells": 52,
+        "acceptedGroups": 24,
+        "acceptedTwoSourceGroups": 4
+      }
+    },
+    {
+      "depth": 30,
+      "domain": "Mountain",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 174,
+        "shapeCandidates": 5,
+        "assignmentAttempts": 9,
+        "assignmentRejections": 4,
+        "safetyRejections": 0,
+        "acceptedPockets": 5,
+        "acceptedCells": 51,
+        "acceptedGroups": 23,
+        "acceptedTwoSourceGroups": 5
+      }
+    },
+    {
+      "depth": 40,
+      "domain": "Dungeon",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 135,
+        "shapeCandidates": 7,
+        "assignmentAttempts": 18,
+        "assignmentRejections": 11,
+        "safetyRejections": 0,
+        "acceptedPockets": 7,
+        "acceptedCells": 80,
+        "acceptedGroups": 38,
+        "acceptedTwoSourceGroups": 4
+      }
+    },
+    {
+      "depth": 40,
+      "domain": "Cave",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 42,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 11,
+        "assignmentRejections": 3,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 87,
+        "acceptedGroups": 39,
+        "acceptedTwoSourceGroups": 9
+      }
+    },
+    {
+      "depth": 40,
+      "domain": "Meadow",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 32,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 24,
+        "assignmentRejections": 16,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 86,
+        "acceptedGroups": 42,
+        "acceptedTwoSourceGroups": 2
+      }
+    },
+    {
+      "depth": 40,
+      "domain": "Forest",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 27,
+        "shapeCandidates": 8,
+        "assignmentAttempts": 30,
+        "assignmentRejections": 22,
+        "safetyRejections": 0,
+        "acceptedPockets": 8,
+        "acceptedCells": 102,
+        "acceptedGroups": 45,
+        "acceptedTwoSourceGroups": 12
+      }
+    },
+    {
+      "depth": 40,
+      "domain": "Archipelago",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 179,
+        "shapeCandidates": 6,
+        "assignmentAttempts": 16,
+        "assignmentRejections": 10,
+        "safetyRejections": 0,
+        "acceptedPockets": 6,
+        "acceptedCells": 84,
+        "acceptedGroups": 36,
+        "acceptedTwoSourceGroups": 12
+      }
+    },
+    {
+      "depth": 40,
+      "domain": "Mountain",
+      "floors": 8,
+      "counts": {
+        "shapeAttempts": 156,
+        "shapeCandidates": 7,
+        "assignmentAttempts": 21,
+        "assignmentRejections": 14,
+        "safetyRejections": 0,
+        "acceptedPockets": 7,
+        "acceptedCells": 61,
+        "acceptedGroups": 27,
+        "acceptedTwoSourceGroups": 7
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 56.03s
+     Running tests/non_euclidean_integration_r36.rs (target/debug/deps/non_euclidean_integration_r36-d2b83b1f7034fa5e)
+
+running 12 tests
+test half_here_keeps_its_creation_plane_and_does_not_project_pocket_sight ... ok
+test dream_transition_does_not_move_or_attack_the_waking_body ... ok
+test invalid_throw_and_interception_before_fork_do_not_draw_a_random_exit ... ok
+test entering_each_source_arrives_once_at_shared_destination_without_rng ... ok
+test actual_empty_throw_samples_once_and_places_one_real_item_at_the_chosen_exit ... ok
+test read_only_queries_and_blocked_sibling_do_not_consume_a_lottery_draw ... ok
+test shared_underfoot_items_are_transferred_once_not_cloned ... ok
+test pockets_do_not_create_an_optical_viewpoint_or_reduce_visual_distance ... ok
+test linked_enemy_occupancy_attacks_without_telefrag_or_random_return ... ok
+test reverse_transition_consumes_exactly_one_serialized_draw_and_exercises_both_exits ... ok
+test absent_pockets_preserve_revision35_commands_and_actor_tuning ... ok
+test save_replay_revert_and_future_preserve_topology_and_random_outcome ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+

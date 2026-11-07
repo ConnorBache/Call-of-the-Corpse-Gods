@@ -1,0 +1,71 @@
+{
+  "revision": 33,
+  "status": "Focused checks and independent debug review passed; aggregate integration owned by parent",
+  "checks": [
+    {
+      "command": "CARGO_INCREMENTAL=0 sh tools/cargo.sh test -p corpse-core --test debug_floor_v33",
+      "passed": 5,
+      "log": "core-tests.log"
+    },
+    {
+      "command": "CARGO_INCREMENTAL=0 sh tools/cargo.sh test -p corpse-core --test playtest_start",
+      "passed": 8,
+      "log": "legacy-playtest-tests.log"
+    },
+    {
+      "command": "CARGO_INCREMENTAL=0 sh tools/cargo.sh test -p corpse-desktop --bin corpse-desktop debug_",
+      "passed": 4,
+      "log": "desktop-tests.log"
+    },
+    {
+      "command": "CARGO_INCREMENTAL=0 sh tools/cargo.sh test -p corpse-desktop --bin corpse-desktop startup_ui::tests",
+      "passed": 4,
+      "log": "startup-loader-tests.log"
+    }
+  ],
+  "headless_workflow": "workflow-result.json",
+  "screenshots": [
+    {
+      "path": "choice.png",
+      "sha256": "bbcf56e24fb2a7c6751fa3ea7f6b6e3db0de0f1e59d86900fec36c7f50006c51",
+      "type": "Actual application renderer, shared live Painter; not an OS window capture"
+    },
+    {
+      "path": "setup.png",
+      "sha256": "d3b71c773d5a9641544673a1b1886ce5caa6b47a6abb4ed7cabfb34752971512",
+      "type": "Actual application renderer, shared live Painter; not an OS window capture"
+    },
+    {
+      "path": "stash.png",
+      "sha256": "e8c04509d1494e49f582e2d0e461d26aa45b34a8afb6cf3fcb0a6119c2543d86",
+      "type": "Actual application renderer, shared live Painter; not an OS window capture"
+    },
+    {
+      "path": "target-floor.png",
+      "sha256": "5769d7ed683d78b8886c9b53aa35ab2efc71802668719c1fcf27c20222f6fea5",
+      "type": "Actual application renderer, shared live Painter; not an OS window capture"
+    }
+  ],
+  "not_claimed": [
+    "Full workspace regression pass",
+    "Physical desktop input/window testing",
+    "Windows platform verification"
+  ],
+  "notes": [
+    "Legacy v1 reconstruction/replay retained; new menu and --debug-floor/--playtest-floor use v2 user choices and complete stash.",
+    "Two initial UI seeds were rejected by normal generation furnace-containment checks; unit tests use verified seed; generator errors remain visible and no seed is silently substituted.",
+    "Normal save replacement was explicitly rejected by the headless new command and original bytes remained unchanged."
+  ],
+  "independent_debug_review": {
+    "passed": 8,
+    "log": "../integration-r33/debug-independent-recheck.log",
+    "cases": "take/put/equip after world turns, explicit save/load plus Revert, pending haste, Future, TreeTap/Honey/Shard semantics, every Blessed god at floor40"
+  },
+  "milestone_audit": {
+    "requested_worlds": 32,
+    "successful_worlds": 32,
+    "failed_worlds": 0,
+    "data": "../../tools/monster-balance/player-progressions-r33-debug32.jsonl",
+    "summary": "../../tools/monster-balance/level-milestones-r33-debug32.json"
+  }
+}

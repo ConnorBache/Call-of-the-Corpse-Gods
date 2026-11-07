@@ -1,0 +1,38 @@
+{
+  "seeds": [
+    "sub-biome-review-1",
+    "sub-biome-review-2",
+    "sub-biomes-review-r37"
+  ],
+  "floorsGenerated": 120,
+  "generationErrors": 0,
+  "cornEligibleFloors": 36,
+  "acceptedCornFloors": 1,
+  "cornChambers": [
+    {
+      "seed": "sub-biome-review-1",
+      "depth": "31",
+      "cells": "81",
+      "residents": "8",
+      "portalPairs": "4",
+      "orderedAreas": "2",
+      "randomPockets": "2",
+      "traversable": "true",
+      "allPortalEndpointsOptional": "true"
+    }
+  ],
+  "forestFloors": 28,
+  "forestsWithVegetation": 28,
+  "forestTrees": 328,
+  "forestGrass": 493,
+  "mountainFloors": 23,
+  "iceCells": 287,
+  "hellfireCells": 204,
+  "speedupAreas": 128,
+  "notes": [
+    "Optional features are omitted when protected geometry, density or route proof rejects placement. Counts are accepted, not requested.",
+    "Forest footprints contain actual vegetation. Existing vent/fire components receive no newly added floor fuel.",
+    "Corn acceptance: at least 8 residents, 3 local portal pairs, 1 ordered area and 1 random CA pocket.",
+    "No gameplay RNG consumed by this survey."
+  ]
+}

@@ -1,0 +1,16 @@
+
+running 11 tests
+test color::tests::dark_blue_telepathy ... ok
+test color::tests::contrast_after_alpha ... ok
+test color::tests::srgb_roundtrip ... ok
+test color::parity::source_600_material_light_memory_cases ... ok
+test source_stationary_and_animated_pulses_match ... ok
+test source_material_inheritance_matches ... ok
+test color_profile::tests::default_profile_preserves_600_frozen_color_cases ... ok
+test source_feature_colors_fallbacks_and_grading_match ... ok
+test source_observed_fog_transition_and_all_seeing_match ... ok
+test source_entity_inheritance_parent_and_tuning_match ... ok
+test color::generated_light_parity::visible_source_light_field ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+

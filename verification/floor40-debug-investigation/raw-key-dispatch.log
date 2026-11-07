@@ -1,0 +1,4 @@
+revision50 native-unsupported-boundary: Ok(DispatchOutcome { took_turn: false, changed: true, events: [], pending_snapshot: None })
+revision50 numo-revert: Err(EngineError("Revert is unavailable under revision41 rules"))
+revision51 native-unsupported-boundary: Ok(DispatchOutcome { took_turn: false, changed: true, events: [], pending_snapshot: None })
+revision51 numo-revert: Err(EngineError("Revert is unavailable under revision41 rules"))

@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "simulation_revision": 39,
+  "packaging": "compact",
+  "quality": 100,
+  "art_count": 84,
+  "art_bytes": 17991772,
+  "alpha_exact": true,
+  "dimensions_exact": true,
+  "rgb_lossy_with_user_approval": true,
+  "original_png_assets_unchanged": true,
+  "workspace_tests": {
+    "passed": 952,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 154
+  },
+  "doctests_exit": 0,
+  "frozen_inputs_unchanged": true,
+  "windows_zip_bytes": 28354828,
+  "windows_zip_sha256": "75ef145fbf936a7fb4f3de309a3fe6668bd5480f97b29cef9f35b8a557a93c73",
+  "windows_runtime_verified": false,
+  "linux_full_page_renders": 8,
+  "independent_decoders": [
+    "Pillow/libwebp",
+    "FFmpeg",
+    "image-webp0.2.4"
+  ],
+  "artifact_scope": "Only distribution encoding/build indexing/decode/tests/packaging/docs changed; gameplay/sourcePNG unchanged"
+}

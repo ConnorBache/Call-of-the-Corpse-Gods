@@ -1,0 +1,35 @@
+# Native Pack: source behavior, cost, and evidence
+
+The native Pack lives in `crates/corpse-desktop/src/pack.rs`. Frozen v48 `ui-items.ts`, `ui-inventory-order.ts`, `ui-inventory-targeting.ts`, `ui-overlays.ts`, and `main.ts::renderInventory` are its behavior references.
+
+## Boundary and behavior
+
+The projection borrows a Run and stores only detached inventory, small session identity/availability fields, and display text. It never clones floor/actor/world history, spends energy, consumes RNG, changes equipment, or dispatches a gameplay command. `PackAction::Command` is routed through the temporal Engine. `PackAction::Order` changes only `Run.inventory_display_order`. Stable display ranks do not reorder the physical inventory or any visual group's physical members. The first physical member remains the ordinary action target. Equipment appears before carried items; each section preserves saved manual order and then acquisition order. Identical carried equipment may form visual groups while continuing to occupy separate slots. Arrow quantity occupies one slot per physical arrow stack. Quantity totals shown beside names and the authoritative occupancy counter remain distinct.
+
+A fixed 900 × 579 drawer at (73,131) is inside the 985-wide dungeon column and does not resize the map or cover the resource rail. The list and selected-item detail columns scroll independently. Twenty row positions remain present for an empty pack. Source CSS panel, edge, selected, text, muted, and gold colors are used. Paint clips to both the drawer and each column, and restores the caller's clip. When Tinker is acquired, source eligibility additionally scans the bounded ability catalog, generated grants, inventory and all floor-ground items to build outside-god pools. If B is the total ground-item count across generated floors, this adds O(A + I + B) time/storage to the refresh availability query.
+
+Pointer hitboxes use half-open rectangles matching painted buttons and list rows. All keyboard/pointer events remain consumed by the owner while open, including unused keys and clicks outside the panel.
+
+Source item actions, slots, Bow Apply, Drop/Throw targeting, heart-craft selection, cancellation, help text, and source-derived item descriptions are projected. A target session ends on tick, phase, player/session identity, inventory, abilities, energy, status, offers, or death-blocker changes. A command can be emitted only once before the owner refreshes. The owner must discard the projection when replacing/loading/restoring a session. UI selection, inspection, cancellation, reordering, repeated open/close, and drawing cost no turn. Replay read-only mode suppresses action and reorder controls.
+
+## Costs
+
+I = physical inventory records (admitted saves cap at100), D = saved display-rank entries, G = visual groups (G ≤ I), A = fixed ability-catalog size, E = total item enhancements, S = total detached item/string data, T = projected description/name/button text, P = pixels covered by the fixed panel, and Q = rasterized glyph pixels.
+
+Observe/refresh has worst-case O(I² × maximum item-identity size + I(D+I) + G log G + I×A + I×cost(effective_stats) + T) work and O(S + T + I + D) extra memory. Typed identity equality deliberately distinguishes absent/null fields and every source identity field; only ID and quantity are excluded, and potion identity is projected through learned knowledge. Groups' numeric ranks are computed once before stable sorting. The read-only core helpers account for item/enhancement/stat work; their costs are not constant by assumption. Potion appearance uses a tiny fixed local shuffle and seed-string scan, never simulation RNG. `refresh` compares the detached session stamp, including inventory content, so its comparison costs O(S + owned ability strings).
+
+Click/keyboard/scroll work scans at most G rows and the selected item's wrapped text/action controls, O(G + selected text + action count); reorder additionally materializes I cosmetic IDs. Wrapped text is bounded to44characters per detail line; the number of lines can exceed the viewport, and remains available by scrolling. Paint costs O(P + visible/selected text + Q + G). The existing fontdue glyph cache determines cold glyph raster cost; cache misses and PNG/font startup are not claimed constant. UI interaction and cached cosmetic redraw frequency are desktop-owned. These are asymptotic bounds, not measured release-performance claims.
+
+## Verification
+
+`tools/export-pack-ui-fixtures.mjs` creates `fixtures/pack-ui-v48.json` from frozen compiled reference modules. It is a development oracle only; the native executable never executes JavaScript.
+
+The64source cases cover empty packs, all11authored equipment definitions, duplicate visual groups, preserved physical-member order, saved display order, equipped-first grouping, bows/arrows, heart quantities, distinct magic/grants/enhancements, and identified/unidentified/diluted potion descriptions including Veridian Sap. Tests compare grouping, IDs, quantities, displayed names, occupancy/capacity, and tooltip content. Rust's typed PartialStats representation has a fixed field order; tests normalize only the comma-separated stat-token order because source JS objects retain insertion order. Source wording and values otherwise compare exactly in these cases.
+
+Native tests additionally cover offhand/ring/both-hands equip commands, actual native equipment mutation followed by observation, visual-stack use targeting, duplicate activation suppression, source Bow Apply blockers, crafting invalid/valid/canceled/stale selection, no cross-section reorder, read-only input, repeated open/close, clip restoration, and unchanged simulation state during paint. Headless raster evidence is useful for layout; it does not establish real-window/OS input or whole-game mechanical parity.
+
+## Explicit limits
+
+Core capability is authoritative. Tinker and Fury/Dream crafting now follow the admitted core capability helpers. Tinker selection uses the shared eligibility query and emits a single targeted command without resource/RNG mutation; core still rejects any unsupported selected grant transactionally. Some consumable/tool/projectile effects are still rejected transactionally by core. The selected-item panel preserves source descriptions even for those effects; descriptions are reference rules, not a claim that every native effect executes. The active engine does not admit unsupported equipment grants. Ability/inventory mechanics coverage is documented separately in `abilities-inventory-complexity.md`.
+
+Release-integration regression: potion Throw and Tree Tap Use now expose their completed native engine commands. Unknown tools retain explicit unsupported-use messaging. Two desktop tests cover all17 potion/sap effect labels and supported/unknown tools. This changes only action availability projection (O(number of actions)); execution remains in the independently verified potion/godbeast modules. See validation/pack-completed-actions.log.

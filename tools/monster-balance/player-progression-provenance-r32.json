@@ -1,0 +1,24 @@
+{
+  "status": "final actual-generator paired cohort; 127 complete worlds from fixed 128 seeds, same failure71 both revisions",
+  "samples_attempted": 128,
+  "samples_complete_each": 127,
+  "paired_n": 127,
+  "excluded_seed_indices": [
+    71
+  ],
+  "placement_hashset_sha256": "11609984ad0be06cea348f519fd1469c1c121d333f1f2683b78b900830d39930",
+  "placement_hashes_reverified": true,
+  "baseline_binary_sha256": "1da2ec26145390ec173ad947eebc78d988395bf4ea564e5fd6fbb7aede422653",
+  "relocated_binary_sha256": "5a6e7c137babc6bdefd379ce290c21b75f14ec36809542a51767139641523fe2",
+  "source_and_output_hashes": {
+    "tools/monster-balance/baseline-player-progressions-r31.jsonl": "f84189dba8b4005894d1bcb5a918203ea9ac2e4e448845335e22038e1ce048e8",
+    "tools/monster-balance/relocated-player-progressions-r32.jsonl": "5448472be0fbaf100bd75d4794abb41348497d0720558abeb810289e9b8bd699",
+    "tools/monster-balance/paired-player-progressions-r31-r32.json": "61b1c04e8f90ab5c2f7103135143f932fffbb0bff6f10705ed369606c7135ebb",
+    "tools/monster-balance/conditional-heart-sensitivities-r31.json": "0fd89337b0caafc1b453202cdd5a62acf6123ae14c4c4f55e230f6d336ac163d",
+    "tools/monster-balance/conditional-heart-sensitivities-r32.json": "03022eaf8a6a58611f0bfd0e1ea2570af4e1c7d3a8c3e2b0d1454981c933a099",
+    "crates/corpse-core/examples/heart_progression_audit.rs": "966e21a0d9e973c5777edf3efc744048b5b9c05c784e5a7267b2b873b7b46dbc",
+    "tools/monster-balance/summarize_player_progression.py": "024648187cf52fd98435b234a841fe419f3fa3d02d17fffd4da0210ec267ceaf",
+    "tools/monster-balance/player_sensitivities.py": "ab46d322a34766d4ae76460c6ce0321555f298432c72ab82450fe05e2ce23b05",
+    "tools/monster-balance/compare_player_progression.py": "f74dd29eb511affc638ab41bc869cbf91b2fd867e3b8f94691439fd0e70d5a62"
+  }
+}

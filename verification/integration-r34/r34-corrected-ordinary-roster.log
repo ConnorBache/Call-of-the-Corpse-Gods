@@ -1,0 +1,15 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/phantasmii-r34/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.67s
+     Running tests/ordinary_roster.rs (target/debug/deps/ordinary_roster-7578476dc40c64c5)
+
+running 6 tests
+test ichor_bands_expand_with_same_uniform_draw_and_templates ... ok
+test shipped_manual_matches_runtime_eligibility ... ok
+test widened_windows_preserve_recipe_rules ... ok
+test deterministic_distribution_sample_all_depths ... ok
+test widened_population_places_on_all_generated_depths ... ok
+test save_lazy_generation_and_replay_keep_revision has been running for over 60 seconds
+test save_lazy_generation_and_replay_keep_revision ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 65.39s
+

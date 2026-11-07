@@ -1,0 +1,3 @@
+import fs from'node:fs';import{migrateBastidion}from'../../release-v48/source/call-of-the-corpse-gods/dist/src/bastidion.js';
+const initial=JSON.parse(fs.readFileSync(new URL('../fixtures/avatar-room-v1.json',import.meta.url),'utf8'));const cases=[];
+for(const name of['Vent Fungus','Mercuria’s Vent Fungus',"Mercuria's Vent Fungus",'Bastidion','Greater Vent Fungus'])for(const dead of[false,true])for(const base of[undefined,5.5]){const before=structuredClone(initial.actors[1][0]);before.name=name;before.dead=dead;before.hp=dead?0:5.5;before.maxHp=15;before.baseMaxHp=base;const after=structuredClone(before);migrateBastidion(after);cases.push({before,after});}fs.writeFileSync(new URL('../fixtures/identity-migrations.json',import.meta.url),JSON.stringify(cases));

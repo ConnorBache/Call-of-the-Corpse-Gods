@@ -1,0 +1,60 @@
+{
+  "revision": 38,
+  "entries": [
+    {
+      "file": "crates/corpse-core/src/generation/world.rs",
+      "line": 54,
+      "text": "Unsupported generation recovery window",
+      "authorship": "assistant",
+      "context": "generation error diagnostic; invalid input or exhausted safe placement"
+    },
+    {
+      "file": "crates/corpse-core/src/generation/world.rs",
+      "line": 231,
+      "text": "Unsupported generation candidate attempt",
+      "authorship": "assistant",
+      "context": "generation error diagnostic; invalid input or exhausted safe placement"
+    },
+    {
+      "file": "crates/corpse-core/src/generation/godbeast_room.rs",
+      "line": 160,
+      "text": "No safe Godbeast tap location",
+      "authorship": "assistant",
+      "context": "generation error diagnostic; invalid input or exhausted safe placement"
+    },
+    {
+      "file": "crates/corpse-core/src/startup.rs",
+      "text": "Generation failed after {attempts} complete floor attempts on floor {depth}: {last_error}",
+      "authorship": "assistant",
+      "context": "Native generation exhaustion diagnostic; visible through startup error handling",
+      "conditional": true,
+      "placeholders": [
+        "attempts",
+        "depth",
+        "last_error"
+      ],
+      "line": 587
+    },
+    {
+      "file": "crates/corpse-core/src/replay.rs",
+      "line": 84,
+      "text": "Replay requires matching initial fixture and simulation revision 29, 30, 31, 32, 33, 34, 35, 36, 37 or 38",
+      "authorship": "partial assistant edit to prior diagnostic",
+      "context": "extended existing supported-revision list to38; do not classify original wording as newly authored"
+    },
+    {
+      "file": "crates/corpse-core/src/storage.rs",
+      "line": 335,
+      "text": "Unsupported legacy migration: native execution requires gameplay 3, divine 1, enemy health 1, simulation 29, 30, 31, 32, 33, 34, 35, 36, 37 or 38",
+      "authorship": "partial assistant edit to prior diagnostic",
+      "context": "extended existing supported-revision list to38; do not classify original wording as newly authored"
+    },
+    {
+      "file": "crates/corpse-core/src/startup.rs",
+      "text": "Generated floor has no safe route between transitions",
+      "authorship": "assistant",
+      "context": "Final complete-floor safety rejection, included in exhaustion diagnostic if all safe candidates fail",
+      "conditional": false
+    }
+  ]
+}

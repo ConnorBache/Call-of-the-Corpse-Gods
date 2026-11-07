@@ -1,0 +1,1437 @@
+{
+  "status": "passed",
+  "count": 84,
+  "elapsed_seconds": 18.259214542000336,
+  "comparison": "Every decoded RGBA byte, including transparent RGB; baseline read from frozen r39 archive, encoded art decoded independently by Pillow and FFmpeg.",
+  "baseline_archive_sha256": "ea367569c3fd33e879749d87d390677a4e8d759091472c7a908a3b1b7319b7fc",
+  "rows": [
+    {
+      "name": "banshee",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "dd69bf86c8d1c8942e6a7b53523e290e20588b5b5abe210340e94560e9d7e161",
+      "baseline_rgba_sha256": "a4b27ac6c2fcf09b23877e09f8662dff98c0e39f680d8d02fd69003118520e33",
+      "encoded_file": "compact-r39/art-benchmark/webp/banshee.webp",
+      "encoded_file_bytes": 576006,
+      "encoded_file_sha256": "13b4c0de301d755a5f76fe79adbf7b253500e49e63f79b1a9641b5e97105360a",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "bastidion",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "28b8ef497c2581057abeac5c939ca74c58d143193c1ad68d2aaffda7b9e2ba13",
+      "baseline_rgba_sha256": "0501f42c1eb37723d2c6b6ee78445ddaaa573c502cdac1f568b31929fdf11883",
+      "encoded_file": "compact-r39/art-benchmark/webp/bastidion.webp",
+      "encoded_file_bytes": 1188242,
+      "encoded_file_sha256": "647ebc2799025401e140ff77bd3545de3f778bde415f728da9b591f0703deecd",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "bear",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "808d70f8970295210d470059bf42ef5a0521365ed37c091596eb09a283d57b8e",
+      "baseline_rgba_sha256": "ac79fa374e381b56ee9efa570979156c3a75c6a39198c884eb8c0fd2db279e46",
+      "encoded_file": "compact-r39/art-benchmark/webp/bear.webp",
+      "encoded_file_bytes": 638560,
+      "encoded_file_sha256": "988b02cd3db793362bc8e8ea2d51e92198c89ded393923ac0bb166bb571ae484",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "blorb",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "ee435c1467570bb9e0a51a3e903c62a683302cbd828584ff3baf5417b630d7b6",
+      "baseline_rgba_sha256": "a4a9d076e57eb402fe4c5a31b9b8ac15f40e6d9caea274de962990d878752626",
+      "encoded_file": "compact-r39/art-benchmark/webp/blorb.webp",
+      "encoded_file_bytes": 520432,
+      "encoded_file_sha256": "55394b9ad9a6122c72264541c012f51337f6c087d196a910eabdf876de2d1150",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "bombardier",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "78bc152ef4af9a05b2d6d31e9ef03bd704c2cd64b90bdc1d0e1e960223bd8683",
+      "baseline_rgba_sha256": "0a1e59996ebd31b463a0ba9362abeed6873389e19528f33b8f3c6ef19f0402a3",
+      "encoded_file": "compact-r39/art-benchmark/webp/bombardier.webp",
+      "encoded_file_bytes": 622298,
+      "encoded_file_sha256": "95b52669896bbb942996417bab22a5edb518af0bc894ff0dc08e94a304924db9",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "cancer",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "f8fec744ca14b35e44b3835bd196129107440e87bd0508ec6ee866abb8bf94f8",
+      "baseline_rgba_sha256": "ea7c2a4f16f3535b6e6be9f009d2b07bc1d335e53e21210ab9ed7e7e7c254f8f",
+      "encoded_file": "compact-r39/art-benchmark/webp/cancer.webp",
+      "encoded_file_bytes": 839608,
+      "encoded_file_sha256": "ac626394dc994f99639d47e702afa2c04c5bba709c5058668394afdb884ec3ce",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "cave-bat",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "419687eeb7c8434c6489127ce67b044e1b6f7e234a33354914e9abe842a792e2",
+      "baseline_rgba_sha256": "bad6f030bc848b1ba3ecc368e1f982fb28be90ec37bc46329c24dbd01c613a0e",
+      "encoded_file": "compact-r39/art-benchmark/webp/cave-bat.webp",
+      "encoded_file_bytes": 343662,
+      "encoded_file_sha256": "5147813771653a2d4105724c13c045f480a6002bf4db021e9b73022f8276223a",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "chimera",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "292eff520c9964cbf8f948f5025ba7e638bfae10a30963e7fd874d22661f3bc3",
+      "baseline_rgba_sha256": "79e6e58b5a2b2a466f3c1254bc2a73d917738e39892e11498de3dc6eb05b7855",
+      "encoded_file": "compact-r39/art-benchmark/webp/chimera.webp",
+      "encoded_file_bytes": 775704,
+      "encoded_file_sha256": "b93cd1f9404cff2ea2e10bd77d3c0a72524164e49881a2de6f1bd48ab552771e",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "dire-bear",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "c743ae85b02946a4b1e10828ee8fb521dbdc42d00f94fa4265f12f020fd2ebb6",
+      "baseline_rgba_sha256": "ba3290aee04410806022edd6c7ba9f312af3478cf9905f234259c7343a45961d",
+      "encoded_file": "compact-r39/art-benchmark/webp/dire-bear.webp",
+      "encoded_file_bytes": 820594,
+      "encoded_file_sha256": "9cacf1d2b7e652e2e6bc6ea987bd90995067e30018dadb3549d4a65a35c7062e",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "dragon",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "4a46ffa5b1e84f2a5a2878761d2c6862344b6677efc749aa31b6c846434d49ac",
+      "baseline_rgba_sha256": "fc4c8055ca043729241040c3492d6366b79ca4bef039a4fe656c62948c51201b",
+      "encoded_file": "compact-r39/art-benchmark/webp/dragon.webp",
+      "encoded_file_bytes": 975446,
+      "encoded_file_sha256": "c5f1bf938f0a8adb3f9d4f5a4957d46beb1ca84da117f7a30113552d2fed2067",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "dryad",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "7cfdee03dea1e4320199d796a868254a84f3b30354fde247666550c0a4ffddb1",
+      "baseline_rgba_sha256": "5d038d075b0a858be60d0641fcc761a31d64f9cf3ef43778acb4b7be633d3906",
+      "encoded_file": "compact-r39/art-benchmark/webp/dryad.webp",
+      "encoded_file_bytes": 568408,
+      "encoded_file_sha256": "445fd6e8d2afce9d392ba2e967acdad624f8771c7e8f9e68aed1a07b053a0808",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "giant-beetle",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "5cbb61b8006290ac808279026ba0864bfb8ec8ad9024e06782c5dc1e230899b3",
+      "baseline_rgba_sha256": "63f1a59c4f7f65c082cdc164112af7c2f9790105a382c91bc940be46d6d67197",
+      "encoded_file": "compact-r39/art-benchmark/webp/giant-beetle.webp",
+      "encoded_file_bytes": 918062,
+      "encoded_file_sha256": "386165c2836732a165aa1428aa1660e3294ef8336ef327c5d9319a2a7d7c014b",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "glim",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "bf897924c625f7664066122631f683c7040280cfa2a76c4fd92633dbc1bbf763",
+      "baseline_rgba_sha256": "919445d884f80e487f20f455ac9e9736d54a86f18b52a144f81c17b2102a865a",
+      "encoded_file": "compact-r39/art-benchmark/webp/glim.webp",
+      "encoded_file_bytes": 800360,
+      "encoded_file_sha256": "4905a4ea69b75386d201469dde2e586231cb11e8ea717e91cc9f0fc31425fc96",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "greater-ichor-fish",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "5d35197769a6cb661feb5a8e5dd74009b3d14ec6dad6ef4115d05ec93398134a",
+      "baseline_rgba_sha256": "8061969c079d9f21e326b89abaa2677ec1a89809406eb07265a9d3eed70a30ab",
+      "encoded_file": "compact-r39/art-benchmark/webp/greater-ichor-fish.webp",
+      "encoded_file_bytes": 781186,
+      "encoded_file_sha256": "51ef4943cc15f626257580b4be44bb5377e32dfe23266a5218768745883b2d1e",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "greater-ichor-leviathan",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "9565f39be859260a6cb7d19d69593761d9c415b159074245ab5bef18093cea6b",
+      "baseline_rgba_sha256": "294c7ef09b12906c23323df085acd318e11f9b39ab75f092f2e855383c95ecfa",
+      "encoded_file": "compact-r39/art-benchmark/webp/greater-ichor-leviathan.webp",
+      "encoded_file_bytes": 943930,
+      "encoded_file_sha256": "ad6b3b588192c17dfe247175f11e71c35add2f6d0ae64ea18250bba3b2a238aa",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "greater-ichor-shark",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "fdbef6dc71b2416e6052c3fc6732ce55961e0c14d39f1f963688269dcb160fe4",
+      "baseline_rgba_sha256": "eedd722b23b61ebe580ca9cbe0bca5b0175277cff9b91a8a81c86b5d63a78b81",
+      "encoded_file": "compact-r39/art-benchmark/webp/greater-ichor-shark.webp",
+      "encoded_file_bytes": 740790,
+      "encoded_file_sha256": "2e69e6e2bdbe6f049d7c05a53bdc27e1c56b8a56a19d70ce8f3df5d603f2fbe8",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "half-here",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "0d9b18f5abf2d7da236195ab26518b3d76306fecda4ac081544de8fef32e615e",
+      "baseline_rgba_sha256": "aba7bc9551b568e5d44e2ec584a0df0c64c8e3081329039d09c5a85754f3f900",
+      "encoded_file": "compact-r39/art-benchmark/webp/half-here.webp",
+      "encoded_file_bytes": 514246,
+      "encoded_file_sha256": "4f9f0fd3a03e7c5cd8108921cd0234ec6d87eae7218bbce5d9e0b039c75d5f9b",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "hemogoblin-bloodmancer",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "6181a82c0f6a11cc44bfac46af39ebb2123733745f2795b729ac9cbf74f51cbf",
+      "baseline_rgba_sha256": "fe0c5e875b505ab058d170bc30b9e1c9ba9e1c8a9937fff528dfc7f35762d423",
+      "encoded_file": "compact-r39/art-benchmark/webp/hemogoblin-bloodmancer.webp",
+      "encoded_file_bytes": 653454,
+      "encoded_file_sha256": "817f30f7dbd0c4b43d747e3135ab1534eb96a966970b0ea7db302e79d280d1c7",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "hemogoblin-inventor",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "d76d0cc44d371242500739e1234c1b06f3dcdd836857ffa487837ec258cfedee",
+      "baseline_rgba_sha256": "8e0e828ec5d5ec43702e3c04cb8499fe1a70d7e08f55e14a421a6057df33857b",
+      "encoded_file": "compact-r39/art-benchmark/webp/hemogoblin-inventor.webp",
+      "encoded_file_bytes": 697056,
+      "encoded_file_sha256": "5f496d20e1dd1b530b255d1ea649535482b0c0cafbe87740fff6e25f5fe46e42",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "hemogoblin-mech",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "142fe173da186529dc66ec2935e96829b153e36836034f3b9487ca7d9c1fd1be",
+      "baseline_rgba_sha256": "00a1602d6e936f279fb5309244a3a445999b846e23d6d4eee9822214fd7aeb9d",
+      "encoded_file": "compact-r39/art-benchmark/webp/hemogoblin-mech.webp",
+      "encoded_file_bytes": 1154062,
+      "encoded_file_sha256": "e389fefd870842b1a9cfe7f718133a3ee0500e8bc6060c54c374eb336a1600dc",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "hemogoblin",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "9dc61fb785482de327358e624328abf20ca06b98bc7dfe34c1f9d796380ef796",
+      "baseline_rgba_sha256": "71c2317908439dd56b23f1d7aceeaa5bf60ab9e4b782cd0b6af11ac464818562",
+      "encoded_file": "compact-r39/art-benchmark/webp/hemogoblin.webp",
+      "encoded_file_bytes": 602708,
+      "encoded_file_sha256": "63624a350819e03f5d1f7caff0740bb905354935e4985b7911c1bb7ff4a706c3",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "horn-1",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "aa409d303f616b9108f0709868bedbe01f27bdbbccebc0de75d5e006051cd575",
+      "baseline_rgba_sha256": "d3f9debc703ef64002d6bdf55e52c6cb042d28ff21c5ddc344babcfc795c12fe",
+      "encoded_file": "compact-r39/art-benchmark/webp/horn-1.webp",
+      "encoded_file_bytes": 472034,
+      "encoded_file_sha256": "c089a4d8174ddd5bcc7792a7bd6b138f37dc40c4bb22e847c413d2880a677c34",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "horn-2",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "913d7c7da806db90a872c02a752d9488e5686c28122333b7b1e39dac28020a59",
+      "baseline_rgba_sha256": "3a4844d37779fa989c6b9c337eea0bd6e296d586866893119aee6fa9fdc99452",
+      "encoded_file": "compact-r39/art-benchmark/webp/horn-2.webp",
+      "encoded_file_bytes": 631862,
+      "encoded_file_sha256": "aef155e837774d763716cf20bce78d2157ea7adb08b1b39cf06a553cff02d6af",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "horn-3",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "349280b82d3dacc64b78d7cabdf5fec8a4b34cee38ca04078d27d4c08b64becf",
+      "baseline_rgba_sha256": "bc6d7b788cea8b1b67f3a7a3fd402f28b459d8ef1405aa71d790bb7986b3e0cd",
+      "encoded_file": "compact-r39/art-benchmark/webp/horn-3.webp",
+      "encoded_file_bytes": 371358,
+      "encoded_file_sha256": "6f6b5fc7ab347799480b362bea718693078e4f952cffee06d23f559634bc6437",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "horn-4",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "b6d5092016f9c2c74280203db596b5b51800a90baee66832cf41dab46beb7a90",
+      "baseline_rgba_sha256": "22f4b0d2805d0845b9c8a4cdb7bd55329690633d6c3e7550604d80705bdb0737",
+      "encoded_file": "compact-r39/art-benchmark/webp/horn-4.webp",
+      "encoded_file_bytes": 472358,
+      "encoded_file_sha256": "7c250e17dee32d4988ac247e1ab6bdee05b84186603048e432374fd715f66620",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "horn-5",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "deddcde45c62e276c5a2f23a17c099c38f4d4c09490710f2de6db8a5939b7f6e",
+      "baseline_rgba_sha256": "c450d46d3432cee652eff25b274a2853ab7f8ea813ee717472fd697429d2688a",
+      "encoded_file": "compact-r39/art-benchmark/webp/horn-5.webp",
+      "encoded_file_bytes": 666484,
+      "encoded_file_sha256": "a6be88c209a8ae128e20e66c6499dabd58843e1ed82c0a2eb399a5b110f6825a",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "horn-6",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "3a766df288f579a82779eb4a99acf3bdcb3aa0c117bd5ab9b25703b4fadecbe0",
+      "baseline_rgba_sha256": "42a310958c7af59fb6b0c311c78d943a149649d4fff7b145c8e532dd808f2fb8",
+      "encoded_file": "compact-r39/art-benchmark/webp/horn-6.webp",
+      "encoded_file_bytes": 617414,
+      "encoded_file_sha256": "3bffc5441f043dc3fb7f5c9329dbf6589821c176fb3d53bdbfb8ab8f9396d028",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "horn-7",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "053f5f32fb04e882cb58092c277041cce4bcadd619be03730e194aead23f04f9",
+      "baseline_rgba_sha256": "0e34d505be09326a897fa3dbd26020f3ac6c344145990fd3e25a2d7a5c95efde",
+      "encoded_file": "compact-r39/art-benchmark/webp/horn-7.webp",
+      "encoded_file_bytes": 867508,
+      "encoded_file_sha256": "c075ca8f2ec0a7fb63eac1cbdff306fef9b255910b1e88af6b74387eb83a2d5e",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "ichor-fish-standard",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "149254d89b5a7342659ebc38aa77fcd6f60c3b7c09280c4ac5f9ec331d126a2e",
+      "baseline_rgba_sha256": "413cd8e646e4a8111c1013d6e461b24d33c284f54dc8d214f23f2622b9e60902",
+      "encoded_file": "compact-r39/art-benchmark/webp/ichor-fish-standard.webp",
+      "encoded_file_bytes": 629624,
+      "encoded_file_sha256": "24fb1b1830ae410ba593daf9ce95b7bd3060dcd24fc9e44a12ccdacecddd2336",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "ichor-leviathan",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "e1b00050c58ba51966cdb76e49d6cd29909569ad67d4c288b8956b5f0c0cbd92",
+      "baseline_rgba_sha256": "d8739da069b8403267191ffa045e66296eee78f957aed0bd28c85edf1bc88be5",
+      "encoded_file": "compact-r39/art-benchmark/webp/ichor-leviathan.webp",
+      "encoded_file_bytes": 888854,
+      "encoded_file_sha256": "16905b9a12ba4efb8178144185309ff8b2b0bd72383011a40b5b7cbb397e4210",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "ichor-shark",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "84feca277cb6c2c8d480720d7a33442b4376d41a7ae09d186629176868bf531c",
+      "baseline_rgba_sha256": "1f64b1c6999fc7fda1a07192999b51cfaf9af934ce20ebff7640855e1408697d",
+      "encoded_file": "compact-r39/art-benchmark/webp/ichor-shark.webp",
+      "encoded_file_bytes": 518806,
+      "encoded_file_sha256": "f348ba64c36f826acd5aa81ea0c930ece3fc3f2836320c1c8601e3e3c06cf599",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "kelpie",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "f423720993c3bc813d1d1751766a262a70f704a76960b4d88ab0a962c2c40ef0",
+      "baseline_rgba_sha256": "07b0e48c158761254788288602b30431450e00ccb24899d5a9a5a92cbd56aba5",
+      "encoded_file": "compact-r39/art-benchmark/webp/kelpie.webp",
+      "encoded_file_bytes": 972664,
+      "encoded_file_sha256": "e3f73c5bcd3022f91e5d550961f31f05414a6892af1f86a0295966e9a565cfec",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "killspawn",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "b21857e76374f348da281d0d368be16ec432d135668a7bbb90a2bf3ecfef7138",
+      "baseline_rgba_sha256": "ef0a864de62daaeff488910cc908c024ed54dad37a6bf1b7760174af71cd6e1c",
+      "encoded_file": "compact-r39/art-benchmark/webp/killspawn.webp",
+      "encoded_file_bytes": 1121304,
+      "encoded_file_sha256": "aad1fb866989329d11447ac4b7a6b3206c9eb85cbdbb111ef256a26c5f8772eb",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "lesser-ichor-fish",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "04125d551014d841e6566727d9e8c3a93f6f5b855122beb047c122d1cf85ed2d",
+      "baseline_rgba_sha256": "21a2b18d09a4f2370ab6d14539371e2c61d7fb77da7a8ad6a58970eac2b39feb",
+      "encoded_file": "compact-r39/art-benchmark/webp/lesser-ichor-fish.webp",
+      "encoded_file_bytes": 725530,
+      "encoded_file_sha256": "b4f49e843c0c8f235db0c54146b20ecd03b51ef416e2e57d9a838559467f7d43",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "lesser-ichor-leviathan",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "3e7c97e202d300601207c9254cb9bfb2c40b9801f43d541d71b4908d3745fd3a",
+      "baseline_rgba_sha256": "8704f44269e0851021ae640a933a40d940e52a73f835a8c2d048e9b51e4db22c",
+      "encoded_file": "compact-r39/art-benchmark/webp/lesser-ichor-leviathan.webp",
+      "encoded_file_bytes": 909900,
+      "encoded_file_sha256": "4952f60218ee16a4a1af64fd7ef9e271f0436214061abfd21e64c5c9fc50eea6",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "lesser-ichor-shark",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "f967059bc260aa7638830a70a30c76a4222ffdd2b669be1e2ea50a7880f5abb3",
+      "baseline_rgba_sha256": "7b5c8b8f400100a02e246ba0f906f5fd948b4f95e0cd978ac4d2f3bf910240d3",
+      "encoded_file": "compact-r39/art-benchmark/webp/lesser-ichor-shark.webp",
+      "encoded_file_bytes": 477438,
+      "encoded_file_sha256": "0574f77c86b56e3be5b9ea8db5941c4de01307e369b71bacaabea60494981219",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "long-saidri",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "e4dd517169f1c6b10d96788eb5464044b1d123cecc9b4e63d023b73ee5b4ddc3",
+      "baseline_rgba_sha256": "92efc927d486f43308f9ea808eaa2cba5edfac2d9972bf90f51653ba6cb80e4a",
+      "encoded_file": "compact-r39/art-benchmark/webp/long-saidri.webp",
+      "encoded_file_bytes": 419200,
+      "encoded_file_sha256": "1b19e22fcd170bea841726d9ffe57b1e9532de2e6eaed6b793c5690ee51ebeef",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "maulchild",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "01ca35ab2565777dbc7ac46da2c176b9f1bbf518c7f934a80b5d38e8d00f1b6e",
+      "baseline_rgba_sha256": "6f12d9738f55e1ad3cdc94387c0b2375c0e6671bcb5505894afd97d9b5a8e8d4",
+      "encoded_file": "compact-r39/art-benchmark/webp/maulchild.webp",
+      "encoded_file_bytes": 670904,
+      "encoded_file_sha256": "bb1616e404fd318fe52d4690d8c798a770a3ddfa564d8b56c6fb3e65ad956f70",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "mini-me",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "c81d64a28afb70bca59b89540436cac697ed2d4fe5258e67410292bc7c3f0f03",
+      "baseline_rgba_sha256": "f956636c77135a07d216f7ddde5089e313aba2a4387000d25a23f6155d716d74",
+      "encoded_file": "compact-r39/art-benchmark/webp/mini-me.webp",
+      "encoded_file_bytes": 384048,
+      "encoded_file_sha256": "a39906e6f85511fa07f96c4c8d0e97080c7be5f3050e907de0e53edbbda160cb",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "minotaur",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "27bdd6d5c5bde2a351b73b979dc8c9b8dbe1373c7104fd4b10f77eeb951e56ce",
+      "baseline_rgba_sha256": "839dd14bdeb4ad592337130dd41324113dfc0fade753d92ec536cb55ec018ab1",
+      "encoded_file": "compact-r39/art-benchmark/webp/minotaur.webp",
+      "encoded_file_bytes": 641278,
+      "encoded_file_sha256": "a77cdc7471340ae007f45e64f427cab82d83ddc68d33ea8a7f7f49865489471b",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "moonspawn",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "6b8b91a7efe10afdc1ece355c1ceea9feb88c4f5c9261854be0b83b4bdf305d4",
+      "baseline_rgba_sha256": "31f4d90890494958ccab784780d05bfc23edc4087b111a1c9dbe7a7540403341",
+      "encoded_file": "compact-r39/art-benchmark/webp/moonspawn.webp",
+      "encoded_file_bytes": 940364,
+      "encoded_file_sha256": "000c0ec5355cbc79841c2f23da62f81edf6dea5ffbde9af709c4de5cc28ac26f",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "needleling",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "74308dda6c3fc5895c03ae299a485c39f57dd70c013efd30f545254cc30650ff",
+      "baseline_rgba_sha256": "29b5ea344c17e26c089b94fd79aeef5cb97ea2a26a100e2abcd60c9e4cb7264a",
+      "encoded_file": "compact-r39/art-benchmark/webp/needleling.webp",
+      "encoded_file_bytes": 497338,
+      "encoded_file_sha256": "a48afce8c7ada184efa396ebb4bddd72d4a57c9bfcdc00447daa61a475c8eaa3",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "night-crawler",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "821a18e42f729397d82c480c72deb2b37bd9050a36f8c3696dca2211a9e36da6",
+      "baseline_rgba_sha256": "07906e01579a2067a0b59a7b879287667db8b2247d92f86f4a8dd15af2e21dd2",
+      "encoded_file": "compact-r39/art-benchmark/webp/night-crawler.webp",
+      "encoded_file_bytes": 1519952,
+      "encoded_file_sha256": "c5e6946a9cfb9513445eb4c61a80d63b5c75408ed6e94d2ed6bb64b53c7db71f",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-birther",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "6797e3bec63ebce8c6e96deca2ae6d9eb7df2edbafeb37df1ad98add883223ee",
+      "baseline_rgba_sha256": "5f072de9f2e52a83f9d78f916058b24140379ad07dd9d2d20447ee5c952df313",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-birther.webp",
+      "encoded_file_bytes": 323304,
+      "encoded_file_sha256": "4742fc56f3ac48114f6d2922d24e50862ab6bd1a9e61194154cf89cbf928764e",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-biter",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "c51c55cd5fd5896307ca93e9b83b72875b1f4c9657e1fcebb30a9a273952f242",
+      "baseline_rgba_sha256": "f1d537226f7e554c607ad03f4e3ed0b76ce6517b0046b6bab3875ec241e0c41a",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-biter.webp",
+      "encoded_file_bytes": 475112,
+      "encoded_file_sha256": "cc62de642a462ddde29a8f0a90f1559b08b84bc90fa9ab2a7374f46853b24496",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-breather",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "3bbd1fd88b645f825148ecf7ff5257728f735087602024262c6602de1cdf1695",
+      "baseline_rgba_sha256": "c4ad1cc8870ab10d7f698f42ea728a14ad6463b4b0c58b500723c77fd63b77e5",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-breather.webp",
+      "encoded_file_bytes": 410460,
+      "encoded_file_sha256": "447ece5d963be39ab63a10a5bf0d2c218f152f016ac3f21e9dbb6c722a84d0c9",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-greater-birther",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "46e62b54c291390f1f9be97e37010dcdc02a7b1e9429b0bb167d34139e7877f5",
+      "baseline_rgba_sha256": "3797f2e60b8ad71eeb9ba6eaa940a2e4917ce20f34971b3cb9baf4b10ec45fc8",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-greater-birther.webp",
+      "encoded_file_bytes": 510980,
+      "encoded_file_sha256": "a9ea8c24755b0108f31e0bf8d7379e0704a3b08673a8343e92a6e3eb7b0cb28a",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-greater-biter",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "ed7c29c40db3a5e1cf9dbb44e5161197e9172d9b2e34beac63f4bb1bdd0dfdb7",
+      "baseline_rgba_sha256": "2a17cf3b848d2eb6a5b725b4ac0e4a0e470201780fe98e502bf6ce32b631c8cc",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-greater-biter.webp",
+      "encoded_file_bytes": 531856,
+      "encoded_file_sha256": "ad61cbc29514dbe6f0c2ea2ea671baecd68b909215149f7c04404ae360219d12",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-greater-breather",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "93a3206a178519f5a546e3f3dffa77cc157d366e79f0f0573597c14c0421708a",
+      "baseline_rgba_sha256": "35dbaa2ca793a7c39d04d0d71127c1b54b81834828447a619695b71281e2b7af",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-greater-breather.webp",
+      "encoded_file_bytes": 485546,
+      "encoded_file_sha256": "07893ed4c17c27263e8d791979aad8a7690ecdb5b1f9d3e6f35bd4edd82705f0",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-greater-screamer",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "1c2d5e256359c047c68ad56f9c2479337a0843b6d7610cad6d9286cd01c465b1",
+      "baseline_rgba_sha256": "d8ec2b5ba812815cde54fadbe2145909e399d7dd21d59712376be8e09b6eddf9",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-greater-screamer.webp",
+      "encoded_file_bytes": 590780,
+      "encoded_file_sha256": "db82e380868d24dd26a8cc57e6bb87ddf50922f35a9a374f8c53d4112e5d9f98",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-greater-spitter",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "783430e3d4111686a0ae3fb7f45db668478a164ef62adc0ab62d659e5830ac87",
+      "baseline_rgba_sha256": "1263fa6698b5489cc9ca2830e17ddd3dcbe0af564dcb4ee9daf90a2c9241c20b",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-greater-spitter.webp",
+      "encoded_file_bytes": 457256,
+      "encoded_file_sha256": "858f41f50c5114668046b3ad22ac172fb04f4014f18a4ed2426ae8d2188de0b3",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-jackal",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "baseline_file_sha256": "a23a65f63f1ed57fc9cc242ee03487bcbce184dd20e6cf0cbf0fb865f721db5a",
+      "baseline_rgba_sha256": "7b9e1c3d0250a561c43db0dca381da7a34a7a2af97b72c40a4975283f6651a3f",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-jackal.webp",
+      "encoded_file_bytes": 492878,
+      "encoded_file_sha256": "e9d92a738db5e61e8e63ad246711767c0c17dd688144ec37b6c6811de8287b53",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6291456,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-screamer",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "104097012e5836a692a22762dd7ae66a04032a7fb633f28447cc830624453794",
+      "baseline_rgba_sha256": "ab06f034ae0dd050dc6bb1ae681211a92f2804227b88346d6516d0509db11069",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-screamer.webp",
+      "encoded_file_bytes": 401794,
+      "encoded_file_sha256": "daa156a0a360b5e45690dad110dea6d756b36be4f52583c5e53cadd008855f7a",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "pale-spitter",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "9cd1de6ac1829ae5a213069e827a4fd7de9ebbddc1c5afe6a44162e6a32154b5",
+      "baseline_rgba_sha256": "8495262c49422b5c611a9976c9b71d72b56ad4266d0b7e7303cc16f51cf0f899",
+      "encoded_file": "compact-r39/art-benchmark/webp/pale-spitter.webp",
+      "encoded_file_bytes": 429594,
+      "encoded_file_sha256": "8649dc6d73ccc5d7239f0ca385d401fbf73c40b593196f120e5ac6ccb68b54e8",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "phoenix",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "fa382d5c7b3c98c0a3d9cd2ea042164e669415eda2673c555edb456fc3c15638",
+      "baseline_rgba_sha256": "98cfb7165662ff2954c1816db8ab9c75efc65eaeeab408612d9798f471d70e2c",
+      "encoded_file": "compact-r39/art-benchmark/webp/phoenix.webp",
+      "encoded_file_bytes": 1251958,
+      "encoded_file_sha256": "eb606f971c8a303553bcd0095db8315bfe598edc9411aef1883619fce64742d6",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "rat",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "baseline_file_sha256": "e2a7f0e98c442da31c62c407e5c4afa0c95239abc33385dfdb1665465e54b32c",
+      "baseline_rgba_sha256": "93422fe9e085d645ac50f99e7f5816010521e9ef7ced5e9b84a9868a5edfdc7a",
+      "encoded_file": "compact-r39/art-benchmark/webp/rat.webp",
+      "encoded_file_bytes": 529466,
+      "encoded_file_sha256": "4c11f81d814e1d312abcee2e9bb676e88b79e0a6b7e3f1e8fb650765ee50ef19",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6291456,
+      "alpha_exact": true
+    },
+    {
+      "name": "river-drake",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "baseline_file_sha256": "5a10de8cca54f28fa31822e9c330e62f8aeda32b9449a896875f5296b21bf30c",
+      "baseline_rgba_sha256": "7df32e4c7c5e48674a013551dd0c056cd70fad32568aac7f81d1a8ad1f396843",
+      "encoded_file": "compact-r39/art-benchmark/webp/river-drake.webp",
+      "encoded_file_bytes": 403100,
+      "encoded_file_sha256": "c0b5efecafb8626eaf3b687666ada7051add934d3624d01a51220619bb50f93e",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6291456,
+      "alpha_exact": true
+    },
+    {
+      "name": "sabretooth",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "99c7d82d14bae8148779be134a3b7fe5d9f859f6756bd11780253eb042f75606",
+      "baseline_rgba_sha256": "615c160ccdfadd1eb7efefa2b6c8fb07328b435fe8e030a51476612ddf42bf01",
+      "encoded_file": "compact-r39/art-benchmark/webp/sabretooth.webp",
+      "encoded_file_bytes": 838980,
+      "encoded_file_sha256": "0eaa9af267dcadc78d826ff15f42462bcb1f152510b7eb896d180f7feffcbee9",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "saidri-guardian",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "5e8956b95bdd30c9dc8a59c276c8addd73cebe1fc7975228819506cffa09af72",
+      "baseline_rgba_sha256": "89d90d9c149fbe3b20a48c777d4decbdbc9dbde13031e289fc847e00613454c9",
+      "encoded_file": "compact-r39/art-benchmark/webp/saidri-guardian.webp",
+      "encoded_file_bytes": 956686,
+      "encoded_file_sha256": "8495399e38f73c5d77382a57f044926b2cd40325eddd56829d3adbebc94352e1",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "saidribee-queen",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "37bc5766c5eb42feb85aaf5689f0273c31c836eb1ba4fd9355a8b62bd5e1f578",
+      "baseline_rgba_sha256": "afbb9304caf30e861f0e7e8ee514af6714a8fbf55eb92d44cf298a425b112b3e",
+      "encoded_file": "compact-r39/art-benchmark/webp/saidribee-queen.webp",
+      "encoded_file_bytes": 966950,
+      "encoded_file_sha256": "7a1e72ed377d6dfc8b4fc4f8ae6282b1ccc052a180e6005988979e7d1d935d6f",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "samara",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "53d2cf44d254f06d5c15731ce0c8c2590c53a75be918a85b9f1e75985288b26f",
+      "baseline_rgba_sha256": "c07d21791168bef2b71e7ae5d769fb28bc2f5613c755a71bd6bda0db1cacbdc3",
+      "encoded_file": "compact-r39/art-benchmark/webp/samara.webp",
+      "encoded_file_bytes": 1232674,
+      "encoded_file_sha256": "b94ce0c51eb1429ed1f065774d0e9809562c94fd6972153a656fd87eed9733db",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "shellback-beetle",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "1a0fb92804bfd69756f5e80f88c58c6cff6aa60de54be148a97365ca66616396",
+      "baseline_rgba_sha256": "3185043bcb1cec2cb1edca5e5775d0759b5800338f3600e1e2b441d9f20a3b0d",
+      "encoded_file": "compact-r39/art-benchmark/webp/shellback-beetle.webp",
+      "encoded_file_bytes": 471166,
+      "encoded_file_sha256": "e3710259436e336a6e3698240088454ce6b9b2a9ba97ff7a8cf569462b38aa79",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "short-saidri",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "24aa1da6c4e68dc4f6d70689b4abb82c0249cbc5599af205f10d33e9c3684385",
+      "baseline_rgba_sha256": "1e8e76d6cc561fa9139b8e78d6b929930db0780bbf51e8b5b417ea449e45258e",
+      "encoded_file": "compact-r39/art-benchmark/webp/short-saidri.webp",
+      "encoded_file_bytes": 783184,
+      "encoded_file_sha256": "d6033b3974e637f76b0dfe004f1c813ee4a3a10bf2105814bf8386780ecdd8f6",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "skin-walker",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "e34e3e78ace398ff1bf6f90a547a8f4475a3f457fef8840c06ab9d7d4d73f856",
+      "baseline_rgba_sha256": "9cd380b57c84e9a52addda9b2a3fb69d1fbd11a2a532142d955e004ac14e91f5",
+      "encoded_file": "compact-r39/art-benchmark/webp/skin-walker.webp",
+      "encoded_file_bytes": 609606,
+      "encoded_file_sha256": "8993e0feb5c0a6e6e0df3dd202db7c690bdd2071f2442e8be28acb182846571b",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "sphinx",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "9cc169391812e9b905c69c6ffffe5993025238c7a7f37b7b192ca3b27dece6f2",
+      "baseline_rgba_sha256": "241c822e14ea262904c1a2267e99130dd550ebca2ea05fbf6973dd50a403a845",
+      "encoded_file": "compact-r39/art-benchmark/webp/sphinx.webp",
+      "encoded_file_bytes": 938370,
+      "encoded_file_sha256": "cccdd00a3db8fb44702db40ac478b7b56b5c394555169e2073aae9b5f4c0b511",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "tiger",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "522a9cdbe8b1faa2206882b400101f0887ae539d4a19e32ad578b2d09951ad06",
+      "baseline_rgba_sha256": "7e86e5e0061874f8c4bd3a600e4bc0f023b630f5b3ab005bc4cc33611b9dfcf6",
+      "encoded_file": "compact-r39/art-benchmark/webp/tiger.webp",
+      "encoded_file_bytes": 712432,
+      "encoded_file_sha256": "3d52ad59623fe595a278331aa043b97215406e649962e5469b4f8eb75748572d",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "troll",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "d52d29b7161ab49271f4228ae0a0c00002cd2ba08d20e6f4e4c8d55e1206056e",
+      "baseline_rgba_sha256": "7168a2910f0655e3cc98c3c74f8b7b37bd79bbc2cccda143a71a2b4f47be96f4",
+      "encoded_file": "compact-r39/art-benchmark/webp/troll.webp",
+      "encoded_file_bytes": 633574,
+      "encoded_file_sha256": "ffe276f2982f23e3cb71bcada779fc0ddf5b691f9d6f1e732c8cc40a3b2b68b5",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "ursa-major",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "812ab6331549d96be124c907a593da505ea047e2c64708255cca111401d8345b",
+      "baseline_rgba_sha256": "099f73e70af91d44d5b09b8307eb5488d8b22fd5019fe7c96bc5cd45070d0d01",
+      "encoded_file": "compact-r39/art-benchmark/webp/ursa-major.webp",
+      "encoded_file_bytes": 1054376,
+      "encoded_file_sha256": "1eb9e04e5a78cf4e5acdec760d2657b844268669d3853c1be8702a5e5fef2a06",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "ursa-minor",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "a65fdbf8544aebf26eb7e0c9fd0520d1c628801d5ec1c69897625c1d2fe38e6a",
+      "baseline_rgba_sha256": "c53462a89cc38444dc068a8966362b055c2d4061259738043f5e4d17d950b2fe",
+      "encoded_file": "compact-r39/art-benchmark/webp/ursa-minor.webp",
+      "encoded_file_bytes": 948040,
+      "encoded_file_sha256": "55c5b55409991c6edd736dd0666f4979eb141759bd51985199c1c5e7fe1f55b1",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "valta",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "45460090fd632c6ca93a1ef5693bad67f365f7ba93105a1637ceec5dbe97c047",
+      "baseline_rgba_sha256": "1f0b494b922c2299af9b0b963d69f8b65e4c0447cac42a1d167b48c4756a24d0",
+      "encoded_file": "compact-r39/art-benchmark/webp/valta.webp",
+      "encoded_file_bytes": 484932,
+      "encoded_file_sha256": "6c4e139d2ae1bfc4c75907d0e78fb30c5a9b392fa8806774c2cf6b5d6b0daf70",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "vampire",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "39750aa7d2fe0fa79cf4b8473eeb3ff8d4165ff8d8fa99bab0d7704f0bc5148b",
+      "baseline_rgba_sha256": "60b99ad1e76145e730763516862cce7ed1a2751fe86cc96a48ed6069211612bf",
+      "encoded_file": "compact-r39/art-benchmark/webp/vampire.webp",
+      "encoded_file_bytes": 637604,
+      "encoded_file_sha256": "00be962c4110b6ee7f01f5c40fc5051f927af865f4cee17521e7a62b2ead0c04",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "wendigo",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "91f496b55ce8becc504178e0685d8b4113433442b790b2f576d80b620da0aa3b",
+      "baseline_rgba_sha256": "909c32604ddbf39aee2171e9a5017fbc0bf70a8b73488f5c7fb152f13124be55",
+      "encoded_file": "compact-r39/art-benchmark/webp/wendigo.webp",
+      "encoded_file_bytes": 323332,
+      "encoded_file_sha256": "81c1f818c9108187f41813ea34ccfc53b85f162c3f513c89e87d19f0991ea84a",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "witch",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "590b9df3bb45624000b72b45c7283bedd45b518bdd6ca2be328df108b5e16a0a",
+      "baseline_rgba_sha256": "61541379f8913c71dc1e4e6b457a20e01fc8057dfad0eb3b804d1b04a405b7f2",
+      "encoded_file": "compact-r39/art-benchmark/webp/witch.webp",
+      "encoded_file_bytes": 408972,
+      "encoded_file_sha256": "49893129711c4636d782345990e97f31d489c8cd97a5f4c6d502b1ff6b986b22",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "yeti",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "ed8de2efe394c985b790b33dcba86b2511971935827f18a509520ea8d35452f1",
+      "baseline_rgba_sha256": "7b041f5452b44f950a40121995a3743a5411631faf465906c59d3e62a855892e",
+      "encoded_file": "compact-r39/art-benchmark/webp/yeti.webp",
+      "encoded_file_bytes": 722402,
+      "encoded_file_sha256": "2cda4f8c3c99a108bc099a692271eff54c868b3239f736fc0d3e775ab83a64a2",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-ancient",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "5134234ee8d355dce59c1f25404486cfeb8320dc0336d6d5cda11736584f8c5a",
+      "baseline_rgba_sha256": "27fd1af18807e89d78dcbfbc3fc2aec448c18fde46e9553565f23cbc14ef6e11",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-ancient.webp",
+      "encoded_file_bytes": 433062,
+      "encoded_file_sha256": "51a64a52d90aa2fcb2f8a3e4095868a67fbc35d71cc6fdc2e6713ade8b83d2c2",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-child",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "3d158b52c947b8e1b6afa7bf1001568a0c4ed6130c3c2847540d5a871b22d2bc",
+      "baseline_rgba_sha256": "5f115aed82fd6bc9673c448635b9948ad44b22507b1caddf2bf67212356a647c",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-child.webp",
+      "encoded_file_bytes": 400050,
+      "encoded_file_sha256": "81f5a09f0e7d4acfc90656c7887cd6b59b2085dc4887c26dd77c0a01db88541b",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-greater",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "a589668d16381173a22d40304f3c581660d993df57395565726f82b6c09e2c56",
+      "baseline_rgba_sha256": "f96f3339fc575be801fb1af5d9d67f78fff2860ad1e26e3f3ab022c38f1ab268",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-greater.webp",
+      "encoded_file_bytes": 452162,
+      "encoded_file_sha256": "2bedb4b0b26af18e8fe59e7b19121ca34870401e61965c8c14c942f00c63e37c",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-hulking",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "9385dc30a6d73328fc29d0d33fd0734cd54c0fae69250ea89152fe556b44cbad",
+      "baseline_rgba_sha256": "9886b901077db1f855358f5c53b7184c942927b6dc244dd38683938304146ca5",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-hulking.webp",
+      "encoded_file_bytes": 485868,
+      "encoded_file_sha256": "32dfe8ef535226d354173853e6f56c96f132c87f1f9ab250dd1976f02e04bbed",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-infant",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "261a6bf2b7f496d901431a358c73814c2024599d78c137d63a9fa0f05ce377dc",
+      "baseline_rgba_sha256": "038148e2db1c680ce51485a703eccd705aa6a79910643ede68cc43b26b75c007",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-infant.webp",
+      "encoded_file_bytes": 286756,
+      "encoded_file_sha256": "172708d718f552bf6ba0e4e54f2bd403463e367023e4e365ae0dbb5b6300604c",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-lesser",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "575db378be3886e740d9ba830b61d0846bccd534aad766c1dd8495c1c0c021b6",
+      "baseline_rgba_sha256": "523fdef61ecf6682dc5ffbf100fa0499bdde6622aa9fd15b0587e0bbf858f0ff",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-lesser.webp",
+      "encoded_file_bytes": 471580,
+      "encoded_file_sha256": "5e9be3bbb6238768f8574e5cfa0beb7387deb1e97c0671cafc414c403b86b39b",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-mature",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "ede141f1592cfedc33bb3ac8d9e01082374d5f86487211f37716ef63a97588d9",
+      "baseline_rgba_sha256": "36483493a9610faf4c05b6a0707ac9775834752636b3e4da45d2d04b64997e0d",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-mature.webp",
+      "encoded_file_bytes": 466512,
+      "encoded_file_sha256": "f9ab4326016cff7e64384bc1f26148fb9eb6f9c9f6ea538e8279ac3515481d06",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-timeless",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "15f584dab820ed894fa1a64ebf132511fb010e0a1cb1b4958320a344a323f3e0",
+      "baseline_rgba_sha256": "dc99120c1153b55891c9aa4783e92dc67b4aefd006653638573996037968b8b3",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-timeless.webp",
+      "encoded_file_bytes": 541628,
+      "encoded_file_sha256": "8028363b2052d0f0220b37cf56a018874c67e12ed95a7e31f2e2ce0651da7027",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-transcendent",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "844fd74f36c9665e797ca7b7179009744bc0cc7b2b4cf1e9599ced9f0b49e213",
+      "baseline_rgba_sha256": "20a38873e3cdc4f0893e208c6ea6bc6349da87e264f4ad4aa4e719d68c1981bf",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-transcendent.webp",
+      "encoded_file_bytes": 484108,
+      "encoded_file_sha256": "e4bd74a3961f8157a94dd4a319c2ad9e07385446492b2393a4ab58a9f15963bd",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    },
+    {
+      "name": "zillennia-unqualified",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "baseline_file_sha256": "43c0758c178207ac091eb88a2f7f79fa8a9bd481a91dff8cf0c7f09dd619d702",
+      "baseline_rgba_sha256": "5010043d0ef4d680039ed6dc8b02b5116aface1a9238d052ed6c5aeea4517417",
+      "encoded_file": "compact-r39/art-benchmark/webp/zillennia-unqualified.webp",
+      "encoded_file_bytes": 412276,
+      "encoded_file_sha256": "9e0c770c7d3d9679c72df65c54e8faea42827163a579df9f8f7232b8574bf1a5",
+      "pillow_dimensions_match": true,
+      "pillow_rgba_exact": true,
+      "ffmpeg_rgba_exact": true,
+      "ffmpeg_rgba_bytes": 6290064,
+      "alpha_exact": true
+    }
+  ]
+}

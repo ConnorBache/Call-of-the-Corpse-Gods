@@ -1,0 +1,157 @@
+{
+  "assets": {
+    "horn-1": {
+      "approved_rgba": "tools/creature-alpha/reviewed/horn-1.png",
+      "approved_rgba_sha256": "aa409d303f616b9108f0709868bedbe01f27bdbbccebc0de75d5e006051cd575",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "initial_seed_labels": "tools/creature-alpha/reviewed/horn-1-initial-labels.png",
+      "initial_seed_labels_sha256": "f0740c685942d413392441139fcf409e6b9773925b3e467c299ea3a2ef93735f",
+      "preserve_uncertain_signal_above": 32,
+      "promotion_kind": "reviewed-partial-cleanup-needs-manual-edge-review",
+      "protect_dark_core": true,
+      "remaining_manual_work": [
+        "Resolve lower-signal ambiguous edge pixels with artist-authored masking; no additional automatic dark deletion.",
+        "Threshold support protection is not semantic proof; residual matte/outline ambiguity remains."
+      ],
+      "review_notes": "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+      "reviewed_background_seeds": [
+        [
+          578,
+          342
+        ],
+        [
+          374,
+          651
+        ],
+        [
+          377,
+          766
+        ],
+        [
+          925,
+          532
+        ],
+        [
+          427,
+          987
+        ]
+      ],
+      "reviewed_mask": "tools/creature-alpha/reviewed/horn-1-alpha.png",
+      "reviewed_mask_sha256": "bf7362717faa178c6600a72469e3a525ac28da9d31e4e88aa14edced71358e8f",
+      "reviewer": "Independent native-resolution visual review plus implementation and root review, 2026-10-26",
+      "seed_notes": "Specific negative-space pockets only; no authority to discard dark anatomy or all dark components.",
+      "seed_reviewer": "independent native-resolution visual review",
+      "source_sha256": "6a5208c330f5642026d41119987f1cdd183a84ac1af57561879d37a8ed599cbb",
+      "status": "approved"
+    },
+    "horn-6": {
+      "review_notes": "Rejected: automatic candidate carves legitimate dark shoulder/foreleg joints and chest fur at x560\u2013770,y630\u2013890, right shoulder crease x900\u20131040,y650\u2013840, rear-left leg joint x180\u2013350,y800\u2013930. Keep exact frozen legacy RGBA; no threshold-based further cleanup.",
+      "reviewer": "independent native-resolution visual reviewer",
+      "status": "rejected-needs-manual-mask"
+    },
+    "phoenix": {
+      "approved_rgba": "tools/creature-alpha/reviewed/phoenix.png",
+      "approved_rgba_sha256": "fa382d5c7b3c98c0a3d9cd2ea042164e669415eda2673c555edb456fc3c15638",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "edge_evidence": "tools/creature-alpha/reviewed/phoenix-edge-evidence.json",
+      "edge_evidence_sha256": "fe627605e3f6a6358fa561a255e6975a3102bf073a566c8f67c61052b4399022",
+      "edge_reconstruction": true,
+      "initial_seed_labels": "tools/creature-alpha/reviewed/phoenix-initial-labels.png",
+      "initial_seed_labels_sha256": "39db53f1748d64a9ea2db814363914853f69d8672dd27672ab6627660db2d483",
+      "matte_rgb": [
+        0,
+        0,
+        0
+      ],
+      "preserve_uncertain_signal_above": 32,
+      "promotion_kind": "reviewed-partial-cleanup-needs-manual-edge-review",
+      "protect_dark_core": false,
+      "remaining_manual_work": [
+        "Resolve lower-signal ambiguous edge pixels with artist-authored masking; no additional automatic dark deletion.",
+        "Threshold support protection is not semantic proof; residual matte/outline ambiguity remains."
+      ],
+      "review_notes": "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+      "reviewed_binary_mask": "tools/creature-alpha/reviewed/phoenix-binary-alpha.png",
+      "reviewed_binary_mask_sha256": "b31a732e8db76d5de5db78720076b5229ebfdf926bffe9344da6a6939a7c5a32",
+      "reviewed_mask": "tools/creature-alpha/reviewed/phoenix-alpha.png",
+      "reviewed_mask_sha256": "64e47b5c37e0f87fc4d40fa9e778dc88a199d1560fef98ef373baa5446e79147",
+      "reviewer": "Independent native-resolution visual review plus implementation and root review, 2026-10-26",
+      "rgb_correction_mask": "tools/creature-alpha/reviewed/phoenix-correction.png",
+      "rgb_correction_mask_sha256": "2f88627e8201100d63a61fe82c5961e67704dd2a9e19530f76ce652131317baf",
+      "source_sha256": "1e3d99f86e0cbdb0c5f9f5d7267e0ae86caf22056967be31f97e501fc15f4eff",
+      "status": "approved"
+    },
+    "river-drake": {
+      "approved_rgba": "tools/creature-alpha/reviewed/river-drake.png",
+      "approved_rgba_sha256": "5a10de8cca54f28fa31822e9c330e62f8aeda32b9449a896875f5296b21bf30c",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "initial_seed_labels": "tools/creature-alpha/reviewed/river-drake-initial-labels.png",
+      "initial_seed_labels_sha256": "52b262f98f86333791b86a1a6d5926eb18baa48191d097b146ab99782f11105e",
+      "preserve_uncertain_signal_above": 32,
+      "promotion_kind": "reviewed-partial-cleanup-needs-manual-edge-review",
+      "protect_dark_core": true,
+      "remaining_manual_work": [
+        "Resolve lower-signal ambiguous edge pixels with artist-authored masking; no additional automatic dark deletion.",
+        "Threshold support protection is not semantic proof; residual matte/outline ambiguity remains."
+      ],
+      "review_notes": "Approved ONLY as conservative PARTIAL cleanup. Original dark anatomy and detached details inspected against source on red/white/gray/black. All source pixels with maxRGB>32 retained as support; this guard is not a semantic guarantee. Unresolved dark rims, weak details and negative-space pockets remain manually queued; not fully fixed.",
+      "reviewed_background_seeds": [
+        [
+          124,
+          377
+        ],
+        [
+          70,
+          389
+        ],
+        [
+          146,
+          608
+        ],
+        [
+          89,
+          644
+        ],
+        [
+          264,
+          565
+        ]
+      ],
+      "reviewed_mask": "tools/creature-alpha/reviewed/river-drake-alpha.png",
+      "reviewed_mask_sha256": "ed3170569280b3806cc029d2a5a6d4c4b23c171efbdd6eaa6fd90f2550faea14",
+      "reviewer": "Independent native-resolution visual review plus implementation and root review, 2026-10-26",
+      "seed_notes": "Specific negative-space pockets only; no authority to discard dark anatomy or all dark components.",
+      "seed_reviewer": "independent native-resolution visual review",
+      "source_sha256": "348b528e4381d76a0d3603cd4c92615ef11f6b3c7fc435d897cadc43874fa8f4",
+      "status": "approved"
+    }
+  },
+  "schema": 1
+}

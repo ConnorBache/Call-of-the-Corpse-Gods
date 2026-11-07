@@ -1,0 +1,25 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/sub-biomes-r37/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 43.86s
+     Running tests/terrain_runtime_r37.rs (target/debug/deps/terrain_runtime_r37-8710dc1a928e857f)
+
+running 17 tests
+test flying_body_does_not_touch_snow_and_everburn_is_not_removed ... ok
+test direct_fire_and_burning_body_melt_snow_without_burning_underlying_fuel ... ok
+test ordered_exception_does_not_change_random_links_or_projectile_transfer ... ok
+test ordered_local_step_preserves_shared_enemy_occupancy ... ok
+test occupied_destination_does_not_attempt_ice_footing ... ok
+test offscreen_burning_creature_melts_and_quenches_snow ... ok
+test ordered_strip_forward_reverse_side_entry_and_two_cell_progress ... ok
+test ice_exempts_flight_ice_species_forced_displacement_and_legacy ... ok
+test npc_slips_and_failed_or_successful_moves_replay_identically ... ok
+test haste_move_contact_quenches_before_normal_turn ... ok
+test ordered_strip_every_interior_start_can_walk_both_directions ... ok
+test hellfire_cannot_be_quenched_by_water_or_fire_state_reset ... ok
+test snow_quenches_a_spreading_fire_contact_and_records_puddle ... ok
+test hellfire_persists_ignites_entrants_and_spreads_ordinary_fire ... ok
+test snapshot_and_serialization_preserve_terrain_and_rng ... ok
+test ordered_pathfields_execute_exact_predicted_cost_for_npc_from_every_cell ... ok
+test slip_uses_one_serialized_coin_only_on_valid_departure ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s
+

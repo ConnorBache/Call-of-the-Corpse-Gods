@@ -1,0 +1,190 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/sub-biomes-r37/source/corpse-gods-native/crates/corpse-core)
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/sub-biomes-r37/source/corpse-gods-native/crates/corpse-desktop)
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:1613:17
+     |
+1613 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `TOP` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:4:11
+  |
+4 | pub const TOP: i32 = 278;
+  |           ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `ROW` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:5:11
+  |
+5 | pub const ROW: i32 = 34;
+  |           ^^^
+
+warning: constant `CAPACITY` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:6:11
+  |
+6 | pub const CAPACITY: usize = 12;
+  |           ^^^^^^^^
+
+warning: function `feature_color` is never used
+  --> crates/corpse-desktop/src/appearance_material.rs:55:8
+   |
+55 | pub fn feature_color(profile: &Profile, key: &str, fallback: Rgb) -> Rgb {
+   |        ^^^^^^^^^^^^^
+
+warning: method `reset_group` is never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:317:12
+    |
+151 | impl Profile {
+    | ------------ method in this implementation
+...
+317 |     pub fn reset_group(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^^^^^^^
+
+warning: field `saved_preset_id` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:111:9
+    |
+105 | pub struct Status {
+    |            ------ field in this struct
+...
+111 |     pub saved_preset_id: Option<String>,
+    |         ^^^^^^^^^^^^^^^
+    |
+    = note: `Status` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: methods `edited`, `begin_gesture`, `reset_group`, and `preferences` are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:396:12
+    |
+225 | impl Store {
+    | ---------- methods in this implementation
+...
+396 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+444 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+512 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+648 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: function `cosmetic_seed` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:27:8
+   |
+27 | pub fn cosmetic_seed(seed: &str, depth: u32) -> u32 {
+   |        ^^^^^^^^^^^^^
+
+warning: function `materials_animated` is never used
+  --> crates/corpse-desktop/src/entity_profile.rs:93:8
+   |
+93 | pub fn materials_animated(p: &Profile) -> bool {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: fields `ordinary` and `conditional` are never read
+  --> crates/corpse-desktop/src/manual.rs:43:9
+   |
+42 | pub struct Depth {
+   |            ----- fields in this struct
+43 |     pub ordinary: Vec<String>,
+   |         ^^^^^^^^
+44 |     pub conditional: Vec<String>,
+   |         ^^^^^^^^^^^
+
+warning: constant `CLOSE` is never used
+  --> crates/corpse-desktop/src/pack.rs:24:7
+   |
+24 | const CLOSE: Rect = Rect(929, 135, 36, 32);
+   |       ^^^^^
+
+warning: constant `CANCEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:25:7
+   |
+25 | const CANCEL: Rect = Rect(881, 202, 80, 32);
+   |       ^^^^^^
+
+warning: constant `ROW` is never used
+  --> crates/corpse-desktop/src/pack.rs:26:7
+   |
+26 | const ROW: i32 = 30;
+   |       ^^^
+
+warning: constant `EDGE` is never used
+  --> crates/corpse-desktop/src/pack.rs:27:7
+   |
+27 | const EDGE: [u8; 3] = [53, 55, 68];
+   |       ^^^^
+
+warning: constant `PANEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:28:7
+   |
+28 | const PANEL: [u8; 3] = [11, 13, 21];
+   |       ^^^^^
+
+warning: constant `SELECTED` is never used
+  --> crates/corpse-desktop/src/pack.rs:29:7
+   |
+29 | const SELECTED: [u8; 3] = [53, 51, 68];
+   |       ^^^^^^^^
+
+warning: variant `Fire` is never constructed
+  --> crates/corpse-desktop/src/render.rs:41:5
+   |
+40 | pub enum Animation {
+   |          --------- variant in this enum
+41 |     Fire { phase: f64 },
+   |     ^^^^
+   |
+   = note: `Animation` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `dead` and `gods` are never read
+   --> crates/corpse-desktop/src/render.rs:136:9
+    |
+105 | pub struct View {
+    |            ---- fields in this struct
+...
+136 |     pub dead: bool,
+    |         ^^^^
+...
+140 |     pub gods: String,
+    |         ^^^^
+
+warning: constant `TOOLBAR_LABELS` is never used
+    --> crates/corpse-desktop/src/render.rs:2589:11
+     |
+2589 | pub const TOOLBAR_LABELS: [&str; 9] = [
+     |           ^^^^^^^^^^^^^^
+
+warning: associated items `ALL` and `parse` are never used
+  --> crates/corpse-desktop/src/typography_ui.rs:16:15
+   |
+15 | impl Role {
+   | --------- associated items in this implementation
+16 |     pub const ALL: [Self; 8] = [
+   |               ^^^
+...
+38 |     pub fn parse(key: &str) -> Option<Self> {
+   |            ^^^^^
+
+warning: function `chronicle_metrics` is never used
+   --> crates/corpse-desktop/src/typography_ui.rs:123:8
+    |
+123 | pub fn chronicle_metrics(
+    |        ^^^^^^^^^^^^^^^^^
+
+warning: `corpse-desktop` (bin "corpse-desktop" test) generated 22 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.91s
+     Running unittests src/main.rs (/workspace/scratch/69f53637ba6f/sub-biomes-r37/build/native-target/debug/deps/corpse_desktop-e1cc4701689999f1)
+
+running 1 test
+Generated capture seed=sub-biomes-review-r37 theme=mountainous floor=18
+Generated capture seed=sub-biomes-review-r37 theme=hellfire floor=25
+Generated capture seed=sub-biome-review-1 theme=corn-dimension floor=31
+test sub_biomes_ui::tests::r37_sub_biomes_actual_renderer_generated_capture ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 240 filtered out; finished in 52.07s
+

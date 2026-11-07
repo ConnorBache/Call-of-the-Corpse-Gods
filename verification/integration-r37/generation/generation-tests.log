@@ -1,0 +1,24 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/sub-biomes-r37/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.19s
+     Running tests/sub_biomes_generation_r37.rs (target/debug/deps/sub_biomes_generation_r37-39c15d783a09c174)
+
+running 5 tests
+test hellfire_starts_at25_and_replaces_only_interior_walls ... ok
+test terrain_is_population_driven_and_historical_revisions_are_untouched ... ok
+test speedup_links_are_ordered_deterministic_and_route_safe ... ok
+test corn_circles_have_eight_residents_and_highest_depth_eligible_odd_horns ... ok
+
+thread 'actual_population_sweep_has_safe_links_and_preserves_every_ice_spawn' (371) panicked at crates/corpse-core/tests/sub_biomes_generation_r37.rs:13:1474:
+[87, 0, 2, 138, 88]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test actual_population_sweep_has_safe_links_and_preserves_every_ice_spawn ... FAILED
+
+failures:
+
+failures:
+    actual_population_sweep_has_safe_links_and_preserves_every_ice_spawn
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 28.61s
+
+error: test failed, to rerun pass `-p corpse-core --test sub_biomes_generation_r37`

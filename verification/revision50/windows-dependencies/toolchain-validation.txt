@@ -1,0 +1,97 @@
+UTC validation time: 2026-11-06T05:04:27Z
+
+Rust targets
+x86_64-pc-windows-gnu
+x86_64-unknown-linux-gnu
+
+Rust compiler
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+binary: rustc
+commit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67
+commit-date: 2026-10-13
+host: x86_64-unknown-linux-gnu
+release: 1.99.1
+LLVM version: 23.1.1
+
+MinGW compiler
+x86_64-w64-mingw32-gcc-posix (GCC) 14-posix
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+MinGW linker
+GNU ld (GNU Binutils) 2.44
+Copyright (C) 2025 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) a later version.
+This program has absolutely no warranty.
+
+MinGW preprocessor
+x86_64-w64-mingw32-cpp-posix (GCC) 14-posix
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+MinGW resource compiler
+GNU windres (GNU Binutils) 2.44
+Copyright (C) 2025 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) any later version.
+This program has absolutely no warranty.
+
+SDK version headers
+#define SDL_MAJOR_VERSION   2
+#define SDL_MINOR_VERSION   32
+#define SDL_PATCHLEVEL      10
+
+Compiler search directories
+install: /workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/x86_64-w64-mingw32/14-posix/
+programs: =/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/x86_64-w64-mingw32/14-posix/:/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/:/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/x86_64-w64-mingw32/14-posix/../../../../x86_64-w64-mingw32/bin/x86_64-w64-mingw32/14-posix/:/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/x86_64-w64-mingw32/14-posix/../../../../x86_64-w64-mingw32/bin/
+libraries: =/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/x86_64-w64-mingw32/14-posix/:/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/:/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/x86_64-w64-mingw32/14-posix/../../../../x86_64-w64-mingw32/lib/x86_64-w64-mingw32/14-posix/:/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/../lib/gcc/x86_64-w64-mingw32/14-posix/../../../../x86_64-w64-mingw32/lib/
+
+Runtime shared libraries
+
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/x86_64-w64-mingw32-gcc-posix
+	linux-vdso.so.1 (0x00007f96c8a7e000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f96c885f000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f96c8a80000)
+
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/bin/x86_64-w64-mingw32-windres
+	linux-vdso.so.1 (0x00007fa4261fa000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007fa426039000)
+	libzstd.so.1 => /lib/x86_64-linux-gnu/libzstd.so.1 (0x00007fa425f6f000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa425d7b000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fa4261fc000)
+
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/cc1
+	linux-vdso.so.1 (0x00007ffa7279a000)
+	libisl.so.23 => /lib/x86_64-linux-gnu/libisl.so.23 (0x00007ffa72571000)
+	libmpc.so.3 => /lib/x86_64-linux-gnu/libmpc.so.3 (0x00007ffa7254e000)
+	libmpfr.so.6 => /lib/x86_64-linux-gnu/libmpfr.so.6 (0x00007ffa7248b000)
+	libgmp.so.10 => /lib/x86_64-linux-gnu/libgmp.so.10 (0x00007ffa72401000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007ffa723df000)
+	libzstd.so.1 => /lib/x86_64-linux-gnu/libzstd.so.1 (0x00007ffa72315000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ffa72225000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ffa72031000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ffa7279c000)
+
+Runtime DLL candidates
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libatomic-1.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libstdc++-6.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libgomp-1.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libgcc_s_seh-1.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libssp-0.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libgfortran-5.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/adalib/libgnat-14.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/adalib/libgnarl-14.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libquadmath-0.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/sysroot/usr/lib/gcc/x86_64-w64-mingw32/14-posix/libobjc-4.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/SDL2-2.32.10/x86_64-w64-mingw32/bin/SDL2.dll
+/workspace/scratch/69f53637ba6f/native-windows-sdk/SDL2-2.32.10/i686-w64-mingw32/bin/SDL2.dll
+
+Absolute sysroot links
+
+Windows runtime availability

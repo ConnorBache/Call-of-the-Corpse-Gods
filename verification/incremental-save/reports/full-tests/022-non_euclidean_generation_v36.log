@@ -1,0 +1,16 @@
+
+running 11 tests
+test a_pocket_must_not_turn_previously_optional_portals_into_the_only_escape ... ok
+test physical_contiguity_and_one_good_stochastic_branch_do_not_prove_safety ... ok
+test unsuitable_floor_omits_instead_of_altering_graph_or_terrain ... ok
+test stairs_fixtures_portals_population_and_loot_are_never_rewritten ... ok
+test startup_adds_only_metadata_without_rebudgeting_or_spending_simulation_rng ... ok
+test depth_revision_determinism_idempotence_and_unchanged_terrain ... ok
+test save_roundtrip_structural_boundaries_and_dream_validation ... ok
+test all_six_domains_keep_geometry_and_every_accepted_pocket_is_traversable ... ok
+test cell_partition_and_all_stochastic_outcomes_have_paths_out ... ok
+test populated_floor_sample_records_actual_exclusions_and_retries ... ok
+test sampled_distribution_and_bounded_retry_receipt ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.86s
+

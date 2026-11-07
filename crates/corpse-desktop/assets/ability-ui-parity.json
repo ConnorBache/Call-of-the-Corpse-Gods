@@ -1,0 +1,1010 @@
+[
+  {
+    "id": "shrail-rage-at-the-dying-of-the-light",
+    "active": false,
+    "summary": "OFF · 0 NRG/rescue",
+    "cost": "0 energy for the next rescue; cost escalates; level-up resets; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "shrail-rage-at-the-dying-of-the-light",
+    "active": true,
+    "summary": "ON · 0 NRG/rescue",
+    "cost": "0 energy for the next rescue; cost escalates; level-up resets; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "shrail-unyielding-assault",
+    "active": false,
+    "summary": "OFF · 10 NRG/attack",
+    "cost": "10 energy per attack action; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "shrail-unyielding-assault",
+    "active": true,
+    "summary": "ON · 10 NRG/attack",
+    "cost": "10 energy per attack action; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "shrail-i-hit-back",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "shrail-i-hit-back",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "shrail-fight-long",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "shrail-fight-long",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "shrail-beat-to-death",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "shrail-beat-to-death",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "shrail-fury-crafting",
+    "active": false,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; equipped craft pays 10 energy per attack",
+    "mode": "craft"
+  },
+  {
+    "id": "shrail-fury-crafting",
+    "active": true,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; equipped craft pays 10 energy per attack",
+    "mode": "craft"
+  },
+  {
+    "id": "pelian-you-shall-never-be-rid-of-me",
+    "active": false,
+    "summary": "OFF · 1/1 rescues",
+    "cost": "One free rescue per level; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-you-shall-never-be-rid-of-me",
+    "active": true,
+    "summary": "ON · 1/1 rescues",
+    "cost": "One free rescue per level; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-i-came-for-you",
+    "active": false,
+    "summary": "10 NRG",
+    "cost": "10 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-i-came-for-you",
+    "active": true,
+    "summary": "10 NRG",
+    "cost": "10 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-never-without-a-fight",
+    "active": false,
+    "summary": "OFF · 10 NRG/counter",
+    "cost": "10 energy per counterattack; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-never-without-a-fight",
+    "active": true,
+    "summary": "ON · 10 NRG/counter",
+    "cost": "10 energy per counterattack; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-never-surrender",
+    "active": false,
+    "summary": "OFF · 8 NRG/first hit",
+    "cost": "8 energy for the first damaging hit each round; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-never-surrender",
+    "active": true,
+    "summary": "ON · 8 NRG/first hit",
+    "cost": "8 energy for the first damaging hit each round; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-bulwark-of-mind",
+    "active": false,
+    "summary": "20 NRG",
+    "cost": "20 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-bulwark-of-mind",
+    "active": true,
+    "summary": "20 NRG",
+    "cost": "20 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "pelian-zeal-craft",
+    "active": false,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; equipped craft heals for 15 energy",
+    "mode": "craft"
+  },
+  {
+    "id": "pelian-zeal-craft",
+    "active": true,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; equipped craft heals for 15 energy",
+    "mode": "craft"
+  },
+  {
+    "id": "isheilah-missed-me",
+    "active": false,
+    "summary": "OFF · 0/1 reactions · 1 reaction/first attack",
+    "cost": "1 reaction on the first incoming attack each round; turning off is free",
+    "mode": "reaction"
+  },
+  {
+    "id": "isheilah-missed-me",
+    "active": true,
+    "summary": "ON · 0/1 reactions · 1 reaction/first attack",
+    "cost": "1 reaction on the first incoming attack each round; turning off is free",
+    "mode": "reaction"
+  },
+  {
+    "id": "isheilah-tools-of-the-trade",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "isheilah-tools-of-the-trade",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "isheilah-make-slippery",
+    "active": false,
+    "summary": "OFF · 8 NRG/move",
+    "cost": "8 energy per blocked move; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "isheilah-make-slippery",
+    "active": true,
+    "summary": "ON · 8 NRG/move",
+    "cost": "8 energy per blocked move; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "isheilah-quick-hand",
+    "active": false,
+    "summary": "OFF · 0/1 reactions · 1 reaction/hit",
+    "cost": "+1 maximum reaction; 1 reaction when hit for 1 turn of haste; no energy cost; turning off is free",
+    "mode": "reaction"
+  },
+  {
+    "id": "isheilah-quick-hand",
+    "active": true,
+    "summary": "ON · 0/1 reactions · 1 reaction/hit",
+    "cost": "+1 maximum reaction; 1 reaction when hit for 1 turn of haste; no energy cost; turning off is free",
+    "mode": "reaction"
+  },
+  {
+    "id": "isheilah-are-you-sure-about-that",
+    "active": false,
+    "summary": "OFF · 0/1 reactions · 1 reaction/miss",
+    "cost": "1 reaction per redirected miss; turning off is free",
+    "mode": "reaction"
+  },
+  {
+    "id": "isheilah-are-you-sure-about-that",
+    "active": true,
+    "summary": "ON · 0/1 reactions · 1 reaction/miss",
+    "cost": "1 reaction per redirected miss; turning off is free",
+    "mode": "reaction"
+  },
+  {
+    "id": "isheilah-guile-craft",
+    "active": false,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; no energy upkeep",
+    "mode": "craft"
+  },
+  {
+    "id": "isheilah-guile-craft",
+    "active": true,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; no energy upkeep",
+    "mode": "craft"
+  },
+  {
+    "id": "numo-implant-thought",
+    "active": false,
+    "summary": "30 NRG + action",
+    "cost": "30 energy + one action",
+    "mode": "active"
+  },
+  {
+    "id": "numo-implant-thought",
+    "active": true,
+    "summary": "30 NRG + action",
+    "cost": "30 energy + one action",
+    "mode": "active"
+  },
+  {
+    "id": "numo-distract",
+    "active": false,
+    "summary": "10 NRG",
+    "cost": "10 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "numo-distract",
+    "active": true,
+    "summary": "10 NRG",
+    "cost": "10 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "numo-mind-read",
+    "active": false,
+    "summary": "OFF · 1 NRG/t",
+    "cost": "1 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "numo-mind-read",
+    "active": true,
+    "summary": "ON · 1 NRG/t",
+    "cost": "1 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "numo-mind-slave",
+    "active": false,
+    "summary": "100 NRG",
+    "cost": "100 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "numo-mind-slave",
+    "active": true,
+    "summary": "100 NRG",
+    "cost": "100 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "numo-revert",
+    "active": false,
+    "summary": "Unavailable · 0/5 charges · 2 NRG + 1 charge",
+    "cost": "2 energy + 1 charge",
+    "mode": "active"
+  },
+  {
+    "id": "numo-revert",
+    "active": true,
+    "summary": "0/5 charges · 2 NRG + 1 charge",
+    "cost": "2 energy + 1 charge",
+    "mode": "active"
+  },
+  {
+    "id": "numo-remember",
+    "active": false,
+    "summary": "5 NRG",
+    "cost": "5 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "numo-remember",
+    "active": true,
+    "summary": "5 NRG",
+    "cost": "5 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "etill-phase-through",
+    "active": false,
+    "summary": "OFF · 5 NRG/t",
+    "cost": "5 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-phase-through",
+    "active": true,
+    "summary": "ON · 5 NRG/t",
+    "cost": "5 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-rushing-torrent",
+    "active": false,
+    "summary": "OFF · 15 NRG/t",
+    "cost": "15 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-rushing-torrent",
+    "active": true,
+    "summary": "ON · 15 NRG/t",
+    "cost": "15 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-drown",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "etill-drown",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "etill-float-away",
+    "active": false,
+    "summary": "OFF · Free",
+    "cost": "No energy cost; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-float-away",
+    "active": true,
+    "summary": "ON · Free",
+    "cost": "No energy cost; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-half-here",
+    "active": false,
+    "summary": "OFF · Free",
+    "cost": "No energy cost; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-half-here",
+    "active": true,
+    "summary": "ON · Free",
+    "cost": "No energy cost; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-riptide",
+    "active": false,
+    "summary": "OFF · 15 NRG + 10/t",
+    "cost": "15 energy to activate + 10/turn; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "etill-riptide",
+    "active": true,
+    "summary": "ON · 15 NRG + 10/t",
+    "cost": "15 energy to activate + 10/turn; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-waking-nightmare",
+    "active": false,
+    "summary": "OFF · 0 dreams · +1/100t · 1 nightmare/hit",
+    "cost": "1 nightmare per prevented damage event; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-waking-nightmare",
+    "active": true,
+    "summary": "ON · 0 dreams · +1/100t · 1 nightmare/hit",
+    "cost": "1 nightmare per prevented damage event; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-sudden-sleep",
+    "active": false,
+    "summary": "20 NRG + action",
+    "cost": "20 energy + one action",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-sudden-sleep",
+    "active": true,
+    "summary": "20 NRG + action",
+    "cost": "20 energy + one action",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-dream-of-time-gone-by",
+    "active": false,
+    "summary": "OFF · 50 NRG",
+    "cost": "50 energy per use; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-dream-of-time-gone-by",
+    "active": true,
+    "summary": "ON · Free return",
+    "cost": "50 energy per use; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-sleep-walk",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "ursa-sleep-walk",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "ursa-dream-see",
+    "active": false,
+    "summary": "OFF · 1 NRG/t",
+    "cost": "1 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-dream-see",
+    "active": true,
+    "summary": "ON · 1 NRG/t",
+    "cost": "1 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "ursa-dream-craft",
+    "active": false,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; no energy upkeep",
+    "mode": "craft"
+  },
+  {
+    "id": "ursa-dream-craft",
+    "active": true,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; no energy upkeep",
+    "mode": "craft"
+  },
+  {
+    "id": "lichor-overflowing",
+    "active": false,
+    "summary": "5/55 blood · 0/50 dmg",
+    "cost": "1 blood per rescue",
+    "mode": "passive"
+  },
+  {
+    "id": "lichor-overflowing",
+    "active": true,
+    "summary": "5/55 blood · 0/50 dmg",
+    "cost": "1 blood per rescue",
+    "mode": "passive"
+  },
+  {
+    "id": "lichor-bleed-them",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "lichor-bleed-them",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "lichor-blood-letting",
+    "active": false,
+    "summary": "10 HP",
+    "cost": "10 self-damage; no energy cost",
+    "mode": "active"
+  },
+  {
+    "id": "lichor-blood-letting",
+    "active": true,
+    "summary": "10 HP",
+    "cost": "10 self-damage; no energy cost",
+    "mode": "active"
+  },
+  {
+    "id": "lichor-hardened-blood",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "lichor-hardened-blood",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "lichor-blood-weapon",
+    "active": false,
+    "summary": "Unprimed · 10 HP",
+    "cost": "10 HP (10% maximum, rounded up); free action; no energy cost",
+    "mode": "active"
+  },
+  {
+    "id": "lichor-blood-weapon",
+    "active": true,
+    "summary": "Unprimed · 10 HP",
+    "cost": "10 HP (10% maximum, rounded up); free action; no energy cost",
+    "mode": "active"
+  },
+  {
+    "id": "lichor-the-number-of-blood",
+    "active": false,
+    "summary": "1/5 phase",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "lichor-the-number-of-blood",
+    "active": true,
+    "summary": "1/5 phase",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "dawel-step-through-shadows",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "dawel-step-through-shadows",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "dawel-silent-strike",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "dawel-silent-strike",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "dawel-unspeak",
+    "active": false,
+    "summary": "OFF · Target NRG/t",
+    "cost": "Target's highest ability cost in energy/turn; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "dawel-unspeak",
+    "active": true,
+    "summary": "ON · 0 NRG/t",
+    "cost": "0 energy/turn (target's highest ability cost); turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "dawel-reverse-entropy",
+    "active": false,
+    "summary": "OFF · Free",
+    "cost": "No energy cost; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "dawel-reverse-entropy",
+    "active": true,
+    "summary": "ON · Free",
+    "cost": "No energy cost; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "dawel-shadow-in-the-dark",
+    "active": false,
+    "summary": "OFF · 2 NRG/t",
+    "cost": "2 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "dawel-shadow-in-the-dark",
+    "active": true,
+    "summary": "ON · 2 NRG/t",
+    "cost": "2 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "dawel-not-there",
+    "active": false,
+    "summary": "OFF · 3 NRG/t",
+    "cost": "3 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "dawel-not-there",
+    "active": true,
+    "summary": "ON · 3 NRG/t",
+    "cost": "3 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-boundless-hunger",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "grisha-boundless-hunger",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "grisha-entropy",
+    "active": false,
+    "summary": "OFF · Free",
+    "cost": "No energy cost to suppress or resume the automatic effect",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-entropy",
+    "active": true,
+    "summary": "ON · Free",
+    "cost": "No energy cost to suppress or resume the automatic effect",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-erase-metaphysical",
+    "active": false,
+    "summary": "OFF · 10 NRG/hit",
+    "cost": "10 energy per hit with a removable ability; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-erase-metaphysical",
+    "active": true,
+    "summary": "ON · 10 NRG/hit",
+    "cost": "10 energy per hit with a removable ability; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-death-swift",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "grisha-death-swift",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "grisha-black-pit",
+    "active": false,
+    "summary": "OFF · 5 NRG/t",
+    "cost": "5 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-black-pit",
+    "active": true,
+    "summary": "ON · 5 NRG/t",
+    "cost": "5 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-uncast",
+    "active": false,
+    "summary": "OFF · 10 NRG/spell",
+    "cost": "10 energy per canceled spell; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "grisha-uncast",
+    "active": true,
+    "summary": "ON · 10 NRG/spell",
+    "cost": "10 energy per canceled spell; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-shine",
+    "active": false,
+    "summary": "OFF · Free",
+    "cost": "No energy cost to suppress or resume the automatic effect",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-shine",
+    "active": true,
+    "summary": "ON · Free",
+    "cost": "No energy cost to suppress or resume the automatic effect",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-ascend",
+    "active": false,
+    "summary": "Unavailable · 50 NRG",
+    "cost": "50 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-ascend",
+    "active": true,
+    "summary": "50 NRG",
+    "cost": "50 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-nova",
+    "active": false,
+    "summary": "OFF · 30 NRG/blast",
+    "cost": "30 energy per attack explosion; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-nova",
+    "active": true,
+    "summary": "ON · 30 NRG/blast",
+    "cost": "30 energy per attack explosion; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-illuminate",
+    "active": false,
+    "summary": "20 NRG",
+    "cost": "20 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-illuminate",
+    "active": true,
+    "summary": "20 NRG",
+    "cost": "20 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-star-power",
+    "active": false,
+    "summary": "OFF · Free",
+    "cost": "No energy cost to suppress or resume the automatic effect",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-star-power",
+    "active": true,
+    "summary": "ON · Free",
+    "cost": "No energy cost to suppress or resume the automatic effect",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-make-kneel",
+    "active": false,
+    "summary": "20 NRG",
+    "cost": "20 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "anavani-make-kneel",
+    "active": true,
+    "summary": "20 NRG",
+    "cost": "20 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "kative-divine-craftsman",
+    "active": false,
+    "summary": "Craft · Pack",
+    "cost": "No energy cost; permits two crafts per item",
+    "mode": "craft"
+  },
+  {
+    "id": "kative-divine-craftsman",
+    "active": true,
+    "summary": "Craft · Pack",
+    "cost": "No energy cost; permits two crafts per item",
+    "mode": "craft"
+  },
+  {
+    "id": "kative-mini-me",
+    "active": false,
+    "summary": "OFF · 30 NRG",
+    "cost": "30 energy per use; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "kative-mini-me",
+    "active": true,
+    "summary": "ON · 30 NRG",
+    "cost": "30 energy per use; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "kative-adaptive-armor",
+    "active": false,
+    "summary": "0 types",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "kative-adaptive-armor",
+    "active": true,
+    "summary": "0 types",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "kative-artifice-craft",
+    "active": false,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; no energy upkeep",
+    "mode": "craft"
+  },
+  {
+    "id": "kative-artifice-craft",
+    "active": true,
+    "summary": "Craft · Pack",
+    "cost": "Heart + equipment; no energy upkeep",
+    "mode": "craft"
+  },
+  {
+    "id": "kative-tinker",
+    "active": false,
+    "summary": "100 NRG",
+    "cost": "100 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "kative-tinker",
+    "active": true,
+    "summary": "100 NRG",
+    "cost": "100 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "kative-dilute-potion",
+    "active": false,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "kative-dilute-potion",
+    "active": true,
+    "summary": "Passive",
+    "cost": "No energy cost",
+    "mode": "passive"
+  },
+  {
+    "id": "morae-fortune-teller",
+    "active": false,
+    "summary": "3/3 fortunes · 1 fortune",
+    "cost": "1 fortune per use · +1 every 20 turns",
+    "mode": "active"
+  },
+  {
+    "id": "morae-fortune-teller",
+    "active": true,
+    "summary": "3/3 fortunes · 1 fortune",
+    "cost": "1 fortune per use · +1 every 20 turns",
+    "mode": "active"
+  },
+  {
+    "id": "morae-bonded-by-unseen-threads",
+    "active": false,
+    "summary": "OFF · 15 NRG + 8/t",
+    "cost": "15 energy to activate + 8/turn; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "morae-bonded-by-unseen-threads",
+    "active": true,
+    "summary": "ON · 15 NRG + 8/t",
+    "cost": "15 energy to activate + 8/turn; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "morae-turning-the-wheel",
+    "active": false,
+    "summary": "OFF · 20 NRG/t",
+    "cost": "20 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "morae-turning-the-wheel",
+    "active": true,
+    "summary": "ON · 20 NRG/t",
+    "cost": "20 energy/turn while enabled; turning off is free",
+    "mode": "active"
+  },
+  {
+    "id": "morae-sever-fate",
+    "active": false,
+    "summary": "30 NRG",
+    "cost": "30 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "morae-sever-fate",
+    "active": true,
+    "summary": "30 NRG",
+    "cost": "30 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "morae-see-the-future",
+    "active": false,
+    "summary": "OFF · 100 NRG",
+    "cost": "All current energy (100); return is free",
+    "mode": "active"
+  },
+  {
+    "id": "morae-see-the-future",
+    "active": true,
+    "summary": "OFF · 100 NRG",
+    "cost": "All current energy (100); return is free",
+    "mode": "active"
+  },
+  {
+    "id": "morae-all-seeing-eyes",
+    "active": false,
+    "summary": "30 NRG",
+    "cost": "30 energy per use",
+    "mode": "active"
+  },
+  {
+    "id": "morae-all-seeing-eyes",
+    "active": true,
+    "summary": "30 NRG",
+    "cost": "30 energy per use",
+    "mode": "active"
+  }
+]

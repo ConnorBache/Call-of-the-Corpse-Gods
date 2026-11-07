@@ -1,0 +1,43 @@
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r51-ui-work/source/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 3.31s
+     Running tests/revision51_fungus_feasts.rs (target/debug/deps/revision51_fungus_feasts-e4ea0a404e5a6f2f)
+
+running 9 tests
+test hidden_root_memory_does_not_change_direction_until_observed_again ... ok
+test root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_intersections ... ok
+test legacy_fungus_generation_keeps_horizontal_canned_corpses_and_no_initial_roots ... ok
+test impossible_layout_omits_fungus_and_both_victims_without_generation_failure ... ok
+test placement_finds_nearest_clear_cells_when_old_horizontal_slots_are_blocked ... ok
+test separate_fungi_never_share_generated_victim_cells ... ok
+test out_of_depth_means_first_eligible_two_or_three_floors_later ... ok
+test no_late_fungi_or_godbeast_corpse_substitutions_when_no_deeper_species_exists ... ok
+test generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+

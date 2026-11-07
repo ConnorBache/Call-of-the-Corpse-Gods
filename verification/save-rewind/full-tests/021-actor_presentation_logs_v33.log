@@ -1,0 +1,11 @@
+
+running 6 tests
+test distinct_actors_status_damage_death_and_attacking_subjects_do_not_leak ... ok
+test legacy_labels_and_true_death_provenance_are_preserved ... ok
+test half_here_reveal_and_hallucination_use_shared_read_only_identity ... ok
+test actual_bow_hit_and_miss_use_far_disguise_and_near_true_name ... ok
+test revert_and_future_restore_observed_identity_and_existing_labels ... ok
+test save_and_replay_preserve_display_labels_without_changing_real_identity ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

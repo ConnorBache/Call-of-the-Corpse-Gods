@@ -1,0 +1,11 @@
+
+running 6 tests
+test seven_bag_is_one_of_each_before_final_boss_and_legacy33_is_unchanged ... ok
+test actual_attack_attempt_keeps_ahvamitt_alive_and_no_ordinary_attack_roll_is_needed ... ok
+test carried_mask_teleports_deterministically_and_drop_repickup_cannot_reset_cooldown ... ok
+test two_attacks_relocate_then_third_gives_one_mask_and_disappears ... ok
+test random_destinations_are_standable_vacant_and_do_not_mutate_a_dream_body_anchor ... ok
+test reward_disappearance_revert_and_future_restore_the_exact_branch ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+

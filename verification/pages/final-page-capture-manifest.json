@@ -1,0 +1,97 @@
+{
+  "command": "target/debug/corpse-desktop --manual-entry ID --render-size WIDTHxHEIGHT --render-test PATH --appearance /tmp/r33-default-appearance.json",
+  "art_unchanged": {
+    "night-crawler": "821a18e42f729397d82c480c72deb2b37bd9050a36f8c3696dca2211a9e36da6",
+    "skin-walker": "e34e3e78ace398ff1bf6f90a547a8f4475a3f457fef8840c06ab9d7d4d73f856",
+    "saidribee-queen": "37bc5766c5eb42feb85aaf5689f0273c31c836eb1ba4fd9355a8b62bd5e1f578"
+  },
+  "files": [
+    {
+      "file": "night-crawler-final-1280x800.png",
+      "sha256": "067b3d555f422f623d19d626feda3916866f3d82620ab6548584252c73875a8a",
+      "native_render": true,
+      "visual_review": "no placeholder, clipping or matte",
+      "changed_region_from_before_overlay": [
+        373,
+        636,
+        534,
+        712
+      ]
+    },
+    {
+      "file": "night-crawler-final-1920x1080.png",
+      "sha256": "a886c6021821da11f5a82492a8ca2b83f554ce43008117e0b7f3f2bbe9b8169f",
+      "native_render": true,
+      "visual_review": "no placeholder, clipping or matte",
+      "changed_region_from_before_overlay": [
+        601,
+        859,
+        817,
+        961
+      ]
+    },
+    {
+      "file": "saidribee-queen-final-1280x800.png",
+      "sha256": "99c31d5d68c66bb1f81bbf8a4205f9661ce5bc1808276dd6b2caadcfe803de46",
+      "native_render": true,
+      "visual_review": "no placeholder, clipping or matte",
+      "changed_region_from_before_overlay": [
+        373,
+        695,
+        397,
+        712
+      ]
+    },
+    {
+      "file": "saidribee-queen-final-1920x1080.png",
+      "sha256": "dbd52a841009c2b35c1acffdc3d1c42b26cbd0e83dd023dc0fa87b336fa8c0b0",
+      "native_render": true,
+      "visual_review": "no placeholder, clipping or matte",
+      "changed_region_from_before_overlay": [
+        601,
+        939,
+        632,
+        961
+      ]
+    },
+    {
+      "file": "skin-walker-final-1280x800.png",
+      "sha256": "7d4a6fc040702584b4de87f0ee35582a749281d791d331da5c369ba74bc64415",
+      "native_render": true,
+      "visual_review": "no placeholder, clipping or matte",
+      "changed_region_from_before_overlay": [
+        373,
+        695,
+        397,
+        712
+      ]
+    },
+    {
+      "file": "skin-walker-final-1920x1080.png",
+      "sha256": "296d26eeb01cb7b110d9a1546c7606849d731a6854e4436c6f36e4ab82256904",
+      "native_render": true,
+      "visual_review": "no placeholder, clipping or matte",
+      "changed_region_from_before_overlay": [
+        601,
+        939,
+        632,
+        961
+      ]
+    }
+  ],
+  "final_effective_accuracy_dodge": {
+    "night-crawler": [
+      144,
+      74
+    ],
+    "skin-walker": [
+      148,
+      92
+    ],
+    "saidribee-queen": [
+      145,
+      27
+    ]
+  },
+  "scope": "Final-stat native page captures only. Earlier reviewed images omitted from this release package."
+}

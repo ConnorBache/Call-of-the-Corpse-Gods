@@ -1,0 +1,6004 @@
+{
+  "implementation": "candidate",
+  "profile": "instrumented; not wall-time baseline",
+  "scope": "warm metadata, one command then immediate encode; no durable disk flush",
+  "cases": [
+    {
+      "case": "avatar_fixture-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 761793,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 4.114532,
+        "p95_ms": 4.114532,
+        "samples_ms": [
+          4.114532
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 1.7004590000000002,
+        "p95_ms": 1.7004590000000002,
+        "samples_ms": [
+          1.7004590000000002
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 5.816374,
+        "p95_ms": 5.816374,
+        "samples_ms": [
+          5.816374
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 5815774,
+            "exclusive_ns": 9526
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2230754,
+            "exclusive_ns": 40932
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2313927,
+            "exclusive_ns": 52786
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 601029,
+            "exclusive_ns": 12450
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 4113983,
+            "exclusive_ns": 11837
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 30387,
+            "exclusive_ns": 13943
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 1692265,
+            "exclusive_ns": 1679221
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 338,
+            "exclusive_ns": 338
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 15698,
+            "exclusive_ns": 14287
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 8093,
+            "exclusive_ns": 7485
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 360572,
+            "exclusive_ns": 157716
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 2564,
+            "exclusive_ns": 2564
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 2784,
+            "exclusive_ns": 1581
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 959,
+            "exclusive_ns": 959
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 30300,
+            "exclusive_ns": 9888
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 36664,
+            "exclusive_ns": 36664
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 216592,
+            "exclusive_ns": 216592
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 1165,
+            "exclusive_ns": 1165
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 23816,
+            "exclusive_ns": 21123
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 391923,
+            "exclusive_ns": 947
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 3366,
+            "exclusive_ns": 3172
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 220363,
+            "exclusive_ns": 3859
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 663939,
+            "exclusive_ns": 1262
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 3811,
+            "exclusive_ns": 3811
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 179,
+            "exclusive_ns": 179
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 555671,
+            "exclusive_ns": 136033
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 13044,
+            "exclusive_ns": 12980
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 64,
+            "exclusive_ns": 64
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 94146,
+            "exclusive_ns": 94146
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 973666,
+            "exclusive_ns": 973666
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 118545,
+            "exclusive_ns": 118545
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 62421,
+            "exclusive_ns": 62421
+          },
+          "history.journal_mutable_access": {
+            "calls": 2336,
+            "inclusive_ns": 266841,
+            "exclusive_ns": 266841
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 1170539,
+            "exclusive_ns": 15907
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 1759718,
+            "exclusive_ns": 495033
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 307496,
+            "exclusive_ns": 47293
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 28501,
+            "exclusive_ns": 28501
+          },
+          "movement.actor": {
+            "calls": 1,
+            "inclusive_ns": 98846,
+            "exclusive_ns": 20382
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 20749,
+            "exclusive_ns": 11380
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 23507,
+            "exclusive_ns": 23507
+          },
+          "path.field_build": {
+            "calls": 1,
+            "inclusive_ns": 287255,
+            "exclusive_ns": 287255
+          },
+          "path.mask_build": {
+            "calls": 1,
+            "inclusive_ns": 92630,
+            "exclusive_ns": 92630
+          },
+          "path.masks_and_key": {
+            "calls": 1,
+            "inclusive_ns": 2450,
+            "exclusive_ns": 2450
+          },
+          "path.request": {
+            "calls": 1,
+            "inclusive_ns": 386472,
+            "exclusive_ns": 4137
+          },
+          "stats.effective": {
+            "calls": 12,
+            "inclusive_ns": 17060,
+            "exclusive_ns": 17060
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 8878,
+            "exclusive_ns": 8317
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 542644,
+            "exclusive_ns": 55364
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 28646,
+            "exclusive_ns": 27155
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 360,
+            "exclusive_ns": 360
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 664562,
+            "exclusive_ns": 623
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 18688,
+            "exclusive_ns": 18688
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 3819,
+            "exclusive_ns": 3819
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 21331,
+            "exclusive_ns": 582
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 689039,
+            "exclusive_ns": 2612
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1044,
+            "exclusive_ns": 941
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1290792,
+            "exclusive_ns": 1853
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 1731,
+            "exclusive_ns": 1731
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 10,
+            "inclusive_ns": 92537,
+            "exclusive_ns": 86427
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 6110,
+            "exclusive_ns": 6110
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 183605,
+            "exclusive_ns": 183605
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 882,
+            "exclusive_ns": 882
+          },
+          "vision.optical_route": {
+            "calls": 4,
+            "inclusive_ns": 1190,
+            "exclusive_ns": 1190
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 419452,
+            "exclusive_ns": 400997
+          }
+        }
+      ]
+    },
+    {
+      "case": "avatar_fixture-history-0-pickup",
+      "starting_frames": 0,
+      "bytes": 415804,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 0.949076,
+        "p95_ms": 0.949076,
+        "samples_ms": [
+          0.949076
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 0.603796,
+        "p95_ms": 0.603796,
+        "samples_ms": [
+          0.603796
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 1.553667,
+        "p95_ms": 1.553667,
+        "samples_ms": [
+          1.553667
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 1553242,
+            "exclusive_ns": 7123
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 870359,
+            "exclusive_ns": 2674
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 920604,
+            "exclusive_ns": 31561
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 677091,
+            "exclusive_ns": 14716
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 948616,
+            "exclusive_ns": 8661
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 18684,
+            "exclusive_ns": 8373
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 597503,
+            "exclusive_ns": 590039
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 1801,
+            "exclusive_ns": 1801
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 512869,
+            "exclusive_ns": 105483
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 7464,
+            "exclusive_ns": 7464
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 126589,
+            "exclusive_ns": 126589
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 46,
+            "exclusive_ns": 46
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 213231,
+            "exclusive_ns": 31594
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 19305,
+            "exclusive_ns": 19305
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 8510,
+            "exclusive_ns": 8510
+          },
+          "stats.effective": {
+            "calls": 7,
+            "inclusive_ns": 8464,
+            "exclusive_ns": 8464
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 50436,
+            "exclusive_ns": 46002
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 4434,
+            "exclusive_ns": 4434
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 133028,
+            "exclusive_ns": 133028
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 411,
+            "exclusive_ns": 411
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 407163,
+            "exclusive_ns": 396964
+          }
+        }
+      ]
+    },
+    {
+      "case": "avatar_fixture-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 762662,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 6.179292,
+        "p95_ms": 6.179292,
+        "samples_ms": [
+          6.179292
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 1.652187,
+        "p95_ms": 1.652187,
+        "samples_ms": [
+          1.652187
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 7.832398,
+        "p95_ms": 7.832398,
+        "samples_ms": [
+          7.832398
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 7831967,
+            "exclusive_ns": 8026
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2027012,
+            "exclusive_ns": 106563
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2065957,
+            "exclusive_ns": 14774
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 609843,
+            "exclusive_ns": 10971
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 6178956,
+            "exclusive_ns": 8921
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 24171,
+            "exclusive_ns": 9340
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 1644985,
+            "exclusive_ns": 1631256
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 252,
+            "exclusive_ns": 252
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 13837,
+            "exclusive_ns": 12959
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 6726,
+            "exclusive_ns": 6200
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 361484,
+            "exclusive_ns": 156169
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 2502,
+            "exclusive_ns": 2502
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 3713,
+            "exclusive_ns": 1146
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 2383,
+            "exclusive_ns": 2383
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 28543,
+            "exclusive_ns": 8221
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 36470,
+            "exclusive_ns": 36470
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 7753,
+            "exclusive_ns": 7753
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 637,
+            "exclusive_ns": 637
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 22200,
+            "exclusive_ns": 20315
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 390933,
+            "exclusive_ns": 818
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 2694,
+            "exclusive_ns": 2461
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 10268,
+            "exclusive_ns": 2549
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 448794,
+            "exclusive_ns": 1117
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 2863,
+            "exclusive_ns": 2863
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 190,
+            "exclusive_ns": 190
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 554361,
+            "exclusive_ns": 101917
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 13729,
+            "exclusive_ns": 13596
+          },
+          "history.export_cache_hit": {
+            "calls": 2,
+            "inclusive_ns": 133,
+            "exclusive_ns": 133
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1513615,
+            "exclusive_ns": 1513615
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 943518,
+            "exclusive_ns": 943518
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 797495,
+            "exclusive_ns": 797495
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 61343,
+            "exclusive_ns": 61343
+          },
+          "history.journal_mutable_access": {
+            "calls": 2336,
+            "inclusive_ns": 366378,
+            "exclusive_ns": 366378
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 1820225,
+            "exclusive_ns": 17869
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 4025052,
+            "exclusive_ns": 691212
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 48127,
+            "exclusive_ns": 48127
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 6801,
+            "exclusive_ns": 6801
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 213297,
+            "exclusive_ns": 28831
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 24098,
+            "exclusive_ns": 24098
+          },
+          "movement.actor": {
+            "calls": 1,
+            "inclusive_ns": 194960,
+            "exclusive_ns": 18080
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 21169,
+            "exclusive_ns": 10227
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 24331,
+            "exclusive_ns": 24331
+          },
+          "path.field_build": {
+            "calls": 1,
+            "inclusive_ns": 256510,
+            "exclusive_ns": 256510
+          },
+          "path.mask_build": {
+            "calls": 1,
+            "inclusive_ns": 96678,
+            "exclusive_ns": 96678
+          },
+          "path.masks_and_key": {
+            "calls": 1,
+            "inclusive_ns": 2391,
+            "exclusive_ns": 2391
+          },
+          "path.request": {
+            "calls": 1,
+            "inclusive_ns": 358607,
+            "exclusive_ns": 3028
+          },
+          "stats.effective": {
+            "calls": 10,
+            "inclusive_ns": 12847,
+            "exclusive_ns": 12847
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 6249,
+            "exclusive_ns": 5748
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 598787,
+            "exclusive_ns": 43120
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 19205,
+            "exclusive_ns": 17869
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 301,
+            "exclusive_ns": 301
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 449147,
+            "exclusive_ns": 353
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 15534,
+            "exclusive_ns": 15534
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 2885,
+            "exclusive_ns": 2885
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 21580,
+            "exclusive_ns": 411
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 473987,
+            "exclusive_ns": 2762
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 741,
+            "exclusive_ns": 642
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1116267,
+            "exclusive_ns": 1764
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 2404,
+            "exclusive_ns": 2404
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 80063,
+            "exclusive_ns": 75733
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 4330,
+            "exclusive_ns": 4330
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 128452,
+            "exclusive_ns": 128452
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 301,
+            "exclusive_ns": 301
+          },
+          "vision.optical_route": {
+            "calls": 4,
+            "inclusive_ns": 923,
+            "exclusive_ns": 923
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 452236,
+            "exclusive_ns": 434554
+          }
+        }
+      ]
+    },
+    {
+      "case": "avatar_fixture-history-1-pickup",
+      "starting_frames": 1,
+      "bytes": 761811,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 2.649552,
+        "p95_ms": 2.649552,
+        "samples_ms": [
+          2.649552
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 1.598028,
+        "p95_ms": 1.598028,
+        "samples_ms": [
+          1.598028
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 4.248411,
+        "p95_ms": 4.248411,
+        "samples_ms": [
+          4.248411
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 4247975,
+            "exclusive_ns": 8014
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 960360,
+            "exclusive_ns": 2752
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 997536,
+            "exclusive_ns": 15400
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 775309,
+            "exclusive_ns": 14998
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2649176,
+            "exclusive_ns": 11905
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 21776,
+            "exclusive_ns": 8884
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 1590785,
+            "exclusive_ns": 1579235
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 1821,
+            "exclusive_ns": 1821
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 578662,
+            "exclusive_ns": 104009
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 11550,
+            "exclusive_ns": 11490
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 60,
+            "exclusive_ns": 60
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 83687,
+            "exclusive_ns": 83687
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 703966,
+            "exclusive_ns": 703966
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 108151,
+            "exclusive_ns": 108151
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 59479,
+            "exclusive_ns": 59479
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 150104,
+            "exclusive_ns": 150104
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 887380,
+            "exclusive_ns": 15784
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 1614507,
+            "exclusive_ns": 643440
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 213399,
+            "exclusive_ns": 26674
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 25228,
+            "exclusive_ns": 25228
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 11071,
+            "exclusive_ns": 11071
+          },
+          "stats.effective": {
+            "calls": 5,
+            "inclusive_ns": 9155,
+            "exclusive_ns": 9155
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 54605,
+            "exclusive_ns": 50251
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 4354,
+            "exclusive_ns": 4354
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 139186,
+            "exclusive_ns": 139186
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 281,
+            "exclusive_ns": 281
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 474392,
+            "exclusive_ns": 458596
+          }
+        }
+      ]
+    },
+    {
+      "case": "avatar_fixture-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 765255,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 8.64846,
+        "p95_ms": 8.64846,
+        "samples_ms": [
+          8.64846
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 2.166395,
+        "p95_ms": 2.166395,
+        "samples_ms": [
+          2.166395
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 10.815679999999999,
+        "p95_ms": 10.815679999999999,
+        "samples_ms": [
+          10.815679999999999
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 10815254,
+            "exclusive_ns": 9408
+          },
+          "combat.attack": {
+            "calls": 1,
+            "inclusive_ns": 60758,
+            "exclusive_ns": 53781
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3119976,
+            "exclusive_ns": 191207
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3157743,
+            "exclusive_ns": 15341
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 960989,
+            "exclusive_ns": 85314
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 8647828,
+            "exclusive_ns": 8880
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 22426,
+            "exclusive_ns": 8954
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 2158018,
+            "exclusive_ns": 2139116
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 148,
+            "exclusive_ns": 148
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 14905,
+            "exclusive_ns": 13601
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 8574,
+            "exclusive_ns": 8144
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 479700,
+            "exclusive_ns": 271366
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 2557,
+            "exclusive_ns": 2557
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 3191,
+            "exclusive_ns": 1237
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 1762,
+            "exclusive_ns": 1762
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 28374,
+            "exclusive_ns": 8371
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 37299,
+            "exclusive_ns": 37299
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 8453,
+            "exclusive_ns": 8453
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 1063,
+            "exclusive_ns": 1063
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 22108,
+            "exclusive_ns": 20360
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 509122,
+            "exclusive_ns": 957
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 4088,
+            "exclusive_ns": 3804
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 264519,
+            "exclusive_ns": 3922
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 823622,
+            "exclusive_ns": 1203
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 3233,
+            "exclusive_ns": 3233
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 108,
+            "exclusive_ns": 108
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 836574,
+            "exclusive_ns": 177959
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 18902,
+            "exclusive_ns": 18602
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 300,
+            "exclusive_ns": 300
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 2443585,
+            "exclusive_ns": 2443585
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 815815,
+            "exclusive_ns": 815815
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 773443,
+            "exclusive_ns": 773443
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 172396,
+            "exclusive_ns": 172396
+          },
+          "history.journal_mutable_access": {
+            "calls": 2333,
+            "inclusive_ns": 444144,
+            "exclusive_ns": 444144
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 1779864,
+            "exclusive_ns": 18210
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 5396509,
+            "exclusive_ns": 1173060
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 52713,
+            "exclusive_ns": 52713
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 3613,
+            "exclusive_ns": 3613
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 602394,
+            "exclusive_ns": 27348
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 28370,
+            "exclusive_ns": 28370
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 22122,
+            "exclusive_ns": 10854
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 23156,
+            "exclusive_ns": 23156
+          },
+          "stats.effective": {
+            "calls": 14,
+            "inclusive_ns": 22576,
+            "exclusive_ns": 22576
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 7876,
+            "exclusive_ns": 7152
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 112248,
+            "exclusive_ns": 48171
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 382327,
+            "exclusive_ns": 378676
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 238,
+            "exclusive_ns": 238
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 824261,
+            "exclusive_ns": 639
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 18062,
+            "exclusive_ns": 18062
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 3624,
+            "exclusive_ns": 3624
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 22563,
+            "exclusive_ns": 441
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 849782,
+            "exclusive_ns": 2517
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1144,
+            "exclusive_ns": 996
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1372917,
+            "exclusive_ns": 1478
+          },
+          "vision.lighting": {
+            "calls": 9,
+            "inclusive_ns": 6990,
+            "exclusive_ns": 6990
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 89082,
+            "exclusive_ns": 84782
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 4300,
+            "exclusive_ns": 4300
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 510717,
+            "exclusive_ns": 510717
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 311,
+            "exclusive_ns": 311
+          },
+          "vision.optical_route": {
+            "calls": 10,
+            "inclusive_ns": 1770,
+            "exclusive_ns": 1770
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 657951,
+            "exclusive_ns": 638657
+          }
+        }
+      ]
+    },
+    {
+      "case": "avatar_fixture-history-5-pickup",
+      "starting_frames": 5,
+      "bytes": 765506,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 7.057807,
+        "p95_ms": 7.057807,
+        "samples_ms": [
+          7.057807
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 1.905459,
+        "p95_ms": 1.905459,
+        "samples_ms": [
+          1.905459
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 8.963972,
+        "p95_ms": 8.963972,
+        "samples_ms": [
+          8.963972
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 8963599,
+            "exclusive_ns": 8764
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1637753,
+            "exclusive_ns": 3615
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1681138,
+            "exclusive_ns": 19270
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 1225909,
+            "exclusive_ns": 17914
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 7057324,
+            "exclusive_ns": 14100
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 24115,
+            "exclusive_ns": 9725
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 1897511,
+            "exclusive_ns": 1880295
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 1709,
+            "exclusive_ns": 1709
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 954340,
+            "exclusive_ns": 105282
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 17216,
+            "exclusive_ns": 16949
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 267,
+            "exclusive_ns": 267
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 2081273,
+            "exclusive_ns": 2081273
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1103678,
+            "exclusive_ns": 1103678
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1144909,
+            "exclusive_ns": 1144909
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 66642,
+            "exclusive_ns": 66642
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 215972,
+            "exclusive_ns": 215972
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2368859,
+            "exclusive_ns": 53630
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 5294656,
+            "exclusive_ns": 844524
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 445542,
+            "exclusive_ns": 31018
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 67430,
+            "exclusive_ns": 67430
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 12681,
+            "exclusive_ns": 12681
+          },
+          "stats.effective": {
+            "calls": 5,
+            "inclusive_ns": 11357,
+            "exclusive_ns": 11357
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 59717,
+            "exclusive_ns": 55158
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 4559,
+            "exclusive_ns": 4559
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 360936,
+            "exclusive_ns": 360936
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 301,
+            "exclusive_ns": 301
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 848614,
+            "exclusive_ns": 831641
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 2207825,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 9.292557,
+        "p95_ms": 9.292557,
+        "samples_ms": [
+          9.292557
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 5.481285,
+        "p95_ms": 5.481285,
+        "samples_ms": [
+          5.481285
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 14.77463,
+        "p95_ms": 14.77463,
+        "samples_ms": [
+          14.77463
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 14774149,
+            "exclusive_ns": 7913
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3905717,
+            "exclusive_ns": 73734
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3956126,
+            "exclusive_ns": 13727
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 1236435,
+            "exclusive_ns": 153048
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 9292070,
+            "exclusive_ns": 12620
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 36682,
+            "exclusive_ns": 21799
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 5474166,
+            "exclusive_ns": 5460661
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 146,
+            "exclusive_ns": 146
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 9728,
+            "exclusive_ns": 6461
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 41758,
+            "exclusive_ns": 38810
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 440796,
+            "exclusive_ns": 175766
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 3177,
+            "exclusive_ns": 3177
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 29117,
+            "exclusive_ns": 26453
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 2384,
+            "exclusive_ns": 2384
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 64922,
+            "exclusive_ns": 44249
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 35871,
+            "exclusive_ns": 35871
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 385293,
+            "exclusive_ns": 385293
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 1745,
+            "exclusive_ns": 1745
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 67145,
+            "exclusive_ns": 61968
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 506611,
+            "exclusive_ns": 804
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 11254,
+            "exclusive_ns": 11012
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 405443,
+            "exclusive_ns": 12062
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 1061035,
+            "exclusive_ns": 1233
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 6733,
+            "exclusive_ns": 6733
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 374,
+            "exclusive_ns": 374
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 575665,
+            "exclusive_ns": 27466
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 13505,
+            "exclusive_ns": 13440
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 65,
+            "exclusive_ns": 65
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1101645,
+            "exclusive_ns": 1101645
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1247387,
+            "exclusive_ns": 1247387
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1216372,
+            "exclusive_ns": 1216372
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 133291,
+            "exclusive_ns": 133291
+          },
+          "history.journal_mutable_access": {
+            "calls": 2693,
+            "inclusive_ns": 559048,
+            "exclusive_ns": 559048
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2676847,
+            "exclusive_ns": 79797
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 5295356,
+            "exclusive_ns": 1516864
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 1147599,
+            "exclusive_ns": 153269
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 27968,
+            "exclusive_ns": 27968
+          },
+          "movement.actor": {
+            "calls": 3,
+            "inclusive_ns": 326393,
+            "exclusive_ns": 51431
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 43898,
+            "exclusive_ns": 31564
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 23916,
+            "exclusive_ns": 23916
+          },
+          "stats.effective": {
+            "calls": 39,
+            "inclusive_ns": 30919,
+            "exclusive_ns": 30919
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 34666,
+            "exclusive_ns": 26593
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 596227,
+            "exclusive_ns": 202901
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 57491,
+            "exclusive_ns": 52934
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 8350,
+            "exclusive_ns": 8350
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 1061538,
+            "exclusive_ns": 503
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 16330,
+            "exclusive_ns": 16330
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 45911,
+            "exclusive_ns": 29667
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 44252,
+            "exclusive_ns": 354
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 1125317,
+            "exclusive_ns": 9434
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1329,
+            "exclusive_ns": 1244
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1832813,
+            "exclusive_ns": 1453
+          },
+          "vision.detection": {
+            "calls": 16,
+            "inclusive_ns": 56105,
+            "exclusive_ns": 37414
+          },
+          "vision.lighting": {
+            "calls": 2,
+            "inclusive_ns": 2963,
+            "exclusive_ns": 2963
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 10,
+            "inclusive_ns": 1284388,
+            "exclusive_ns": 947047
+          },
+          "vision.lighting_field_build": {
+            "calls": 2,
+            "inclusive_ns": 337341,
+            "exclusive_ns": 337341
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 547843,
+            "exclusive_ns": 259368
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 61104,
+            "exclusive_ns": 61104
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 333,
+            "exclusive_ns": 333
+          },
+          "vision.optical_route": {
+            "calls": 18,
+            "inclusive_ns": 6331,
+            "exclusive_ns": 6331
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors-history-0-pickup",
+      "starting_frames": 0,
+      "bytes": 1850065,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 1.236906,
+        "p95_ms": 1.236906,
+        "samples_ms": [
+          1.236906
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 3.4518869999999997,
+        "p95_ms": 3.4518869999999997,
+        "samples_ms": [
+          3.4518869999999997
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 4.689387,
+        "p95_ms": 4.689387,
+        "samples_ms": [
+          4.689387
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 4689063,
+            "exclusive_ns": 9367
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1152681,
+            "exclusive_ns": 2755
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1205772,
+            "exclusive_ns": 15756
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 724361,
+            "exclusive_ns": 21739
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1236400,
+            "exclusive_ns": 8515
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 37335,
+            "exclusive_ns": 19943
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 3443296,
+            "exclusive_ns": 3435893
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 3015,
+            "exclusive_ns": 3015
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 395295,
+            "exclusive_ns": 26773
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 7403,
+            "exclusive_ns": 7403
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 192615,
+            "exclusive_ns": 192615
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 62,
+            "exclusive_ns": 62
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 540282,
+            "exclusive_ns": 128802
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 22051,
+            "exclusive_ns": 22051
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 14377,
+            "exclusive_ns": 14377
+          },
+          "stats.effective": {
+            "calls": 4,
+            "inclusive_ns": 5581,
+            "exclusive_ns": 5581
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 438425,
+            "exclusive_ns": 298822
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 139603,
+            "exclusive_ns": 139603
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 368120,
+            "exclusive_ns": 297317
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 38349,
+            "exclusive_ns": 38349
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 325,
+            "exclusive_ns": 325
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 2217261,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 12.692414000000001,
+        "p95_ms": 12.692414000000001,
+        "samples_ms": [
+          12.692414000000001
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 5.600701,
+        "p95_ms": 5.600701,
+        "samples_ms": [
+          5.600701
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 18.293922000000002,
+        "p95_ms": 18.293922000000002,
+        "samples_ms": [
+          18.293922000000002
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 18293446,
+            "exclusive_ns": 8625
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 4233051,
+            "exclusive_ns": 78402
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 4286097,
+            "exclusive_ns": 13685
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 607419,
+            "exclusive_ns": 18284
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 12691916,
+            "exclusive_ns": 8536
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 39361,
+            "exclusive_ns": 25414
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 5592905,
+            "exclusive_ns": 5579429
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 135,
+            "exclusive_ns": 135
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 9822,
+            "exclusive_ns": 6702
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 47237,
+            "exclusive_ns": 44272
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 622317,
+            "exclusive_ns": 334772
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 3222,
+            "exclusive_ns": 3222
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 30815,
+            "exclusive_ns": 28534
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 2012,
+            "exclusive_ns": 2012
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 191294,
+            "exclusive_ns": 169299
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 38513,
+            "exclusive_ns": 38513
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 12855,
+            "exclusive_ns": 12855
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 1644,
+            "exclusive_ns": 1644
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 62865,
+            "exclusive_ns": 58921
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 814954,
+            "exclusive_ns": 1250
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 7851,
+            "exclusive_ns": 7665
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 29385,
+            "exclusive_ns": 11478
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 996319,
+            "exclusive_ns": 1241
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 6113,
+            "exclusive_ns": 6113
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 372,
+            "exclusive_ns": 372
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 461155,
+            "exclusive_ns": 27892
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 13476,
+            "exclusive_ns": 13342
+          },
+          "history.export_cache_hit": {
+            "calls": 2,
+            "inclusive_ns": 134,
+            "exclusive_ns": 134
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 2172160,
+            "exclusive_ns": 2172160
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 2550718,
+            "exclusive_ns": 2550718
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1548863,
+            "exclusive_ns": 1548863
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 58678,
+            "exclusive_ns": 58678
+          },
+          "history.journal_mutable_access": {
+            "calls": 2699,
+            "inclusive_ns": 1040810,
+            "exclusive_ns": 1040810
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 4176587,
+            "exclusive_ns": 18328
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 8322557,
+            "exclusive_ns": 1973810
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 47297,
+            "exclusive_ns": 47297
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 3874,
+            "exclusive_ns": 3874
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 953022,
+            "exclusive_ns": 110234
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 23555,
+            "exclusive_ns": 23555
+          },
+          "movement.actor": {
+            "calls": 4,
+            "inclusive_ns": 830388,
+            "exclusive_ns": 96254
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 36994,
+            "exclusive_ns": 23273
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 24647,
+            "exclusive_ns": 24647
+          },
+          "stats.effective": {
+            "calls": 38,
+            "inclusive_ns": 30225,
+            "exclusive_ns": 30225
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 34966,
+            "exclusive_ns": 27072
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 1392031,
+            "exclusive_ns": 164600
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 58047,
+            "exclusive_ns": 53053
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 7915,
+            "exclusive_ns": 7915
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 996798,
+            "exclusive_ns": 479
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 17277,
+            "exclusive_ns": 17277
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 51287,
+            "exclusive_ns": 32518
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 37477,
+            "exclusive_ns": 483
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 1053380,
+            "exclusive_ns": 9432
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1432,
+            "exclusive_ns": 1349
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 2558537,
+            "exclusive_ns": 1404
+          },
+          "vision.detection": {
+            "calls": 16,
+            "inclusive_ns": 382321,
+            "exclusive_ns": 8151
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 28705,
+            "exclusive_ns": 28705
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 642227,
+            "exclusive_ns": 370066
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 272161,
+            "exclusive_ns": 272161
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 432962,
+            "exclusive_ns": 349370
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 360561,
+            "exclusive_ns": 360561
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 349,
+            "exclusive_ns": 349
+          },
+          "vision.optical_route": {
+            "calls": 19,
+            "inclusive_ns": 363032,
+            "exclusive_ns": 363032
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors-history-1-pickup",
+      "starting_frames": 1,
+      "bytes": 2207843,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 7.146971000000001,
+        "p95_ms": 7.146971000000001,
+        "samples_ms": [
+          7.146971000000001
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 5.6108590000000005,
+        "p95_ms": 5.6108590000000005,
+        "samples_ms": [
+          5.6108590000000005
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 12.758607999999999,
+        "p95_ms": 12.758607999999999,
+        "samples_ms": [
+          12.758607999999999
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 12758222,
+            "exclusive_ns": 9568
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1155844,
+            "exclusive_ns": 2721
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1211590,
+            "exclusive_ns": 17905
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 785709,
+            "exclusive_ns": 27179
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 7146418,
+            "exclusive_ns": 12411
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 37841,
+            "exclusive_ns": 24847
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 5602236,
+            "exclusive_ns": 5589235
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 3360,
+            "exclusive_ns": 3360
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 229213,
+            "exclusive_ns": 24046
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 13001,
+            "exclusive_ns": 12922
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 79,
+            "exclusive_ns": 79
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1119871,
+            "exclusive_ns": 1119871
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 2169172,
+            "exclusive_ns": 2169172
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 481139,
+            "exclusive_ns": 481139
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 496453,
+            "exclusive_ns": 496453
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 411609,
+            "exclusive_ns": 411609
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 3164129,
+            "exclusive_ns": 17365
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 5887984,
+            "exclusive_ns": 1603984
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 484725,
+            "exclusive_ns": 88028
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 34433,
+            "exclusive_ns": 34433
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 9634,
+            "exclusive_ns": 9634
+          },
+          "stats.effective": {
+            "calls": 3,
+            "inclusive_ns": 4661,
+            "exclusive_ns": 4661
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 437449,
+            "exclusive_ns": 241929
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 195520,
+            "exclusive_ns": 195520
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 204886,
+            "exclusive_ns": 123928
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 35881,
+            "exclusive_ns": 35881
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 342,
+            "exclusive_ns": 342
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 2246716,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 35.545096,
+        "p95_ms": 35.545096,
+        "samples_ms": [
+          35.545096
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 12.492036,
+        "p95_ms": 12.492036,
+        "samples_ms": [
+          12.492036
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 48.037914,
+        "p95_ms": 48.037914,
+        "samples_ms": [
+          48.037914
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 48037459,
+            "exclusive_ns": 30332
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3060337,
+            "exclusive_ns": 133375
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3155626,
+            "exclusive_ns": 56815
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 391320,
+            "exclusive_ns": 17888
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 35525521,
+            "exclusive_ns": 29669
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 38474,
+            "exclusive_ns": 26051
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 12481606,
+            "exclusive_ns": 12275672
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 246,
+            "exclusive_ns": 246
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 9056,
+            "exclusive_ns": 6186
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 41398,
+            "exclusive_ns": 38280
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 389506,
+            "exclusive_ns": 176830
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 2971,
+            "exclusive_ns": 2971
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 98111,
+            "exclusive_ns": 95722
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 2140,
+            "exclusive_ns": 2140
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 66103,
+            "exclusive_ns": 42826
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 39373,
+            "exclusive_ns": 39373
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 13206,
+            "exclusive_ns": 13206
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 1396,
+            "exclusive_ns": 1396
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 63661,
+            "exclusive_ns": 59070
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 456472,
+            "exclusive_ns": 763
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 8436,
+            "exclusive_ns": 8231
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 30056,
+            "exclusive_ns": 11111
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 699921,
+            "exclusive_ns": 1167
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 6212,
+            "exclusive_ns": 6212
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 464,
+            "exclusive_ns": 464
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 230347,
+            "exclusive_ns": 24912
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 205934,
+            "exclusive_ns": 205664
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 270,
+            "exclusive_ns": 270
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1681807,
+            "exclusive_ns": 1681807
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1482200,
+            "exclusive_ns": 1482200
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1361407,
+            "exclusive_ns": 1361407
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 60046,
+            "exclusive_ns": 60046
+          },
+          "history.journal_mutable_access": {
+            "calls": 2699,
+            "inclusive_ns": 988771,
+            "exclusive_ns": 988771
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2925272,
+            "exclusive_ns": 21619
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 32267156,
+            "exclusive_ns": 27660077
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 45539,
+            "exclusive_ns": 45539
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 7296,
+            "exclusive_ns": 7296
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 604110,
+            "exclusive_ns": 90871
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 20235,
+            "exclusive_ns": 20235
+          },
+          "movement.actor": {
+            "calls": 4,
+            "inclusive_ns": 827490,
+            "exclusive_ns": 70369
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 38061,
+            "exclusive_ns": 24233
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 23044,
+            "exclusive_ns": 23044
+          },
+          "stats.effective": {
+            "calls": 38,
+            "inclusive_ns": 26195,
+            "exclusive_ns": 26195
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 35578,
+            "exclusive_ns": 27610
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 1063027,
+            "exclusive_ns": 198198
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 54234,
+            "exclusive_ns": 49489
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 8120,
+            "exclusive_ns": 8120
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 700385,
+            "exclusive_ns": 464
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 18103,
+            "exclusive_ns": 18103
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 51277,
+            "exclusive_ns": 33889
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 38598,
+            "exclusive_ns": 537
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 758186,
+            "exclusive_ns": 9330
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1437,
+            "exclusive_ns": 1356
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1931988,
+            "exclusive_ns": 1423
+          },
+          "vision.detection": {
+            "calls": 16,
+            "inclusive_ns": 24512,
+            "exclusive_ns": 7073
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 5619,
+            "exclusive_ns": 5619
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 637164,
+            "exclusive_ns": 362681
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 274483,
+            "exclusive_ns": 274483
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 205231,
+            "exclusive_ns": 124441
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 36498,
+            "exclusive_ns": 36498
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 469,
+            "exclusive_ns": 469
+          },
+          "vision.optical_route": {
+            "calls": 19,
+            "inclusive_ns": 7125,
+            "exclusive_ns": 7125
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors-history-5-pickup",
+      "starting_frames": 5,
+      "bytes": 2247193,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 7.686762,
+        "p95_ms": 7.686762,
+        "samples_ms": [
+          7.686762
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 5.007835,
+        "p95_ms": 5.007835,
+        "samples_ms": [
+          5.007835
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 12.695519,
+        "p95_ms": 12.695519,
+        "samples_ms": [
+          12.695519
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 12694998,
+            "exclusive_ns": 8249
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1518259,
+            "exclusive_ns": 17345
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1627177,
+            "exclusive_ns": 21486
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 966733,
+            "exclusive_ns": 77055
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 7686238,
+            "exclusive_ns": 27243
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 87432,
+            "exclusive_ns": 72983
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 5000511,
+            "exclusive_ns": 4981407
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 3528,
+            "exclusive_ns": 3528
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 378644,
+            "exclusive_ns": 31989
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 19104,
+            "exclusive_ns": 18805
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 299,
+            "exclusive_ns": 299
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1583437,
+            "exclusive_ns": 1583437
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1117503,
+            "exclusive_ns": 1117503
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1320568,
+            "exclusive_ns": 1320568
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 67247,
+            "exclusive_ns": 67247
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 387777,
+            "exclusive_ns": 387777
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2907508,
+            "exclusive_ns": 402190
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 5997983,
+            "exclusive_ns": 1507038
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 656177,
+            "exclusive_ns": 155769
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 33835,
+            "exclusive_ns": 33835
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 10921,
+            "exclusive_ns": 10921
+          },
+          "stats.effective": {
+            "calls": 3,
+            "inclusive_ns": 7212,
+            "exclusive_ns": 7212
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 527160,
+            "exclusive_ns": 338993
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 188167,
+            "exclusive_ns": 188167
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 346280,
+            "exclusive_ns": 263405
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 49871,
+            "exclusive_ns": 49871
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 676,
+            "exclusive_ns": 676
+          }
+        }
+      ]
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 5274932,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 14.646536,
+        "p95_ms": 14.646536,
+        "samples_ms": [
+          14.646536
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 20.448601,
+        "p95_ms": 20.448601,
+        "samples_ms": [
+          20.448601
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 35.096182,
+        "p95_ms": 35.096182,
+        "samples_ms": [
+          35.096182
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 35095676,
+            "exclusive_ns": 13957
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 9521267,
+            "exclusive_ns": 132528
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 10629669,
+            "exclusive_ns": 946138
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 988769,
+            "exclusive_ns": 19232
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 14646149,
+            "exclusive_ns": 11813
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 162264,
+            "exclusive_ns": 22776
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 20435570,
+            "exclusive_ns": 20409934
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 372,
+            "exclusive_ns": 372
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 41807,
+            "exclusive_ns": 36748
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 51667,
+            "exclusive_ns": 47765
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 1511458,
+            "exclusive_ns": 1294123
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 4000,
+            "exclusive_ns": 4000
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 4008,
+            "exclusive_ns": 2044
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 1770,
+            "exclusive_ns": 1770
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 80119,
+            "exclusive_ns": 58474
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 42729,
+            "exclusive_ns": 42729
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 816636,
+            "exclusive_ns": 816636
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 3141,
+            "exclusive_ns": 3141
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 116963,
+            "exclusive_ns": 112230
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 1593108,
+            "exclusive_ns": 1437
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 13665,
+            "exclusive_ns": 13330
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 830834,
+            "exclusive_ns": 5300
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 2639698,
+            "exclusive_ns": 1311
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 3953,
+            "exclusive_ns": 3953
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 436,
+            "exclusive_ns": 436
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 733755,
+            "exclusive_ns": 33324
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 25636,
+            "exclusive_ns": 25571
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 65,
+            "exclusive_ns": 65
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 321398,
+            "exclusive_ns": 321398
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1287129,
+            "exclusive_ns": 1287129
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 652582,
+            "exclusive_ns": 652582
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 95215,
+            "exclusive_ns": 95215
+          },
+          "history.journal_mutable_access": {
+            "calls": 2643,
+            "inclusive_ns": 3717334,
+            "exclusive_ns": 3717334
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2098049,
+            "exclusive_ns": 63123
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 3959195,
+            "exclusive_ns": 1539748
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 662940,
+            "exclusive_ns": 132977
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 45472,
+            "exclusive_ns": 45472
+          },
+          "movement.actor": {
+            "calls": 5,
+            "inclusive_ns": 3448551,
+            "exclusive_ns": 74390
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 361851,
+            "exclusive_ns": 303707
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 195456,
+            "exclusive_ns": 195456
+          },
+          "stats.effective": {
+            "calls": 47,
+            "inclusive_ns": 39304,
+            "exclusive_ns": 39304
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 43722,
+            "exclusive_ns": 33581
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 4086064,
+            "exclusive_ns": 591144
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 72598,
+            "exclusive_ns": 67040
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 9402,
+            "exclusive_ns": 9402
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 2640373,
+            "exclusive_ns": 675
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 32977,
+            "exclusive_ns": 32977
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 272523,
+            "exclusive_ns": 272523
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 362537,
+            "exclusive_ns": 686
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 3023496,
+            "exclusive_ns": 9406
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1856,
+            "exclusive_ns": 1772
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 7262228,
+            "exclusive_ns": 1515
+          },
+          "vision.detection": {
+            "calls": 20,
+            "inclusive_ns": 31643,
+            "exclusive_ns": 9358
+          },
+          "vision.lighting": {
+            "calls": 2,
+            "inclusive_ns": 3550,
+            "exclusive_ns": 3550
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 10,
+            "inclusive_ns": 1093281,
+            "exclusive_ns": 733297
+          },
+          "vision.lighting_field_build": {
+            "calls": 2,
+            "inclusive_ns": 359984,
+            "exclusive_ns": 359984
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 29682,
+            "exclusive_ns": 29682
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 582,
+            "exclusive_ns": 582
+          },
+          "vision.optical_route": {
+            "calls": 22,
+            "inclusive_ns": 7649,
+            "exclusive_ns": 7649
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 700094,
+            "exclusive_ns": 401881
+          }
+        }
+      ]
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-0-pickup",
+      "starting_frames": 0,
+      "bytes": 4922919,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 2.35522,
+        "p95_ms": 2.35522,
+        "samples_ms": [
+          2.35522
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 14.061918,
+        "p95_ms": 14.061918,
+        "samples_ms": [
+          14.061918
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 16.418218,
+        "p95_ms": 16.418218,
+        "samples_ms": [
+          16.418218
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 16417577,
+            "exclusive_ns": 12072
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1649659,
+            "exclusive_ns": 3357
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2301259,
+            "exclusive_ns": 590492
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 1192719,
+            "exclusive_ns": 20446
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2354595,
+            "exclusive_ns": 12025
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 61108,
+            "exclusive_ns": 18124
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 14050910,
+            "exclusive_ns": 13950739
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 1933,
+            "exclusive_ns": 1933
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 747182,
+            "exclusive_ns": 32046
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 100171,
+            "exclusive_ns": 100171
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 208314,
+            "exclusive_ns": 208314
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 68,
+            "exclusive_ns": 68
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 669782,
+            "exclusive_ns": 194456
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 41243,
+            "exclusive_ns": 41243
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 41051,
+            "exclusive_ns": 41051
+          },
+          "stats.effective": {
+            "calls": 4,
+            "inclusive_ns": 7247,
+            "exclusive_ns": 7247
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 700970,
+            "exclusive_ns": 582233
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 118737,
+            "exclusive_ns": 118737
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 29448,
+            "exclusive_ns": 29448
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 531,
+            "exclusive_ns": 531
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 714514,
+            "exclusive_ns": 452844
+          }
+        }
+      ]
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 5278167,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 8.317737000000001,
+        "p95_ms": 8.317737000000001,
+        "samples_ms": [
+          8.317737000000001
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 21.164162,
+        "p95_ms": 21.164162,
+        "samples_ms": [
+          21.164162
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 29.482768999999998,
+        "p95_ms": 29.482768999999998,
+        "samples_ms": [
+          29.482768999999998
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 29482196,
+            "exclusive_ns": 15671
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2808736,
+            "exclusive_ns": 83852
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3037577,
+            "exclusive_ns": 154445
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 694729,
+            "exclusive_ns": 16908
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 8317215,
+            "exclusive_ns": 11314
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 74396,
+            "exclusive_ns": 23927
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 21149310,
+            "exclusive_ns": 21031488
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 445,
+            "exclusive_ns": 445
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 11309,
+            "exclusive_ns": 7724
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 40866,
+            "exclusive_ns": 36940
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 385329,
+            "exclusive_ns": 168073
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 3108,
+            "exclusive_ns": 3108
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 3004,
+            "exclusive_ns": 1665
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 1254,
+            "exclusive_ns": 1254
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 64550,
+            "exclusive_ns": 42412
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 41548,
+            "exclusive_ns": 41548
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 8388,
+            "exclusive_ns": 8388
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 1771,
+            "exclusive_ns": 1771
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 57766,
+            "exclusive_ns": 54406
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 450905,
+            "exclusive_ns": 932
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 8675,
+            "exclusive_ns": 8486
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 19888,
+            "exclusive_ns": 4616
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 584797,
+            "exclusive_ns": 1059
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 4015,
+            "exclusive_ns": 4015
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 527,
+            "exclusive_ns": 527
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 557626,
+            "exclusive_ns": 32386
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 117822,
+            "exclusive_ns": 117661
+          },
+          "history.export_cache_hit": {
+            "calls": 2,
+            "inclusive_ns": 161,
+            "exclusive_ns": 161
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1191098,
+            "exclusive_ns": 1191098
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1425117,
+            "exclusive_ns": 1425117
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1251607,
+            "exclusive_ns": 1251607
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 92416,
+            "exclusive_ns": 92416
+          },
+          "history.journal_mutable_access": {
+            "calls": 2649,
+            "inclusive_ns": 537026,
+            "exclusive_ns": 537026
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2816633,
+            "exclusive_ns": 47493
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 5119835,
+            "exclusive_ns": 1112104
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 104489,
+            "exclusive_ns": 104489
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 5071,
+            "exclusive_ns": 5071
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 536776,
+            "exclusive_ns": 90072
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 38929,
+            "exclusive_ns": 38929
+          },
+          "movement.actor": {
+            "calls": 6,
+            "inclusive_ns": 359839,
+            "exclusive_ns": 57065
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 216575,
+            "exclusive_ns": 99564
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 165408,
+            "exclusive_ns": 165408
+          },
+          "stats.effective": {
+            "calls": 46,
+            "inclusive_ns": 30789,
+            "exclusive_ns": 30789
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 43680,
+            "exclusive_ns": 33912
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 537522,
+            "exclusive_ns": 138161
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 44468,
+            "exclusive_ns": 40125
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 8066,
+            "exclusive_ns": 8066
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 585204,
+            "exclusive_ns": 407
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 27649,
+            "exclusive_ns": 27649
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 35798,
+            "exclusive_ns": 35798
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 217191,
+            "exclusive_ns": 616
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 821116,
+            "exclusive_ns": 8913
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1531,
+            "exclusive_ns": 1452
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1477235,
+            "exclusive_ns": 1269
+          },
+          "vision.detection": {
+            "calls": 20,
+            "inclusive_ns": 26005,
+            "exclusive_ns": 7506
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 5483,
+            "exclusive_ns": 5483
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 565366,
+            "exclusive_ns": 316170
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 249196,
+            "exclusive_ns": 249196
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 29619,
+            "exclusive_ns": 29619
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 500,
+            "exclusive_ns": 500
+          },
+          "vision.optical_route": {
+            "calls": 23,
+            "inclusive_ns": 6092,
+            "exclusive_ns": 6092
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 524941,
+            "exclusive_ns": 447832
+          }
+        }
+      ]
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-1-pickup",
+      "starting_frames": 1,
+      "bytes": 5274950,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 4.493321,
+        "p95_ms": 4.493321,
+        "samples_ms": [
+          4.493321
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 14.201892,
+        "p95_ms": 14.201892,
+        "samples_ms": [
+          14.201892
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 18.696184000000002,
+        "p95_ms": 18.696184000000002,
+        "samples_ms": [
+          18.696184000000002
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 18695688,
+            "exclusive_ns": 12415
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1280438,
+            "exclusive_ns": 4080
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1523155,
+            "exclusive_ns": 94040
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 917207,
+            "exclusive_ns": 23870
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 4492722,
+            "exclusive_ns": 17193
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 148677,
+            "exclusive_ns": 27006
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 14190551,
+            "exclusive_ns": 14169302
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 2069,
+            "exclusive_ns": 2069
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 478726,
+            "exclusive_ns": 28966
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 21249,
+            "exclusive_ns": 21169
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 80,
+            "exclusive_ns": 80
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 304699,
+            "exclusive_ns": 304699
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1089946,
+            "exclusive_ns": 1089946
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 430807,
+            "exclusive_ns": 430807
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 99822,
+            "exclusive_ns": 99822
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 295835,
+            "exclusive_ns": 295835
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 1659271,
+            "exclusive_ns": 38696
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 2909569,
+            "exclusive_ns": 945599
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 476728,
+            "exclusive_ns": 90031
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 42805,
+            "exclusive_ns": 42805
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 119602,
+            "exclusive_ns": 119602
+          },
+          "stats.effective": {
+            "calls": 3,
+            "inclusive_ns": 6052,
+            "exclusive_ns": 6052
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 432519,
+            "exclusive_ns": 239507
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 193012,
+            "exclusive_ns": 193012
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 29717,
+            "exclusive_ns": 29717
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 513,
+            "exclusive_ns": 513
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 449586,
+            "exclusive_ns": 368855
+          }
+        }
+      ]
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 5283597,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 9.366401999999999,
+        "p95_ms": 9.366401999999999,
+        "samples_ms": [
+          9.366401999999999
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 20.069726,
+        "p95_ms": 20.069726,
+        "samples_ms": [
+          20.069726
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 29.436951,
+        "p95_ms": 29.436951,
+        "samples_ms": [
+          29.436951
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 29436475,
+            "exclusive_ns": 14490
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2887320,
+            "exclusive_ns": 80160
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3003234,
+            "exclusive_ns": 22434
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 616034,
+            "exclusive_ns": 17016
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 9365784,
+            "exclusive_ns": 13534
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 93480,
+            "exclusive_ns": 29381
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 20056201,
+            "exclusive_ns": 20022177
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 328,
+            "exclusive_ns": 328
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 11783,
+            "exclusive_ns": 7927
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 45712,
+            "exclusive_ns": 41981
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 498322,
+            "exclusive_ns": 288892
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 3264,
+            "exclusive_ns": 3264
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 3210,
+            "exclusive_ns": 1564
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 1280,
+            "exclusive_ns": 1280
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 63995,
+            "exclusive_ns": 43611
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 38931,
+            "exclusive_ns": 38931
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 9276,
+            "exclusive_ns": 9276
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 2072,
+            "exclusive_ns": 2072
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 59007,
+            "exclusive_ns": 55746
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 563539,
+            "exclusive_ns": 1129
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 9784,
+            "exclusive_ns": 9492
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 21258,
+            "exclusive_ns": 4540
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 705653,
+            "exclusive_ns": 1144
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 4093,
+            "exclusive_ns": 4093
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 287,
+            "exclusive_ns": 287
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 482807,
+            "exclusive_ns": 29188
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 34024,
+            "exclusive_ns": 33686
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 338,
+            "exclusive_ns": 338
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1391232,
+            "exclusive_ns": 1391232
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1030896,
+            "exclusive_ns": 1030896
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1238381,
+            "exclusive_ns": 1238381
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 276458,
+            "exclusive_ns": 276458
+          },
+          "history.journal_mutable_access": {
+            "calls": 2631,
+            "inclusive_ns": 763605,
+            "exclusive_ns": 763605
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2587131,
+            "exclusive_ns": 41396
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 6195252,
+            "exclusive_ns": 2216889
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 108335,
+            "exclusive_ns": 108335
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 5059,
+            "exclusive_ns": 5059
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 432186,
+            "exclusive_ns": 89952
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 40370,
+            "exclusive_ns": 40370
+          },
+          "movement.actor": {
+            "calls": 3,
+            "inclusive_ns": 579419,
+            "exclusive_ns": 42272
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 133203,
+            "exclusive_ns": 93201
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 101897,
+            "exclusive_ns": 101897
+          },
+          "stats.effective": {
+            "calls": 46,
+            "inclusive_ns": 30613,
+            "exclusive_ns": 30613
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 43583,
+            "exclusive_ns": 33664
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 756969,
+            "exclusive_ns": 137435
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 46503,
+            "exclusive_ns": 42100
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 9868,
+            "exclusive_ns": 9868
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 706193,
+            "exclusive_ns": 540
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 28739,
+            "exclusive_ns": 28739
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 36013,
+            "exclusive_ns": 36013
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 133807,
+            "exclusive_ns": 604
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 861287,
+            "exclusive_ns": 9698
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1631,
+            "exclusive_ns": 1542
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1740037,
+            "exclusive_ns": 1325
+          },
+          "vision.detection": {
+            "calls": 20,
+            "inclusive_ns": 26898,
+            "exclusive_ns": 7692
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 4761,
+            "exclusive_ns": 4761
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 461589,
+            "exclusive_ns": 318821
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 142768,
+            "exclusive_ns": 142768
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 30735,
+            "exclusive_ns": 30735
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 565,
+            "exclusive_ns": 565
+          },
+          "vision.optical_route": {
+            "calls": 23,
+            "inclusive_ns": 6153,
+            "exclusive_ns": 6153
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 453429,
+            "exclusive_ns": 374935
+          }
+        }
+      ]
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-5-pickup",
+      "starting_frames": 5,
+      "bytes": 5287009,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 5.914673,
+        "p95_ms": 5.914673,
+        "samples_ms": [
+          5.914673
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 14.190134,
+        "p95_ms": 14.190134,
+        "samples_ms": [
+          14.190134
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 20.105735,
+        "p95_ms": 20.105735,
+        "samples_ms": [
+          20.105735
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 20105109,
+            "exclusive_ns": 14127
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1298017,
+            "exclusive_ns": 5346
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1426779,
+            "exclusive_ns": 55060
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 940401,
+            "exclusive_ns": 26313
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 5914100,
+            "exclusive_ns": 18692
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 73702,
+            "exclusive_ns": 31024
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 14176882,
+            "exclusive_ns": 14149941
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 2428,
+            "exclusive_ns": 2428
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 518331,
+            "exclusive_ns": 32504
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 26941,
+            "exclusive_ns": 26655
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 286,
+            "exclusive_ns": 286
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 872087,
+            "exclusive_ns": 872087
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1356806,
+            "exclusive_ns": 1356806
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1010090,
+            "exclusive_ns": 1010090
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 102878,
+            "exclusive_ns": 102878
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 276702,
+            "exclusive_ns": 276702
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2507405,
+            "exclusive_ns": 37631
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 4417888,
+            "exclusive_ns": 1038396
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 470238,
+            "exclusive_ns": 92987
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 50741,
+            "exclusive_ns": 50741
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 40250,
+            "exclusive_ns": 40250
+          },
+          "stats.effective": {
+            "calls": 3,
+            "inclusive_ns": 7160,
+            "exclusive_ns": 7160
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 419494,
+            "exclusive_ns": 273973
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 145521,
+            "exclusive_ns": 145521
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 31429,
+            "exclusive_ns": 31429
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 761,
+            "exclusive_ns": 761
+          },
+          "vision.terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 485581,
+            "exclusive_ns": 405321
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 6465976,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 20.399436,
+        "p95_ms": 20.399436,
+        "samples_ms": [
+          20.399436
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 12.607869,
+        "p95_ms": 12.607869,
+        "samples_ms": [
+          12.607869
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 33.008134,
+        "p95_ms": 33.008134,
+        "samples_ms": [
+          33.008134
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 33007668,
+            "exclusive_ns": 11753
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3694181,
+            "exclusive_ns": 81035
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3951737,
+            "exclusive_ns": 113768
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 766898,
+            "exclusive_ns": 19648
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 20398666,
+            "exclusive_ns": 12793
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 143788,
+            "exclusive_ns": 122690
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 12597249,
+            "exclusive_ns": 12290878
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 391,
+            "exclusive_ns": 391
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 10770,
+            "exclusive_ns": 6847
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 50579,
+            "exclusive_ns": 47288
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 780336,
+            "exclusive_ns": 480968
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 3853,
+            "exclusive_ns": 3853
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 31112,
+            "exclusive_ns": 28346
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 2488,
+            "exclusive_ns": 2488
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 173375,
+            "exclusive_ns": 148716
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 41695,
+            "exclusive_ns": 41695
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 288321,
+            "exclusive_ns": 288321
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 2424,
+            "exclusive_ns": 2424
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 67875,
+            "exclusive_ns": 63071
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 954907,
+            "exclusive_ns": 1092
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 12003,
+            "exclusive_ns": 11660
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 308546,
+            "exclusive_ns": 12419
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 1425080,
+            "exclusive_ns": 1291
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 8207,
+            "exclusive_ns": 8207
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 413,
+            "exclusive_ns": 413
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 621112,
+            "exclusive_ns": 31601
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 306371,
+            "exclusive_ns": 306189
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 182,
+            "exclusive_ns": 182
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1387935,
+            "exclusive_ns": 1387935
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 2251864,
+            "exclusive_ns": 2251864
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 991700,
+            "exclusive_ns": 991700
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 3931623,
+            "exclusive_ns": 3931623
+          },
+          "history.journal_mutable_access": {
+            "calls": 2693,
+            "inclusive_ns": 691609,
+            "exclusive_ns": 691609
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 7196658,
+            "exclusive_ns": 21471
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 15119454,
+            "exclusive_ns": 6534861
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 594105,
+            "exclusive_ns": 94717
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 1314682,
+            "exclusive_ns": 1314682
+          },
+          "movement.actor": {
+            "calls": 3,
+            "inclusive_ns": 430631,
+            "exclusive_ns": 54499
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 50136,
+            "exclusive_ns": 38221
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 28011,
+            "exclusive_ns": 28011
+          },
+          "stats.effective": {
+            "calls": 38,
+            "inclusive_ns": 28654,
+            "exclusive_ns": 28654
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 36805,
+            "exclusive_ns": 28664
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 598809,
+            "exclusive_ns": 134186
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 63304,
+            "exclusive_ns": 58670
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 7422,
+            "exclusive_ns": 7422
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 1425701,
+            "exclusive_ns": 621
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 47923,
+            "exclusive_ns": 47923
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 49914,
+            "exclusive_ns": 33261
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 50595,
+            "exclusive_ns": 459
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 1494703,
+            "exclusive_ns": 9235
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1497,
+            "exclusive_ns": 1414
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 2244692,
+            "exclusive_ns": 1651
+          },
+          "vision.detection": {
+            "calls": 16,
+            "inclusive_ns": 23485,
+            "exclusive_ns": 7068
+          },
+          "vision.lighting": {
+            "calls": 2,
+            "inclusive_ns": 3255,
+            "exclusive_ns": 3255
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 806237,
+            "exclusive_ns": 391437
+          },
+          "vision.lighting_field_build": {
+            "calls": 2,
+            "inclusive_ns": 414800,
+            "exclusive_ns": 414800
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 589038,
+            "exclusive_ns": 180430
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 170823,
+            "exclusive_ns": 170823
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 642,
+            "exclusive_ns": 642
+          },
+          "vision.optical_route": {
+            "calls": 18,
+            "inclusive_ns": 5833,
+            "exclusive_ns": 5833
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-0-pickup",
+      "starting_frames": 0,
+      "bytes": 3839613,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 1.374018,
+        "p95_ms": 1.374018,
+        "samples_ms": [
+          1.374018
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 6.794442,
+        "p95_ms": 6.794442,
+        "samples_ms": [
+          6.794442
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 8.169295,
+        "p95_ms": 8.169295,
+        "samples_ms": [
+          8.169295
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 8168758,
+            "exclusive_ns": 11592
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 996958,
+            "exclusive_ns": 3939
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1055864,
+            "exclusive_ns": 20026
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 613620,
+            "exclusive_ns": 27635
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1373217,
+            "exclusive_ns": 12976
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 38880,
+            "exclusive_ns": 25258
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 6783949,
+            "exclusive_ns": 6598540
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 3266,
+            "exclusive_ns": 3266
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 224959,
+            "exclusive_ns": 25941
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 185409,
+            "exclusive_ns": 185409
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 247629,
+            "exclusive_ns": 247629
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 128,
+            "exclusive_ns": 128
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 491831,
+            "exclusive_ns": 89747
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 304249,
+            "exclusive_ns": 304249
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 10356,
+            "exclusive_ns": 10356
+          },
+          "stats.effective": {
+            "calls": 3,
+            "inclusive_ns": 5900,
+            "exclusive_ns": 5900
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 435262,
+            "exclusive_ns": 228135
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 207127,
+            "exclusive_ns": 207127
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 198684,
+            "exclusive_ns": 123972
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 36311,
+            "exclusive_ns": 36311
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 622,
+            "exclusive_ns": 622
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 8743899,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 19.091908,
+        "p95_ms": 19.091908,
+        "samples_ms": [
+          19.091908
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 17.781562,
+        "p95_ms": 17.781562,
+        "samples_ms": [
+          17.781562
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 36.874289999999995,
+        "p95_ms": 36.874289999999995,
+        "samples_ms": [
+          36.874289999999995
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 36873760,
+            "exclusive_ns": 13595
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2766569,
+            "exclusive_ns": 79122
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 2834776,
+            "exclusive_ns": 16878
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 374795,
+            "exclusive_ns": 18997
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 19091212,
+            "exclusive_ns": 13492
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 51329,
+            "exclusive_ns": 38327
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 17768953,
+            "exclusive_ns": 17198271
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 37464,
+            "exclusive_ns": 37464
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 10503,
+            "exclusive_ns": 6838
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 86769,
+            "exclusive_ns": 46393
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 421932,
+            "exclusive_ns": 180326
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 3324,
+            "exclusive_ns": 3324
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 30716,
+            "exclusive_ns": 28452
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 1967,
+            "exclusive_ns": 1967
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 228050,
+            "exclusive_ns": 203596
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 42133,
+            "exclusive_ns": 42133
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 13320,
+            "exclusive_ns": 13320
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 2166,
+            "exclusive_ns": 2166
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 62330,
+            "exclusive_ns": 58524
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 651146,
+            "exclusive_ns": 1062
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 8452,
+            "exclusive_ns": 8199
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 29551,
+            "exclusive_ns": 11355
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 872387,
+            "exclusive_ns": 1372
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 6381,
+            "exclusive_ns": 6381
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 327,
+            "exclusive_ns": 327
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 236796,
+            "exclusive_ns": 25464
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 570682,
+            "exclusive_ns": 570348
+          },
+          "history.export_cache_hit": {
+            "calls": 2,
+            "inclusive_ns": 334,
+            "exclusive_ns": 334
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 2497138,
+            "exclusive_ns": 2497138
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1705055,
+            "exclusive_ns": 1705055
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1222548,
+            "exclusive_ns": 1222548
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 940142,
+            "exclusive_ns": 940142
+          },
+          "history.journal_mutable_access": {
+            "calls": 2699,
+            "inclusive_ns": 577553,
+            "exclusive_ns": 577553
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 3888296,
+            "exclusive_ns": 20551
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 10983435,
+            "exclusive_ns": 4598001
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 4938477,
+            "exclusive_ns": 4938477
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 8387,
+            "exclusive_ns": 8387
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 531608,
+            "exclusive_ns": 88786
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 312645,
+            "exclusive_ns": 312645
+          },
+          "movement.actor": {
+            "calls": 4,
+            "inclusive_ns": 379758,
+            "exclusive_ns": 62100
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 38948,
+            "exclusive_ns": 29075
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 19483,
+            "exclusive_ns": 19483
+          },
+          "stats.effective": {
+            "calls": 38,
+            "inclusive_ns": 26848,
+            "exclusive_ns": 26848
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 36952,
+            "exclusive_ns": 29030
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 550400,
+            "exclusive_ns": 133766
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 144688,
+            "exclusive_ns": 139824
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 7632,
+            "exclusive_ns": 7632
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 872872,
+            "exclusive_ns": 485
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 20096,
+            "exclusive_ns": 20096
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 57312,
+            "exclusive_ns": 37309
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 39399,
+            "exclusive_ns": 451
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 930821,
+            "exclusive_ns": 9180
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1930,
+            "exclusive_ns": 1850
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1686368,
+            "exclusive_ns": 1481
+          },
+          "vision.detection": {
+            "calls": 16,
+            "inclusive_ns": 23895,
+            "exclusive_ns": 6863
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 6155,
+            "exclusive_ns": 6155
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 631685,
+            "exclusive_ns": 400302
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 231383,
+            "exclusive_ns": 231383
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 211142,
+            "exclusive_ns": 128678
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 37306,
+            "exclusive_ns": 37306
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 692,
+            "exclusive_ns": 692
+          },
+          "vision.optical_route": {
+            "calls": 19,
+            "inclusive_ns": 6461,
+            "exclusive_ns": 6461
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-1-pickup",
+      "starting_frames": 1,
+      "bytes": 6465994,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 10.262593,
+        "p95_ms": 10.262593,
+        "samples_ms": [
+          10.262593
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 17.976091,
+        "p95_ms": 17.976091,
+        "samples_ms": [
+          17.976091
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 28.239546,
+        "p95_ms": 28.239546,
+        "samples_ms": [
+          28.239546
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 28239065,
+            "exclusive_ns": 12471
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1247997,
+            "exclusive_ns": 4961
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1326054,
+            "exclusive_ns": 21785
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 864239,
+            "exclusive_ns": 33231
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 10261792,
+            "exclusive_ns": 18810
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 56272,
+            "exclusive_ns": 38048
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 17964802,
+            "exclusive_ns": 17461315
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 3221,
+            "exclusive_ns": 3221
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 334802,
+            "exclusive_ns": 30551
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 503487,
+            "exclusive_ns": 503321
+          },
+          "history.export_cache_hit": {
+            "calls": 1,
+            "inclusive_ns": 166,
+            "exclusive_ns": 166
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1061707,
+            "exclusive_ns": 1061707
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1174218,
+            "exclusive_ns": 1174218
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 729723,
+            "exclusive_ns": 729723
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 700397,
+            "exclusive_ns": 700397
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 317208,
+            "exclusive_ns": 317208
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 2624072,
+            "exclusive_ns": 19734
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 8602106,
+            "exclusive_ns": 4916327
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 557533,
+            "exclusive_ns": 95369
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 314822,
+            "exclusive_ns": 314822
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 15003,
+            "exclusive_ns": 15003
+          },
+          "stats.effective": {
+            "calls": 3,
+            "inclusive_ns": 6251,
+            "exclusive_ns": 6251
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 504296,
+            "exclusive_ns": 307161
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 197135,
+            "exclusive_ns": 197135
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 303845,
+            "exclusive_ns": 219050
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 36514,
+            "exclusive_ns": 36514
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 566,
+            "exclusive_ns": 566
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 15578695,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 18.568246,
+        "p95_ms": 18.568246,
+        "samples_ms": [
+          18.568246
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 22.587739,
+        "p95_ms": 22.587739,
+        "samples_ms": [
+          22.587739
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 41.156974999999996,
+        "p95_ms": 41.156974999999996,
+        "samples_ms": [
+          41.156974999999996
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 41156544,
+            "exclusive_ns": 15409
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3234917,
+            "exclusive_ns": 85721
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 3319394,
+            "exclusive_ns": 23473
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 552865,
+            "exclusive_ns": 18833
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 18567304,
+            "exclusive_ns": 17678
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 61004,
+            "exclusive_ns": 44886
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 22573831,
+            "exclusive_ns": 21534127
+          },
+          "environment.burst_victims": {
+            "calls": 1,
+            "inclusive_ns": 290,
+            "exclusive_ns": 290
+          },
+          "environment.cleanup_and_items": {
+            "calls": 1,
+            "inclusive_ns": 10862,
+            "exclusive_ns": 7219
+          },
+          "environment.damage_exposure": {
+            "calls": 1,
+            "inclusive_ns": 52089,
+            "exclusive_ns": 48887
+          },
+          "environment.fire_advance": {
+            "calls": 1,
+            "inclusive_ns": 562772,
+            "exclusive_ns": 275201
+          },
+          "environment.fire_views": {
+            "calls": 2,
+            "inclusive_ns": 3196,
+            "exclusive_ns": 3196
+          },
+          "environment.freeze_blood_fungi": {
+            "calls": 1,
+            "inclusive_ns": 32805,
+            "exclusive_ns": 30343
+          },
+          "environment.freeze_mask": {
+            "calls": 1,
+            "inclusive_ns": 2112,
+            "exclusive_ns": 2112
+          },
+          "environment.gas_diffusion": {
+            "calls": 1,
+            "inclusive_ns": 65816,
+            "exclusive_ns": 43658
+          },
+          "environment.gas_views": {
+            "calls": 2,
+            "inclusive_ns": 39901,
+            "exclusive_ns": 39901
+          },
+          "environment.initialize": {
+            "calls": 4,
+            "inclusive_ns": 15398,
+            "exclusive_ns": 15398
+          },
+          "environment.item_drift": {
+            "calls": 1,
+            "inclusive_ns": 2156,
+            "exclusive_ns": 2156
+          },
+          "environment.passive_emitters": {
+            "calls": 1,
+            "inclusive_ns": 66578,
+            "exclusive_ns": 62625
+          },
+          "environment.propagation": {
+            "calls": 1,
+            "inclusive_ns": 629744,
+            "exclusive_ns": 1034
+          },
+          "environment.razorleaves": {
+            "calls": 1,
+            "inclusive_ns": 7957,
+            "exclusive_ns": 7714
+          },
+          "environment.setup": {
+            "calls": 1,
+            "inclusive_ns": 32424,
+            "exclusive_ns": 11986
+          },
+          "environment.total": {
+            "calls": 1,
+            "inclusive_ns": 826027,
+            "exclusive_ns": 1525
+          },
+          "environment.validate": {
+            "calls": 2,
+            "inclusive_ns": 7011,
+            "exclusive_ns": 7011
+          },
+          "environment.vents": {
+            "calls": 1,
+            "inclusive_ns": 331,
+            "exclusive_ns": 331
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 297641,
+            "exclusive_ns": 31284
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 1039704,
+            "exclusive_ns": 1038776
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 928,
+            "exclusive_ns": 928
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1861009,
+            "exclusive_ns": 1861009
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1524536,
+            "exclusive_ns": 1524536
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1722033,
+            "exclusive_ns": 1722033
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 744297,
+            "exclusive_ns": 744297
+          },
+          "history.journal_mutable_access": {
+            "calls": 2699,
+            "inclusive_ns": 1023775,
+            "exclusive_ns": 1023775
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 4039081,
+            "exclusive_ns": 48215
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 10177107,
+            "exclusive_ns": 4277017
+          },
+          "history.opening_identity_guard": {
+            "calls": 1,
+            "inclusive_ns": 4632069,
+            "exclusive_ns": 4632069
+          },
+          "history.opening_identity_reuse": {
+            "calls": 1,
+            "inclusive_ns": 8561,
+            "exclusive_ns": 8561
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 708154,
+            "exclusive_ns": 97309
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 412495,
+            "exclusive_ns": 412495
+          },
+          "movement.actor": {
+            "calls": 4,
+            "inclusive_ns": 788681,
+            "exclusive_ns": 71165
+          },
+          "offscreen.total": {
+            "calls": 1,
+            "inclusive_ns": 45203,
+            "exclusive_ns": 33883
+          },
+          "offscreen.validate": {
+            "calls": 2,
+            "inclusive_ns": 23835,
+            "exclusive_ns": 23835
+          },
+          "stats.effective": {
+            "calls": 38,
+            "inclusive_ns": 27365,
+            "exclusive_ns": 27365
+          },
+          "tick.actor_upkeep": {
+            "calls": 1,
+            "inclusive_ns": 37144,
+            "exclusive_ns": 29208
+          },
+          "tick.ai": {
+            "calls": 1,
+            "inclusive_ns": 966645,
+            "exclusive_ns": 140812
+          },
+          "tick.clocks_and_setup": {
+            "calls": 1,
+            "inclusive_ns": 60639,
+            "exclusive_ns": 56264
+          },
+          "tick.currents": {
+            "calls": 1,
+            "inclusive_ns": 9064,
+            "exclusive_ns": 9064
+          },
+          "tick.environments": {
+            "calls": 1,
+            "inclusive_ns": 826649,
+            "exclusive_ns": 622
+          },
+          "tick.final_settlement": {
+            "calls": 1,
+            "inclusive_ns": 20231,
+            "exclusive_ns": 20231
+          },
+          "tick.haste": {
+            "calls": 1,
+            "inclusive_ns": 56305,
+            "exclusive_ns": 36749
+          },
+          "tick.inactive_floors": {
+            "calls": 1,
+            "inclusive_ns": 45683,
+            "exclusive_ns": 480
+          },
+          "tick.late_statuses": {
+            "calls": 1,
+            "inclusive_ns": 892646,
+            "exclusive_ns": 9520
+          },
+          "tick.pre_ai_sync_riptide": {
+            "calls": 1,
+            "inclusive_ns": 1732,
+            "exclusive_ns": 1648
+          },
+          "tick.total": {
+            "calls": 1,
+            "inclusive_ns": 1980511,
+            "exclusive_ns": 1474
+          },
+          "vision.detection": {
+            "calls": 16,
+            "inclusive_ns": 24572,
+            "exclusive_ns": 7137
+          },
+          "vision.lighting": {
+            "calls": 3,
+            "inclusive_ns": 5741,
+            "exclusive_ns": 5741
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 8,
+            "inclusive_ns": 782004,
+            "exclusive_ns": 545731
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 236273,
+            "exclusive_ns": 236273
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 266111,
+            "exclusive_ns": 130654
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 37826,
+            "exclusive_ns": 37826
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 861,
+            "exclusive_ns": 861
+          },
+          "vision.optical_route": {
+            "calls": 19,
+            "inclusive_ns": 6983,
+            "exclusive_ns": 6983
+          }
+        }
+      ]
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-5-pickup",
+      "starting_frames": 5,
+      "bytes": 15579292,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 11.953647,
+        "p95_ms": 11.953647,
+        "samples_ms": [
+          11.953647
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 28.541962,
+        "p95_ms": 28.541962,
+        "samples_ms": [
+          28.541962
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 40.496648,
+        "p95_ms": 40.496648,
+        "samples_ms": [
+          40.496648
+        ]
+      },
+      "profile_reports": [
+        {
+          "benchmark.command_plus_save": {
+            "calls": 1,
+            "inclusive_ns": 40496050,
+            "exclusive_ns": 16280
+          },
+          "command.action_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1290117,
+            "exclusive_ns": 6152
+          },
+          "command.core_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 1422843,
+            "exclusive_ns": 27154
+          },
+          "command.finish": {
+            "calls": 1,
+            "inclusive_ns": 903338,
+            "exclusive_ns": 33469
+          },
+          "command.temporal_dispatch": {
+            "calls": 1,
+            "inclusive_ns": 11952867,
+            "exclusive_ns": 20573
+          },
+          "command.validate": {
+            "calls": 1,
+            "inclusive_ns": 105572,
+            "exclusive_ns": 43947
+          },
+          "desktop.save_encode": {
+            "calls": 1,
+            "inclusive_ns": 28526903,
+            "exclusive_ns": 27535893
+          },
+          "environment.validate": {
+            "calls": 1,
+            "inclusive_ns": 3487,
+            "exclusive_ns": 3487
+          },
+          "finish.remember": {
+            "calls": 1,
+            "inclusive_ns": 425903,
+            "exclusive_ns": 33784
+          },
+          "history.export": {
+            "calls": 1,
+            "inclusive_ns": 991010,
+            "exclusive_ns": 990057
+          },
+          "history.export_cache_hit": {
+            "calls": 5,
+            "inclusive_ns": 953,
+            "exclusive_ns": 953
+          },
+          "history.inverse_diff": {
+            "calls": 1,
+            "inclusive_ns": 1757050,
+            "exclusive_ns": 1757050
+          },
+          "history.journal_after_block": {
+            "calls": 3,
+            "inclusive_ns": 1126161,
+            "exclusive_ns": 1126161
+          },
+          "history.journal_first_old": {
+            "calls": 3,
+            "inclusive_ns": 1170856,
+            "exclusive_ns": 1170856
+          },
+          "history.journal_header": {
+            "calls": 2,
+            "inclusive_ns": 740632,
+            "exclusive_ns": 740632
+          },
+          "history.journal_mutable_access": {
+            "calls": 5,
+            "inclusive_ns": 321688,
+            "exclusive_ns": 321688
+          },
+          "history.journal_project": {
+            "calls": 1,
+            "inclusive_ns": 3057022,
+            "exclusive_ns": 19373
+          },
+          "history.journal_seal": {
+            "calls": 1,
+            "inclusive_ns": 10060129,
+            "exclusive_ns": 5246057
+          },
+          "history.resources": {
+            "calls": 2,
+            "inclusive_ns": 502548,
+            "exclusive_ns": 96130
+          },
+          "history.snapshot": {
+            "calls": 2,
+            "inclusive_ns": 449322,
+            "exclusive_ns": 449322
+          },
+          "offscreen.validate": {
+            "calls": 1,
+            "inclusive_ns": 58138,
+            "exclusive_ns": 58138
+          },
+          "stats.effective": {
+            "calls": 3,
+            "inclusive_ns": 5848,
+            "exclusive_ns": 5848
+          },
+          "vision.lighting_dependency_check": {
+            "calls": 6,
+            "inclusive_ns": 447099,
+            "exclusive_ns": 255720
+          },
+          "vision.lighting_field_build": {
+            "calls": 1,
+            "inclusive_ns": 191379,
+            "exclusive_ns": 191379
+          },
+          "vision.native_terrain_mask": {
+            "calls": 1,
+            "inclusive_ns": 391815,
+            "exclusive_ns": 308870
+          },
+          "vision.observer_field_build": {
+            "calls": 1,
+            "inclusive_ns": 36252,
+            "exclusive_ns": 36252
+          },
+          "vision.optical_field_build": {
+            "calls": 1,
+            "inclusive_ns": 825,
+            "exclusive_ns": 825
+          }
+        }
+      ]
+    }
+  ]
+}

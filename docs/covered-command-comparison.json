@@ -1,0 +1,35 @@
+{
+  "scope": "Controlled13-command Avatar room trace, not arbitrary generated gameplay or renderer performance",
+  "source_parity": "validation/covered-benchmark-parity-2023.log:13 commands, all current and reconstructed temporal fields",
+  "concurrent_load": "Other implementation and test processes were active; repeat under quiet load before release claims",
+  "rows": [
+    {
+      "ledger_entries": 0,
+      "native": {
+        "median_us": 1922.453,
+        "p95_us": 2898.196,
+        "samples": 1300
+      },
+      "reference": {
+        "median_us": 35956.491000000824,
+        "p95_us": 58368.21399999826,
+        "samples": 260
+      },
+      "ratio_medians": 18.703443465198276
+    },
+    {
+      "ledger_entries": 100000,
+      "native": {
+        "median_us": 2185.785,
+        "p95_us": 3571.4990000000003,
+        "samples": 1300
+      },
+      "reference": {
+        "median_us": 36041.511999996146,
+        "p95_us": 55344.529000001785,
+        "samples": 260
+      },
+      "ratio_medians": 16.489047184419395
+    }
+  ]
+}

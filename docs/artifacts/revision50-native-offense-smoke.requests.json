@@ -1,0 +1,182 @@
+[
+  {
+    "kind": "rat",
+    "scenario": "adjacent",
+    "revision": 46,
+    "profiles": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ]
+    ],
+    "trials": 4,
+    "seed_prefix": "r50-native-bare:rat:adjacent",
+    "max_turns": 128,
+    "settle_turns": 64,
+    "settlement_strategy": "escape",
+    "include_trials": true
+  },
+  {
+    "kind": "rat",
+    "scenario": "adjacent",
+    "revision": 50,
+    "profiles": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ]
+    ],
+    "trials": 4,
+    "seed_prefix": "r50-native-bare:rat:adjacent",
+    "max_turns": 128,
+    "settle_turns": 64,
+    "settlement_strategy": "escape",
+    "include_trials": true
+  },
+  {
+    "kind": "shellback-beetle",
+    "scenario": "adjacent",
+    "revision": 46,
+    "profiles": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ]
+    ],
+    "trials": 4,
+    "seed_prefix": "r50-native-bare:shellback-beetle:adjacent",
+    "max_turns": 128,
+    "settle_turns": 64,
+    "settlement_strategy": "escape",
+    "include_trials": true
+  },
+  {
+    "kind": "shellback-beetle",
+    "scenario": "adjacent",
+    "revision": 50,
+    "profiles": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
+      ]
+    ],
+    "trials": 4,
+    "seed_prefix": "r50-native-bare:shellback-beetle:adjacent",
+    "max_turns": 128,
+    "settle_turns": 64,
+    "settlement_strategy": "escape",
+    "include_trials": true
+  }
+]

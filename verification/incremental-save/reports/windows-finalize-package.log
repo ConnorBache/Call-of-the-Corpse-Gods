@@ -1,0 +1,9 @@
+{
+  "path": "incremental-save/package/corpse-gods-native-r39-incremental-save-windows-final.zip",
+  "bytes": 19717928,
+  "sha256": "ac425fdcff13279b5e06152da039057e671c93a0c6f4d9c3ac7dbbaefe3e3293",
+  "archive_verified": true,
+  "windows_runtime_verified": false,
+  "base_archive_sha256": "8c125a750fba2db39de7e8da73affa02bbeb61dd1c23c5c0ff3c6a0804e57e19",
+  "binary_and_asset_bytes_unchanged": true
+}

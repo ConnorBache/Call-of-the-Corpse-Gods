@@ -1,0 +1,41 @@
+
+running 8 tests
+test offscreen_low_energy_stair_follower_keeps_chase_and_arrives_off_stair ... FAILED
+test offscreen_low_energy_hunt_persists_then_finishes_at_stair_edge ... FAILED
+test observation_and_queries_do_not_mutate_saved_run_or_rng ... ok
+test hunter_refreshes_awareness_at_old_location_if_player_is_plausibly_visible ... ok
+test successful_sleep_detection_records_awareness_without_an_extra_wandering_roll ... ok
+test unseen_stair_goal_finishes_at_legal_edge_but_visible_target_is_reacquired ... FAILED
+test approved_heart_rewards_keep_existing_bonuses_and_only_change_new_revision_drops ... ok
+test hunter_reaches_stored_location_before_forgetting_without_live_position_tracking ... ok
+
+failures:
+
+---- offscreen_low_energy_stair_follower_keeps_chase_and_arrives_off_stair stdout ----
+
+thread 'offscreen_low_energy_stair_follower_keeps_chase_and_arrives_off_stair' (38) panicked at crates/corpse-core/tests/revision51_perception_lifecycle.rs:107:2:
+assertion failed: r.actors_at(1.).iter().all(|a| a.id != id)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- offscreen_low_energy_hunt_persists_then_finishes_at_stair_edge stdout ----
+
+thread 'offscreen_low_energy_hunt_persists_then_finishes_at_stair_edge' (37) panicked at crates/corpse-core/tests/revision51_perception_lifecycle.rs:89:3:
+assertion `left == right` failed
+  left: "sleeping"
+ right: "hunting"
+
+---- unseen_stair_goal_finishes_at_legal_edge_but_visible_target_is_reacquired stdout ----
+
+thread 'unseen_stair_goal_finishes_at_legal_edge_but_visible_target_is_reacquired' (40) panicked at crates/corpse-core/tests/revision51_perception_lifecycle.rs:76:35:
+assertion `left == right` failed
+  left: "hunting"
+ right: "wandering"
+
+
+failures:
+    offscreen_low_energy_hunt_persists_then_finishes_at_stair_edge
+    offscreen_low_energy_stair_follower_keeps_chase_and_arrives_off_stair
+    unseen_stair_goal_finishes_at_legal_edge_but_visible_target_is_reacquired
+
+test result: FAILED. 5 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

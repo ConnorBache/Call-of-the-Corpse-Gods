@@ -1,0 +1,1666 @@
+{
+  "profile": "optimized-tests",
+  "sample": "fully generated and populated seed runs; selected floors20,30,40",
+  "floors": 12,
+  "elapsedSeconds": 8.166613592,
+  "rows": [
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 20.0,
+      "domain": "Meadow",
+      "actors": 37,
+      "ground": 8,
+      "counts": {
+        "shapeAttempts": 3,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 2,
+        "assignmentRejections": 1,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 6,
+        "acceptedGroups": 3,
+        "acceptedTwoSourceGroups": 0
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 30.0,
+      "domain": "Cave",
+      "actors": 52,
+      "ground": 11,
+      "counts": {
+        "shapeAttempts": 1,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 1,
+        "assignmentRejections": 0,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 6,
+        "acceptedGroups": 3,
+        "acceptedTwoSourceGroups": 0
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 40.0,
+      "domain": "Dungeon",
+      "actors": 21,
+      "ground": 7,
+      "counts": {
+        "shapeAttempts": 14,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 2,
+        "assignmentRejections": 1,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 12,
+        "acceptedGroups": 5,
+        "acceptedTwoSourceGroups": 2
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 20.0,
+      "domain": "Mountain",
+      "actors": 53,
+      "ground": 8,
+      "counts": {
+        "shapeAttempts": 5,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 2,
+        "assignmentRejections": 1,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 12,
+        "acceptedGroups": 6,
+        "acceptedTwoSourceGroups": 0
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 30.0,
+      "domain": "Cave",
+      "actors": 47,
+      "ground": 7,
+      "counts": {
+        "shapeAttempts": 11,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 1,
+        "assignmentRejections": 0,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 7,
+        "acceptedGroups": 3,
+        "acceptedTwoSourceGroups": 1
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 40.0,
+      "domain": "Forest",
+      "actors": 38,
+      "ground": 8,
+      "counts": {
+        "shapeAttempts": 3,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 1,
+        "assignmentRejections": 0,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 7,
+        "acceptedGroups": 3,
+        "acceptedTwoSourceGroups": 1
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 20.0,
+      "domain": "Mountain",
+      "actors": 51,
+      "ground": 8,
+      "counts": {
+        "shapeAttempts": 29,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 2,
+        "assignmentRejections": 1,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 12,
+        "acceptedGroups": 5,
+        "acceptedTwoSourceGroups": 2
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 30.0,
+      "domain": "Meadow",
+      "actors": 37,
+      "ground": 8,
+      "counts": {
+        "shapeAttempts": 1,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 4,
+        "assignmentRejections": 3,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 8,
+        "acceptedGroups": 4,
+        "acceptedTwoSourceGroups": 0
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 40.0,
+      "domain": "Mountain",
+      "actors": 22,
+      "ground": 11,
+      "counts": {
+        "shapeAttempts": 10,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 3,
+        "assignmentRejections": 2,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 17,
+        "acceptedGroups": 8,
+        "acceptedTwoSourceGroups": 1
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 20.0,
+      "domain": "Forest",
+      "actors": 44,
+      "ground": 8,
+      "counts": {
+        "shapeAttempts": 2,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 6,
+        "assignmentRejections": 5,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 13,
+        "acceptedGroups": 5,
+        "acceptedTwoSourceGroups": 3
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 30.0,
+      "domain": "Archipelago",
+      "actors": 37,
+      "ground": 6,
+      "counts": {
+        "shapeAttempts": 48,
+        "shapeCandidates": 0,
+        "assignmentAttempts": 0,
+        "assignmentRejections": 0,
+        "safetyRejections": 0,
+        "acceptedPockets": 0,
+        "acceptedCells": 0,
+        "acceptedGroups": 0,
+        "acceptedTwoSourceGroups": 0
+      }
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 40.0,
+      "domain": "Dungeon",
+      "actors": 19,
+      "ground": 11,
+      "counts": {
+        "shapeAttempts": 22,
+        "shapeCandidates": 1,
+        "assignmentAttempts": 1,
+        "assignmentRejections": 0,
+        "safetyRejections": 0,
+        "acceptedPockets": 1,
+        "acceptedCells": 6,
+        "acceptedGroups": 3,
+        "acceptedTwoSourceGroups": 0
+      }
+    }
+  ],
+  "allGeneratedFloors": [
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 1.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 17,
+      "ground": 2
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 2.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 3
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 3.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 15,
+      "ground": 5
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 4.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 16,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 5.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 21,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 6.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 3
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 7.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 22,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 8.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 9.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 22,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 10.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 27,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 11.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 18,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 12.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 21,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 13.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 23,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 14.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 22,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 15.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 21,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 16.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 24,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 17.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 24,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 18.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 35,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 19.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 31,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 20.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 37,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 21.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 45,
+      "ground": 5
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 22.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 50,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 23.0,
+      "domain": "Archipelago",
+      "pockets": 1,
+      "cells": 10,
+      "actors": 42,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 24.0,
+      "domain": "Archipelago",
+      "pockets": 1,
+      "cells": 13,
+      "actors": 40,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 25.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 46,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 26.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 13,
+      "actors": 38,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 27.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 9,
+      "actors": 20,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 28.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 8,
+      "actors": 19,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 29.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 20,
+      "actors": 21,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 30.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 52,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 31.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 46,
+      "ground": 9
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 32.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 35,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 33.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 21,
+      "actors": 36,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 34.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 33,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 35.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 21,
+      "actors": 39,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 36.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 16,
+      "actors": 21,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 37.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 8,
+      "actors": 20,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 38.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 17,
+      "actors": 19,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 39.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 11,
+      "actors": 17,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:0",
+      "depth": 40.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 12,
+      "actors": 21,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 1.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 2
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 2.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 18,
+      "ground": 4
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 3.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 14,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 4.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 5.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 5
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 6.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 18,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 7.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 21,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 8.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 9.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 10.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 11.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 25,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 12.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 25,
+      "ground": 10
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 13.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 27,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 14.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 29,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 15.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 30,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 16.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 29,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 17.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 27,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 18.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 28,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 19.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 27,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 20.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 12,
+      "actors": 53,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 21.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 12,
+      "actors": 41,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 22.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 41,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 23.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 37,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 24.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 39,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 25.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 9,
+      "actors": 45,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 26.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 46,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 27.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 9,
+      "actors": 20,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 28.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 22,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 29.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 8,
+      "actors": 21,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 30.0,
+      "domain": "Cave",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 47,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 31.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 23,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 32.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 9,
+      "actors": 21,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 33.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 28,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 34.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 24,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 35.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 20,
+      "ground": 12
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 36.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 10,
+      "actors": 38,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 37.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 42,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 38.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 15,
+      "actors": 43,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 39.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 36,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:1",
+      "depth": 40.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 38,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 1.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 3
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 2.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 16,
+      "ground": 2
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 3.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 14,
+      "ground": 5
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 4.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 5.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 16,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 6.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 23,
+      "ground": 3
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 7.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 8.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 9.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 10.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 25,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 11.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 23,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 12.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 26,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 13.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 26,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 14.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 27,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 15.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 30,
+      "ground": 10
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 16.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 36,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 17.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 25,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 18.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 30,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 19.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 28,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 20.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 12,
+      "actors": 51,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 21.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 43,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 22.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 17,
+      "actors": 43,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 23.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 39,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 24.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 23,
+      "actors": 42,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 25.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 39,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 26.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 12,
+      "actors": 24,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 27.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 30,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 28.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 13,
+      "actors": 30,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 29.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 12,
+      "actors": 28,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 30.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 8,
+      "actors": 37,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 31.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 21,
+      "actors": 30,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 32.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 9,
+      "actors": 24,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 33.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 23,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 34.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 24,
+      "ground": 12
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 35.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 13,
+      "actors": 20,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 36.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 8,
+      "actors": 20,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 37.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 19,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 38.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 10,
+      "actors": 19,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 39.0,
+      "domain": "Mountain",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 17,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:2",
+      "depth": 40.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 17,
+      "actors": 22,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 1.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 24,
+      "ground": 3
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 2.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 16,
+      "ground": 3
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 3.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 2
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 4.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 18,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 5.0,
+      "domain": "Dungeon",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 17,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 6.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 7.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 8.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 19,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 9.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 21,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 10.0,
+      "domain": "Cave",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 27,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 11.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 21,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 12.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 20,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 13.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 22,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 14.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 24,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 15.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 26,
+      "ground": 10
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 16.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 25,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 17.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 27,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 18.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 38,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 19.0,
+      "domain": "Forest",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 39,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 20.0,
+      "domain": "Forest",
+      "pockets": 1,
+      "cells": 13,
+      "actors": 44,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 21.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 46,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 22.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 7,
+      "actors": 22,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 23.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 8,
+      "actors": 24,
+      "ground": 11
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 24.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 12,
+      "actors": 19,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 25.0,
+      "domain": "Mountain",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 47,
+      "ground": 9
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 26.0,
+      "domain": "Archipelago",
+      "pockets": 1,
+      "cells": 8,
+      "actors": 43,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 27.0,
+      "domain": "Archipelago",
+      "pockets": 1,
+      "cells": 19,
+      "actors": 38,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 28.0,
+      "domain": "Archipelago",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 37,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 29.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 42,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 30.0,
+      "domain": "Archipelago",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 37,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 31.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 23,
+      "actors": 34,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 32.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 13,
+      "actors": 35,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 33.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 11,
+      "actors": 35,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 34.0,
+      "domain": "Meadow",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 44,
+      "ground": 9
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 35.0,
+      "domain": "Meadow",
+      "pockets": 0,
+      "cells": 0,
+      "actors": 43,
+      "ground": 7
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 36.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 17,
+      "actors": 22,
+      "ground": 6
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 37.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 10,
+      "actors": 20,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 38.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 11,
+      "actors": 20,
+      "ground": 8
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 39.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 22,
+      "ground": 10
+    },
+    {
+      "seed": "0-1-2:ne-r36-populated:3",
+      "depth": 40.0,
+      "domain": "Dungeon",
+      "pockets": 1,
+      "cells": 6,
+      "actors": 19,
+      "ground": 11
+    }
+  ]
+}

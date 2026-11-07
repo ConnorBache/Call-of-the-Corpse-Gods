@@ -1,0 +1,115 @@
+{
+  "seed": "0-1-2:native-port-baseline",
+  "scope": "Same frozen generated payloads; setup included for history operations as named; shared-host CPU measurement.",
+  "checksum": 18310,
+  "results": [
+    {
+      "floors": 10,
+      "bytes": 971588,
+      "cases": [
+        {
+          "operation": "parse",
+          "samples": 20,
+          "median_us": 3741.4669999998296,
+          "p95_us": 6757.544000000053
+        },
+        {
+          "operation": "snapshot",
+          "samples": 30,
+          "median_us": 7997.798999999986,
+          "p95_us": 10565.36200000005
+        },
+        {
+          "operation": "snapshot-and-touch-floor",
+          "samples": 30,
+          "median_us": 7039.287999999942,
+          "p95_us": 8944.083000000091
+        },
+        {
+          "operation": "snapshot-history-export",
+          "samples": 10,
+          "median_us": 52934.70999999999,
+          "p95_us": 57253.185999999914
+        },
+        {
+          "operation": "snapshot-history-undo",
+          "samples": 10,
+          "median_us": 81351.30200000003,
+          "p95_us": 85135.97499999969
+        }
+      ]
+    },
+    {
+      "floors": 20,
+      "bytes": 2053697,
+      "cases": [
+        {
+          "operation": "parse",
+          "samples": 20,
+          "median_us": 11903.682999999546,
+          "p95_us": 38494.982000000164
+        },
+        {
+          "operation": "snapshot",
+          "samples": 30,
+          "median_us": 15841.188999999758,
+          "p95_us": 20540.388999999777
+        },
+        {
+          "operation": "snapshot-and-touch-floor",
+          "samples": 30,
+          "median_us": 14004.158999999163,
+          "p95_us": 21880.592999999863
+        },
+        {
+          "operation": "snapshot-history-export",
+          "samples": 10,
+          "median_us": 143668.26300000047,
+          "p95_us": 179008.70599999963
+        },
+        {
+          "operation": "snapshot-history-undo",
+          "samples": 10,
+          "median_us": 118379.08900000002,
+          "p95_us": 149788.5669999996
+        }
+      ]
+    },
+    {
+      "floors": 40,
+      "bytes": 4198691,
+      "cases": [
+        {
+          "operation": "parse",
+          "samples": 20,
+          "median_us": 16606.94500000136,
+          "p95_us": 27861.50599999928
+        },
+        {
+          "operation": "snapshot",
+          "samples": 30,
+          "median_us": 34472.06499999993,
+          "p95_us": 48846.11000000041
+        },
+        {
+          "operation": "snapshot-and-touch-floor",
+          "samples": 30,
+          "median_us": 36000.47099999938,
+          "p95_us": 44931.95700000069
+        },
+        {
+          "operation": "snapshot-history-export",
+          "samples": 10,
+          "median_us": 244206.16800000062,
+          "p95_us": 263641.3339999999
+        },
+        {
+          "operation": "snapshot-history-undo",
+          "samples": 10,
+          "median_us": 245785.85600000224,
+          "p95_us": 280018.90300000017
+        }
+      ]
+    }
+  ]
+}

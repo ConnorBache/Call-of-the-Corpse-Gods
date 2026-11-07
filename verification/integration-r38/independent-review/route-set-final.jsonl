@@ -1,0 +1,5 @@
+{"seed":"r37-event-count-0078","prior_invariant_errors":["stairs-unreachable:30"],"candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"93","prior_invariant_errors":["stairs-unreachable:32"],"candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"生成-é-🌱-113","prior_invariant_errors":["stairs-unreachable:27"],"candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"0-1-2:qa-120","prior_invariant_errors":["stairs-unreachable:22"],"candidate":{"Ok":{"floors":40,"errors":[]}}}
+{"seed":"11-10-9:qa-127","prior_invariant_errors":["stairs-unreachable:27"],"candidate":{"Ok":{"floors":40,"errors":[]}}}

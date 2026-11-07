@@ -1,0 +1,9 @@
+{
+  "exporterVersion": 1,
+  "cases": 4,
+  "commands": 20,
+  "sha256": "2be88b62ccc06cf894937a395244eae043bd943a10064bcce2bed851c52f1818",
+  "source": "frozen release-v48",
+  "sourceSha256": "9e03af22f8bb5eb352323d751523939d8eaffd5f75a1a3cf3d46252dc07b5f2a",
+  "exporterSha256": "b8fc4ea5cd70ef12947839b1d64d8d684af87934f19e134d15472eb8d9a88644"
+}

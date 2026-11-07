@@ -1,0 +1,26 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 1m 21s
+     Running tests/shard_weapon_independent_r39.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shard_weapon_independent_r39-478025afbba7b049)
+
+running 17 tests
+test dream_plane_target_is_not_harmed_from_waking_plane ... ok
+test mainhand_ordinary_kill_does_not_spend_offhand_shard_or_add_stone_text ... ok
+test ordinary_death_never_gets_shard_stone_sentence ... ok
+test erase_metaphysical_cannot_erase_the_shards_permanent_death_marker ... ok
+test deflected_melee_or_thrown_shard_hits_actual_target_once_without_false_corpse_log ... ok
+test dream_throw_miss_ignores_waking_actor_preserves_anchor_and_recovers_only_in_dream ... ok
+test saved_permanent_death_and_snapshot_restore_keep_item_identity_consistent ... ok
+test nightmare_shard_death_has_no_stone_suffix_without_you_kill_chronicle ... ok
+test shard_strike_preserves_active_nova_after_attack ... ok
+test player_counterstrike_uses_its_equipped_mainhand_shard ... ok
+test successful_shard_hit_bypasses_sphinx_immunity_and_death_rescue_and_revival ... ok
+test successful_hit_only_policy_preserves_melee_miss_and_recovers_thrown_miss ... ok
+test thrown_shard_through_portal_kills_resolved_actor_once_and_leaves_no_shard ... ok
+test two_shards_and_assault_do_not_reuse_consumed_weapon_or_spend_unused_hand ... ok
+test thrown_shard_crosses_random_non_euclidean_branch_and_resolves_one_hit ... ok
+test thrown_shard_hits_only_dream_actor_overlapping_waking_actor ... ok
+test command_boundary_equipped_attack_and_dream_throw_replay_deterministically ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

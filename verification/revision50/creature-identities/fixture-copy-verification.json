@@ -1,0 +1,90 @@
+{
+  "exact_fixture_bytes_preserved": true,
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 4826,
+      "sha256": "4f57f705670a1a7e871abe88b94085bbe4291a07986b0f0370f04779f468abf5"
+    },
+    {
+      "path": "SHA256SUMS",
+      "bytes": 1318,
+      "sha256": "f1589d68da684bfb34858809c6c930504f8d0adf85b01d732299ebbbd6163f98"
+    },
+    {
+      "path": "build-provenance.json",
+      "bytes": 26959,
+      "sha256": "84db88f08a13c09e1a7c5e8e82ac9b4a0f812c1cefa65a8ac49fa6de370f0e28"
+    },
+    {
+      "path": "build.log",
+      "bytes": 11245,
+      "sha256": "052cfe99f9a4cd0223251219762db8c5eb9780e8758618b10d9b4404ca304ba4"
+    },
+    {
+      "path": "controlled-setup-run.json",
+      "bytes": 1866257,
+      "sha256": "10b06061549a4ca888633ff7d4e11aa5b8bdf71f0cdd106266dd151407855cde"
+    },
+    {
+      "path": "fixture-report.json",
+      "bytes": 2576,
+      "sha256": "dea9e14ae52e8efdbafae22b3186773382b7c39858d45845091d6620e990a252"
+    },
+    {
+      "path": "generate.log",
+      "bytes": 3198,
+      "sha256": "c26c9edee99f79ccf57ebbb6c019d7decce57331612b76d7cd59d349e3736229"
+    },
+    {
+      "path": "generated-start.json",
+      "bytes": 1861274,
+      "sha256": "0f02e8b220c6814fb3d1332afe7a5db25a002e3576517a87ff9b278cf942b409"
+    },
+    {
+      "path": "old-final-run.json",
+      "bytes": 4270254,
+      "sha256": "9db6a8032a5da9d891be15ec27c0701e1832ee8f00348075670bcb8e18b586b9"
+    },
+    {
+      "path": "old-incremental-recording.json",
+      "bytes": 3874689,
+      "sha256": "c6ff3295ffa39659a75dbdf1aab380c9be558443ae3435b81db612cad7790215"
+    },
+    {
+      "path": "old-incremental-recording.json.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "old-native-checkpoint.json",
+      "bytes": 3873681,
+      "sha256": "fb59dd6604402e85d5c8270a2f1433c125284efc330f5d709f05f2ad5c31ff55"
+    },
+    {
+      "path": "old-recording-checkpoint-prefix.bin",
+      "bytes": 3874152,
+      "sha256": "9714cc44f400f796c38704167312a45ec10b59b420898d988c2134c572fbc531"
+    },
+    {
+      "path": "old-restored-future-run.json",
+      "bytes": 1866712,
+      "sha256": "8f8558590308dc8c8f91d54dee3cf9e516496afe523f635c584df5136da8b13e"
+    },
+    {
+      "path": "old-run-with-future.json",
+      "bytes": 3873631,
+      "sha256": "b01c13472c6ce6de88e71a0ae305b509a9347b341bfd3d68afc540e0d569ab66"
+    },
+    {
+      "path": "source-verification.json",
+      "bytes": 97112,
+      "sha256": "4605bb5d088317795792f916ff1bfd847e785f808d3329ccd47a6271d19123fa"
+    },
+    {
+      "path": "toolchain.txt",
+      "bytes": 232,
+      "sha256": "db19261270b0428d1cffd44795917261238eab88402716d4f372b5b1c1350a6d"
+    }
+  ]
+}

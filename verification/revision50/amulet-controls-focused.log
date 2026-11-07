@@ -1,0 +1,50 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `corpse-core` (lib test) generated 2 warnings (run `cargo fix --lib -p corpse-core --tests` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 1m 31s
+     Running unittests src/lib.rs (../r50-optimized-target/debug/deps/corpse_core-c5176256c434b1cf)
+
+running 12 tests
+test revision50_control_amulets::tests::discord_is_mutual_preserves_allegiance_and_expires_after_six_ticks ... ok
+test revision50_control_amulets::tests::beckoning_failure_has_no_resource_or_state_mutation ... ok
+test revision50_control_amulets::tests::free_command_spends_cost_but_not_status_or_world_clocks ... ok
+test revision50_control_amulets::tests::obstruction_exact_perpendicular_unlimited_range_and_safe_expiry ... ok
+test revision50_control_amulets::tests::obstruction_rejects_occupied_stairs_portals_bounds_and_unknown_orientation ... ok
+test revision50_control_amulets::tests::beckoning_pulls_nearest_adjacent_and_breaks_roots ... ok
+test revision50_control_amulets::tests::target_plane_visibility_range_and_revision_are_enforced ... ok
+test revision50_control_amulets::tests::roots_tick_four_times_block_only_movement_and_break_on_fire ... FAILED
+test revision50_control_amulets::tests::obstruction_preview_does_not_probe_hidden_creature ... ok
+test revision50_control_amulets::tests::discord_haste_moves_only_without_ticking_status ... ok
+test revision50_control_amulets::tests::offscreen_normal_ticks_expire_terrain_and_control_statuses ... ok
+test revision50_control_amulets::tests::temporary_terrain_and_statuses_roundtrip_and_rewind_together ... ok
+
+failures:
+
+---- revision50_control_amulets::tests::roots_tick_four_times_block_only_movement_and_break_on_fire stdout ----
+
+thread 'revision50_control_amulets::tests::roots_tick_four_times_block_only_movement_and_break_on_fire' (80) panicked at crates/corpse-core/src/revision50_control_amulets.rs:358:53:
+assertion failed: !engine::move_actor(&mut r, 100., 1., 0., true).unwrap()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    revision50_control_amulets::tests::roots_tick_four_times_block_only_movement_and_break_on_fire
+
+test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 330 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p corpse-core --lib`

@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/workspace/scratch/69f53637ba6f/incremental-save/cache-work/baseline/crates/corpse-core/src/temporal.rs",
+    "sha256": "0cdd305d96c8a1d359734b3860886c96627634c70308723dad80340d8d460259",
+    "bytes": 53588
+  },
+  {
+    "path": "/workspace/scratch/69f53637ba6f/incremental-save/cache-work/source/crates/corpse-core/src/temporal.rs",
+    "sha256": "e5d3352ea720a485ca7055329565337727fafc35dc9bd4df1a27dc6c7f850cff",
+    "bytes": 62700
+  },
+  {
+    "path": "/workspace/scratch/69f53637ba6f/incremental-save/cache-work/source/crates/corpse-desktop/examples/cache_opening_bench.rs",
+    "sha256": "8fd2d87672b9866d6b2c5c732c03244774e3c475e1fe9cdfb81a50d365654c5b",
+    "bytes": 7655
+  },
+  {
+    "path": "/workspace/scratch/69f53637ba6f/incremental-save/cache-work/baseline/crates/corpse-desktop/examples/cache_opening_bench.rs",
+    "sha256": "8fd2d87672b9866d6b2c5c732c03244774e3c475e1fe9cdfb81a50d365654c5b",
+    "bytes": 7655
+  },
+  {
+    "path": "/workspace/scratch/69f53637ba6f/incremental-save/cache-work/bin/baseline-normal",
+    "sha256": "8435274c2fd77276434d1925856f12a2465902b3d8755c3048b2c7880a96c9a6",
+    "bytes": 56810928
+  },
+  {
+    "path": "/workspace/scratch/69f53637ba6f/incremental-save/cache-work/bin/candidate-normal",
+    "sha256": "5795088e45cc3c2326df69f14d85d8ea35f60412296eef33f53875a01758850f",
+    "bytes": 56675616
+  },
+  {
+    "path": "/workspace/scratch/69f53637ba6f/incremental-save/cache-work/bin/candidate-profiled",
+    "sha256": "366c799e43a617fd3fef2107302b5ae15a9626d88592c51c9dbe810805113b1a",
+    "bytes": 56994640
+  }
+]

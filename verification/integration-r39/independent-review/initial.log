@@ -1,0 +1,40 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 10.10s
+     Running tests/shard_weapon_independent_r39.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shard_weapon_independent_r39-478025afbba7b049)
+
+running 10 tests
+test dream_plane_target_is_not_harmed_from_waking_plane ... ok
+test ordinary_death_never_gets_shard_stone_sentence ... ok
+test player_counterstrike_uses_its_equipped_mainhand_shard ... FAILED
+test nightmare_shard_death_has_no_stone_suffix_without_you_kill_chronicle ... ok
+test thrown_shard_through_portal_kills_resolved_actor_once_and_leaves_no_shard ... ok
+test shard_strike_preserves_active_nova_after_attack ... FAILED
+test mainhand_ordinary_kill_does_not_spend_offhand_shard_or_add_stone_text ... ok
+test saved_permanent_death_and_snapshot_restore_keep_item_identity_consistent ... ok
+test successful_shard_hit_bypasses_sphinx_immunity_and_death_rescue_and_revival ... ok
+test two_shards_and_assault_do_not_reuse_consumed_weapon_or_spend_unused_hand ... ok
+
+failures:
+
+---- player_counterstrike_uses_its_equipped_mainhand_shard stdout ----
+
+thread 'player_counterstrike_uses_its_equipped_mainhand_shard' (82) panicked at crates/corpse-core/tests/shard_weapon_independent_r39.rs:133:5:
+assertion failed: dead(&r, id)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- shard_strike_preserves_active_nova_after_attack stdout ----
+
+thread 'shard_strike_preserves_active_nova_after_attack' (84) panicked at crates/corpse-core/tests/shard_weapon_independent_r39.rs:142:27:
+assertion `left == right` failed
+  left: 1000.0
+ right: 970.0
+
+
+failures:
+    player_counterstrike_uses_its_equipped_mainhand_shard
+    shard_strike_preserves_active_nova_after_attack
+
+test result: FAILED. 8 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p corpse-core --test shard_weapon_independent_r39`

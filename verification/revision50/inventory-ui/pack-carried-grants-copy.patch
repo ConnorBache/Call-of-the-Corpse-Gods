@@ -1,0 +1,52 @@
+--- a/crates/corpse-desktop/src/pack.rs
++++ b/crates/corpse-desktop/src/pack.rs
+@@ -1763,7 +1763,9 @@
+     if !stats.is_empty() {
+         lines.push(format!(
+             "{}: {stats}",
+-            if equipment::equippable(i) {
++            if corpse_core::revision50::enabled(run) && matches!(i.kind.as_str(), "ring" | "amulet") {
++                "While carried"
++            } else if equipment::equippable(i) {
+                 "When equipped"
+             } else {
+                 "Inactive equipment bonuses"
+@@ -1773,7 +1775,9 @@
+     for id in i.granted_ability.as_ref().filter(|s| !s.is_empty()).into_iter().chain(i.additional_granted_abilities.iter().filter(|_| run.simulation_revision.value_or(29.) >= 50.)) {
+         lines.push(format!(
+             "{} {}.",
+-            if equipment::equippable(i) {
++            if corpse_core::revision50::enabled(run) && matches!(i.kind.as_str(), "ring" | "amulet") {
++                "While carried: grants"
++            } else if equipment::equippable(i) {
+                 "While equipped: grants"
+             } else {
+                 "Inactive equipment grant:"
+@@ -2988,6 +2992,27 @@
+         let r=run(); let i=Item { kind:"ring".into(),granted_ability:"shrail-execute".to_string().into(), additional_granted_abilities:vec!["kative-appropriate".into()],..Default::default() };
+         let text=describe_item(&r,&i);assert!(text.contains("Execute"));assert!(text.contains("Appropriate"));assert!(text.contains("energy costs from amulets by 10"));
+     }
++    #[test] fn carried_jewelry_grant_and_bonus_copy_preserves_legacy() {
++        let mut r=run();
++        for kind in ["ring", "amulet"] {
++            for equipped in [Field::Missing, "ring1".to_string().into()] {
++                let item=Item{kind:kind.into(),equipped,
++                    bonus:PartialStats{offense:1.0.into(),..Default::default()}.into(),
++                    granted_ability:"shrail-execute".to_string().into(),
++                    additional_granted_abilities:vec!["kative-appropriate".into()],..Default::default()};
++                r.simulation_revision=50.0.into();
++                let text=describe_item(&r,&item);
++                assert!(text.contains("While carried: grants Execute."));
++                assert!(text.contains("While carried: grants Appropriate."));
++                assert!(!text.contains("While equipped")&&!text.contains("When equipped"));
++                r.simulation_revision=49.0.into();
++                let text=describe_item(&r,&item);
++                assert!(text.contains("While equipped: grants Execute."));
++                assert!(text.contains("When equipped:"));
++                assert!(!text.contains("While carried"));
++            }
++        }
++    }
+     #[test] fn reserve_changes_invalidate_pack_and_reach_item_tooltips() {
+         let mut r=run();r.player.energy=0.;
+         let id="numo-implant-thought";

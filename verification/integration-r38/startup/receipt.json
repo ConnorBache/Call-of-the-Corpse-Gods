@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "revision": 38,
+  "unit_recovery_tests": 5,
+  "integration_tests": 3,
+  "failures": 0,
+  "known_seed_full_worlds": [
+    "r37-event-count-0047",
+    "\u751f\u6210-\u00e9-\ud83c\udf31-35",
+    "heart-audit-000071",
+    "r37-event-count-0078",
+    "93",
+    "\u751f\u6210-\u00e9-\ud83c\udf31-113",
+    "0-1-2:qa-120",
+    "11-10-9:qa-127"
+  ],
+  "historical_failure_preserved": true,
+  "production_files": [
+    "crates/corpse-core/src/startup.rs",
+    "crates/corpse-core/src/population.rs"
+  ],
+  "test_file": "crates/corpse-core/tests/startup_recovery_r38.rs",
+  "file_hashes": {
+    "crates/corpse-core/src/startup.rs": "94ece701130cd2fd2c2a587b83754ba8305c6e21c2b944ad67855cc99fa83a8c",
+    "crates/corpse-core/src/population.rs": "55efcf9f6b1d986cc7c90b75a225ad90c0716c895f350097aa2874f87c0b7a4f",
+    "crates/corpse-core/tests/startup_recovery_r38.rs": "2e923cdb0d7ccb97283dc1d89d499d98e881a4afc5c73f952c9601abff1fbeb2"
+  },
+  "initial_test_only_error": "First integration assertion summed optional creature_kind and missed fungi. Corrected to actual generated heart rewards; production unchanged.",
+  "post_decoration_safe_transition_gate": true
+}

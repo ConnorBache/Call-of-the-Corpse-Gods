@@ -1,0 +1,50 @@
+Runtime terrain implementation (r37)
+
+New player-facing text longer than three words:
+- crates/corpse-core/src/terrain_runtime.rs: slip() logs "You slip on the ice."
+  Authorship: user verbatim, latest Sub-Biomes and Environmental Terrain message.
+- No newly assistant-authored player-facing prose in this runtime slice.
+  The puddle description is implemented separately in presentation.
+
+Complexity:
+- Slip lookup O(1), plus existing flight/species-catalog lookup (bounded catalog),
+  once per admitted voluntary movement action, at most one serialized RNG draw.
+  Pure path/target queries do not draw. Invalid steps and attacks do not slip.
+- Snow contact O(1) plus existing actor/flight lookup; first puddle-array allocation
+  O(V) space/time. V is number of floor cells. Subsequent mutations O(1).
+- Snow/fire overlap scan O(V) per environment tick, up to O(V) changed-cell scratch.
+  Actor contact pass adds O(A) contact tests plus existing actor lookup costs.
+- Hellfire environment normalization and fire advance add O(V) scans, with up to
+  O(H) scratch for H active sources. Existing propagation and actor damage costs
+  remain unchanged and are not included in the O(V) terrain overlay scan claim.
+- Offscreen dynamic-floor classification adds O(V) Hellfire scan; these floors use
+  precise existing environment turns rather than stationary approximate catch-up.
+
+Behavioral defaults:
+- Melted snow leaves an aesthetic puddle overlay; it does not create swimming,
+  currents or a new water tile. Ice beneath snow remains ice (no ice melting rule
+  was requested).
+- Flying bodies do not physically contact snow; their emitted ordinary fire can.
+  Permanent-burning and fire-immune creatures retain their water-equivalent
+  burning immunity behavior, while physical contact still melts the snow.
+- Hellfire is a boolean terrain source with existing non-expiring brazier fire
+  lifetime; only its own cells remain permanent. Spread produces ordinary fire.
+  Terrain destruction may remove the underlying Hellfire cell along with floor.
+
+Ordered walking follow-up:
+- A direct step between endpoints of the actor's CURRENT ordered speed-up pair
+  stays on the entered square (one ordinary walking step). Entering a different
+  pair still crosses its link. Shared occupancy and projectile exits unchanged.
+- portals::walking_exits is a pure O(S) lookup over S ordered pairs (bounded by
+  generated-area limits), currently allocates O(S) ordered-pair scratch per call.
+- distance_field_ordered stores O(V) ordered mate lookup, adds at most one direct
+  predecessor per cell, and excludes old pair self-loops. This preserves the
+  existing O(V+E) plain/O((V+E)log V) hazardous path search bounds and O(V+E) memory;
+  map degree remains bounded by eight physical neighbors plus linked entries.
+- All core runtime path callers supply ordered links only for r37. The original
+  distance_field_portals API forwards an empty ordered set, preserving legacy.
+- Added five deterministic tests: every interior start in both directions,
+  immediate reversal, side entry, two-cell progress, exact NPC planned/executed
+  path lengths (both deterministic and stochastic-aware field code paths),
+  shared occupancy, and unchanged random links/projectile transfer.
+- Final targeted result: 17 passed, 0 failed. See ordered-tests.log.

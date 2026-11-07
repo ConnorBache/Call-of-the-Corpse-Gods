@@ -1,0 +1,86 @@
+{
+  "status": "failed_invariants",
+  "requested": 1024,
+  "complete_generated_worlds": 1024,
+  "floors": 40960,
+  "generation_errors": 0,
+  "invariant_failed_worlds": 5,
+  "failures": [
+    {
+      "index": 624,
+      "seed": "r37-event-count-0078",
+      "normalized_seed": "3-6-9:r37-event-count-0078",
+      "revision": 38.0,
+      "floors": 40,
+      "population_retries": 0,
+      "errors": [
+        "stairs-unreachable:30"
+      ],
+      "repeated": false,
+      "loaded": false,
+      "elapsed_ms": 2364
+    },
+    {
+      "index": 746,
+      "seed": "93",
+      "normalized_seed": "0-3-6:93",
+      "revision": 38.0,
+      "floors": 40,
+      "population_retries": 0,
+      "errors": [
+        "stairs-unreachable:32"
+      ],
+      "repeated": false,
+      "loaded": false,
+      "elapsed_ms": 2630
+    },
+    {
+      "index": 909,
+      "seed": "生成-é-🌱-113",
+      "normalized_seed": "2-1-8:生成-é-🌱-113",
+      "revision": 38.0,
+      "floors": 40,
+      "population_retries": 0,
+      "errors": [
+        "stairs-unreachable:27"
+      ],
+      "repeated": false,
+      "loaded": false,
+      "elapsed_ms": 1915
+    },
+    {
+      "index": 963,
+      "seed": "0-1-2:qa-120",
+      "normalized_seed": "0-1-2:qa-120",
+      "revision": 38.0,
+      "floors": 40,
+      "population_retries": 0,
+      "errors": [
+        "stairs-unreachable:22"
+      ],
+      "repeated": false,
+      "loaded": false,
+      "elapsed_ms": 2113
+    },
+    {
+      "index": 1020,
+      "seed": "11-10-9:qa-127",
+      "normalized_seed": "11-10-9:qa-127",
+      "revision": 38.0,
+      "floors": 40,
+      "population_retries": 0,
+      "errors": [
+        "stairs-unreachable:27"
+      ],
+      "repeated": false,
+      "loaded": false,
+      "elapsed_ms": 2740
+    }
+  ],
+  "fingerprint": "c28003a4b1a36df7c533c868561b1b4f05b6f11ded250ac053f8f095bed121f4",
+  "environment_restart": {
+    "before_completed": 614,
+    "resumed_completed": 410,
+    "interrupted_attempts_upper_bound": 4
+  }
+}

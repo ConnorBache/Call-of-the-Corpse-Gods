@@ -1,0 +1,15 @@
+
+running 10 tests
+test ichor_fish_catalog_matches_all_depth_bands ... ok
+test static_environment_matches_complete_v48_state ... ok
+test generated_currents_match_v48 ... ok
+test observed_hazards_match_v48 ... ok
+test ichor_dispatch_matches_reference ... ok
+test active_environment_matches_v48 ... ok
+test ordinary_explosion_and_gas_closure_match_v48 ... ok
+test divine_compound_dispatch_matches_reference ... ok
+test supported_offscreen_catchup_matches_v48 ... ok
+test status_dispatch_matches_reference ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.23s
+

@@ -1,0 +1,43 @@
+THE CALL OF THE CORPSE GODS — R32 MONSTER REBALANCE
+Final verification record — 2026-10-26
+
+Scope
+This is the accepted revision 32 role-first rebalance source checkpoint.
+New games use revision 32; revision 29–31 behavior remains compatibility-gated.
+Percentages are rough design guidelines, not universal exact-fit guarantees.
+The accepted mechanics include energy-gated summons, a shared ten-world-turn
+summoning cooldown, and heartless children from heartless parents.
+Later Witch/summon feature work is not included in this checkpoint.
+
+Native workspace verification
+Final aggregate: 505 passed, 0 failed, 1 ignored; process exit status 0.
+The ignored test is an opt-in paint benchmark, not a failed gameplay test.
+All 593 recorded build-input hashes were unchanged through the final QA run.
+These are the corrected aggregate counts; earlier summary-line-derived counts
+are superseded and must not be presented as test totals.
+
+Frozen native balance audit
+532 output rows, 43,008 actual native trials, 0 execution errors.
+The final verification receipt reports that source/input hashes were unchanged.
+Full primary, layer, support, and hazard-stress measurements and reproducible
+inputs are in tools/monster-balance/final and its documented case/cohort files.
+Death, censoring, incomplete lifetimes, lingering hazards, and role exceptions
+remain explicit; these measurements do not establish all-scenario balance.
+See docs/monster-balance-v32.md and docs/monster-balance-native-audit.md.
+
+Platform and artwork boundaries
+Tests and measurements were executed in the cloud Linux workspace.
+This deliverable is source, not a newly built Windows executable. No new Windows
+build, Windows runtime verification, or broad interactive platform QA is claimed.
+Rust 1.99.1 and Cargo.lock are preserved.
+All 81 original creature PNGs, 81 runtime RGBA PNGs, and the existing alpha
+pipeline are preserved. Existing artwork review status is unchanged: one
+authored-alpha-preserved plate, 77 legacy references needing manual masks, and
+three reviewed partial cleanups needing manual edge review. This is not a claim
+that creature-art cleanup is complete. The bestiary retains 79 entries.
+
+Package integrity
+SOURCE-MANIFEST.json describes the packaged files. The prior source manifest is
+preserved separately as verification/historical-r31-creature-alpha-pipeline-source-manifest.json.
+Toolchains, build outputs, temporary logs, private QA working files, preliminary
+measurements, superseded fitting artifacts, and unused downloads are excluded.

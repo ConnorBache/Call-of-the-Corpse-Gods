@@ -1,0 +1,154 @@
+[
+  {
+    "floors": "1-5",
+    "name": "Small Nightmare",
+    "baseline": "bear",
+    "hp": 136.0,
+    "offense": 46.0,
+    "defense": 6.0,
+    "raw_melee_base": 56.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      21.0,
+      35.0
+    ],
+    "dr": 0.0,
+    "accuracy": 6.0,
+    "dodge": -9.0,
+    "perception": 40.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  },
+  {
+    "floors": "6-10",
+    "name": "Lesser Nightmare",
+    "baseline": "long-saidri",
+    "hp": 190.0,
+    "offense": 157.0,
+    "defense": 15.0,
+    "raw_melee_base": 167.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      63.0,
+      105.0
+    ],
+    "dr": 0.0,
+    "accuracy": 45.0,
+    "dodge": 27.0,
+    "perception": 40.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  },
+  {
+    "floors": "11-15",
+    "name": "Minor Nightmare",
+    "baseline": "pale:Greater Biter",
+    "hp": 310.0,
+    "offense": 133.0,
+    "defense": 35.0,
+    "raw_melee_base": 143.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      54.0,
+      90.0
+    ],
+    "dr": 0.0,
+    "accuracy": 108.0,
+    "dodge": 26.0,
+    "perception": 25.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  },
+  {
+    "floors": "16-20",
+    "name": "Nightmare",
+    "baseline": "dire-bear",
+    "hp": 448.0,
+    "offense": 188.0,
+    "defense": 58.0,
+    "raw_melee_base": 198.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      75.0,
+      124.0
+    ],
+    "dr": 15.0,
+    "accuracy": 124.0,
+    "dodge": 9.0,
+    "perception": 40.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  },
+  {
+    "floors": "21-25",
+    "name": "Major Nightmare",
+    "baseline": "killspawn",
+    "hp": 514.0,
+    "offense": 588.0,
+    "defense": 69.0,
+    "raw_melee_base": 598.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      225.0,
+      374.0
+    ],
+    "dr": 25.0,
+    "accuracy": 140.0,
+    "dodge": 31.0,
+    "perception": 40.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  },
+  {
+    "floors": "26-30",
+    "name": "Greater Nightmare",
+    "baseline": "phoenix",
+    "hp": 718.0,
+    "offense": 590.0,
+    "defense": 103.0,
+    "raw_melee_base": 600.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      225.0,
+      375.0
+    ],
+    "dr": 0.0,
+    "accuracy": 158.0,
+    "dodge": 56.0,
+    "perception": 40.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  },
+  {
+    "floors": "31-35",
+    "name": "Gargantuan Nightmare",
+    "baseline": "ursa-minor",
+    "hp": 880.0,
+    "offense": 614.0,
+    "defense": 130.0,
+    "raw_melee_base": 624.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      234.0,
+      390.0
+    ],
+    "dr": 50.0,
+    "accuracy": 160.0,
+    "dodge": 53.0,
+    "perception": 40.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  },
+  {
+    "floors": "36-40",
+    "name": "Terrible Nightmare",
+    "baseline": "dragon",
+    "hp": 1018.0,
+    "offense": 1479.0,
+    "defense": 153.0,
+    "raw_melee_base": 1489.0,
+    "ordinary_melee_damage_vs_zero_dr": [
+      559.0,
+      931.0
+    ],
+    "dr": 83.0,
+    "accuracy": 179.0,
+    "dodge": 62.0,
+    "perception": 80.0,
+    "energy": 50.0,
+    "speed": "normal: one normal action per world turn; no innate haste or slow"
+  }
+]

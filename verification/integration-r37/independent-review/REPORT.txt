@@ -1,0 +1,28 @@
+Independent r37 integration review
+
+Status: PASS for the checks below. Core inputs remained byte-identical through the final runs; see core-inputs-before.json and receipt.json. This is not a substitute for the lead's complete workspace gate or final archive audit.
+
+Four fixed seeds produced 160 unique populated floors. Generating each complete 40-floor world a second time produced exactly equal Run state (320 floor-generation results compared). On every sampled floor the review checked biome and link structural validity, full directed topology traversability, optional traversal with all portal endpoints avoided, and placement of every initial Wendigo/Yeti in mountainous metadata.
+
+Three accepted Corn dimensions were found: sub-biome-review-1/floor31, r37-independent-0/floor36 and r37-independent-1/floor34. Each contains eight Corns, including the highest eligible odd-horn resident, four local portal pairs, and a round 81-cell footprint. Their local ordered/random cells are 8/15, 10/21 and 8/32. This means 31,39 and48 of81 cells are topology endpoints/cells, including portal cells, with no overlap. The fourth world has no accepted Corn dimension; optional omission is permitted by the generation contract. These counts are measured outcomes, not a guaranteed proposal acceptance rate.
+
+Found and resolved a release-blocking admission bug: generated Corn residents had an unregistered cornDimensionResident condition, so real player commands failed. The lead fixed admission and corpse/revival preservation. A new integration regression saves/loads a real generated Corn floor through temporal::Engine, executes Wait, Move, Wait, checks turn advancement for Wait, and compares canonical original/restored state after every command. It passes 1/1. The final measurement probe also executes a full Wait from inside each sampled chamber and verifies restored-state command determinism.
+
+Speed-up review identified mirrored end pairing as an unexpected mid-strip cycling behavior. The final design uses consecutive pairs plus the approved ordinary one-cell move between the currently occupied pair's own endpoints; this preserves reversal. The lead/runtime tests cover that rule. Random non-Euclidean areas and projectile transfer semantics remain separate from this walking-only exception. Optical route_filtered still includes portals only, excluding random and ordered non-Euclidean links.
+
+Measured optimized Linux timings, under shared-machine build load:
+- Forty-floor generation: 1.736–1.971 seconds per sampled world.
+- Forty first-pass route helper calls: 0.667–1.287 ms.
+- Forty repeated route helper calls: 0.730–1.212 ms (mean of10 sweeps; no persistent route cache is implied).
+- Forty aimed-ray preview helper calls: 2.726–13.403 ms.
+- One complete Wait with actual NPC/environment simulation inside the three Corn chambers: 53.269–115.598 ms.
+
+These timings do not include desktop drawing and are not a worst-case latency guarantee. The probe uses actual generated topology (28–36 source/portal links across a floor), not the maximum save-admission topology. Shared-machine contention and first-pass CPU cache effects can change measurements. General route search remains O(K²*C), with K physical metric graph nodes and C clearance-check cost; merely fast sample results do not remove its higher worst-case cost.
+
+Reproduction:
+CARGO_TARGET_DIR=<separate-review-target> tools/cargo.sh run --release -p corpse-core --example review_sub_biome_r37 -- sub-biome-review-1 sub-biome-review-2 r37-independent-0 r37-independent-1
+CARGO_TARGET_DIR=<separate-review-target> tools/cargo.sh test --release -p corpse-core --test sub_biome_generated_turn_r37
+
+No Windows runtime, end-to-end desktop interaction, final ZIP hash, exhaustive seed space, or all theoretical maximum link-count cases were tested by this reviewer. Release packaging and the full suite belong to the lead's separate gate.
+
+Post-review test-only amendment: The aggregate workspace gate later exposed two stale unsupported-revision assertions in flavor_placement.rs and physical_balance.rs. The lead changed those two tests to reject revision38 and accept37. No production core source changed from this review. Exact old/new test hashes are in post-review-test-only-delta.json; the release's final aggregate gate verifies the revised tests. The independent measurement's original 268-input fingerprint is intentionally retained as its truthful provenance.

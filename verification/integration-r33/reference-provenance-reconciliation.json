@@ -1,0 +1,79 @@
+{
+  "status": "Reconciled: different reference tracks, trial weighting, RNG seed streams; not conflicting same-case results.",
+  "primary_reference": "all_initial_unblessed.entry",
+  "sensitivity_reference": "ordinary_unblessed.entry",
+  "shared_profile_file_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+  "witch": {
+    "track": "ordinary_unblessed.entry",
+    "profiles": 127,
+    "trials": 128,
+    "profile_selection": "index modulo 127; first profile repeats once",
+    "seed_prefix": "trade31:{kind}:adjacent (default), then :{trial}; explicit revision33 still used",
+    "scenario": "adjacent; player (2,2), creature (3,2); full health, awake enemy, player attacks first",
+    "max_combat_commands": 256,
+    "max_settlement_commands": 64,
+    "settlement_strategy": "wait (default)",
+    "binary_hash": "not recorded in checkpoint artifacts; cannot retroactively prove old executable identity",
+    "request_sha256": "7cd8d1b4cb7be2cdca21fe7b834fe900002656ce91ac7242857fdbce92a04ad8",
+    "results_sha256": "0265cb66ceae7008dcb24d7cb30ae3d1b3be054740d8088af7d588072c3029b0"
+  },
+  "accuracy_before": {
+    "track": "all_initial_unblessed primary; ordinary_unblessed sensitivity",
+    "profiles": 127,
+    "trials": 127,
+    "profile_selection": "one trial per joint profile",
+    "seed_prefix": "accuracy33:{kind}:{track}:joint_mean then :{trial}",
+    "scenario": "same adjacent geometry/player first",
+    "max_combat_commands": 256,
+    "max_settlement_commands": 64,
+    "settlement_strategy": "escape",
+    "binary_hash": "c48f61020bc71af934c106bd5c13e2349169911d23927f95ff6a2b8f8a498d17"
+  },
+  "metric": "Both headline values are mean_gross_combat_damage_fraction: authoritative incoming damage packets before current-HP capping / starting maxHP, stopped at end of dispatch containing primary death. Settlement is separate; these Night/Skin BEFORE results have no extra postdeath damage, death or censoring. Neither is full revision33 world progression.",
+  "findings": [
+    {
+      "kind": "night-crawler",
+      "reference_depth": 24,
+      "exact_witch_profiles_match_ordinary_entry": true,
+      "witch_primary_combat_gross": 0.3553835274586667,
+      "accuracy_before": [
+        {
+          "track": "all_initial_unblessed",
+          "trials": 127,
+          "mean_gross_combat_damage_fraction": 0.20864300390417642,
+          "deaths": 0,
+          "censored": 0
+        },
+        {
+          "track": "ordinary_unblessed",
+          "trials": 127,
+          "mean_gross_combat_damage_fraction": 0.36736308970125675,
+          "deaths": 0,
+          "censored": 0
+        }
+      ]
+    },
+    {
+      "kind": "skin-walker",
+      "reference_depth": 26,
+      "exact_witch_profiles_match_ordinary_entry": true,
+      "witch_primary_combat_gross": 0.33646187122483145,
+      "accuracy_before": [
+        {
+          "track": "all_initial_unblessed",
+          "trials": 127,
+          "mean_gross_combat_damage_fraction": 0.2131380318679925,
+          "deaths": 0,
+          "censored": 0
+        },
+        {
+          "track": "ordinary_unblessed",
+          "trials": 127,
+          "mean_gross_combat_damage_fraction": 0.3396164393284889,
+          "deaths": 0,
+          "censored": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+    Blocking waiting for file lock on build directory
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.3
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling foldhash v0.2.0
+   Compiling syn v3.0.9
+   Compiling indexmap v2.14.2
+   Compiling serde_derive v1.0.229
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/generation-r38/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.25s
+     Running tests/ahvamitt_r34.rs (target/debug/deps/ahvamitt_r34-d93835099a27fe30)
+
+running 6 tests
+test seven_bag_is_one_of_each_before_final_boss_and_legacy33_is_unchanged ... ok
+test actual_attack_attempt_keeps_ahvamitt_alive_and_no_ordinary_attack_roll_is_needed ... ok
+test carried_mask_teleports_deterministically_and_drop_repickup_cannot_reset_cooldown ... ok
+test two_attacks_relocate_then_third_gives_one_mask_and_disappears ... ok
+test random_destinations_are_standable_vacant_and_do_not_mutate_a_dream_body_anchor ... ok
+test reward_disappearance_revert_and_future_restore_the_exact_branch ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+     Running tests/borge_event.rs (target/debug/deps/borge_event-d9c054b45d876a61)
+
+running 20 tests
+test all_25_body_cells_have_obelisk_feature_and_altar_survives_hazard_memory ... ok
+test altar_is_a_fixed_fixture_like_existing_godbeast_hardware ... ok
+test blocked_ordinary_melee_geometry_preserves_the_shard ... ok
+test actual_stair_travel_preserves_the_marked_heart_and_event ... ok
+test exact_heart_not_same_species_one_shard_and_no_food_stats_when_offered ... ok
+test malformed_provenance_and_half_initialized_event_are_rejected_at_load ... ok
+test one_heart_cannot_be_pledged_to_two_borge_events_after_actor_travel ... ok
+test marked_heart_is_still_food_and_cannot_reselect_after_consumption_or_empty_floor ... ok
+test seven_exact_milestones_four_authored_types_and_legacy_plan_unchanged ... ok
+test equipped_shard_kills_any_adjacent_creature_including_sphinx_and_allies ... ok
+test shard_invalid_targets_do_not_consume_and_phoenix_cannot_revive_no_accuracy_roll ... ok
+test strongest_is_alive_eligible_and_stable_hp_dr_defense_id_tiebreak ... ok
+test provenance_survives_actor_floor_transfer_carry_drop_save_and_snapshot ... ok
+test bumping_obelisk_interacts_before_collision_in_normal_and_haste_phases ... ok
+test verdania_is_existing_tree_with_legacy_internal_identity_and_r33_display ... ok
+test shard_administrator_uses_existing_terminal_boss_hook_not_immunity_or_corpse ... ok
+test offering_is_atomic_across_actual_revert_future_and_save ... ok
+test save_replay_and_both_time_abilities_preserve_consumption_and_permanent_death ... ok
+test generated_borge_has_25_solid_cells_clear_accessible_ring_altar_and_stairs ... ok
+test generated_floor40_and_nonmilestones_never_add_an_extra_godbeast ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.69s
+
+     Running tests/phantasmii_dreamwalking_r34.rs (target/debug/deps/phantasmii_dreamwalking_r34-0828344a4a754787)
+
+running 10 tests
+test half_here_keeps_creation_plane_across_sleep_and_wake ... ok
+test blood_costs_still_apply_in_dream ... ok
+test dream_floor_mutations_do_not_change_waking_floor_and_restore_on_error ... ok
+test projection_overlaps_normal_enemy_without_attack ... ok
+test plane_attacks_and_body_damage_notify_without_waking ... ok
+test nightmares_hidden_awake_seen_dream_and_leave_nothing ... ok
+test begin_body_anchor_and_wake_are_persistent ... ok
+test real_dispatch_wait_keeps_body_and_projection_valid ... ok
+test rejected_travel_and_consumption_are_turnless ... ok
+test debug_seed_replay_rejects_unrecorded_stash_edits_with_session_guidance ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.01s
+

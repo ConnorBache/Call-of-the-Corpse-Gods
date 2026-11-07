@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-20",
+  "method": "built-in image_gen; one edit call per asset; originals inspected before edits; no procedural image editing",
+  "assets": [
+    {
+      "id": "witch",
+      "prompt": "Edit the supplied Witch. SIGNIFICANTLY simplify it: about 80 percent less detail, broad readable clusters like a 96 pixel tall sprite scaled up. Retain adult pale female dark witch, sinister expression, ragged charcoal robe with muted red cloth, hood, pale hands and dark hair. Remove all chains, intricate jewelry, embroidered detail, lace, individual hair strands and tiny rips; use only several large garment folds. Keep full-body pose and essential identity. Use case: precise-object-edit. Asset: single game bestiary sprite. Full-body silhouette entirely inside frame with margins, isolated on solid pure black background, no scene, no lettering. Deliberate simple low-resolution pixel art with large crisp square pixel clusters and restrained palette. Avoid photorealism, antialiasing, smooth painting, intricate dithering and noisy microtexture.",
+      "generated": "/workspace/scratch/69f53637ba6f/generated_images/exec-78b17daa-c227-4a5e-b663-dd73e2cb621a.png",
+      "output": "crates/corpse-desktop/assets/creatures/witch.png",
+      "backup": "docs/art-backups-horrors-20261020/witch.png",
+      "original_sha256": "6d1d266c926a3b45f51b6464472b25de05cbedfdf9102a276c176e06cbd1f53e",
+      "output_sha256": "88c4037f5c2bd9f0217e8236129578dbe123bc6c90ddba4949b4fe375c875d8c",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "description": "A whore whom has forsaken her humanity for devilish power.",
+      "visual_inspection": "Passed: full silhouette, black backdrop, no text; requested creature-specific change checked."
+    },
+    {
+      "id": "kelpie",
+      "prompt": "Edit the supplied Kelpie water horse. Remove every bell, bell-shaped dangling object, metal ornament and jewel. The trailing kelp tentacles must end plainly as tapering green ribbons, not round hanging bells or beads. Preserve aquatic green-blue horse anatomy and kelp mane/tail, hoof fins, pose and full silhouette. Simplify the scale noise into larger deliberate pixel clusters. Use case: precise-object-edit. Asset: single game bestiary sprite. Full-body silhouette entirely inside frame with margins, isolated on solid pure black background, no scene, no lettering. Deliberate simple low-resolution pixel art with large crisp square pixel clusters and restrained palette. Avoid photorealism, antialiasing, smooth painting, intricate dithering and noisy microtexture.",
+      "generated": "/workspace/scratch/69f53637ba6f/generated_images/exec-c1235e2f-bcd8-4349-a9e5-8a5434cf99cd.png",
+      "output": "crates/corpse-desktop/assets/creatures/kelpie.png",
+      "backup": "docs/art-backups-horrors-20261020/kelpie.png",
+      "original_sha256": "e73f40e8677458ad9cdeee5e907ab365fe073d5869db118078d029b8c10d5bdc",
+      "output_sha256": "eddba987094af67cd2cecfd33c44fc317546901f588adb32eeab384e74cceb34",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "description": "An infamous man-eating water horse, known for dragging its victims to the bottom of the ocean with its kelp like tentacles.",
+      "visual_inspection": "Passed: full silhouette, black backdrop, no text; requested creature-specific change checked."
+    },
+    {
+      "id": "wendigo",
+      "prompt": "Edit this Wendigo: significantly less detailed, broad simple pixel clusters like a 96 pixel tall sprite scaled up. It is explicitly a starved CANNIBAL HUMAN: preserve human head, human nose and mouth, long disheveled hair, gaunt hunched body, long arms and ragged brown clothing. Simple dark open mouth and small restrained blood stains. NO antlers, no horns, no deer skull, no animal muzzle or fur. Remove tiny skin texture, individual ribs, tiny fabric threads and hair strands, use a few broad shadow planes. Use case: precise-object-edit. Asset: single game bestiary sprite. Full-body silhouette entirely inside frame with margins, isolated on solid pure black background, no scene, no lettering. Deliberate simple low-resolution pixel art with large crisp square pixel clusters and restrained palette. Avoid photorealism, antialiasing, smooth painting, intricate dithering and noisy microtexture.",
+      "generated": "/workspace/scratch/69f53637ba6f/generated_images/exec-18ede9d5-665e-45ea-a76e-28f9267d3e25.png",
+      "output": "crates/corpse-desktop/assets/creatures/wendigo.png",
+      "backup": "docs/art-backups-horrors-20261020/wendigo.png",
+      "original_sha256": "364f188a1e2b266b12c93cf07c166a914e03d988e46ac4f9f3a5ea817b74b5b7",
+      "output_sha256": "b34810201b6421e83e6e924fa89c3e4ce23d868687b9afcd083ea7b9c6cec1d4",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "description": "A cannibalistic human who has long since given themselves to the madness of the flesh. It looks starved.",
+      "visual_inspection": "Passed: full silhouette, black backdrop, no text; requested creature-specific change checked."
+    },
+    {
+      "id": "troll",
+      "prompt": "Edit this Troll. Torn flesh must exist ONLY on the front knuckles that scrape the ground. Heal ALL exposed muscle, wounds, tears and blood on forearms, wrists, back of hands, elbows, torso and legs to intact grey-beige skin. Only two small scraped red areas on the actual knuckle contact surfaces. Preserve huge brutish hunched biped, disproportionately long arms dragging its knuckles, dark hair, grey skin, bulky silhouette. Simplify noisy texture to larger pixel clusters. Use case: precise-object-edit. Asset: single game bestiary sprite. Full-body silhouette entirely inside frame with margins, isolated on solid pure black background, no scene, no lettering. Deliberate simple low-resolution pixel art with large crisp square pixel clusters and restrained palette. Avoid photorealism, antialiasing, smooth painting, intricate dithering and noisy microtexture.",
+      "generated": "/workspace/scratch/69f53637ba6f/generated_images/exec-50db75e6-59b1-48e7-9be9-977a4876030e.png",
+      "output": "crates/corpse-desktop/assets/creatures/troll.png",
+      "backup": "docs/art-backups-horrors-20261020/troll.png",
+      "original_sha256": "21fbb5ad1e08bfccac7340004a5fad497cc0f5f308f506932a1fcdc59a3d4177",
+      "output_sha256": "a0d8a4ae1dde0e985d0b45bba39b5769ddf6bae51456c752c8d73f810a05e3b5",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "description": "A huge, brutish biped. It clumsily drags its knuckles along the floor, tearing off skin which rapidly replaces itself.",
+      "visual_inspection": "Passed: full silhouette, black backdrop, no text; requested creature-specific change checked."
+    },
+    {
+      "id": "river-drake",
+      "prompt": "Redesign the supplied blue River Drake into a much more slender AQUATIC ALLIGATOR / CROCODILE-like draconid. Long narrow crocodile snout, low horizontal slim body, short splayed legs with webbed toes, very long streamlined swimming tail, small modest back scutes. Keep blue scales and yellow eye; remove large ornate dragon horns/spikes and thick upright dragon neck. Its open mouth projects a clearly visible forceful pale cyan WATER GEYSER outward: one coherent thick jet with a splashing plume and a few large water droplets, clearly attached to the mouth. Fit the entire crocodilian and entire water jet comfortably in the image, side-three-quarter profile. Simple bold pixel art, not ornate scales. Use case: precise-object-edit. Asset: single game bestiary sprite. Full-body silhouette entirely inside frame with margins, isolated on solid pure black background, no scene, no lettering. Deliberate simple low-resolution pixel art with large crisp square pixel clusters and restrained palette. Avoid photorealism, antialiasing, smooth painting, intricate dithering and noisy microtexture.",
+      "generated": "/workspace/scratch/69f53637ba6f/generated_images/exec-32282ff2-e3a8-4234-ad43-a9db417c71a2.png",
+      "output": "crates/corpse-desktop/assets/creatures/river-drake.png",
+      "backup": "docs/art-backups-horrors-20261020/river-drake.png",
+      "original_sha256": "2ddc1f85df68a8da481f927a0db091183e8771d2e8a1ab0d381c0ea64deaf80e",
+      "output_sha256": "348b528e4381d76a0d3603cd4c92615ef11f6b3c7fc435d897cadc43874fa8f4",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "description": "A blue draconid, its scales quiver in anticipation of its next meal.",
+      "visual_inspection": "Passed: full silhouette, black backdrop, no text; requested creature-specific change checked."
+    },
+    {
+      "id": "vampire",
+      "prompt": "Redesign supplied Vampire into an ORIGINAL human vampire of decadence and excess, much less detailed, readable chunky pixel art. Use a heavy-lidded middle-aged pale human face, receding short dark hair, small fangs, stout indulgent body, a simple loose deep plum velvet robe with muted ochre sash and soft shoes, one relaxed clawed hand. A small blood mark at mouth. No cape, no high collar, no white flowing hair, no cravat, no gold filigree, no intricate jewelry, no recognizable existing game/anime/movie character. Full body, a few large folds and flat shading planes, deliberate sparse details. Use case: precise-object-edit. Asset: single game bestiary sprite. Full-body silhouette entirely inside frame with margins, isolated on solid pure black background, no scene, no lettering. Deliberate simple low-resolution pixel art with large crisp square pixel clusters and restrained palette. Avoid photorealism, antialiasing, smooth painting, intricate dithering and noisy microtexture.",
+      "generated": "/workspace/scratch/69f53637ba6f/art-horrors-temp/vampire.png",
+      "output": "crates/corpse-desktop/assets/creatures/vampire.png",
+      "backup": "docs/art-backups-horrors-20261020/vampire.png",
+      "original_sha256": "ee439ee236d4093eb7f8079f8604253ea485290506a175d75ea407a3f9c7011b",
+      "output_sha256": "e1e2717fc0231f1e7061f83cb6ad6352edbe80eb063ed75dcb4930e71d9a5647",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "description": "A creature of decadence and excess, who, having grown tired of wine and sex, turned to blood and murder.",
+      "visual_inspection": "Passed: full silhouette, black backdrop, no text; requested creature-specific change checked."
+    }
+  ]
+}

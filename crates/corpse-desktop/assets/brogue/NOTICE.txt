@@ -1,0 +1,30 @@
+Brogue CE ASCII artwork adaptation
+
+Copyright (C) Brogue: Community Edition maintainers.
+Original tile artwork by Antony Boucher, based heavily on Oryx Design Lab's
+Brogue Tiles, as described in the retained upstream asset notice.
+
+Source: Brogue CE v1.15.1, bin/assets/tiles.png
+https://github.com/tmewett/BrogueCE/blob/v1.15.1/bin/assets/tiles.png
+Source asset terms:
+https://github.com/tmewett/BrogueCE/blob/v1.15.1/bin/assets/LICENSE.txt
+License: Creative Commons Attribution-ShareAlike 4.0 International
+https://creativecommons.org/licenses/by-sa/4.0/
+
+Changes for The Call of the Corpse Gods, 2026-10-16:
+- Extracted only printable ASCII cells 32 through 127 (six rows).
+- Converted white-on-black intensity to a white alpha mask.
+- Packaged the same mask as a PNG and an embedded data URL for offline use.
+The ASCII artwork adaptation remains licensed under CC BY-SA 4.0.
+Redistributions and adaptations must retain attribution and comply with that
+license, including its ShareAlike requirements for adapted artwork.
+
+Upstream tiles.png SHA-256:
+40bb927cf8f1816f16720e7630e1d004974f7e780c9f137258ad017d554ec7af
+Adapted BrogueCE-ASCII.png SHA-256:
+d06f4915b58f6bf3b2f294d9ffed60c27cabc72abad7c3421772f080e56fffe3
+
+This notice applies to the artwork. The new Canvas painter is independently
+written. No Brogue CE program source or AGPL renderer code was incorporated.
+The font fallback subsets are separately licensed under SIL OFL 1.1.
+The creators of Brogue CE and the original artwork do not endorse this game.

@@ -1,0 +1,25 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/shard-r39/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 29.25s
+     Running tests/shard_weapon_independent_r39.rs (/workspace/scratch/69f53637ba6f/shard-r39/build/native-target/debug/deps/shard_weapon_independent_r39-478025afbba7b049)
+
+running 1 test
+test thrown_shard_crosses_random_non_euclidean_branch_and_resolves_one_hit ... FAILED
+
+failures:
+
+---- thrown_shard_crosses_random_non_euclidean_branch_and_resolves_one_hit stdout ----
+
+thread 'thrown_shard_crosses_random_non_euclidean_branch_and_resolves_one_hit' (72) panicked at crates/corpse-core/tests/shard_weapon_independent_r39.rs:185:9:
+assertion `left != right` failed: seed=1 ground={"1": [GroundItem { x: 10.0, y: 10.0, item: Item { blessed: Missing, id: 500.0, name: "Shard of the Borge", kind: "weapon", glyph: "/", quantity: Missing, granted_ability: Missing, tinkered: Missing, heart_creature_type: Missing, source_actor_id: Missing, borge_depth: Missing, potion_nature: Missing, magic_nature: Missing, damage: Value(0.0), offense_multiplier: Value(0.0), base_bonus: Missing, enchantment: Missing, hands: Value(1.0), thrown: Missing, ranged_weapon: Missing, identified: Value(true), diluted: Missing, effect: Value("A shard of the dark obelisk. Any creature which it bleeds will fall into an endless nightmare. It can only be used once."), bonus: Missing, energy: Missing, exp: Missing, enhancements: [], equipped: Missing }, auto_pickup_blocked: Missing }]} logs=["You throw Shard of the Borge.", "The equipment change removes 900 HP."]
+  left: false
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    thrown_shard_crosses_random_non_euclidean_branch_and_resolves_one_hit
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p corpse-core --test shard_weapon_independent_r39`

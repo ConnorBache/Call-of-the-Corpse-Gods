@@ -1,0 +1,10 @@
+
+running 5 tests
+test repeated_movement_preserves_prior_stains_without_rng ... ok
+test normal_and_movement_only_steps_share_cosmetic_hook_without_other_changes ... ok
+test temporal_snapshot_restores_stain_layer_without_sharing_future_mutation ... ok
+test no_trails_for_mech_nonfamily_dead_or_nonfloor_tiles ... ok
+test family_footprints_only_change_existing_cosmetic_layer ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+

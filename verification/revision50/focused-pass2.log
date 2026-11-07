@@ -1,0 +1,91 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.50s
+     Running tests/revision50_ability_energy.rs (target/debug/deps/revision50_ability_energy-1c47bc5d5bebc5f7)
+
+running 4 tests
+test missing_capacity_rejects_paid_activation_without_spending_player_energy ... ok
+test paid_activation_uses_its_reserve_without_player_energy ... ok
+test upkeep_uses_reserve_then_exhausted_player_fallback ... ok
+test repeated_initialization_cannot_refresh_charge ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/revision50_future_reserve_guard.rs (target/debug/deps/revision50_future_reserve_guard-0c6a902b42059d26)
+
+running 3 tests
+test revision50_temporal_dispatch_rejects_before_bookkeeping_even_when_silenced ... ok
+test revision50_capture_rejects_before_any_resource_or_anchor_mutation ... ok
+test legacy_capture_preserves_all_shared_energy_payment ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/revision50_runtime_paths.rs (target/debug/deps/revision50_runtime_paths-23fdf664adddeecd)
+
+running 23 tests
+test duel_dispatch_uses_fixed_five_by_five_square_and_only_exempts_chosen_enemy ... ok
+test duel_actual_attack_blocks_outsider_without_rng_but_allows_selected_enemy ... ok
+test implant_exact_fifteen_energy_is_sufficient_and_leaves_zero ... ok
+test implant_dispatch_spends_fifteen_and_one_action_for_the_selected_immediate_attack ... ok
+test duel_leaving_area_expires_before_exit_turn_upkeep_and_does_not_reactivate_on_return ... ok
+test implant_can_choose_the_player_as_the_adjacent_creature ... ok
+test duel_haste_movement_does_not_charge_an_extra_upkeep_turn ... ok
+test nightmare_actual_melee_miss_retains_decoy_and_landed_zero_damage_strike_dissolves_it ... ok
+test implant_uses_its_explicit_own_reserve_even_with_zero_player_energy ... ok
+test nightmare_ranged_miss_retains_and_landed_projectile_dissolves_decoy ... ok
+test nightmare_is_targeted_by_actual_enemy_turn_and_disappears_without_a_reward ... ok
+test duel_invalid_admission_and_floor_change_do_not_leave_protection_active ... ok
+test duel_pays_three_per_world_turn_without_energy_regeneration_and_expires_unfunded ... ok
+test nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks ... FAILED
+test implant_missing_reserve_never_silently_falls_back_to_player_energy ... ok
+test pursuit_attack_displacement_from_unstoppable_force_never_earns_credit ... ok
+test implant_insufficient_energy_and_silence_reject_before_payment_or_attack ... ok
+test pursuit_bonus_cannot_make_an_attack_free_or_resolve_it_twice ... ok
+test pursuit_blocked_bonus_move_preserves_credit_and_does_not_tick_or_draw_rng ... ok
+test pursuit_wait_is_an_ordinary_turn_and_discards_unused_credit ... ok
+test pursuit_bonus_round_trips_and_does_not_repeat_a_world_or_haste_phase ... ok
+test pursuit_dispatch_grants_exactly_one_movement_only_credit_per_world_turn ... ok
+test implant_invalid_target_or_nonadjacent_victim_is_atomic ... ok
+
+failures:
+
+---- nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks stdout ----
+
+thread 'nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks' (530) panicked at crates/corpse-core/tests/revision50_runtime_paths.rs:201:5:
+assertion `left == right` failed
+  left: Actor { ability_reserves: Missing, copied_inventory: Missing, creature_kind: Missing, zillennia_quality: Missing, monster_state: Missing, id: 5.0, x: 11.0, y: 10.0, name: "Hallucination of You", glyph: "@", color: "#fff0c9", hp: 1.0, max_hp: 1.0, base_max_hp: Value(1.0), energy: 0.0, stats: Stats { offense: 0.0, defense: 0.0, accuracy: 0.0, dodge: 0.0, dr: 0.0, perception: 0.0, max_energy: 0.0, max_hp: Missing }, state: "ally", perfect: Value(false), order: Missing, last_seen: Missing, heartless: Value(true), born_from_birther: Missing, dead: Missing, corpse_age: Missing, abilities: [], equipment_abilities: Missing, ability_order: Missing, active: [], conditions: {"wakingNightmare": 1.0, "wakingNightmareOwner": 0.0, "phantasmiiPlane": 0.0, "creatureHungerTurns": 1.0, "creatureHungerClock": 1.0}, blood: Missing, damage_bank: Missing, nightmares: Missing, reactions: Missing, adaptive_dr: Missing, adaptive_hearts: Missing }
+ right: Actor { ability_reserves: Missing, copied_inventory: Missing, creature_kind: Missing, zillennia_quality: Missing, monster_state: Missing, id: 5.0, x: 11.0, y: 10.0, name: "Hallucination of You", glyph: "@", color: "#fff0c9", hp: 1.0, max_hp: 1.0, base_max_hp: Value(1.0), energy: 0.0, stats: Stats { offense: 0.0, defense: 0.0, accuracy: 0.0, dodge: 0.0, dr: 0.0, perception: 0.0, max_energy: 0.0, max_hp: Missing }, state: "ally", perfect: Value(false), order: Missing, last_seen: Missing, heartless: Value(true), born_from_birther: Missing, dead: Missing, corpse_age: Missing, abilities: [], equipment_abilities: Missing, ability_order: Missing, active: [], conditions: {"wakingNightmare": 1.0, "wakingNightmareOwner": 0.0, "phantasmiiPlane": 0.0}, blood: Missing, damage_bank: Missing, nightmares: Missing, reactions: Missing, adaptive_dr: Missing, adaptive_hearts: Missing }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks
+
+test result: FAILED. 22 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+error: test failed, to rerun pass `-p corpse-core --test revision50_runtime_paths`

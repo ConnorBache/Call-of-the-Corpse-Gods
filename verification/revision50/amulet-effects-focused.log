@@ -1,0 +1,25 @@
+
+running 20 tests
+test revision50_amulet_effects::tests::fated_duel_blocks_iceblast_damage_and_attached_slow ... ok
+test revision50_amulet_effects::tests::acid_has_range_eight_and_refreshes_six_turn_penalty ... ok
+test revision50_amulet_effects::tests::blinking_visible_empty_within_ten_and_arrival_fire ... ok
+test revision50_amulet_effects::tests::firebolt_ignites_blocking_tree_but_never_hits_beyond_it ... ok
+test revision50_amulet_effects::tests::cold_immunity_is_enforced_at_shared_damage_packet_boundary ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_acid_damage_and_attached_dr_loss ... ok
+test revision50_amulet_effects::tests::iceblast_closed_corner_shields_and_corrosion_compounds_sustain ... ok
+test revision50_amulet_effects::tests::inactive_floor_uses_the_same_poison_and_corrosion_normal_clock ... ok
+test revision50_amulet_effects::tests::iceblast_thirty_hits_player_and_allies_while_immunity_blocks_damage_and_slow ... ok
+test revision50_amulet_effects::tests::lightning_continues_beyond_aim_pierces_allies_and_stops_at_wall ... ok
+test revision50_amulet_effects::tests::named_resistances_apply_to_final_packets_and_acid_penalty ... ok
+test revision50_amulet_effects::tests::firebolt_is_eighty_not_twenty_and_ignites_path_and_first_target ... ok
+test revision50_amulet_effects::tests::dispatch_free_activation_then_other_amulet_consumes_turn ... ok
+test revision50_amulet_effects::tests::invalid_dispatch_does_not_start_clocks_or_claim_free_credit ... ok
+test revision50_amulet_effects::tests::poison_is_six_per_normal_tick_for_twenty_and_refreshes_without_rate_stacking ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_poison_source_without_curing_existing_poison ... ok
+test revision50_amulet_effects::tests::spatial_ray_cycles_are_bounded_and_duplicate_actor_is_hit_once ... ok
+test revision50_amulet_effects::tests::preview_cannot_leak_unseen_live_terrain_or_consume_rng ... ok
+test revision50_amulet_effects::tests::saved_item_energy_and_poison_rate_replay_identically ... ok
+test revision50_amulet_effects::tests::invalid_target_and_partial_payment_leave_energy_rng_and_ledger_untouched ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 334 filtered out; finished in 0.04s
+

@@ -1,0 +1,387 @@
+{
+  "status": "passed",
+  "recorded_utc": "2026-10-26T17:00:46.164895+00:00",
+  "inputs_unchanged": true,
+  "binary_sha256": "7cc28d5bd7cc56980cd8a63c7ac56e4cf97c6f26d6a644c1294dc548783cec86",
+  "primary_reference_policy": "earliest approved natural/conditional appearance; SAME validated r32 joint player cohort in both r31/r32; independent held-out combat RNG",
+  "primary_metric": "mean_gross_combat_damage_fraction: through ENDnative dispatch containing primary death; incomplete primary lifespans are explicitly reported",
+  "summoner_adjacent_scope": "Parent plus early child incoming damage until parent death, not isolated parent-only damage; body guideline comparisons are not applicable. Three-cast-children runs through all living descendants.",
+  "stationary_hazard_scope": "wait settlement is deliberate residual-room hazard stress, not ordinary fight lifetime",
+  "schema_checks": "No candidate overrides, no execution errors, gross >= actual capped, combat+tail=total, deaths/censors partition, exact shipping actor stats and newborn profiles",
+  "datasets": {
+    "primary": {
+      "rows": 176,
+      "measured": 158,
+      "not_applicable": 18,
+      "trials": 20224,
+      "errors": 0,
+      "revision32_primary_incomplete": [
+        {
+          "kind": "needleling",
+          "scenario": "adjacent",
+          "layer_position": "first",
+          "kills": 126,
+          "trials": 128,
+          "combat_deaths": 2,
+          "combat_censored": 0
+        },
+        {
+          "kind": "hemogoblin-inventor",
+          "scenario": "adjacent",
+          "layer_position": "first",
+          "kills": 2,
+          "trials": 128,
+          "combat_deaths": 0,
+          "combat_censored": 126
+        },
+        {
+          "kind": "pale:Greater Birther",
+          "scenario": "adjacent",
+          "layer_position": "first",
+          "kills": 127,
+          "trials": 128,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        },
+        {
+          "kind": "pale:Greater Birther",
+          "scenario": "three-cast-children",
+          "layer_position": "first",
+          "kills": 125,
+          "trials": 128,
+          "combat_deaths": 3,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:hulking",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 127,
+          "trials": 128,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        },
+        {
+          "kind": "vampire",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 126,
+          "trials": 128,
+          "combat_deaths": 2,
+          "combat_censored": 0
+        },
+        {
+          "kind": "banshee",
+          "scenario": "adjacent",
+          "layer_position": "first",
+          "kills": 123,
+          "trials": 128,
+          "combat_deaths": 5,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:ancient",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 123,
+          "trials": 128,
+          "combat_deaths": 5,
+          "combat_censored": 0
+        },
+        {
+          "kind": "horn-5",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 125,
+          "trials": 128,
+          "combat_deaths": 3,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:timeless",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 126,
+          "trials": 128,
+          "combat_deaths": 2,
+          "combat_censored": 0
+        },
+        {
+          "kind": "valta",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 126,
+          "trials": 128,
+          "combat_deaths": 2,
+          "combat_censored": 0
+        },
+        {
+          "kind": "horn-7",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 125,
+          "trials": 128,
+          "combat_deaths": 3,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:transcendent",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 124,
+          "trials": 128,
+          "combat_deaths": 4,
+          "combat_censored": 0
+        }
+      ]
+    },
+    "layers": {
+      "rows": 316,
+      "measured": 316,
+      "not_applicable": 0,
+      "trials": 20224,
+      "errors": 0,
+      "revision32_primary_incomplete": [
+        {
+          "kind": "needleling",
+          "scenario": "adjacent",
+          "layer_position": "mid",
+          "kills": 63,
+          "trials": 64,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        },
+        {
+          "kind": "hemogoblin-inventor",
+          "scenario": "adjacent",
+          "layer_position": "mid",
+          "kills": 24,
+          "trials": 64,
+          "combat_deaths": 0,
+          "combat_censored": 40
+        },
+        {
+          "kind": "hemogoblin-inventor",
+          "scenario": "adjacent",
+          "layer_position": "last",
+          "kills": 44,
+          "trials": 64,
+          "combat_deaths": 0,
+          "combat_censored": 20
+        },
+        {
+          "kind": "pale:Greater Birther",
+          "scenario": "three-cast-children",
+          "layer_position": "mid",
+          "kills": 63,
+          "trials": 64,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:hulking",
+          "scenario": "chase",
+          "layer_position": "mid",
+          "kills": 63,
+          "trials": 64,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:hulking",
+          "scenario": "chase",
+          "layer_position": "last",
+          "kills": 63,
+          "trials": 64,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:timeless",
+          "scenario": "chase",
+          "layer_position": "mid",
+          "kills": 63,
+          "trials": 64,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        },
+        {
+          "kind": "zillennia:timeless",
+          "scenario": "chase",
+          "layer_position": "last",
+          "kills": 63,
+          "trials": 64,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        }
+      ]
+    },
+    "support": {
+      "rows": 12,
+      "measured": 12,
+      "not_applicable": 0,
+      "trials": 768,
+      "errors": 0,
+      "revision32_primary_incomplete": []
+    },
+    "hazard-stress": {
+      "rows": 28,
+      "measured": 28,
+      "not_applicable": 0,
+      "trials": 1792,
+      "errors": 0,
+      "revision32_primary_incomplete": [
+        {
+          "kind": "pale:Greater Birther",
+          "scenario": "three-cast-children",
+          "layer_position": "first",
+          "kills": 61,
+          "trials": 64,
+          "combat_deaths": 3,
+          "combat_censored": 0
+        },
+        {
+          "kind": "valta",
+          "scenario": "chase",
+          "layer_position": "first",
+          "kills": 63,
+          "trials": 64,
+          "combat_deaths": 1,
+          "combat_censored": 0
+        }
+      ]
+    }
+  },
+  "total_native_encounter_trials": 43008,
+  "shipping_primary_templates_checked": 76,
+  "shipping_primary_template_keys": [
+    "banshee",
+    "bear",
+    "blorb",
+    "cancer",
+    "cave-bat",
+    "chimera",
+    "dire-bear",
+    "dragon",
+    "dryad",
+    "flesh-administrator",
+    "giant-beetle",
+    "glim",
+    "greater-ichor-fish",
+    "greater-ichor-leviathan",
+    "greater-ichor-shark",
+    "hemogoblin",
+    "hemogoblin-bloodmancer",
+    "hemogoblin-inventor",
+    "hemogoblin-mech",
+    "horn-1",
+    "horn-2",
+    "horn-3",
+    "horn-4",
+    "horn-5",
+    "horn-6",
+    "horn-7",
+    "ichor-fish-standard",
+    "ichor-leviathan",
+    "ichor-shark",
+    "kelpie",
+    "killspawn",
+    "lesser-ichor-fish",
+    "lesser-ichor-leviathan",
+    "lesser-ichor-shark",
+    "long-saidri",
+    "maulchild",
+    "minotaur",
+    "moonspawn",
+    "needleling",
+    "pale:Birther",
+    "pale:Biter",
+    "pale:Breather",
+    "pale:Greater Birther",
+    "pale:Greater Biter",
+    "pale:Greater Breather",
+    "pale:Greater Screamer",
+    "pale:Greater Spitter",
+    "pale:Jackal",
+    "pale:Screamer",
+    "pale:Spitter",
+    "phoenix",
+    "rat",
+    "river-drake",
+    "sabretooth",
+    "saidri-guardian",
+    "shellback-beetle",
+    "short-saidri",
+    "tiger",
+    "troll",
+    "ursa-major",
+    "ursa-minor",
+    "valta",
+    "vampire",
+    "wendigo",
+    "witch",
+    "yeti",
+    "zillennia:ancient",
+    "zillennia:child",
+    "zillennia:greater",
+    "zillennia:hulking",
+    "zillennia:infant",
+    "zillennia:lesser",
+    "zillennia:mature",
+    "zillennia:timeless",
+    "zillennia:transcendent",
+    "zillennia:unqualified"
+  ],
+  "files": [
+    {
+      "path": "tools/monster-balance/final/birth-constructor-verification.json",
+      "sha256": "172f635f82e13d3cfac4fa928b47ce6f679a32ada010fe891a5066163e7e548f",
+      "bytes": 115846
+    },
+    {
+      "path": "tools/monster-balance/final/hazard-stress.csv",
+      "sha256": "f065c9479bb890b3730b2c1795a28ca37480224c1f468054dd0c752606ce1a59",
+      "bytes": 9918
+    },
+    {
+      "path": "tools/monster-balance/final/hazard-stress.json",
+      "sha256": "a2e5eab6b126ceb5ddd60cc739979ccb3466b6ea1663c488c03b5e142eef8145",
+      "bytes": 158410
+    },
+    {
+      "path": "tools/monster-balance/final/input-receipt.json",
+      "sha256": "8c920b1562878b870ba534343a57b498b65afa591dcef2ed9a5986ed689c5792",
+      "bytes": 21351
+    },
+    {
+      "path": "tools/monster-balance/final/layers.csv",
+      "sha256": "21b8481bdc193ca7d3e135f5eb2e1877e4913e2f1fe32dae59bbaab747f2d1f6",
+      "bytes": 92346
+    },
+    {
+      "path": "tools/monster-balance/final/layers.json",
+      "sha256": "6725e997c8a7ebd341679bcd34a217e92c77c22bdb5e04de91da8fbed8c5d2b2",
+      "bytes": 1589056
+    },
+    {
+      "path": "tools/monster-balance/final/primary.csv",
+      "sha256": "88b711e3039b038f663c2addae369fdf4edd7e2533337a32b24438d4e147ef69",
+      "bytes": 51867
+    },
+    {
+      "path": "tools/monster-balance/final/primary.json",
+      "sha256": "301315f8e4b2ece464d6f29dcc100380dbff5a1cdb000239d31975b969f9a3d8",
+      "bytes": 829703
+    },
+    {
+      "path": "tools/monster-balance/final/support.csv",
+      "sha256": "b0996eecf0c0e2b2aebc87a6b28e5b2fc89c32a8d247a89053cdda3c909f6085",
+      "bytes": 4439
+    },
+    {
+      "path": "tools/monster-balance/final/support.json",
+      "sha256": "2cc38890cf0792f780a0e2fbb22dfb889b89055bc89dbf3d3c39e27cb3109c9e",
+      "bytes": 64830
+    }
+  ]
+}

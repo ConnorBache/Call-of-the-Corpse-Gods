@@ -1,0 +1,26 @@
+
+running 21 tests
+test diffusion_is_bounded_water_only_deterministic_and_respects_frozen_cells ... ok
+test exposed_enemy_status_does_not_change_real_stats_ai_hostility_or_health ... ok
+test blood_deposits_at_half_here_damaged_body_not_owner_pool ... ok
+test kelpie_spawn_source_is_mild_and_persists_at_spawn_after_movement_and_death ... ok
+test hidden_water_never_leaks_live_blood_through_observed_or_unseen_hazards ... ok
+test hallucination_exposure_refreshes_exactly_two_world_turns_without_damage_or_confusion ... ok
+test ordinary_movement_is_not_a_water_blood_trail ... ok
+test haste_movement_does_not_tick_hallucinations_or_diffusion ... ok
+test reflected_hit_back_blood_uses_the_reflected_victims_water_tile ... ok
+test offscreen_world_turns_expire_status_and_diffuse_sources ... ok
+test greater_breather_uses_hallucinogenic_for_passive_and_boost_and_is_immune ... ok
+test severed_fungus_corpse_pair_cannot_reacquire_but_unrelated_link_and_fire_survive ... ok
+test successful_escape_breaks_binding_root_only_failed_or_blocked_attempt_does_not ... ok
+test scream_disorients_accuracy_only_refreshes_and_expires_allied_boost_unchanged ... ok
+test water_and_status_round_trip_and_temporal_snapshots ... ok
+test source_registration_never_adds_legacy_fields_and_water_memory_distinguishes_zero ... ok
+test legacy_revisions_keep_no_blood_caustic_breath_and_offense_weakening ... ok
+test hallucination_gas_schema_provenance_and_hazard_memory_round_trip ... ok
+test authored_river_sources_exclude_lakes_dry_cells_and_ichor_and_persist_independently ... ok
+test only_actual_positive_hp_damage_in_water_deposits_including_forced_and_dot_packets ... ok
+test revert_and_see_the_future_restore_new_layers_and_world_turn_status_clocks ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+

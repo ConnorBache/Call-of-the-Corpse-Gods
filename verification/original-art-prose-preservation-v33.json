@@ -1,0 +1,655 @@
+{
+  "source_checkpoint": "frozen revision32",
+  "original_plates_each_set": 81,
+  "original_histories_unchanged": 79,
+  "hashes": [
+    {
+      "file": "crates/corpse-desktop/assets/creatures/banshee.png",
+      "sha256": "1d88afc5a4c13b648f3faeed39375a17020647575a35c49f049d38e77be2f4c5"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/bastidion.png",
+      "sha256": "c8de304cbf0b37a62fe48b298409138dfd2a154d7ef80e46fbeb83b1132fb67e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/bear.png",
+      "sha256": "0943b09f6e81c044aebd1d622785f2b799c9dc968233e890e6c64424daa24842"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/blorb.png",
+      "sha256": "f09c7bb8f24661555b266ad0080f214ab4b691a89472ade5cad9ab222816d5c6"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/bombardier.png",
+      "sha256": "cf8dbca32cb66775de858de1d5cd20a3eb75e19c2ce961ca1d27b9161d2e620a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/cancer.png",
+      "sha256": "124b8e446aec28eeef1d1c28161db9faea99e4fa82f6f10fa6ebd4f9ea6068aa"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/cave-bat.png",
+      "sha256": "fa9f38a6b4a6662afd72bfe670935e8b0eba3e7a637c62405012c6efca1af611"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/chimera.png",
+      "sha256": "bbdfa0a52a556e356da3f53151b96eae5f4608819d734b0fd79673ae47ff49a7"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/dire-bear.png",
+      "sha256": "b7d92d7e793cf98e68ac1d55d505371d815e2e30340a47420dfade398f0a5844"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/dragon.png",
+      "sha256": "a4ad1da8d6dff0afeb9716392634119fa54450351e59f9af78ea00dee2e1cb5f"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/dryad.png",
+      "sha256": "b5740ed86dd2c45cac400a5a8e18fede503043e26af057d7a63b5440c76b50de"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/giant-beetle.png",
+      "sha256": "fd56c2f464a42b6fd578c43f438e0145cb48bcc3641599ad0b86f41e696ca713"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/glim.png",
+      "sha256": "d5f9f7a7fc934aee070733fbf6bc9a97844e9eb15b5301bd279593ece7ca642f"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/greater-ichor-fish.png",
+      "sha256": "fae17dece56f89bed1c4e1eca95bc1ba2e3906cb5f945ee6004342b9f9e0ba8e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/greater-ichor-leviathan.png",
+      "sha256": "032019b4f84f5c415f76189bbdf3431b7e04dbc81878a4a12f880c337af4c353"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/greater-ichor-shark.png",
+      "sha256": "39b69c653cf4e4fdd796a72ee4e4322c5e3615abac27895df1dba3ad6bc515c4"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/half-here.png",
+      "sha256": "5291808e11aa71dfc5f75594f4094e14643cc819c3c65e758e2082e0d121f900"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/hemogoblin-bloodmancer.png",
+      "sha256": "7da17c2f99b886f453d7f29f21be531499204d2a74ae4b0dc8ec866b1150b1c8"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/hemogoblin-inventor.png",
+      "sha256": "703b186e27e3bfcbe7bfc3c30dbbb5bfd42002a72a7b4f39f72e167494af992a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/hemogoblin-mech.png",
+      "sha256": "7a08a5669183750a721322a80eb978150990188904caa5bba20f8c6f48c795d0"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/hemogoblin.png",
+      "sha256": "2fd63f46cbf9f550319ec433ce2a53389c0b94a93f615426ea440f64daafa77e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/horn-1.png",
+      "sha256": "6a5208c330f5642026d41119987f1cdd183a84ac1af57561879d37a8ed599cbb"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/horn-2.png",
+      "sha256": "2bd5da78733c3eab5a141b355b92d66192e136a66d2e2f05e4123394e9bae808"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/horn-3.png",
+      "sha256": "d9dc3469e90133147e0d9de98af78f4582d8accaa0895f61a19f088a677a1cea"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/horn-4.png",
+      "sha256": "5da1f01c166b08d86994feff728f3aa119558d2267cdf76a9a7e3b051d968c80"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/horn-5.png",
+      "sha256": "74f3df35d3f40001aa28c0cdb582ecfb62c639220c3576a039565d9d71d72905"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/horn-6.png",
+      "sha256": "eae405bd1fd602e9d9f6d1918f159a72ed386e743aacf9b68b5d8cb4ba8231bb"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/horn-7.png",
+      "sha256": "5d15a5a471be1f1f5ed2bd478d630b7be5d87bf860b1ad03864c97fac7cbd325"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/ichor-fish-standard.png",
+      "sha256": "e485399eae0427d4f29902edbfcdb559298a6ca1d35903c451d533a995a72de5"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/ichor-leviathan.png",
+      "sha256": "8c3467b2c03dfd2496c379e4dd860d63a5eda95e5448e0680a780f62fe93e3c1"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/ichor-shark.png",
+      "sha256": "6681d0274df207bc6a598e25f74540f774c02d0763c98bdb8c03f0338c480752"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/kelpie.png",
+      "sha256": "eddba987094af67cd2cecfd33c44fc317546901f588adb32eeab384e74cceb34"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/killspawn.png",
+      "sha256": "9f120e11275f9a00505bf229429d99bd0a2fdb48a17825c465e1027cc8a5c3bf"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/lesser-ichor-fish.png",
+      "sha256": "6f939a449dc9a1170d40c0e3b99da68a0b6fc39bb1b9f67f662de6034c32fd34"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/lesser-ichor-leviathan.png",
+      "sha256": "1e77935d17239a2e78193346c5c95112d8af16664e0169a16d03bafb75202cb7"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/lesser-ichor-shark.png",
+      "sha256": "dd19dc95c4a4625bbaa56afbb823716725f0d321fa7017a6159950ae8080dd03"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/long-saidri.png",
+      "sha256": "50e71c43d290f69d37982bda38e7991e7b481b4b86e318141901a01756f4edf2"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/maulchild.png",
+      "sha256": "81e6d8244fb499bff2f29cc9a7427946dbd63e5ef6c948219b01031e1c7c9317"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/mini-me.png",
+      "sha256": "8c179a0bfc970bdedb3cd93eb49fd77c0690f5dab77c956e9ddfc88c61972666"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/minotaur.png",
+      "sha256": "9641f639efe1fee87a63bf690e6bb31c4fe54d01a5e149064b9930adf986d5c2"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/moonspawn.png",
+      "sha256": "1086036ddeb85e888a238959611ef0cdb0aa80c817a8853e7fa7c9f4e12b8a11"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/needleling.png",
+      "sha256": "bb39b6fa4694220c2c46563abd796fb882975af598e227255044bee284262e1c"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-birther.png",
+      "sha256": "929544b55a028d636e22d34382ee8145f7c327680a9e08ef1374358e5cff9fe5"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-biter.png",
+      "sha256": "17faa85f4d1dc3df2b52e06be9a1a0083e295cf01c7bd5aed5597f3a9c07ab35"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-breather.png",
+      "sha256": "686eefe4fcd4f1ec30c62ab5e8a69b0ad1592f64ce722864f3d3a4cd22774ddd"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-greater-birther.png",
+      "sha256": "2cfb092ac220c0916c757eed043ca8da8278fbb33ea2c878ee3e5498d5eb4cb4"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-greater-biter.png",
+      "sha256": "52a8071724f4fb0a08f1b142fb51e893358c4a8821bd5544793b799548f78f37"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-greater-breather.png",
+      "sha256": "58f69e18540cfc7d241e3cda72783ced927a3caf00152b9091aae13cb1ec6ef6"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-greater-screamer.png",
+      "sha256": "5f0d94bd77c257fe422cd3b461d5cc4b2d5faf265e75bb9df479ccb16dce2100"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-greater-spitter.png",
+      "sha256": "8048659529595a77aa7fb79b58451bc6d44dbafa06c97e8b5000f737b18e7624"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-jackal.png",
+      "sha256": "1569576d02fa350f98c1d1453012090f878362f66a17f689797487fb52fbe412"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-screamer.png",
+      "sha256": "5e6811ab48bcc4463a62200b2070bb16bccb3d2092ff611321fcc7638c64129a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/pale-spitter.png",
+      "sha256": "cc1e12b9dcca7682411b818a343db347f6b9998a0f244ff747c10d96e73a5419"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/phoenix.png",
+      "sha256": "1e3d99f86e0cbdb0c5f9f5d7267e0ae86caf22056967be31f97e501fc15f4eff"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/rat.png",
+      "sha256": "dcf105538b242140599ff10fe12cfc392f2d5549f69d09d12db88a4db6f4f3fb"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/river-drake.png",
+      "sha256": "348b528e4381d76a0d3603cd4c92615ef11f6b3c7fc435d897cadc43874fa8f4"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/sabretooth.png",
+      "sha256": "fff1fc94dce2f91dc5a2f34ea4818026be71bf1d9c8987b4b2422bc5987efc07"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/saidri-guardian.png",
+      "sha256": "ea494a156e3fd9ccacd47f0920e685d1a5a015f2aebfbb3a8a148d9595ed3fca"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/samara.png",
+      "sha256": "0cde43db8c95b460fa3db78ed1af94140cf4f0a16fbd3b50f6fce8f10575729e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/shellback-beetle.png",
+      "sha256": "aa3f247743ba2fcd985611abd3302ef4c580375d224f3310f657672ebca934f2"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/short-saidri.png",
+      "sha256": "6a22c9b9f42946ca06fa560e1d49efaea5e75cad998fa41843989b46eb3870af"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/sphinx.png",
+      "sha256": "edf5de40d87499a91be7e25768ea58dd4bcfd3d8d33ce432299e66601570b64b"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/tiger.png",
+      "sha256": "af13ad68d27c71e12ae4625a13859df94f38faed233f5d7bbde6e3c06c4c6987"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/troll.png",
+      "sha256": "a0d8a4ae1dde0e985d0b45bba39b5769ddf6bae51456c752c8d73f810a05e3b5"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/ursa-major.png",
+      "sha256": "20f33c5c53af2c24d88df57ba2ebbdbf6eec96f5e945eb0ec62cde6a2cca2307"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/ursa-minor.png",
+      "sha256": "45e4725345b9db674fb5e11cefbf67e08e0241490baeca3013d13ee298646462"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/valta.png",
+      "sha256": "1847b38a5892ae3ae880e3eb10ad8027897520706079a6e58ca966ca33754a4b"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/vampire.png",
+      "sha256": "b055e2cb354c4ae603fe77d3083d52af9ba3d8a5214645c2ad072012bc8c9cfc"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/wendigo.png",
+      "sha256": "b34810201b6421e83e6e924fa89c3e4ce23d868687b9afcd083ea7b9c6cec1d4"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/witch.png",
+      "sha256": "88c4037f5c2bd9f0217e8236129578dbe123bc6c90ddba4949b4fe375c875d8c"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/yeti.png",
+      "sha256": "ead86b355ee0f9ab16247bbb5ea8dcf0870f229b6daf506d4dc322229b154120"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-ancient.png",
+      "sha256": "5ffbf7feee145bdbfe7642591a64d121aef79dc6e6c3f72afcff493317a5ea03"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-child.png",
+      "sha256": "864e1ebe108e34a6fdc13a51d2ce7713813ca327de7f971f60d29c329abfb418"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-greater.png",
+      "sha256": "612a1d420819de075547b9d5e3c8cb686cf3eb24fcbd34893586afd8b1d29237"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-hulking.png",
+      "sha256": "35085ad040f3bafb1ff63dbb7651b5aa96e6a7d34004e8d26931b28c6a7de847"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-infant.png",
+      "sha256": "74ffd90b235665b2cebc52ff02f55cce765e6e811b61417c23f0da878f8230d4"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-lesser.png",
+      "sha256": "ed766d2ef4e02b735ddf02743ba5afc161ffd57491b7567d6ee616849c2d7f08"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-mature.png",
+      "sha256": "31e461b09f1bc19934d560aba4b7036f912ac3d24952608df21ae23dcfc70f98"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-timeless.png",
+      "sha256": "a16c5329f72c8f32c7455106a421f1e62b15a64b8460c5b398e45c9718962569"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-transcendent.png",
+      "sha256": "8ba20ae2c0d5fa7e1c29f84e64457d1014d36698a73fc84e5325baac55bbba0b"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures/zillennia-unqualified.png",
+      "sha256": "6b8d23b2e43d4df5b88cb8166a0590b71c6ee05f8635717c5723f549678af0e7"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/banshee.png",
+      "sha256": "dd69bf86c8d1c8942e6a7b53523e290e20588b5b5abe210340e94560e9d7e161"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/bastidion.png",
+      "sha256": "28b8ef497c2581057abeac5c939ca74c58d143193c1ad68d2aaffda7b9e2ba13"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/bear.png",
+      "sha256": "808d70f8970295210d470059bf42ef5a0521365ed37c091596eb09a283d57b8e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/blorb.png",
+      "sha256": "ee435c1467570bb9e0a51a3e903c62a683302cbd828584ff3baf5417b630d7b6"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/bombardier.png",
+      "sha256": "78bc152ef4af9a05b2d6d31e9ef03bd704c2cd64b90bdc1d0e1e960223bd8683"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/cancer.png",
+      "sha256": "f8fec744ca14b35e44b3835bd196129107440e87bd0508ec6ee866abb8bf94f8"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/cave-bat.png",
+      "sha256": "419687eeb7c8434c6489127ce67b044e1b6f7e234a33354914e9abe842a792e2"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/chimera.png",
+      "sha256": "292eff520c9964cbf8f948f5025ba7e638bfae10a30963e7fd874d22661f3bc3"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/dire-bear.png",
+      "sha256": "c743ae85b02946a4b1e10828ee8fb521dbdc42d00f94fa4265f12f020fd2ebb6"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/dragon.png",
+      "sha256": "4a46ffa5b1e84f2a5a2878761d2c6862344b6677efc749aa31b6c846434d49ac"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/dryad.png",
+      "sha256": "7cfdee03dea1e4320199d796a868254a84f3b30354fde247666550c0a4ffddb1"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/giant-beetle.png",
+      "sha256": "5cbb61b8006290ac808279026ba0864bfb8ec8ad9024e06782c5dc1e230899b3"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/glim.png",
+      "sha256": "bf897924c625f7664066122631f683c7040280cfa2a76c4fd92633dbc1bbf763"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/greater-ichor-fish.png",
+      "sha256": "5d35197769a6cb661feb5a8e5dd74009b3d14ec6dad6ef4115d05ec93398134a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/greater-ichor-leviathan.png",
+      "sha256": "9565f39be859260a6cb7d19d69593761d9c415b159074245ab5bef18093cea6b"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/greater-ichor-shark.png",
+      "sha256": "fdbef6dc71b2416e6052c3fc6732ce55961e0c14d39f1f963688269dcb160fe4"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/half-here.png",
+      "sha256": "0d9b18f5abf2d7da236195ab26518b3d76306fecda4ac081544de8fef32e615e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin-bloodmancer.png",
+      "sha256": "6181a82c0f6a11cc44bfac46af39ebb2123733745f2795b729ac9cbf74f51cbf"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin-inventor.png",
+      "sha256": "d76d0cc44d371242500739e1234c1b06f3dcdd836857ffa487837ec258cfedee"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin-mech.png",
+      "sha256": "142fe173da186529dc66ec2935e96829b153e36836034f3b9487ca7d9c1fd1be"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin.png",
+      "sha256": "9dc61fb785482de327358e624328abf20ca06b98bc7dfe34c1f9d796380ef796"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/horn-1.png",
+      "sha256": "aa409d303f616b9108f0709868bedbe01f27bdbbccebc0de75d5e006051cd575"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/horn-2.png",
+      "sha256": "913d7c7da806db90a872c02a752d9488e5686c28122333b7b1e39dac28020a59"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/horn-3.png",
+      "sha256": "349280b82d3dacc64b78d7cabdf5fec8a4b34cee38ca04078d27d4c08b64becf"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/horn-4.png",
+      "sha256": "b6d5092016f9c2c74280203db596b5b51800a90baee66832cf41dab46beb7a90"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/horn-5.png",
+      "sha256": "deddcde45c62e276c5a2f23a17c099c38f4d4c09490710f2de6db8a5939b7f6e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/horn-6.png",
+      "sha256": "3a766df288f579a82779eb4a99acf3bdcb3aa0c117bd5ab9b25703b4fadecbe0"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/horn-7.png",
+      "sha256": "053f5f32fb04e882cb58092c277041cce4bcadd619be03730e194aead23f04f9"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/ichor-fish-standard.png",
+      "sha256": "149254d89b5a7342659ebc38aa77fcd6f60c3b7c09280c4ac5f9ec331d126a2e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/ichor-leviathan.png",
+      "sha256": "e1b00050c58ba51966cdb76e49d6cd29909569ad67d4c288b8956b5f0c0cbd92"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/ichor-shark.png",
+      "sha256": "84feca277cb6c2c8d480720d7a33442b4376d41a7ae09d186629176868bf531c"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/kelpie.png",
+      "sha256": "f423720993c3bc813d1d1751766a262a70f704a76960b4d88ab0a962c2c40ef0"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/killspawn.png",
+      "sha256": "b21857e76374f348da281d0d368be16ec432d135668a7bbb90a2bf3ecfef7138"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/lesser-ichor-fish.png",
+      "sha256": "04125d551014d841e6566727d9e8c3a93f6f5b855122beb047c122d1cf85ed2d"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/lesser-ichor-leviathan.png",
+      "sha256": "3e7c97e202d300601207c9254cb9bfb2c40b9801f43d541d71b4908d3745fd3a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/lesser-ichor-shark.png",
+      "sha256": "f967059bc260aa7638830a70a30c76a4222ffdd2b669be1e2ea50a7880f5abb3"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/long-saidri.png",
+      "sha256": "e4dd517169f1c6b10d96788eb5464044b1d123cecc9b4e63d023b73ee5b4ddc3"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/maulchild.png",
+      "sha256": "01ca35ab2565777dbc7ac46da2c176b9f1bbf518c7f934a80b5d38e8d00f1b6e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/mini-me.png",
+      "sha256": "c81d64a28afb70bca59b89540436cac697ed2d4fe5258e67410292bc7c3f0f03"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/minotaur.png",
+      "sha256": "27bdd6d5c5bde2a351b73b979dc8c9b8dbe1373c7104fd4b10f77eeb951e56ce"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/moonspawn.png",
+      "sha256": "6b8b91a7efe10afdc1ece355c1ceea9feb88c4f5c9261854be0b83b4bdf305d4"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/needleling.png",
+      "sha256": "74308dda6c3fc5895c03ae299a485c39f57dd70c013efd30f545254cc30650ff"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-birther.png",
+      "sha256": "6797e3bec63ebce8c6e96deca2ae6d9eb7df2edbafeb37df1ad98add883223ee"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-biter.png",
+      "sha256": "c51c55cd5fd5896307ca93e9b83b72875b1f4c9657e1fcebb30a9a273952f242"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-breather.png",
+      "sha256": "3bbd1fd88b645f825148ecf7ff5257728f735087602024262c6602de1cdf1695"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-birther.png",
+      "sha256": "46e62b54c291390f1f9be97e37010dcdc02a7b1e9429b0bb167d34139e7877f5"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-biter.png",
+      "sha256": "ed7c29c40db3a5e1cf9dbb44e5161197e9172d9b2e34beac63f4bb1bdd0dfdb7"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-breather.png",
+      "sha256": "93a3206a178519f5a546e3f3dffa77cc157d366e79f0f0573597c14c0421708a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-screamer.png",
+      "sha256": "1c2d5e256359c047c68ad56f9c2479337a0843b6d7610cad6d9286cd01c465b1"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-greater-spitter.png",
+      "sha256": "783430e3d4111686a0ae3fb7f45db668478a164ef62adc0ab62d659e5830ac87"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-jackal.png",
+      "sha256": "a23a65f63f1ed57fc9cc242ee03487bcbce184dd20e6cf0cbf0fb865f721db5a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-screamer.png",
+      "sha256": "104097012e5836a692a22762dd7ae66a04032a7fb633f28447cc830624453794"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/pale-spitter.png",
+      "sha256": "9cd1de6ac1829ae5a213069e827a4fd7de9ebbddc1c5afe6a44162e6a32154b5"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/phoenix.png",
+      "sha256": "fa382d5c7b3c98c0a3d9cd2ea042164e669415eda2673c555edb456fc3c15638"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/rat.png",
+      "sha256": "e2a7f0e98c442da31c62c407e5c4afa0c95239abc33385dfdb1665465e54b32c"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/river-drake.png",
+      "sha256": "5a10de8cca54f28fa31822e9c330e62f8aeda32b9449a896875f5296b21bf30c"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/sabretooth.png",
+      "sha256": "99c7d82d14bae8148779be134a3b7fe5d9f859f6756bd11780253eb042f75606"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/saidri-guardian.png",
+      "sha256": "5e8956b95bdd30c9dc8a59c276c8addd73cebe1fc7975228819506cffa09af72"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/samara.png",
+      "sha256": "53d2cf44d254f06d5c15731ce0c8c2590c53a75be918a85b9f1e75985288b26f"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/shellback-beetle.png",
+      "sha256": "1a0fb92804bfd69756f5e80f88c58c6cff6aa60de54be148a97365ca66616396"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/short-saidri.png",
+      "sha256": "24aa1da6c4e68dc4f6d70689b4abb82c0249cbc5599af205f10d33e9c3684385"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/sphinx.png",
+      "sha256": "9cc169391812e9b905c69c6ffffe5993025238c7a7f37b7b192ca3b27dece6f2"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/tiger.png",
+      "sha256": "522a9cdbe8b1faa2206882b400101f0887ae539d4a19e32ad578b2d09951ad06"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/troll.png",
+      "sha256": "d52d29b7161ab49271f4228ae0a0c00002cd2ba08d20e6f4e4c8d55e1206056e"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/ursa-major.png",
+      "sha256": "812ab6331549d96be124c907a593da505ea047e2c64708255cca111401d8345b"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/ursa-minor.png",
+      "sha256": "a65fdbf8544aebf26eb7e0c9fd0520d1c628801d5ec1c69897625c1d2fe38e6a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/valta.png",
+      "sha256": "45460090fd632c6ca93a1ef5693bad67f365f7ba93105a1637ceec5dbe97c047"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/vampire.png",
+      "sha256": "39750aa7d2fe0fa79cf4b8473eeb3ff8d4165ff8d8fa99bab0d7704f0bc5148b"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/wendigo.png",
+      "sha256": "91f496b55ce8becc504178e0685d8b4113433442b790b2f576d80b620da0aa3b"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/witch.png",
+      "sha256": "590b9df3bb45624000b72b45c7283bedd45b518bdd6ca2be328df108b5e16a0a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/yeti.png",
+      "sha256": "ed8de2efe394c985b790b33dcba86b2511971935827f18a509520ea8d35452f1"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-ancient.png",
+      "sha256": "5134234ee8d355dce59c1f25404486cfeb8320dc0336d6d5cda11736584f8c5a"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-child.png",
+      "sha256": "3d158b52c947b8e1b6afa7bf1001568a0c4ed6130c3c2847540d5a871b22d2bc"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-greater.png",
+      "sha256": "a589668d16381173a22d40304f3c581660d993df57395565726f82b6c09e2c56"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-hulking.png",
+      "sha256": "9385dc30a6d73328fc29d0d33fd0734cd54c0fae69250ea89152fe556b44cbad"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-infant.png",
+      "sha256": "261a6bf2b7f496d901431a358c73814c2024599d78c137d63a9fa0f05ce377dc"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-lesser.png",
+      "sha256": "575db378be3886e740d9ba830b61d0846bccd534aad766c1dd8495c1c0c021b6"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-mature.png",
+      "sha256": "ede141f1592cfedc33bb3ac8d9e01082374d5f86487211f37716ef63a97588d9"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-timeless.png",
+      "sha256": "15f584dab820ed894fa1a64ebf132511fb010e0a1cb1b4958320a344a323f3e0"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-transcendent.png",
+      "sha256": "844fd74f36c9665e797ca7b7179009744bc0cc7b2b4cf1e9599ced9f0b49e213"
+    },
+    {
+      "file": "crates/corpse-desktop/assets/creatures-rgba/zillennia-unqualified.png",
+      "sha256": "43c0758c178207ac091eb88a2f7f79fa8a9bd481a91dff8cf0c7f09dd619d702"
+    }
+  ]
+}

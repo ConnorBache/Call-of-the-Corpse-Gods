@@ -1,0 +1,22 @@
+
+running 17 tests
+test adjacent_sibling_step_is_not_a_zero_cost_transfer ... ok
+test local_origin_shot_does_not_draw_and_blocked_return_origin_cannot_reroll ... ok
+test half_here_keeps_native_pocket_plane_after_dreamwalk ... ok
+test legacy_throw_keeps_second_raster_trajectory_check ... ok
+test actual_npc_ranged_launch_resolves_fork_not_preview_stop ... ok
+test legacy_charged_moonbeam_out_of_range_still_discharges_without_attack ... ok
+test collision_or_blocked_exit_stops_before_fork_without_rng ... ok
+test possible_shot_search_never_supplies_remote_optical_knowledge ... ok
+test actual_throw_transfers_one_item_and_invalid_potion_does_not_draw ... ok
+test stochastic_path_rejects_an_unwalkable_sibling ... ok
+test preview_stops_at_random_entry_and_committed_trace_draws_once ... ok
+test thrown_potion_hits_shared_occupant_once_without_sampling_return ... ok
+test real_witch_fork_miss_advances_phase_spends_and_sets_same_cooldown ... ok
+test witch_over_range_random_branch_is_a_paid_cooled_down_miss ... ok
+test linked_source_origins_are_deterministic_but_reverse_origin_is_not_previewed ... ok
+test npc_path_admits_both_outcomes_and_commits_only_actual_movement ... ok
+test real_horn_ai_admits_possible_shot_but_commits_fair_miss_and_recovery ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

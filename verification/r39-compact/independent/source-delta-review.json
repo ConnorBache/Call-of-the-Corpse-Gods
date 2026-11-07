@@ -1,0 +1,10 @@
+{
+  "archived_files_checked": 1724,
+  "changed_or_missing": [
+    "corpse-gods-native/crates/corpse-desktop/build.rs",
+    "corpse-gods-native/crates/corpse-desktop/src/embedded_assets.rs",
+    "corpse-gods-native/docs/complexity-ledger.md",
+    "corpse-gods-native/docs/native-embedded-art.md"
+  ],
+  "runtime_files_match_q100": 84
+}

@@ -1,0 +1,12 @@
+
+running 7 tests
+test beckoning_preview_respects_known_movement_restrictions ... ok
+test acid_physical_portal_distance_and_blink_endpoint_range ... ok
+test fixed_fixtures_block_physical_rays_only_from_revision51 ... ok
+test blocked_blink_is_atomic_and_never_shortens ... ok
+test hidden_occupancy_and_remembered_terrain_do_not_leak ... ok
+test iceblast_is_area_only_and_beckoning_exposes_pull_route ... ok
+test observed_delivery_matches_effects_and_preserves_lightning_piercing ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

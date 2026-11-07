@@ -1,0 +1,7 @@
+
+running 2 tests
+test fixed_brood_profiles_do_not_retune_natural_or_loaded_creatures ... ok
+test revision32_overlay_is_finite_birth_only_and_preserves_rewards_and_traits ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

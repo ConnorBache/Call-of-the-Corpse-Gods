@@ -1,0 +1,4646 @@
+[
+  {
+    "kind": "pale:Breather",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Pale Breather",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:breath",
+          "enemy:pale:breath-boost",
+          "enemy:pale:gas-vulnerability"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": -5.0,
+          "accuracy": -2.0,
+          "dodge": -3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": -5.0,
+          "accuracy": -2.0,
+          "dodge": -3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -4.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 70.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.9703177396937694,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.20459371708902446,
+    "mean_residual_net_cost": 0.7657240226047448,
+    "mean_cost_at_enemy_death": 0.20459371708902446,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 26.578125,
+    "mean_combat_commands": 3.03125,
+    "mean_world_turns": 26.578125,
+    "mean_settlement_commands": 23.546875,
+    "mean_enemy_attack_attempts": 0.0,
+    "mean_player_attack_attempts": 3.03125,
+    "mean_player_landed_attacks": 3.03125,
+    "mean_attacks_to_kill_conditional_on_kill": 3.03125,
+    "mean_world_turns_to_kill_conditional_on_kill": 3.03125,
+    "mean_enemy_attacks_over_killed_lifespan": 0.0,
+    "mean_gross_damage_fraction": 1.0532559919232416,
+    "mean_gross_combat_damage_fraction": 0.20865621708902446,
+    "gross_combat_standard_error": 0.004474855637418539,
+    "gross_total_standard_error": 0.005181750382582742,
+    "mean_gross_postdeath_damage_fraction": 0.844599774834217,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 1.0532559919232416,
+    "mean_gross_damage_fraction_conditional_on_kill": 1.0532559919232416,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.20865621708902446,
+    "mean_capped_actual_damage_fraction": 1.0214739896937697,
+    "mean_enemy_energy_consumed": 20.3125,
+    "kills": 64,
+    "deaths": 56,
+    "combat_deaths": 0,
+    "residual_deaths": 56,
+    "censored": 8,
+    "combat_censored": 0,
+    "aftermath_censored": 8,
+    "kill_rate": 1.0,
+    "death_rate": 0.875,
+    "censor_rate": 0.125,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "corpse_revival": 8,
+      "enemy_energy_consumed": 130
+    },
+    "marker_trials": {
+      "corpse_revival": 8,
+      "enemy_energy_consumed": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Pale Breather#4": 8
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 260.6875
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 208.578125
+    },
+    "outcomes": null,
+    "role": "Controller",
+    "reference_depth": 5,
+    "category": "ordinary",
+    "target_gross_fraction": 0.1,
+    "qualification": "Pale gas-defense specialist follows basic bites; retain its one-note gas identity and measure lingering clouds separately.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Breather",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Pale Breather",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:breath",
+          "enemy:pale:breath-boost",
+          "enemy:pale:gas-vulnerability"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": 7.0,
+          "accuracy": 7.0,
+          "dodge": -3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": 7.0,
+          "accuracy": 7.0,
+          "dodge": -3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -4.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 142.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 1.0,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.3956538594217658,
+    "mean_residual_net_cost": 0.6043461405782342,
+    "mean_cost_at_enemy_death": 0.3956538594217658,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 14.859375,
+    "mean_combat_commands": 5.609375,
+    "mean_world_turns": 14.859375,
+    "mean_settlement_commands": 9.25,
+    "mean_enemy_attack_attempts": 0.1875,
+    "mean_player_attack_attempts": 5.609375,
+    "mean_player_landed_attacks": 5.609375,
+    "mean_attacks_to_kill_conditional_on_kill": 5.609375,
+    "mean_world_turns_to_kill_conditional_on_kill": 5.609375,
+    "mean_enemy_attacks_over_killed_lifespan": 0.1875,
+    "mean_gross_damage_fraction": 1.0645690047578242,
+    "mean_gross_combat_damage_fraction": 0.40487260942176573,
+    "gross_combat_standard_error": 0.012810156903756779,
+    "gross_total_standard_error": 0.002645975713612742,
+    "mean_gross_postdeath_damage_fraction": 0.6596963953360584,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 1.0645690047578242,
+    "mean_gross_damage_fraction_conditional_on_kill": 1.0645690047578242,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.40487260942176573,
+    "mean_capped_actual_damage_fraction": 1.0277187500000002,
+    "mean_enemy_energy_consumed": 44.21875,
+    "kills": 64,
+    "deaths": 64,
+    "combat_deaths": 0,
+    "residual_deaths": 64,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 1.0,
+    "censor_rate": 0.0,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "enemy_energy_consumed": 283
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Caustic gas": 262.046875,
+      "physical_attack": 1.0625
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 161.625
+    },
+    "outcomes": null,
+    "role": "Controller",
+    "reference_depth": 5,
+    "category": "ordinary",
+    "target_gross_fraction": 0.1,
+    "qualification": "Pale gas-defense specialist follows basic bites; retain its one-note gas identity and measure lingering clouds separately.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Spitter",
+    "revision": 31,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Pale Spitter",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:spit",
+          "enemy:pale:gas-shot"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": -11.0,
+          "accuracy": 4.0,
+          "dodge": 1.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": -11.0,
+          "accuracy": 4.0,
+          "dodge": 1.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 2.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 34.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.8637828513502851,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.4197804760259916,
+    "mean_residual_net_cost": 0.444002375324294,
+    "mean_cost_at_enemy_death": 0.4197804760259916,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 46.828125,
+    "mean_combat_commands": 5.09375,
+    "mean_world_turns": 46.828125,
+    "mean_settlement_commands": 41.734375,
+    "mean_enemy_attack_attempts": 3.09375,
+    "mean_player_attack_attempts": 2.09375,
+    "mean_player_landed_attacks": 1.9375,
+    "mean_attacks_to_kill_conditional_on_kill": 2.09375,
+    "mean_world_turns_to_kill_conditional_on_kill": 5.09375,
+    "mean_enemy_attacks_over_killed_lifespan": 3.09375,
+    "mean_gross_damage_fraction": 0.974799775130291,
+    "mean_gross_combat_damage_fraction": 0.42796797602599135,
+    "gross_combat_standard_error": 0.00934137547882546,
+    "gross_total_standard_error": 0.015899622874123203,
+    "mean_gross_postdeath_damage_fraction": 0.5468317991042996,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.974799775130291,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.974799775130291,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.42796797602599135,
+    "mean_capped_actual_damage_fraction": 0.9554391013502854,
+    "mean_enemy_energy_consumed": 10.0,
+    "kills": 64,
+    "deaths": 41,
+    "combat_deaths": 0,
+    "residual_deaths": 41,
+    "censored": 23,
+    "combat_censored": 0,
+    "aftermath_censored": 23,
+    "kill_rate": 1.0,
+    "death_rate": 0.640625,
+    "censor_rate": 0.359375,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "corpse_revival": 23,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 192
+    },
+    "marker_trials": {
+      "corpse_revival": 23,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Pale Spitter#4": 23
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 192.4375,
+      "physical_attack": 15.8125
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 116.515625
+    },
+    "outcomes": null,
+    "role": "Mage/Artillery",
+    "reference_depth": 4,
+    "category": "ordinary",
+    "target_gross_fraction": 0.12,
+    "qualification": "Low-beast projectile specialist: about half its peer Fighter budget, with existing recovery and gas shot intact.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Spitter",
+    "revision": 32,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Pale Spitter",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:spit",
+          "enemy:pale:gas-shot"
+        ],
+        "stats": {
+          "offense": 6.0,
+          "defense": -11.0,
+          "accuracy": 10.0,
+          "dodge": -5.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 6.0,
+          "defense": -11.0,
+          "accuracy": 10.0,
+          "dodge": -5.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 2.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0,
+          "monsterGasShotVolume": 25.0
+        },
+        "max_hp": 34.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.005149852095183895,
+    "mean_completed_cost": null,
+    "mean_combat_cost": 0.15866838791025764,
+    "mean_residual_net_cost": -0.1535185358150738,
+    "mean_cost_at_enemy_death": 0.15866838791025764,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 104.90625,
+    "mean_combat_commands": 4.953125,
+    "mean_world_turns": 104.90625,
+    "mean_settlement_commands": 99.953125,
+    "mean_enemy_attack_attempts": 2.953125,
+    "mean_player_attack_attempts": 1.953125,
+    "mean_player_landed_attacks": 1.953125,
+    "mean_attacks_to_kill_conditional_on_kill": 1.953125,
+    "mean_world_turns_to_kill_conditional_on_kill": 4.953125,
+    "mean_enemy_attacks_over_killed_lifespan": 2.953125,
+    "mean_gross_damage_fraction": 0.16657463791025753,
+    "mean_gross_combat_damage_fraction": 0.16657463791025753,
+    "gross_combat_standard_error": 0.0046858976250721525,
+    "gross_total_standard_error": 0.0046858976250721525,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.16657463791025753,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.16657463791025753,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.16657463791025753,
+    "mean_capped_actual_damage_fraction": 0.16657463791025753,
+    "mean_enemy_energy_consumed": 10.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 64,
+    "combat_censored": 0,
+    "aftermath_censored": 64,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 1.0,
+    "p50_cost": 0.0,
+    "p90_cost": 0.01673076923077066,
+    "p95_cost": 0.0280198019801996,
+    "max_cost": 0.09470588235293764,
+    "markers": {
+      "corpse_revival": 64,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 192
+    },
+    "marker_trials": {
+      "corpse_revival": 64,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Pale Spitter#4": 64
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 14.828125,
+      "physical_attack": 20.28125
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Mage/Artillery",
+    "reference_depth": 4,
+    "category": "ordinary",
+    "target_gross_fraction": 0.12,
+    "qualification": "Low-beast projectile specialist: about half its peer Fighter budget, with existing recovery and gas shot intact.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Birther",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Pale Birther",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:birth",
+          "enemy:pale:double-birth",
+          "enemy:pale:slow"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": -7.0,
+          "accuracy": -4.0,
+          "dodge": -5.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": -7.0,
+          "accuracy": -4.0,
+          "dodge": -5.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 30.0
+        },
+        "max_hp": 58.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.0011746171257946431,
+    "mean_completed_cost": null,
+    "mean_combat_cost": 0.0011746171257946431,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.0011746171257946431,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 2.34375,
+    "mean_combat_commands": 2.34375,
+    "mean_world_turns": 2.34375,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 0.28125,
+    "mean_player_attack_attempts": 2.34375,
+    "mean_player_landed_attacks": 2.34375,
+    "mean_attacks_to_kill_conditional_on_kill": 2.34375,
+    "mean_world_turns_to_kill_conditional_on_kill": 2.34375,
+    "mean_enemy_attacks_over_killed_lifespan": 0.28125,
+    "mean_gross_damage_fraction": 0.0012371171257946445,
+    "mean_gross_combat_damage_fraction": 0.0012371171257946445,
+    "gross_combat_standard_error": 0.0008752199353674456,
+    "gross_total_standard_error": 0.0008752199353674456,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.0012371171257946445,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.0012371171257946445,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.0012371171257946445,
+    "mean_capped_actual_damage_fraction": 0.0012371171257946445,
+    "mean_enemy_energy_consumed": 30.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 64,
+    "combat_censored": 0,
+    "aftermath_censored": 64,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 1.0,
+    "p50_cost": 0.0,
+    "p90_cost": 0.0,
+    "p95_cost": 0.0,
+    "max_cost": 0.04269273743016755,
+    "markers": {
+      "enemy_energy_consumed": 64
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Pale Jackal#6,Pale Jackal#7": 64
+    },
+    "mean_damage_packets": {
+      "physical_attack": 0.375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 6,
+    "category": "ordinary",
+    "target_gross_fraction": 0.05,
+    "qualification": "Low-beast mother follows the first small pale group; most power is children, with ten-turn cooldown and three-cast Fighter-equivalent budget.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Birther",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Pale Birther",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:birth",
+          "enemy:pale:double-birth",
+          "enemy:pale:slow"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": 3.0,
+          "accuracy": 7.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": 3.0,
+          "accuracy": 7.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 30.0
+        },
+        "max_hp": 118.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.06249341832988138,
+    "mean_completed_cost": null,
+    "mean_combat_cost": 0.06249341832988138,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.06249341832988138,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 4.453125,
+    "mean_combat_commands": 4.453125,
+    "mean_world_turns": 4.453125,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 2.25,
+    "mean_player_attack_attempts": 4.453125,
+    "mean_player_landed_attacks": 4.453125,
+    "mean_attacks_to_kill_conditional_on_kill": 4.453125,
+    "mean_world_turns_to_kill_conditional_on_kill": 4.453125,
+    "mean_enemy_attacks_over_killed_lifespan": 2.25,
+    "mean_gross_damage_fraction": 0.06433716832988137,
+    "mean_gross_combat_damage_fraction": 0.06433716832988137,
+    "gross_combat_standard_error": 0.01042943819398071,
+    "gross_total_standard_error": 0.01042943819398071,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.06433716832988137,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.06433716832988137,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.06433716832988137,
+    "mean_capped_actual_damage_fraction": 0.06433716832988137,
+    "mean_enemy_energy_consumed": 30.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 64,
+    "combat_censored": 0,
+    "aftermath_censored": 64,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 1.0,
+    "p50_cost": 0.03048275862068972,
+    "p90_cost": 0.20303125,
+    "p95_cost": 0.23143016759776525,
+    "max_cost": 0.3215862068965517,
+    "markers": {
+      "enemy_energy_consumed": 64
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Pale Jackal#6,Pale Jackal#7": 64
+    },
+    "mean_damage_packets": {
+      "physical_attack": 16.984375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 6,
+    "category": "ordinary",
+    "target_gross_fraction": 0.05,
+    "qualification": "Low-beast mother follows the first small pale group; most power is children, with ten-turn cooldown and three-cast Fighter-equivalent budget.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Birther",
+    "revision": 31,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 22.0
+      },
+      {
+        "id": 7.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 22.0
+      },
+      {
+        "id": 8.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 22.0
+      },
+      {
+        "id": 9.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 4.0,
+          "defense": -13.0,
+          "accuracy": -2.0,
+          "dodge": 3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 22.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.005343483642128865,
+    "mean_completed_cost": 0.005343483642128865,
+    "mean_combat_cost": 0.005343483642128865,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.005343483642128865,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 4.921875,
+    "mean_combat_commands": 4.921875,
+    "mean_world_turns": 4.921875,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 1.296875,
+    "mean_player_attack_attempts": 4.265625,
+    "mean_player_landed_attacks": 4.265625,
+    "mean_attacks_to_kill_conditional_on_kill": 4.265625,
+    "mean_world_turns_to_kill_conditional_on_kill": 4.921875,
+    "mean_enemy_attacks_over_killed_lifespan": 1.296875,
+    "mean_gross_damage_fraction": 0.007124733642128867,
+    "mean_gross_combat_damage_fraction": 0.007124733642128867,
+    "gross_combat_standard_error": 0.0015207948023176847,
+    "gross_total_standard_error": 0.0015207948023176847,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.007124733642128867,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.007124733642128867,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.007124733642128867,
+    "mean_capped_actual_damage_fraction": 0.007124733642128867,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.0,
+    "p90_cost": 0.019000000000000017,
+    "p95_cost": 0.025613445378151245,
+    "max_cost": 0.035795620437956144,
+    "markers": {
+      "forced_player_displacement": 42
+    },
+    "marker_trials": {
+      "forced_player_displacement": 40
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 1.859375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 6,
+    "category": "ordinary",
+    "target_gross_fraction": 0.25,
+    "qualification": "Isolated three-cast payload; parent removed; includes child descendants.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Birther",
+    "revision": 32,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 46.0
+      },
+      {
+        "id": 7.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 46.0
+      },
+      {
+        "id": 8.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 46.0
+      },
+      {
+        "id": 9.0,
+        "name": "Pale Jackal",
+        "abilities": [
+          "enemy:pale:gas-immunity"
+        ],
+        "stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0
+        },
+        "effective_stats": {
+          "offense": 25.0,
+          "defense": -9.0,
+          "accuracy": 9.0,
+          "dodge": 11.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 100.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 0.0
+        },
+        "max_hp": 46.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.21157708874805636,
+    "mean_completed_cost": 0.21157708874805636,
+    "mean_combat_cost": 0.21157708874805636,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.21157708874805636,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 9.015625,
+    "mean_combat_commands": 9.015625,
+    "mean_world_turns": 9.015625,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 5.765625,
+    "mean_player_attack_attempts": 8.578125,
+    "mean_player_landed_attacks": 8.25,
+    "mean_attacks_to_kill_conditional_on_kill": 8.578125,
+    "mean_world_turns_to_kill_conditional_on_kill": 9.015625,
+    "mean_enemy_attacks_over_killed_lifespan": 5.765625,
+    "mean_gross_damage_fraction": 0.22451458874805633,
+    "mean_gross_combat_damage_fraction": 0.22451458874805633,
+    "gross_combat_standard_error": 0.020453285617418455,
+    "gross_total_standard_error": 0.020453285617418455,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.22451458874805633,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.22451458874805633,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.22451458874805633,
+    "mean_capped_actual_damage_fraction": 0.22451458874805633,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.17565517241379314,
+    "p90_cost": 0.43947945205479444,
+    "p95_cost": 0.5709565217391306,
+    "max_cost": 0.7411578947368422,
+    "markers": {
+      "forced_player_displacement": 28
+    },
+    "marker_trials": {
+      "forced_player_displacement": 27
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 58.84375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 6,
+    "category": "ordinary",
+    "target_gross_fraction": 0.25,
+    "qualification": "Isolated three-cast payload; parent removed; includes child descendants.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "revision": 31,
+    "scenario": "piloted-mech",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Hemogoblin Mech",
+        "abilities": [
+          "enemy:beast:mech",
+          "enemy:beast:fire-breath"
+        ],
+        "stats": {
+          "offense": 43.0,
+          "defense": 41.0,
+          "accuracy": 34.0,
+          "dodge": 17.0,
+          "dr": 31.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 43.0,
+          "defense": 41.0,
+          "accuracy": 34.0,
+          "dodge": 17.0,
+          "dr": 31.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": -10.0,
+          "monsterLinkedInventorId": 5.0
+        },
+        "max_hp": 346.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.19191338836393762,
+    "mean_completed_cost": 0.19191338836393762,
+    "mean_combat_cost": 0.15829869902991317,
+    "mean_residual_net_cost": 0.03361468933402446,
+    "mean_cost_at_enemy_death": 0.15829869902991317,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 16.109375,
+    "mean_combat_commands": 9.546875,
+    "mean_world_turns": 16.109375,
+    "mean_settlement_commands": 6.5625,
+    "mean_enemy_attack_attempts": 3.84375,
+    "mean_player_attack_attempts": 9.546875,
+    "mean_player_landed_attacks": 9.546875,
+    "mean_attacks_to_kill_conditional_on_kill": 9.546875,
+    "mean_world_turns_to_kill_conditional_on_kill": 9.546875,
+    "mean_enemy_attacks_over_killed_lifespan": 3.84375,
+    "mean_gross_damage_fraction": 0.22213213836393803,
+    "mean_gross_combat_damage_fraction": 0.17539244902991338,
+    "gross_combat_standard_error": 0.005010358872507937,
+    "gross_total_standard_error": 0.006680850850743883,
+    "mean_gross_postdeath_damage_fraction": 0.04673968933402462,
+    "mean_status_channel_postdeath_damage_fraction": 0.04673968933402462,
+    "mean_logged_damage_fraction": 0.22213213836393803,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.22213213836393803,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.17539244902991338,
+    "mean_capped_actual_damage_fraction": 0.22213213836393803,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.18118725099601551,
+    "p90_cost": 0.26514826498422706,
+    "p95_cost": 0.29866129032258004,
+    "max_cost": 0.33104089219330757,
+    "markers": {
+      "active_fire_grid": 421,
+      "event_fire_breath": 157,
+      "fire_breath": 157,
+      "player_burning": 967
+    },
+    "marker_trials": {
+      "active_fire_grid": 64,
+      "event_fire_breath": 64,
+      "fire_breath": 64,
+      "player_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Fire": 123.3125,
+      "physical_attack": 4.6875
+    },
+    "mean_postdeath_damage_packets": {
+      "Fire": 26.25
+    },
+    "outcomes": null,
+    "role": "Fighter/Artillery",
+    "reference_depth": 14,
+    "category": "paired_follower",
+    "target_gross_fraction": 0.38,
+    "qualification": "Large dormant machine is threatening after piloting; its dependency justifies stronger contact than an unconstrained midgame Fighter.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "revision": 32,
+    "scenario": "piloted-mech",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Hemogoblin Mech",
+        "abilities": [
+          "enemy:beast:mech",
+          "enemy:beast:fire-breath"
+        ],
+        "stats": {
+          "offense": 149.0,
+          "defense": 28.0,
+          "accuracy": 58.0,
+          "dodge": 28.0,
+          "dr": 33.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 149.0,
+          "defense": 28.0,
+          "accuracy": 58.0,
+          "dodge": 28.0,
+          "dr": 33.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": -10.0,
+          "monsterLinkedInventorId": 5.0
+        },
+        "max_hp": 268.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.4074349480924459,
+    "mean_completed_cost": 0.4074349480924459,
+    "mean_combat_cost": 0.3694117139777776,
+    "mean_residual_net_cost": 0.03802323411466834,
+    "mean_cost_at_enemy_death": 0.3694117139777776,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 15.40625,
+    "mean_combat_commands": 7.6875,
+    "mean_world_turns": 15.40625,
+    "mean_settlement_commands": 7.71875,
+    "mean_enemy_attack_attempts": 2.765625,
+    "mean_player_attack_attempts": 7.6875,
+    "mean_player_landed_attacks": 7.6875,
+    "mean_attacks_to_kill_conditional_on_kill": 7.6875,
+    "mean_world_turns_to_kill_conditional_on_kill": 7.6875,
+    "mean_enemy_attacks_over_killed_lifespan": 2.765625,
+    "mean_gross_damage_fraction": 0.43624744809244603,
+    "mean_gross_combat_damage_fraction": 0.3827867139777775,
+    "gross_combat_standard_error": 0.018811520450933025,
+    "gross_total_standard_error": 0.018962565993542357,
+    "mean_gross_postdeath_damage_fraction": 0.053460734114668416,
+    "mean_status_channel_postdeath_damage_fraction": 0.053460734114668416,
+    "mean_logged_damage_fraction": 0.43624744809244603,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.43624744809244603,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.3827867139777775,
+    "mean_capped_actual_damage_fraction": 0.43624744809244603,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.40426062322946177,
+    "p90_cost": 0.5777560975609751,
+    "p95_cost": 0.644941979522184,
+    "max_cost": 0.8067419354838707,
+    "markers": {
+      "active_fire_grid": 407,
+      "event_fire_breath": 135,
+      "fire_breath": 135,
+      "player_burning": 922
+    },
+    "marker_trials": {
+      "active_fire_grid": 64,
+      "event_fire_breath": 64,
+      "fire_breath": 64,
+      "player_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Fire": 112.25,
+      "physical_attack": 141.375
+    },
+    "mean_postdeath_damage_packets": {
+      "Fire": 30.875
+    },
+    "outcomes": null,
+    "role": "Fighter/Artillery",
+    "reference_depth": 14,
+    "category": "paired_follower",
+    "target_gross_fraction": 0.38,
+    "qualification": "Large dormant machine is threatening after piloting; its dependency justifies stronger contact than an unconstrained midgame Fighter.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "revision": 31,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Greater Pale Spitter",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:spit",
+          "enemy:pale:gas-shot"
+        ],
+        "stats": {
+          "offense": 20.0,
+          "defense": -5.0,
+          "accuracy": 5.0,
+          "dodge": 1.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 20.0,
+          "defense": -5.0,
+          "accuracy": 5.0,
+          "dodge": 1.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 1.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 70.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.9696668549340096,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.28807766994339684,
+    "mean_residual_net_cost": 0.6815891849906132,
+    "mean_cost_at_enemy_death": 0.28807766994339684,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 28.296875,
+    "mean_combat_commands": 4.375,
+    "mean_world_turns": 28.296875,
+    "mean_settlement_commands": 23.921875,
+    "mean_enemy_attack_attempts": 2.375,
+    "mean_player_attack_attempts": 1.375,
+    "mean_player_landed_attacks": 1.375,
+    "mean_attacks_to_kill_conditional_on_kill": 1.375,
+    "mean_world_turns_to_kill_conditional_on_kill": 4.375,
+    "mean_enemy_attacks_over_killed_lifespan": 2.375,
+    "mean_gross_damage_fraction": 1.0657564374884654,
+    "mean_gross_combat_damage_fraction": 0.29482766994339693,
+    "gross_combat_standard_error": 0.004054191975275498,
+    "gross_total_standard_error": 0.004470352426749142,
+    "mean_gross_postdeath_damage_fraction": 0.770928767545068,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 1.0657564374884654,
+    "mean_gross_damage_fraction_conditional_on_kill": 1.0657564374884654,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.29482766994339693,
+    "mean_capped_actual_damage_fraction": 1.0242606049340104,
+    "mean_enemy_energy_consumed": 10.0,
+    "kills": 64,
+    "deaths": 55,
+    "combat_deaths": 0,
+    "residual_deaths": 55,
+    "censored": 9,
+    "combat_censored": 0,
+    "aftermath_censored": 9,
+    "kill_rate": 1.0,
+    "death_rate": 0.859375,
+    "censor_rate": 0.140625,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "corpse_revival": 9,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 192
+    },
+    "marker_trials": {
+      "corpse_revival": 9,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Greater Pale Spitter#4": 9
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 834.203125
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 602.265625
+    },
+    "outcomes": null,
+    "role": "Mage/Artillery",
+    "reference_depth": 19,
+    "category": "ordinary",
+    "target_gross_fraction": 0.18,
+    "qualification": "Long grown pale remains projectile/gas artillery at roughly half its Fighter peer, not a stronger melee reskin.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "revision": 32,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Greater Pale Spitter",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:spit",
+          "enemy:pale:gas-shot"
+        ],
+        "stats": {
+          "offense": 20.0,
+          "defense": 7.0,
+          "accuracy": 120.0,
+          "dodge": 62.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 20.0,
+          "defense": 7.0,
+          "accuracy": 120.0,
+          "dodge": 62.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 1.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0,
+          "monsterGasShotVolume": 50.0
+        },
+        "max_hp": 142.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.0,
+    "mean_completed_cost": null,
+    "mean_combat_cost": 0.12847986572854478,
+    "mean_residual_net_cost": -0.12847986572854478,
+    "mean_cost_at_enemy_death": 0.12847986572854478,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 105.65625,
+    "mean_combat_commands": 5.65625,
+    "mean_world_turns": 105.65625,
+    "mean_settlement_commands": 100.0,
+    "mean_enemy_attack_attempts": 3.65625,
+    "mean_player_attack_attempts": 2.65625,
+    "mean_player_landed_attacks": 2.515625,
+    "mean_attacks_to_kill_conditional_on_kill": 2.65625,
+    "mean_world_turns_to_kill_conditional_on_kill": 5.65625,
+    "mean_enemy_attacks_over_killed_lifespan": 3.65625,
+    "mean_gross_damage_fraction": 0.13779236572854492,
+    "mean_gross_combat_damage_fraction": 0.13779236572854492,
+    "gross_combat_standard_error": 0.0006422659877567386,
+    "gross_total_standard_error": 0.0006422659877567386,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.13779236572854492,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.13779236572854492,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.13779236572854492,
+    "mean_capped_actual_damage_fraction": 0.13779236572854492,
+    "mean_enemy_energy_consumed": 10.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 64,
+    "combat_censored": 0,
+    "aftermath_censored": 64,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 1.0,
+    "p50_cost": 0.0,
+    "p90_cost": 0.0,
+    "p95_cost": 0.0,
+    "max_cost": 0.0,
+    "markers": {
+      "corpse_revival": 64,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 192
+    },
+    "marker_trials": {
+      "corpse_revival": 64,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Greater Pale Spitter#4": 64
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 105.5625,
+      "physical_attack": 2.25
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Mage/Artillery",
+    "reference_depth": 19,
+    "category": "ordinary",
+    "target_gross_fraction": 0.18,
+    "qualification": "Long grown pale remains projectile/gas artillery at roughly half its Fighter peer, not a stronger melee reskin.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Greater Pale Breather",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:breath",
+          "enemy:pale:breath-boost",
+          "enemy:pale:gas-vulnerability"
+        ],
+        "stats": {
+          "offense": 20.0,
+          "defense": 7.0,
+          "accuracy": -1.0,
+          "dodge": -4.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 20.0,
+          "defense": 7.0,
+          "accuracy": -1.0,
+          "dodge": -4.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -6.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 142.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.9843193046723394,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.1425663161230875,
+    "mean_residual_net_cost": 0.8417529885492522,
+    "mean_cost_at_enemy_death": 0.1425663161230875,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 25.265625,
+    "mean_combat_commands": 2.15625,
+    "mean_world_turns": 25.265625,
+    "mean_settlement_commands": 23.109375,
+    "mean_enemy_attack_attempts": 0.0,
+    "mean_player_attack_attempts": 2.15625,
+    "mean_player_landed_attacks": 2.15625,
+    "mean_attacks_to_kill_conditional_on_kill": 2.15625,
+    "mean_world_turns_to_kill_conditional_on_kill": 2.15625,
+    "mean_enemy_attacks_over_killed_lifespan": 0.0,
+    "mean_gross_damage_fraction": 1.072966951297559,
+    "mean_gross_combat_damage_fraction": 0.14487881612308745,
+    "gross_combat_standard_error": 0.0030724713056694986,
+    "gross_total_standard_error": 0.0016625550214178955,
+    "mean_gross_postdeath_damage_fraction": 0.9280881351744715,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 1.072966951297559,
+    "mean_gross_damage_fraction_conditional_on_kill": 1.072966951297559,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.14487881612308745,
+    "mean_capped_actual_damage_fraction": 1.03285055467234,
+    "mean_enemy_energy_consumed": 11.5625,
+    "kills": 64,
+    "deaths": 57,
+    "combat_deaths": 0,
+    "residual_deaths": 57,
+    "censored": 7,
+    "combat_censored": 0,
+    "aftermath_censored": 7,
+    "kill_rate": 1.0,
+    "death_rate": 0.890625,
+    "censor_rate": 0.109375,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "corpse_revival": 7,
+      "enemy_energy_consumed": 74
+    },
+    "marker_trials": {
+      "corpse_revival": 7,
+      "enemy_energy_consumed": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Greater Pale Breather#4": 7
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 1144.15625
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 988.34375
+    },
+    "outcomes": null,
+    "role": "Controller",
+    "reference_depth": 22,
+    "category": "ordinary",
+    "target_gross_fraction": 0.14,
+    "qualification": "Existentially dreadful grown breather is later than ordinary pale growth, but keeps the existing gas toolkit rather than invented soul mechanics.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Greater Pale Breather",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:breath",
+          "enemy:pale:breath-boost",
+          "enemy:pale:gas-vulnerability"
+        ],
+        "stats": {
+          "offense": 20.0,
+          "defense": 37.0,
+          "accuracy": 127.0,
+          "dodge": 69.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 20.0,
+          "defense": 37.0,
+          "accuracy": 127.0,
+          "dodge": 69.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -6.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 322.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 1.0,
+    "mean_completed_cost": 1.0,
+    "mean_combat_cost": 0.30656941326177195,
+    "mean_residual_net_cost": 0.6934305867382282,
+    "mean_cost_at_enemy_death": 0.30656941326177195,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 16.0,
+    "mean_combat_commands": 4.671875,
+    "mean_world_turns": 16.0,
+    "mean_settlement_commands": 11.328125,
+    "mean_enemy_attack_attempts": 0.203125,
+    "mean_player_attack_attempts": 4.671875,
+    "mean_player_landed_attacks": 4.421875,
+    "mean_attacks_to_kill_conditional_on_kill": 4.671875,
+    "mean_world_turns_to_kill_conditional_on_kill": 4.671875,
+    "mean_enemy_attacks_over_killed_lifespan": 0.203125,
+    "mean_gross_damage_fraction": 1.0750596119947131,
+    "mean_gross_combat_damage_fraction": 0.3139131632617719,
+    "gross_combat_standard_error": 0.012161053937164504,
+    "gross_total_standard_error": 0.0006073892198423894,
+    "mean_gross_postdeath_damage_fraction": 0.7611464487329415,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 1.0750596119947131,
+    "mean_gross_damage_fraction_conditional_on_kill": 1.0750596119947131,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.3139131632617719,
+    "mean_capped_actual_damage_fraction": 1.0300000000000007,
+    "mean_enemy_energy_consumed": 34.6875,
+    "kills": 64,
+    "deaths": 64,
+    "combat_deaths": 0,
+    "residual_deaths": 64,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 1.0,
+    "censor_rate": 0.0,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "enemy_energy_consumed": 222
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Caustic gas": 1146.5,
+      "physical_attack": 0.0
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 805.765625
+    },
+    "outcomes": null,
+    "role": "Controller",
+    "reference_depth": 22,
+    "category": "ordinary",
+    "target_gross_fraction": 0.14,
+    "qualification": "Existentially dreadful grown breather is later than ordinary pale growth, but keeps the existing gas toolkit rather than invented soul mechanics.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Greater Pale Birther",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:birth",
+          "enemy:pale:double-birth",
+          "enemy:pale:slow"
+        ],
+        "stats": {
+          "offense": 20.0,
+          "defense": 2.0,
+          "accuracy": -4.0,
+          "dodge": -6.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 20.0,
+          "defense": 2.0,
+          "accuracy": -4.0,
+          "dodge": -6.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -5.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 30.0
+        },
+        "max_hp": 112.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.03422391587746806,
+    "mean_completed_cost": 0.0,
+    "mean_combat_cost": 0.03422391587746806,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.03422391587746806,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 2.0,
+    "mean_combat_commands": 2.0,
+    "mean_world_turns": 2.0,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 0.046875,
+    "mean_player_attack_attempts": 2.0,
+    "mean_player_landed_attacks": 2.0,
+    "mean_attacks_to_kill_conditional_on_kill": 2.0,
+    "mean_world_turns_to_kill_conditional_on_kill": 2.0,
+    "mean_enemy_attacks_over_killed_lifespan": 0.046875,
+    "mean_gross_damage_fraction": 0.034598915877468044,
+    "mean_gross_combat_damage_fraction": 0.034598915877468044,
+    "gross_combat_standard_error": 0.006681184643913902,
+    "gross_total_standard_error": 0.006681184643913902,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.034598915877468044,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.034598915877468044,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.034598915877468044,
+    "mean_capped_actual_damage_fraction": 0.034598915877468044,
+    "mean_enemy_energy_consumed": 33.59375,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 63,
+    "combat_censored": 0,
+    "aftermath_censored": 63,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.984375,
+    "p50_cost": 0.0,
+    "p90_cost": 0.1319285714285714,
+    "p95_cost": 0.1325218800648298,
+    "max_cost": 0.13286842105263152,
+    "markers": {
+      "enemy_energy_consumed": 83
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 63
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Pale Birther#6,Pale Birther#7": 4,
+      "living_actor_after_target_death:Pale Birther#6,Pale Biter#7": 2,
+      "living_actor_after_target_death:Pale Birther#6,Pale Breather#7": 4,
+      "living_actor_after_target_death:Pale Birther#6,Pale Screamer#7": 1,
+      "living_actor_after_target_death:Pale Birther#6,Pale Spitter#7": 3,
+      "living_actor_after_target_death:Pale Biter#6,Pale Birther#7": 3,
+      "living_actor_after_target_death:Pale Biter#6,Pale Biter#7": 1,
+      "living_actor_after_target_death:Pale Biter#6,Pale Breather#7": 3,
+      "living_actor_after_target_death:Pale Biter#6,Pale Screamer#7": 3,
+      "living_actor_after_target_death:Pale Biter#6,Pale Spitter#7": 4,
+      "living_actor_after_target_death:Pale Breather#6,Pale Birther#7": 3,
+      "living_actor_after_target_death:Pale Breather#6,Pale Biter#7": 4,
+      "living_actor_after_target_death:Pale Breather#6,Pale Breather#7": 1,
+      "living_actor_after_target_death:Pale Breather#6,Pale Screamer#7": 5,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Birther#7": 2,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Birther#7,Pale Jackal#9,Pale Jackal#10": 1,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Biter#7": 3,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Breather#7": 3,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Screamer#7": 3,
+      "living_actor_after_target_death:Pale Spitter#6,Pale Biter#7": 4,
+      "living_actor_after_target_death:Pale Spitter#6,Pale Screamer#7": 5,
+      "living_actor_after_target_death:Pale Spitter#6,Pale Spitter#7": 1
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 42.109375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 23,
+    "category": "ordinary",
+    "target_gross_fraction": 0.07,
+    "qualification": "Large mother of multiple low-beast families comes after their grown variants; test random children and recursive Birther descendants explicitly.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Greater Pale Birther",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:birth",
+          "enemy:pale:double-birth",
+          "enemy:pale:slow"
+        ],
+        "stats": {
+          "offense": 20.0,
+          "defense": 28.0,
+          "accuracy": 126.0,
+          "dodge": 75.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 20.0,
+          "defense": 28.0,
+          "accuracy": 126.0,
+          "dodge": 75.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -5.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 30.0
+        },
+        "max_hp": 268.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.07254576761359306,
+    "mean_completed_cost": null,
+    "mean_combat_cost": 0.07254576761359306,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.07254576761359306,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 4.078125,
+    "mean_combat_commands": 4.078125,
+    "mean_world_turns": 4.078125,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 1.703125,
+    "mean_player_attack_attempts": 4.078125,
+    "mean_player_landed_attacks": 3.765625,
+    "mean_attacks_to_kill_conditional_on_kill": 4.078125,
+    "mean_world_turns_to_kill_conditional_on_kill": 4.078125,
+    "mean_enemy_attacks_over_killed_lifespan": 1.703125,
+    "mean_gross_damage_fraction": 0.07423067151292374,
+    "mean_gross_combat_damage_fraction": 0.07423067151292374,
+    "gross_combat_standard_error": 0.011857642564571558,
+    "gross_total_standard_error": 0.011857642564571558,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.07423067151292374,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.07423067151292374,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.07423067151292374,
+    "mean_capped_actual_damage_fraction": 0.07423067151292374,
+    "mean_enemy_energy_consumed": 50.890625,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 64,
+    "combat_censored": 0,
+    "aftermath_censored": 64,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 1.0,
+    "p50_cost": 0.010236220472440993,
+    "p90_cost": 0.19819435736677127,
+    "p95_cost": 0.2627140115163149,
+    "max_cost": 0.26373684210526316,
+    "markers": {
+      "biter_multiple_attacks_in_command": 9,
+      "enemy_energy_consumed": 158
+    },
+    "marker_trials": {
+      "biter_multiple_attacks_in_command": 3,
+      "enemy_energy_consumed": 64
+    },
+    "censor_reasons": {
+      "living_actor_after_target_death:Pale Birther#6,Pale Birther#7": 3,
+      "living_actor_after_target_death:Pale Birther#6,Pale Birther#7,Pale Jackal#9,Pale Jackal#10": 1,
+      "living_actor_after_target_death:Pale Birther#6,Pale Biter#7": 1,
+      "living_actor_after_target_death:Pale Birther#6,Pale Biter#7,Pale Jackal#8,Pale Jackal#9": 1,
+      "living_actor_after_target_death:Pale Birther#6,Pale Breather#7": 4,
+      "living_actor_after_target_death:Pale Birther#6,Pale Screamer#7": 1,
+      "living_actor_after_target_death:Pale Birther#6,Pale Spitter#7": 3,
+      "living_actor_after_target_death:Pale Biter#6,Pale Birther#7": 1,
+      "living_actor_after_target_death:Pale Biter#6,Pale Birther#7,Pale Jackal#8,Pale Jackal#9": 1,
+      "living_actor_after_target_death:Pale Biter#6,Pale Birther#7,Pale Jackal#9,Pale Jackal#10": 1,
+      "living_actor_after_target_death:Pale Biter#6,Pale Biter#7": 1,
+      "living_actor_after_target_death:Pale Biter#6,Pale Breather#7": 3,
+      "living_actor_after_target_death:Pale Biter#6,Pale Screamer#7": 3,
+      "living_actor_after_target_death:Pale Biter#6,Pale Spitter#7": 4,
+      "living_actor_after_target_death:Pale Breather#6,Pale Birther#7": 3,
+      "living_actor_after_target_death:Pale Breather#6,Pale Biter#7": 3,
+      "living_actor_after_target_death:Pale Breather#6,Pale Breather#7": 1,
+      "living_actor_after_target_death:Pale Breather#6,Pale Screamer#7": 4,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Birther#7,Pale Jackal#8,Pale Jackal#9": 3,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Biter#7": 3,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Breather#7": 3,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Screamer#7": 4,
+      "living_actor_after_target_death:Pale Screamer#6,Pale Screamer#7,Pale Biter#8": 1,
+      "living_actor_after_target_death:Pale Spitter#6,Pale Biter#7": 4,
+      "living_actor_after_target_death:Pale Spitter#6,Pale Screamer#7": 5,
+      "living_actor_after_target_death:Pale Spitter#6,Pale Spitter#7": 2
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 87.828125,
+      "physical_attack": 2.40625
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 23,
+    "category": "ordinary",
+    "target_gross_fraction": 0.07,
+    "qualification": "Large mother of multiple low-beast families comes after their grown variants; test random children and recursive Birther descendants explicitly.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "revision": 31,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Pale Screamer",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:scream"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": -2.0,
+          "accuracy": -2.0,
+          "dodge": -2.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": -2.0,
+          "accuracy": -2.0,
+          "dodge": -2.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -8.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 15.0
+        },
+        "max_hp": 88.0
+      },
+      {
+        "id": 7.0,
+        "name": "Pale Birther",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:birth",
+          "enemy:pale:double-birth",
+          "enemy:pale:slow"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": -7.0,
+          "accuracy": -4.0,
+          "dodge": -5.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": -7.0,
+          "accuracy": -4.0,
+          "dodge": -5.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 30.0
+        },
+        "max_hp": 58.0
+      },
+      {
+        "id": 8.0,
+        "name": "Pale Breather",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:breath",
+          "enemy:pale:breath-boost",
+          "enemy:pale:gas-vulnerability"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": -5.0,
+          "accuracy": -2.0,
+          "dodge": -3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": -5.0,
+          "accuracy": -2.0,
+          "dodge": -3.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -4.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 70.0
+      },
+      {
+        "id": 9.0,
+        "name": "Pale Spitter",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:spit",
+          "enemy:pale:gas-shot"
+        ],
+        "stats": {
+          "offense": 10.0,
+          "defense": -11.0,
+          "accuracy": 4.0,
+          "dodge": 1.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 10.0,
+          "defense": -11.0,
+          "accuracy": 4.0,
+          "dodge": 1.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 2.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0
+        },
+        "max_hp": 34.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.8384740795282637,
+    "mean_completed_cost": 0.8620689655172413,
+    "mean_combat_cost": 0.554445822012791,
+    "mean_residual_net_cost": 0.2840282575154728,
+    "mean_cost_at_enemy_death": 0.5400731065938488,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 27.859375,
+    "mean_combat_commands": 11.015625,
+    "mean_world_turns": 27.859375,
+    "mean_settlement_commands": 16.84375,
+    "mean_enemy_attack_attempts": 4.421875,
+    "mean_player_attack_attempts": 8.140625,
+    "mean_player_landed_attacks": 8.140625,
+    "mean_attacks_to_kill_conditional_on_kill": 8.0,
+    "mean_world_turns_to_kill_conditional_on_kill": 10.85483870967742,
+    "mean_enemy_attacks_over_killed_lifespan": 4.370967741935484,
+    "mean_gross_damage_fraction": 0.9222053904241533,
+    "mean_gross_combat_damage_fraction": 0.5717665778565741,
+    "gross_combat_standard_error": 0.03722559795782288,
+    "gross_total_standard_error": 0.04452807950967043,
+    "mean_gross_postdeath_damage_fraction": 0.35043881256757886,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.9222053904241533,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.9173377353953248,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.555594445002985,
+    "mean_capped_actual_damage_fraction": 0.8875365795282644,
+    "mean_enemy_energy_consumed": 113.125,
+    "kills": 62,
+    "deaths": 50,
+    "combat_deaths": 3,
+    "residual_deaths": 47,
+    "censored": 6,
+    "combat_censored": 0,
+    "aftermath_censored": 6,
+    "kill_rate": 0.96875,
+    "death_rate": 0.78125,
+    "censor_rate": 0.09375,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "biter_multiple_attacks_in_command": 9,
+      "enemy_energy_consumed": 551,
+      "forced_player_displacement": 184
+    },
+    "marker_trials": {
+      "biter_multiple_attacks_in_command": 5,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 62
+    },
+    "censor_reasons": {
+      "residual_effect_horizon:128:active_gas_grid": 6
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 1094.0625
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 415.6875
+    },
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 23,
+    "category": "ordinary",
+    "target_gross_fraction": 0.38,
+    "qualification": "Isolated three-cast payload; parent removed; includes child descendants.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "revision": 32,
+    "scenario": "three-cast-children",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 6.0,
+        "name": "Pale Screamer",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:scream"
+        ],
+        "stats": {
+          "offense": 59.0,
+          "defense": -8.0,
+          "accuracy": 128.0,
+          "dodge": 79.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 59.0,
+          "defense": -8.0,
+          "accuracy": 128.0,
+          "dodge": 79.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -8.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 15.0
+        },
+        "max_hp": 52.0
+      },
+      {
+        "id": 7.0,
+        "name": "Pale Birther",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:birth",
+          "enemy:pale:double-birth",
+          "enemy:pale:slow"
+        ],
+        "stats": {
+          "offense": 59.0,
+          "defense": -11.0,
+          "accuracy": 126.0,
+          "dodge": 76.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 59.0,
+          "defense": -11.0,
+          "accuracy": 126.0,
+          "dodge": 76.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -3.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 30.0
+        },
+        "max_hp": 34.0
+      },
+      {
+        "id": 8.0,
+        "name": "Pale Breather",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:breath",
+          "enemy:pale:breath-boost",
+          "enemy:pale:gas-vulnerability"
+        ],
+        "stats": {
+          "offense": 59.0,
+          "defense": -10.0,
+          "accuracy": 128.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 59.0,
+          "defense": -10.0,
+          "accuracy": 128.0,
+          "dodge": 78.0,
+          "dr": 0.0,
+          "perception": 25.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": -4.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0,
+          "monsterGasPassiveVolume": 35.0,
+          "monsterGasBoostVolume": 80.0
+        },
+        "max_hp": 40.0
+      },
+      {
+        "id": 9.0,
+        "name": "Pale Spitter",
+        "abilities": [
+          "enemy:pale:gas-immunity",
+          "enemy:pale:spit",
+          "enemy:pale:gas-shot"
+        ],
+        "stats": {
+          "offense": 59.0,
+          "defense": -13.0,
+          "accuracy": 134.0,
+          "dodge": 82.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 59.0,
+          "defense": -13.0,
+          "accuracy": 134.0,
+          "dodge": 82.0,
+          "dr": 0.0,
+          "perception": 65.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "stealth": 2.0,
+          "paleTraitsInitialized": 1.0,
+          "maxAbilityCost": 10.0,
+          "monsterGasShotVolume": 100.0
+        },
+        "max_hp": 22.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.8142236147223159,
+    "mean_completed_cost": 0.847719742181905,
+    "mean_combat_cost": 0.46418185338819523,
+    "mean_residual_net_cost": 0.3500417613341206,
+    "mean_cost_at_enemy_death": 0.43783014125974584,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 23.875,
+    "mean_combat_commands": 8.34375,
+    "mean_world_turns": 23.875,
+    "mean_settlement_commands": 15.53125,
+    "mean_enemy_attack_attempts": 3.125,
+    "mean_player_attack_attempts": 5.71875,
+    "mean_player_landed_attacks": 5.46875,
+    "mean_attacks_to_kill_conditional_on_kill": 5.60655737704918,
+    "mean_world_turns_to_kill_conditional_on_kill": 8.229508196721312,
+    "mean_enemy_attacks_over_killed_lifespan": 2.8688524590163933,
+    "mean_gross_damage_fraction": 0.8903677112131695,
+    "mean_gross_combat_damage_fraction": 0.47712290595844675,
+    "gross_combat_standard_error": 0.03239900612053666,
+    "gross_total_standard_error": 0.04719482546124591,
+    "mean_gross_postdeath_damage_fraction": 0.41324480525472274,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.8903677112131695,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.88296405890174,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.4493957386344899,
+    "mean_capped_actual_damage_fraction": 0.8571845747201188,
+    "mean_enemy_energy_consumed": 100.203125,
+    "kills": 61,
+    "deaths": 50,
+    "combat_deaths": 3,
+    "residual_deaths": 47,
+    "censored": 5,
+    "combat_censored": 0,
+    "aftermath_censored": 5,
+    "kill_rate": 0.953125,
+    "death_rate": 0.78125,
+    "censor_rate": 0.078125,
+    "p50_cost": 1.0,
+    "p90_cost": 1.0,
+    "p95_cost": 1.0,
+    "max_cost": 1.0,
+    "markers": {
+      "biter_multiple_attacks_in_command": 17,
+      "enemy_energy_consumed": 462,
+      "forced_player_displacement": 168
+    },
+    "marker_trials": {
+      "biter_multiple_attacks_in_command": 11,
+      "enemy_energy_consumed": 64,
+      "forced_player_displacement": 64
+    },
+    "censor_reasons": {
+      "residual_effect_horizon:128:active_gas_grid": 5
+    },
+    "mean_damage_packets": {
+      "Caustic gas": 1047.046875,
+      "physical_attack": 8.625
+    },
+    "mean_postdeath_damage_packets": {
+      "Caustic gas": 492.125
+    },
+    "outcomes": null,
+    "role": "Summoner",
+    "reference_depth": 23,
+    "category": "ordinary",
+    "target_gross_fraction": 0.38,
+    "qualification": "Isolated three-cast payload; parent removed; includes child descendants.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "phoenix",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Phoenix",
+        "abilities": [
+          "enemy:beast:flight",
+          "enemy:beast:everburn",
+          "enemy:beast:fire-immunity",
+          "enemy:beast:phoenix"
+        ],
+        "stats": {
+          "offense": 350.0,
+          "defense": 140.0,
+          "accuracy": 100.0,
+          "dodge": 55.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 350.0,
+          "defense": 140.0,
+          "accuracy": 100.0,
+          "dodge": 55.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "burning": 1.0,
+          "stealth": -6.0
+        },
+        "max_hp": 940.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.005836404639530394,
+    "mean_completed_cost": 0.005836404639530394,
+    "mean_combat_cost": 0.005836404639530394,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.005836404639530394,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 7.859375,
+    "mean_combat_commands": 7.859375,
+    "mean_world_turns": 7.859375,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 6.859375,
+    "mean_player_attack_attempts": 7.859375,
+    "mean_player_landed_attacks": 7.859375,
+    "mean_attacks_to_kill_conditional_on_kill": 7.859375,
+    "mean_world_turns_to_kill_conditional_on_kill": 7.859375,
+    "mean_enemy_attacks_over_killed_lifespan": 6.859375,
+    "mean_gross_damage_fraction": 0.0068676546395304,
+    "mean_gross_combat_damage_fraction": 0.0068676546395304,
+    "gross_combat_standard_error": 0.0023518052108279165,
+    "gross_total_standard_error": 0.0023518052108279165,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.0068676546395304,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.0068676546395304,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.0068676546395304,
+    "mean_capped_actual_damage_fraction": 0.0068676546395304,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.0,
+    "p90_cost": 0.03906143344709878,
+    "p95_cost": 0.04915961800818558,
+    "max_cost": 0.0643827919227391,
+    "markers": {
+      "everburn_alive_and_burning": 439
+    },
+    "marker_trials": {
+      "everburn_alive_and_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 18.40625
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Fighter",
+    "reference_depth": 32,
+    "category": "ordinary",
+    "target_gross_fraction": 0.42,
+    "qualification": "Rebirth guardian of the Administrator belongs near finale; 42 percent is first-life target only until corpse denial/revival is included in a complete encounter.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "phoenix",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Phoenix",
+        "abilities": [
+          "enemy:beast:flight",
+          "enemy:beast:everburn",
+          "enemy:beast:fire-immunity",
+          "enemy:beast:phoenix"
+        ],
+        "stats": {
+          "offense": 590.0,
+          "defense": 103.0,
+          "accuracy": 158.0,
+          "dodge": 56.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 590.0,
+          "defense": 103.0,
+          "accuracy": 158.0,
+          "dodge": 56.0,
+          "dr": 0.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "burning": 1.0,
+          "stealth": -6.0
+        },
+        "max_hp": 718.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.39591483467569355,
+    "mean_completed_cost": 0.39591483467569355,
+    "mean_combat_cost": 0.39591483467569355,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.39591483467569355,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 6.03125,
+    "mean_combat_commands": 6.03125,
+    "mean_world_turns": 6.03125,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 5.03125,
+    "mean_player_attack_attempts": 6.03125,
+    "mean_player_landed_attacks": 6.03125,
+    "mean_attacks_to_kill_conditional_on_kill": 6.03125,
+    "mean_world_turns_to_kill_conditional_on_kill": 6.03125,
+    "mean_enemy_attacks_over_killed_lifespan": 5.03125,
+    "mean_gross_damage_fraction": 0.40475858467569353,
+    "mean_gross_combat_damage_fraction": 0.40475858467569353,
+    "gross_combat_standard_error": 0.022300716538848835,
+    "gross_total_standard_error": 0.022300716538848835,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.40475858467569353,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.40475858467569353,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.40475858467569353,
+    "mean_capped_actual_damage_fraction": 0.40475858467569353,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.44327102803738316,
+    "p90_cost": 0.5756158382476831,
+    "p95_cost": 0.5835430463576159,
+    "max_cost": 0.6357155049786629,
+    "markers": {
+      "everburn_alive_and_burning": 322
+    },
+    "marker_trials": {
+      "everburn_alive_and_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 1039.9375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Fighter",
+    "reference_depth": 32,
+    "category": "ordinary",
+    "target_gross_fraction": 0.42,
+    "qualification": "Rebirth guardian of the Administrator belongs near finale; 42 percent is first-life target only until corpse denial/revival is included in a complete encounter.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "moonspawn",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Moonspawn",
+        "abilities": [
+          "enemy:beast:blink",
+          "enemy:beast:everburn",
+          "enemy:beast:fire-immunity"
+        ],
+        "stats": {
+          "offense": 346.0,
+          "defense": 181.0,
+          "accuracy": 103.0,
+          "dodge": 47.0,
+          "dr": 0.0,
+          "perception": 70.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 346.0,
+          "defense": 181.0,
+          "accuracy": 103.0,
+          "dodge": 47.0,
+          "dr": 0.0,
+          "perception": 70.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "burning": 1.0,
+          "stealth": -5.0
+        },
+        "max_hp": 1186.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.0039347874108620826,
+    "mean_completed_cost": 0.0039347874108620826,
+    "mean_combat_cost": 0.0039347874108620826,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.0039347874108620826,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 9.1875,
+    "mean_combat_commands": 9.1875,
+    "mean_world_turns": 9.1875,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 8.1875,
+    "mean_player_attack_attempts": 9.1875,
+    "mean_player_landed_attacks": 9.1875,
+    "mean_attacks_to_kill_conditional_on_kill": 9.1875,
+    "mean_world_turns_to_kill_conditional_on_kill": 9.1875,
+    "mean_enemy_attacks_over_killed_lifespan": 8.1875,
+    "mean_gross_damage_fraction": 0.004653537410862083,
+    "mean_gross_combat_damage_fraction": 0.004653537410862083,
+    "gross_combat_standard_error": 0.0018396735765288132,
+    "gross_total_standard_error": 0.0018396735765288132,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.004653537410862083,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.004653537410862083,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.004653537410862083,
+    "mean_capped_actual_damage_fraction": 0.004653537410862083,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.0,
+    "p90_cost": 0.0,
+    "p95_cost": 0.038263456090651404,
+    "max_cost": 0.05828668941979509,
+    "markers": {
+      "everburn_alive_and_burning": 524
+    },
+    "marker_trials": {
+      "everburn_alive_and_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 12.859375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Skirmisher",
+    "reference_depth": 33,
+    "category": "ordinary",
+    "target_gross_fraction": 0.31,
+    "qualification": "Anavani's moon-bear child belongs near divine apex; blink mobility trades down to about 70 percent of a comparable Fighter.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "moonspawn",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Moonspawn",
+        "abilities": [
+          "enemy:beast:blink",
+          "enemy:beast:everburn",
+          "enemy:beast:fire-immunity"
+        ],
+        "stats": {
+          "offense": 534.0,
+          "defense": 100.0,
+          "accuracy": 160.0,
+          "dodge": 46.0,
+          "dr": 0.0,
+          "perception": 70.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 534.0,
+          "defense": 100.0,
+          "accuracy": 160.0,
+          "dodge": 46.0,
+          "dr": 0.0,
+          "perception": 70.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "burning": 1.0,
+          "stealth": -5.0
+        },
+        "max_hp": 700.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.29741063188973216,
+    "mean_completed_cost": 0.29741063188973216,
+    "mean_combat_cost": 0.29741063188973216,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.29741063188973216,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 5.53125,
+    "mean_combat_commands": 5.53125,
+    "mean_world_turns": 5.53125,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 4.53125,
+    "mean_player_attack_attempts": 5.53125,
+    "mean_player_landed_attacks": 5.53125,
+    "mean_attacks_to_kill_conditional_on_kill": 5.53125,
+    "mean_world_turns_to_kill_conditional_on_kill": 5.53125,
+    "mean_enemy_attacks_over_killed_lifespan": 4.53125,
+    "mean_gross_damage_fraction": 0.30512938188973215,
+    "mean_gross_combat_damage_fraction": 0.30512938188973215,
+    "gross_combat_standard_error": 0.01896705359525339,
+    "gross_total_standard_error": 0.01896705359525339,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.30512938188973215,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.30512938188973215,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.30512938188973215,
+    "mean_capped_actual_damage_fraction": 0.30512938188973215,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.35118508655126524,
+    "p90_cost": 0.4416925246826515,
+    "p95_cost": 0.47675997099347334,
+    "max_cost": 0.5122652084757349,
+    "markers": {
+      "everburn_alive_and_burning": 290
+    },
+    "marker_trials": {
+      "everburn_alive_and_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 818.15625
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Skirmisher",
+    "reference_depth": 33,
+    "category": "ordinary",
+    "target_gross_fraction": 0.31,
+    "qualification": "Anavani's moon-bear child belongs near divine apex; blink mobility trades down to about 70 percent of a comparable Fighter.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "valta",
+    "revision": 31,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Valta",
+        "abilities": [
+          "enemy:beast:blink",
+          "enemy:beast:moon-laser",
+          "enemy:beast:everburn",
+          "enemy:beast:fire-immunity"
+        ],
+        "stats": {
+          "offense": 14.0,
+          "defense": 3.0,
+          "accuracy": 4.0,
+          "dodge": 4.0,
+          "dr": 0.0,
+          "perception": 85.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 14.0,
+          "defense": 3.0,
+          "accuracy": 4.0,
+          "dodge": 4.0,
+          "dr": 0.0,
+          "perception": 85.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "burning": 1.0,
+          "stealth": -3.0
+        },
+        "max_hp": 118.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.0,
+    "mean_completed_cost": 0.0,
+    "mean_combat_cost": 0.0,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.0,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 5.015625,
+    "mean_combat_commands": 5.015625,
+    "mean_world_turns": 5.015625,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 2.015625,
+    "mean_player_attack_attempts": 1.015625,
+    "mean_player_landed_attacks": 1.015625,
+    "mean_attacks_to_kill_conditional_on_kill": 1.015625,
+    "mean_world_turns_to_kill_conditional_on_kill": 5.015625,
+    "mean_enemy_attacks_over_killed_lifespan": 2.015625,
+    "mean_gross_damage_fraction": 0.0,
+    "mean_gross_combat_damage_fraction": 0.0,
+    "gross_combat_standard_error": 0.0,
+    "gross_total_standard_error": 0.0,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": -0.0,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.0,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.0,
+    "mean_capped_actual_damage_fraction": 0.0,
+    "mean_enemy_energy_consumed": 20.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.0,
+    "p90_cost": 0.0,
+    "p95_cost": 0.0,
+    "max_cost": 0.0,
+    "markers": {
+      "enemy_energy_consumed": 64,
+      "everburn_alive_and_burning": 257,
+      "forced_player_displacement": 256
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 64,
+      "everburn_alive_and_burning": 64,
+      "forced_player_displacement": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {},
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Mage/Artillery",
+    "reference_depth": 34,
+    "category": "ordinary",
+    "target_gross_fraction": 0.22,
+    "qualification": "Protective moon companion fires charged moonbeams and blinks; late divine artillery at about half Fighter damage.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "valta",
+    "revision": 32,
+    "scenario": "chase",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Valta",
+        "abilities": [
+          "enemy:beast:blink",
+          "enemy:beast:moon-laser",
+          "enemy:beast:everburn",
+          "enemy:beast:fire-immunity"
+        ],
+        "stats": {
+          "offense": 364.0,
+          "defense": 84.0,
+          "accuracy": 157.0,
+          "dodge": 102.0,
+          "dr": 0.0,
+          "perception": 85.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 364.0,
+          "defense": 84.0,
+          "accuracy": 157.0,
+          "dodge": 102.0,
+          "dr": 0.0,
+          "perception": 85.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "burning": 1.0,
+          "stealth": -3.0
+        },
+        "max_hp": 604.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.18646614011536605,
+    "mean_completed_cost": 0.18646614011536605,
+    "mean_combat_cost": 0.18646614011536605,
+    "mean_residual_net_cost": 0.0,
+    "mean_cost_at_enemy_death": 0.17355290424418138,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 9.40625,
+    "mean_combat_commands": 9.40625,
+    "mean_world_turns": 9.40625,
+    "mean_settlement_commands": 0.0,
+    "mean_enemy_attack_attempts": 6.421875,
+    "mean_player_attack_attempts": 5.40625,
+    "mean_player_landed_attacks": 4.5625,
+    "mean_attacks_to_kill_conditional_on_kill": 5.158730158730159,
+    "mean_world_turns_to_kill_conditional_on_kill": 9.158730158730158,
+    "mean_enemy_attacks_over_killed_lifespan": 6.158730158730159,
+    "mean_gross_damage_fraction": 0.1972706981532365,
+    "mean_gross_combat_damage_fraction": 0.1972706981532365,
+    "gross_combat_standard_error": 0.0220662151280794,
+    "gross_total_standard_error": 0.0220662151280794,
+    "mean_gross_postdeath_damage_fraction": 0.0,
+    "mean_status_channel_postdeath_damage_fraction": -0.0,
+    "mean_logged_damage_fraction": 0.1972706981532365,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.18355746061261433,
+    "all_primary_lifespans_observed": false,
+    "all_settlements_observed": false,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.18355746061261433,
+    "mean_capped_actual_damage_fraction": 0.1970331252905422,
+    "mean_enemy_energy_consumed": 20.0,
+    "kills": 63,
+    "deaths": 1,
+    "combat_deaths": 1,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 0.984375,
+    "death_rate": 0.015625,
+    "censor_rate": 0.0,
+    "p50_cost": 0.20962937542896365,
+    "p90_cost": 0.4154838709677422,
+    "p95_cost": 0.4269602122015913,
+    "max_cost": 1.0,
+    "markers": {
+      "enemy_energy_consumed": 64,
+      "everburn_alive_and_burning": 539,
+      "forced_player_displacement": 256
+    },
+    "marker_trials": {
+      "enemy_energy_consumed": 64,
+      "everburn_alive_and_burning": 64,
+      "forced_player_displacement": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "physical_attack": 554.375
+    },
+    "mean_postdeath_damage_packets": {},
+    "outcomes": null,
+    "role": "Mage/Artillery",
+    "reference_depth": 34,
+    "category": "ordinary",
+    "target_gross_fraction": 0.22,
+    "qualification": "Protective moon companion fires charged moonbeams and blinks; late divine artillery at about half Fighter damage.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "chimera",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Chimera",
+        "abilities": [
+          "enemy:beast:flight",
+          "enemy:beast:fire-breath"
+        ],
+        "stats": {
+          "offense": 573.0,
+          "defense": 257.0,
+          "accuracy": 105.0,
+          "dodge": 46.0,
+          "dr": 60.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 573.0,
+          "defense": 257.0,
+          "accuracy": 105.0,
+          "dodge": 46.0,
+          "dr": 60.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": -7.0
+        },
+        "max_hp": 1642.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.024226561325402206,
+    "mean_completed_cost": 0.024226561325402206,
+    "mean_combat_cost": 0.02834215808518122,
+    "mean_residual_net_cost": -0.004115596759779001,
+    "mean_cost_at_enemy_death": 0.02834215808518122,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 20.625,
+    "mean_combat_commands": 13.5625,
+    "mean_world_turns": 20.625,
+    "mean_settlement_commands": 7.0625,
+    "mean_enemy_attack_attempts": 5.8125,
+    "mean_player_attack_attempts": 13.5625,
+    "mean_player_landed_attacks": 13.5625,
+    "mean_attacks_to_kill_conditional_on_kill": 13.5625,
+    "mean_world_turns_to_kill_conditional_on_kill": 13.5625,
+    "mean_enemy_attacks_over_killed_lifespan": 5.8125,
+    "mean_gross_damage_fraction": 0.06347656132540225,
+    "mean_gross_combat_damage_fraction": 0.05346715808518119,
+    "gross_combat_standard_error": 0.0026926086329381632,
+    "gross_total_standard_error": 0.0028774350755923824,
+    "mean_gross_postdeath_damage_fraction": 0.010009403240221032,
+    "mean_status_channel_postdeath_damage_fraction": 0.010009403240221032,
+    "mean_logged_damage_fraction": 0.06347656132540225,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.06347656132540225,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.05346715808518119,
+    "mean_capped_actual_damage_fraction": 0.06347656132540225,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.018554744525547284,
+    "p90_cost": 0.028869300911853246,
+    "p95_cost": 0.08344011756061764,
+    "max_cost": 0.11891205211726474,
+    "markers": {
+      "active_fire_grid": 597,
+      "event_fire_breath": 222,
+      "fire_breath": 222,
+      "player_burning": 1256
+    },
+    "marker_trials": {
+      "active_fire_grid": 64,
+      "event_fire_breath": 64,
+      "fire_breath": 64,
+      "player_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Fire": 165.75,
+      "physical_attack": 15.296875
+    },
+    "mean_postdeath_damage_packets": {
+      "Fire": 28.25
+    },
+    "outcomes": null,
+    "role": "Fighter/Artillery",
+    "reference_depth": 35,
+    "category": "ordinary",
+    "target_gross_fraction": 0.45,
+    "qualification": "Flying three-headed abomination combines strong body with fire breath; total lifetime budget includes both and remains below Dragon.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "chimera",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Chimera",
+        "abilities": [
+          "enemy:beast:flight",
+          "enemy:beast:fire-breath"
+        ],
+        "stats": {
+          "offense": 1222.0,
+          "defense": 144.0,
+          "accuracy": 167.0,
+          "dodge": 44.0,
+          "dr": 48.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 1222.0,
+          "defense": 144.0,
+          "accuracy": 167.0,
+          "dodge": 44.0,
+          "dr": 48.0,
+          "perception": 40.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": -7.0
+        },
+        "max_hp": 964.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.4196513886657572,
+    "mean_completed_cost": 0.4196513886657572,
+    "mean_combat_cost": 0.42367140052118785,
+    "mean_residual_net_cost": -0.004020011855430482,
+    "mean_cost_at_enemy_death": 0.42367140052118785,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 14.625,
+    "mean_combat_commands": 7.765625,
+    "mean_world_turns": 14.625,
+    "mean_settlement_commands": 6.859375,
+    "mean_enemy_attack_attempts": 2.796875,
+    "mean_player_attack_attempts": 7.765625,
+    "mean_player_landed_attacks": 7.765625,
+    "mean_attacks_to_kill_conditional_on_kill": 7.765625,
+    "mean_world_turns_to_kill_conditional_on_kill": 7.765625,
+    "mean_enemy_attacks_over_killed_lifespan": 2.796875,
+    "mean_gross_damage_fraction": 0.44690051453988316,
+    "mean_gross_combat_damage_fraction": 0.43720265052118773,
+    "gross_combat_standard_error": 0.031073689684938073,
+    "gross_total_standard_error": 0.030906429101077677,
+    "mean_gross_postdeath_damage_fraction": 0.009697864018695396,
+    "mean_status_channel_postdeath_damage_fraction": 0.009697864018695396,
+    "mean_logged_damage_fraction": 0.44690051453988316,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.44690051453988316,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.43720265052118773,
+    "mean_capped_actual_damage_fraction": 0.44690051453988316,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.45084145504461237,
+    "p90_cost": 0.733175788795879,
+    "p95_cost": 0.7744542504866968,
+    "max_cost": 0.8628205510052123,
+    "markers": {
+      "active_fire_grid": 352,
+      "event_fire_breath": 130,
+      "fire_breath": 130,
+      "player_burning": 872
+    },
+    "marker_trials": {
+      "active_fire_grid": 64,
+      "event_fire_breath": 64,
+      "fire_breath": 64,
+      "player_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Fire": 107.25,
+      "physical_attack": 1183.421875
+    },
+    "mean_postdeath_damage_packets": {
+      "Fire": 27.4375
+    },
+    "outcomes": null,
+    "role": "Fighter/Artillery",
+    "reference_depth": 35,
+    "category": "ordinary",
+    "target_gross_fraction": 0.45,
+    "qualification": "Flying three-headed abomination combines strong body with fire breath; total lifetime budget includes both and remains below Dragon.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "dragon",
+    "revision": 31,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Dragon",
+        "abilities": [
+          "enemy:beast:fast",
+          "enemy:beast:fire-breath"
+        ],
+        "stats": {
+          "offense": 465.0,
+          "defense": 497.0,
+          "accuracy": 110.0,
+          "dodge": 48.0,
+          "dr": 99.0,
+          "perception": 80.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 465.0,
+          "defense": 497.0,
+          "accuracy": 110.0,
+          "dodge": 48.0,
+          "dr": 99.0,
+          "perception": 80.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": -10.0
+        },
+        "max_hp": 3082.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.0355192965678176,
+    "mean_completed_cost": 0.0355192965678176,
+    "mean_combat_cost": 0.04043840007286936,
+    "mean_residual_net_cost": -0.004919103505051769,
+    "mean_cost_at_enemy_death": 0.04043840007286936,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 31.640625,
+    "mean_combat_commands": 24.40625,
+    "mean_world_turns": 31.640625,
+    "mean_settlement_commands": 7.234375,
+    "mean_enemy_attack_attempts": 11.171875,
+    "mean_player_attack_attempts": 24.40625,
+    "mean_player_landed_attacks": 24.40625,
+    "mean_attacks_to_kill_conditional_on_kill": 24.40625,
+    "mean_world_turns_to_kill_conditional_on_kill": 24.40625,
+    "mean_enemy_attacks_over_killed_lifespan": 11.171875,
+    "mean_gross_damage_fraction": 0.09680054656781757,
+    "mean_gross_combat_damage_fraction": 0.08725090007286934,
+    "gross_combat_standard_error": 0.0030575247148599436,
+    "gross_total_standard_error": 0.0031963913743052346,
+    "mean_gross_postdeath_damage_fraction": 0.009549646494948195,
+    "mean_status_channel_postdeath_damage_fraction": 0.009549646494948195,
+    "mean_logged_damage_fraction": 0.09680054656781757,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.09680054656781757,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.08725090007286934,
+    "mean_capped_actual_damage_fraction": 0.09680054656781757,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.029584158415842166,
+    "p90_cost": 0.04532501948557999,
+    "p95_cost": 0.09618374558304044,
+    "max_cost": 0.12912709237445452,
+    "markers": {
+      "active_fire_grid": 978,
+      "event_fire_breath": 399,
+      "fire_breath": 399,
+      "player_burning": 1961
+    },
+    "marker_trials": {
+      "active_fire_grid": 64,
+      "event_fire_breath": 64,
+      "fire_breath": 64,
+      "player_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Fire": 276.1875,
+      "physical_attack": 19.578125
+    },
+    "mean_postdeath_damage_packets": {
+      "Fire": 28.9375
+    },
+    "outcomes": null,
+    "role": "Fighter/Artillery",
+    "reference_depth": 38,
+    "category": "ordinary",
+    "target_gross_fraction": 0.5,
+    "qualification": "Legendary apex reptile stays in the deepest three floors; combined body/breath/burning target is 50 percent, not the old 80-percent exception.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  },
+  {
+    "kind": "dragon",
+    "revision": 32,
+    "scenario": "adjacent",
+    "candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "initial_actors": [
+      {
+        "id": 4.0,
+        "name": "Dragon",
+        "abilities": [
+          "enemy:beast:fast",
+          "enemy:beast:fire-breath"
+        ],
+        "stats": {
+          "offense": 1479.0,
+          "defense": 153.0,
+          "accuracy": 179.0,
+          "dodge": 62.0,
+          "dr": 83.0,
+          "perception": 80.0,
+          "maxEnergy": 50.0
+        },
+        "effective_stats": {
+          "offense": 1479.0,
+          "defense": 153.0,
+          "accuracy": 179.0,
+          "dodge": 62.0,
+          "dr": 83.0,
+          "perception": 80.0,
+          "maxEnergy": 50.0,
+          "maxHp": 0.0
+        },
+        "conditions": {
+          "bestiaryTraitsInitialized": 1.0,
+          "stealth": -10.0
+        },
+        "max_hp": 1018.0
+      }
+    ],
+    "summoned_candidates": {},
+    "settlement_strategy": "wait",
+    "partner_candidate": {
+      "offense": null,
+      "defense": null,
+      "accuracy": null,
+      "dodge": null,
+      "dr": null,
+      "gas_passive": null,
+      "gas_boost": null,
+      "gas_shot": null,
+      "max_hp": null
+    },
+    "partner_kind": null,
+    "without_support": false,
+    "trials": 64,
+    "profiles": 64,
+    "measurement": "Player attack attempts include misses. Kill-conditional lifetime metrics are not unconditional expectations if deaths/censors occur. Gross damage uses authoritative pre-HP-cap native packets (can overkill), including unlogged spell packets; net HP loss includes native passive regen; death boundary is end of native dispatch containing death. Damage packets are raw logged packets and may overkill. Censored net costs are partial observations, not bounds or completed encounters; exclude them from calibration.",
+    "mean_cost": 0.5380952494645574,
+    "mean_completed_cost": 0.5380952494645574,
+    "mean_combat_cost": 0.5428529411918883,
+    "mean_residual_net_cost": -0.004757691727330872,
+    "mean_cost_at_enemy_death": 0.5428529411918883,
+    "mean_minor_death_cost": null,
+    "minor_kills": 0,
+    "mean_commands": 14.734375,
+    "mean_combat_commands": 7.6875,
+    "mean_world_turns": 14.734375,
+    "mean_settlement_commands": 7.046875,
+    "mean_enemy_attack_attempts": 2.78125,
+    "mean_player_attack_attempts": 7.6875,
+    "mean_player_landed_attacks": 7.6875,
+    "mean_attacks_to_kill_conditional_on_kill": 7.6875,
+    "mean_world_turns_to_kill_conditional_on_kill": 7.6875,
+    "mean_enemy_attacks_over_killed_lifespan": 2.78125,
+    "mean_gross_damage_fraction": 0.5655639994645573,
+    "mean_gross_combat_damage_fraction": 0.5562279411918883,
+    "gross_combat_standard_error": 0.0351877785299381,
+    "gross_total_standard_error": 0.03513009000963707,
+    "mean_gross_postdeath_damage_fraction": 0.009336058272669112,
+    "mean_status_channel_postdeath_damage_fraction": 0.009336058272669112,
+    "mean_logged_damage_fraction": 0.5655639994645573,
+    "mean_gross_damage_fraction_conditional_on_kill": 0.5655639994645573,
+    "all_primary_lifespans_observed": true,
+    "all_settlements_observed": true,
+    "mean_gross_combat_damage_fraction_conditional_on_kill": 0.5562279411918883,
+    "mean_capped_actual_damage_fraction": 0.5655639994645573,
+    "mean_enemy_energy_consumed": 0.0,
+    "kills": 64,
+    "deaths": 0,
+    "combat_deaths": 0,
+    "residual_deaths": 0,
+    "censored": 0,
+    "combat_censored": 0,
+    "aftermath_censored": 0,
+    "kill_rate": 1.0,
+    "death_rate": 0.0,
+    "censor_rate": 0.0,
+    "p50_cost": 0.5557821187077381,
+    "p90_cost": 0.8962928660826034,
+    "p95_cost": 0.9195445544554457,
+    "max_cost": 0.967966101694915,
+    "markers": {
+      "active_fire_grid": 376,
+      "event_fire_breath": 128,
+      "fire_breath": 128,
+      "player_burning": 879
+    },
+    "marker_trials": {
+      "active_fire_grid": 64,
+      "event_fire_breath": 64,
+      "fire_breath": 64,
+      "player_burning": 64
+    },
+    "censor_reasons": {},
+    "mean_damage_packets": {
+      "Fire": 106.9375,
+      "physical_attack": 1640.890625
+    },
+    "mean_postdeath_damage_packets": {
+      "Fire": 28.1875
+    },
+    "outcomes": null,
+    "role": "Fighter/Artillery",
+    "reference_depth": 38,
+    "category": "ordinary",
+    "target_gross_fraction": 0.5,
+    "qualification": "Legendary apex reptile stays in the deepest three floors; combined body/breath/burning target is 50 percent, not the old 80-percent exception.",
+    "reference_policy": "stationary_residual_room_hazard_stress_not_primary_target",
+    "layer_position": "first",
+    "baseline": {
+      "profile_file": "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json",
+      "profile_sha256": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+      "track": "all_initial_unblessed",
+      "profile_revision": [
+        32.0
+      ],
+      "paired_same_profiles": true,
+      "paired_same_seeds": true,
+      "before_profile_file": null,
+      "before_profile_sha256": null
+    }
+  }
+]

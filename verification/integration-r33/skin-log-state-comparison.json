@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "changed_top_level_fields": [
+    "log",
+    "logArchive"
+  ],
+  "before_log": [
+    "You fire an arrow from Bow.",
+    "You shoot Skin Walker, but miss."
+  ],
+  "after_log": [
+    "You fire an arrow from Bow.",
+    "You shoot Hemogoblin, but miss."
+  ],
+  "all_non_narration_state_exactly_equal": true,
+  "archive_diff": "Only same Skin Walker to Hemogoblin replacement in the archived shot message.",
+  "rng": 411567604.0,
+  "rlib_after_sha256": "28c0eed414e4ece71b31eac93a5697ffad8c51ab8b3813866aa383299e9a7bac",
+  "final_input_fingerprint": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "post_guard_probe_linked_from_final_opt2_gate": true
+}

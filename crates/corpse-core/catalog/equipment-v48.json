@@ -1,0 +1,75 @@
+{
+  "Shortsword": {
+    "kind": "weapon",
+    "glyph": ")",
+    "damage": 30,
+    "hands": 1
+  },
+  "Bastard sword": {
+    "kind": "weapon",
+    "glyph": ")",
+    "damage": 40,
+    "hands": 1
+  },
+  "Hatchet": {
+    "kind": "weapon",
+    "glyph": ")",
+    "damage": 30,
+    "hands": 1,
+    "thrown": true
+  },
+  "Greatsword": {
+    "kind": "weapon",
+    "glyph": ")",
+    "damage": 45,
+    "hands": 2,
+    "offenseMultiplier": 2
+  },
+  "Bow": {
+    "kind": "weapon",
+    "glyph": ")",
+    "damage": 15,
+    "hands": 2,
+    "offenseMultiplier": 0.5,
+    "rangedWeapon": "bow"
+  },
+  "Composite bow": {
+    "kind": "weapon",
+    "glyph": ")",
+    "damage": 30,
+    "hands": 2,
+    "offenseMultiplier": 0.5,
+    "rangedWeapon": "composite-bow"
+  },
+  "Leather armor": {
+    "kind": "armor",
+    "glyph": "[",
+    "bonus": {
+      "dr": 1
+    }
+  },
+  "Chainmail": {
+    "kind": "armor",
+    "glyph": "[",
+    "bonus": {
+      "dr": 2,
+      "dodge": -1
+    }
+  },
+  "Plate armor": {
+    "kind": "armor",
+    "glyph": "[",
+    "bonus": {
+      "dr": 4,
+      "dodge": -2
+    }
+  },
+  "Ring": {
+    "kind": "ring",
+    "glyph": "="
+  },
+  "Amulet": {
+    "kind": "amulet",
+    "glyph": "\""
+  }
+}

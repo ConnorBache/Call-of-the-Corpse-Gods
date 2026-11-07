@@ -1,0 +1,32 @@
+[
+  {
+    "path": "crates/corpse-core/src/borge.rs",
+    "bytes": 11469,
+    "sha256": "0375c9723c7f7d7ba3f881a90a3eab2a001bf4446e317d332b4ebb4f81e767fe"
+  },
+  {
+    "path": "crates/corpse-core/src/engine.rs",
+    "bytes": 150946,
+    "sha256": "f04da82a425d8f55443f04f597336830f85ea376e3751a43a96cd1170aca0ab4"
+  },
+  {
+    "path": "crates/corpse-core/src/inventory.rs",
+    "bytes": 19933,
+    "sha256": "515c2d10f2b1786f37353914084ad7d73a7e45a8cfabfa1d49546249f9f8890d"
+  },
+  {
+    "path": "crates/corpse-core/src/projectiles.rs",
+    "bytes": 15356,
+    "sha256": "f5e421f8a52f21c63af02623684e3fcbbacd3a59a826c5d18ee709fda6349897"
+  },
+  {
+    "path": "crates/corpse-core/src/dreamwalking.rs",
+    "bytes": 11966,
+    "sha256": "f331be55d3b0267dc6635e6615ef669e08ec9fa7d4455416ee34e097ed30664c"
+  },
+  {
+    "path": "crates/corpse-core/tests/shard_weapon_r39.rs",
+    "bytes": 6311,
+    "sha256": "2cb2f03d3f5867fa2785d3695ea09975ce88f52ad981931f700aacb2aaad49a6"
+  }
+]

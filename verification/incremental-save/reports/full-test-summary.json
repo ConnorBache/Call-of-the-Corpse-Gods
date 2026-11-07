@@ -1,0 +1,1982 @@
+{
+  "all_targets_passed": true,
+  "targets": 164,
+  "totals": {
+    "passed": 1306,
+    "failed": 0,
+    "ignored": 13,
+    "measured": 0,
+    "filtered": 0
+  },
+  "profile": "opt-level1/debug0/debug assertions true/overflow checks true; all workspace targets, including example test harnesses; duplicate module tests across harnesses count as executions, not unique cases",
+  "details": [
+    {
+      "target": "appearance_typography",
+      "seconds": 0.05524468421936035,
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "d6c707096a73811c2ca57633abfea870ae17c55ceaba586c144d1a3391b3e3bd"
+    },
+    {
+      "target": "freeze_legacy_alpha",
+      "seconds": 0.003284454345703125,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "journal_temporal_bench",
+      "seconds": 10.824788570404053,
+      "counts": {
+        "passed": 45,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "e5945933d011859b744c76f5fa58cfe22ce8d814285f94c27a0af16257ee1d59"
+    },
+    {
+      "target": "incremental_recovery_bench",
+      "seconds": 14.304049968719482,
+      "counts": {
+        "passed": 45,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "95496b69f62c52f52a7be0c845d9f14ce692fd7290037864a26331d9f9604d43"
+    },
+    {
+      "target": "appearance_lighting",
+      "seconds": 0.5480086803436279,
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "ad0317f32a4b44a5e1fe1431a794f6d3daf9ca53164f36431353ebc9e8262c2e"
+    },
+    {
+      "target": "incremental_save_bench",
+      "seconds": 9.42190170288086,
+      "counts": {
+        "passed": 45,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "1a017f63a8020f55ee9bd800b20cc692b669faf4b915ac27557766baba2a715e"
+    },
+    {
+      "target": "save_envelope_bench",
+      "seconds": 9.267653703689575,
+      "counts": {
+        "passed": 45,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "42a27328d9f4fc450822459213497a50841b24b883bf9b7cdf56c7ba2d8167f2"
+    },
+    {
+      "target": "appearance_entities",
+      "seconds": 0.9701042175292969,
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "d207972ce7ce3f0d2d04936beb7345fafc027dd877dd822cc48ae33d8da8f258"
+    },
+    {
+      "target": "appearance",
+      "seconds": 2.674515724182129,
+      "counts": {
+        "passed": 30,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "973614ba80267ad6f6482223ce61976ab66753735020ee08b84443eed94f4158"
+    },
+    {
+      "target": "corpse-desktop",
+      "seconds": 27.298869132995605,
+      "counts": {
+        "passed": 306,
+        "failed": 0,
+        "ignored": 6,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "e3afa41c004bca406910d7e503a983ff126918fc0d528a51269152e9409ba85a"
+    },
+    {
+      "target": "mini_me_starter_combinations",
+      "seconds": 77.56040024757385,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "e710cc44b062a7344685fc984ccc834cb16d0f185e9d124f7cd648cc984a18f5"
+    },
+    {
+      "target": "journal_command_bench",
+      "seconds": 7.466581106185913,
+      "counts": {
+        "passed": 45,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "10c3217254b7b26eeac78dd4116b41ccfbfb0dea720dd732b076e9652de21f80"
+    },
+    {
+      "target": "sub_biome_survey_r37",
+      "seconds": 0.005368471145629883,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "shard_ground_r39",
+      "seconds": 1.4984564781188965,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "43096de84cf427016567ee146c748e2d846c240c4eb9c720768b13e9e715d5c4"
+    },
+    {
+      "target": "generation_sweep_parity",
+      "seconds": 12.51625657081604,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "9fa8a434c26d43697874e09819e37900f1abcdda43686a342db095a534203ed6"
+    },
+    {
+      "target": "phantasmii_integration_r34",
+      "seconds": 0.7112414836883545,
+      "counts": {
+        "passed": 16,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "6fb7e8b1ac42ad57a04bf2d2e72b0aee2b13f357875409a854ab39e24d260047"
+    },
+    {
+      "target": "blood_weapon_commands",
+      "seconds": 1.3401434421539307,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "765e24b4922986dff982633fdd9b6c933f15ac175e2182bde1ff0ceb8aeff02d"
+    },
+    {
+      "target": "journal_projection",
+      "seconds": 28.30238676071167,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "30195b3df93a32c7b5bd6856fa91b1987f3e6d0312603cda6ac9fb3de904d83a"
+    },
+    {
+      "target": "remember",
+      "seconds": 8.389469623565674,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "a95eec74a9fc054107eab63be985be70d2c882f00879dd6a3bd1ed9124f15c7f"
+    },
+    {
+      "target": "debug_floor",
+      "seconds": 0.0043375492095947266,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "divine_environment",
+      "seconds": 1.2273874282836914,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "3f16f00d2882b895a6a5147af9980ac15387b7e04945e6432b63706067792670"
+    },
+    {
+      "target": "floor_one_entrance",
+      "seconds": 12.549038171768188,
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0d11d67059fa64ffe2871394aa1a28dab74a8718245fb4f3ed818f2d5a45cadd"
+    },
+    {
+      "target": "non_euclidean_generation_v36",
+      "seconds": 20.88705539703369,
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "6faaee00f18b754bad583f91f0717c1a9692f7433dfbb63d6c1fcfc4f9559aec"
+    },
+    {
+      "target": "stalking_traces",
+      "seconds": 20.209779500961304,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "400212d6d842f5e7b50a8479a4a861cf1ac06f4666c7a5e744388d800f09a607"
+    },
+    {
+      "target": "half_here_traces",
+      "seconds": 5.115621089935303,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f185b3008cccf93bf5b9ba99f48ad11477955183733e13f9a0f8468cf9ed9017"
+    },
+    {
+      "target": "portal_consumers_v35",
+      "seconds": 0.053978919982910156,
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f5b48b5f5d11431e681188e4202a6ccb97a4743fe6710e569728780c94782b09"
+    },
+    {
+      "target": "terrain_runtime_r37",
+      "seconds": 1.2199742794036865,
+      "counts": {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df75517d26db8833a3694d19d4154366cf8ad219ef1d101bca8974bc49edf326"
+    },
+    {
+      "target": "unspeak",
+      "seconds": 1.4479176998138428,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "e4de98b8287ff17e78247b53b5f589c5addb088856beca4c504b59dd47482a71"
+    },
+    {
+      "target": "consumption_passives",
+      "seconds": 1.1096744537353516,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "3fb4e6f15899c16cef9b451d8646b170e15905428e7e0385f2c2e42e4d92801c"
+    },
+    {
+      "target": "equipment_abilities",
+      "seconds": 0.3492112159729004,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "6675517e04b8c4dceb08305815fa7fe4ec90da7b33430176e40f975f4b546f2a"
+    },
+    {
+      "target": "mini_me_offscreen",
+      "seconds": 14.63980770111084,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f863a42a29db7aed3d025b674f3bbff7f9ecb7d5ac17470ae8f5c758071c5dc9"
+    },
+    {
+      "target": "review_sub_biome_r37",
+      "seconds": 0.0035223960876464844,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "setups_parity",
+      "seconds": 1.639523983001709,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "fe69b2d8e9490a50d92be03a7d956136915d00ef76c153d022d64de43bf7a4db"
+    },
+    {
+      "target": "phantasmii_generation_r34",
+      "seconds": 1.9065845012664795,
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "4d9369ea3f41cd0c5a7723362020883ee0aa6b9c11f0719011405d1af3eadf10"
+    },
+    {
+      "target": "generation_parity",
+      "seconds": 2.396881103515625,
+      "counts": {
+        "passed": 12,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df67bdc148757707f47c4a118a771105930f9c3ef38f53e45cc995f0c13c0a41"
+    },
+    {
+      "target": "temporal_commands",
+      "seconds": 8.183799266815186,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "9c01d5ad0563ac09408a58cdeca9a62536b5e2fe4bcee6239ca1d1b2e00e7d0d"
+    },
+    {
+      "target": "blood_letting",
+      "seconds": 0.5432486534118652,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f01d7f54f64161e93f47df7ffc4ba8f687e52292c65c097356cc20ed683d5c2d"
+    },
+    {
+      "target": "reaction_commands",
+      "seconds": 2.743706464767456,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "4c29642553c707c8cf1dabec6ee5f92832707f4e36c0ab0e66b69de5a9a5433b"
+    },
+    {
+      "target": "creature_lookup_bench",
+      "seconds": 0.005501508712768555,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "divine_combat",
+      "seconds": 0.18423843383789062,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "513aa6ca3196429d50956e355c8d4b7d92bf95928ea39f09a7f217f6e26ea9f7"
+    },
+    {
+      "target": "inventory_trace",
+      "seconds": 0.7206017971038818,
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "d49b8ea0935d09a99bf65e92669642b7882bd3989da53d54306efdf47ffb3728"
+    },
+    {
+      "target": "flesh_finale",
+      "seconds": 99.98439288139343,
+      "counts": {
+        "passed": 19,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "6a00fb1fea198623a12153c69af92f919539c3f283c9c298a2b9723efd402e4f"
+    },
+    {
+      "target": "sphinx_traces",
+      "seconds": 24.109938383102417,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "a8a18ae00391db4930ddf42408481694d9b61fc68375b4a8348de9834838000f"
+    },
+    {
+      "target": "nest_pockets_v33",
+      "seconds": 0.893836259841919,
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "e5d2c2bd0292f024cda25572fce7c2893f10be90809cb7ca005b9d9a0295cc78"
+    },
+    {
+      "target": "half_here_commands",
+      "seconds": 0.4497044086456299,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "ca247158012a75420328243503bda36093df273701d471e000f31b68fcd2a149"
+    },
+    {
+      "target": "enemy_traits",
+      "seconds": 0.6776561737060547,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0ac9fbd17a1e73d5074d2414de22f0163585e4f6c50a9719bbb1f757db3693f3"
+    },
+    {
+      "target": "physical_balance",
+      "seconds": 4.530958414077759,
+      "counts": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "738f6ad217f224f24c50bf8fe3ef7e4e98c3836fa20ad523c4eacdaaa3c7e13a"
+    },
+    {
+      "target": "tree_tap_commands",
+      "seconds": 0.6851251125335693,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "5a991d994ed2a3a90a86ec5280df86320d8c01bd8abc6e562a679f3a1c17f337"
+    },
+    {
+      "target": "corpse-fixtures",
+      "seconds": 0.00798344612121582,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "population",
+      "seconds": 2.925244092941284,
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "ea1a8ff507e4197611b818648b8d890404de987cfffb29145d2da7a56ab0fa2b"
+    },
+    {
+      "target": "mini_me_commands",
+      "seconds": 15.2600736618042,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "9c52cf12dc1ce8ec128af3695f5cb59e331aa6bc0f861cc685423ce52b01c21d"
+    },
+    {
+      "target": "combat_starters",
+      "seconds": 1.394989013671875,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "cc4dc961897ef8f59c92b1448a0cf088e0d7f745ec0864bd17b222dfbecfd6e3"
+    },
+    {
+      "target": "ruin_traces",
+      "seconds": 14.226486206054688,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "cb2e46f9facbb1cd0dafb520b0936da348962528801cef1d9aa288327c94a847"
+    },
+    {
+      "target": "generation_geometry_r38",
+      "seconds": 19.982995748519897,
+      "counts": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "2fe690c0b85c47cbe23827378d10e4fcc4b238d1e6d2d8284f8e64ed7608d2b3"
+    },
+    {
+      "target": "phantasmii_dreamwalking_r34",
+      "seconds": 0.7407374382019043,
+      "counts": {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "fdf7babb0ca1d96d17e4ecb5653660d3cc90dfbd6ebca7d042f73d6dd4f81b72"
+    },
+    {
+      "target": "sub_biomes_generation_r37",
+      "seconds": 8.235483646392822,
+      "counts": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b283bf2cd4be27038084e2bcc257461afbb6151964044162ce83ad94f1efb4ae"
+    },
+    {
+      "target": "physical_trade_arena",
+      "seconds": 0.039263248443603516,
+      "counts": {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b2b88e9a6cb928b09948bd202f903b1a38f80a2f11d0f0310716e9105bf12f2a"
+    },
+    {
+      "target": "avatar_trace",
+      "seconds": 0.5335288047790527,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "977b0db2af9771c9efbebbb56d2b265dfbd1cfab6614326ceb0017b81b25b50e"
+    },
+    {
+      "target": "environment_parity",
+      "seconds": 4.73007345199585,
+      "counts": {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "7e6b4794c3cee8d788fa3a86a784e905cfb84a96e300e568ac48521740d52458"
+    },
+    {
+      "target": "inventor_traces",
+      "seconds": 10.199345350265503,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "3af21f40828cb41780234f275ffafeb4f6fbc4e9dedc6f762cf2cbf0c1ae2e70"
+    },
+    {
+      "target": "accuracy_npc_arena",
+      "seconds": 0.004245758056640625,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "qa_monster_rebalance",
+      "seconds": 1.2232189178466797,
+      "counts": {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "030269d1c9f8b06f0b7aa5d45c7ba0a612e1b37378ea5a7830f0a67e6a60759c"
+    },
+    {
+      "target": "descent_potions",
+      "seconds": 1.0047607421875,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "4caff8766c144460b92ecc3b5f8eb883b19cceb0e0ed49bf94e507fdc833ecb2"
+    },
+    {
+      "target": "flavor_placement",
+      "seconds": 2.4330763816833496,
+      "counts": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "da85d97b08bcb21c7ab886d4a43ae80e24439a4c768a535a7e8d163a1f05910e"
+    },
+    {
+      "target": "slime_leaves",
+      "seconds": 20.29131317138672,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "8d974b62ecf572e1782f50f4b8d22fc18619e66cfe73c1df7b3a098081523b3d"
+    },
+    {
+      "target": "half_here",
+      "seconds": 0.39911556243896484,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "242d6e140f214db1302098766f99ab4a53cfeaaba51e6afc21814862724212f0"
+    },
+    {
+      "target": "native_environment_hooks",
+      "seconds": 0.2687239646911621,
+      "counts": {
+        "passed": 21,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "68f96fe84ab448e7adcdedba8941b5707f6033a86cdfd8afb15db7b293e63dcb"
+    },
+    {
+      "target": "dream_craft",
+      "seconds": 3.928647994995117,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "3a8a7fae704024cf587d192139bef477527484b48f3bd68022edf52c3b2c0554"
+    },
+    {
+      "target": "playtest_start",
+      "seconds": 2.5303688049316406,
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "c41d656eba68b3bc7b1d9ffa36f32890783e4b7a94609c05770b7fdff10a90ea"
+    },
+    {
+      "target": "travel_traces",
+      "seconds": 13.997079133987427,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "ae65dfd209fc263d46475b72a684304853bc9f815d95e61997ea4ca6d554f103"
+    },
+    {
+      "target": "cleanup_parity",
+      "seconds": 1.4775004386901855,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "c6e3860b87db029e518717b77efffdbeaba46e681431b54978672100c3510770"
+    },
+    {
+      "target": "revision_39_startup",
+      "seconds": 37.38205003738403,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "d638265d7ac456c8eb4212f7d6f8c16308a7f0f6d061e8200d6b241d392c500d"
+    },
+    {
+      "target": "nest_preview",
+      "seconds": 0.00658869743347168,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "mini_me",
+      "seconds": 0.7365677356719971,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "db725176ed03177b0e339a41b4ceed654a5e887013272fbacb4ec85b3f97f964"
+    },
+    {
+      "target": "pathfinding_parity",
+      "seconds": 0.026380062103271484,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "db319aaad5daec34541d5c6ac159bce6e2114ef147edf00a172031bff582b466"
+    },
+    {
+      "target": "sub_biome_persistence_r37",
+      "seconds": 0.06743717193603516,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b2f5c0e8a9430e21b146718d8cc9b73211ebdfce5ae91c6f354bdd9425afe2cc"
+    },
+    {
+      "target": "ascend_commands",
+      "seconds": 2.5369558334350586,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f35d3f57ec57f1bada30647256ba52c7cb1cbd0973866ab6f242fa523ee2f523"
+    },
+    {
+      "target": "generation_environment_parity",
+      "seconds": 0.9298844337463379,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b05d7a4c8ff37d927fe57f03d06f972282ebb1b1207c56ff2d5b7e1995624819"
+    },
+    {
+      "target": "propagation_parity",
+      "seconds": 0.02098846435546875,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "535bea91f57e8b4547dda8493dc561d56f5c49df8fc73abc0183821bfdcc1d3d"
+    },
+    {
+      "target": "integration_r33_worlds",
+      "seconds": 4.541280269622803,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0fd2ef33cf92963decedca0af355711dd81f60b1576beae3cee7a261f0fac3b0"
+    },
+    {
+      "target": "debug_floor_v33",
+      "seconds": 6.485321521759033,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b8d4dfa6a26965d91664419b7b2833450e4d4296d389f28712d13af0059e305f"
+    },
+    {
+      "target": "fire_parity",
+      "seconds": 0.053466796875,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "eee60f2af8e9c1edb54a6914c4586b5f118c8d53961e684992d4978f97c6198f"
+    },
+    {
+      "target": "movement_fuzz",
+      "seconds": 21.641857624053955,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "1ff56a9b22682628bde72e58729b1467cb05b636a267af89613acde9eca9ebc8"
+    },
+    {
+      "target": "zillennia_ground_r33",
+      "seconds": 0.20795750617980957,
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "2dcc39f4f00817b20cb370e2bf6f3bddd5950c4175742f7d4928dbd2ea7f28d6"
+    },
+    {
+      "target": "silenced_abilities",
+      "seconds": 1.5113608837127686,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "9e6e7e939e2acb0d614bf98e51dfd3275edd62acaa356a584b9ffb7263e50824"
+    },
+    {
+      "target": "visibility_bench",
+      "seconds": 0.0039365291595458984,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "grab_traces",
+      "seconds": 16.694275617599487,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "5647201eb6d61483afa952b4223d5e699de79bc049d5ed1e364662d8d09809ad"
+    },
+    {
+      "target": "travel",
+      "seconds": 2.577080011367798,
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "99fb75cdaa1283baaea006238fe1bbaa8ed31da181817a7b3313289e20bebdeb"
+    },
+    {
+      "target": "caster_spell_traces",
+      "seconds": 26.210205554962158,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "315ddf62666a5673e92a0d463aae87336cad20fb0a5f6052f3d5ab6892aff8d6"
+    },
+    {
+      "target": "mind_control",
+      "seconds": 3.1963272094726562,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0556b4b2cb4a51698b25a0397497b7e5b9282567e242439e9afe0c7b3f8a027d"
+    },
+    {
+      "target": "rescue_commands",
+      "seconds": 1.2016711235046387,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "c1058ab419a7833690457664793233b3bbae0887b911cce299e93ddf1ff1d4bc"
+    },
+    {
+      "target": "heart_progression_audit",
+      "seconds": 0.011810302734375,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "4d3fcdf801428b8eea319d8860ea2fc18a664f2558d3ac861b6d95af2e574cf5"
+    },
+    {
+      "target": "generated_walks",
+      "seconds": 41.68885159492493,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "e6c6378fd0fcff9bdcffd52d43de231755bd5be08616886e673aa9d2b633c3a7"
+    },
+    {
+      "target": "passive_monster_traces",
+      "seconds": 45.10098385810852,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "35346362ad5e14f907ef92f2d082fafae6ff784f8a992dc0caaec662338f48d8"
+    },
+    {
+      "target": "sub_biome_generated_turn_r37",
+      "seconds": 6.452974796295166,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "ae8f9468bc41521aaa5c0ed06a03ca5cfd05d2e74ffaed9b30f02301e12674fe"
+    },
+    {
+      "target": "ordinary_roster",
+      "seconds": 23.474560976028442,
+      "counts": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "d014489b9495a6c408372f8a9e3b9e1539c9090dec83236ff8f9bedfe37b90c4"
+    },
+    {
+      "target": "ally_commands",
+      "seconds": 5.262654542922974,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "04fe74f3d5fdbb092820f1401f047bad2ce906d05d24626825e5b115aafa08a0"
+    },
+    {
+      "target": "integration_r33_debug",
+      "seconds": 42.72625207901001,
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "6d01e8e5795898e4b4f562a192fb2570dced000a627791dae517211720c0425d"
+    },
+    {
+      "target": "actor_presentation_logs_v33",
+      "seconds": 0.08287763595581055,
+      "counts": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f75fbb9357f00cb1cb9bca803693ade97f2d078c773a8323ab1fd78fe49f4d93"
+    },
+    {
+      "target": "world_generation_parity",
+      "seconds": 1.2652323246002197,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0cfdb076df22e8a592f30aa9628eee5c6a9225d2acdf91566f7776efca6e5c3d"
+    },
+    {
+      "target": "projectile_parity",
+      "seconds": 2.0681240558624268,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "56781f338eb2e1b7eb06dc24df7afc3b80490b282f0f3326f03a8054791123b6"
+    },
+    {
+      "target": "final_toggles",
+      "seconds": 2.6239380836486816,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "aba4b6873657602506d387faab081b96957c996ea7a3e0e50fec6f7eabda0ed6"
+    },
+    {
+      "target": "death_transfer_traces",
+      "seconds": 3.590062141418457,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "bbe9b67562fa949a3b1cb10b5384450ccd122c34e1f1512652be890b0d42f7f9"
+    },
+    {
+      "target": "shine_slippery",
+      "seconds": 1.1486260890960693,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "a20a67cb54c9fbc977e16b688ff8909fcb2df41327d4ef3a4ee53da942a31ccb"
+    },
+    {
+      "target": "update_manual_depths",
+      "seconds": 0.0046939849853515625,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "entrance_observation",
+      "seconds": 0.03133416175842285,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "2b2d8261a9e716b9d74c3b06e471518932fdd1de815034b284bd680658138520"
+    },
+    {
+      "target": "moon_traces",
+      "seconds": 17.82530188560486,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "da8fe850ccfe8406dabb79e4bba0dcc28466f8fae99028a65d9d9cb95a9c4c43"
+    },
+    {
+      "target": "topology_parity",
+      "seconds": 0.8254165649414062,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "313319c58fe6e2a04aee53af694d242f7fd7818bb4d3e251f33508e876661229"
+    },
+    {
+      "target": "godbeast_interactions",
+      "seconds": 1.16839599609375,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f94b9ba167c00e6b2b64ae3e5534cb83a3e64fb5d16f7f40916f06883160ea5f"
+    },
+    {
+      "target": "mercuria_lever_traces",
+      "seconds": 31.501962184906006,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "5a6674cbf77c2a96b717b16ddd724ae7767ecb24264a170848ce990043d6a050"
+    },
+    {
+      "target": "replay_seed",
+      "seconds": 3.5018022060394287,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "5a1ed89dfeb606a7830bd50743a96c359081135fde25322c4f2d3d2f5062d7d8"
+    },
+    {
+      "target": "generated_commands_bench",
+      "seconds": 0.006854534149169922,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "borge_event",
+      "seconds": 0.679201602935791,
+      "counts": {
+        "passed": 20,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "00624953af27ac4e7c80f0a8b112fd5afd01035381098838893fd52cdd7f1d3a"
+    },
+    {
+      "target": "dream_anchor",
+      "seconds": 1.419179916381836,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "1f305b731437111369bc7a5fea0b9e15d33e456f07f6fff34ce4fc897f3afa43"
+    },
+    {
+      "target": "generated_avatar_play",
+      "seconds": 11.358393430709839,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "a56807d9491a10ad176f255d74978837c22a5660424980b4c80ac93e6e049d1f"
+    },
+    {
+      "target": "nova_commands",
+      "seconds": 1.1612708568572998,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b45e29d6b478c51135570f2bf84f5a669415049b9f809199da00552a85aff00a"
+    },
+    {
+      "target": "stealth_passives",
+      "seconds": 2.105966091156006,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "20e9e18295c4830b8fe735586eedffcaffa6d9330b7dd6be788ef0293df56f7b"
+    },
+    {
+      "target": "identity_migrations",
+      "seconds": 0.3525421619415283,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "5eb01d1f29ce48e2678f757f53656339cc98444df64392a91cf8d5eda7a33a1f"
+    },
+    {
+      "target": "ahvamitt_r34",
+      "seconds": 0.12057662010192871,
+      "counts": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "ddaf78ab9f3cb3fe2b5d95c52545e0319cf1f11d9b4de0375cecd0bcc33d421b"
+    },
+    {
+      "target": "profile",
+      "seconds": 0.23035073280334473,
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f87a2bb5954074f5ca0f32a464235b20f8e9855bdb67c6e1388bffad3e9d67bc"
+    },
+    {
+      "target": "expanded_consumables",
+      "seconds": 3.9479217529296875,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "1e6d1a53c3860be39265ebda909ee2ef0368b5a2352d851b93d14fcd79d4b5be"
+    },
+    {
+      "target": "witch_skinwalker_v33",
+      "seconds": 0.1947154998779297,
+      "counts": {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "37050abd47fae84b71b2bf952e0d783f2912fe5064ed955cf94449da79a608ed"
+    },
+    {
+      "target": "monster_chill",
+      "seconds": 0.5752413272857666,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f8c619e44e5bf51a51a5cb24bbfa572549541dc565bf0af363f9851e8079da07"
+    },
+    {
+      "target": "creature_feeding_v33",
+      "seconds": 0.30008816719055176,
+      "counts": {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "acd5e7234632402e63c405197afe6b3c47de8f09d105f27db28089f2872121c6"
+    },
+    {
+      "target": "trace_core",
+      "seconds": 0.0043430328369140625,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "shard_weapon_r39",
+      "seconds": 0.05708479881286621,
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "2997bba9868f82767a1fb8700c95242cee6fa21d0e80211fea236259b0af0841"
+    },
+    {
+      "target": "advanced_environment_commands",
+      "seconds": 2.3940556049346924,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b5bebe90df18ca69a1bc74cdad4d747e6b3aba8a74fb0fc2f6d66f21becbab6d"
+    },
+    {
+      "target": "tinker_commands",
+      "seconds": 5.255503177642822,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "35450d5a8156bd2ababced408bc3a36546c897ee3ef2cf0d017d4832856d72b8"
+    },
+    {
+      "target": "bonded_commands",
+      "seconds": 0.9447383880615234,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "77cd7ad864ffb6cebc16af0da551edd8ae035d7f287265145adf853510d35610"
+    },
+    {
+      "target": "maintained_links",
+      "seconds": 0.11739325523376465,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "3e33f2cf103ed451c3c92deae5930789148e6a268f1c4e703ef7e93156cab2ad"
+    },
+    {
+      "target": "remember_hazards",
+      "seconds": 5.243718147277832,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "daf8e1892e60a83b0020b38ea942fbc289501421227ec7001a90d9ce73205a6e"
+    },
+    {
+      "target": "generated_bench",
+      "seconds": 0.003960132598876953,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "fury_commands",
+      "seconds": 1.3951175212860107,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "68eb191757836506d84cbdd168fad10ed891a210fa0f15bd285cbb87ab8b5b40"
+    },
+    {
+      "target": "divine_rescues",
+      "seconds": 0.08838391304016113,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "1719d80187a77ccaab362e3dca565dcc29d3c3f4f7967feb4d7d442def2f32cb"
+    },
+    {
+      "target": "geology_parity",
+      "seconds": 2.0435986518859863,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "58ba650ebdb1a32de7b60dd124170939413aed9864ab3c1065a5f6c7a956a13c"
+    },
+    {
+      "target": "actor_parity",
+      "seconds": 6.301495790481567,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "430fdd6e6dd7d4085e8ac0211cb8f125bdab39af7a85dc1223a382fe79187a93"
+    },
+    {
+      "target": "startup_recovery_r38",
+      "seconds": 33.20830464363098,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "90f12267d1a89e9da377952c832cb925f4d279b7bc1444391300f68ac3efb3da"
+    },
+    {
+      "target": "non_euclidean_physics_r36",
+      "seconds": 0.10223817825317383,
+      "counts": {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f7e10a8fa3b626269787b8f0a394f45528a8f5727e8984898a6d539fa22e0505"
+    },
+    {
+      "target": "horn_caster_traces",
+      "seconds": 27.316131353378296,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "90b0a8e5005b26a1cfa5123c7f9e7ffdd92cfdf6d6ae094e1e7f791061124b80"
+    },
+    {
+      "target": "vision_parity",
+      "seconds": 0.3374006748199463,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "5e98c69fe1c3d294af69b2d9984f56922bfe9b4c5ab0da7dabd1bc60dce59ba7"
+    },
+    {
+      "target": "portal_integration_v35",
+      "seconds": 0.7970695495605469,
+      "counts": {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0e56300841c034cfde8152e74d7e534a59f640b41eae6c7240eef3d9e3216684"
+    },
+    {
+      "target": "crafting_parity",
+      "seconds": 0.3484640121459961,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "9230f982453046b5a20569ed4be6966083e9fa2066b384b92076562b79d651f1"
+    },
+    {
+      "target": "exhausted_offers",
+      "seconds": 1.1971657276153564,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f28c583f4f35585b542e6f524f48fded647daaf6230f71daa9f314826138b33c"
+    },
+    {
+      "target": "monster_balance_v32",
+      "seconds": 0.015421390533447266,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "89543bbc26b85fdec348ad256be6132aba50a39676acd3571777128c96a01c30"
+    },
+    {
+      "target": "accuracy_dodge_v33",
+      "seconds": 0.07753491401672363,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "a69272c00f55dc59b10a6a15ad0521f21870b851daf7139c00199be0fb30d926"
+    },
+    {
+      "target": "shard_weapon_independent_r39",
+      "seconds": 0.15731143951416016,
+      "counts": {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b20614a3f6a9f046b85a47bd6b233f417d668be069c6d8aed2ebb7275a9e636b"
+    },
+    {
+      "target": "timing_test",
+      "seconds": 0.005570650100708008,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "generation_validation_parity",
+      "seconds": 0.17107629776000977,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "dcd7a793dfa3aa5f40d76e9db6b9ec2b45fc64a6c6d886366f89ba81a522dcae"
+    },
+    {
+      "target": "bombardier_traces",
+      "seconds": 10.093602418899536,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "bce83f7468c0f9b5c376e6e03a62e14eb1c6551a8e61443f489bdcd46f05fb12"
+    },
+    {
+      "target": "thrown_potions",
+      "seconds": 22.815096139907837,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0be34efdbb28bea8c61337e0ac0e5e451fdc7644b6c556a7584a7ee93b0183cb"
+    },
+    {
+      "target": "load_migrations",
+      "seconds": 7.447272777557373,
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "4e1d9f006428fb6f67d24fbae401caae548eed48f7f30e0390e3a0682cfee0bf"
+    },
+    {
+      "target": "foundation_bench",
+      "seconds": 0.006481170654296875,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd"
+    },
+    {
+      "target": "remember_all_passives",
+      "seconds": 31.183128118515015,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "7149328cfc5a9b1e6cbbde345dd7bbe42bcff16d3bf294626cab49a5cc6288e1"
+    },
+    {
+      "target": "divine_reactions",
+      "seconds": 1.2299575805664062,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "9815c1737c7809bde177cd4ffa03ccb611db8c1b0570491f164182a76f8daa57"
+    },
+    {
+      "target": "foundation",
+      "seconds": 4.079744577407837,
+      "counts": {
+        "passed": 19,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b1ae17b3eb1ff4d89d15eee5185983b62450deaa9180b3e11ab1bb72c279432d"
+    },
+    {
+      "target": "non_euclidean_integration_r36",
+      "seconds": 10.608341217041016,
+      "counts": {
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "691b3c333bbd3f4575a9ed129d4ccecd8ae6b8c8017dd67df9c7107b6cf70879"
+    },
+    {
+      "target": "starter_modes",
+      "seconds": 3.5473484992980957,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "0bbb21bd4920972459ed2c104901950738ba7d3a541ba362060ef939377afec3"
+    },
+    {
+      "target": "hazard_potions",
+      "seconds": 4.615101099014282,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "c8461ad3f13e132553787ed5a40865f01f05c800cb54a8a71f1ba4d1040700c3"
+    },
+    {
+      "target": "visibility_projection_cache",
+      "seconds": 0.1665177345275879,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "f123e4564f61bf99cd032173e0ae5ef44e169c9919e21b9e4714ef500e7a8adb"
+    },
+    {
+      "target": "portal_generation_v35",
+      "seconds": 2.417470932006836,
+      "counts": {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "ad329b5fb1c144359e2cc78d30b9b94b2449ac0b15b914d629185a62ce6d0b28"
+    },
+    {
+      "target": "equipment_grant_commands",
+      "seconds": 1.15494704246521,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "bf108c88e337a5d15075b611655b5dfd1c52091b3dde2e301f7579d78a12b60d"
+    },
+    {
+      "target": "epidite_r34",
+      "seconds": 0.3502523899078369,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "fb8ef73a97a29e6572ab8205d8e96413cbf1c95914666e1721e09f38e1f74540"
+    },
+    {
+      "target": "corpse_core",
+      "seconds": 12.320978879928589,
+      "counts": {
+        "passed": 146,
+        "failed": 0,
+        "ignored": 2,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "571c02474ccdc9d260dd0acff61f47dc5b6605336138f570cb4d28153437b733"
+    },
+    {
+      "target": "cosmetic_blood_trails",
+      "seconds": 0.22295713424682617,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "log_sha256": "b404bb9482595679c602a9c35216d02cdb4dea0122db79203740cfad34f6cf32"
+    }
+  ]
+}

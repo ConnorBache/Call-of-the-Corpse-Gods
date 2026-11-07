@@ -1,0 +1,367 @@
+{
+  "implementation": "candidate",
+  "profile": "normal collector-off",
+  "scope": "warm metadata, one command then immediate encode; no durable disk flush",
+  "cases": [
+    {
+      "case": "avatar_fixture-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 761793,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 15.513472,
+        "p95_ms": 15.513472,
+        "samples_ms": [
+          15.513472
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 2.443396,
+        "p95_ms": 2.443396,
+        "samples_ms": [
+          2.443396
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 17.957821999999997,
+        "p95_ms": 17.957821999999997,
+        "samples_ms": [
+          17.957821999999997
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "avatar_fixture-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 762662,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 23.765062999999998,
+        "p95_ms": 23.765062999999998,
+        "samples_ms": [
+          23.765062999999998
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 2.242619,
+        "p95_ms": 2.242619,
+        "samples_ms": [
+          2.242619
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 26.008063,
+        "p95_ms": 26.008063,
+        "samples_ms": [
+          26.008063
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "avatar_fixture-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 765255,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 20.769811,
+        "p95_ms": 20.769811,
+        "samples_ms": [
+          20.769811
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 7.130822,
+        "p95_ms": 7.130822,
+        "samples_ms": [
+          7.130822
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 27.901011,
+        "p95_ms": 27.901011,
+        "samples_ms": [
+          27.901011
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 2207825,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 1135.297808,
+        "p95_ms": 1135.297808,
+        "samples_ms": [
+          1135.297808
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 589.725948,
+        "p95_ms": 589.725948,
+        "samples_ms": [
+          589.725948
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 1725.024358,
+        "p95_ms": 1725.024358,
+        "samples_ms": [
+          1725.024358
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 2217261,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 15.520361999999999,
+        "p95_ms": 15.520361999999999,
+        "samples_ms": [
+          15.520361999999999
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 6.822267,
+        "p95_ms": 6.822267,
+        "samples_ms": [
+          6.822267
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 22.342978,
+        "p95_ms": 22.342978,
+        "samples_ms": [
+          22.342978
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 2246716,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 11.515511,
+        "p95_ms": 11.515511,
+        "samples_ms": [
+          11.515511
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 6.848146,
+        "p95_ms": 6.848146,
+        "samples_ms": [
+          6.848146
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 18.364078999999997,
+        "p95_ms": 18.364078999999997,
+        "samples_ms": [
+          18.364078999999997
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 5274932,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 11.346224,
+        "p95_ms": 11.346224,
+        "samples_ms": [
+          11.346224
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 33.843005000000005,
+        "p95_ms": 33.843005000000005,
+        "samples_ms": [
+          33.843005000000005
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 45.18965,
+        "p95_ms": 45.18965,
+        "samples_ms": [
+          45.18965
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 5278167,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 12.865267999999999,
+        "p95_ms": 12.865267999999999,
+        "samples_ms": [
+          12.865267999999999
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 21.835431,
+        "p95_ms": 21.835431,
+        "samples_ms": [
+          21.835431
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 34.7011,
+        "p95_ms": 34.7011,
+        "samples_ms": [
+          34.7011
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "legacy_40_floors_full_pack-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 5283597,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 11.313941,
+        "p95_ms": 11.313941,
+        "samples_ms": [
+          11.313941
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 21.597099,
+        "p95_ms": 21.597099,
+        "samples_ms": [
+          21.597099
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 32.911528000000004,
+        "p95_ms": 32.911528000000004,
+        "samples_ms": [
+          32.911528000000004
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-0-wait",
+      "starting_frames": 0,
+      "bytes": 6465976,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 33.268167,
+        "p95_ms": 33.268167,
+        "samples_ms": [
+          33.268167
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 18.793159,
+        "p95_ms": 18.793159,
+        "samples_ms": [
+          18.793159
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 52.061969,
+        "p95_ms": 52.061969,
+        "samples_ms": [
+          52.061969
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-1-wait",
+      "starting_frames": 1,
+      "bytes": 8743899,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 44.806714,
+        "p95_ms": 44.806714,
+        "samples_ms": [
+          44.806714
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 25.066295999999998,
+        "p95_ms": 25.066295999999998,
+        "samples_ms": [
+          25.066295999999998
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 69.87353,
+        "p95_ms": 69.87353,
+        "samples_ms": [
+          69.87353
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 15578695,
+      "command_inclusive": {
+        "n": 1,
+        "median_ms": 46.52501,
+        "p95_ms": 46.52501,
+        "samples_ms": [
+          46.52501
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 1,
+        "median_ms": 36.375649,
+        "p95_ms": 36.375649,
+        "samples_ms": [
+          36.375649
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 1,
+        "median_ms": 82.90109299999999,
+        "p95_ms": 82.90109299999999,
+        "samples_ms": [
+          82.90109299999999
+        ]
+      },
+      "profile_reports": []
+    }
+  ]
+}

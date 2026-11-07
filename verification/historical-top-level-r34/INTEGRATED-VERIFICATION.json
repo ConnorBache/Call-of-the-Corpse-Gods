@@ -1,0 +1,52 @@
+{
+  "status": "passed_with_documented_test_corrections",
+  "consolidated_current_source_pass": true,
+  "completed_utc": "2026-10-27T23:41:39.406205+00:00",
+  "command": "sh tools/cargo.sh test --workspace --all-targets --locked --no-fail-fast",
+  "raw_workspace": {
+    "exit_code": 101,
+    "passed": 751,
+    "failed": 2,
+    "ignored": 1,
+    "targets": 136,
+    "failed_targets": [
+      "ordinary_roster::save_lazy_generation_and_replay_keep_revision",
+      "witch_skinwalker_v33::new_state_survives_save_snapshot_revert_and_future"
+    ],
+    "failure_reason": "Obsolete new-run defaults expected revision33; implementation correctly returned34. No other failures."
+  },
+  "corrected_targets": [
+    {
+      "target": "ordinary_roster",
+      "exit_code": 0,
+      "passed": 6,
+      "failed": 0,
+      "command": "sh tools/cargo.sh test -p corpse-core --test ordinary_roster --locked"
+    },
+    {
+      "target": "witch_skinwalker_v33",
+      "exit_code": 0,
+      "passed": 11,
+      "failed": 0,
+      "command": "sh tools/cargo.sh test -p corpse-core --test witch_skinwalker_v33 --locked"
+    }
+  ],
+  "consolidated_current_source": {
+    "passed": 753,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 136
+  },
+  "doctests_exit_code": 0,
+  "production_build_manifest_sha256": "6b38787754521be07384f5642690b7c1b4bd169846ca108d18ab2284762c7c85",
+  "final_code_manifest_sha256": "d808403c8c5d0d556a4b694e85d6ac738288abc1d3b47547509794875ba86b66",
+  "production_and_assets_unchanged": true,
+  "windows_crossbuild_verified": true,
+  "windows_runtime_verified": false,
+  "logs": {
+    "r34-frozen-workspace-tests.log": "832527af38a7b83abbd826b9c50addd35a419d9e03c167636b8df91fcfaec7a8",
+    "r34-corrected-ordinary-roster.log": "c2a09499ec76bb4735bdc26b3df272aa76146542692aee08aec015ddea7bbfca",
+    "r34-corrected-witch-skinwalker.log": "82d041cefa4130f2cb40e05ab99cdcf9fe90e3dddbf1372b88ac8efae12807e4",
+    "r34-frozen-doctests.log": "5bb64f9cbfd19e87d32c827a324f8502a57198e72fcdfa5a45968267e97836bc"
+  }
+}

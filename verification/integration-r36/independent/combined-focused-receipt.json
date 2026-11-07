@@ -1,0 +1,15 @@
+{
+  "result": "passed",
+  "scope": "combined affected core focused sweep; not full workspace gate",
+  "targets": 24,
+  "counts": {
+    "passed": 222,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "log": "verification/integration-r36/independent/combined-focused.log",
+  "sha256": "fa004e26d2ad9eef16f8db49637a236ef7f0978a5f49a2417ac218710c9aad98",
+  "completedUtc": "2026-10-28T15:25:52.517210+00:00"
+}

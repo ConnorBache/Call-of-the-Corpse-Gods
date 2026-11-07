@@ -1,0 +1,7 @@
+
+running 2 tests
+test geological_plans_match_v48_all_domains ... ok
+test geology_constrained_accretion_loops_and_materialization_match_v48 ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.72s
+

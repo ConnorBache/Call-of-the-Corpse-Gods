@@ -1,0 +1,9 @@
+{
+  "path": "../r51-delivery/revision51-windows-x64.zip",
+  "bytes": 22012569,
+  "sha256": "2b3ab21b9e243a2ba4991c1c7c05a63546a3c8b652ad3886d18aee295d8b4cd1",
+  "archive_verified": true,
+  "member_count": 113,
+  "source_snapshot_sha256": "7dfe86d997d3bcca56b381b9ef77ec335fdcc8baa39bf83a5631e04a6880e7be",
+  "windows_runtime_verified": false
+}

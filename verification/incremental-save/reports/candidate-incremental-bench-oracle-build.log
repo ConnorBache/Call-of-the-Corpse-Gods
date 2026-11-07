@@ -1,0 +1,28 @@
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:152:19
+    |
+ 63 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+152 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `corpse-core` (lib) generated 1 warning
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/incremental-save/source/crates/corpse-desktop)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/corpse-desktop/examples/../src/tracked_engine.rs:40:30
+   |
+40 | ...   let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity ex...
+   |                            ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+40 -         let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+40 +         let identity=NEXT_ID.try_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+   |
+
+warning: `corpse-desktop` (example "incremental_save_bench") generated 1 warning (run `cargo fix --example "incremental_save_bench" -p corpse-desktop` to apply 1 suggestion)
+    Finished `release` profile [optimized + debuginfo] target(s) in 57.60s

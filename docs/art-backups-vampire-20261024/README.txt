@@ -1,0 +1,1 @@
+Original Vampire master and embedded distribution preserved before the owner-requested gaunt, lamprey-mouth revision on 2026-10-24. Only Vampire art changed. Revised master generated with built-in image_gen using the original as edit target; alpha retained. WebP encoded at existing quality90/method6, original dimensions. No runtime rendering code changed.

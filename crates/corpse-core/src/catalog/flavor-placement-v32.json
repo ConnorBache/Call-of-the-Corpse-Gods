@@ -1,0 +1,458 @@
+[
+  {
+    "id": "blorb",
+    "first": 1,
+    "last": 3,
+    "reference_depth": 1,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 10.0
+  },
+  {
+    "id": "rat",
+    "first": 1,
+    "last": 3,
+    "reference_depth": 1,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 20.0
+  },
+  {
+    "id": "shellback-beetle",
+    "first": 1,
+    "last": 4,
+    "reference_depth": 1,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 24.0
+  },
+  {
+    "id": "hemogoblin",
+    "first": 1,
+    "last": 5,
+    "reference_depth": 1,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 20.0
+  },
+  {
+    "id": "cave-bat",
+    "first": 1,
+    "last": 6,
+    "reference_depth": 1,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 14.0
+  },
+  {
+    "id": "pale:Jackal",
+    "first": 1,
+    "last": 7,
+    "reference_depth": 1,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 12.0
+  },
+  {
+    "id": "needleling",
+    "first": 1,
+    "last": 7,
+    "reference_depth": 1,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 20.0
+  },
+  {
+    "id": "short-saidri",
+    "first": 1,
+    "last": 8,
+    "reference_depth": 1,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 15.0
+  },
+  {
+    "id": "pale:Biter",
+    "first": 3,
+    "last": 11,
+    "reference_depth": 7.0,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 25.0
+  },
+  {
+    "id": "dryad",
+    "first": 3,
+    "last": 12,
+    "reference_depth": 7.5,
+    "role": "Support",
+    "target_lifetime_damage_pct": 6.0
+  },
+  {
+    "id": "hemogoblin-bloodmancer",
+    "first": 5,
+    "last": 14,
+    "reference_depth": 9.5,
+    "role": "Controller",
+    "target_lifetime_damage_pct": 8.0
+  },
+  {
+    "id": "pale:Breather",
+    "first": 5,
+    "last": 13,
+    "reference_depth": 9.0,
+    "role": "Controller",
+    "target_lifetime_damage_pct": 10.0
+  },
+  {
+    "id": "pale:Spitter",
+    "first": 4,
+    "last": 12,
+    "reference_depth": 8.0,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 12.0
+  },
+  {
+    "id": "pale:Screamer",
+    "first": 4,
+    "last": 13,
+    "reference_depth": 8.5,
+    "role": "Support/Controller",
+    "target_lifetime_damage_pct": 6.0
+  },
+  {
+    "id": "pale:Birther",
+    "first": 6,
+    "last": 15,
+    "reference_depth": 10.5,
+    "role": "Summoner",
+    "target_lifetime_damage_pct": 5.0
+  },
+  {
+    "id": "giant-beetle",
+    "first": 8,
+    "last": 17,
+    "reference_depth": 12.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 28.0
+  },
+  {
+    "id": "glim",
+    "first": 7,
+    "last": 16,
+    "reference_depth": 11.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 30.0
+  },
+  {
+    "id": "bear",
+    "first": 6,
+    "last": 14,
+    "reference_depth": 10.0,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 28.0
+  },
+  {
+    "id": "witch",
+    "first": 27,
+    "last": 36,
+    "reference_depth": 31.5,
+    "role": "Controller",
+    "target_lifetime_damage_pct": 15.0
+  },
+  {
+    "id": "horn-1",
+    "first": 12,
+    "last": 21,
+    "reference_depth": 16.5,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 15.0
+  },
+  {
+    "id": "horn-2",
+    "first": 12,
+    "last": 21,
+    "reference_depth": 16.5,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 22.0
+  },
+  {
+    "id": "hemogoblin-inventor",
+    "first": 14,
+    "last": 23,
+    "reference_depth": 18.5,
+    "role": "Support",
+    "target_lifetime_damage_pct": 4.0
+  },
+  {
+    "id": "hemogoblin-mech",
+    "first": 14,
+    "last": 23,
+    "reference_depth": 18.5,
+    "role": "Fighter/Artillery",
+    "target_lifetime_damage_pct": 38.0
+  },
+  {
+    "id": "tiger",
+    "first": 10,
+    "last": 19,
+    "reference_depth": 14.5,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 20.0
+  },
+  {
+    "id": "bombardier",
+    "first": 13,
+    "last": 21,
+    "reference_depth": 17.0,
+    "role": "Mage/Artillery (burst exception)",
+    "target_lifetime_damage_pct": null
+  },
+  {
+    "id": "long-saidri",
+    "first": 13,
+    "last": 22,
+    "reference_depth": 17.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 31.0
+  },
+  {
+    "id": "kelpie",
+    "first": 16,
+    "last": 25,
+    "reference_depth": 20.5,
+    "role": "Fighter/Controller",
+    "target_lifetime_damage_pct": 36.0
+  },
+  {
+    "id": "wendigo",
+    "first": 17,
+    "last": 26,
+    "reference_depth": 21.5,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 24.0
+  },
+  {
+    "id": "pale:Greater Biter",
+    "first": 18,
+    "last": 27,
+    "reference_depth": 22.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 35.0
+  },
+  {
+    "id": "pale:Greater Spitter",
+    "first": 19,
+    "last": 28,
+    "reference_depth": 23.5,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 18.0
+  },
+  {
+    "id": "troll",
+    "first": 19,
+    "last": 28,
+    "reference_depth": 23.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 38.0
+  },
+  {
+    "id": "pale:Greater Breather",
+    "first": 22,
+    "last": 31,
+    "reference_depth": 26.5,
+    "role": "Controller",
+    "target_lifetime_damage_pct": 14.0
+  },
+  {
+    "id": "pale:Greater Screamer",
+    "first": 20,
+    "last": 29,
+    "reference_depth": 24.5,
+    "role": "Support/Controller",
+    "target_lifetime_damage_pct": 9.0
+  },
+  {
+    "id": "pale:Greater Birther",
+    "first": 23,
+    "last": 32,
+    "reference_depth": 27.5,
+    "role": "Summoner",
+    "target_lifetime_damage_pct": 7.0
+  },
+  {
+    "id": "dire-bear",
+    "first": 20,
+    "last": 29,
+    "reference_depth": 24.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 36.0
+  },
+  {
+    "id": "river-drake",
+    "first": 22,
+    "last": 31,
+    "reference_depth": 26.5,
+    "role": "Fighter/Artillery/Controller",
+    "target_lifetime_damage_pct": 40.0
+  },
+  {
+    "id": "horn-3",
+    "first": 22,
+    "last": 31,
+    "reference_depth": 26.5,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 18.0
+  },
+  {
+    "id": "killspawn",
+    "first": 25,
+    "last": 34,
+    "reference_depth": 29.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 45.0
+  },
+  {
+    "id": "horn-4",
+    "first": 24,
+    "last": 33,
+    "reference_depth": 28.5,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 27.0
+  },
+  {
+    "id": "sabretooth",
+    "first": 25,
+    "last": 33,
+    "reference_depth": 29.0,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 27.0
+  },
+  {
+    "id": "vampire",
+    "first": 30,
+    "last": 38,
+    "reference_depth": 34.0,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 32.0
+  },
+  {
+    "id": "banshee",
+    "first": 29,
+    "last": 37,
+    "reference_depth": 33.0,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 22.0
+  },
+  {
+    "id": "maulchild",
+    "first": 25,
+    "last": 34,
+    "reference_depth": 29.5,
+    "role": "Controller",
+    "target_lifetime_damage_pct": 0.0
+  },
+  {
+    "id": "horn-5",
+    "first": 29,
+    "last": 38,
+    "reference_depth": 33.5,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 21.0
+  },
+  {
+    "id": "horn-6",
+    "first": 30,
+    "last": 38,
+    "reference_depth": 34.0,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 30.0
+  },
+  {
+    "id": "phoenix",
+    "first": 32,
+    "last": 40,
+    "reference_depth": 36.0,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 42.0
+  },
+  {
+    "id": "yeti",
+    "first": 27,
+    "last": 36,
+    "reference_depth": 31.5,
+    "role": "Fighter/Controller",
+    "target_lifetime_damage_pct": 40.0
+  },
+  {
+    "id": "moonspawn",
+    "first": 33,
+    "last": 40,
+    "reference_depth": 36.5,
+    "role": "Skirmisher",
+    "target_lifetime_damage_pct": 31.0
+  },
+  {
+    "id": "valta",
+    "first": 34,
+    "last": 40,
+    "reference_depth": 37.0,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 22.0
+  },
+  {
+    "id": "saidri-guardian",
+    "first": 31,
+    "last": 40,
+    "reference_depth": 35.5,
+    "role": "Fighter/Controller",
+    "target_lifetime_damage_pct": 44.0
+  },
+  {
+    "id": "chimera",
+    "first": 35,
+    "last": 40,
+    "reference_depth": 37.5,
+    "role": "Fighter/Artillery",
+    "target_lifetime_damage_pct": 45.0
+  },
+  {
+    "id": "cancer",
+    "first": 35,
+    "last": 40,
+    "reference_depth": 37.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 48.0
+  },
+  {
+    "id": "horn-7",
+    "first": 36,
+    "last": 40,
+    "reference_depth": 38.0,
+    "role": "Mage/Artillery",
+    "target_lifetime_damage_pct": 24.0
+  },
+  {
+    "id": "ursa-minor",
+    "first": 36,
+    "last": 40,
+    "reference_depth": 38.0,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 32.0
+  },
+  {
+    "id": "ursa-major",
+    "first": 36,
+    "last": 40,
+    "reference_depth": 38.0,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 48.0
+  },
+  {
+    "id": "minotaur",
+    "first": 33,
+    "last": 40,
+    "reference_depth": 36.5,
+    "role": "Fighter",
+    "target_lifetime_damage_pct": 50.0
+  },
+  {
+    "id": "dragon",
+    "first": 38,
+    "last": 40,
+    "reference_depth": 39.0,
+    "role": "Fighter/Artillery",
+    "target_lifetime_damage_pct": 50.0
+  }
+]

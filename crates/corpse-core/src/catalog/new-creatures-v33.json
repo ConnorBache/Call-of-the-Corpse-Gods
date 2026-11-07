@@ -1,0 +1,87 @@
+[
+  {
+    "id": 0,
+    "x": 0,
+    "y": 0,
+    "creatureKind": "night-crawler",
+    "name": "Night Crawler",
+    "glyph": "n",
+    "color": "#D54B5C",
+    "hp": 292,
+    "maxHp": 292,
+    "energy": 50,
+    "stats": {
+      "offense": 200,
+      "defense": 32,
+      "accuracy": 140,
+      "dodge": 35,
+      "dr": 0,
+      "perception": 45,
+      "maxEnergy": 50
+    },
+    "state": "wandering",
+    "abilities": [
+      "enemy:beast:lifesteal"
+    ],
+    "active": [],
+    "conditions": {
+      "bestiaryTraitsInitialized": 1
+    }
+  },
+  {
+    "id": 0,
+    "x": 0,
+    "y": 0,
+    "creatureKind": "skin-walker",
+    "name": "Skin Walker",
+    "glyph": "s",
+    "color": "#B596E8",
+    "hp": 376,
+    "maxHp": 376,
+    "energy": 50,
+    "stats": {
+      "offense": 310,
+      "defense": 46,
+      "accuracy": 148,
+      "dodge": 44,
+      "dr": 0,
+      "perception": 45,
+      "maxEnergy": 50
+    },
+    "state": "wandering",
+    "abilities": [],
+    "active": [],
+    "conditions": {
+      "bestiaryTraitsInitialized": 1
+    }
+  },
+  {
+    "id": 0,
+    "x": 0,
+    "y": 0,
+    "creatureKind": "saidribee-queen",
+    "name": "Saidribee Queen",
+    "glyph": "Q",
+    "color": "#F3C66B",
+    "hp": 430,
+    "maxHp": 430,
+    "energy": 100,
+    "stats": {
+      "offense": 230,
+      "defense": 48,
+      "accuracy": 145,
+      "dodge": 35,
+      "dr": 0,
+      "perception": 55,
+      "maxEnergy": 100
+    },
+    "state": "wandering",
+    "abilities": [
+      "enemy:beast:saidribee-queen"
+    ],
+    "active": [],
+    "conditions": {
+      "bestiaryTraitsInitialized": 1
+    }
+  }
+]

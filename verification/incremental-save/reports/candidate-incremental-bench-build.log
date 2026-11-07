@@ -1,0 +1,70 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling unicode-ident v1.0.27
+   Compiling simd-adler32 v0.3.10
+   Compiling version-compare v0.1.1
+   Compiling cfg-if v1.0.5
+   Compiling libm v0.2.16
+   Compiling libc v0.2.191
+   Compiling equivalent v1.0.3
+   Compiling crc32fast v1.5.2
+   Compiling zmij v1.0.23
+   Compiling adler2 v2.0.1
+   Compiling sdl2-sys v0.38.0
+   Compiling hashbrown v0.17.1
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling miniz_oxide v0.9.1
+   Compiling bitflags v1.3.2
+   Compiling foldhash v0.1.5
+   Compiling allocator-api2 v0.2.21
+   Compiling getrandom v0.3.4
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling syn v3.0.9
+   Compiling foldhash v0.2.0
+   Compiling sdl2 v0.38.0
+   Compiling hashbrown v0.15.5
+   Compiling flate2 v1.1.10
+   Compiling core_maths v0.1.1
+   Compiling ttf-parser v0.25.1
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling lazy_static v1.5.1
+   Compiling quick-error v2.0.1
+   Compiling byteorder-lite v0.1.0
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/incremental-save/source/crates/corpse-desktop)
+   Compiling image-webp v0.2.4
+   Compiling png v0.17.16
+   Compiling fontdue v0.9.5
+   Compiling serde_derive v1.0.229
+   Compiling indexmap v2.14.2
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/incremental-save/source/crates/corpse-core)
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:152:19
+    |
+ 63 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+152 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `corpse-core` (lib) generated 1 warning
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/corpse-desktop/examples/../src/tracked_engine.rs:40:30
+   |
+40 | ...   let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity ex...
+   |                            ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+40 -         let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+40 +         let identity=NEXT_ID.try_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+   |
+
+warning: `corpse-desktop` (example "incremental_save_bench") generated 1 warning (run `cargo fix --example "incremental_save_bench" -p corpse-desktop` to apply 1 suggestion)
+    Finished `release` profile [optimized + debuginfo] target(s) in 2m 55s

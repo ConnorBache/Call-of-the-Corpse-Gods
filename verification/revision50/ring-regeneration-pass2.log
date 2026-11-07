@@ -1,0 +1,16 @@
+
+running 11 tests
+test actor_local_equipment_does_not_leak_to_minime_decoys_or_ordinary_actors ... ok
+test duplicate_fixed_powers_do_not_stack_or_remove_separate_tinker_grants ... ok
+test exact_inactive_catchup_uses_actor_rings_without_healing_absent_player ... ok
+test existing_drown_and_creature_regeneration_multipliers_still_apply ... ok
+test identity_requires_authored_effect_ring_wearing_and_revision ... ok
+test half_here_uses_owner_rings_and_one_regeneration_tick_with_water_endpoint ... ok
+test normal_combat_regenerates_but_haste_bonus_movement_does_not ... ok
+test regeneration_never_refills_player_or_blessing_energy_and_caps_hp ... ok
+test reverse_entropy_still_suppresses_a_hostile_ring_wearer ... ok
+test regeneration_is_point_four_percent_only_when_worn_and_keeps_legacy_rate ... ok
+test ring_identity_and_power_survive_raw_save_and_snapshot_restore ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

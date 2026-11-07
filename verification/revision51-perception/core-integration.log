@@ -1,0 +1,131 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r51-ui-work/source/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 2m 53s
+     Running tests/debug_floor40_fire_admission.rs (target/debug/deps/debug_floor40_fire_admission-cbe9a8ff032b1a1d)
+
+running 2 tests
+test legacy_debug_checkpoint_still_round_trips ... ok
+test debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 41.91s
+
+     Running tests/revision50_ring_lighting.rs (target/debug/deps/revision50_ring_lighting-d5a8dc720ae58de0)
+
+running 6 tests
+test light_is_additive_without_falloff_and_excludes_entire_wearer_tile ... ok
+test light_stays_in_the_wearers_plane ... ok
+test additive_light_reduces_absolute_darkness_aura_and_does_not_duplicate_shared_bodies ... ok
+test light_and_stealth_restore_and_remain_revision_gated ... ok
+test stealth_only_multiplies_negative_actor_light_once ... ok
+test light_respects_walls_doors_portals_and_same_tick_cache_changes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/revision51_fungus_feasts.rs (target/debug/deps/revision51_fungus_feasts-e4ea0a404e5a6f2f)
+
+running 11 tests
+test hidden_root_memory_does_not_change_direction_until_observed_again ... ok
+test root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_intersections ... ok
+test impossible_layout_omits_fungus_and_both_victims_without_generation_failure ... ok
+test placement_finds_nearest_clear_cells_when_old_horizontal_slots_are_blocked ... ok
+test dead_aquatic_victims_fill_the_floor13_gap_without_changing_spawn_depths ... ok
+test separate_fungi_never_share_generated_victim_cells ... ok
+test legacy_fungus_generation_keeps_horizontal_canned_corpses_and_no_initial_roots ... ok
+test dead_feast_pools_include_ordinary_pairs_followers_and_banshees ... ok
+test out_of_depth_means_first_eligible_two_or_three_floors_later ... ok
+test no_late_fungi_or_godbeast_corpse_substitutions_when_no_deeper_species_exists ... ok
+test generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/revision51_perception.rs (target/debug/deps/revision51_perception-2f90d429fbef3c4d)
+
+running 12 tests
+test hunting_does_not_expire_into_recovery_sleep_en_route ... ok
+test awareness_is_fixed_after_shared_plausible_sight ... ok
+test player_uses_own_perception_for_both_tiles_and_creatures ... ok
+test lit_tiles_and_creatures_require_line_of_sight_not_distance ... ok
+test actor_stealth_hides_actor_not_the_tile_and_invisibility_is_preserved ... ok
+test pure_sleep_awareness_cap_is_inclusive_and_bright_light_does_not_bypass_it ... ok
+test fractional_stealth_is_added_without_legacy_rounding ... ok
+test same_plane_and_portal_optical_distance_are_shared ... ok
+test legacy_saved_rules_do_not_change ... ok
+test water_has_only_the_authored_submerged_stealth_not_legacy_perception_multiplier ... ok
+test negative_lighting_and_stealth_are_shared_with_ally_target_acquisition ... ok
+test projected_scalar_visibility_and_memory_match_new_rules ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/revision51_perception_lifecycle.rs (target/debug/deps/revision51_perception_lifecycle-812da5fec4f42669)
+
+running 8 tests
+test hunter_refreshes_awareness_at_old_location_if_player_is_plausibly_visible ... ok
+test successful_sleep_detection_records_awareness_without_an_extra_wandering_roll ... ok
+test offscreen_low_energy_stair_follower_keeps_chase_and_arrives_off_stair ... ok
+test observation_and_queries_do_not_mutate_saved_run_or_rng ... ok
+test unseen_stair_goal_finishes_at_legal_edge_but_visible_target_is_reacquired ... ok
+test approved_heart_rewards_keep_existing_bonuses_and_only_change_new_revision_drops ... ok
+test offscreen_low_energy_hunt_persists_then_finishes_at_stair_edge ... ok
+test hunter_reaches_stored_location_before_forgetting_without_live_position_tracking ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/revision51_speed_up_tiles.rs (target/debug/deps/revision51_speed_up_tiles-3e8b0349cef0e39f)
+
+running 7 tests
+test revision51_speed_up_lighting_and_visibility_are_local_and_not_opaque ... ok
+test revision51_replacement_deactivates_tile_links_and_exact_restoration_reactivates ... ok
+test revision51_speed_up_preserves_movement_projectiles_and_local_reversal ... ok
+test revision51_speed_up_generation_replaces_ground_without_changing_assignments ... ok
+test revision51_speed_up_admission_and_ids_are_revision_safe ... ok
+test revision51_black_pit_restores_speed_up_on_the_authored_three_updates ... ok
+test revision51_speed_up_saves_memory_replay_and_temporal_state_exactly ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+     Running tests/stealth_passives.rs (target/debug/deps/stealth_passives-4a540c5a2c51ee36)
+
+running 1 test
+test stealth_passives_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.36s
+
+     Running tests/visibility_projection_cache.rs (target/debug/deps/visibility_projection_cache-cf523363db2a1e1a)
+
+running 1 test
+test projected_actor_visibility_matches_scalar_special_cases ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/vision_parity.rs (target/debug/deps/vision_parity-fe308a47ffc939cb)
+
+running 1 test
+test perception_matches_twenty_reference_scenes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+

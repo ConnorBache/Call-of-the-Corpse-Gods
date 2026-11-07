@@ -1,0 +1,74 @@
+{
+  "status": "failed",
+  "simulation_revision": 37,
+  "started_utc": "2026-10-28T18:14:41.145381+00:00",
+  "scope": "All files in crates, fixtures and tools except __pycache__, plus Cargo.toml, Cargo.lock, rust-toolchain.toml and AGENTS.md. Generated verification/release documentation is excluded.",
+  "frozen_input_count": 1068,
+  "input_fingerprint_before": "78d94dd4d4dfb28309ad52af964ad19c4bd6f49e77c448498693fe443491ce29",
+  "profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "cargo_version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "rust_toolchain": "[toolchain]\nchannel = \"1.99.1\"\nprofile = \"minimal\"",
+  "checks": [
+    {
+      "label": "workspace",
+      "command": [
+        "sh",
+        "tools/cargo.sh",
+        "test",
+        "--workspace",
+        "--locked",
+        "--all-targets",
+        "--no-fail-fast"
+      ],
+      "exit_code": 101,
+      "seconds": 1154.043,
+      "targets": 148,
+      "log": "verification/integration-r37/final-gate/workspace.log",
+      "log_sha256": "9ff37d6694f554957128984d856aa0e07c958bb8ae66d2165e4c24f8e71e6710",
+      "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+      "failed_tests": [
+        "final_windows_cover_every_leader_and_pair_without_legacy_changes",
+        "revision_overlay_preserves_abilities_rewards_and_frozen_catalog"
+      ],
+      "passed": 900,
+      "failed": 2,
+      "ignored": 1,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "label": "doctests",
+      "command": [
+        "sh",
+        "tools/cargo.sh",
+        "test",
+        "--workspace",
+        "--locked",
+        "--doc",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0,
+      "seconds": 1.221,
+      "targets": 1,
+      "log": "verification/integration-r37/final-gate/doctests.log",
+      "log_sha256": "2b0e193f64c5171f729f607c022f96472b5d8fffe0ccee2e004856dff017d5be",
+      "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+      "failed_tests": [],
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ],
+  "finished_utc": "2026-10-28T18:33:58.515437+00:00",
+  "input_fingerprint_after": "78d94dd4d4dfb28309ad52af964ad19c4bd6f49e77c448498693fe443491ce29",
+  "changed_inputs": [],
+  "code_build_inputs_unchanged": true
+}

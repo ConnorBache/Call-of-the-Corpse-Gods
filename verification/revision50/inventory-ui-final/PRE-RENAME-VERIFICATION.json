@@ -1,0 +1,14 @@
+{
+  "status": "pre-rename inventory/UI checks passed",
+  "counts": {
+    "completed_targets": 189,
+    "passed": 2005,
+    "failed": 0,
+    "ignored": 38
+  },
+  "source_snapshot_sha256": "f19312126dd8d9cfac9eb449f9bf543b65ee6c41e53780b81ee4e9433e25b59c",
+  "live_source_now_has_later_creature_changes": true,
+  "captures_identical_to_reviewed": 50,
+  "windows_runtime_verified": false,
+  "note": "Already-built binaries executed these tests; current source has subsequent creature-name/color edits and requires fresh verification."
+}

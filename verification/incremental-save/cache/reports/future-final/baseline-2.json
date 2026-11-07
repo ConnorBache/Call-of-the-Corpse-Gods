@@ -1,0 +1,79 @@
+{
+  "implementation": "candidate",
+  "profile": "normal collector-off",
+  "scope": "warm metadata, one command then immediate encode; no durable disk flush",
+  "cases": [
+    {
+      "case": "generated_10_floors-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 2246716,
+      "command_inclusive": {
+        "n": 3,
+        "median_ms": 10.874859,
+        "p95_ms": 14.137643,
+        "samples_ms": [
+          10.874859,
+          14.137643,
+          9.544092000000001
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 3,
+        "median_ms": 16.128799,
+        "p95_ms": 17.756814,
+        "samples_ms": [
+          14.270961,
+          16.128799,
+          17.756814
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 3,
+        "median_ms": 27.301271,
+        "p95_ms": 30.266807999999997,
+        "samples_ms": [
+          25.146418,
+          30.266807999999997,
+          27.301271
+        ]
+      },
+      "profile_reports": []
+    },
+    {
+      "case": "generated_10_floors_future_anchor-history-5-wait",
+      "starting_frames": 5,
+      "bytes": 15578695,
+      "command_inclusive": {
+        "n": 3,
+        "median_ms": 23.950822,
+        "p95_ms": 26.274037,
+        "samples_ms": [
+          23.772814,
+          26.274037,
+          23.950822
+        ]
+      },
+      "immediate_save_inclusive": {
+        "n": 3,
+        "median_ms": 53.116783,
+        "p95_ms": 53.697649,
+        "samples_ms": [
+          53.116783,
+          53.697649,
+          50.745903
+        ]
+      },
+      "command_plus_save_inclusive": {
+        "n": 3,
+        "median_ms": 76.890104,
+        "p95_ms": 79.972294,
+        "samples_ms": [
+          76.890104,
+          79.972294,
+          74.697259
+        ]
+      },
+      "profile_reports": []
+    }
+  ]
+}

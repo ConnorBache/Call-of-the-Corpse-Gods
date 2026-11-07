@@ -1,0 +1,131 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r51-ui-work/source/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 2m 30s
+     Running tests/revision50_bastidion.rs (target/debug/deps/revision50_bastidion-d488d8e4e5b4ce82)
+
+running 8 tests
+test amulet_only_cooldown_clarification_preserves_mask_and_enemy_lockouts ... ok
+test r50_root_connections_keep_volume_and_recolor_old_saved_roots ... ok
+test dead_fungus_cannot_revive_even_after_all_roots_are_removed ... ok
+test rooted_corpses_never_revive_during_normal_or_haste_turns_and_severing_frees_them ... ok
+test r50_offscreen_save_snapshot_and_future_replay_emit_hallucinogenic_gas ... ok
+test r50_live_emission_overrides_every_saved_gas_and_legacy_keeps_exact_mapping ... ok
+test rooted_corpses_remain_dead_offscreen_after_save_and_both_temporal_restores ... ok
+test r50_population_all_aliases_depths_and_seeds_skip_random_gas_selection ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.25s
+
+     Running tests/revision51_damage_rounding.rs (target/debug/deps/revision51_damage_rounding-2b6f610b8e3da1ca)
+
+running 13 tests
+test revision51_poison_tick_hemophilia_and_blood_weapon_use_matching_values ... ok
+test revision51_explosion_aoe_rounds_each_victim_and_preserves_immunity ... ok
+test revision51_fractional_healing_and_curse_duration_remain_unchanged ... ok
+test revision51_bonded_packets_round_their_half_independently ... ok
+test revision51_attack_rng_is_unchanged_and_ordinary_health_delta_is_integer ... ok
+test revision51_nearest_boundaries_and_legacy_primitives ... ok
+test revision51_shared_body_resistance_rounds_once_for_the_owner ... ok
+test revision51_terminal_strike_stays_lethal_below_half_hp_and_displays_integer ... ok
+test revision51_offscreen_status_packets_round_without_changing_the_clock ... ok
+test revision51_gas_vulnerability_and_resistance_round_once ... ok
+test revision51_resistance_precedes_the_only_round_and_keeps_legacy_fractions ... ok
+test revision51_save_snapshot_and_fixture_replay_preserve_damage_policy ... ok
+test revision51_all_packet_kinds_and_exact_packets_use_nearest ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/revision51_fungus_feasts.rs (target/debug/deps/revision51_fungus_feasts-e4ea0a404e5a6f2f)
+
+running 9 tests
+test legacy_fungus_generation_keeps_horizontal_canned_corpses_and_no_initial_roots ... FAILED
+test hidden_root_memory_does_not_change_direction_until_observed_again ... FAILED
+test impossible_layout_omits_fungus_and_both_victims_without_generation_failure ... FAILED
+test placement_finds_nearest_clear_cells_when_old_horizontal_slots_are_blocked ... FAILED
+test root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_intersections ... FAILED
+test separate_fungi_never_share_generated_victim_cells ... FAILED
+test generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots ... FAILED
+test no_late_fungi_or_godbeast_corpse_substitutions_when_no_deeper_species_exists ... FAILED
+test out_of_depth_means_first_eligible_two_or_three_floors_later ... ok
+
+failures:
+
+---- legacy_fungus_generation_keeps_horizontal_canned_corpses_and_no_initial_roots stdout ----
+
+thread 'legacy_fungus_generation_keeps_horizontal_canned_corpses_and_no_initial_roots' (171) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:96:92:
+called `Result::unwrap()` on an `Err` value: "Required setup creature cannot occupy coordinate"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- hidden_root_memory_does_not_change_direction_until_observed_again stdout ----
+
+thread 'hidden_root_memory_does_not_change_direction_until_observed_again' (169) panicked at crates/corpse-core/src/hazard_memory.rs:34:22:
+attempt to calculate the remainder with a divisor of zero
+
+---- impossible_layout_omits_fungus_and_both_victims_without_generation_failure stdout ----
+
+thread 'impossible_layout_omits_fungus_and_both_victims_without_generation_failure' (170) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:74:83:
+called `Result::unwrap()` on an `Err` value: "Required setup creature cannot occupy coordinate"
+
+---- placement_finds_nearest_clear_cells_when_old_horizontal_slots_are_blocked stdout ----
+
+thread 'placement_finds_nearest_clear_cells_when_old_horizontal_slots_are_blocked' (174) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:65:76:
+called `Result::unwrap()` on an `Err` value: "Required setup creature cannot occupy coordinate"
+
+---- root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_intersections stdout ----
+
+thread 'root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_intersections' (175) panicked at crates/corpse-core/src/hazard_memory.rs:34:22:
+attempt to calculate the remainder with a divisor of zero
+
+---- separate_fungi_never_share_generated_victim_cells stdout ----
+
+thread 'separate_fungi_never_share_generated_victim_cells' (176) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:84:83:
+called `Result::unwrap()` on an `Err` value: "Required setup creature cannot occupy coordinate"
+
+---- generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots stdout ----
+
+thread 'generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots' (168) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:16:91:
+called `Result::unwrap()` on an `Err` value: "Required setup creature cannot occupy coordinate"
+
+---- no_late_fungi_or_godbeast_corpse_substitutions_when_no_deeper_species_exists stdout ----
+
+thread 'no_late_fungi_or_godbeast_corpse_substitutions_when_no_deeper_species_exists' (172) panicked at crates/corpse-core/tests/revision51_fungus_feasts.rs:16:91:
+called `Result::unwrap()` on an `Err` value: "Required setup creature cannot occupy coordinate"
+
+
+failures:
+    generated_feasts_have_two_distinct_depth_eligible_victims_and_active_roots
+    hidden_root_memory_does_not_change_direction_until_observed_again
+    impossible_layout_omits_fungus_and_both_victims_without_generation_failure
+    legacy_fungus_generation_keeps_horizontal_canned_corpses_and_no_initial_roots
+    no_late_fungi_or_godbeast_corpse_substitutions_when_no_deeper_species_exists
+    placement_finds_nearest_clear_cells_when_old_horizontal_slots_are_blocked
+    root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_intersections
+    separate_fungi_never_share_generated_victim_cells
+
+test result: FAILED. 1 passed; 8 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p corpse-core --test revision51_fungus_feasts`

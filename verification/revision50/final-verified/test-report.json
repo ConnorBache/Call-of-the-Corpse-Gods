@@ -1,0 +1,27 @@
+{
+  "command": "CARGO_TARGET_DIR=../r50-optimized-target CARGO_PROFILE_TEST_OPT_LEVEL=1 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true CARGO_INCREMENTAL=0 CORPSE_R50_JEWELRY_OUTPUT=$PWD/verification/revision50/final-verified/items CORPSE_R50_VISUAL_OUTPUT=$PWD/verification/revision50/final-verified/ui CORPSE_COMPACT_DIALOG_OUTPUT=$PWD/verification/revision50/final-verified/compact CORPSE_CREATURE_IDENTITY_REVIEW=$PWD/verification/revision50/final-verified/visual sh tools/cargo.sh test --workspace --locked --offline --no-fail-fast -j2 -- --test-threads=2",
+  "counts": {
+    "completed_targets": 190,
+    "failed": 0,
+    "ignored": 40,
+    "passed": 2018
+  },
+  "exit_code": 0,
+  "exit_code_file": {
+    "bytes": 2,
+    "path": "verification/revision50/final-verified/workspace.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "kind": "r50-test-report",
+  "limits": "Only executed tests in the recorded log; ignored tests did not run. Not Windows runtime verification.",
+  "log": {
+    "bytes": 272019,
+    "path": "verification/revision50/final-verified/workspace.log",
+    "sha256": "e902b4fe96b8d51b24fd348c26e026bc05426e3f794c5656b6a14330f1a1c61f"
+  },
+  "revision": 50,
+  "schema": 1,
+  "source_snapshot_sha256": "2d8baa52ba161f402c8e932ce7f573bd55a9b9a619e63a63677cf563f3d478bb",
+  "test_platform": "Linux x86_64",
+  "windows_runtime_verified": false
+}

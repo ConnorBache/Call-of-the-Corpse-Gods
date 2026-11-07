@@ -1,0 +1,7 @@
+10-h0-wait total median/p95 27.227 60.438 12.123 29.131 append 0.88 checkpoint max 10.013 bytes {'baseline': 561316216, 'candidate': 17734048}
+10-h1-wait total median/p95 28.728 63.234 13.171 37.237 append 0.974 checkpoint max 38.821 bytes {'baseline': 561541190, 'candidate': 17829238}
+10-h5-wait total median/p95 28.188 58.196 12.976 22.779 append 0.927 checkpoint max 13.893 bytes {'baseline': 562397848, 'candidate': 18102610}
+10-h5-pickup total median/p95 13.346 27.611 8.31 14.144 append 0.985 checkpoint max 15.036 bytes {'baseline': 547326780, 'candidate': 17179204}
+40-h5-wait total median/p95 39.785 83.448 12.668 24.347 append 2.019 checkpoint max 29.775 bytes {'baseline': 1248767272, 'candidate': 39480150}
+40-h5-pickup total median/p95 25.399 51.766 8.812 19.99 append 2.275 checkpoint max 54.903 bytes {'baseline': 1235770940, 'candidate': 38693084}
+Exactcrossbinary states 30

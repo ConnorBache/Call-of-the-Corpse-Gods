@@ -1,0 +1,8 @@
+Initial unoptimized targeted run, 2026-10-28 17:38 UTC:
+12 tests: 11 passed, 1 failed.
+Failure: flying_body_does_not_touch_snow_and_everburn_is_not_removed.
+Assertion: engine::condition(&r.player,"burning") > 0.
+Cause: snow used corpses::has_permanent_burning (requires everburn AND immunity),
+whereas ordinary water independently exempts the everburn trait.
+Fix: add independent enemy:beast:everburn to snow quenching exemption.
+This initial failure is retained; final targeted-tests.log records the rerun.

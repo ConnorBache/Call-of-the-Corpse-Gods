@@ -1,0 +1,219 @@
+{
+  "date": "2026-10-20",
+  "records": [
+    {
+      "id": "rat",
+      "method": "built-in image_gen",
+      "source": "docs/art-backups-anatomy-20261020/rat.png",
+      "destination": "crates/corpse-desktop/assets/creatures/rat.png",
+      "generated_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-2ec769e1-0095-4562-a847-e92ae6be489f.png",
+      "prompts": [
+        "Use case: precise-object-edit. Edit target: supplied creature sprite. Simplify this giant rat substantially. Replace dense fine fur strokes and microtexture with broad readable pixel-art fur clumps and clean shading, approximately half the detail. Preserve the same fierce rat identity, gray-brown fur, pink tail, four legs and full pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery."
+      ],
+      "source_sha256": "c8fc76a2a4d04cc00fd2ab141fc2725409125f18bceed98cb03156cfc436be75",
+      "output_sha256": "dcf105538b242140599ff10fe12cfc392f2d5549f69d09d12db88a4db6f4f3fb",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "visual_review": "Full silhouette, pixel-art style and black background checked; requested revision verified.",
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied creature sprite. Simplify this giant rat substantially. Replace dense fine fur strokes and microtexture with broad readable pixel-art fur clumps and clean shading, approximately half the detail. Preserve the same fierce rat identity, gray-brown fur, pink tail, four legs and full pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+          "input_path": "docs/art-backups-anatomy-20261020/rat.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-2ec769e1-0095-4562-a847-e92ae6be489f.png",
+          "input_sha256": "c8fc76a2a4d04cc00fd2ab141fc2725409125f18bceed98cb03156cfc436be75",
+          "output_sha256": "dcf105538b242140599ff10fe12cfc392f2d5549f69d09d12db88a4db6f4f3fb"
+        }
+      ]
+    },
+    {
+      "id": "pale-jackal",
+      "method": "built-in image_gen",
+      "source": "docs/art-backups-anatomy-20261020/pale-jackal.png",
+      "destination": "crates/corpse-desktop/assets/creatures/pale-jackal.png",
+      "generated_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-854001bd-0923-453c-bf1d-8f0e42d9c73f.png",
+      "prompts": [
+        "Use case: precise-object-edit. Edit target: supplied creature sprite. Change the pale jackal head: the face is basically one huge open toothy mouth filling almost the whole face. The small nose and two small eyes are located at the lateral sides of the head around the giant mouth, rather than a normal human face above it. Keep the gaunt pale humanoid body, two arms, two legs, pointed ears and full pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+        "Use case: precise-object-edit. Change only the head of the supplied pale humanoid monster. Preserve enormous vertical toothy mouth filling nearly entire face and eyes at left and right lateral edges of head. Add a small clearly visible pink nose with two nostrils on the left SIDE of the head just below the left eye, off to the side of the giant mouth. This is a surreal monster with lateral nose rather than a normal human face. Keep body, pose, ears, palette, crisp pixel art, full silhouette and pure black background unchanged. No text.",
+        "Use case: precise-object-edit. Change ONLY the small round pink nose on the left side of this monster head: replace that pig-like disc with a subtle pale flesh-colored pointed humanoid nose in profile, integrated into the side of the face below the lateral eye, with a tiny dark nostril. It must match the ivory skin, not pink, not round, not a pig snout. Preserve everything else exactly: huge vertical toothy mouth occupying entire front face, lateral eyes, ears, full gaunt humanoid body, pose, black background, pixel-art style. No text."
+      ],
+      "source_sha256": "985ae9ec344ba5d6676d63b9264ba02bcf89dd22b237994123b129b46b0a4d9c",
+      "output_sha256": "1569576d02fa350f98c1d1453012090f878362f66a17f689797487fb52fbe412",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "visual_review": "Full silhouette, pixel-art style and black background checked; requested revision verified.",
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied creature sprite. Change the pale jackal head: the face is basically one huge open toothy mouth filling almost the whole face. The small nose and two small eyes are located at the lateral sides of the head around the giant mouth, rather than a normal human face above it. Keep the gaunt pale humanoid body, two arms, two legs, pointed ears and full pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+          "input_path": "docs/art-backups-anatomy-20261020/pale-jackal.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-8ab547d2-9d2b-44d2-97bf-80ecb3cfe119.png",
+          "input_sha256": "985ae9ec344ba5d6676d63b9264ba02bcf89dd22b237994123b129b46b0a4d9c",
+          "output_sha256": "bd45babe1bd4ba74d49c5aad815b52156c62025ad0138f2b646efdb7a7fbda2b"
+        },
+        {
+          "prompt": "Use case: precise-object-edit. Change only the head of the supplied pale humanoid monster. Preserve enormous vertical toothy mouth filling nearly entire face and eyes at left and right lateral edges of head. Add a small clearly visible pink nose with two nostrils on the left SIDE of the head just below the left eye, off to the side of the giant mouth. This is a surreal monster with lateral nose rather than a normal human face. Keep body, pose, ears, palette, crisp pixel art, full silhouette and pure black background unchanged. No text.",
+          "input_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-8ab547d2-9d2b-44d2-97bf-80ecb3cfe119.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-66713818-de71-4f0b-a443-51b6c1574eb4.png",
+          "input_sha256": "bd45babe1bd4ba74d49c5aad815b52156c62025ad0138f2b646efdb7a7fbda2b",
+          "output_sha256": "580767e7e8d3b073d2dd15f6bf8da0a31fd20702b9fc7b69545581cf32081eb9"
+        },
+        {
+          "prompt": "Use case: precise-object-edit. Change ONLY the small round pink nose on the left side of this monster head: replace that pig-like disc with a subtle pale flesh-colored pointed humanoid nose in profile, integrated into the side of the face below the lateral eye, with a tiny dark nostril. It must match the ivory skin, not pink, not round, not a pig snout. Preserve everything else exactly: huge vertical toothy mouth occupying entire front face, lateral eyes, ears, full gaunt humanoid body, pose, black background, pixel-art style. No text.",
+          "input_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-66713818-de71-4f0b-a443-51b6c1574eb4.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-854001bd-0923-453c-bf1d-8f0e42d9c73f.png",
+          "input_sha256": "580767e7e8d3b073d2dd15f6bf8da0a31fd20702b9fc7b69545581cf32081eb9",
+          "output_sha256": "1569576d02fa350f98c1d1453012090f878362f66a17f689797487fb52fbe412"
+        }
+      ]
+    },
+    {
+      "id": "needleling",
+      "method": "built-in image_gen",
+      "source": "docs/art-backups-anatomy-20261020/needleling.png",
+      "destination": "crates/corpse-desktop/assets/creatures/needleling.png",
+      "generated_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-ff302d18-f9aa-422b-91eb-fb961cd322fc.png",
+      "prompts": [
+        "Use case: precise-object-edit. Edit target: supplied creature sprite. Remove ALL green slime, stains, drips and green coloring from the body, tail, limbs, feet, neck and face. Only its long metallic needle snout drips green venom, with a few green droplets directly under the needle. Keep dry beige-gray-brown skeletal skin everywhere else. Preserve needle, four-legged pose and full silhouette. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery."
+      ],
+      "source_sha256": "17207d1ba66ba842383609b2a7180031107603ad2eb324468e7803c380587bca",
+      "output_sha256": "bb39b6fa4694220c2c46563abd796fb882975af598e227255044bee284262e1c",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "visual_review": "Full silhouette, pixel-art style and black background checked; requested revision verified.",
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied creature sprite. Remove ALL green slime, stains, drips and green coloring from the body, tail, limbs, feet, neck and face. Only its long metallic needle snout drips green venom, with a few green droplets directly under the needle. Keep dry beige-gray-brown skeletal skin everywhere else. Preserve needle, four-legged pose and full silhouette. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+          "input_path": "docs/art-backups-anatomy-20261020/needleling.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-ff302d18-f9aa-422b-91eb-fb961cd322fc.png",
+          "input_sha256": "17207d1ba66ba842383609b2a7180031107603ad2eb324468e7803c380587bca",
+          "output_sha256": "bb39b6fa4694220c2c46563abd796fb882975af598e227255044bee284262e1c"
+        }
+      ]
+    },
+    {
+      "id": "giant-beetle",
+      "method": "built-in image_gen",
+      "source": "docs/art-backups-anatomy-20261020/giant-beetle.png",
+      "destination": "crates/corpse-desktop/assets/creatures/giant-beetle.png",
+      "generated_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-9f2055e2-c467-4e43-8975-4c2e4abc299c.png",
+      "prompts": [
+        "Use case: precise-object-edit. Edit target: supplied creature sprite. Correct the anatomy to exactly SIX clearly visible jointed legs, three per side, each with a separately readable continuous path from thorax to foot. The current image has only five visible legs; add the missing far-side leg, position legs so all six can be counted. Keep its rhinoceros horn, open wing cases and membranous wings, color and overall pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+        "Use case: precise-object-edit. Edit supplied giant rhinoceros beetle sprite. It currently has FIVE legs. It must have EXACTLY SIX COUNTABLE LEGS, three on left and three on right. Repose lower body to a nearly frontal view if necessary so leg count is unambiguous. Arrange three separated legs fanning left and three separated legs fanning right, no overlap, every foot clearly against black. Keep the dark green bronze shell, single large curved horn, smaller thorax horn, open wing cases, cream membranous wings and pixel-art style. Entire silhouette comfortably within frame. Pure black background. No labels or text.",
+        "Use case: precise-object-edit. REDRAW THE BEETLE'S POSE ENTIRELY to correct insect anatomy. Full body FRONT VIEW rhinoceros beetle, body centered upright along vertical axis. EXACTLY SIX LEGS in three symmetric pairs: upper pair extends diagonally up-left and up-right; middle pair extends horizontally left and right; lower pair extends diagonally down-left and down-right. All six long jointed legs project OUTSIDE the body silhouette and end in six clearly separated feet. Three feet on left, three feet on right. Do not hide any leg behind body. Keep reference's dark green bronze armored shell, large curved rhinoceros horn, open wing cases and cream wings at top, crisp retro pixel art on pure black background. It is one beetle. Entire silhouette visible with margins. No text or labels."
+      ],
+      "source_sha256": "14ede11f0f1b99038512942f5a68ae9674f7d1ed8c03ae04ef00e73b1cd935c4",
+      "output_sha256": "fd56c2f464a42b6fd578c43f438e0145cb48bcc3641599ad0b86f41e696ca713",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "visual_review": "Full silhouette, pixel-art style and black background checked; requested revision verified.",
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied creature sprite. Correct the anatomy to exactly SIX clearly visible jointed legs, three per side, each with a separately readable continuous path from thorax to foot. The current image has only five visible legs; add the missing far-side leg, position legs so all six can be counted. Keep its rhinoceros horn, open wing cases and membranous wings, color and overall pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+          "input_path": "docs/art-backups-anatomy-20261020/giant-beetle.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-ef6e5ce9-cd1a-4e0f-be0c-8fd84cc6fb7f.png",
+          "input_sha256": "14ede11f0f1b99038512942f5a68ae9674f7d1ed8c03ae04ef00e73b1cd935c4",
+          "output_sha256": "b6b6c846ac55314324cb25182049894d63f88a898f3d612bf1f0371541c9d6fc"
+        },
+        {
+          "prompt": "Use case: precise-object-edit. Edit supplied giant rhinoceros beetle sprite. It currently has FIVE legs. It must have EXACTLY SIX COUNTABLE LEGS, three on left and three on right. Repose lower body to a nearly frontal view if necessary so leg count is unambiguous. Arrange three separated legs fanning left and three separated legs fanning right, no overlap, every foot clearly against black. Keep the dark green bronze shell, single large curved horn, smaller thorax horn, open wing cases, cream membranous wings and pixel-art style. Entire silhouette comfortably within frame. Pure black background. No labels or text.",
+          "input_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-ef6e5ce9-cd1a-4e0f-be0c-8fd84cc6fb7f.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-75a49782-1587-4ca2-8bad-b54083fa18f2.png",
+          "input_sha256": "b6b6c846ac55314324cb25182049894d63f88a898f3d612bf1f0371541c9d6fc",
+          "output_sha256": "ca021a28c1e813078bbf891cc3e00d16bd543fef4a2ed4601a3247b4e8a1eb7f"
+        },
+        {
+          "prompt": "Use case: precise-object-edit. REDRAW THE BEETLE'S POSE ENTIRELY to correct insect anatomy. Full body FRONT VIEW rhinoceros beetle, body centered upright along vertical axis. EXACTLY SIX LEGS in three symmetric pairs: upper pair extends diagonally up-left and up-right; middle pair extends horizontally left and right; lower pair extends diagonally down-left and down-right. All six long jointed legs project OUTSIDE the body silhouette and end in six clearly separated feet. Three feet on left, three feet on right. Do not hide any leg behind body. Keep reference's dark green bronze armored shell, large curved rhinoceros horn, open wing cases and cream wings at top, crisp retro pixel art on pure black background. It is one beetle. Entire silhouette visible with margins. No text or labels.",
+          "input_path": "docs/art-backups-anatomy-20261020/giant-beetle.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-9f2055e2-c467-4e43-8975-4c2e4abc299c.png",
+          "input_sha256": "14ede11f0f1b99038512942f5a68ae9674f7d1ed8c03ae04ef00e73b1cd935c4",
+          "output_sha256": "fd56c2f464a42b6fd578c43f438e0145cb48bcc3641599ad0b86f41e696ca713"
+        }
+      ]
+    },
+    {
+      "id": "long-saidri",
+      "method": "built-in image_gen",
+      "source": "docs/art-backups-anatomy-20261020/long-saidri.png",
+      "destination": "crates/corpse-desktop/assets/creatures/long-saidri.png",
+      "generated_path": "/workspace/scratch/69f53637ba6f/generated_images/anatomy-long-saidri.png",
+      "prompts": [
+        "Use case: precise-object-edit. Edit target: supplied creature sprite. Remove every wing completely. This long-legged Saidribee must be entirely wingless, with clean black space where the wings were. Preserve the bee head, two antennae, yellow-black striped abdomen, stinger, short forelimbs and two extremely long humanoid legs, full pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery."
+      ],
+      "source_sha256": "c12dc67c1c75d91175f7c18bdb769c9b9cbc6786b6f40e7322b9fb5ab8faf8bb",
+      "output_sha256": "50e71c43d290f69d37982bda38e7991e7b481b4b86e318141901a01756f4edf2",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "visual_review": "Full silhouette, pixel-art style and black background checked; requested revision verified.",
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied creature sprite. Remove every wing completely. This long-legged Saidribee must be entirely wingless, with clean black space where the wings were. Preserve the bee head, two antennae, yellow-black striped abdomen, stinger, short forelimbs and two extremely long humanoid legs, full pose. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+          "input_path": "docs/art-backups-anatomy-20261020/long-saidri.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/anatomy-long-saidri.png",
+          "input_sha256": "c12dc67c1c75d91175f7c18bdb769c9b9cbc6786b6f40e7322b9fb5ab8faf8bb",
+          "output_sha256": "50e71c43d290f69d37982bda38e7991e7b481b4b86e318141901a01756f4edf2"
+        }
+      ]
+    },
+    {
+      "id": "bombardier",
+      "method": "built-in image_gen",
+      "source": "docs/art-backups-anatomy-20261020/bombardier.png",
+      "destination": "crates/corpse-desktop/assets/creatures/bombardier.png",
+      "generated_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-acd30344-1beb-4e86-9086-411a99bbabf1.png",
+      "prompts": [
+        "Use case: precise-object-edit. Edit target: supplied creature sprite. Correct antenna anatomy: exactly TWO long slender segmented antennae, one anchored on each side of the beetle head, with both roots and trajectories distinct and clearly visible. Do not confuse legs or mandibles with antennae. Preserve the beetle's glowing orange abdomen, dark shell, pose and full silhouette. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery."
+      ],
+      "source_sha256": "6e646803d853a5a876907eb24ee7845b9d77bbcc81b276314680b4b6dcac8e10",
+      "output_sha256": "cf8dbca32cb66775de858de1d5cd20a3eb75e19c2ce961ca1d27b9161d2e620a",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "visual_review": "Full silhouette, pixel-art style and black background checked; requested revision verified.",
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied creature sprite. Correct antenna anatomy: exactly TWO long slender segmented antennae, one anchored on each side of the beetle head, with both roots and trajectories distinct and clearly visible. Do not confuse legs or mandibles with antennae. Preserve the beetle's glowing orange abdomen, dark shell, pose and full silhouette. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+          "input_path": "docs/art-backups-anatomy-20261020/bombardier.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-acd30344-1beb-4e86-9086-411a99bbabf1.png",
+          "input_sha256": "6e646803d853a5a876907eb24ee7845b9d77bbcc81b276314680b4b6dcac8e10",
+          "output_sha256": "cf8dbca32cb66775de858de1d5cd20a3eb75e19c2ce961ca1d27b9161d2e620a"
+        }
+      ]
+    },
+    {
+      "id": "saidri-guardian",
+      "method": "built-in image_gen",
+      "source": "docs/art-backups-anatomy-20261020/saidri-guardian.png",
+      "destination": "crates/corpse-desktop/assets/creatures/saidri-guardian.png",
+      "generated_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-d06e93b9-e6b6-4cec-a141-50c1f03f7946.png",
+      "prompts": [
+        "Use case: precise-object-edit. Edit target: supplied creature sprite. Simplify this Saidribee Guardian substantially: broad clean pixel clusters, less fur microtexture and fewer armor details. Keep it a quadrupedal bee-like creature with exactly four supporting limbs: two huge forelimbs ending in large readable hands, and two smaller rear legs. Retain yellow-black bee stripes, bee head with two antennae, wings, and one large intimidating pointed stinger. Remove the long trunk-like mouth appendage in favor of simpler bee-like mouthparts. Preserve intimidating stance and full silhouette. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery."
+      ],
+      "source_sha256": "d0fb242b8603aa4b0784fb03cb9afe3f9fd32539e3a669ff1aa2cae604662cbb",
+      "output_sha256": "ea494a156e3fd9ccacd47f0920e685d1a5a015f2aebfbb3a8a148d9595ed3fca",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "visual_review": "Full silhouette, pixel-art style and black background checked; requested revision verified.",
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied creature sprite. Simplify this Saidribee Guardian substantially: broad clean pixel clusters, less fur microtexture and fewer armor details. Keep it a quadrupedal bee-like creature with exactly four supporting limbs: two huge forelimbs ending in large readable hands, and two smaller rear legs. Retain yellow-black bee stripes, bee head with two antennae, wings, and one large intimidating pointed stinger. Remove the long trunk-like mouth appendage in favor of simpler bee-like mouthparts. Preserve intimidating stance and full silhouette. Keep full creature inside frame with generous black margins, pure black background, crisp retro pixel-art style, existing palette and aspect ratio. No text, borders, labels or scenery.",
+          "input_path": "docs/art-backups-anatomy-20261020/saidri-guardian.png",
+          "output_path": "/workspace/scratch/69f53637ba6f/generated_images/exec-d06e93b9-e6b6-4cec-a141-50c1f03f7946.png",
+          "input_sha256": "d0fb242b8603aa4b0784fb03cb9afe3f9fd32539e3a669ff1aa2cae604662cbb",
+          "output_sha256": "ea494a156e3fd9ccacd47f0920e685d1a5a015f2aebfbb3a8a148d9595ed3fca"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+
+running 6 tests
+test hellfire_starts_at25_and_replaces_only_interior_walls ... ok
+test terrain_is_population_driven_and_historical_revisions_are_untouched ... ok
+test speedup_links_are_ordered_deterministic_and_route_safe ... ok
+test corn_circles_have_eight_residents_and_highest_depth_eligible_odd_horns ... ok
+test actual_population_sweep_has_safe_links_and_preserves_every_ice_spawn ... ok
+test generated_corn_floor_accepts_a_turn_and_exact_save_resume ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.20s
+

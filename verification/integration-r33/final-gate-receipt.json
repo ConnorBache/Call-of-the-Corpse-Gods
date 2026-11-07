@@ -1,0 +1,52 @@
+{
+  "started_utc": "2026-10-26T19:22:03.294095+00:00",
+  "input_scope": "All files under crates, fixtures, tools (excluding __pycache__), plus Cargo.toml, Cargo.lock, rust-toolchain.toml and AGENTS.md. Generated verification and release documentation are excluded.",
+  "input_files": 1124,
+  "input_fingerprint_before": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "environment": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "checks": [
+    {
+      "label": "workspace-all-targets",
+      "command": "sh tools/cargo.sh test --workspace --locked --all-targets",
+      "exit_code": 0,
+      "seconds": 817.516,
+      "passed": 659,
+      "failed": 0,
+      "ignored": 1,
+      "failed_tests": [],
+      "ignored_tests": [
+        "manual::tests::benchmark_animated_manual_warm_frames"
+      ],
+      "log": "verification/integration-r33/final-workspace-all-targets.log",
+      "log_sha256": "e7cc131309e780287d0353ccb1d0216943d0670ea5ceda02d434b978147268fe",
+      "count_method": "Only actual test NAME ... STATUS lines; summary lines are not tests."
+    },
+    {
+      "label": "workspace-doc",
+      "command": "sh tools/cargo.sh test --workspace --locked --doc",
+      "exit_code": 0,
+      "seconds": 1.286,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "failed_tests": [],
+      "ignored_tests": [],
+      "log": "verification/integration-r33/final-workspace-doc.log",
+      "log_sha256": "e4dca9bddba980c24ce79fa7a5fb46a458298492c575617e11977c5a1d9134a0",
+      "count_method": "Only actual test NAME ... STATUS lines; summary lines are not tests."
+    }
+  ],
+  "cargo_version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "rust_toolchain": "[toolchain]\nchannel = \"1.99.1\"\nprofile = \"minimal\"",
+  "finished_utc": "2026-10-26T19:35:43.872595+00:00",
+  "input_fingerprint_after": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "changed_inputs": [],
+  "code_build_inputs_unchanged": true,
+  "passed": true
+}

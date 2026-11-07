@@ -1,0 +1,13 @@
+
+running 8 tests
+test connected_bottom_center_door_is_distinct_and_idempotent ... ok
+test identity_validation_does_not_reinterpret_legacy_stairs ... ok
+test corridor_avoids_fixtures_and_invalid_install_is_atomic ... ok
+test ordinary_required_cell_fixtures_are_reconciled_but_machines_are_not ... ok
+test legacy_revisions_keep_original_entrance_geometry ... ok
+test populated_floor_one_keeps_the_north_arrival_safe_and_unoccupied ... ok
+test revision31_start_save_replay_and_temporal_restore_keep_identity ... ok
+test normal_generation_all_domains_has_safe_connected_entry ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.52s
+

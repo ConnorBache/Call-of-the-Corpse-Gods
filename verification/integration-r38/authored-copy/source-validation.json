@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "exact_replacements": [
+    {
+      "file": "crates/corpse-core/src/new_creatures.rs",
+      "replacement_present": true,
+      "old_text_absent": true
+    },
+    {
+      "file": "crates/corpse-desktop/assets/manual.json",
+      "replacement_present": true,
+      "old_text_absent": true
+    },
+    {
+      "file": "crates/corpse-desktop/src/ability_ui.rs",
+      "replacement_present": true,
+      "old_text_absent": true
+    },
+    {
+      "file": "crates/corpse-desktop/src/ability_ui.rs",
+      "replacement_present": true,
+      "old_text_absent": true
+    },
+    {
+      "file": "crates/corpse-desktop/src/ability_ui.rs",
+      "replacement_present": true,
+      "old_text_absent": true
+    },
+    {
+      "file": "crates/corpse-core/src/borge.rs",
+      "replacement_present": true,
+      "old_text_absent": true
+    },
+    {
+      "file": "crates/corpse-core/src/ahvamitt.rs",
+      "replacement_present": true,
+      "old_text_absent": true
+    },
+    {
+      "file": "crates/corpse-desktop/src/pack.rs",
+      "replacement_present": true,
+      "old_text_absent": true
+    }
+  ],
+  "pending_5_to_9_untouched": true,
+  "five_non_test_source_files_only_authorized_copy_diffs": true,
+  "counts": {
+    "queued_originals": 69,
+    "applied_queued": 5,
+    "pending": 64,
+    "pending_current_batch": 5,
+    "unsent": 59,
+    "additional_mask_description": 1,
+    "additional_mask_source_variants": 2
+  },
+  "applied_queue_ids": [
+    "REPLACE-3e507ec956fd",
+    "REPLACE-a5b52ebc2224",
+    "REPLACE-fcc8bf51575d",
+    "REPLACE-26090b05246f",
+    "REPLACE-b8ca2c93821f"
+  ],
+  "test_results": {
+    "desktop_authored_copy_r38": {
+      "passed": 3,
+      "failed": 0
+    },
+    "core_existing_regressions": {
+      "suites": [
+        "ahvamitt_r34",
+        "borge_event",
+        "phantasmii_dreamwalking_r34"
+      ],
+      "status": "passed"
+    },
+    "full_workspace_gate": "lead-owned, not run by copy worker"
+  }
+}

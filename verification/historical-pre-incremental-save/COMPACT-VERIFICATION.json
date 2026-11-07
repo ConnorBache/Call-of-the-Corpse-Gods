@@ -1,0 +1,9 @@
+{
+  "path": "save-journal-r39/package/corpse-gods-native-r39-save-journal-windows.zip",
+  "bytes": 19687351,
+  "sha256": "4537a5206e30dac05e841b657a5515826e7335405305cc4bf91fc1a825a157b4",
+  "archive_verified": true,
+  "windows_runtime_verified": false,
+  "scope": "Current save/rewind compact Windows cross-build and archive/static validation only",
+  "historical_receipt": "verification/historical-pre-save-journal/COMPACT-VERIFICATION.json"
+}

@@ -1,0 +1,251 @@
+{
+  "method": "Exact body-only recurrence, not a native encounter simulation",
+  "limitations": [
+    "Stored r32 all-initial Unblessed joint cohorts, not regenerated R50 progression",
+    "No enemy healing, AI, incoming damage, player deaths, statuses, blessings, terrain or summons",
+    "No enemy retuning inferred from this diagnostic; use paired native encounters before numeric changes"
+  ],
+  "profile_revision": [
+    32.0
+  ],
+  "track": "all_initial_unblessed",
+  "profiles": 127,
+  "source_sha256": {
+    "tools/monster-balance/relocated-player-progressions-r32-joint-profiles.json": "ec65fb32c5032d3cd52839b48fcafa9d2429b1ea1b0af0a5e6490f7e9770a3ec",
+    "tools/monster-balance/revision50_greatsword_sensitivity.py": "bce02764b160fa78fc394508f318a21419d339791eb14f16141ff6ddfc6a3ad3",
+    "crates/corpse-core/catalog/equipment-v48.json": "1386d08b281d4f5a2a3b357be227b20576ef8384ec843fe668d9db997d2ac149",
+    "crates/corpse-core/src/revision50_player_attack.rs": "3b784c832995623391f45329106facbc75408182b233e2a9ca89dc85cd9c9049",
+    "crates/corpse-core/src/catalog/population-v48.json": "7b4ba8f5c049ad3886696dad2b412bd736a8271878721d13dcfa7226999a6a67",
+    "crates/corpse-core/src/catalog/physical-balance-v31.json": "b2b8ba02d7c6905103ee46373f045032a27fe77932b4ad83278b0667c1b18f20",
+    "crates/corpse-core/src/catalog/physical-balance-v32.json": "17056d95a626da329e014cf342f4131259b28dd6f8ab5c14186d91ff3fe87bb2",
+    "crates/corpse-core/src/catalog/accuracy-dodge-v33.json": "447397fd85f7fc01b9c08ed4ef57b33cd590b14d9c98f85e21552b99412583b7",
+    "crates/corpse-core/src/catalog/balance-v42.json": "f91ddd923d5e77e472f268c2869870d0128f2e9d16bcc76e7f7221e3ed41a380"
+  },
+  "rows": [
+    {
+      "kind": "blorb",
+      "reference_depth": 1.0,
+      "profiles": 127,
+      "enemy_hp": 10,
+      "enemy_dodge": -11.0,
+      "enemy_dr": 0.0,
+      "mean_player_offense": 0.0,
+      "mean_old_landed_packet": 15.5,
+      "mean_new_landed_packet": 23.0,
+      "mean_old_landed_hits": 1.0,
+      "mean_new_landed_hits": 1.0,
+      "mean_old_attempts": 1.0,
+      "mean_new_attempts": 1.0,
+      "body_only_attempt_reduction_fraction": 0.0,
+      "abilities_excluded": [
+        "enemy:beast:slow",
+        "enemy:beast:slime-walker"
+      ]
+    },
+    {
+      "kind": "rat",
+      "reference_depth": 1.0,
+      "profiles": 127,
+      "enemy_hp": 22,
+      "enemy_dodge": -3.0,
+      "enemy_dr": 0.0,
+      "mean_player_offense": 0.0,
+      "mean_old_landed_packet": 15.5,
+      "mean_new_landed_packet": 23.0,
+      "mean_old_landed_hits": 2.0,
+      "mean_new_landed_hits": 1.3666666666666667,
+      "mean_old_attempts": 2.2430769230769236,
+      "mean_new_attempts": 1.532769230769231,
+      "body_only_attempt_reduction_fraction": 0.31666666666666665,
+      "abilities_excluded": []
+    },
+    {
+      "kind": "cave-bat",
+      "reference_depth": 1.0,
+      "profiles": 127,
+      "enemy_hp": 16,
+      "enemy_dodge": 0.0,
+      "enemy_dr": 0.0,
+      "mean_player_offense": 0.0,
+      "mean_old_landed_packet": 15.5,
+      "mean_new_landed_packet": 23.0,
+      "mean_old_landed_hits": 1.5,
+      "mean_new_landed_hits": 1.0,
+      "mean_old_attempts": 2.3076923076923075,
+      "mean_new_attempts": 1.5384615384615383,
+      "body_only_attempt_reduction_fraction": 0.33333333333333337,
+      "abilities_excluded": [
+        "enemy:beast:flight",
+        "enemy:beast:fast"
+      ]
+    },
+    {
+      "kind": "shellback-beetle",
+      "reference_depth": 1.0,
+      "profiles": 127,
+      "enemy_hp": 46,
+      "enemy_dodge": -14.0,
+      "enemy_dr": 14.0,
+      "mean_player_offense": 0.0,
+      "mean_old_landed_packet": 8.5,
+      "mean_new_landed_packet": 16.0,
+      "mean_old_landed_hits": 5.885524418023319,
+      "mean_new_landed_hits": 3.3376674439871974,
+      "mean_old_attempts": 5.885524418023319,
+      "mean_new_attempts": 3.3376674439871974,
+      "body_only_attempt_reduction_fraction": 0.43290228585812773,
+      "abilities_excluded": [
+        "enemy:beast:slow"
+      ]
+    },
+    {
+      "kind": "hemogoblin",
+      "reference_depth": 1.0,
+      "profiles": 127,
+      "enemy_hp": 34,
+      "enemy_dodge": -5.0,
+      "enemy_dr": 0.0,
+      "mean_player_offense": 0.0,
+      "mean_old_landed_packet": 15.5,
+      "mean_new_landed_packet": 23.0,
+      "mean_old_landed_hits": 2.7766666666666664,
+      "mean_new_landed_hits": 2.0,
+      "mean_old_attempts": 2.7766666666666664,
+      "mean_new_attempts": 2.0,
+      "body_only_attempt_reduction_fraction": 0.2797118847539015,
+      "abilities_excluded": []
+    },
+    {
+      "kind": "bear",
+      "reference_depth": 6.0,
+      "profiles": 127,
+      "enemy_hp": 136,
+      "enemy_dodge": -9.0,
+      "enemy_dr": 0.0,
+      "mean_player_offense": 30.677165354330707,
+      "mean_old_landed_packet": 30.838582677165356,
+      "mean_new_landed_packet": 53.67716535433071,
+      "mean_old_landed_hits": 5.017476158888424,
+      "mean_new_landed_hits": 3.126554842157103,
+      "mean_old_attempts": 5.017476158888424,
+      "mean_new_attempts": 3.126554842157103,
+      "body_only_attempt_reduction_fraction": 0.3768670257419293,
+      "abilities_excluded": []
+    },
+    {
+      "kind": "giant-beetle",
+      "reference_depth": 8.0,
+      "profiles": 127,
+      "enemy_hp": 118,
+      "enemy_dodge": 8.0,
+      "enemy_dr": 21.0,
+      "mean_player_offense": 42.20472440944882,
+      "mean_old_landed_packet": 26.10236220472441,
+      "mean_new_landed_packet": 54.70472440944882,
+      "mean_old_landed_hits": 5.238643643998471,
+      "mean_new_landed_hits": 2.7620303382776368,
+      "mean_old_attempts": 5.238643643998471,
+      "mean_new_attempts": 2.7620303382776368,
+      "body_only_attempt_reduction_fraction": 0.4727584989595748,
+      "abilities_excluded": [
+        "enemy:beast:flight"
+      ]
+    },
+    {
+      "kind": "tiger",
+      "reference_depth": 10.0,
+      "profiles": 127,
+      "enemy_hp": 106,
+      "enemy_dodge": 38.0,
+      "enemy_dr": 0.0,
+      "mean_player_offense": 52.78740157480315,
+      "mean_old_landed_packet": 41.89370078740158,
+      "mean_new_landed_packet": 75.78740157480316,
+      "mean_old_landed_hits": 3.085891308787325,
+      "mean_new_landed_hits": 1.9932848178382345,
+      "mean_old_attempts": 3.299608131435675,
+      "mean_new_attempts": 2.12813878760809,
+      "body_only_attempt_reduction_fraction": 0.3550328697116748,
+      "abilities_excluded": [
+        "enemy:beast:fast",
+        "enemy:beast:stalk"
+      ]
+    },
+    {
+      "kind": "troll",
+      "reference_depth": 19.0,
+      "profiles": 127,
+      "enemy_hp": 352,
+      "enemy_dodge": 16.0,
+      "enemy_dr": 18.0,
+      "mean_player_offense": 112.62992125984252,
+      "mean_old_landed_packet": 62.81496062992126,
+      "mean_new_landed_packet": 126.62992125984252,
+      "mean_old_landed_hits": 6.209644258858972,
+      "mean_new_landed_hits": 3.3295825601573315,
+      "mean_old_attempts": 6.209644258858972,
+      "mean_new_attempts": 3.3295825601573315,
+      "body_only_attempt_reduction_fraction": 0.46380462046482107,
+      "abilities_excluded": [
+        "enemy:beast:regeneration"
+      ]
+    },
+    {
+      "kind": "dire-bear",
+      "reference_depth": 20.0,
+      "profiles": 127,
+      "enemy_hp": 448,
+      "enemy_dodge": 9.0,
+      "enemy_dr": 15.0,
+      "mean_player_offense": 119.65354330708661,
+      "mean_old_landed_packet": 67.8267716535433,
+      "mean_new_landed_packet": 135.1535433070866,
+      "mean_old_landed_hits": 7.228613215200507,
+      "mean_new_landed_hits": 3.883208599926043,
+      "mean_old_attempts": 7.228613215200507,
+      "mean_new_attempts": 3.883208599926043,
+      "body_only_attempt_reduction_fraction": 0.46280033468102355,
+      "abilities_excluded": []
+    },
+    {
+      "kind": "minotaur",
+      "reference_depth": 33.0,
+      "profiles": 127,
+      "enemy_hp": 784,
+      "enemy_dodge": 29.0,
+      "enemy_dr": 56.0,
+      "mean_player_offense": 246.66141732283464,
+      "mean_old_landed_packet": 110.83070866141732,
+      "mean_new_landed_packet": 241.66141732283464,
+      "mean_old_landed_hits": 7.7142975755539025,
+      "mean_new_landed_hits": 3.80332030100927,
+      "mean_old_attempts": 7.7142975755539025,
+      "mean_new_attempts": 3.80332030100927,
+      "body_only_attempt_reduction_fraction": 0.5069777560744169,
+      "abilities_excluded": [
+        "enemy:beast:fast",
+        "enemy:beast:minotaur"
+      ]
+    },
+    {
+      "kind": "dragon",
+      "reference_depth": 38.0,
+      "profiles": 127,
+      "enemy_hp": 1018,
+      "enemy_dodge": 62.0,
+      "enemy_dr": 83.0,
+      "mean_player_offense": 344.40944881889766,
+      "mean_old_landed_packet": 146.20472440944883,
+      "mean_new_landed_packet": 325.90944881889766,
+      "mean_old_landed_hits": 7.599432935380947,
+      "mean_new_landed_hits": 3.682399392107844,
+      "mean_old_attempts": 7.599432935380947,
+      "mean_new_attempts": 3.682399392107844,
+      "body_only_attempt_reduction_fraction": 0.515437609171657,
+      "abilities_excluded": [
+        "enemy:beast:fast",
+        "enemy:beast:fire-breath"
+      ]
+    }
+  ]
+}

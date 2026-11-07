@@ -1,0 +1,13 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/generation-r38/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 1m 15s
+     Running unittests src/lib.rs (target/debug/deps/corpse_core-22ef95f16f60b69b)
+
+running 4 tests
+test startup::recovery_tests_r38::retry_classification_does_not_mask_configuration_or_invariants ... ok
+test startup::recovery_tests_r38::custom_generators_keep_single_attempt_contract ... ok
+test startup::recovery_tests_r38::failed_population_trial_leaves_no_ids_metrics_loot_or_ability_grants ... ok
+test startup::recovery_tests_r38::finite_exhaustion_and_fatal_failure_are_atomic ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 77 filtered out; finished in 0.80s
+

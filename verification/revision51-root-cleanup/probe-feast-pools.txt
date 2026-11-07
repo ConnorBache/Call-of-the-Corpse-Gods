@@ -1,0 +1,43 @@
+1: dryad, pale:Biter, pale:Spitter, pale:Screamer
+2: pale:Spitter, pale:Screamer, hemogoblin-bloodmancer, pale:Breather
+3: hemogoblin-bloodmancer, pale:Breather, bear, pale:Birther
+4: bear, pale:Birther, glim
+5: glim, giant-beetle
+6: giant-beetle
+7: tiger
+8: tiger
+9: horn-1, horn-2
+10: horn-1, horn-2, long-saidri, bombardier
+11: long-saidri, bombardier, hemogoblin-inventor, hemogoblin-mech
+12: hemogoblin-inventor, hemogoblin-mech
+13: 
+14: wendigo
+15: wendigo, pale:Greater Biter
+16: pale:Greater Biter, troll, pale:Greater Spitter
+17: troll, pale:Greater Spitter, dire-bear, pale:Greater Screamer
+18: dire-bear, pale:Greater Screamer
+19: horn-3, pale:Greater Breather
+20: horn-3, pale:Greater Breather, pale:Greater Birther
+21: pale:Greater Birther, horn-4, night-crawler
+22: horn-4, night-crawler, sabretooth, killspawn, maulchild
+23: sabretooth, killspawn, maulchild, skin-walker
+24: skin-walker, yeti, witch
+25: yeti, witch
+26: horn-5, banshee
+27: horn-5, banshee, horn-6, vampire
+28: horn-6, vampire, saidri-guardian
+29: saidri-guardian, phoenix
+30: phoenix, moonspawn, minotaur
+31: moonspawn, minotaur, valta
+32: valta, chimera, cancer
+33: chimera, cancer, horn-7, ursa-minor, ursa-major
+34: horn-7, ursa-minor, ursa-major
+35: dragon
+36: dragon
+37: 
+38: 
+39: 
+40: 
+water-inclusive floor 14: {"bear", "bombardier", "giant-beetle", "glim", "hemogoblin-bloodmancer", "hemogoblin-inventor", "hemogoblin-mech", "horn-1", "horn-2", "long-saidri", "pale:Birther", "tiger"}
+water-inclusive floor 15: {"bombardier", "giant-beetle", "glim", "hemogoblin-inventor", "hemogoblin-mech", "horn-1", "horn-2", "long-saidri", "pale:Birther", "tiger"}
+water-inclusive floor 16: {"bombardier", "giant-beetle", "glim", "hemogoblin-inventor", "hemogoblin-mech", "horn-1", "horn-2", "kelpie", "long-saidri", "tiger"}

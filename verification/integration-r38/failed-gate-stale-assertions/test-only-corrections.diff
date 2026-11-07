@@ -1,0 +1,22 @@
+--- crates/corpse-core/tests/ordinary_roster.rs
++++ crates/corpse-core/tests/ordinary_roster.rs
+@@ -145,7 +145,7 @@
+             .unwrap()
+             .simulation_revision
+             .as_ref(),
+-        Some(&37.0)
++        Some(&38.0)
+     );
+ }
+ #[test]
+--- crates/corpse-desktop/src/pack.rs
++++ crates/corpse-desktop/src/pack.rs
+@@ -1818,7 +1818,7 @@
+         let teleport=buttons.iter().find(|b|b.label=="Teleport").unwrap();assert!(teleport.blocker.is_none());
+         assert!(matches!(&teleport.action,ButtonAction::Command(Command::Ability{id,..}) if id==corpse_core::ahvamitt::TELEPORT_ID));
+         assert!(buttons.iter().all(|b|b.label!="Use"&&b.label!="Apply"&&b.label!="Equip"));
+-        assert!(describe_item(&r,&mask).contains("while carried"));
++        assert!(describe_item(&r,&mask).contains("Grants Teleport while in your inventory."));
+         let mut view=PackView::observe(&r);let before=view.stamp.clone();
+         r.player.conditions.insert("ahvamittTeleportReadyAt".into(),r.tick+100.);
+         view.refresh(&r);assert!(view.stamp!=before);assert_eq!(view.stamp.teleport_cooldown,100);

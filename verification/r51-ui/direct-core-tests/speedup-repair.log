@@ -1,0 +1,12 @@
+
+running 7 tests
+test revision51_replacement_deactivates_tile_links_and_exact_restoration_reactivates ... ok
+test revision51_black_pit_restores_speed_up_on_the_authored_three_updates ... ok
+test revision51_speed_up_admission_and_ids_are_revision_safe ... ok
+test revision51_speed_up_lighting_and_visibility_are_local_and_not_opaque ... ok
+test revision51_speed_up_generation_replaces_ground_without_changing_assignments ... ok
+test revision51_speed_up_preserves_movement_projectiles_and_local_reversal ... ok
+test revision51_speed_up_saves_memory_replay_and_temporal_state_exactly ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+

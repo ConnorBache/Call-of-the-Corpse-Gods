@@ -1,0 +1,12 @@
+
+running 7 tests
+test collapse_loss_keeps_exact_recorded_reason ... ok
+test profile_identity_and_corruption ... ok
+test legacy_summaries_omit_optional_ending ... ok
+test finale_summary_and_archive_preserve_exact_ending ... ok
+test profile_preserves_extension_record_fields ... ok
+test profile_validates_optional_ending ... ok
+test profile_source_parity ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

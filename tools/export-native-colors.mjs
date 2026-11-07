@@ -1,0 +1,6 @@
+// Build-time parity evidence; never shipped as a simulation dependency.
+import {pathToFileURL} from 'node:url';import {resolve} from 'node:path';import fs from 'node:fs';
+const root=resolve(process.argv[2]);const mod=n=>import(pathToFileURL(resolve(root,'dist/src',n+'.js')).href);
+const {terrainStyle}=await mod('ui-tiles');const {colorChannels,cosmeticSeed}=await mod('ui-color');const {DEFAULT_APPEARANCE}=await mod('appearance-config');
+const rows=[];const seed=cosmeticSeed('native-color-parity',17);for(const tile of ['wall','floor','water','shallow-water','grass','tree','chasm','pit','up','down'])for(const knowledge of ['direct','telepathic','remembered','layout'])for(const illumination of [-100,-50,0,50,100])for(const distance of [0,8,24]){const s=terrainStyle(tile,11,19,knowledge,73,illumination,{}, {seed,distance,visualLight:{energy:new Float32Array(3),wallEnergy:new Float32Array(3),ambient:new Float32Array([illumination]),illumination:new Float64Array([illumination])},index:0});rows.push({tile,knowledge,illumination,distance,seed,x:11,y:19,baseFg:colorChannels(DEFAULT_APPEARANCE.terrain[tile].color),baseBg:colorChannels(DEFAULT_APPEARANCE.terrain[tile].background),fg:colorChannels(s.color),bg:colorChannels(s.background)});}
+fs.writeFileSync(process.argv[3],JSON.stringify(rows));console.log(`Exported ${rows.length} native color cases.`);

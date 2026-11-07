@@ -1,0 +1,2643 @@
+[
+  {
+    "kind": "pale:Biter",
+    "reference_depth": 4.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -5.0,
+      "accuracy": 1.0,
+      "dodge": -2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Biter:adjacent:100"
+  },
+  {
+    "kind": "pale:Biter",
+    "reference_depth": 4.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 13.0,
+      "defense": -2.0,
+      "accuracy": 5.0,
+      "dodge": 0.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Biter:adjacent:100"
+  },
+  {
+    "kind": "pale:Biter",
+    "reference_depth": 4.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 13.0,
+      "defense": -2.0,
+      "accuracy": 5.0,
+      "dodge": 0.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Biter:adjacent:75"
+  },
+  {
+    "kind": "pale:Biter",
+    "reference_depth": 4.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 13.0,
+      "defense": -2.0,
+      "accuracy": 5.0,
+      "dodge": 0.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Biter:adjacent:50"
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "reference_depth": 20.0,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 20.0,
+      "defense": 7.0,
+      "accuracy": 2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Greater Biter:adjacent:100"
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "reference_depth": 20.0,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 88.0,
+      "defense": 37.0,
+      "accuracy": 54.0,
+      "dodge": 31.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Greater Biter:adjacent:100"
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "reference_depth": 20.0,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 88.0,
+      "defense": 37.0,
+      "accuracy": 54.0,
+      "dodge": 31.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Greater Biter:adjacent:75"
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "reference_depth": 20.0,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 88.0,
+      "defense": 37.0,
+      "accuracy": 54.0,
+      "dodge": 31.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Greater Biter:adjacent:50"
+  },
+  {
+    "kind": "needleling",
+    "reference_depth": 1,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 3.0,
+      "defense": -14.0,
+      "accuracy": -3.0,
+      "dodge": 2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:needleling:adjacent:100"
+  },
+  {
+    "kind": "needleling",
+    "reference_depth": 1,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 11.0,
+      "defense": -13.0,
+      "accuracy": -3.0,
+      "dodge": 2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:needleling:adjacent:100"
+  },
+  {
+    "kind": "needleling",
+    "reference_depth": 1,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 11.0,
+      "defense": -13.0,
+      "accuracy": -3.0,
+      "dodge": 2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:needleling:adjacent:75"
+  },
+  {
+    "kind": "needleling",
+    "reference_depth": 1,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 11.0,
+      "defense": -13.0,
+      "accuracy": -3.0,
+      "dodge": 2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:needleling:adjacent:50"
+  },
+  {
+    "kind": "short-saidri",
+    "reference_depth": 4.0,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 4.0,
+      "defense": -12.0,
+      "accuracy": -9.0,
+      "dodge": 3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:short-saidri:adjacent:100"
+  },
+  {
+    "kind": "short-saidri",
+    "reference_depth": 4.0,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 29.0,
+      "defense": -6.0,
+      "accuracy": 4.0,
+      "dodge": 1.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:short-saidri:adjacent:100"
+  },
+  {
+    "kind": "short-saidri",
+    "reference_depth": 4.0,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 29.0,
+      "defense": -6.0,
+      "accuracy": 4.0,
+      "dodge": 1.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:short-saidri:adjacent:75"
+  },
+  {
+    "kind": "short-saidri",
+    "reference_depth": 4.0,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 29.0,
+      "defense": -6.0,
+      "accuracy": 4.0,
+      "dodge": 1.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:short-saidri:adjacent:50"
+  },
+  {
+    "kind": "long-saidri",
+    "reference_depth": 17.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 16.0,
+      "defense": -4.0,
+      "accuracy": -5.0,
+      "dodge": 2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:long-saidri:adjacent:100"
+  },
+  {
+    "kind": "long-saidri",
+    "reference_depth": 17.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 93.0,
+      "defense": 20.0,
+      "accuracy": 42.0,
+      "dodge": 28.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:long-saidri:adjacent:100"
+  },
+  {
+    "kind": "long-saidri",
+    "reference_depth": 17.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 93.0,
+      "defense": 20.0,
+      "accuracy": 42.0,
+      "dodge": 28.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:long-saidri:adjacent:75"
+  },
+  {
+    "kind": "long-saidri",
+    "reference_depth": 17.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 93.0,
+      "defense": 20.0,
+      "accuracy": 42.0,
+      "dodge": 28.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:long-saidri:adjacent:50"
+  },
+  {
+    "kind": "saidri-guardian",
+    "reference_depth": 37.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 52.0,
+      "defense": 23.0,
+      "accuracy": 3.0,
+      "dodge": -3.0,
+      "dr": 3.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:saidri-guardian:adjacent:100"
+  },
+  {
+    "kind": "saidri-guardian",
+    "reference_depth": 37.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 531.0,
+      "defense": 166.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 58.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:saidri-guardian:adjacent:100"
+  },
+  {
+    "kind": "saidri-guardian",
+    "reference_depth": 37.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 531.0,
+      "defense": 166.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 58.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:saidri-guardian:adjacent:75"
+  },
+  {
+    "kind": "saidri-guardian",
+    "reference_depth": 37.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 531.0,
+      "defense": 166.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 58.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:saidri-guardian:adjacent:50"
+  },
+  {
+    "kind": "yeti",
+    "reference_depth": 34.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 75.0,
+      "defense": 37.0,
+      "accuracy": -2.0,
+      "dodge": -5.0,
+      "dr": 5.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:yeti:adjacent:100"
+  },
+  {
+    "kind": "yeti",
+    "reference_depth": 34.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 257.0,
+      "defense": 97.0,
+      "accuracy": 96.0,
+      "dodge": 43.0,
+      "dr": 52.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:yeti:adjacent:100"
+  },
+  {
+    "kind": "yeti",
+    "reference_depth": 34.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 257.0,
+      "defense": 97.0,
+      "accuracy": 96.0,
+      "dodge": 43.0,
+      "dr": 52.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:yeti:adjacent:75"
+  },
+  {
+    "kind": "yeti",
+    "reference_depth": 34.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 257.0,
+      "defense": 97.0,
+      "accuracy": 96.0,
+      "dodge": 43.0,
+      "dr": 52.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:yeti:adjacent:50"
+  },
+  {
+    "kind": "kelpie",
+    "reference_depth": 18.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "water-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 30.0,
+      "defense": 5.0,
+      "accuracy": 3.0,
+      "dodge": 2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:kelpie:water-shore:100"
+  },
+  {
+    "kind": "kelpie",
+    "reference_depth": 18.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "water-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 128.0,
+      "defense": 22.0,
+      "accuracy": 46.0,
+      "dodge": 31.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:kelpie:water-shore:100"
+  },
+  {
+    "kind": "kelpie",
+    "reference_depth": 18.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "water-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 128.0,
+      "defense": 22.0,
+      "accuracy": 46.0,
+      "dodge": 31.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:kelpie:water-shore:75"
+  },
+  {
+    "kind": "kelpie",
+    "reference_depth": 18.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "water-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 128.0,
+      "defense": 22.0,
+      "accuracy": 46.0,
+      "dodge": 31.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:kelpie:water-shore:50"
+  },
+  {
+    "kind": "moonspawn",
+    "reference_depth": 35.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 58.0,
+      "defense": 22.0,
+      "accuracy": 2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:moonspawn:adjacent:100"
+  },
+  {
+    "kind": "moonspawn",
+    "reference_depth": 35.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 181.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:moonspawn:adjacent:100"
+  },
+  {
+    "kind": "moonspawn",
+    "reference_depth": 35.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 181.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:moonspawn:adjacent:75"
+  },
+  {
+    "kind": "moonspawn",
+    "reference_depth": 35.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 181.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:moonspawn:adjacent:50"
+  },
+  {
+    "kind": "river-drake",
+    "reference_depth": 25.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "water-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 25.0,
+      "defense": 6.0,
+      "accuracy": 3.0,
+      "dodge": 2.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:river-drake:water-shore:100"
+  },
+  {
+    "kind": "river-drake",
+    "reference_depth": 25.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "water-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 54.0,
+      "accuracy": 57.0,
+      "dodge": 47.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:river-drake:water-shore:100"
+  },
+  {
+    "kind": "river-drake",
+    "reference_depth": 25.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "water-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 54.0,
+      "accuracy": 57.0,
+      "dodge": 47.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:river-drake:water-shore:75"
+  },
+  {
+    "kind": "river-drake",
+    "reference_depth": 25.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "water-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 54.0,
+      "accuracy": 57.0,
+      "dodge": 47.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:river-drake:water-shore:50"
+  },
+  {
+    "kind": "lesser-ichor-fish",
+    "reference_depth": 3.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 7.0,
+      "defense": -12.0,
+      "accuracy": 1.0,
+      "dodge": 3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-fish:ichor-shore:100"
+  },
+  {
+    "kind": "lesser-ichor-fish",
+    "reference_depth": 3.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 24.0,
+      "defense": -7.0,
+      "accuracy": 4.0,
+      "dodge": 1.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-fish:ichor-shore:100"
+  },
+  {
+    "kind": "lesser-ichor-fish",
+    "reference_depth": 3.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 24.0,
+      "defense": -7.0,
+      "accuracy": 4.0,
+      "dodge": 1.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-fish:ichor-shore:75"
+  },
+  {
+    "kind": "lesser-ichor-fish",
+    "reference_depth": 3.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 24.0,
+      "defense": -7.0,
+      "accuracy": 4.0,
+      "dodge": 1.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-fish:ichor-shore:50"
+  },
+  {
+    "kind": "ichor-fish-standard",
+    "reference_depth": 7,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 15.0,
+      "defense": -8.0,
+      "accuracy": 2.0,
+      "dodge": 3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-fish-standard:ichor-shore:100"
+  },
+  {
+    "kind": "ichor-fish-standard",
+    "reference_depth": 7,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 46.0,
+      "defense": -1.0,
+      "accuracy": 8.0,
+      "dodge": 8.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-fish-standard:ichor-shore:100"
+  },
+  {
+    "kind": "ichor-fish-standard",
+    "reference_depth": 7,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 46.0,
+      "defense": -1.0,
+      "accuracy": 8.0,
+      "dodge": 8.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-fish-standard:ichor-shore:75"
+  },
+  {
+    "kind": "ichor-fish-standard",
+    "reference_depth": 7,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 46.0,
+      "defense": -1.0,
+      "accuracy": 8.0,
+      "dodge": 8.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-fish-standard:ichor-shore:50"
+  },
+  {
+    "kind": "greater-ichor-fish",
+    "reference_depth": 11.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 25.0,
+      "defense": -4.0,
+      "accuracy": 2.0,
+      "dodge": 2.0,
+      "dr": 1.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-fish:ichor-shore:100"
+  },
+  {
+    "kind": "greater-ichor-fish",
+    "reference_depth": 11.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 90.0,
+      "defense": 6.0,
+      "accuracy": 13.0,
+      "dodge": 16.0,
+      "dr": 4.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-fish:ichor-shore:100"
+  },
+  {
+    "kind": "greater-ichor-fish",
+    "reference_depth": 11.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 90.0,
+      "defense": 6.0,
+      "accuracy": 13.0,
+      "dodge": 16.0,
+      "dr": 4.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-fish:ichor-shore:75"
+  },
+  {
+    "kind": "greater-ichor-fish",
+    "reference_depth": 11.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 90.0,
+      "defense": 6.0,
+      "accuracy": 13.0,
+      "dodge": 16.0,
+      "dr": 4.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-fish:ichor-shore:50"
+  },
+  {
+    "kind": "lesser-ichor-shark",
+    "reference_depth": 16.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 35.0,
+      "defense": 0.0,
+      "accuracy": 3.0,
+      "dodge": 2.0,
+      "dr": 1.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-shark:ichor-shore:100"
+  },
+  {
+    "kind": "lesser-ichor-shark",
+    "reference_depth": 16.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 88.0,
+      "defense": 23.0,
+      "accuracy": 37.0,
+      "dodge": 25.0,
+      "dr": 9.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-shark:ichor-shore:100"
+  },
+  {
+    "kind": "lesser-ichor-shark",
+    "reference_depth": 16.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 88.0,
+      "defense": 23.0,
+      "accuracy": 37.0,
+      "dodge": 25.0,
+      "dr": 9.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-shark:ichor-shore:75"
+  },
+  {
+    "kind": "lesser-ichor-shark",
+    "reference_depth": 16.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 88.0,
+      "defense": 23.0,
+      "accuracy": 37.0,
+      "dodge": 25.0,
+      "dr": 9.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-shark:ichor-shore:50"
+  },
+  {
+    "kind": "ichor-shark",
+    "reference_depth": 21.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 45.0,
+      "defense": 4.0,
+      "accuracy": 4.0,
+      "dodge": 1.0,
+      "dr": 2.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-shark:ichor-shore:100"
+  },
+  {
+    "kind": "ichor-shark",
+    "reference_depth": 21.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 123.0,
+      "defense": 45.0,
+      "accuracy": 57.0,
+      "dodge": 38.0,
+      "dr": 15.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-shark:ichor-shore:100"
+  },
+  {
+    "kind": "ichor-shark",
+    "reference_depth": 21.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 123.0,
+      "defense": 45.0,
+      "accuracy": 57.0,
+      "dodge": 38.0,
+      "dr": 15.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-shark:ichor-shore:75"
+  },
+  {
+    "kind": "ichor-shark",
+    "reference_depth": 21.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 123.0,
+      "defense": 45.0,
+      "accuracy": 57.0,
+      "dodge": 38.0,
+      "dr": 15.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-shark:ichor-shore:50"
+  },
+  {
+    "kind": "greater-ichor-shark",
+    "reference_depth": 26.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 55.0,
+      "defense": 8.0,
+      "accuracy": 4.0,
+      "dodge": -1.0,
+      "dr": 3.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-shark:ichor-shore:100"
+  },
+  {
+    "kind": "greater-ichor-shark",
+    "reference_depth": 26.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 191.0,
+      "defense": 70.0,
+      "accuracy": 59.0,
+      "dodge": 46.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-shark:ichor-shore:100"
+  },
+  {
+    "kind": "greater-ichor-shark",
+    "reference_depth": 26.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 191.0,
+      "defense": 70.0,
+      "accuracy": 59.0,
+      "dodge": 46.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-shark:ichor-shore:75"
+  },
+  {
+    "kind": "greater-ichor-shark",
+    "reference_depth": 26.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 191.0,
+      "defense": 70.0,
+      "accuracy": 59.0,
+      "dodge": 46.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-shark:ichor-shore:50"
+  },
+  {
+    "kind": "lesser-ichor-leviathan",
+    "reference_depth": 31.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 65.0,
+      "defense": 12.0,
+      "accuracy": 3.0,
+      "dodge": -3.0,
+      "dr": 3.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-leviathan:ichor-shore:100"
+  },
+  {
+    "kind": "lesser-ichor-leviathan",
+    "reference_depth": 31.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 196.0,
+      "defense": 151.0,
+      "accuracy": 78.0,
+      "dodge": 42.0,
+      "dr": 41.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-leviathan:ichor-shore:100"
+  },
+  {
+    "kind": "lesser-ichor-leviathan",
+    "reference_depth": 31.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 196.0,
+      "defense": 151.0,
+      "accuracy": 78.0,
+      "dodge": 42.0,
+      "dr": 41.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-leviathan:ichor-shore:75"
+  },
+  {
+    "kind": "lesser-ichor-leviathan",
+    "reference_depth": 31.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 196.0,
+      "defense": 151.0,
+      "accuracy": 78.0,
+      "dodge": 42.0,
+      "dr": 41.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:lesser-ichor-leviathan:ichor-shore:50"
+  },
+  {
+    "kind": "ichor-leviathan",
+    "reference_depth": 36,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 75.0,
+      "defense": 17.0,
+      "accuracy": 3.0,
+      "dodge": -5.0,
+      "dr": 4.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-leviathan:ichor-shore:100"
+  },
+  {
+    "kind": "ichor-leviathan",
+    "reference_depth": 36,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 208.0,
+      "defense": 250.0,
+      "accuracy": 105.0,
+      "dodge": 43.0,
+      "dr": 66.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-leviathan:ichor-shore:100"
+  },
+  {
+    "kind": "ichor-leviathan",
+    "reference_depth": 36,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 208.0,
+      "defense": 250.0,
+      "accuracy": 105.0,
+      "dodge": 43.0,
+      "dr": 66.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-leviathan:ichor-shore:75"
+  },
+  {
+    "kind": "ichor-leviathan",
+    "reference_depth": 36,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 208.0,
+      "defense": 250.0,
+      "accuracy": 105.0,
+      "dodge": 43.0,
+      "dr": 66.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ichor-leviathan:ichor-shore:50"
+  },
+  {
+    "kind": "greater-ichor-leviathan",
+    "reference_depth": 38.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 85.0,
+      "defense": 21.0,
+      "accuracy": 4.0,
+      "dodge": -6.0,
+      "dr": 5.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-leviathan:ichor-shore:100"
+  },
+  {
+    "kind": "greater-ichor-leviathan",
+    "reference_depth": 38.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 1024,
+    "candidate": {
+      "offense": 212.0,
+      "defense": 330.0,
+      "accuracy": 107.0,
+      "dodge": 44.0,
+      "dr": 82.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-leviathan:ichor-shore:100"
+  },
+  {
+    "kind": "greater-ichor-leviathan",
+    "reference_depth": 38.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 212.0,
+      "defense": 330.0,
+      "accuracy": 107.0,
+      "dodge": 44.0,
+      "dr": 82.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-leviathan:ichor-shore:75"
+  },
+  {
+    "kind": "greater-ichor-leviathan",
+    "reference_depth": 38.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ichor-shore",
+    "trials": 512,
+    "candidate": {
+      "offense": 212.0,
+      "defense": 330.0,
+      "accuracy": 107.0,
+      "dodge": 44.0,
+      "dr": 82.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:greater-ichor-leviathan:ichor-shore:50"
+  },
+  {
+    "kind": "chimera",
+    "reference_depth": 38.0,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 70.0,
+      "defense": 43.0,
+      "accuracy": 2.0,
+      "dodge": -4.0,
+      "dr": 4.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:chimera:adjacent:100"
+  },
+  {
+    "kind": "chimera",
+    "reference_depth": 38.0,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 573.0,
+      "defense": 257.0,
+      "accuracy": 105.0,
+      "dodge": 46.0,
+      "dr": 60.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:chimera:adjacent:100"
+  },
+  {
+    "kind": "chimera",
+    "reference_depth": 38.0,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 573.0,
+      "defense": 257.0,
+      "accuracy": 105.0,
+      "dodge": 46.0,
+      "dr": 60.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:chimera:adjacent:75"
+  },
+  {
+    "kind": "chimera",
+    "reference_depth": 38.0,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 573.0,
+      "defense": 257.0,
+      "accuracy": 105.0,
+      "dodge": 46.0,
+      "dr": 60.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:chimera:adjacent:50"
+  },
+  {
+    "kind": "dragon",
+    "reference_depth": 40.0,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 220.0,
+      "defense": 142.0,
+      "accuracy": 4.0,
+      "dodge": -6.0,
+      "dr": 16.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:dragon:adjacent:100"
+  },
+  {
+    "kind": "dragon",
+    "reference_depth": 40.0,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 465.0,
+      "defense": 497.0,
+      "accuracy": 110.0,
+      "dodge": 48.0,
+      "dr": 99.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:dragon:adjacent:100"
+  },
+  {
+    "kind": "dragon",
+    "reference_depth": 40.0,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 465.0,
+      "defense": 497.0,
+      "accuracy": 110.0,
+      "dodge": 48.0,
+      "dr": 99.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:dragon:adjacent:75"
+  },
+  {
+    "kind": "dragon",
+    "reference_depth": 40.0,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 465.0,
+      "defense": 497.0,
+      "accuracy": 110.0,
+      "dodge": 48.0,
+      "dr": 99.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:dragon:adjacent:50"
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "reference_depth": 15.5,
+    "collection_pct": 100,
+    "mode": "before",
+    "scenario": "piloted-mech",
+    "trials": 1024,
+    "candidate": {
+      "offense": 65.0,
+      "defense": 30.0,
+      "accuracy": -3.0,
+      "dodge": -7.0,
+      "dr": 8.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:hemogoblin-mech:piloted-mech:100"
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "reference_depth": 15.5,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "piloted-mech",
+    "trials": 1024,
+    "candidate": {
+      "offense": 43.0,
+      "defense": 41.0,
+      "accuracy": 34.0,
+      "dodge": 17.0,
+      "dr": 31.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:hemogoblin-mech:piloted-mech:100"
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "reference_depth": 15.5,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "piloted-mech",
+    "trials": 512,
+    "candidate": {
+      "offense": 43.0,
+      "defense": 41.0,
+      "accuracy": 34.0,
+      "dodge": 17.0,
+      "dr": 31.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:hemogoblin-mech:piloted-mech:75"
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "reference_depth": 15.5,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "piloted-mech",
+    "trials": 512,
+    "candidate": {
+      "offense": 43.0,
+      "defense": 41.0,
+      "accuracy": 34.0,
+      "dodge": 17.0,
+      "dr": 31.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:hemogoblin-mech:piloted-mech:50"
+  },
+  {
+    "kind": "pale:Jackal",
+    "reference_depth": 1,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 2048,
+    "candidate": {
+      "offense": 4.0,
+      "defense": -13.0,
+      "accuracy": -2.0,
+      "dodge": 3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Jackal:adjacent:100"
+  },
+  {
+    "kind": "pale:Jackal",
+    "reference_depth": 1,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 4.0,
+      "defense": -13.0,
+      "accuracy": -2.0,
+      "dodge": 3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Jackal:adjacent:75"
+  },
+  {
+    "kind": "pale:Jackal",
+    "reference_depth": 1,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 4.0,
+      "defense": -13.0,
+      "accuracy": -2.0,
+      "dodge": 3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:pale:Jackal:adjacent:50"
+  },
+  {
+    "kind": "ursa-minor",
+    "reference_depth": 39.0,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 2048,
+    "candidate": {
+      "offense": 369.0,
+      "defense": 167.0,
+      "accuracy": 91.0,
+      "dodge": 51.0,
+      "dr": 63.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-minor:adjacent:100"
+  },
+  {
+    "kind": "ursa-minor",
+    "reference_depth": 39.0,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 369.0,
+      "defense": 167.0,
+      "accuracy": 91.0,
+      "dodge": 51.0,
+      "dr": 63.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-minor:adjacent:75"
+  },
+  {
+    "kind": "ursa-minor",
+    "reference_depth": 39.0,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 369.0,
+      "defense": 167.0,
+      "accuracy": 91.0,
+      "dodge": 51.0,
+      "dr": 63.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-minor:adjacent:50"
+  },
+  {
+    "kind": "ursa-major",
+    "reference_depth": 39,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "awake-major",
+    "trials": 2048,
+    "candidate": {
+      "offense": 372.0,
+      "defense": 234.0,
+      "accuracy": 103.0,
+      "dodge": 45.0,
+      "dr": 90.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-major:awake-major:100"
+  },
+  {
+    "kind": "ursa-major",
+    "reference_depth": 39,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "awake-major",
+    "trials": 512,
+    "candidate": {
+      "offense": 372.0,
+      "defense": 234.0,
+      "accuracy": 103.0,
+      "dodge": 45.0,
+      "dr": 90.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-major:awake-major:75"
+  },
+  {
+    "kind": "ursa-major",
+    "reference_depth": 39,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "awake-major",
+    "trials": 512,
+    "candidate": {
+      "offense": 372.0,
+      "defense": 234.0,
+      "accuracy": 103.0,
+      "dodge": 45.0,
+      "dr": 90.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-major:awake-major:50"
+  },
+  {
+    "kind": "ursa-major",
+    "reference_depth": 39,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "ursa-pair",
+    "trials": 2048,
+    "candidate": {
+      "offense": 372.0,
+      "defense": 234.0,
+      "accuracy": 103.0,
+      "dodge": 45.0,
+      "dr": 90.0
+    },
+    "partner_candidate": {
+      "offense": 369.0,
+      "defense": 167.0,
+      "accuracy": 91.0,
+      "dodge": 51.0,
+      "dr": 63.0
+    },
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-major:ursa-pair:100"
+  },
+  {
+    "kind": "ursa-major",
+    "reference_depth": 39,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "ursa-pair",
+    "trials": 512,
+    "candidate": {
+      "offense": 372.0,
+      "defense": 234.0,
+      "accuracy": 103.0,
+      "dodge": 45.0,
+      "dr": 90.0
+    },
+    "partner_candidate": {
+      "offense": 369.0,
+      "defense": 167.0,
+      "accuracy": 91.0,
+      "dodge": 51.0,
+      "dr": 63.0
+    },
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-major:ursa-pair:75"
+  },
+  {
+    "kind": "ursa-major",
+    "reference_depth": 39,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "ursa-pair",
+    "trials": 512,
+    "candidate": {
+      "offense": 372.0,
+      "defense": 234.0,
+      "accuracy": 103.0,
+      "dodge": 45.0,
+      "dr": 90.0
+    },
+    "partner_candidate": {
+      "offense": 369.0,
+      "defense": 167.0,
+      "accuracy": 91.0,
+      "dodge": 51.0,
+      "dr": 63.0
+    },
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:ursa-major:ursa-pair:50"
+  },
+  {
+    "kind": "flesh-administrator",
+    "reference_depth": 40,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 2048,
+    "candidate": {},
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:flesh-administrator:adjacent:100"
+  },
+  {
+    "kind": "flesh-administrator",
+    "reference_depth": 40,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {},
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:flesh-administrator:adjacent:75"
+  },
+  {
+    "kind": "flesh-administrator",
+    "reference_depth": 40,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {},
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 32,
+    "seed_prefix": "stage2-heldout:flesh-administrator:adjacent:50"
+  },
+  {
+    "kind": "kelpie",
+    "reference_depth": 18.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "water-wet",
+    "trials": 256,
+    "candidate": {
+      "offense": 128.0,
+      "defense": 22.0,
+      "accuracy": 46.0,
+      "dodge": 31.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:kelpie:water-wet:100"
+  },
+  {
+    "kind": "river-drake",
+    "reference_depth": 25.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "water-wet",
+    "trials": 256,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 54.0,
+      "accuracy": 57.0,
+      "dodge": 47.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:river-drake:water-wet:100"
+  },
+  {
+    "kind": "river-drake",
+    "reference_depth": 25.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "water-approach",
+    "trials": 256,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 54.0,
+      "accuracy": 57.0,
+      "dodge": 47.0,
+      "dr": 21.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:river-drake:water-approach:100"
+  },
+  {
+    "kind": "moonspawn",
+    "reference_depth": 35.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "approach",
+    "trials": 256,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 181.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:moonspawn:approach:100"
+  },
+  {
+    "kind": "moonspawn",
+    "reference_depth": 35.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "adjacent-grass",
+    "trials": 256,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 181.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:moonspawn:adjacent-grass:100"
+  },
+  {
+    "kind": "moonspawn",
+    "reference_depth": 35.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "approach-grass",
+    "trials": 256,
+    "candidate": {
+      "offense": 346.0,
+      "defense": 181.0,
+      "accuracy": 103.0,
+      "dodge": 47.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:moonspawn:approach-grass:100"
+  },
+  {
+    "kind": "dragon",
+    "reference_depth": 40.0,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "approach",
+    "trials": 256,
+    "candidate": {
+      "offense": 465.0,
+      "defense": 497.0,
+      "accuracy": 110.0,
+      "dodge": 48.0,
+      "dr": 99.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:dragon:approach:100"
+  },
+  {
+    "kind": "dragon",
+    "reference_depth": 40.0,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "adjacent-grass",
+    "trials": 256,
+    "candidate": {
+      "offense": 465.0,
+      "defense": 497.0,
+      "accuracy": 110.0,
+      "dodge": 48.0,
+      "dr": 99.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:dragon:adjacent-grass:100"
+  },
+  {
+    "kind": "chimera",
+    "reference_depth": 38.0,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "approach",
+    "trials": 256,
+    "candidate": {
+      "offense": 573.0,
+      "defense": 257.0,
+      "accuracy": 105.0,
+      "dodge": 46.0,
+      "dr": 60.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:chimera:approach:100"
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "reference_depth": 15.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "piloted-mech",
+    "trials": 256,
+    "candidate": {
+      "offense": 43.0,
+      "defense": 41.0,
+      "accuracy": 34.0,
+      "dodge": 17.0,
+      "dr": 31.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:hemogoblin-mech:piloted-mech:100"
+  },
+  {
+    "kind": "vampire",
+    "reference_depth": 30.0,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "adjacent",
+    "trials": 256,
+    "candidate": {
+      "offense": 268.0,
+      "defense": 55.0,
+      "accuracy": 71.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:vampire:adjacent:100"
+  },
+  {
+    "kind": "wendigo",
+    "reference_depth": 19.5,
+    "collection_pct": 100,
+    "mode": "scenario_sensitivity",
+    "scenario": "adjacent",
+    "trials": 256,
+    "candidate": {
+      "offense": 204.0,
+      "defense": 13.0,
+      "accuracy": 49.0,
+      "dodge": 39.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 128,
+    "settle_turns": 128,
+    "seed_prefix": "stage2-heldout:wendigo:adjacent:100"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:adjacent:100"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "approach",
+    "trials": 1024,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:approach:100"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent-grass",
+    "trials": 1024,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:adjacent-grass:100"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "approach-grass",
+    "trials": 1024,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:approach-grass:100"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:adjacent:75"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "approach",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:approach:75"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:adjacent-grass:75"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "approach-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:approach-grass:75"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:adjacent:50"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "approach",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:approach:50"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:adjacent-grass:50"
+  },
+  {
+    "kind": "phoenix",
+    "reference_depth": 34,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "approach-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 350.0,
+      "defense": 140.0,
+      "accuracy": 100.0,
+      "dodge": 55.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:phoenix:approach-grass:50"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 1024,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:adjacent:100"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "approach",
+    "trials": 1024,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:approach:100"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "adjacent-grass",
+    "trials": 1024,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:adjacent-grass:100"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 100,
+    "mode": "after",
+    "scenario": "approach-grass",
+    "trials": 1024,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:approach-grass:100"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:adjacent:75"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "approach",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:approach:75"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "adjacent-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:adjacent-grass:75"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 75,
+    "mode": "after",
+    "scenario": "approach-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:approach-grass:75"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:adjacent:50"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "approach",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:approach:50"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "adjacent-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:adjacent-grass:50"
+  },
+  {
+    "kind": "bombardier",
+    "reference_depth": 17,
+    "collection_pct": 50,
+    "mode": "after",
+    "scenario": "approach-grass",
+    "trials": 512,
+    "candidate": {
+      "offense": 10.0,
+      "defense": -7.0,
+      "accuracy": -2.0,
+      "dodge": -3.0,
+      "dr": 0.0
+    },
+    "partner_candidate": {},
+    "max_turns": 256,
+    "settle_turns": 256,
+    "seed_prefix": "stage2-heldout:bombardier:approach-grass:50"
+  }
+]

@@ -1,0 +1,126 @@
+{
+  "input": "tools/monster-balance/player-progressions-r33-debug32.jsonl",
+  "revisions": [
+    33.0
+  ],
+  "requested_worlds": 32,
+  "successful_worlds": 32,
+  "indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "failed_worlds": [],
+  "definition": "Level first earned DURING each floor, after collecting every initial natural heart once; not floor-entry or survival. Includes initial Nest/Godbeast hearts. Excludes finite summoned/event extras. Level 1 is the start.",
+  "milestones": [
+    {
+      "level": 2,
+      "median_floor": 1.0,
+      "min_floor": 1,
+      "max_floor": 1,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 3,
+      "median_floor": 1.0,
+      "min_floor": 1,
+      "max_floor": 1,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 4,
+      "median_floor": 2.0,
+      "min_floor": 2,
+      "max_floor": 2,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 5,
+      "median_floor": 4.0,
+      "min_floor": 4,
+      "max_floor": 4,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 6,
+      "median_floor": 6.0,
+      "min_floor": 6,
+      "max_floor": 7,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 7,
+      "median_floor": 10.0,
+      "min_floor": 10,
+      "max_floor": 11,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 8,
+      "median_floor": 16.0,
+      "min_floor": 16,
+      "max_floor": 17,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 9,
+      "median_floor": 25.0,
+      "min_floor": 25,
+      "max_floor": 26,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 10,
+      "median_floor": 38.0,
+      "min_floor": 37,
+      "max_floor": 38,
+      "worlds_reached": 32,
+      "worlds_not_reached": 0
+    },
+    {
+      "level": 11,
+      "median_floor": null,
+      "min_floor": null,
+      "max_floor": null,
+      "worlds_reached": 0,
+      "worlds_not_reached": 32
+    }
+  ]
+}

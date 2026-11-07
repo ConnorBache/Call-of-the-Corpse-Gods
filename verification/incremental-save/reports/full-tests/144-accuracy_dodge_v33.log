@@ -1,0 +1,10 @@
+
+running 5 tests
+test meaningful_counters_keep_the_global_formula_and_no_universal_invulnerability ... ok
+test witch_profiles_are_fixed_separate_and_identity_not_appearance_selects_stats ... ok
+test specialization_is_only_accuracy_dodge_and_only_new_revision33_actors ... ok
+test native_witch_birth_uses_newborn_not_natural_or_disguise_profile ... ok
+test saved_grown_state_and_temporal_snapshots_are_not_retuned ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

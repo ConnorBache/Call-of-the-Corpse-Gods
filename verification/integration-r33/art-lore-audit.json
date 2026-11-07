@@ -1,0 +1,11 @@
+{
+  "original_histories_checked": 79,
+  "original_histories_unchanged": true,
+  "changed_histories": [],
+  "original_plates_each_set": 81,
+  "current_pages": 82,
+  "current_plates_each_set": 84,
+  "original_162_plate_hashes_match_manifest": true,
+  "reference_manual": "/workspace/scratch/69f53637ba6f/monster-rebalance/source/corpse-gods-native/crates/corpse-desktop/assets/manual.json",
+  "reference_manual_sha256": "cab062aa7155fb785652113cccb9244d6b6ec5e52fd23041b3ee90fc3830a783"
+}

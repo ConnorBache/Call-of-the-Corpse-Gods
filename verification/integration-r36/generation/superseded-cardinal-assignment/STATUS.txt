@@ -1,0 +1,1 @@
+Superseded focused evidence from the earlier four-neighbor assignment inference. Retained for audit only; these are not shipping generation results. Current assignment uses live eight-neighbor adjacency with the existing no-wall-corner rule. The parent directory contains the current evidence.

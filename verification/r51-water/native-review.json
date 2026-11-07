@@ -1,0 +1,109 @@
+{
+  "before_binary_sha256": "860a9d12e56241aadd5f9f6d148b3ee87dc949dda3b39c1b767825cc12d49f5d",
+  "after_binary_sha256": "75e52ddd6aa29892a8c6c5834a55aa40c21f606dd4cac66e2365f7dfcf9c5d4d",
+  "review": "Native 1280x800 shore and 1920x1080/960x1200 immersion images visually inspected: lighter blue shallow bank and richer blue deep section clearly separated; immersed frame has readable subtle blue tint including HUD; no image editing. All six native CLI renders succeeded. Test-fixture repairs still require the shared test-binary rebuild.",
+  "captures": [
+    {
+      "size": "1280x800",
+      "scene": "shore",
+      "before": "1280x800-binary-before-shore.png",
+      "after": "1280x800-binary-after-shore.png",
+      "before_background": [
+        8,
+        6,
+        14
+      ],
+      "after_background": [
+        8,
+        6,
+        14
+      ],
+      "same_size": true
+    },
+    {
+      "size": "1280x800",
+      "scene": "deep",
+      "before": "1280x800-binary-before-deep.png",
+      "after": "1280x800-binary-after-deep.png",
+      "before_background": [
+        8,
+        6,
+        14
+      ],
+      "after_background": [
+        9,
+        15,
+        34
+      ],
+      "same_size": true
+    },
+    {
+      "size": "1920x1080",
+      "scene": "shore",
+      "before": "1920x1080-binary-before-shore.png",
+      "after": "1920x1080-binary-after-shore.png",
+      "before_background": [
+        8,
+        6,
+        14
+      ],
+      "after_background": [
+        8,
+        6,
+        14
+      ],
+      "same_size": true
+    },
+    {
+      "size": "1920x1080",
+      "scene": "deep",
+      "before": "1920x1080-binary-before-deep.png",
+      "after": "1920x1080-binary-after-deep.png",
+      "before_background": [
+        8,
+        6,
+        14
+      ],
+      "after_background": [
+        9,
+        15,
+        34
+      ],
+      "same_size": true
+    },
+    {
+      "size": "960x1200",
+      "scene": "shore",
+      "before": "960x1200-binary-before-shore.png",
+      "after": "960x1200-binary-after-shore.png",
+      "before_background": [
+        8,
+        6,
+        14
+      ],
+      "after_background": [
+        8,
+        6,
+        14
+      ],
+      "same_size": true
+    },
+    {
+      "size": "960x1200",
+      "scene": "deep",
+      "before": "960x1200-binary-before-deep.png",
+      "after": "960x1200-binary-after-deep.png",
+      "before_background": [
+        8,
+        6,
+        14
+      ],
+      "after_background": [
+        9,
+        15,
+        34
+      ],
+      "same_size": true
+    }
+  ]
+}

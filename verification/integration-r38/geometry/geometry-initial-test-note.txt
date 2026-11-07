@@ -1,0 +1,11 @@
+The first geometry_r38 focused run had 3 passes and 1 test assertion failure.
+The test attempted to reproduce r37-event-count-0047 floor20 with actual_up=None,
+then expected the old tap tile to equal "up". Its actual tile was "grass".
+The real saved-world reproduction carries actual_up=(10,18), as preserved in the
+original diagnosis trace. The test was corrected to pass that stair coordinate;
+production code was unchanged for this correction. Later targeted runs passed4/4.
+The initial raw log was inadvertently overwritten by a subsequent queued Cargo
+invocation before copying it; the file labelled initial-assertion contains only
+its queued lock line. This note records the missing evidence limit rather than
+claiming that raw failed log is retained. The initial failure text appears in
+this worker's tool transcript. Final raw passing log is geometry-r38-test-final.log.

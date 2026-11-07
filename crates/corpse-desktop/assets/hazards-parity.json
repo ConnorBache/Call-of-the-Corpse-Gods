@@ -1,0 +1,266 @@
+[
+  {
+    "hazard": "none",
+    "offset": 0,
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "none",
+    "offset": 1,
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "fire",
+    "offset": 0,
+    "wait": "Wait in the fire? It can burn you and cause damage.",
+    "move": null
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "wait": null,
+    "move": "Step in the fire? It can burn you and cause damage."
+  },
+  {
+    "hazard": "razorleaves",
+    "offset": 0,
+    "wait": "Wait amid razorleaves? Ending your turn there costs 2% of your maximum health (rounded up).",
+    "move": null
+  },
+  {
+    "hazard": "razorleaves",
+    "offset": 1,
+    "wait": null,
+    "move": "Step amid razorleaves? Ending your turn there costs 2% of your maximum health (rounded up)."
+  },
+  {
+    "hazard": "caustic",
+    "offset": 0,
+    "wait": "Wait in caustic gas? It can damage you.",
+    "move": null
+  },
+  {
+    "hazard": "caustic",
+    "offset": 1,
+    "wait": null,
+    "move": "Step in caustic gas? It can damage you."
+  },
+  {
+    "hazard": "breather",
+    "offset": 0,
+    "wait": "Wait in breather gas? It can damage you.",
+    "move": null
+  },
+  {
+    "hazard": "breather",
+    "offset": 1,
+    "wait": null,
+    "move": "Step in breather gas? It can damage you."
+  },
+  {
+    "hazard": "paralysis",
+    "offset": 0,
+    "wait": "Wait in paralysis gas? It can paralyze you.",
+    "move": null
+  },
+  {
+    "hazard": "paralysis",
+    "offset": 1,
+    "wait": null,
+    "move": "Step in paralysis gas? It can paralyze you."
+  },
+  {
+    "hazard": "confusion",
+    "offset": 0,
+    "wait": "Wait in confusion gas? It refreshes confusion to 8 turns while present.",
+    "move": null
+  },
+  {
+    "hazard": "confusion",
+    "offset": 1,
+    "wait": null,
+    "move": "Step in confusion gas? It refreshes confusion to 8 turns while present."
+  },
+  {
+    "hazard": "steam",
+    "offset": 0,
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "steam",
+    "offset": 1,
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "ability": "anavani-star-power",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "caustic",
+    "offset": 1,
+    "ability": "anavani-star-power",
+    "wait": null,
+    "move": "Step in caustic gas? It can damage you."
+  },
+  {
+    "hazard": "paralysis",
+    "offset": 1,
+    "ability": "anavani-star-power",
+    "wait": null,
+    "move": "Step in paralysis gas? It can paralyze you."
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "ability": "enemy:beast:fire-immunity",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "caustic",
+    "offset": 1,
+    "ability": "enemy:beast:fire-immunity",
+    "wait": null,
+    "move": "Step in caustic gas? It can damage you."
+  },
+  {
+    "hazard": "paralysis",
+    "offset": 1,
+    "ability": "enemy:beast:fire-immunity",
+    "wait": null,
+    "move": "Step in paralysis gas? It can paralyze you."
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "ability": "enemy:beast:gas-immunity",
+    "wait": null,
+    "move": "Step in the fire? It can burn you and cause damage."
+  },
+  {
+    "hazard": "caustic",
+    "offset": 1,
+    "ability": "enemy:beast:gas-immunity",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "paralysis",
+    "offset": 1,
+    "ability": "enemy:beast:gas-immunity",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "ability": "grisha-entropy",
+    "wait": null,
+    "move": "Step in the fire? It can burn you and cause damage."
+  },
+  {
+    "hazard": "caustic",
+    "offset": 1,
+    "ability": "grisha-entropy",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "paralysis",
+    "offset": 1,
+    "ability": "grisha-entropy",
+    "wait": null,
+    "move": "Step in paralysis gas? It can paralyze you."
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "ability": "enemy:pale:gas-immunity",
+    "wait": null,
+    "move": "Step in the fire? It can burn you and cause damage."
+  },
+  {
+    "hazard": "caustic",
+    "offset": 1,
+    "ability": "enemy:pale:gas-immunity",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "paralysis",
+    "offset": 1,
+    "ability": "enemy:pale:gas-immunity",
+    "wait": null,
+    "move": "Step in paralysis gas? It can paralyze you."
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "condition": "paralyzed",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "condition": "confused",
+    "wait": null,
+    "move": "Move while confused? Your random step could enter a nearby visible hazard."
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "condition": "riptide",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "condition": "forcedMove",
+    "wait": null,
+    "move": null
+  },
+  {
+    "hazard": "caustic",
+    "offset": 1,
+    "current": true,
+    "wait": "Be swept by the current in caustic gas? It can damage you.",
+    "move": "Step in caustic gas? It can damage you."
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "current": true,
+    "wait": "Be swept by the current in the fire? It can burn you and cause damage.",
+    "move": "Step in the fire? It can burn you and cause damage."
+  },
+  {
+    "hazard": "fire",
+    "offset": 1,
+    "current": true,
+    "ability": "enemy:beast:flight",
+    "wait": null,
+    "move": "Step in the fire? It can burn you and cause damage."
+  },
+  {
+    "hazard": "chasm",
+    "offset": 1,
+    "wait": null,
+    "move": "Jump into this chasm? Falling may cost 6.25% of your maximum health (rounded up) unless you land in deep water."
+  },
+  {
+    "hazard": "chasm",
+    "offset": 1,
+    "ability": "enemy:beast:flight",
+    "wait": null,
+    "move": null
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "original_bytes": 116885985,
+  "original_sha256": "4dee02f538eabe5b9023c1be910ec3655b2ee80026c84062f1b39aade94eaa31",
+  "parts": [
+    {
+      "path": "mini-me-starter-combinations-v48.json.part1",
+      "bytes": 67108864,
+      "sha256": "f4c34deb334417cf7138e634777825707974cdf7b1e5654d3769027f216fb9a8"
+    },
+    {
+      "path": "mini-me-starter-combinations-v48.json.part2",
+      "bytes": 49777121,
+      "sha256": "a1504869f3c14a1db00ff11207dc82df07d088f4601e0162f1eb0d5a4951ca1a"
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+[
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "floor",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      251,
+      232,
+      226
+    ],
+    "background": [
+      116,
+      95,
+      109
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2101007803,
+    "centerRgbaCrc32": 3154425072
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "floor",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      242,
+      224,
+      218
+    ],
+    "background": [
+      70,
+      57,
+      66
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1807039727,
+    "centerRgbaCrc32": 2860849023
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "floor",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      251,
+      232,
+      226
+    ],
+    "background": [
+      116,
+      95,
+      109
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2101007803,
+    "centerRgbaCrc32": 3154425072
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "wall",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      250,
+      222,
+      204
+    ],
+    "background": [
+      201,
+      177,
+      180
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 446893720,
+    "centerRgbaCrc32": 1845787691
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "wall",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      238,
+      212,
+      195
+    ],
+    "background": [
+      121,
+      107,
+      109
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2071196699,
+    "centerRgbaCrc32": 3772161828
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "wall",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      250,
+      222,
+      204
+    ],
+    "background": [
+      201,
+      177,
+      180
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 446893720,
+    "centerRgbaCrc32": 1845787691
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "grass",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      155,
+      252,
+      140
+    ],
+    "background": [
+      61,
+      133,
+      105
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3609414552,
+    "centerRgbaCrc32": 1996042258
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "grass",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      153,
+      249,
+      138
+    ],
+    "background": [
+      37,
+      80,
+      64
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 1752716267,
+    "centerRgbaCrc32": 4188243951
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "grass",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      155,
+      252,
+      140
+    ],
+    "background": [
+      61,
+      133,
+      105
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3609414552,
+    "centerRgbaCrc32": 1996042258
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "water",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      111,
+      147,
+      250
+    ],
+    "background": [
+      61,
+      75,
+      194
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3281322687,
+    "centerRgbaCrc32": 4138335560
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "water",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      106,
+      141,
+      240
+    ],
+    "background": [
+      37,
+      45,
+      117
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 2599163136,
+    "centerRgbaCrc32": 3459945387
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "water",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      111,
+      147,
+      250
+    ],
+    "background": [
+      61,
+      75,
+      194
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 3281322687,
+    "centerRgbaCrc32": 4138335560
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "shallow-water",
+    "stage": "before",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      107,
+      191,
+      251
+    ],
+    "background": [
+      112,
+      168,
+      242
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4171843310,
+    "centerRgbaCrc32": 361819123
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "shallow-water",
+    "stage": "active",
+    "illumination": 50.0,
+    "ambient": 100.0,
+    "foreground": [
+      104,
+      186,
+      244
+    ],
+    "background": [
+      78,
+      117,
+      168
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 989064480,
+    "centerRgbaCrc32": 116233883
+  },
+  {
+    "sheet": "darkness-potion-native-comparison.png",
+    "terrain": "shallow-water",
+    "stage": "expired",
+    "illumination": 100.0,
+    "ambient": 100.0,
+    "foreground": [
+      107,
+      191,
+      251
+    ],
+    "background": [
+      112,
+      168,
+      242
+    ],
+    "nativeCropWidth": 238,
+    "nativeCropHeight": 162,
+    "nativeCropRgbaCrc32": 4171843310,
+    "centerRgbaCrc32": 361819123
+  }
+]

@@ -1,0 +1,17 @@
+
+running 12 tests
+test encounter_budgets_match_v48 ... ok
+test recorded_loot_acceptance_and_fallback_match_v48 ... ok
+test geological_fields_match_v48_float32_bits_and_rng ... ok
+test unsupported_floor_configuration_is_rejected ... ok
+test heart_budgets_match_v48 ... ok
+test legacy_loot_allocations_match_v48 ... ok
+test domain_plan_matches_v48 ... ok
+test passage_cells_and_paths_match_v48 ... ok
+test room_masks_match_v48_including_order_and_rng ... ok
+test stair_spines_match_v48_current_legacy_and_clamped ... ok
+test room_loops_match_v48_including_bent_and_rejected_candidates ... ok
+test full_room_accretion_matches_v48_stages_graph_and_rng ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s
+

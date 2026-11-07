@@ -1,0 +1,1 @@
+CARGO_TARGET_DIR=../r50-windows-target CARGO_INCREMENTAL=0 sh tools/cargo.sh build --release --locked --offline --jobs 2 --target x86_64-pc-windows-gnu -p corpse-desktop

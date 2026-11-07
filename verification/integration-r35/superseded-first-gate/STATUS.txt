@@ -1,0 +1,1 @@
+Interrupted (exit130) after detecting legacy Riptide zero-axis regression; not an accepted full gate.

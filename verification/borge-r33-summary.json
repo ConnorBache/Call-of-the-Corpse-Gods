@@ -1,0 +1,26 @@
+{
+  "scope": "Borge revision33 focused native regression handoff; not aggregate/platform verification",
+  "result": "passed",
+  "passed": 34,
+  "failed": 0,
+  "test_groups": {
+    "borge_event": 20,
+    "generation_parity": 12,
+    "tree_tap_commands": 1,
+    "world_generation_parity": 1
+  },
+  "command": "CARGO_INCREMENTAL=0 bash tools/cargo.sh test -p corpse-core --test borge_event --test tree_tap_commands --test world_generation_parity --test generation_parity -- --nocapture",
+  "log": "verification/borge-r33-tests.log",
+  "log_sha256": "3e5f98c70d326281f3d07cb5af790db3717bbaeae4462cc76cc72b2bbc7cd0ed",
+  "core_files": {
+    "crates/corpse-core/src/borge.rs": "7d883f63f7af6555124c4c8d8bb1e32abb07619c698b9bd932317c07be32dddf",
+    "crates/corpse-core/tests/borge_event.rs": "ca4cf1131a236bf481337d78dec2692bc1cff6448e119b83e3eae15f9f9d1038"
+  },
+  "interface": "Bump/Interact obelisk; exact-heart bump/Interact altar; Shard Equip+ordinary bump attack or Pack Use on\u2026/UseAt adjacent creature",
+  "notes": [
+    "No upload",
+    "Frozen monster-rebalance r32 untouched",
+    "Desktop UI owned by implement_witch_creature_hooks; its verification is reported separately",
+    "Full workspace integration and platform visual review remain separate gates"
+  ]
+}

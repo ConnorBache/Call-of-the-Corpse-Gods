@@ -1,0 +1,47 @@
+{
+  "binary_sha256": "f5135804175935762e52765269fdce9818c6e47e4225f8ea86019878fc206358",
+  "route": "live native renderer via --render-game. Details use actual Pack Home key selection, with no simulation dispatch.",
+  "screens": [
+    {
+      "file": "verification/integration-r33/screens/borge-altar.png",
+      "sha256": "b0aab2452cd346ed5fae397a8ab3a64d9a31971b6d4b15cbe19b32ebd6712295"
+    },
+    {
+      "file": "verification/integration-r33/screens/borge-heart-details.png",
+      "sha256": "e7e354cec973b69d4b3cd5d6efdd84008d3aebdfd8b576879539f000119bf0a6"
+    },
+    {
+      "file": "verification/integration-r33/screens/borge-heart-pack.png",
+      "sha256": "cbdb7c7ea41528b163f62e8eced6dcaee861a3267a0e7dd9b73440296666d2ea"
+    },
+    {
+      "file": "verification/integration-r33/screens/borge-mark.png",
+      "sha256": "2c44f5b38353e5a51dc78c3798e1e335a27d8b27079f397b882a8f3152453090"
+    },
+    {
+      "file": "verification/integration-r33/screens/borge-obelisk.png",
+      "sha256": "0ef0e1da70fd36b0260f2e127c7d9f804ebf9a64cae27baa2cc6a1badb522038"
+    },
+    {
+      "file": "verification/integration-r33/screens/borge-shard-details.png",
+      "sha256": "5367e1e821a039ad0f04659ecbfe723d871bb767fea66f4ff3c4e180507511d9"
+    },
+    {
+      "file": "verification/integration-r33/screens/borge-shard-pack.png",
+      "sha256": "6ee38766697f56229f54085ccf99d2e5a4fa17c417644df65e364dc51457d0bc"
+    },
+    {
+      "file": "verification/integration-r33/screens/nest-2366245279.png",
+      "sha256": "c551fa39602a1a5a0364da68bf0e13fe05f9809c4e741eb8a810ad1e6d38a046"
+    },
+    {
+      "file": "verification/integration-r33/screens/nest-272613304.png",
+      "sha256": "2b402d1d80524841d9460248230a93ac32108c50a73cc8e86fbfb68a02dd0001"
+    },
+    {
+      "file": "verification/integration-r33/screens/nest-2930110369.png",
+      "sha256": "eb9ff31207df03ac053d55d839d4533f23be36d6db18c59a69d9920bb8dfea20"
+    }
+  ],
+  "platform_limit": "Linux headless native painting verified, not interactive Windows launch/input."
+}

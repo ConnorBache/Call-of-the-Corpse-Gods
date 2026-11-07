@@ -1,0 +1,67 @@
+{
+  "geometry-sweep.json": {
+    "sampleFloors": 144,
+    "totals": {
+      "shapeAttempts": 1806,
+      "shapeCandidates": 131,
+      "assignmentAttempts": 343,
+      "assignmentRejections": 212,
+      "safetyRejections": 0,
+      "acceptedPockets": 131,
+      "acceptedCells": 1379,
+      "acceptedGroups": 624,
+      "acceptedTwoSourceGroups": 131
+    },
+    "elapsedSeconds": 7.396270953
+  },
+  "populated-sweep.json": {
+    "sampleFloors": 12,
+    "totals": {
+      "shapeAttempts": 149,
+      "shapeCandidates": 11,
+      "assignmentAttempts": 25,
+      "assignmentRejections": 14,
+      "safetyRejections": 0,
+      "acceptedPockets": 11,
+      "acceptedCells": 106,
+      "acceptedGroups": 48,
+      "acceptedTwoSourceGroups": 10
+    },
+    "elapsedSeconds": 8.166613592,
+    "inventory": {
+      "allFloors": 160,
+      "eligibleFloors20to40": 84,
+      "installedEligibleFloors": 77,
+      "omittedEligibleFloors": 7,
+      "below20Floors": 76,
+      "below20Installed": 0
+    }
+  },
+  "focusedChecks": {
+    "integration": {
+      "passed": 11,
+      "failed": 0
+    },
+    "proposalUnits": {
+      "passed": 4,
+      "failed": 0
+    },
+    "environment": {
+      "CARGO_INCREMENTAL": "0",
+      "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+      "CARGO_PROFILE_TEST_DEBUG": "0",
+      "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+      "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+    },
+    "commands": [
+      "./tools/cargo.sh test -p corpse-core --test non_euclidean_generation_v36 --locked -- --nocapture",
+      "./tools/cargo.sh test -p corpse-core --lib non_euclidean_generation --locked -- --nocapture"
+    ]
+  },
+  "assignmentAdjacency": "Live eight-neighbor movement with existing wall-corner rule; cardinal CA contiguity and cardinal full/portal-free safety proofs remain.",
+  "sourceSha256": {
+    "crates/corpse-core/src/non_euclidean_generation.rs": "eb5659738d7138f10431845a3a485e7736babb8a94ed2975936075218b8c9671",
+    "crates/corpse-core/tests/non_euclidean_generation_v36.rs": "cdfaeba711731587aed260ddf9e234cefd2106609aa3cf0ec10b29587689982f",
+    "docs/non-euclidean-generation-r36.md": "e1d720315b56a9bfb0d9dd196efd014ec7d07c3d07407befe6f82e7ea9ec8689"
+  }
+}

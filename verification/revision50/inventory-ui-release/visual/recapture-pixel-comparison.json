@@ -1,0 +1,172 @@
+[
+  {
+    "file": "dialog-ability-bottom-after-84-1280x800.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-bottom-after-84-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-bottom-after-84-960x720.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-bottom-before-88-1280x800.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-bottom-before-88-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-bottom-before-88-960x720.png",
+    "changed_pixels": 658,
+    "changed_bounds": [
+      699,
+      195,
+      701,
+      525
+    ]
+  },
+  {
+    "file": "dialog-ability-top-after-84-1280x800.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-top-after-84-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-top-after-84-960x720.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-top-before-88-1280x800.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-top-before-88-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-ability-top-before-88-960x720.png",
+    "changed_pixels": 658,
+    "changed_bounds": [
+      699,
+      195,
+      701,
+      525
+    ]
+  },
+  {
+    "file": "dialog-hazard-after-84-1280x800.png",
+    "changed_pixels": 1108,
+    "changed_bounds": [
+      362,
+      491,
+      917,
+      493
+    ]
+  },
+  {
+    "file": "dialog-hazard-after-84-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-hazard-after-84-960x720.png",
+    "changed_pixels": 830,
+    "changed_bounds": [
+      272,
+      428,
+      688,
+      430
+    ]
+  },
+  {
+    "file": "dialog-hazard-before-88-1280x800.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-hazard-before-88-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-hazard-before-88-960x720.png",
+    "changed_pixels": 290,
+    "changed_bounds": [
+      697,
+      287,
+      699,
+      433
+    ]
+  },
+  {
+    "file": "dialog-inspection-after-84-1280x800.png",
+    "changed_pixels": 435,
+    "changed_bounds": [
+      123,
+      659,
+      558,
+      660
+    ]
+  },
+  {
+    "file": "dialog-inspection-after-84-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-inspection-after-84-960x720.png",
+    "changed_pixels": 326,
+    "changed_bounds": [
+      93,
+      554,
+      419,
+      555
+    ]
+  },
+  {
+    "file": "dialog-inspection-before-88-1280x800.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-inspection-before-88-1920x1080.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "dialog-inspection-before-88-960x720.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "markers-custom-blood.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "markers-default.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  },
+  {
+    "file": "markers-fog.png",
+    "changed_pixels": 0,
+    "changed_bounds": null
+  }
+]

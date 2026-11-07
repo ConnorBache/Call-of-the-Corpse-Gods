@@ -1,0 +1,93 @@
+{
+  "scope": "Native desktop package tests, not workspace aggregate and not Windows runtime",
+  "result": "passed",
+  "passed": 285,
+  "failed": 0,
+  "ignored": 1,
+  "suites": [
+    [
+      232,
+      0,
+      1
+    ],
+    [
+      30,
+      0,
+      0
+    ],
+    [
+      11,
+      0,
+      0
+    ],
+    [
+      8,
+      0,
+      0
+    ],
+    [
+      4,
+      0,
+      0
+    ]
+  ],
+  "command": "tools/cargo.sh test -p corpse-desktop --locked",
+  "profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "capture_environment": {
+    "CORPSE_NON_EUCLIDEAN_UI_REVIEW": "verification/integration-r36/desktop-ui",
+    "CORPSE_NON_EUCLIDEAN_GENERATED_REVIEW": "verification/integration-r36/desktop-ui"
+  },
+  "capture_provenance": "Actual native rasterizer. Controlled topology and Epidite fixtures; generated floor20 uses controlled placement/full reveal, no simulated turns. No interactive Windows runtime claim.",
+  "artifacts": [
+    {
+      "path": "epidite-10-turns-controlled.png",
+      "bytes": 346553,
+      "sha256": "1457c3eb5f2b2efb3537c084a58369b65653c982e224b944432a7fa3570f3607"
+    },
+    {
+      "path": "epidite-9-turns-controlled.png",
+      "bytes": 346628,
+      "sha256": "cacf15b90bcc7a8d97d1bfe5f5452e28a1719b420e72cb672b90b94bc85c2d21"
+    },
+    {
+      "path": "non-euclidean-generated-floor20-debug.png",
+      "bytes": 748147,
+      "sha256": "68e421d2199a61cf4460a380642b98b79b9e7b25eb2f27592b48b5280e67a97c"
+    },
+    {
+      "path": "non-euclidean-possible-exits-controlled.png",
+      "bytes": 353124,
+      "sha256": "5a2d91cdfdd5eb516fb374651695d5db97b8232e05c23975bd656bcf6558e6ca"
+    }
+  ],
+  "pre_final_gate_capture_artifacts": [
+    {
+      "path": "epidite-10-turns-controlled.png",
+      "bytes": 346553,
+      "sha256": "1457c3eb5f2b2efb3537c084a58369b65653c982e224b944432a7fa3570f3607"
+    },
+    {
+      "path": "epidite-9-turns-controlled.png",
+      "bytes": 346628,
+      "sha256": "cacf15b90bcc7a8d97d1bfe5f5452e28a1719b420e72cb672b90b94bc85c2d21"
+    },
+    {
+      "path": "non-euclidean-generated-floor20-debug.png",
+      "bytes": 748151,
+      "sha256": "1cc9086f7728cc04edb41f704050834f691351cbac6dd658eb0b08612f8b2180"
+    },
+    {
+      "path": "non-euclidean-possible-exits-controlled.png",
+      "bytes": 353124,
+      "sha256": "5a2d91cdfdd5eb516fb374651695d5db97b8232e05c23975bd656bcf6558e6ca"
+    }
+  ],
+  "final_gate_capture_refreshed_utc": "2026-10-28T15:39:08.761752+00:00",
+  "final_gate_fingerprint": "f0b38fb5e06763c1cae69d2fc0a72c8cc647cd612ca75b50ba5c2ae1eff2ec03"
+}

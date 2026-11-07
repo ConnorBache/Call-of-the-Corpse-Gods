@@ -1,0 +1,947 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+warning: `corpse-core` (lib test) generated 2 warnings (1 duplicate)
+    Finished `test` profile [optimized] target(s) in 2m 48s
+     Running unittests src/lib.rs (../r50-optimized-target/debug/deps/corpse_core-c5176256c434b1cf)
+
+running 418 tests
+test abilities::dream_plane_tests::ahvamitt_allegiance_is_protected_before_cost_without_disabling_other_powers ... ok
+test abilities::dream_plane_tests::dream_plane_sparkle_and_bulwark_mutate_only_the_dream_floor ... ok
+test abilities::dream_plane_tests::matching_plane_and_legacy_targeting_still_work_and_cross_plane_link_can_stop ... ok
+test abilities::dream_plane_tests::silence_aura_and_maintained_unspeak_do_not_cross_planes ... ok
+test abilities::dream_plane_tests::sleeping_body_has_no_owner_toggles_but_half_here_keeps_them ... ok
+test abilities::dream_plane_tests::every_actor_target_rejects_another_plane_before_cost_or_mutation ... ok
+test abilities::reaction_attack_reference::retained_reaction_sources_and_offhand ... ok
+test attack_text::tests::exact_weapon_identity_and_conjugation ... ok
+test attack_text::tests::explicit_sources_and_neutral_unknowns ... ok
+test attack_text::tests::projectiles_are_not_melee_attacks ... ok
+test attack_text_revision46::deflection_preserves_the_original_projectile_verb ... ok
+test attack_text_revision46::hit_and_miss_use_creature_identity_and_correct_person ... ok
+test attack_text_revision46::nonattacking_creatures_stay_nonattacking_and_zero_damage_is_not_a_miss ... ok
+test attack_text_revision46::ranged_routes_preserve_hit_rolls_and_projectile_identity ... ok
+test attack_text_revision46::weapon_identity_tracks_each_hand_and_implicit_counter_path ... ok
+test balance42::tests::catalog_has_unique_finite_rows ... ok
+test balance42::tests::old_revision_is_exact_noop ... ok
+test capture_pilot::tests::boundaries_and_nested_discard ... ok
+test capture_pilot::tests::disabled_hooks_do_not_leak ... ok
+test capture_pilot::tests::discarded_scratch_not_collected ... ok
+test capture_pilot::tests::final_master_values_only ... ok
+test capture_pilot::tests::no_op_repeated_and_cancellation ... ok
+test capture_pilot::tests::raw_unmarked_write_is_oracle_miss ... ok
+test combat::tests::chance_clamps_before_range ... ok
+test combat::tests::mitigation_before_scale_rounding ... ok
+test combat::tests::negative_rounding ... ok
+test combat::tests::packets_round_up ... ok
+test combat_audit::tests::disabled_by_default_and_take_disables ... ok
+test corpses::tests::hazard_boundaries ... ok
+test creature_index::tests::floor_transfer_reuse_player_and_stale_handles ... ok
+test creature_index::tests::public_mutations_cannot_leave_stale_locations ... ok
+test creature_index::tests::snapshots_load_and_nested_pilots_preserve_identity_contract ... ok
+test creature_trie::tests::capacity_error_preserves_existing_occupant_and_reuse ... ok
+test creature_trie::tests::decimal_trie_microtiming ... ignored, run optimized with --ignored --nocapture for lookup microtimings
+test creature_trie::tests::exhausted_generation_retires_slot ... ok
+test creature_trie::tests::hundred_thousand_slots_reuse_and_snapshot_independence ... ok
+test creature_trie::tests::hundred_thousand_unique_keys_and_pruning ... ok
+test creature_trie::tests::mixed_operations_match_ordered_map ... ok
+test creature_trie::tests::sparse_growth_extremes_and_snapshot_isolation ... ok
+test deadline_map::tests::arbitrary_mutable_access_cannot_leave_stale_deadlines ... ok
+test deadline_map::tests::differential_mutation_sequence_matches_index_map ... ok
+test deadline_map::tests::due_checks_cache_and_expiry_preserves_order ... ok
+test deadline_map::tests::empty_and_optional_shape_stay_unchanged ... ok
+test deadline_map::tests::floating_deadlines_match_legacy_comparisons ... ok
+test deadline_map::tests::nan_guarded_and_unconditional_expiration_are_distinct ... ok
+test deadline_map::tests::renewal_and_cancel_do_not_fire_old_events ... ok
+test deadline_map::tests::transparent_serde_and_clone_are_canonical ... ok
+test debug_floor::revision50_loadout_tests::deeper_r50_stash_has_unlimited_trinkets_but_enforces_finite_categories ... ok
+test debug_floor::revision50_loadout_tests::invalid_stash_grants_and_non_jewelry_equip_are_atomic ... ok
+test debug_floor::revision50_loadout_tests::legacy_stash_still_has_shared_twenty_slots ... ok
+test debug_floor::revision50_loadout_tests::stash_acquisition_materializes_once_and_preserves_spent_item_and_grant_energy ... ok
+test divine_environment::tests::dream_plane_black_pit_and_water_queries_use_each_endpoint_floor ... ok
+test divine_environment::tests::dream_plane_riptide_and_reverse_entropy_keep_endpoint_planes ... ok
+test abilities::remember_passive_reference::copies_authored_divine_passives ... ok
+test divine_reactions::dream_plane_tests::sleeping_body_reactions_are_inert_and_deflection_stays_on_its_endpoint_plane ... ok
+test engine::timeweave_movement_tests::attacking_backwards_is_not_free_and_does_not_append ... ok
+test engine::timeweave_movement_tests::backward_door_opening_preserves_arrival_without_time ... ok
+test engine::timeweave_movement_tests::confusion_resolved_reverse_is_free_and_missed_probe_is_exactly_discarded ... ok
+test engine::timeweave_movement_tests::dream_walking_records_dream_edges_and_backtracks_without_time ... ok
+test engine::timeweave_movement_tests::forced_and_transition_policy_remains_outside_local_scope ... ok
+test engine::timeweave_movement_tests::forward_walk_lays_source_arrow_backward_walk_is_free_without_append ... ok
+test engine::timeweave_movement_tests::hasted_forward_and_free_backtrack_preserve_phase_without_pending_snapshot ... ok
+test engine::timeweave_movement_tests::ice_success_free_and_failed_probe_does_not_consume_rng_or_log ... ok
+test engine::timeweave_movement_tests::sticky_hold_probe_discards_then_successful_escape_is_free ... ok
+test engine::timeweave_movement_tests::wrong_side_entry_preserves_old_arrow_until_departure_source_collision ... ok
+test environment::presentation_parity::dream_plane_explosion_geometry_uses_the_blast_layer_not_the_players_plane ... ok
+test divine_environment::tests::phase_loss_matches_frozen_reference ... ok
+test environment::presentation_parity::dream_plane_physical_half_here_burst_keeps_owner_credit_without_changing_its_plane ... ok
+test environment::presentation_parity::dream_plane_projection_cannot_consume_a_physical_bodys_gas_blast_pool ... ok
+test equipment::catalog_tests::authored_bow_and_arrow_bundle ... ok
+test equipment::catalog_tests::every_equipment_definition_parses ... ok
+test equipment::generated_loot::revision43_tests::every_legacy_revision_preserves_frozen_draws_with_full_or_empty_ability_pool ... ok
+test equipment::generated_loot::revision43_tests::exhausted_ability_pool_and_floor_loot_still_have_special_jewelry ... ok
+test equipment::generated_loot::revision43_tests::godbeast_jewelry_already_has_modifier_and_authored_plain_items_stay_plain ... ok
+test equipment::generated_loot::revision43_tests::old42_exact_items_and_rng_match_frozen_algorithm_and43_keeps_successful_rolls ... ok
+test equipment::generated_loot::revision43_tests::property_check_requires_real_effect_not_field_presence ... ok
+test equipment::generated_loot::revision50_tests::actual_mercuria_reward_uses_revisioned_constructor_and_preserves_simulation_rng ... ok
+test environment::presentation_parity::explosion_presentation_matches_reference ... ok
+test equipment::generated_loot::revision50_tests::floor_loot_generates_named_items_with_unique_ids_and_deterministic_rng ... ok
+test equipment::generated_loot::revision50_tests::generated_jewelry_is_picked_up_worn_and_generated_amulet_applies ... ok
+test equipment::generated_loot::revision50_tests::revisioned_event_rewards_are_valid_and_preserve_every_legacy_reward_draw ... ok
+test equipment::generated_loot::revision50_tests::starting_inventory_keeps_bow_and_ammo_without_sword_and_apply_needs_no_equipping ... ok
+test equipment::generated_loot::revision50_tests::uniform_named_groups_have_one_draw_fixed_effects_and_all_names_reachable ... ok
+test equipment::generated_loot::tests::exact_loot_and_reward_draws ... ok
+test events::presentation_identity_tests::exact_actor_labels_keep_distinct_disguises_without_changing_event_geometry ... ok
+test events::probe_tests::accepted_probe_keeps_ordered_explosion_replacement ... ok
+test events::probe_tests::accepted_probe_uses_existing_emit_cap ... ok
+test events::probe_tests::no_outer_batch_is_not_fabricated ... ok
+test events::probe_tests::probe_drop_nested_and_unwind_restore_outer ... ok
+test future_anchor::tests::capture_omits_nested_authorities_without_touching_current ... ok
+test equipment::generated_loot::revision50_tests::actual_sphinx_reward_branch_uses_named_permanents ... ok
+test future_anchor::tests::checkpoint_reload_and_cow_divergence_match_native_restore ... ok
+test future_anchor::tests::engine_clone_save_warms_shared_cache_explicitly ... ok
+test future_anchor::tests::finite_invalid_fresh_anchor_still_validates_on_restore ... ok
+test future_anchor::tests::finite_visitor_handles_bits_and_nested_nonfinite ... ok
+test future_anchor::tests::imported_certificate_skips_only_duplicate_validation ... ok
+test future_anchor::tests::imported_valid_promotes_invalid_defers_and_replacement_is_local ... ok
+test future_anchor::tests::native_capture_is_lazy_shared_and_boundary_compatible ... ok
+test future_anchor::tests::promotion_does_not_hide_invalid_history_or_revision ... ok
+test future_anchor::tests::optional_nonfinite_uses_exact_legacy_fallback ... ok
+test gas_reactions::tests::expiration_is_not_a_bridge ... ok
+test gas_reactions::tests::minimum_identity_survives_rank_and_zero ... ok
+test half_here::identity_birth_tests::collision_rejects_before_dismissing_existing_endpoint ... ok
+test health_dirty::tests::cache_warmth_is_not_canonical_state_or_semantic_equality ... ok
+test health_dirty::tests::clean_health_still_unlocks_blood_and_fury_exactly_once ... ok
+test health_dirty::tests::damage_and_regeneration_do_not_dirty_maximum_health ... ok
+test health_dirty::tests::default_dirty_then_clean_and_scalar_changes_detected ... ok
+test health_dirty::tests::dirty_settlement_matches_forced_for_buffs_equipment_and_crafts ... ok
+test health_dirty::tests::equipped_take_then_replace_invalidates_even_at_same_length ... ok
+test inventory::heart_items::tests::exact_all_authored_heart_rewards ... ok
+test inventory::item_magic::display_tests::exact_potion_display ... ok
+test future_anchor::tests::typed_inventory_normalization_matches_json ... ok
+test inventory::item_magic::tests::exact_magic_detection_memory ... ok
+test inventory::water_tests::exact_float_item_rng_and_quantities ... ok
+test lighting_cache::exclusion_tests::active_shine_identity_and_plane_edits_invalidate ... ok
+test lighting_cache::exclusion_tests::excluded_sources_match_target_major_oracle_bit_for_bit ... ok
+test inventory::tests::reference_inventory_boundaries ... ok
+test lighting_cache::world_exclusion_tests::world_source_exclusion_matches_scalar_across_mutations ... ok
+test mini_me::identity_birth_tests::stale_preview_and_collision_preserve_state ... ok
+test mini_me::plane_tests::r34_mini_me_spawn_occupancy_ignores_only_opposite_plane_actors ... ok
+test mini_me::plane_tests::r34_mini_me_serializes_creation_plane_and_never_copies_body_or_nightmare ... ok
+test mini_me::revision50_stats_tests::commit_rejects_power_bearing_r50_copy_without_mutation ... ok
+test mini_me::revision50_stats_tests::freezes_effective_stats_without_inheriting_powers_items_or_statuses ... ok
+test mini_me::revision50_stats_tests::owner_phase_through_does_not_allow_spawning_stats_only_copy_in_wall ... ok
+test monster_chill::tests::dream_plane_chill_chooses_native_yeti_and_preserves_half_here_shared_slow ... ok
+test monster_grab::tests::dream_plane_grabs_cannot_apply_or_survive_a_plane_change ... ok
+test monster_bombardier::tests::bombardier_matches_frozen_reference ... ok
+test monster_grab::venom_tests::terminal_venom_matches_frozen_reference ... ok
+test monster_horn::plane_tests::r34_dream_projection_uncast_and_aura_use_dream_geometry ... ok
+test monster_horn::plane_tests::r34_horn_destination_occupancy_uses_actor_or_context_plane ... ok
+test monster_horn::plane_tests::r34_stone_seal_expires_on_creation_plane_after_caster_changes_plane ... ok
+test monster_horn::plane_tests::r34_target_permission_silence_and_sleeping_body_are_plane_local ... ok
+test monster_horn::plane_tests::r34_uncast_requires_a_same_plane_observing_endpoint_not_union_visibility ... ok
+test monster_grab::tests::grabs_match_frozen_reference ... ok
+test monster_inventor::tests::dream_plane_fire_cone_never_applies_burning_or_rng_to_other_plane_victims ... ok
+test monster_inventor::tests::duplicate_pilot_identity_rejects_without_mutation ... ok
+test monster_horn::tests::horn_caster_matches_frozen_reference ... ok
+test monster_inventor::tests::inventor_matches_frozen_reference ... ok
+test monster_ruin::tests::revision42_early_pulse_is_local_and_once_scaled ... ok
+test monster_moon::tests::moon_matches_frozen_reference ... ok
+test monster_ruin::tests::ruin_matches_frozen_reference ... ok
+test monster_spells::tests::dream_plane_dryad_heals_only_a_native_endpoint ... ok
+test monster_sphinx::tests::sphinx_ai_matches_frozen_reference ... ok
+test monster_spells::tests::caster_spells_match_frozen_reference ... ok
+test monster_statuses::parity::status_and_lifecycle_reference ... ok
+test monster_statuses::plane_tests::r34_inflicted_dot_keeps_source_credit_after_caster_changes_plane ... ok
+test monster_statuses::plane_tests::r34_source_less_status_uses_contact_plane_and_legacy_is_unchanged ... ok
+test monster_statuses::plane_tests::r34_status_infliction_rejects_cross_plane_without_mutation ... ok
+test movement::tests::corner_wall_but_not_tree ... ok
+test movement::tests::safe_route_beats_short_hazard ... ok
+test mutation_journal::tests::alias_collision_is_only_missing_evidence_never_wrong_old_value ... ok
+test mutation_journal::tests::cloned_branch_alias_chain_has_exact_original_fallback ... ok
+test mutation_journal::tests::first_old_coalesces_and_keeps_original_even_after_net_zero ... ok
+test mutation_journal::tests::inactive_and_unsupported_access_do_not_force_cow ... ok
+test mutation_journal::tests::nested_drop_and_merge_preserve_exact_opening_keys ... ok
+test mutation_journal::tests::retain_opening_prunes_probe_roots_and_keeps_historical_counts ... ok
+test non_euclidean_generation::proposal_tests::assignment_uses_diagonal_neighbors_and_forced_next_source_but_never_cuts_wall_corners ... ok
+test non_euclidean_generation::proposal_tests::last_two_always_form_one_pair_and_terminal_singletons_reject ... ok
+test non_euclidean_generation::proposal_tests::proposal_threshold_and_removed_source_eligibility_are_literal ... ok
+test non_euclidean_generation::proposal_tests::source_removal_changes_destination_eligibility_and_forced_chain_is_preserved ... ok
+test offscreen::clay_tests::clay_forces_exact_inactive_tick_without_active_floor_duplicates ... ok
+test offscreen::clay_tests::offscreen_clay_receives_actual_player_stats_not_stripped_proxy ... ok
+test offscreen::portal_traversal_tests::credited_returning_ally_traverses_portal_once_with_remote_occupancy ... ok
+test offscreen::portal_traversal_tests::offscreen_pursuit_traverses_once_and_does_not_overlap_remote_occupant ... ok
+test offscreen::portal_traversal_tests::offscreen_stochastic_pursuit_replans_both_returns_without_telefrag ... ok
+test offscreen::revision50_ring_tests::aggregate_regen_keeps_suppression_water_creature_and_endpoint_rules ... ok
+test offscreen::revision50_ring_tests::stationary_approximation_uses_elapsed_ticks_and_preserves_legacy_rate ... ok
+test monster_stalking::tests::stalking_matches_frozen_reference ... ok
+test optical_cache::tests::direct_opacity_portal_edits_and_clone_invalidate ... ok
+test optical_cache::tests::cached_distances_match_original_directed_graph_bit_for_bit ... ok
+test playtest::revision50_loadout_tests::deeper_r50_with_only_two_starters_does_not_panic_or_equip_a_weapon ... ok
+test progression::tests::exact_authored_weighted_choices ... ok
+test projectiles::throw_base_preview_tests::lifted_throw_base_preserves_frozen_arithmetic_and_input_state ... ok
+test playtest::revision50_loadout_tests::deeper_r50_collection_and_selection_preserve_starters_named_jewelry_and_trinkets ... ok
+test replay::policy_tests::snapshot_and_future_restore_preserve_policy_with_live_ledger ... ok
+test replay::policy_tests::unknown_and_invalid_policy_is_rejected_without_guessing ... ok
+test replay::policy_tests::actual_future_commands_keep_mixed_policy_after_restore_and_restart ... ok
+test replay::policy_tests::v2_snapshot_three_wait_two_reverts_roundtrips_and_restarts ... ok
+test revision50::tests::duel_is_five_by_five_and_expires_when_leaving ... ok
+test revision50::tests::independent_duel_preserves_target_and_anchor_but_expires_and_pays_independently ... ok
+test revision50::tests::invalid_implant_does_not_spend_or_mutate ... ok
+test revision50::tests::owner_on_another_floor_uses_its_actual_depth_for_expiry ... ok
+test revision50::tests::shared_endpoint_uses_owner_area_and_outside_spawn_does_not_recenter_anchor ... ok
+test revision50_ability_energy::tests::invalid_missing_insufficient_and_stale_leave_state_unchanged ... ok
+test revision50_ability_energy::tests::level_refill_serializes_and_does_not_refill_player_energy ... ok
+test revision50_ability_energy::tests::malformed_later_reserve_prevents_entire_refill ... ok
+test revision50_ability_energy::tests::own_first_and_exhausted_fallback ... ok
+test revision50_ability_energy::tests::revision_gating_and_real_level_up ... ok
+test revision50_amulet_effects::tests::acid_has_range_eight_and_refreshes_six_turn_penalty ... ok
+test revision50_amulet_effects::tests::blinking_visible_empty_within_ten_and_arrival_fire ... ok
+test revision50_amulet_effects::tests::cold_immunity_is_enforced_at_shared_damage_packet_boundary ... ok
+test revision50_amulet_effects::tests::dispatch_free_activation_then_other_amulet_consumes_turn ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_acid_damage_and_attached_dr_loss ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_iceblast_damage_and_attached_slow ... ok
+test revision50_amulet_effects::tests::fated_duel_blocks_poison_source_without_curing_existing_poison ... ok
+test revision50_amulet_effects::tests::firebolt_ignites_blocking_tree_but_never_hits_beyond_it ... ok
+test revision50_amulet_effects::tests::firebolt_is_eighty_not_twenty_and_ignites_path_and_first_target ... ok
+test revision50_amulet_effects::tests::iceblast_closed_corner_shields_and_corrosion_compounds_sustain ... ok
+test revision50_amulet_effects::tests::iceblast_thirty_hits_player_and_allies_while_immunity_blocks_damage_and_slow ... ok
+test revision50_amulet_effects::tests::inactive_floor_uses_the_same_poison_and_corrosion_normal_clock ... ok
+test revision50_amulet_effects::tests::invalid_dispatch_does_not_start_clocks_or_claim_free_credit ... ok
+test revision50_amulet_effects::tests::invalid_target_and_partial_payment_leave_energy_rng_and_ledger_untouched ... FAILED
+test revision50_amulet_effects::tests::lightning_continues_beyond_aim_pierces_allies_and_stops_at_wall ... ok
+test revision50_amulet_effects::tests::named_resistances_apply_to_final_packets_and_acid_penalty ... ok
+test revision50_amulet_effects::tests::poison_is_six_per_normal_tick_for_twenty_and_refreshes_without_rate_stacking ... ok
+test revision50_amulet_effects::tests::preview_cannot_leak_unseen_live_terrain_or_consume_rng ... ok
+test revision50_amulet_effects::tests::saved_item_energy_and_poison_rate_replay_identically ... ok
+test revision50_amulet_effects::tests::spatial_ray_cycles_are_bounded_and_duplicate_actor_is_hit_once ... ok
+test revision50_amulets::tests::appropriate_reduces_cost_ten_and_can_make_zero_cost ... ok
+test revision50_amulets::tests::global_free_credit_and_stale_commit_remain_atomic ... ok
+test revision50_amulets::tests::initialization_is_once_only_and_unknown_or_invalid_specs_fail ... ok
+test revision50_amulets::tests::own_energy_then_exhausted_player_fallback_without_cooldowns ... ok
+test revision50_control_amulets::tests::beckoning_failure_has_no_resource_or_state_mutation ... ok
+test revision50_control_amulets::tests::beckoning_pulls_nearest_adjacent_and_breaks_roots ... ok
+test revision50_control_amulets::tests::direct_magic_honors_fated_duel_but_hazards_keep_existing_rules ... ok
+test revision50_control_amulets::tests::discord_curses_respect_willpower_and_distinct_shared_owners ... ok
+test revision50_control_amulets::tests::discord_haste_moves_only_without_ticking_status ... ok
+test revision50_control_amulets::tests::discord_is_mutual_preserves_allegiance_and_expires_after_six_ticks ... ok
+test revision50_control_amulets::tests::duel_rejects_new_control_impacts_before_payment_but_existing_roots_persist ... ok
+test revision50_control_amulets::tests::free_command_spends_cost_but_not_status_or_world_clocks ... ok
+test revision50_control_amulets::tests::obstruction_exact_perpendicular_unlimited_range_and_safe_expiry ... ok
+test revision50_control_amulets::tests::obstruction_only_center_must_be_visible_and_unknown_outer_cell_does_not_change_preview ... ok
+test revision50_control_amulets::tests::obstruction_preview_does_not_probe_hidden_creature ... ok
+test revision50_control_amulets::tests::obstruction_rejects_occupied_stairs_portals_bounds_and_unknown_orientation ... ok
+test revision50_control_amulets::tests::offscreen_discord_does_not_act_on_last_paralyzed_turn ... ok
+test revision50_control_amulets::tests::offscreen_normal_ticks_expire_terrain_and_control_statuses ... ok
+test revision50_control_amulets::tests::roots_player_provenance_provokes_neutrals_on_and_offscreen ... ok
+test revision50_control_amulets::tests::roots_tick_four_times_block_only_movement_and_break_on_fire ... ok
+test revision50_control_amulets::tests::target_plane_visibility_range_and_revision_are_enforced ... ok
+test revision50_control_amulets::tests::temporary_terrain_and_statuses_roundtrip_and_rewind_together ... ok
+test revision50_grappler::tests::blocked_front_keeps_entire_chain_and_other_lane_moves ... ok
+test revision50_grappler::tests::carried_actor_uses_forced_movement_and_restores_condition ... ok
+test revision50_grappler::tests::chains_move_front_first_independent_of_input_order ... ok
+test revision50_grappler::tests::diagonal_wall_prevents_squeezing_despite_forced_flag ... ok
+test revision50_grappler::tests::lock_filters_dead_allied_neutral_distant_and_old_revision ... ok
+test revision50_grappler::tests::outside_occupant_blocks_chain ... ok
+test revision50_inventory::tests::base_and_combined_capacity ... ok
+test revision50_inventory::tests::bow_apply_admission_does_not_require_equipping ... ok
+test revision50_inventory::tests::independent_categories_and_shared_jewelry ... ok
+test revision50_inventory::tests::jewelry_wearing_does_not_displace_existing_items ... ok
+test revision50_inventory::tests::legacy_capacity_unchanged ... ok
+test revision50_inventory::tests::masque_name_is_revisioned_and_old_spellings_keep_teleport_identity ... ok
+test revision50_inventory::tests::pickup_respects_categories_and_collects_tools ... ok
+test revision50_inventory::tests::special_categories_preserve_identity_and_have_unlimited_stack_space ... FAILED
+test revision50_inventory::tests::unlimited_trinkets_and_worn_jewelry_do_not_relax_finite_limits ... ok
+test revision50_inventory::tests::weapons_and_armor_cannot_be_equipped ... ok
+test revision50_inventory::tests::worn_jewelry_excluded_and_unequip_requires_space ... ok
+test revision50_nightmares::independent_clock_tests::explicit_owner_activation_uses_own_visibility_charge_identity_and_plane ... ok
+test revision50_nightmares::independent_clock_tests::independent_recharge_clock_and_charges_are_independent_and_persisted ... ok
+test revision50_nightmares::independent_clock_tests::shared_bodies_decoys_dead_and_legacy_actors_do_not_recharge ... ok
+test revision50_player_attack::tests::base_reads_live_effective_offense_without_attack_side_effects ... ok
+test revision50_player_attack::tests::baseline_matches_authored_greatsword_not_shortsword ... ok
+test revision50_player_attack::tests::explicit_bow_and_thrown_item_bases_stay_item_defined ... ok
+test revision50_potions::tests::cleansing_half_here_settles_owner_capacity_not_unrelated_local_penalties ... ok
+test revision50_potions::tests::cleansing_negative_timed_buffs_settles_health_and_preserves_benefits ... ok
+test revision50_potions::tests::cleansing_removes_only_harmful_temporaries_and_metadata ... ok
+test revision50_potions::tests::darkness_exact_square_timer_and_cache_invalidation ... ok
+test revision50_potions::tests::darkness_reapplication_refreshes_without_stacking ... ok
+test revision50_potions::tests::discord_expires_and_does_not_redirect_player_movement ... ok
+test revision50_potions::tests::discord_self_drink_preserves_player_control_and_allegiance ... ok
+test revision50_potions::tests::drinking_discord_draws_neutral_and_ally_ai_until_expiry ... ok
+test revision50_potions::tests::drinking_discord_never_crosses_planes_or_turns_shared_body_against_owner ... ok
+test revision50_potions::tests::exact_twenty_roster_and_legacy_generation_preserved ... ok
+test replay::policy_tests::v1_legacy_and_v2_mixed_transition_reproduce_retained_history ... ok
+test revision50_potions::tests::fire_immunity_blocks_fire_and_new_burning_not_other_damage ... ok
+test revision50_potions::tests::fire_immunity_does_not_grant_explosion_immunity ... ok
+test revision50_potions::tests::flooding_restores_exact_ground_and_preserves_structures ... ok
+test revision50_potions::tests::freezing_water_persists_until_heat_and_ring_prevents_slow ... ok
+test revision50_potions::tests::healing_energy_and_sap_keep_ownership_caps_and_dilution ... ok
+test revision50_potions::tests::ice_melting_is_revision_gated_and_preserves_snow_water_underlay ... ok
+test revision50_potions::tests::iceblast_retains_damage_and_wall_shielding_and_leaves_permanent_ice ... ok
+test revision50_potions::tests::old_revision_rejects_new_effect_before_mutation ... ok
+test revision50_potions::tests::paralysis_impact_five_turns_is_separate_from_gas_refresh ... ok
+test revision50_potions::tests::offscreen_expires_darkness_water_and_fire_immunity ... ok
+test revision50_potions::tests::potion_state_roundtrip_snapshot_and_future_capture ... ok
+test revision50_potions::tests::repulsion_center_choice_repeats_from_serde_snapshot_and_future_capture ... ok
+test revision50_potions::tests::repulsion_center_chooses_clear_first_step_then_uses_arrival_and_collision_rules ... ok
+test revision50_potions::tests::repulsion_center_with_no_valid_direction_consumes_no_rng ... ok
+test revision50_potions::tests::repulsion_drink_and_direct_throw_share_seeded_center_rule ... ok
+test revision50_potions::tests::repulsion_without_center_keeps_radius_collision_order_and_rng ... ok
+test revision50_potions::tests::shattering_does_not_rebreak_restored_underlying_wall_in_same_blast ... ok
+test revision50_potions::tests::repulsion_immutable_or_other_plane_center_consumes_no_rng ... ok
+test revision50_potions::tests::shattering_intersecting_one_cell_destroys_whole_shared_wall ... ok
+test revision50_potions::tests::shattering_scope_preserves_clay_and_radius_and_boundary ... ok
+test revision50_potions::tests::telepathy_is_floor_wide_for_drinker_and_thrown_target ... ok
+test revision50_potions::tests::teleportation_can_move_drinker_and_uses_serialized_rng ... ok
+test revision50_pursuit::runtime_tests::runtime_enemy_free_detour_precedes_occupied_shortcut ... ok
+test revision50_pursuit::runtime_tests::runtime_failed_activation_is_atomic_and_legacy_is_unchanged ... ok
+test revision50_pursuit::runtime_tests::runtime_fallback_crosses_enemy_only_when_clear_route_is_impossible ... ok
+test revision50_pursuit::runtime_tests::runtime_move_bonus_is_once_and_not_for_attack_or_wrong_direction ... ok
+test revision50_pursuit::runtime_tests::runtime_portal_entry_and_arrival_both_appear_and_earn_credit ... ok
+test revision50_pursuit::tests::bonus_is_once_per_turn_and_survives_serialization ... ok
+test revision50_pursuit::tests::enemy_route_only_as_fallback ... ok
+test revision50_pursuit::tests::long_clear_route_beats_short_enemy_route ... ok
+test revision50_pursuit::tests::target_motion_and_obstacle_changes_are_replanned ... ok
+test revision50_pursuit::runtime_tests::runtime_target_follows_movement_and_death ... ok
+test revision50_terrain::tests::clay_attacks_use_live_stats_without_abilities ... ok
+test revision50_terrain::tests::clay_black_pit_departure_overlap_rolls_back_move_and_events ... ok
+test revision50_terrain::tests::clay_end_turn_attacks_any_adjacent_creature_and_cleans_sources ... ok
+test revision50_terrain::tests::clay_grappler_cannot_entomb_dragged_creature_in_departure_cell ... ok
+test revision50_terrain::tests::clay_placement_moves_and_leaves_unbreakable_wall ... ok
+test revision50_terrain::tests::clay_placement_uses_its_reserve_before_shared_energy ... ok
+test revision50_terrain::tests::clay_preview_hides_invisible_occupants_but_activation_rejects ... ok
+test revision50_terrain::tests::clay_rejected_move_is_atomic ... ok
+test revision50_terrain::tests::clay_requires_committable_one_cell_move ... ok
+test revision50_terrain::tests::clay_rejected_runtime_move_preserves_outer_presentation_batch ... ok
+test revision50_terrain::tests::clay_source_cleanup_tracks_original_floor_on_reaction_error ... ok
+test revision50_terrain::tests::clay_transient_ids_obey_registry_and_terminal_turns_stop ... ok
+test revision50_terrain::tests::cogworks_cannot_remove_clay_soldiers ... ok
+test revision50_terrain::tests::legacy_and_removal_without_selection_are_rejected ... ok
+test revision50_terrain::tests::hidden_occupant_does_not_change_preview_but_blocks_commit ... ok
+test revision50_terrain::tests::mode_selection_is_free_and_rejects_invalid_values ... ok
+test revision50_terrain::tests::pit_requires_all_nine_cells_unoccupied ... ok
+test revision50_terrain::tests::paid_commit_and_free_removal_round_trip ... ok
+test revision50_terrain::tests::rejected_payment_does_not_mutate ... ok
+test revision50_terrain::tests::runtime_occupied_pit_and_wall_fail_atomically ... ok
+test revision50_terrain::tests::wall_is_five_cells_perpendicular_to_throw ... ok
+test revision50_terrain::wall_tests::breach_path_uses_only_breakable_walls_when_normal_path_absent ... ok
+test revision50_terrain::tests::runtime_pit_and_free_removal_preserve_save_state ... ok
+test revision50_terrain::wall_tests::haste_forced_player_friendly_neutral_and_clay_cannot_break_wall ... ok
+test revision50_terrain::wall_tests::hostile_bump_strikes_with_one_damage_draw_and_no_movement ... ok
+test revision50_terrain::wall_tests::null_terrain_metadata_is_rejected_on_each_plane ... ok
+test revision50_terrain::wall_tests::malformed_wall_records_are_rejected_without_mutation ... ok
+test revision50_terrain::wall_tests::occupied_and_underfunded_walls_are_atomic ... ok
+test revision50_terrain::wall_tests::physical_and_dream_walls_have_independent_health ... ok
+test revision50_terrain::wall_tests::offscreen_normal_turn_can_breach_without_duplicate_catchup ... ok
+test revision50_terrain::wall_tests::shared_wall_placement_payment_collision_damage_and_full_restore ... ok
+test revision50_terrain::wall_tests::sight_cache_observes_wall_creation_and_removal_in_same_tick ... ok
+test revision50_terrain::wall_tests::temporary_terrain_cannot_expire_under_persistent_wall ... ok
+test revision50_wave_teleport::tests::flood_duel_guard_skips_damage_and_push_without_curing_status_or_shielding_ground ... ok
+test revision50_wave_teleport::tests::flood_hits_once_and_pushes_two_without_extra_rng ... ok
+test revision50_terrain::wall_tests::wall_save_snapshot_and_free_remove_preserve_shared_health ... ok
+test revision50_wave_teleport::tests::production_flood_diagonal_stop_and_invalid_target_are_rng_atomic ... ok
+test revision50_wave_teleport::tests::production_flood_activation_pays_once_and_each_lane_stops_at_old_water ... ok
+test revision50_wave_teleport::tests::quench_preserves_permanent_flame ... ok
+test revision50_wave_teleport::tests::teleport_no_destination_consumes_no_rng_or_position ... ok
+test revision50_wave_teleport::tests::teleport_rejects_self_and_wrong_plane_without_rng ... ok
+test revision50_wave_teleport::tests::teleport_selection_is_repeatable_unexplored_and_unoccupied ... ok
+test revision50_wave_teleport::tests::teleport_dispatch_rejects_immutable_endpoints_before_payment ... ok
+test revision50_wave_teleport::tests::teleport_still_admits_an_independent_mini_me ... ok
+test revision50_wave_teleport::tests::wave_is_fifteen_cells_and_never_overwrites_stop_tile ... ok
+test shore_currents::tests::all_eight_authored_water_setups_have_nontrapping_repaired_routes ... ok
+test shore_currents::tests::enclosed_pool_disables_flow_without_carving ... ok
+test shore_currents::tests::every_origin_in_deterministic_generated_floor_reaches_bank_when_reachable ... ok
+test shore_currents::tests::floating_item_reaches_bank_via_environment_tick ... ok
+test shore_currents::tests::good_authored_route_is_preserved_bad_cycle_repaired ... ok
+test shore_currents::tests::inactive_floor_current_activity_catches_up_to_bank ... ok
+test shore_currents::tests::inward_basin_repairs_to_finite_bank_routes_without_rng_or_tile_changes ... ok
+test shore_currents::tests::legacy_destination_does_not_gain_bank_landings ... ok
+test shore_currents::tests::npc_is_washed_to_bank_without_following_player_controls ... ok
+test shore_currents::tests::occupied_final_bank_uses_only_available_adjacent_bank ... ok
+test startup::recovery_tests_r38::custom_generators_keep_single_attempt_contract ... ok
+test startup::recovery_tests_r38::failed_population_trial_leaves_no_ids_metrics_loot_or_ability_grants ... ok
+test startup::recovery_tests_r38::final_safety_gate_rejects_hazard_only_transition_routes ... ok
+test shore_currents::tests::actual_wait_washes_player_to_bank_and_reloads_exactly ... ok
+test startup::recovery_tests_r38::retry_classification_does_not_mask_configuration_or_invariants ... ok
+test startup::recovery_tests_r38::finite_exhaustion_and_fatal_failure_are_atomic ... ok
+test temporal::export_reuse_tests::export_cache_misses_on_public_endpoint_cursor_and_cow_mutations ... ok
+test temporal::export_reuse_tests::opening_guard_checks_external_headers_roots_order_dream_and_cursors ... ok
+test temporal::export_reuse_tests::recorded_inverse_number_spellings_and_cursor_misses_are_exact ... ok
+test temporal::export_reuse_tests::next_completed_turn_retains_prior_sealed_edge_but_external_edits_miss ... ok
+test temporal::export_reuse_tests::recorded_revert_matches_uncached_inverse_for_all_temporal_traces ... ok
+test temporal::export_reuse_tests::reused_endpoints_keep_all_legacy_patches_in_temporal_reference_traces ... ok
+test temporal::export_reuse_tests::shared_export_cache_concurrent_divergent_clones_are_exact ... ok
+test temporal::export_reuse_tests::reused_endpoints_match_legacy_export_for_zero_to_five_frames_and_reload ... ok
+test temporal::export_reuse_tests::warm_export_cache_checks_both_archive_cursor_keys ... ok
+test temporal::legacy_undefined_tests::missing_patch_value_restores_undefined_not_null ... ok
+test temporal::timeweave_history_tests::actual_hasted_move_has_no_pending_snapshot_and_resumes_phase ... ok
+test temporal::timeweave_history_tests::administrative_retired_history_cannot_emit_unloadable_checkpoint ... ok
+test temporal::timeweave_history_tests::checkpoint_borrows_new_state_and_owns_legacy_export_without_wire_change ... ok
+test temporal::timeweave_history_tests::failed_future_command_preserves_replay_metrics_and_current_state ... ok
+test temporal::timeweave_history_tests::future_preserves_phase_and_replay_without_retained_revert_state ... ok
+test temporal::timeweave_history_tests::invalid_administrative_trail_cannot_emit_unloadable_checkpoint ... ok
+test temporal::timeweave_history_tests::new_future_cannot_switch_recording_mechanics_revision ... ok
+test temporal::timeweave_history_tests::new_rules_capture_no_revert_snapshots_on_wait_free_save_or_reload ... ok
+test temporal::timeweave_history_tests::old_rules_still_capture_and_new_rules_reject_legacy_history ... ok
+test temporal::timeweave_history_tests::retired_activation_fails_without_mutation ... ok
+test timeweave::compact_wire_tests::strict_tuple_shape_types_and_bounds ... ok
+test timeweave::compact_wire_tests::tuple_serializer_rejects_information_losing_segment_shapes ... ok
+test timeweave::geometry_tests::geometry_checks_source_destination_plane_and_adjacent_cells ... ok
+test timeweave::geometry_tests::legacy_missing_allowed_but_present_or_null_requires_revision41 ... ok
+test timeweave::run_serde_tests::full_run_roundtrip_and_legacy_missing_omission ... ok
+test timeweave::tests::collision_removes_collided_and_older_only_then_appends_newest ... ok
+test timeweave::tests::identities_and_arrow_ownership_are_explicit ... ok
+test timeweave::tests::large_prefix_deletion_preserves_suffix_lookup_and_order ... ok
+test timeweave::tests::roundtrip_order_and_duplicate_rejection ... ok
+test timeweave::tests::shared_snapshot_detaches_without_mutating_old_order ... ok
+test tinker::revision50_tests::all_existing_grants_are_excluded_from_generation ... ok
+test tinker::revision50_tests::existing_jewelry_powers_do_not_block_tinker_and_legacy_stays_unchanged ... ok
+test tinker::revision50_tests::tinker_preserves_original_power_and_costs_exactly_one_payment ... ok
+test turn_schedule::tests::absent_due_does_not_touch_payloads_or_events ... ok
+test turn_schedule::tests::deterministic_roundtrip_and_clone ... ok
+test turn_schedule::tests::exact_phase_and_explicit_catch_up ... ok
+test turn_schedule::tests::exhaustion_is_transactional ... ok
+test turn_schedule::tests::rejects_invalid_serialized_state ... ok
+test turn_schedule::tests::renewal_does_not_accumulate_or_accept_stale_handle ... ok
+test turn_schedule::tests::stable_order_is_explicit_not_actor_id ... ok
+test validation::creature_identity_admission_tests::pilot_ids_are_reserved_and_legacy_cursor_preserved ... ok
+test validation::creature_identity_admission_tests::player_cannot_contain_a_mounted_pilot ... ok
+test validation::creature_identity_admission_tests::unique_safe_ids_and_counter_are_required ... ok
+test vision::lighting_cache_equivalence_tests::all_seeing_masks_preserve_no_lighting_shortcut ... ok
+test vision::lighting_cache_equivalence_tests::cache_reuses_clean_field_and_ignores_non_light_changes ... ok
+test vision::lighting_cache_equivalence_tests::clone_restore_and_sparse_exclusion_remain_exact ... ok
+test vision::lighting_cache_equivalence_tests::direct_mutations_and_planes_match_original_lighting_exactly ... ok
+test vision::lighting_cache_equivalence_tests::generated_visibility_mask_matches_reference_queries ... ok
+test vision::lighting_cache_equivalence_tests::varied_sources_and_opaque_edits_match_reference ... ok
+test vision::native_plane_tests::hidden_other_plane_cells_do_not_expose_current_terrain_hazards_or_sources ... ok
+test vision::native_plane_tests::native_memory_all_seeing_and_senses_need_a_native_endpoint_not_a_sleeping_body ... ok
+test vision::native_plane_tests::native_memory_mask_excludes_opposite_clone_only_visibility ... ok
+test vision::native_plane_tests::opposite_half_here_observes_native_geometry_hazards_and_lights_without_mutation ... ok
+test vision::native_plane_tests::player_plane_wins_when_both_half_here_views_see_the_tile ... ok
+test vision::scalar_light_culling_tests::detection_sample_matches_frozen_original ... ok
+test vision::scalar_light_culling_tests::scalar_light_culling_microbenchmark ... ignored, manual release-only quiet-window microbenchmark
+test vision::scalar_light_culling_tests::scalar_source_culls_match_frozen_original ... ok
+test vision::tests::dark_impossible ... ok
+test vision::tests::destination_wall_visible ... ok
+test witch::wording_tests::names_keep_one_article ... ok
+test temporal::export_reuse_tests::warm_export_cache_detects_debug_loadout_revision_changes ... ok
+
+failures:
+
+---- revision50_amulet_effects::tests::invalid_target_and_partial_payment_leave_energy_rng_and_ledger_untouched stdout ----
+
+thread 'revision50_amulet_effects::tests::invalid_target_and_partial_payment_leave_energy_rng_and_ledger_untouched' (1032) panicked at crates/corpse-core/src/revision50_amulet_effects.rs:495:54:
+assertion failed: admission(&r, &Command::UseAt { id: 1., x: 11., y: 10. }).unwrap().is_err()
+
+---- revision50_inventory::tests::special_categories_preserve_identity_and_have_unlimited_stack_space stdout ----
+
+thread 'revision50_inventory::tests::special_categories_preserve_identity_and_have_unlimited_stack_space' (1074) panicked at crates/corpse-core/src/revision50_inventory.rs:217:9:
+assertion `left == right` failed
+  left: 506
+ right: 507
+
+
+failures:
+    revision50_amulet_effects::tests::invalid_target_and_partial_payment_leave_energy_rng_and_ledger_untouched
+    revision50_inventory::tests::special_categories_preserve_identity_and_have_unlimited_stack_space
+
+test result: FAILED. 414 passed; 2 failed; 2 ignored; 0 measured; 0 filtered out; finished in 15.60s
+
+error: test failed, to rerun pass `-p corpse-core --lib`
+     Running tests/blood_weapon_commands.rs (../r50-optimized-target/debug/deps/blood_weapon_commands-0dbae946b13b567c)
+
+running 1 test
+test blood_weapon_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+
+     Running tests/revision50_ability_energy.rs (../r50-optimized-target/debug/deps/revision50_ability_energy-fca9d83c9deaf141)
+
+running 4 tests
+test missing_capacity_rejects_paid_activation_without_spending_player_energy ... ok
+test paid_activation_uses_its_reserve_without_player_energy ... ok
+test repeated_initialization_cannot_refresh_charge ... ok
+test upkeep_uses_reserve_then_exhausted_player_fallback ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/revision50_admission.rs (../r50-optimized-target/debug/deps/revision50_admission-7491ed32d89247b6)
+
+running 8 tests
+test revision50_all_twelve_starter_pools_keep_draws_and_initialize_every_selected_power ... ok
+test revision50_admission_rejects_skipped_future_fractional_and_nonfinite_revisions ... ok
+test revision50_debug_and_playtest_roundtrip_keep_explicit_replay_boundaries ... ok
+test revision50_deep_public_playtest_creation_loadout_and_save_admit_real_generated_worlds ... ok
+test revision50_deep_public_debug_creation_choices_stash_and_save_admit_real_generated_worlds ... ok
+test revision50_default_admission_never_upgrades_a_revision46_saved_run ... ok
+test revision50_engine_commands_restore_pools_terrain_status_and_weave_through_future ... ok
+test revision50_generated_avatar_blessed_unblessed_save_load_seed_replay_and_restart ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.56s
+
+     Running tests/revision50_amulet_energy.rs (../r50-optimized-target/debug/deps/revision50_amulet_energy-7e96ac5afc0a5a51)
+
+running 6 tests
+test exhausted_fallback_appropriate_and_legacy_deadline_never_blocks ... ok
+test free_credit_is_shared_and_invalid_stale_commit_is_unchanged ... ok
+test initial_fifty_is_once_only_never_equip_or_passive_refill ... ok
+test invalid_item_state_and_old_revision_are_rejected_without_mutation ... ok
+test partial_item_energy_splits_and_combined_insufficiency_rolls_back ... ok
+test raw_save_and_snapshot_restore_energy_and_shared_credit_together ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/revision50_bastidion.rs (../r50-optimized-target/debug/deps/revision50_bastidion-d488d8e4e5b4ce82)
+
+running 5 tests
+test amulet_only_cooldown_clarification_preserves_mask_and_enemy_lockouts ... ok
+test r50_live_emission_overrides_every_saved_gas_and_legacy_keeps_exact_mapping ... ok
+test r50_offscreen_save_snapshot_and_future_replay_emit_hallucinogenic_gas ... ok
+test r50_root_connections_keep_volume_and_recolor_old_saved_roots ... ok
+test r50_population_all_aliases_depths_and_seeds_skip_random_gas_selection ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.30s
+
+     Running tests/revision50_caster_births.rs (../r50-optimized-target/debug/deps/revision50_caster_births-f863ef431dd71555)
+
+running 4 tests
+test every_approved_kind_is_tagged_only_on_revision50_births ... ok
+test ordinary_population_births_and_nest_queen_use_explicit_revision ... ok
+test summons_keep_noncasters_and_existing_newborn_profiles ... ok
+test authored_trait_drives_telepathy_and_landed_terminal_strike ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/revision50_catalog.rs (../r50-optimized-target/debug/deps/revision50_catalog-868435f734c79462)
+
+running 2 tests
+test revision50_preserves_all_72_names_and_authorized_descriptions ... ok
+test revision50_identity_map_is_complete_unique_and_keeps_old_catalog ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/revision50_combat.rs (../r50-optimized-target/debug/deps/revision50_combat-649cff0c80f6676e)
+
+running 22 tests
+test commandment_paid_push_uses_reserve_with_empty_shared_bar ... ok
+test commandment_cannot_push_nonflying_enemy_into_chasm ... ok
+test commandment_restores_existing_forced_move_value ... ok
+test execute_strict_threshold_and_exact_cost_and_revision_gate ... ok
+test commandment_passive_one_active_max_and_insufficient_energy_fallback ... ok
+test force_does_not_silently_limit_attack_to_melee_distance ... ok
+test force_into_killed_target_square_runs_corpse_stomp ... ok
+test force_swaps_instead_of_pushing_nonflyer_over_chasm ... ok
+test force_pushes_else_swaps_and_old_revision_is_inert ... ok
+test masochism_crossings_rearm_after_healing_and_are_strict ... ok
+test masochism_common_damage_packet_hook_runs_once_for_four_crossings ... ok
+test masochism_is_passive_revision_gated_and_never_triggers_on_healing ... ok
+test masochism_multiple_thresholds_grant_ten_total_and_healing_rearms ... ok
+test masochism_uses_derived_maximum_and_does_not_shorten_longer_haste ... ok
+test missed_me_retreats_only_with_space_and_spends_no_reaction_if_trapped ... ok
+test oblivious_blocks_unseen_enemy_but_not_environment_or_ally ... ok
+test masochism_normal_and_haste_phase_share_existing_duration_clock ... ok
+test paid_combat_uses_its_own_reserve_and_missing_reserve_refuses_payment ... ok
+test rage_free_first_rescue_then_uses_own_reserve_and_legacy_stays_unchanged ... ok
+test replaced_debuff_and_counter_and_nightmare_are_inert ... ok
+test surrender_admission_and_payment_both_use_the_ability_reserve ... ok
+test witch_hatred_uses_explicit_trait_and_does_not_charge_execute ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/revision50_combat_rings.rs (../r50-optimized-target/debug/deps/revision50_combat_rings-8daf9b20ba76d20d)
+
+running 16 tests
+test allies_never_heal_player_and_actor_local_vampirism_heals_only_attacker ... ok
+test exact_offscreen_status_resistance_does_not_use_absent_player_rings ... ok
+test fire_resistance_does_not_prevent_ignition_or_change_terrain_or_other_actors ... ok
+test fire_and_poison_statuses_keep_duration_and_only_normal_turn_ticks ... ok
+test flight_crosses_chasms_water_and_currents_but_not_fire_gas_or_attacks ... ok
+test half_here_shares_combat_ring_owner_and_minime_decoys_inherit_none ... ok
+test fire_resistance_halves_final_packets_including_fractions_and_keeps_immunity ... ok
+test new_identities_are_fixed_worn_revision_gated_and_count_distinct_items ... ok
+test raw_save_and_snapshot_preserve_powers_and_independent_grants ... ok
+test poison_and_corrosion_resistances_are_distinct_and_do_not_mitigate_other_kinds ... ok
+test removing_last_flight_ring_settles_fall_immediately_but_preserves_other_flight ... ok
+test reverse_entropy_still_blocks_hostile_vampirism ... ok
+test reaping_equip_is_admitted_without_stranding_normal_or_haste_commands ... ok
+test vampirism_caps_hp_and_ignores_ranged_misses_and_zero_damage ... ok
+test vampirism_reads_old_draft_identity_but_displays_only_new_name ... ok
+test vampirism_heals_actual_melee_hp_loss_adds_fight_long_and_never_stacks ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/revision50_energy_lifecycle.rs (../r50-optimized-target/debug/deps/revision50_energy_lifecycle-f2d4b78b7a254181)
+
+running 8 tests
+test actual_revision50_starters_initialize_authored_reserves ... ok
+test canonical_owner_pays_for_half_here_and_dream_body_not_the_copied_pool ... ok
+test level_up_refills_dormant_blessings_never_player_or_amulet_and_roundtrips ... ok
+test offers_initialize_once_and_promotion_keeps_existing_charge ... ok
+test direct_equipment_rejects_retired_or_unknown_grants_before_any_mutation ... ok
+test pickup_initializes_dormant_grants_and_amulets_only_once ... ok
+test paid_activation_splits_remaining_charge_and_rejection_is_atomic ... ok
+test remember_copies_reserves_once_and_reacquiring_does_not_refill ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/revision50_environment_admission.rs (../r50-optimized-target/debug/deps/revision50_environment_admission-f093d22e6ba8628e)
+
+running 6 tests
+test explicit_caster_marker_is_inert_admission_only_at_revision50 ... ok
+test new_player_powers_do_not_admit_unrelated_hostile_or_allied_npcs ... ok
+test all_integrated_revision50_player_powers_pass_environment_admission ... ok
+test shared_player_endpoint_is_admitted_but_foreign_owner_is_not ... ok
+test valid_revision50_power_does_not_mask_an_unknown_later_power ... ok
+test revision50_power_admission_is_not_backported_to_legacy_revisions ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/revision50_future_reserve_guard.rs (../r50-optimized-target/debug/deps/revision50_future_reserve_guard-70d945a4b0bf5c32)
+
+running 5 tests
+test legacy_capture_preserves_all_shared_energy_payment ... ok
+test revision50_capture_drains_exactly_own_and_player_and_saves_paid_state ... ok
+test revision50_missing_or_invalid_payment_rejects_without_bookkeeping ... ok
+test revision50_reserve_only_capture_is_silenced_but_free_capture_and_return_are_not ... FAILED
+test revision50_raw_save_restore_preserves_paid_and_other_pools ... FAILED
+
+failures:
+
+---- revision50_reserve_only_capture_is_silenced_but_free_capture_and_return_are_not stdout ----
+
+thread 'revision50_reserve_only_capture_is_silenced_but_free_capture_and_return_are_not' (1349) panicked at crates/corpse-core/tests/revision50_future_reserve_guard.rs:56:60:
+called `Result::unwrap()` on an `Err` value: EngineError("Missing floor actor/ground block")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- revision50_raw_save_restore_preserves_paid_and_other_pools stdout ----
+
+thread 'revision50_raw_save_restore_preserves_paid_and_other_pools' (1348) panicked at crates/corpse-core/tests/revision50_future_reserve_guard.rs:67:63:
+called `Result::unwrap()` on an `Err` value: StorageError("Missing floor actor/ground block")
+
+
+failures:
+    revision50_raw_save_restore_preserves_paid_and_other_pools
+    revision50_reserve_only_capture_is_silenced_but_free_capture_and_return_are_not
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p corpse-core --test revision50_future_reserve_guard`
+     Running tests/revision50_ice_immunity.rs (../r50-optimized-target/debug/deps/revision50_ice_immunity-7da348b47e088618)
+
+running 8 tests
+test half_here_and_actor_local_footing_use_the_correct_equipment_owner ... ok
+test ice_immunity_prevents_slip_without_rng_or_terrain_changes_and_removal_restores_it ... ok
+test chill_preserves_portal_distance_and_plane_rules ... ok
+test immunity_keeps_beneficial_snow_quenching_and_does_not_melt_ice ... ok
+test only_worn_authored_r50_identity_prevents_yeti_chill ... ok
+test protected_action_and_haste_clocks_do_not_receive_yeti_delay ... ok
+test witchcraft_and_other_statuses_are_not_ice_and_are_not_cleared ... ok
+test raw_save_and_snapshot_restore_keep_both_immunities_and_determinism ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/revision50_item_knowledge.rs (../r50-optimized-target/debug/deps/revision50_item_knowledge-53450ceda88fd41a)
+
+running 6 tests
+test r50_item_knowledge_diluted_values_and_fixed_footprints_match_effects ... ok
+test r50_item_knowledge_drink_throw_and_restore_never_discover_items ... ok
+test r50_item_knowledge_legacy_discovery_remains_unchanged ... ok
+test r50_item_knowledge_all_potions_are_known_without_mutating_save_or_rng ... ok
+test r50_item_knowledge_pickup_and_drop_logs_use_the_canonical_name ... ok
+test r50_item_knowledge_names_saved_jewelry_without_renaming_it ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/revision50_mini_me.rs (../r50-optimized-target/debug/deps/revision50_mini_me-b2472397a8e60b01)
+
+running 5 tests
+test fractional_snapshot_exception_does_not_change_ordinary_or_historical_base_rounding ... ok
+test actual_wait_and_dismiss_keep_copy_independent_without_ability_upkeep ... ok
+test missing_reserve_and_blocked_spawn_never_create_or_charge ... FAILED
+test real_activation_spends_own_reserve_and_creates_stats_only_ally ... ok
+test real_activation_copies_exact_fractional_stats_without_live_sustain_or_rerounding ... ok
+
+failures:
+
+---- missing_reserve_and_blocked_spawn_never_create_or_charge stdout ----
+
+thread 'missing_reserve_and_blocked_spawn_never_create_or_charge' (1369) panicked at crates/corpse-core/tests/revision50_mini_me.rs:78:9:
+assertion `left == right` failed
+  left: (5.0, 61.0, Value({"kative-mini-me": AbilityReserve { capacity: 50.0, energy: 50.0 }}))
+ right: (5.0, 61.0, Missing)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    missing_reserve_and_blocked_spawn_never_create_or_charge
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p corpse-core --test revision50_mini_me`
+     Running tests/revision50_nightmares.rs (../r50-optimized-target/debug/deps/revision50_nightmares-6b52d1da82cb860c)
+
+running 11 tests
+test decoys_do_not_follow_stairs_or_fall_through_terrain ... ok
+test blocked_curse_does_not_dissolve_and_immediate_blast_does ... ok
+test decoys_never_execute_enemy_special_actions ... ok
+test direct_breath_and_ruin_pulse_dissolve_but_lingering_fire_does_not ... ok
+test independent_serialized_actor_and_multiple_decoys ... ok
+test occupied_decoy_square_is_rejected_before_spending ... ok
+test passive_fire_and_biological_statuses_do_not_affect_hallucination ... ok
+test recharge_on_hundredth_normal_turn_persists_through_save ... ok
+test resolved_curse_projectile_dissolves_and_preserves_caster_cost_and_recovery ... ok
+test strike_removes_only_decoy_without_rewards_or_shared_damage ... ok
+test invalid_activation_is_atomic_including_bad_birth_cursor ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/revision50_player_attack.rs (../r50-optimized-target/debug/deps/revision50_player_attack-c989e74c7d75bac1)
+
+running 9 tests
+test balance_admission_does_not_open_unimplemented_intermediate_revisions ... ok
+test explicit_ranged_damage_is_identical_across_player_baseline_revision ... ok
+test main_and_generic_player_strikes_share_the_revisioned_base ... ok
+test revision50_copies_greatsword_baseline_without_stale_offhand ... ok
+test revision50_early_ruin_packets_keep_the_existing_forgiving_start ... ok
+test revision50_internal_floor_generation_keeps_existing_layouts ... ok
+test revision50_natural_birth_profiles_and_plans_preserve_revision46_except_authored_gas ... FAILED
+test revision50_preserves_latest_physical_profiles_without_new_retuning ... ok
+test revision50_actual_witch_and_queen_births_keep_parent_specific_profiles ... ok
+
+failures:
+
+---- revision50_natural_birth_profiles_and_plans_preserve_revision46_except_authored_gas stdout ----
+
+thread 'revision50_natural_birth_profiles_and_plans_preserve_revision46_except_authored_gas' (1392) panicked at crates/corpse-core/tests/revision50_player_attack.rs:118:9:
+assertion `left == right` failed: horn-1 constructor
+  left: Actor { reaping_ledger: Missing, amulet_ledger: Missing, ability_reserves: Missing, copied_inventory: Missing, creature_kind: Value("horn-1"), zillennia_quality: Missing, monster_state: Missing, id: 77.0, x: 2.0, y: 3.0, name: "Unicorn", glyph: "1", color: "#9481ae", hp: 160.0, max_hp: 160.0, base_max_hp: Missing, energy: 100.0, stats: Stats { offense: 30.625, defense: 10.0, accuracy: 41.0, dodge: 43.0, dr: 0.0, perception: 60.0, max_energy: 100.0, max_hp: Missing }, state: "wandering", perfect: Missing, order: Missing, last_seen: Missing, heartless: Missing, born_from_birther: Missing, dead: Missing, corpse_age: Missing, abilities: ["enemy:beast:horn-bolt", "enemy:beast:magickal-caster"], equipment_abilities: Missing, ability_order: Missing, active: [], conditions: {"bestiaryTraitsInitialized": 1.0, "stealth": 2.0}, blood: Missing, damage_bank: Missing, nightmares: Missing, reactions: Missing, adaptive_dr: Missing, adaptive_hearts: Missing }
+ right: Actor { reaping_ledger: Missing, amulet_ledger: Missing, ability_reserves: Missing, copied_inventory: Missing, creature_kind: Value("horn-1"), zillennia_quality: Missing, monster_state: Missing, id: 77.0, x: 2.0, y: 3.0, name: "Unicorn", glyph: "1", color: "#9481ae", hp: 160.0, max_hp: 160.0, base_max_hp: Missing, energy: 100.0, stats: Stats { offense: 30.625, defense: 10.0, accuracy: 41.0, dodge: 43.0, dr: 0.0, perception: 60.0, max_energy: 100.0, max_hp: Missing }, state: "wandering", perfect: Missing, order: Missing, last_seen: Missing, heartless: Missing, born_from_birther: Missing, dead: Missing, corpse_age: Missing, abilities: ["enemy:beast:horn-bolt"], equipment_abilities: Missing, ability_order: Missing, active: [], conditions: {"bestiaryTraitsInitialized": 1.0, "stealth": 2.0}, blood: Missing, damage_bank: Missing, nightmares: Missing, reactions: Missing, adaptive_dr: Missing, adaptive_hearts: Missing }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    revision50_natural_birth_profiles_and_plans_preserve_revision46_except_authored_gas
+
+test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+
+error: test failed, to rerun pass `-p corpse-core --test revision50_player_attack`
+     Running tests/revision50_player_power_admission.rs (../r50-optimized-target/debug/deps/revision50_player_power_admission-76ddcfd05480719b)
+
+running 6 tests
+test borrowed_passive_traits_npcs_and_special_item_identities_are_not_catalog_migrated ... ok
+test every_retired_player_identity_rejects_before_wait_bookkeeping ... ok
+test all_current_blessings_and_temporal_future_remain_admitted ... ok
+test retired_active_ids_reject_even_when_not_present_in_owned_abilities ... ok
+test shared_endpoint_and_copy_reject_retired_powers_without_rejecting_current_ids ... ok
+test legacy_power_admission_is_unchanged ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/revision50_preserved_edges.rs (../r50-optimized-target/debug/deps/revision50_preserved_edges-ea324cfdcb6f648e)
+
+running 12 tests
+test dream_sparkle_uses_only_its_current_plane_on_noncombustible_terrain ... ok
+test haste_and_came_and_pursuit_moves_finish_actions_without_world_turns ... ok
+test legacy_sparkle_keeps_terrain_filter_and_ordinary_fire_keeps_it_in_r50 ... ok
+test ordinary_consumption_and_action_abilities_expire_reveal ... ok
+test preexisting_future_and_raw_save_preserve_reveal ... ok
+test reveal_persists_through_explicitly_no_action_commands_and_failed_actions ... ok
+test reveal_stays_active_through_final_observation_of_a_bonus_action ... ok
+test sparkle_accepts_every_visible_terrain_and_ignites_immediately ... ok
+test sparkle_admits_occupied_squares_and_reveal_shows_hidden_creatures ... ok
+test future_save_load_and_seed_replay_restore_reveal_then_expire_it_once ... ok
+test weave_movement_expires_reveal_and_snapshot_restoration_keeps_original_boundary ... ok
+test sparkle_rejects_unseen_invalid_and_unfunded_targets_without_mutation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests/revision50_reaping.rs (../r50-optimized-target/debug/deps/revision50_reaping-85ecee5a325f43ff)
+
+running 16 tests
+test allies_neutral_self_and_allied_sources_do_not_generate_player_credit ... ok
+test caps_waste_whole_awards_but_retain_subtwenty_remainder ... ok
+test damage_over_time_hazards_and_bonded_secondary_packets_never_count ... ok
+test fractional_damage_overkill_and_multiple_whole_awards_are_exact ... ok
+test half_here_uses_owner_items_and_single_owner_carry_but_mini_me_and_clay_do_not ... ok
+test immediate_ruin_cast_counts_but_an_allied_caster_does_not ... ok
+test invalid_ledgers_and_old_revisions_are_rejected_and_legacy_damage_does_not_accrue ... ok
+test immunity_fated_duel_and_damage_reduction_do_not_create_phantom_credit ... ok
+test nineteen_then_one_across_turns_rewards_every_owned_amulet_once ... ok
+test melee_ranged_and_execute_credit_only_actual_positive_hp_removed ... FAILED
+test one_lightning_activation_credits_each_hostile_hit_and_the_spent_source_amulet ... ok
+test rescued_target_awards_gross_removed_hp_not_overkill_or_net_postrescue_loss ... ok
+test retained_damage_math_handles_finite_extremes_without_per_energy_work ... ok
+test simultaneous_multitarget_blast_keeps_original_source_even_after_self_death ... ok
+test unworn_ring_stops_accrual_without_resetting_existing_carry ... ok
+test raw_save_snapshot_and_timeweave_keep_carry_without_recharge_or_replay ... ok
+
+failures:
+
+---- melee_ranged_and_execute_credit_only_actual_positive_hp_removed stdout ----
+
+thread 'melee_ranged_and_execute_credit_only_actual_positive_hp_removed' (1423) panicked at crates/corpse-core/tests/revision50_reaping.rs:122:48:
+assertion failed: engine::actor(&r, 901.).unwrap().dead.value_or(false)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    melee_ranged_and_execute_credit_only_actual_positive_hp_removed
+
+test result: FAILED. 15 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+error: test failed, to rerun pass `-p corpse-core --test revision50_reaping`
+     Running tests/revision50_release_boundaries.rs (../r50-optimized-target/debug/deps/revision50_release_boundaries-958de384a878f64b)
+
+running 8 tests
+test additional_grants_validate_without_losing_primary_or_accepting_duplicates ... ok
+test copied_trait_reserves_and_nested_grants_use_their_own_context ... ok
+test current_grants_are_revision_scoped_unknown_ids_fail_and_old_provenance_survives ... ok
+test more_than_100_worn_jewels_preserve_save_while_other_entry_bounds_remain ... ok
+test reserve_ids_and_numbers_validate_without_inventing_missing_capacities ... ok
+test starter_replacements_preserve_every_position_and_weight ... ok
+test unlimited_special_inventory_roundtrips_without_loosening_finite_categories ... ok
+test all_72_current_ids_validate_as_generated_primary_and_equipment_grants ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.96s
+
+     Running tests/revision50_reserve_finish.rs (../r50-optimized-target/debug/deps/revision50_reserve_finish-1192eff84929c369)
+
+running 3 tests
+test legacy_finish_ignores_future_reserve_fields ... ok
+test exhausted_reserve_uses_shared_affordability_at_finish ... ok
+test reserve_funded_active_modes_survive_real_free_command_finish ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/revision50_ring_lighting.rs (../r50-optimized-target/debug/deps/revision50_ring_lighting-d5a8dc720ae58de0)
+
+running 6 tests
+test additive_light_reduces_absolute_darkness_aura_and_does_not_duplicate_shared_bodies ... ok
+test light_and_stealth_restore_and_remain_revision_gated ... ok
+test light_is_additive_without_falloff_and_excludes_entire_wearer_tile ... ok
+test light_stays_in_the_wearers_plane ... ok
+test stealth_only_multiplies_negative_actor_light_once ... ok
+test light_respects_walls_doors_portals_and_same_tick_cache_changes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/revision50_rings.rs (../r50-optimized-target/debug/deps/revision50_rings-3eea758bb15b64c6)
+
+running 11 tests
+test actor_local_equipment_does_not_leak_to_minime_decoys_or_ordinary_actors ... ok
+test duplicate_fixed_powers_do_not_stack_or_remove_separate_tinker_grants ... ok
+test exact_inactive_catchup_uses_actor_rings_without_healing_absent_player ... ok
+test existing_drown_and_creature_regeneration_multipliers_still_apply ... ok
+test half_here_uses_owner_rings_and_one_regeneration_tick_with_water_endpoint ... ok
+test identity_requires_authored_effect_ring_wearing_and_revision ... ok
+test normal_combat_regenerates_but_haste_bonus_movement_does_not ... ok
+test regeneration_never_refills_player_or_blessing_energy_and_caps_hp ... ok
+test reverse_entropy_still_suppresses_a_hostile_ring_wearer ... ok
+test regeneration_is_point_four_percent_only_when_worn_and_keeps_legacy_rate ... ok
+test ring_identity_and_power_survive_raw_save_and_snapshot_restore ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/revision50_runtime_paths.rs (../r50-optimized-target/debug/deps/revision50_runtime_paths-014853ce1cffd0a3)
+
+running 23 tests
+test duel_dispatch_uses_fixed_five_by_five_square_and_only_exempts_chosen_enemy ... ok
+test duel_actual_attack_blocks_outsider_without_rng_but_allows_selected_enemy ... ok
+test duel_haste_movement_does_not_charge_an_extra_upkeep_turn ... ok
+test duel_leaving_area_expires_before_exit_turn_upkeep_and_does_not_reactivate_on_return ... ok
+test duel_invalid_admission_and_floor_change_do_not_leave_protection_active ... ok
+test duel_pays_three_per_world_turn_without_energy_regeneration_and_expires_unfunded ... ok
+test implant_can_choose_the_player_as_the_adjacent_creature ... ok
+test implant_dispatch_spends_fifteen_and_one_action_for_the_selected_immediate_attack ... ok
+test implant_exact_fifteen_energy_is_sufficient_and_leaves_zero ... ok
+test implant_insufficient_energy_and_silence_reject_before_payment_or_attack ... ok
+test implant_missing_reserve_never_silently_falls_back_to_player_energy ... ok
+test implant_uses_its_explicit_own_reserve_even_with_zero_player_energy ... ok
+test nightmare_actual_melee_miss_retains_decoy_and_landed_zero_damage_strike_dissolves_it ... ok
+test nightmare_dispatch_creates_an_independent_decoy_without_advancing_actor_clocks ... ok
+test nightmare_is_targeted_by_actual_enemy_turn_and_disappears_without_a_reward ... ok
+test implant_invalid_target_or_nonadjacent_victim_is_atomic ... ok
+test nightmare_ranged_miss_retains_and_landed_projectile_dissolves_decoy ... ok
+test pursuit_attack_displacement_from_unstoppable_force_never_earns_credit ... ok
+test pursuit_blocked_bonus_move_preserves_credit_and_does_not_tick_or_draw_rng ... ok
+test pursuit_bonus_cannot_make_an_attack_free_or_resolve_it_twice ... ok
+test pursuit_dispatch_grants_exactly_one_movement_only_credit_per_world_turn ... ok
+test pursuit_bonus_round_trips_and_does_not_repeat_a_world_or_haste_phase ... ok
+test pursuit_wait_is_an_ordinary_turn_and_discards_unused_credit ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/revision50_stat_status_rings.rs (../r50-optimized-target/debug/deps/revision50_stat_status_rings-ebba96e9e0c60340)
+
+running 21 tests
+test actor_local_powers_exclude_decoys_and_minime_keeps_only_its_frozen_numeric_stats ... ok
+test enemy_curses_round_up_without_reducing_existing_longer_timers_or_potency ... ok
+test equipping_and_removing_only_change_new_applications_and_live_stats ... ok
+test authored_witch_and_bloodmancer_curses_are_reduced_at_the_spell_boundary ... ok
+test half_here_keeps_status_local_and_uses_owner_rings_once ... ok
+test haste_movement_does_not_retick_or_rehalve_applied_statuses ... ok
+test mental_duration_rounds_up_fractional_incoming_durations_and_never_stacks ... ok
+test offscreen_status_clocks_keep_reduced_application_and_exact_sustain_magnitude ... ok
+test ordinary_slow_poison_physical_paralysis_and_silence_do_not_shorten ... ok
+test protection_and_slaying_add_four_once_without_accuracy_or_quality_scaling ... ok
+test gas_confusion_and_hallucination_halve_without_source_or_rng_changes ... ok
+test protection_uses_ordinary_dr_and_does_not_change_bypassing_packets ... ok
+test self_or_allied_curses_are_not_enemy_curses_but_hostile_recipients_can_resist ... ok
+test slaying_changes_live_offense_strikes_without_changing_hit_rolls ... ok
+test sustain_equip_removal_and_health_timer_changes_rederive_without_mutating_debuffs ... ok
+test sustain_halves_all_eight_timed_stat_reductions_with_exact_fractions ... ok
+test sustain_halves_self_weakness_and_enemy_penalties_without_shortening_timers ... ok
+test sustain_preserves_base_equipment_untimed_penalties_and_item_rounding ... ok
+test raw_snapshot_and_preexisting_future_preserve_applied_durations_without_rehalving ... ok
+test sustain_uses_owner_defensive_buffs_endpoint_offense_and_frozen_minime_stats ... ok
+test sustain_snapshot_restores_ring_debuff_magnitude_and_duration ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/revision50_tinker_history.rs (../r50-optimized-target/debug/deps/revision50_tinker_history-9a6c018634384bda)
+
+running 4 tests
+test every_legacy_revision_keeps_exact_id_exclusion_and_pool_order ... ok
+test historical_exclusion_keeps_the_existing_two_draw_activation_and_payment ... ok
+test old_new_and_duplicate_provenance_have_the_same_ordered_candidates ... ok
+test every_explicit_replacement_is_excluded_by_historical_identity_without_mutation ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+error: 5 targets failed:
+    `-p corpse-core --lib`
+    `-p corpse-core --test revision50_future_reserve_guard`
+    `-p corpse-core --test revision50_mini_me`
+    `-p corpse-core --test revision50_player_attack`
+    `-p corpse-core --test revision50_reaping`

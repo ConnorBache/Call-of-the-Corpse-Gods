@@ -1,0 +1,16 @@
+
+running 11 tests
+test living_occupancy_blocks_contact_instead_of_erasing_or_killing_anybody ... ok
+test initial_current_tile_clears_without_motion_and_dead_zillennia_do_not_clear ... ok
+test float_away_displacement_also_resolves_ground_contact ... ok
+test ordinary_arrival_clears_all_loose_items_but_not_corpses_loot_inventory_or_adjacent_tiles ... ok
+test cleared_cover_spares_existing_gas_and_empty_contact_is_a_true_noop ... ok
+test real_startup_population_clears_a_deep_zillennia_spawn_tile ... ok
+test forced_current_and_haste_paths_clear_only_arrival_tiles ... ok
+test offscreen_catchup_preserves_knowledge_until_the_cell_is_observed_again ... ok
+test water_ichor_topology_structures_and_environment_are_untouched ... ok
+test quality_cutoff_is_greater_not_current_depth_and_legacy_is_unchanged ... ok
+test save_revert_future_and_replay_restore_the_same_erasure_state ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

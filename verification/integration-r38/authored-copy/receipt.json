@@ -1,0 +1,102 @@
+{
+  "revision": "r38",
+  "user_message_id": "Sentinel_9d362f1015a08191ac62845e4c44fdd8",
+  "applied_batch_sequences": [
+    1,
+    2,
+    3,
+    4,
+    10
+  ],
+  "pending_batch_sequences": [
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "changes": [
+    {
+      "file": "crates/corpse-core/src/new_creatures.rs",
+      "old": "The Saidribee Queen summons Saidribees. Royal Honey lies in her chamber.",
+      "new": "Queens such as this take care of their nests, spawning new young and weaving royal jelly to nourish them."
+    },
+    {
+      "file": "crates/corpse-desktop/assets/manual.json",
+      "old": "The Saidribee Queen summons Saidribees. Royal Honey lies in her chamber.",
+      "new": "Queens such as this take care of their nests, spawning new young and weaving royal jelly to nourish them."
+    },
+    {
+      "file": "crates/corpse-desktop/src/ability_ui.rs",
+      "old": "Toggle Dreamwalking. Leave your sleeping body behind to enter the dream plane; toggle again to return to your body. Normal-plane creatures cannot touch your projection, but can attack your sleeping body.",
+      "new": "Toggle Dreamwalking. Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake."
+    },
+    {
+      "file": "crates/corpse-desktop/src/ability_ui.rs",
+      "old": "Return from Dreamwalking to your sleeping body. Your projection cannot touch normal-plane creatures, but your sleeping body remains vulnerable.",
+      "new": "Awake from the realm of dreams."
+    },
+    {
+      "file": "crates/corpse-desktop/src/ability_ui.rs",
+      "old": "format!(\"Granted while the Mask of Trickery is in your inventory. Teleport to a random standable spot on this floor. Cooldown: 100 turns. {}\",\n            if cooldown > 0 { format!(\"Ready in {cooldown} turns.\") } else { \"Ready now.\".into() })",
+      "new": "\"Teleport to a random location on the floor.\".into()"
+    },
+    {
+      "file": "crates/corpse-core/src/borge.rs",
+      "old": "First strike the Borge to learn its demand.",
+      "new": "Strike the Borge to learn it's demand."
+    },
+    {
+      "file": "crates/corpse-core/src/ahvamitt.rs",
+      "old": "Grants Teleport while carried: teleport to a random standable spot on this floor. Cooldown: 100 turns.",
+      "new": "Grants Teleport while in your inventory."
+    },
+    {
+      "file": "crates/corpse-desktop/src/pack.rs",
+      "old": "        let cooldown=corpse_core::ahvamitt::cooldown(run);\n        return format!(\"{}\\nGrants Teleport while carried in your inventory; no need to equip it. Teleport to a random standable spot on this floor. Cooldown: 100 turns.\\n{}\",\n            i.name, if cooldown>0 {format!(\"Ready in {cooldown} turns.\")} else {\"Ready now.\".into()});",
+      "new": "        return format!(\"{}\\nGrants Teleport while in your inventory.\", i.name);"
+    }
+  ],
+  "additional_mask_description": {
+    "replacement_id": "R38-USER-MASK-DESCRIPTION",
+    "context": "Mask of Trickery item description (additional to queued Teleport ability)",
+    "user_replacement": "Grants Teleport while in your inventory.",
+    "user_message_id": "Sentinel_9d362f1015a08191ac62845e4c44fdd8",
+    "status": "applied_r38",
+    "applied_revision": "r38",
+    "counting_note": "Not one of 69 confirmed definite queue originals; two previously unclassified source variants replaced by one user-authored description.",
+    "occurrences": [
+      {
+        "file": "crates/corpse-core/src/ahvamitt.rs",
+        "old": "Grants Teleport while carried: teleport to a random standable spot on this floor. Cooldown: 100 turns.",
+        "new": "Grants Teleport while in your inventory.",
+        "line": 16,
+        "audit_id": "TEXT-0275",
+        "original_authorship": "unresolved",
+        "current_authorship": "user_authored"
+      },
+      {
+        "file": "crates/corpse-desktop/src/pack.rs",
+        "old": "        let cooldown=corpse_core::ahvamitt::cooldown(run);\n        return format!(\"{}\\nGrants Teleport while carried in your inventory; no need to equip it. Teleport to a random standable spot on this floor. Cooldown: 100 turns.\\n{}\",\n            i.name, if cooldown>0 {format!(\"Ready in {cooldown} turns.\")} else {\"Ready now.\".into()});",
+        "new": "        return format!(\"{}\\nGrants Teleport while in your inventory.\", i.name);",
+        "line": 1499,
+        "audit_id": "TEXT-2839",
+        "original_authorship": "unresolved",
+        "current_authorship": "user_authored"
+      }
+    ]
+  },
+  "user_original_instructions": "1. Queens such as this take care of their nests, spawning new young and weaving royal jelly to nourish them.\n\n2. Change dream plane to \"Realm of Dreams.\" Then say \"Toggle again to awake.\" And then cut the rest out.\n\n3. \"Awake from the realm of dreams.\"\n\n4. The description of \"mask of trickery\" should be \"Grants Teleport while in your inventory.\"\n\nThe text of Teleport should be \"Teleport to a random location on the floor.\"\n\n10. \"Strike the Borge to learn it's demand.\"",
+  "resolution_acknowledgement": {
+    "message_id": "Sentinel_0760f2c686d88191ae28d73e8ddb3b82",
+    "dreamwalk_description": "Toggle Dreamwalking. Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake."
+  },
+  "applied_queue_ids": [
+    "REPLACE-3e507ec956fd",
+    "REPLACE-a5b52ebc2224",
+    "REPLACE-fcc8bf51575d",
+    "REPLACE-26090b05246f",
+    "REPLACE-b8ca2c93821f"
+  ],
+  "mechanics_preservation": "100-turn cooldown constant and teleport implementation unchanged; separate UI cost/state and action blockers retained. No global dream-plane rename or mechanical Royal Honey rename."
+}

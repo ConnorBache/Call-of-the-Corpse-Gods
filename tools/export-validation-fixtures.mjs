@@ -1,0 +1,18 @@
+import fs from'node:fs';import{deserialize}from'../../release-v48/source/call-of-the-corpse-gods/dist/src/persistence.js';
+const initial=JSON.parse(fs.readFileSync(new URL('../fixtures/avatar-room-v1.json',import.meta.url),'utf8'));const cases=[];const add=(name,path,value)=>{const run=structuredClone(initial);let p=run;for(const k of path.slice(0,-1))p=p[k];p[path.at(-1)]=value;let accepted=true;try{deserialize(JSON.stringify(run));}catch{accepted=false;}cases.push({name,path,value,accepted});};
+add('negative player coordinate',['player','x'],-1);add('fractional actor coordinate',['actors','1',0,'y'],14.5);add('zero quantity',['inventory',0,'quantity'],0);add('nonstack weapon',['inventory',0,'quantity'],2);add('log classification mismatch',['logKinds'],[]);add('archive invalid event',['logArchive','events'],[9999]);add('history prototype key',['history'],[JSON.stringify({groups:[[{path:['__proto__','x'],value:1}]],future:null})]);add('history excessive array',['history'],[JSON.stringify({groups:[[{path:['floors'],length:100001}]],future:null})]);add('stale width metadata',['floors',0,'width'],0);add('incomplete roots grid',['floors',0,'roots'],[1]);add('invalid current',['floors',0,'currents'],Array(2291).fill(9));add('bad resource meter',['resourceHistory'],{tick:0,depth:1,actors:{0:{hp:{start:100,max:100,loss:-1}}}});add('negative blessing count',['runStats','blessingsReceived'],-1);add('memory noncanonical depth',['rememberedItems'],{'01':[]});add('invalid magic nature',['inventory',0,'magicNature'],'evil');add('bad base bonus',['inventory',0,'baseBonus'],{defense:null});add('bad adaptive heart',['player','adaptiveHearts'],{Jackal:6});add('duplicate acquired order',['player','abilityOrder'],['anavani-illuminate','anavani-illuminate']);add('negative vent countdown',['floors',0,'vents'],[{at:1,gas:'steam',countdown:-1,phase:'waiting'}]);add('bad door burning',['floors',0,'doors'],{'1':{open:true,burning:-1}});add('valid sparse door',['floors',0,'doors'],{'1':{open:true,burning:0}});add('valid root absence',['floors',0,'roots'],Array(2291).fill(0));
+add('invalid sap flag',['veridianSapHarvested'],null);
+add('unknown creature kind',['actors','1',0,'creatureKind'],'invented');
+add('valid legacy creature kind',['actors','1',0,'creatureKind'],'Vent Fungus');
+add('invalid equipment grant',['inventory',0,'grantedAbility'],'not-authored');
+add('invalid tinkering grant',['inventory',0,'tinkered'],true);
+add('duplicate generated grants',['generatedAbilityGrants'],['anavani-illuminate','anavani-illuminate']);
+add('unknown generated grants',['generatedAbilityGrants'],['not-authored']);
+add('invalid hazard snapshot',['floors',0,'rememberedHazards'],{'1':{fire:-1}});
+add('unknown family',['floors',0,'enemyFamilies'],['invented']);
+add('duplicate families',['floors',0,'enemyFamilies'],['pale','pale']);
+add('valid families',['floors',0,'enemyFamilies'],['pale','slime']);
+add('invalid event flag',['floors',0,'godbeastEvent'],{kind:'Mercuria',x:10,y:10,room:{left:8,right:12,top:8,bottom:12},activated:null});
+add('invalid event fish cap',['floors',0,'godbeastEvent'],{kind:'Mercuria',x:10,y:10,room:{left:8,right:12,top:8,bottom:12},fishSpawned:11});
+add('valid event',['floors',0,'godbeastEvent'],{kind:'Mercuria',x:10,y:10,room:{left:8,right:12,top:8,bottom:12},fishSpawned:10});
+fs.writeFileSync(new URL('../fixtures/validation.json',import.meta.url),JSON.stringify(cases));console.log(cases.length,'validation cases',cases.filter(x=>x.accepted).length,'accepted');

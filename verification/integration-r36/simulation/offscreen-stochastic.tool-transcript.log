@@ -1,0 +1,16 @@
+Evidence source: retained exec/write_stdin tool output, transcribed verbatim below.
+This is a tool-output transcript, not an original shell tee/log file.
+
+Command: CARGO_INCREMENTAL=0 CARGO_PROFILE_TEST_OPT_LEVEL=2 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true tools/cargo.sh test -p corpse-core --lib offscreen_stochastic --locked -- --nocapture
+Exec session: 71220
+Observed completion: 2026-10-28 15:09:06 UTC
+Exit code: 0
+Scope: earlier implementation snapshot; later source edits require aggregate rerun.
+
+    Finished `test` profile [optimized] target(s) in 34.45s
+     Running unittests src/lib.rs (target/debug/deps/corpse_core-22ef95f16f60b69b)
+
+running 1 test
+test offscreen::portal_traversal_tests::offscreen_stochastic_pursuit_replans_both_returns_without_telefrag ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 75 filtered out; finished in 0.01s

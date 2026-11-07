@@ -1,0 +1,13 @@
+test_build_requires_freeze (__main__.CheckpointToolTests.test_build_requires_freeze) ... ok
+test_end_to_end_unchanged_restore_and_snapshot (__main__.CheckpointToolTests.test_end_to_end_unchanged_restore_and_snapshot) ... ok
+test_exclusion_and_sensitive_paths (__main__.CheckpointToolTests.test_exclusion_and_sensitive_paths) ... ok
+test_manifest_delta_and_inventory (__main__.CheckpointToolTests.test_manifest_delta_and_inventory) ... ok
+test_rejects_symlink_and_credentials (__main__.CheckpointToolTests.test_rejects_symlink_and_credentials) ... ok
+test_secret_signatures_do_not_echo_values (__main__.CheckpointToolTests.test_secret_signatures_do_not_echo_values) ... ok
+test_stale_evidence_and_nested_outputs_rejected (__main__.CheckpointToolTests.test_stale_evidence_and_nested_outputs_rejected) ... ok
+test_unsafe_paths (__main__.CheckpointToolTests.test_unsafe_paths) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.176s
+
+OK

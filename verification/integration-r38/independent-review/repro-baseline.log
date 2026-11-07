@@ -1,0 +1,4 @@
+seed=r37-event-count-0047 depth=20 godbeast=Veridian tap=(10, 18) tile=up
+seed=r37-event-count-0047 result=Err("Required generated item invalid/occupied on floor20") retained=0
+seed=生成-é-🌱-35 depth=35 godbeast=Veridian tap=(26, 18) tile=down
+seed=生成-é-🌱-35 result=Err("Required generated item invalid/occupied on floor35") retained=0

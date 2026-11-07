@@ -1,0 +1,293 @@
+--- a/crates/corpse-core/src/temporal.rs
++++ b/crates/corpse-core/src/temporal.rs
+@@ -44,6 +44,37 @@
+         }
+         Ok(v)
+     }
++    /// Exact snapshot-equivalence guard for identity reuse. O(R + M) time and
++    /// O(R + M) scratch for R large-block handles and M serialized metadata bytes.
++    /// Never descends into physical/dream floors or actor/ground block payloads.
++    /// Different COW identities conservatively miss even when their values match.
++    fn same_boundary(&self, other: &Snapshot) -> Result<bool> {
++        let _timing = crate::timing::span("history.opening_identity_guard");
++        if self.cursor != other.cursor
++            || !same_arc_array(&self.state.floors, &other.state.floors)
++            || !same_arc_map(&self.state.actors, &other.state.actors)
++            || !same_arc_map(&self.state.ground, &other.state.ground) {
++            return Ok(false);
++        }
++        let both_dream = match (self.state.dreamwalking.as_ref(), other.state.dreamwalking.as_ref()) {
++            (Some(a), Some(b)) if same_arc_array(&a.floors, &b.floors) => true,
++            (None, None) => false,
++            _ => return Ok(false),
++        };
++        // Future is already canonical text: compare its exact Option/string bytes
++        // rather than escaping a potentially multi-megabyte anchor twice. None
++        // and Some("") remain different. All other nullable fields stay serialized.
++        if self.state.future != other.state.future { return Ok(false); }
++        let mut a = snapshot_header(self, both_dream);
++        let mut b = snapshot_header(other, both_dream);
++        a.future = None;
++        b.future = None;
++        // Byte comparison also checks ordered maps and floating spelling. Pointer
++        // identity alone is insufficient: Engine.run permits external header edits.
++        // Header clones still copy Future before clearing it; charge that O(F) work.
++        Ok(serde_json::to_vec(&a)? == serde_json::to_vec(&b)?)
++    }
++
+     pub fn from_value(mut v: Value) -> Result<Self> {
+         let o = v
+             .as_object_mut()
+@@ -224,8 +255,20 @@
+         inverse(before, after, true)
+     }
+ 
++    /// O(H) exact identity/cursor comparisons, H <= 5; no payload traversal.
++    /// Cloned histories may share the cache, so only locally retained edges survive.
++    fn retains_edge(&self, entry: &ExportedFrame) -> bool {
++        let Some(mut newer) = self.pending_haste.as_ref().or(self.closing.as_ref()) else { return false; };
++        for older in self.frames.iter().rev() {
++            if entry.matches(older, newer) { return true; }
++            newer = older;
++        }
++        false
++    }
++
+     /// Seal the current completed edge when a command finishes, not at a later save.
+-    /// O(changed block bytes * nesting + metadata + patch bytes), or O(5) cache hit.
++    /// O(changed block bytes * nesting + metadata + patch bytes + H*C),
++    /// H,C <= 5 for retained-edge pruning; O(C) on a cache hit.
+     /// Pending haste keeps the prior completed edge's opening, never partial state.
+     fn seal_current(&self) -> Result<()> {
+         let _timing = crate::timing::span("history.journal_seal");
+@@ -244,7 +287,11 @@
+             encoded: Arc::from(encoded),
+         };
+         let mut cache = self.exported.lock().unwrap_or_else(|e| e.into_inner());
+-        if cache.len() == 5 { cache.remove(0); }
++        // Export stores newest-first, while seals append: index zero is not a
++        // reliable oldest-entry policy. Prune by actual retained transitions.
++        if cache.iter().any(|edge| edge.matches(before, after)) { return Ok(()); }
++        cache.retain(|edge| self.retains_edge(edge));
++        if cache.len() >= 5 { cache.remove(0); }
+         cache.push(entry);
+         Ok(())
+     }
+@@ -253,7 +300,8 @@
+     /// Cold O(H*S + D + B), warm O(H² + B + run clone), where S is snapshot
+     /// JSON size, D recursive diff/path/compaction work and B encoded history bytes.
+     /// Cache is at most five strings; cold scratch is two JSON endpoints + patches.
+-    /// Dispatch seals the latest edge; fresh identities can still miss older edges.
++    /// Dispatch reuses a previous closing identity only after exact root/header
++    /// checks, preserving the previously sealed edge without trusting public writes.
+     /// Shared unchanged payloads are skipped; no world/disk work is skipped.
+     pub fn export(&self, run: &Run) -> Result<Run> {
+     let _timing_function = crate::timing::span("history.export");
+@@ -514,10 +562,16 @@
+     Ok((a, b))
+ }
+ 
+-/// O(header bytes + number of shared block handles), excluding big COW payloads.
+-/// Dream-plane creation/removal retains its complete value for a structural patch.
+-fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
+-    let _timing = crate::timing::span("history.journal_header");
++/// O(R) exact ordered handle comparison, O(1) scratch; no payload equality.
++fn same_arc_array<T>(a: &[Arc<T>], b: &[Arc<T>]) -> bool {
++    a.len() == b.len() && a.iter().zip(b).all(|(a,b)| Arc::ptr_eq(a,b))
++}
++/// O(R + key bytes) exact ordered keys/handles, O(1) scratch; no actor/item scan.
++fn same_arc_map<T>(a: &indexmap::IndexMap<String, Arc<T>>, b: &indexmap::IndexMap<String, Arc<T>>) -> bool {
++    a.len() == b.len() && a.iter().zip(b).all(|((ak,av),(bk,bv))| ak == bk && Arc::ptr_eq(av,bv))
++}
++/// O(R + M) clone/drop of handles and metadata; large COW payloads stay shared.
++fn snapshot_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Run {
+     let mut header = clone_snapshot_state(&snapshot.state);
+     header.floors.clear();
+     header.actors = Default::default();
+@@ -525,7 +579,13 @@
+     if mask_dream_floors {
+         header.dreamwalking.as_mut().unwrap().floors.clear();
+     }
+-    let mut value = serde_json::to_value(&header)?;
++    header
++}
++/// O(header bytes + number of shared block handles), excluding big COW payloads.
++/// Dream-plane creation/removal retains its complete value for a structural patch.
++fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
++    let _timing = crate::timing::span("history.journal_header");
++    let mut value = serde_json::to_value(snapshot_header(snapshot, mask_dream_floors))?;
+     for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId"] {
+         value.as_object_mut().unwrap().shift_remove(key);
+     }
+@@ -921,6 +981,24 @@
+         let outcome = crate::engine::dispatch(&mut self.run, command)?;
+         let writes = writes_scope.finish();
+         if self.run.tick != before.state.tick {
++            if let Some(closing) = &self.history.closing {
++                // Compare the immutable pre-command capture only when it will become
++                // a completed opening. Free commands never pay this metadata guard.
++                // There is no benefit with a pending opening or no preceding seal.
++                // Release the cache lock before comparing metadata; no lock
++                // spans serialization or simulation work.
++                let sealed = self.history.pending_haste.is_none()
++                    && self.history.frames.back().is_some_and(|older| {
++                        self.history.exported.lock().unwrap_or_else(|e| e.into_inner())
++                            .iter().any(|edge| edge.matches(older, closing))
++                    });
++                if sealed && closing.same_boundary(&before).map_err(err)? {
++                    let _reuse = crate::timing::span("history.opening_identity_reuse");
++                    // Preserve the previously sealed edge endpoint only after exact
++                    // projected equality, never merely because dispatch was last writer.
++                    before = closing.clone();
++                }
++            }
+             let opening = self.history.pending_haste.take().unwrap_or(before);
+             let mut incoming = std::mem::take(&mut self.history.pending_writes);
+             incoming.merge(&writes);
+@@ -1041,6 +1119,92 @@
+         assert!(loaded.save().unwrap() == engine.save().unwrap(), "valid timeline reload differs");
+     }
+ 
++    /// O(R + M) per guard plus fixed fixture construction; checks all guard classes.
++    #[test]
++    fn opening_guard_checks_external_headers_roots_order_dream_and_cursors() {
++        let mut run = Run::default();
++        run.floors = vec![Arc::new(crate::Floor::default()), Arc::new(crate::Floor::default())];
++        run.actors.insert("1".into(), Arc::new(vec![]));
++        run.actors.insert("2".into(), Arc::new(vec![]));
++        run.ground.insert("1".into(), Arc::new(vec![]));
++        run.player.conditions.insert("first".into(), 1.);
++        run.player.conditions.insert("second".into(), 2.);
++        let old = Snapshot::capture(&run);
++        assert!(old.same_boundary(&Snapshot::capture(&run)).unwrap());
++        let mut edited = run.clone(); edited.player.energy = 1.;
++        assert!(!old.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut with_future = run.clone(); with_future.future = Some("anchor\"bytes".repeat(32));
++        let future = Snapshot::capture(&with_future);
++        assert!(future.same_boundary(&Snapshot::capture(&with_future)).unwrap());
++        assert!(!old.same_boundary(&future).unwrap());
++        with_future.future.as_mut().unwrap().push('x');
++        assert!(!future.same_boundary(&Snapshot::capture(&with_future)).unwrap());
++        with_future.future = Some(String::new());
++        assert!(!old.same_boundary(&Snapshot::capture(&with_future)).unwrap());
++        let mut edited = run.clone(); edited.tick = -0.;
++        assert!(!old.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut edited = run.clone();
++        let value = edited.player.conditions.shift_remove("first").unwrap();
++        edited.player.conditions.insert("first".into(), value);
++        assert!(!old.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut edited = run.clone();
++        let value = edited.actors.shift_remove("1").unwrap(); edited.actors.insert("1".into(), value);
++        assert!(!old.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut edited = run.clone(); edited.floors.swap(0,1);
++        assert!(!old.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut edited = run.clone(); edited.floors[0] = Arc::new((*edited.floors[0]).clone());
++        assert!(!old.same_boundary(&Snapshot::capture(&edited)).unwrap(), "equal values with new identities conservatively miss");
++        let mut edited = run.clone(); Arc::make_mut(edited.ground.get_mut("1").unwrap()).push(crate::GroundItem::default());
++        assert!(!old.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut cursor = Snapshot::capture(&run); cursor.cursor = Some(ArchiveCursor {messages:0,events:0});
++        assert!(!old.same_boundary(&cursor).unwrap());
++        run.dreamwalking = crate::dreamwalking::State { floors:run.floors.clone(), ..Default::default() }.into();
++        let dream = Snapshot::capture(&run);
++        assert!(dream.same_boundary(&Snapshot::capture(&run)).unwrap());
++        let mut edited=run.clone(); edited.dreamwalking.as_mut().unwrap().floors.swap(0,1);
++        assert!(!dream.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut edited=run.clone(); edited.dreamwalking.as_mut().unwrap().active=true;
++        assert!(!dream.same_boundary(&Snapshot::capture(&edited)).unwrap());
++        let mut edited=run.clone(); edited.dreamwalking=Field::Null;
++        assert!(!dream.same_boundary(&Snapshot::capture(&edited)).unwrap());
++    }
++
++    /// O(commands * (dispatch + H*S)), proving actual cache identity/retention and fallback.
++    #[test]
++    fn next_completed_turn_retains_prior_sealed_edge_but_external_edits_miss() {
++        let mut engine = Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++        for _ in 0..5 { engine.dispatch(&crate::Command::Wait).unwrap(); }
++        assert_exact(&engine);
++        let older=engine.history.frames.back().unwrap().clone();
++        let closing=engine.history.closing.as_ref().unwrap().clone();
++        assert!(engine.history.exported.lock().unwrap().iter().any(|e|e.matches(&older,&closing)));
++        engine.dispatch(&crate::Command::Wait).unwrap();
++        let opening=engine.history.frames.back().unwrap();
++        assert!(Arc::ptr_eq(&opening.state,&closing.state));
++        assert!(engine.history.exported.lock().unwrap().iter().any(|e|e.matches(&older,opening)),
++            "new seal must not evict the preceding still-retained edge");
++        {
++            let cache=engine.history.exported.lock().unwrap();
++            let mut newer=engine.history.closing.as_ref().unwrap();
++            for frame in engine.history.frames.iter().rev() {
++                assert!(cache.iter().any(|edge|edge.matches(frame,newer)),
++                    "all five retained edges should be cached before exporting");
++                newer=frame;
++            }
++        }
++        assert_exact(&engine);
++        engine.dispatch(&crate::Command::Pickup).unwrap();
++        let free_closing=engine.history.closing.as_ref().unwrap().clone();
++        engine.dispatch(&crate::Command::Wait).unwrap();
++        assert!(Arc::ptr_eq(&engine.history.frames.back().unwrap().state,&free_closing.state));
++        assert_exact(&engine);
++        let closing=engine.history.closing.as_ref().unwrap().clone();
++        engine.run.player.energy -= 0.5;
++        engine.dispatch(&crate::Command::Wait).unwrap();
++        assert!(!Arc::ptr_eq(&engine.history.frames.back().unwrap().state,&closing.state));
++        assert_exact(&engine);
++    }
++
+     #[test]
+     fn reused_endpoints_match_legacy_export_for_zero_to_five_frames_and_reload() {
+         let mut engine = Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+--- /dev/null
++++ b/docs/snapshot-opening-cache-reuse.md
+@@ -0,0 +1,42 @@
++# Exact opening identity reuse
++
++This cache-only change preserves gameplay, save schema, legacy inverse bytes and durability. It does not introduce incremental storage or a complete mutation journal.
++
++## Redundancy removed
++
++The old dispatch captured a fresh opening `Arc<Run>` even when it exactly represented the previous closing boundary. An already sealed inverse edge therefore missed its identity key on the next export. Additionally, `seal_current` evicted cache index zero at capacity, but export stores newest-first; that could evict the immediately preceding still-retained edge.
++
++The candidate reuses a closing identity only after an exact projected guard, and prunes sealed entries by membership in the currently retained transitions rather than assuming a vector index means oldest. Cache size remains at most five.
++
++## Safety guard
++
++`Engine.run` remains public. Desktop DEBUG loadout calls and `ensure_run_id` are examples of writes outside `Engine::dispatch`; tests and library callers can perform arbitrary other writes. Therefore no “dispatch was the last writer” assumption is used.
++
++After ordinary dispatch confirms that a tick completed, compare its immutable pre-command capture and attempt reuse only when no pending-haste opening exists and the exact preceding edge is already sealed. Free commands do not pay this guard. Then require:
++
++1. Equal archive cursors.
++2. Equal ordered physical/dream floor Arc identities.
++3. Equal ordered actor/ground map keys and Arc identities.
++4. Exact equality of the Future `Option<String>`, including None versus Some(empty).
++5. Equal serialized metadata bytes after the identity-checked blocks and already-compared Future text are removed from temporary headers.
++
++The metadata comparison includes every other snapshot-owned field, including RNG, scalar/player/inventory state, logs, structural dream metadata and ordered map contents. Future anchors are compared directly as exact text rather than escaped into two guard JSON buffers; actual inverse/save serialization is unchanged. Comparing bytes rather than map equality retains ordering and floating spelling. Other Field Missing/Null/Value distinctions remain in the serialized header. Snapshot-excluded replay/history/run identity/archive payloads retain their existing exclusion contract; archive cursor counts are checked separately.
++
++Any mismatch retains the fresh opening. Different COW identities conservatively miss even when their values happen to be equal. No hash or unverified alias can create a false hit. Pending haste uses its existing authoritative opening and bypasses this redundant guard; temporal branch ownership/rebase is unchanged. Imported/rebased histories with no matching cached seal likewise bypass the guard.
++
++## Complexity (not measured timings)
++
++Let R be physical/dream floor handles plus actor/ground map entries, K their key bytes, M all remaining snapshot metadata bytes including Future text, H retained frames and C cache entries (H,C <= 5 normally).
++
++- `same_arc_array`: O(R) time, O(1) scratch, no payload equality.
++- `same_arc_map`: O(R + K) time, O(1) scratch, order-sensitive.
++- `snapshot_header`: O(R + M) handle/metadata clone work and scratch, including dropping copied handles. Large optimized COW payloads are not copied.
++- `Snapshot::same_boundary`: O(R + K + M) time; two temporary metadata clones and serialized byte buffers (Future still copies in header clones before being cleared, but is not escaped/serialized there), O(R + M) scratch. M may be large: Future anchors or other metadata are **not** constant-size.
++- Completed-turn dispatch adds O(C) cache eligibility checks and, when eligible, the guard above. Free/pending commands do not add the metadata guard. Existing opening snapshot capture still occurs. The guard is not O(1), and its cost must be compared with the avoided earlier-edge projection/diff/encoding.
++- `History::retains_edge`: O(H) exact identity/cursor comparisons, O(1) scratch.
++- `seal_current`: existing missing-edge construction plus O(H*C) retained-edge pruning; cache hits remain O(C). Shared cloned timelines may evict each other's entries without changing results.
++- Export and Revert continue exact identity/cursor lookup. Actual prior-edge cache hits, guard cost, command latency and save latency need normal-build before/after measurement; moving work between phases is not a speedup claim.
++
++## Verification
++
++Focused tests cover root/key ordering, conservative equal-value/new-identity misses, player edits, signed zero, metadata map reordering, dream state/roots, ground changes and archive cursors. A real command test proves a prior sealed edge survives the next completed turn, free-action closing identity is reused, and a direct external player edit forces a fresh opening. Existing exact legacy-byte tests and all temporal traces remain required for haste, Future, Revert, DEBUG external edits and reload. Runtime timing labels expose guard work and successful reuse separately.
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -535,3 +535,6 @@
+ 
+ ### Save and rewind export reuse (October 2026)
+ See [save-rewind-export-complexity.md](save-rewind-export-complexity.md) and [save-envelope-complexity.md](save-envelope-complexity.md) for bounded immutable-edge reuse, invalidation proof, direct envelope encoding and retained serialization/durability costs.
++
++### Snapshot opening identity reuse
++See [snapshot-opening-cache-reuse.md](snapshot-opening-cache-reuse.md) for the exact metadata/root guard, conservative external-write fallback, retained-edge eviction and added O(R + M) guard cost.

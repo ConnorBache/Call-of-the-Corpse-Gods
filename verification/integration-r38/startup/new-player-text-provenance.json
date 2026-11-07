@@ -1,0 +1,24 @@
+{
+  "revision": 38,
+  "entries": [
+    {
+      "file": "crates/corpse-core/src/startup.rs",
+      "text": "Generation failed after {attempts} complete floor attempts on floor {depth}: {last_error}",
+      "authorship": "assistant",
+      "context": "Native generation exhaustion diagnostic; visible through startup error handling",
+      "conditional": true,
+      "placeholders": [
+        "attempts",
+        "depth",
+        "last_error"
+      ]
+    },
+    {
+      "file": "crates/corpse-core/src/startup.rs",
+      "text": "Generated floor has no safe route between transitions",
+      "authorship": "assistant",
+      "context": "Final complete-floor safety rejection, included in exhaustion diagnostic if all safe candidates fail",
+      "conditional": false
+    }
+  ]
+}

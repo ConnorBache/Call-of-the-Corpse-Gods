@@ -1,0 +1,53 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+warning: unused import: `StorageError`
+ --> crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+    Finished `test` profile [optimized] target(s) in 2m 05s
+     Running tests/revision50_creature_identity.rs (../r50-optimized-target/debug/deps/revision50_creature_identity-31251d6c13ef53f8)
+
+running 4 tests
+test revision50_creature_identity_defaults_and_legacy_versions_are_exact ... ok
+test revision50_creature_identity_hearts_keep_rewards_and_species_counters ... ok
+test revision50_creature_identity_load_covers_all_owned_locations_without_rng_or_history_edits ... ok
+test revision50_creature_identity_renames_only_cosmetics_and_preserves_custom_appearance ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/revision50_player_attack.rs (../r50-optimized-target/debug/deps/revision50_player_attack-c989e74c7d75bac1)
+
+running 9 tests
+test balance_admission_does_not_open_unimplemented_intermediate_revisions ... ok
+test explicit_ranged_damage_is_identical_across_player_baseline_revision ... ok
+test main_and_generic_player_strikes_share_the_revisioned_base ... ok
+test revision50_copies_greatsword_baseline_without_stale_offhand ... ok
+test revision50_early_ruin_packets_keep_the_existing_forgiving_start ... ok
+test revision50_internal_floor_generation_keeps_existing_layouts ... ok
+test revision50_natural_birth_profiles_and_plans_preserve_revision46_except_authored_gas_and_caster_tags ... ok
+test revision50_preserves_latest_physical_profiles_without_new_retuning ... ok
+test revision50_actual_witch_and_queen_births_keep_parent_specific_profiles ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+

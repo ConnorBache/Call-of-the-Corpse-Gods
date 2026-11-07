@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "simulation_revision": 37,
+  "started_utc": "2026-10-28T18:34:19.105158+00:00",
+  "scope": "All files in crates, fixtures and tools except __pycache__, plus Cargo.toml, Cargo.lock, rust-toolchain.toml and AGENTS.md. Generated verification/release documentation is excluded.",
+  "frozen_input_count": 1068,
+  "input_fingerprint_before": "a852faae4f33ecaf333dade0c4b0ff71dcd3bd5016301cf5a11f92d54522774b",
+  "profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "cargo_version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "rust_toolchain": "[toolchain]\nchannel = \"1.99.1\"\nprofile = \"minimal\"",
+  "checks": [
+    {
+      "label": "workspace",
+      "command": [
+        "sh",
+        "tools/cargo.sh",
+        "test",
+        "--workspace",
+        "--locked",
+        "--all-targets",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0,
+      "seconds": 537.321,
+      "targets": 148,
+      "log": "verification/integration-r37/final-gate/workspace.log",
+      "log_sha256": "80e68db26a082d5982ecac98d298ac649f2ade5300fe568ea34526dc52de0f28",
+      "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+      "failed_tests": [],
+      "passed": 902,
+      "failed": 0,
+      "ignored": 1,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "label": "doctests",
+      "command": [
+        "sh",
+        "tools/cargo.sh",
+        "test",
+        "--workspace",
+        "--locked",
+        "--doc",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0,
+      "seconds": 1.509,
+      "targets": 1,
+      "log": "verification/integration-r37/final-gate/doctests.log",
+      "log_sha256": "6133a1bf9c3f09bb12ef60e947f49e4fc1d6e24085305bee5ebf457f4702c9ce",
+      "count_method": "Sum each target's test result summary once; never count individual test lines additionally.",
+      "failed_tests": [],
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ],
+  "finished_utc": "2026-10-28T18:43:20.159130+00:00",
+  "input_fingerprint_after": "a852faae4f33ecaf333dade0c4b0ff71dcd3bd5016301cf5a11f92d54522774b",
+  "changed_inputs": [],
+  "code_build_inputs_unchanged": true
+}

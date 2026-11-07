@@ -1,0 +1,1387 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/portals-r35/source/corpse-gods-native/crates/corpse-core)
+   Compiling corpse-desktop v0.1.0 (/workspace/scratch/69f53637ba6f/portals-r35/source/corpse-gods-native/crates/corpse-desktop)
+warning: value assigned to `glyph` is never read
+    --> crates/corpse-desktop/src/observe.rs:1581:17
+     |
+1581 |                 glyph = "*".into();
+     |                 ^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `TOP` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:4:11
+  |
+4 | pub const TOP: i32 = 278;
+  |           ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `ROW` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:5:11
+  |
+5 | pub const ROW: i32 = 34;
+  |           ^^^
+
+warning: constant `CAPACITY` is never used
+ --> crates/corpse-desktop/src/ability_ui.rs:6:11
+  |
+6 | pub const CAPACITY: usize = 12;
+  |           ^^^^^^^^
+
+warning: function `feature_color` is never used
+  --> crates/corpse-desktop/src/appearance_material.rs:55:8
+   |
+55 | pub fn feature_color(profile: &Profile, key: &str, fallback: Rgb) -> Rgb {
+   |        ^^^^^^^^^^^^^
+
+warning: method `reset_group` is never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:317:12
+    |
+151 | impl Profile {
+    | ------------ method in this implementation
+...
+317 |     pub fn reset_group(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^^^^^^^
+
+warning: field `saved_preset_id` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:111:9
+    |
+105 | pub struct Status {
+    |            ------ field in this struct
+...
+111 |     pub saved_preset_id: Option<String>,
+    |         ^^^^^^^^^^^^^^^
+    |
+    = note: `Status` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: methods `edited`, `begin_gesture`, `reset_group`, and `preferences` are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:396:12
+    |
+225 | impl Store {
+    | ---------- methods in this implementation
+...
+396 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+444 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+512 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+648 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: function `cosmetic_seed` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:27:8
+   |
+27 | pub fn cosmetic_seed(seed: &str, depth: u32) -> u32 {
+   |        ^^^^^^^^^^^^^
+
+warning: function `materials_animated` is never used
+  --> crates/corpse-desktop/src/entity_profile.rs:93:8
+   |
+93 | pub fn materials_animated(p: &Profile) -> bool {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: fields `ordinary` and `conditional` are never read
+  --> crates/corpse-desktop/src/manual.rs:43:9
+   |
+42 | pub struct Depth {
+   |            ----- fields in this struct
+43 |     pub ordinary: Vec<String>,
+   |         ^^^^^^^^
+44 |     pub conditional: Vec<String>,
+   |         ^^^^^^^^^^^
+
+warning: constant `CLOSE` is never used
+  --> crates/corpse-desktop/src/pack.rs:24:7
+   |
+24 | const CLOSE: Rect = Rect(929, 135, 36, 32);
+   |       ^^^^^
+
+warning: constant `CANCEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:25:7
+   |
+25 | const CANCEL: Rect = Rect(881, 202, 80, 32);
+   |       ^^^^^^
+
+warning: constant `ROW` is never used
+  --> crates/corpse-desktop/src/pack.rs:26:7
+   |
+26 | const ROW: i32 = 30;
+   |       ^^^
+
+warning: constant `EDGE` is never used
+  --> crates/corpse-desktop/src/pack.rs:27:7
+   |
+27 | const EDGE: [u8; 3] = [53, 55, 68];
+   |       ^^^^
+
+warning: constant `PANEL` is never used
+  --> crates/corpse-desktop/src/pack.rs:28:7
+   |
+28 | const PANEL: [u8; 3] = [11, 13, 21];
+   |       ^^^^^
+
+warning: constant `SELECTED` is never used
+  --> crates/corpse-desktop/src/pack.rs:29:7
+   |
+29 | const SELECTED: [u8; 3] = [53, 51, 68];
+   |       ^^^^^^^^
+
+warning: variant `Fire` is never constructed
+  --> crates/corpse-desktop/src/render.rs:41:5
+   |
+40 | pub enum Animation {
+   |          --------- variant in this enum
+41 |     Fire { phase: f64 },
+   |     ^^^^
+   |
+   = note: `Animation` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `dead` and `gods` are never read
+   --> crates/corpse-desktop/src/render.rs:132:9
+    |
+103 | pub struct View {
+    |            ---- fields in this struct
+...
+132 |     pub dead: bool,
+    |         ^^^^
+...
+136 |     pub gods: String,
+    |         ^^^^
+
+warning: constant `TOOLBAR_LABELS` is never used
+    --> crates/corpse-desktop/src/render.rs:2569:11
+     |
+2569 | pub const TOOLBAR_LABELS: [&str; 9] = [
+     |           ^^^^^^^^^^^^^^
+
+warning: associated items `ALL` and `parse` are never used
+  --> crates/corpse-desktop/src/typography_ui.rs:16:15
+   |
+15 | impl Role {
+   | --------- associated items in this implementation
+16 |     pub const ALL: [Self; 8] = [
+   |               ^^^
+...
+38 |     pub fn parse(key: &str) -> Option<Self> {
+   |            ^^^^^
+
+warning: function `chronicle_metrics` is never used
+   --> crates/corpse-desktop/src/typography_ui.rs:123:8
+    |
+123 | pub fn chronicle_metrics(
+    |        ^^^^^^^^^^^^^^^^^
+
+warning: `corpse-desktop` (bin "corpse-desktop" test) generated 22 warnings
+warning: fields `category`, `group`, `step`, and `description` are never read
+  --> crates/corpse-desktop/tests/../src/appearance_profile.rs:15:9
+   |
+13 | pub struct Control {
+   |            ------- fields in this struct
+14 |     pub path: String,
+15 |     pub category: String,
+   |         ^^^^^^^^
+16 |     pub group: Option<String>,
+   |         ^^^^^
+...
+22 |     pub step: Option<f64>,
+   |         ^^^^
+...
+25 |     pub description: Option<String>,
+   |         ^^^^^^^^^^^
+   |
+   = note: `Control` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `next` and `label` are never used
+  --> crates/corpse-desktop/tests/../src/appearance_store.rs:24:12
+   |
+23 | impl DisplayMode {
+   | ---------------- methods in this implementation
+24 |     pub fn next(self) -> Self {
+   |            ^^^^
+...
+45 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+
+warning: method `working` is never used
+   --> crates/corpse-desktop/tests/../src/appearance_store.rs:399:12
+    |
+225 | impl Store {
+    | ---------- method in this implementation
+...
+399 |     pub fn working(&self) -> &Profile {
+    |            ^^^^^^^
+
+warning: `corpse-desktop` (test "appearance") generated 3 warnings
+warning: fields `category`, `group`, `step`, and `description` are never read
+  --> crates/corpse-desktop/src/appearance_profile.rs:15:9
+   |
+13 | pub struct Control {
+   |            ------- fields in this struct
+14 |     pub path: String,
+15 |     pub category: String,
+   |         ^^^^^^^^
+16 |     pub group: Option<String>,
+   |         ^^^^^
+...
+22 |     pub step: Option<f64>,
+   |         ^^^^
+...
+25 |     pub description: Option<String>,
+   |         ^^^^^^^^^^^
+   |
+   = note: `Control` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: function `get_mut` is never used
+  --> crates/corpse-desktop/src/appearance_profile.rs:50:4
+   |
+50 | fn get_mut<'a>(v: &'a mut Value, path: &str) -> Option<&'a mut Value> {
+   |    ^^^^^^^
+
+warning: multiple associated items are never used
+   --> crates/corpse-desktop/src/appearance_profile.rs:161:12
+    |
+151 | impl Profile {
+    | ------------ associated items in this implementation
+...
+161 |     pub fn parse(raw: &str) -> Result<Self, String> {
+    |            ^^^^^
+...
+252 |     pub fn boolean(&self, path: &str) -> bool {
+    |            ^^^^^^^
+...
+258 |     pub fn json(&self) -> String {
+    |            ^^^^
+...
+271 |     pub fn set(&self, path: &str, value: Value) -> Result<Self, String> {
+    |            ^^^
+...
+287 |     pub fn reset(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^
+...
+317 |     pub fn reset_group(&self, path: &str) -> Result<Self, String> {
+    |            ^^^^^^^^^^^
+...
+326 |     pub fn named(&self, name: &str) -> Self {
+    |            ^^^^^
+
+warning: method `label` is never used
+  --> crates/corpse-desktop/src/appearance_store.rs:45:12
+   |
+23 | impl DisplayMode {
+   | ---------------- method in this implementation
+...
+45 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+
+warning: field `profile` is never read
+   --> crates/corpse-desktop/src/appearance_store.rs:101:5
+    |
+100 | struct History {
+    |        ------- field in this struct
+101 |     profile: Profile,
+    |     ^^^^^^^
+    |
+    = note: `History` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Status` is never constructed
+   --> crates/corpse-desktop/src/appearance_store.rs:105:12
+    |
+105 | pub struct Status {
+    |            ^^^^^^
+
+warning: multiple methods are never used
+   --> crates/corpse-desktop/src/appearance_store.rs:396:12
+    |
+225 | impl Store {
+    | ---------- methods in this implementation
+...
+396 |     pub fn edited(&self) -> &Profile {
+    |            ^^^^^^
+...
+399 |     pub fn working(&self) -> &Profile {
+    |            ^^^^^^^
+...
+406 |     pub fn presets(&self) -> &[Preset] {
+    |            ^^^^^^^
+...
+409 |     pub fn status(&self) -> Status {
+    |            ^^^^^^
+...
+431 |     pub fn open(&mut self) {
+    |            ^^^^
+...
+444 |     pub fn begin_gesture(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+483 |     fn edit(&mut self, next: Profile) {
+    |        ^^^^
+...
+495 |     pub fn set(&mut self, path: &str, value: Value) -> Result<(), String> {
+    |            ^^^
+...
+504 |     pub fn reset_property(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^^
+...
+512 |     pub fn reset_group(&mut self, path: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+527 |     pub fn reset_all(&mut self) {
+    |            ^^^^^^^^^
+...
+535 |     pub fn undo(&mut self) {
+    |            ^^^^
+...
+545 |     pub fn redo(&mut self) {
+    |            ^^^^
+...
+555 |     pub fn preview(&mut self, value: Profile) {
+    |            ^^^^^^^
+...
+560 |     pub fn begin_preview(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+563 |     pub fn commit_preview(&mut self) {
+    |            ^^^^^^^^^^^^^^
+...
+568 |     pub fn cancel_preview(&mut self) {
+    |            ^^^^^^^^^^^^^^
+...
+571 |     pub fn compare(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^
+...
+579 |     fn require(&self, id: &str) -> Result<&Preset, String> {
+    |        ^^^^^^^
+...
+586 |     fn unique(&self, name: &str, except: Option<&str>) -> Result<String, String> {
+    |        ^^^^^^
+...
+648 |     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+654 |     pub fn save_preset(&mut self, name: &str) -> Result<String, String> {
+    |            ^^^^^^^^^^^
+...
+674 |     pub fn update_preset(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+689 |     pub fn load_preset(&mut self, id: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+696 |     pub fn duplicate_preset(&mut self, id: &str, name: &str) -> Result<String, String> {
+    |            ^^^^^^^^^^^^^^^^
+...
+713 |     pub fn rename_preset(&mut self, id: &str, name: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+726 |     pub fn delete_preset(&mut self, id: &str, confirmed: bool) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^
+...
+745 |     pub fn set_default(&mut self, id: Option<&str>) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+753 |     pub fn import_json(&mut self, text: &str) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+759 |     pub fn export_json(&self) -> String {
+    |            ^^^^^^^^^^^
+...
+762 |     pub fn import_file(&mut self, path: &Path) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+...
+765 |     pub fn export_file(&self, path: &Path) -> Result<(), String> {
+    |            ^^^^^^^^^^^
+
+warning: constant `CATEGORIES` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:12:11
+   |
+12 | pub const CATEGORIES: [&str; 10] = [
+   |           ^^^^^^^^^^
+
+warning: variants `Changed`, `ReducedMotion`, `Close`, `Copy`, and `Paste` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:27:5
+   |
+25 | pub enum Action {
+   |          ------ variants in this enum
+26 |     None,
+27 |     Changed,
+   |     ^^^^^^^
+28 |     ReducedMotion(bool),
+   |     ^^^^^^^^^^^^^
+29 |     Fullscreen,
+30 |     Close,
+   |     ^^^^^
+31 |     Copy(String),
+   |     ^^^^
+32 |     Paste,
+   |     ^^^^^
+   |
+   = note: `Action` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variants `Search`, `Value`, `PresetName`, and `FilePath` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:36:5
+   |
+35 | enum Focus {
+   |      ----- variants in this enum
+36 |     Search,
+   |     ^^^^^^
+37 |     Value(usize),
+   |     ^^^^^
+38 |     PresetName,
+   |     ^^^^^^^^^^
+39 |     FilePath,
+   |     ^^^^^^^^
+   |
+   = note: `Focus` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: variants `Delete` and `Overwrite` are never constructed
+  --> crates/corpse-desktop/src/appearance_ui.rs:44:5
+   |
+43 | enum Confirmation {
+   |      ------------ variants in this enum
+44 |     Delete(String),
+   |     ^^^^^^
+45 |     Overwrite(String),
+   |     ^^^^^^^^^
+   |
+   = note: `Confirmation` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `category`, `group`, and `preset` are never read
+  --> crates/corpse-desktop/src/appearance_ui.rs:52:5
+   |
+47 | pub struct SettingsView {
+   |            ------------ fields in this struct
+...
+52 |     category: usize,
+   |     ^^^^^^^^
+53 |     group: usize,
+   |     ^^^^^
+...
+60 |     preset: usize,
+   |     ^^^^^^
+
+warning: function `integrated_layout` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:66:4
+   |
+66 | fn integrated_layout(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^^^^^
+
+warning: function `integrated_role` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:83:4
+   |
+83 | fn integrated_role(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^^^
+
+warning: function `retained_only` is never used
+  --> crates/corpse-desktop/src/appearance_ui.rs:96:4
+   |
+96 | fn retained_only(path: &str) -> bool {
+   |    ^^^^^^^^^^^^^
+
+warning: function `partially_applied` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:139:4
+    |
+139 | fn partially_applied(path: &str) -> bool {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: function `changed_notice` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:152:4
+    |
+152 | fn changed_notice(path: &str) -> &'static str {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `display` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:162:4
+    |
+162 | fn display(v: Option<&Value>) -> String {
+    |    ^^^^^^^
+
+warning: function `button` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:169:4
+    |
+169 | fn button(p: &mut Painter, label: &str, x: i32, y: i32, w: i32, active: bool) {
+    |    ^^^^^^
+
+warning: function `field` is never used
+   --> crates/corpse-desktop/src/appearance_ui.rs:180:4
+    |
+180 | fn field(p: &mut Painter, label: &str, value: &str, x: i32, y: i32, w: i32, active: bool) {
+    |    ^^^^^
+
+warning: multiple methods are never used
+    --> crates/corpse-desktop/src/appearance_ui.rs:220:12
+     |
+ 192 | impl SettingsView {
+     | ----------------- methods in this implementation
+...
+ 220 |     pub fn open(&mut self) {
+     |            ^^^^
+...
+ 231 |     pub fn import_file(&mut self, path: &Path) -> Action {
+     |            ^^^^^^^^^^^
+...
+ 252 |     fn finish(&mut self, result: Result<(), String>, success: &str) -> Action {
+     |        ^^^^^^
+...
+ 264 |     fn groups(&self) -> Vec<&str> {
+     |        ^^^^^^
+...
+ 281 |     fn filtered(&self) -> Vec<usize> {
+     |        ^^^^^^^^
+...
+ 307 |     fn change_category(&mut self, n: usize) {
+     |        ^^^^^^^^^^^^^^^
+...
+ 318 |     fn focus(&mut self, focus: Focus) {
+     |        ^^^^^
+...
+ 328 |     fn select_control(&mut self, relative: usize) {
+     |        ^^^^^^^^^^^^^^
+...
+ 335 |     fn selected_control(&self) -> Option<&'static Control> {
+     |        ^^^^^^^^^^^^^^^^
+...
+ 338 |     fn edit_selected(&mut self, direction: i32) -> Action {
+     |        ^^^^^^^^^^^^^
+...
+ 364 |     fn commit_input(&mut self) -> Action {
+     |        ^^^^^^^^^^^^
+...
+ 435 |     fn page_rows(&self) -> usize {
+     |        ^^^^^^^^^
+...
+ 442 |     pub fn scroll(&mut self, delta: i32) {
+     |            ^^^^^^
+...
+ 447 |     pub fn key(&mut self, key: Keycode, mods: Mod) -> Action {
+     |            ^^^
+...
+ 552 |     fn toggle_reduced(&mut self) -> Action {
+     |        ^^^^^^^^^^^^^^
+...
+ 568 |     fn selected_preset(&self) -> Result<String, String> {
+     |        ^^^^^^^^^^^^^^^
+...
+ 575 |     fn preset_action(&mut self, n: usize) -> Action {
+     |        ^^^^^^^^^^^^^
+...
+ 620 |     fn confirm_action(&mut self) -> Action {
+     |        ^^^^^^^^^^^^^^
+...
+ 636 |     pub fn click(&mut self, x: i32, y: i32) -> Action {
+     |            ^^^^^
+...
+ 724 |     fn preset_click(&mut self, x: i32, y: i32) -> Action {
+     |        ^^^^^^^^^^^^
+...
+ 790 |     pub fn paint(&self, p: &mut Painter) {
+     |            ^^^^^
+...
+ 912 |     fn paint_controls(&self, p: &mut Painter) {
+     |        ^^^^^^^^^^^^^^
+...
+1043 |     fn paint_presets(&self, p: &mut Painter) {
+     |        ^^^^^^^^^^^^^
+
+warning: function `vary` is never used
+  --> crates/corpse-desktop/src/color.rs:81:8
+   |
+81 | pub fn vary(fg: Rgb, bg: Rgb, tile: &str, x: f64, y: f64, seed: u32) -> (Rgb, Rgb) {
+   |        ^^^^
+
+warning: function `desaturate` is never used
+   --> crates/corpse-desktop/src/color.rs:151:4
+    |
+151 | fn desaturate(c: Rgb, t: f64) -> Rgb {
+    |    ^^^^^^^^^^
+
+warning: function `memory` is never used
+   --> crates/corpse-desktop/src/color.rs:155:8
+    |
+155 | pub fn memory(c: Rgb) -> Rgb {
+    |        ^^^^^^
+
+warning: function `environment` is never used
+   --> crates/corpse-desktop/src/color.rs:171:8
+    |
+171 | pub fn environment(c: Rgb, bg: bool, light: Light, emissive: bool, tile: &str) -> Rgb {
+    |        ^^^^^^^^^^^
+
+warning: function `shadow_gamma` is never used
+   --> crates/corpse-desktop/src/color.rs:226:8
+    |
+226 | pub fn shadow_gamma(distance: f64, light: Light, tile: &str) -> f64 {
+    |        ^^^^^^^^^^^^
+
+warning: function `shadow` is never used
+   --> crates/corpse-desktop/src/color.rs:242:8
+    |
+242 | pub fn shadow(c: Rgb, gamma: f64) -> Rgb {
+    |        ^^^^^^
+
+warning: function `translucent_ink` is never used
+   --> crates/corpse-desktop/src/color.rs:262:8
+    |
+262 | pub fn translucent_ink(fg: Rgb, bg: Rgb, min: f64, alpha: f64) -> Rgb {
+    |        ^^^^^^^^^^^^^^^
+
+warning: function `ramp` is never used
+   --> crates/corpse-desktop/src/color.rs:277:4
+    |
+277 | fn ramp(dark: Rgb, normal: Rgb, bright: Rgb, amount: f64) -> Rgb {
+    |    ^^^^
+
+warning: function `offset` is never used
+   --> crates/corpse-desktop/src/color.rs:284:4
+    |
+284 | fn offset(anchor: Rgb, actual: Rgb, reference: Rgb) -> Rgb {
+    |    ^^^^^^
+
+warning: function `illuminated` is never used
+   --> crates/corpse-desktop/src/color.rs:289:8
+    |
+289 | pub fn illuminated(fg: Rgb, bg: Rgb, tile: &str, light: Light, stone_floor: bool) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^^
+
+warning: function `map_colors` is never used
+   --> crates/corpse-desktop/src/color.rs:335:8
+    |
+335 | pub fn map_colors(fg: Rgb, bg: Rgb, c: Context<'_>) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^
+
+warning: function `map_colors_emissive` is never used
+   --> crates/corpse-desktop/src/color.rs:338:8
+    |
+338 | pub fn map_colors_emissive(mut fg: Rgb, mut bg: Rgb, c: Context<'_>, emissive: bool) -> (Rgb, Rgb) {
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: function `terrain_style` is never used
+   --> crates/corpse-desktop/src/color.rs:375:8
+    |
+375 | pub fn terrain_style(
+    |        ^^^^^^^^^^^^^
+
+warning: function `light_field` is never used
+   --> crates/corpse-desktop/src/color.rs:453:8
+    |
+453 | pub fn light_field(observation: &corpse_core::vision::TerrainObservation) -> Vec<Light> {
+    |        ^^^^^^^^^^^
+
+warning: function `vary` is never used
+  --> crates/corpse-desktop/src/color_profile.rs:60:8
+   |
+60 | pub fn vary(p: &Profile, fg: Rgb, bg: Rgb, tile: &str, x: f64, y: f64, seed: u32) -> (Rgb, Rgb) {
+   |        ^^^^
+
+warning: function `terrain_style` is never used
+   --> crates/corpse-desktop/src/color_profile.rs:499:8
+    |
+499 | pub fn terrain_style(
+    |        ^^^^^^^^^^^^^
+
+warning: constant `BOUNDS` is never used
+  --> crates/corpse-desktop/src/inspection_ui.rs:18:11
+   |
+18 | pub const BOUNDS: (i32, i32, i32, i32) = (24, 138, 520, 572);
+   |           ^^^^^^
+
+warning: function `close_hit` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1348:8
+     |
+1348 | pub fn close_hit(x: i32, y: i32) -> bool {
+     |        ^^^^^^^^^
+
+warning: function `hover_bounds` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1405:4
+     |
+1405 | fn hover_bounds(
+     |    ^^^^^^^^^^^^
+
+warning: function `paint_hover` is never used
+    --> crates/corpse-desktop/src/inspection_ui.rs:1429:8
+     |
+1429 | pub fn paint_hover(report: &Report, p: &mut Painter, x: i32, y: i32) {
+     |        ^^^^^^^^^^^
+
+warning: fields `depths` and `companions` are never read
+  --> crates/corpse-desktop/src/manual.rs:49:9
+   |
+47 | pub struct Catalog {
+   |            ------- fields in this struct
+48 |     pub entries: Vec<Entry>,
+49 |     pub depths: Vec<Depth>,
+   |         ^^^^^^
+50 |     pub companions: Vec<String>,
+   |         ^^^^^^^^^^
+
+warning: methods `paint` and `paint_at_depth` are never used
+   --> crates/corpse-desktop/src/manual.rs:129:12
+    |
+ 61 | impl Manual {
+    | ----------- methods in this implementation
+...
+129 |     pub fn paint(&mut self, p: &mut Painter) {
+    |            ^^^^^
+...
+138 |     pub fn paint_at_depth(&mut self, p: &mut Painter, _time_ms: f64, depth: usize) {
+    |            ^^^^^^^^^^^^^^
+
+warning: associated function `at` is never used
+   --> crates/corpse-desktop/src/manual.rs:284:8
+    |
+283 | impl Theme {
+    | ---------- associated function in this implementation
+284 |     fn at(depth: usize) -> Self { Self::at_depth(depth as f64) }
+    |        ^^
+
+warning: function `actor_cell` is never used
+   --> crates/corpse-desktop/src/observe.rs:234:4
+    |
+234 | fn actor_cell(
+    |    ^^^^^^^^^^
+
+warning: constant `BOUNDS` is never used
+  --> crates/corpse-desktop/src/pack.rs:21:11
+   |
+21 | pub const BOUNDS: (i32, i32, i32, i32) = (73, 131, 900, 579);
+   |           ^^^^^^
+
+warning: constant `LIST` is never used
+  --> crates/corpse-desktop/src/pack.rs:22:7
+   |
+22 | const LIST: Rect = Rect(85, 249, 480, 449);
+   |       ^^^^
+
+warning: constant `DETAIL` is never used
+  --> crates/corpse-desktop/src/pack.rs:23:7
+   |
+23 | const DETAIL: Rect = Rect(577, 249, 384, 449);
+   |       ^^^^^^
+
+warning: methods `bounds` and `set_read_only` are never used
+   --> crates/corpse-desktop/src/pack.rs:224:12
+    |
+173 | impl PackView {
+    | ------------- methods in this implementation
+...
+224 |     pub fn bounds(&self) -> (i32, i32, i32, i32) {
+    |            ^^^^^^
+...
+270 |     pub fn set_read_only(&mut self, read_only: bool) {
+    |            ^^^^^^^^^^^^^
+
+warning: methods `map_glyph` and `game` are never used
+    --> crates/corpse-desktop/src/render.rs:705:12
+     |
+ 174 | impl Painter {
+     | ------------ methods in this implementation
+...
+ 705 |     pub fn map_glyph(&mut self, ch: char, x: i32, y: i32, w: i32, h: i32, c: Rgb) {
+     |            ^^^^^^^^^
+...
+1520 |     pub fn game(&mut self, v: &View, notice: &str, inventory: bool) {
+     |            ^^^^
+
+warning: function `map_layout` is never used
+    --> crates/corpse-desktop/src/render.rs:2119:8
+     |
+2119 | pub fn map_layout(w: usize, h: usize) -> (i32, i32, i32, i32) {
+     |        ^^^^^^^^^^
+
+warning: function `toolbar_action` is never used
+    --> crates/corpse-desktop/src/render.rs:2600:8
+     |
+2600 | pub fn toolbar_action(x: i32, y: i32) -> Option<usize> {
+     |        ^^^^^^^^^^^^^^
+
+warning: function `hover_description` is never used
+  --> crates/corpse-desktop/src/statuses_ui.rs:81:8
+   |
+81 | pub fn hover_description(status: &Status) -> String {
+   |        ^^^^^^^^^^^^^^^^^
+
+warning: `corpse-desktop` (bin "corpse-desktop") generated 72 warnings (19 duplicates)
+   Compiling corpse-fixtures v0.1.0 (/workspace/scratch/69f53637ba6f/portals-r35/source/corpse-gods-native/crates/corpse-fixtures)
+    Finished `test` profile [optimized] target(s) in 4m 56s
+     Running unittests src/lib.rs (target/debug/deps/corpse_core-22ef95f16f60b69b)
+
+running 72 tests
+test abilities::dream_plane_tests::silence_aura_and_maintained_unspeak_do_not_cross_planes ... ok
+test combat::tests::mitigation_before_scale_rounding ... ok
+test combat::tests::negative_rounding ... ok
+test combat::tests::chance_clamps_before_range ... ok
+test combat::tests::packets_round_up ... ok
+test combat_audit::tests::disabled_by_default_and_take_disables ... ok
+test abilities::dream_plane_tests::ahvamitt_allegiance_is_protected_before_cost_without_disabling_other_powers ... ok
+test divine_environment::tests::dream_plane_black_pit_and_water_queries_use_each_endpoint_floor ... ok
+test abilities::dream_plane_tests::sleeping_body_has_no_owner_toggles_but_half_here_keeps_them ... ok
+test divine_environment::tests::dream_plane_riptide_and_reverse_entropy_keep_endpoint_planes ... ok
+test corpses::tests::hazard_boundaries ... ok
+test abilities::dream_plane_tests::matching_plane_and_legacy_targeting_still_work_and_cross_plane_link_can_stop ... ok
+test abilities::dream_plane_tests::dream_plane_sparkle_and_bulwark_mutate_only_the_dream_floor ... ok
+test divine_reactions::dream_plane_tests::sleeping_body_reactions_are_inert_and_deflection_stays_on_its_endpoint_plane ... ok
+test environment::presentation_parity::dream_plane_projection_cannot_consume_a_physical_bodys_gas_blast_pool ... ok
+test equipment::catalog_tests::authored_bow_and_arrow_bundle ... ok
+test equipment::catalog_tests::every_equipment_definition_parses ... ok
+test events::presentation_identity_tests::exact_actor_labels_keep_distinct_disguises_without_changing_event_geometry ... ok
+test gas_reactions::tests::expiration_is_not_a_bridge ... ok
+test gas_reactions::tests::minimum_identity_survives_rank_and_zero ... ok
+test inventory::heart_items::tests::exact_all_authored_heart_rewards ... ok
+test environment::presentation_parity::dream_plane_physical_half_here_burst_keeps_owner_credit_without_changing_its_plane ... ok
+test inventory::item_magic::display_tests::exact_potion_display ... ok
+test equipment::generated_loot::tests::exact_loot_and_reward_draws ... ok
+test abilities::dream_plane_tests::every_actor_target_rejects_another_plane_before_cost_or_mutation ... ok
+test mini_me::plane_tests::r34_mini_me_serializes_creation_plane_and_never_copies_body_or_nightmare ... ok
+test environment::presentation_parity::dream_plane_explosion_geometry_uses_the_blast_layer_not_the_players_plane ... ok
+test mini_me::plane_tests::r34_mini_me_spawn_occupancy_ignores_only_opposite_plane_actors ... ok
+test monster_chill::tests::dream_plane_chill_chooses_native_yeti_and_preserves_half_here_shared_slow ... ok
+test monster_grab::tests::dream_plane_grabs_cannot_apply_or_survive_a_plane_change ... ok
+test inventory::water_tests::exact_float_item_rng_and_quantities ... ok
+test inventory::item_magic::tests::exact_magic_detection_memory ... ok
+test monster_horn::plane_tests::r34_dream_projection_uncast_and_aura_use_dream_geometry ... ok
+test monster_horn::plane_tests::r34_horn_destination_occupancy_uses_actor_or_context_plane ... ok
+test monster_horn::plane_tests::r34_stone_seal_expires_on_creation_plane_after_caster_changes_plane ... ok
+test monster_horn::plane_tests::r34_target_permission_silence_and_sleeping_body_are_plane_local ... ok
+test monster_horn::plane_tests::r34_uncast_requires_a_same_plane_observing_endpoint_not_union_visibility ... ok
+test monster_grab::venom_tests::terminal_venom_matches_frozen_reference ... ok
+test monster_inventor::tests::dream_plane_fire_cone_never_applies_burning_or_rng_to_other_plane_victims ... ok
+test inventory::tests::reference_inventory_boundaries ... ok
+test monster_bombardier::tests::bombardier_matches_frozen_reference ... ok
+test divine_environment::tests::phase_loss_matches_frozen_reference ... ok
+test environment::presentation_parity::explosion_presentation_matches_reference ... ok
+test monster_inventor::tests::duplicate_pilot_identity_rejects_without_mutation ... ok
+test monster_spells::tests::dream_plane_dryad_heals_only_a_native_endpoint ... ok
+test monster_grab::tests::grabs_match_frozen_reference ... ok
+test abilities::reaction_attack_reference::retained_reaction_sources_and_offhand ... ok
+test monster_statuses::parity::status_and_lifecycle_reference ... ok
+test monster_statuses::plane_tests::r34_inflicted_dot_keeps_source_credit_after_caster_changes_plane ... ok
+test monster_statuses::plane_tests::r34_source_less_status_uses_contact_plane_and_legacy_is_unchanged ... ok
+test monster_statuses::plane_tests::r34_status_infliction_rejects_cross_plane_without_mutation ... ok
+test movement::tests::corner_wall_but_not_tree ... ok
+test movement::tests::safe_route_beats_short_hazard ... ok
+test offscreen::portal_traversal_tests::credited_returning_ally_traverses_portal_once_with_remote_occupancy ... ok
+test offscreen::portal_traversal_tests::offscreen_pursuit_traverses_once_and_does_not_overlap_remote_occupant ... ok
+test progression::tests::exact_authored_weighted_choices ... ok
+test temporal::legacy_undefined_tests::missing_patch_value_restores_undefined_not_null ... ok
+test vision::native_plane_tests::hidden_other_plane_cells_do_not_expose_current_terrain_hazards_or_sources ... ok
+test vision::native_plane_tests::native_memory_all_seeing_and_senses_need_a_native_endpoint_not_a_sleeping_body ... ok
+test vision::native_plane_tests::native_memory_mask_excludes_opposite_clone_only_visibility ... ok
+test vision::native_plane_tests::opposite_half_here_observes_native_geometry_hazards_and_lights_without_mutation ... ok
+test vision::native_plane_tests::player_plane_wins_when_both_half_here_views_see_the_tile ... ok
+test vision::tests::dark_impossible ... ok
+test vision::tests::destination_wall_visible ... ok
+test monster_moon::tests::moon_matches_frozen_reference ... ok
+test monster_ruin::tests::ruin_matches_frozen_reference ... ok
+test monster_inventor::tests::inventor_matches_frozen_reference ... ok
+test monster_sphinx::tests::sphinx_ai_matches_frozen_reference ... ok
+test monster_spells::tests::caster_spells_match_frozen_reference ... ok
+test monster_horn::tests::horn_caster_matches_frozen_reference ... ok
+test abilities::remember_passive_reference::copies_authored_divine_passives ... ok
+test monster_stalking::tests::stalking_matches_frozen_reference ... ok
+
+test result: ok. 72 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.20s
+
+     Running tests/accuracy_dodge_v33.rs (target/debug/deps/accuracy_dodge_v33-e74e649320b60268)
+
+running 5 tests
+test meaningful_counters_keep_the_global_formula_and_no_universal_invulnerability ... ok
+test witch_profiles_are_fixed_separate_and_identity_not_appearance_selects_stats ... ok
+test specialization_is_only_accuracy_dodge_and_only_new_revision33_actors ... ok
+test native_witch_birth_uses_newborn_not_natural_or_disguise_profile ... ok
+test saved_grown_state_and_temporal_snapshots_are_not_retuned ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/actor_parity.rs (target/debug/deps/actor_parity-216e108a2d2976b0)
+
+running 1 test
+test actor_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.13s
+
+     Running tests/actor_presentation_logs_v33.rs (target/debug/deps/actor_presentation_logs_v33-3ba3b7a5d3dd8129)
+
+running 6 tests
+test distinct_actors_status_damage_death_and_attacking_subjects_do_not_leak ... ok
+test legacy_labels_and_true_death_provenance_are_preserved ... ok
+test half_here_reveal_and_hallucination_use_shared_read_only_identity ... ok
+test actual_bow_hit_and_miss_use_far_disguise_and_near_true_name ... ok
+test revert_and_future_restore_observed_identity_and_existing_labels ... ok
+test save_and_replay_preserve_display_labels_without_changing_real_identity ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/advanced_environment_commands.rs (target/debug/deps/advanced_environment_commands-841103fc8ed0962b)
+
+running 1 test
+test advanced_environment_commands_exact_trace ... FAILED
+
+failures:
+
+---- advanced_environment_commands_exact_trace stdout ----
+
+thread 'advanced_environment_commands_exact_trace' (6342) panicked at crates/corpse-core/tests/advanced_environment_commands.rs:45:17:
+"etill-riptide energy 25" step1 differing ["actors", "actors"]
+actors: actual {"1":[{"creatureKind":"hemogoblin","id":4.0,"x":16.0,"y":15.0,"name":"Hemogoblin","glyph":"h","color":"#BA5358","hp":34.0,"maxHp":34.0,"energy":50.0,"stats":{"offense":7.0,"defense":-11.0,"accuracy":-1.0,"dodge":2.0,"dr":0.0,"perception":40.0,"maxEnergy":50.0},"state":"hunting","lastSeen":{"x":12.0,"y":14.0},"abilities":[],"active":[],"conditions":{"bestiaryTraitsInitialized":1.0,"stealth":2.0,"riptide":1.0,"seesPlayer":1.0,"monsterUnseenTurns":0.0,"targetId":0.0,"maxAbilityCost":0.0}}],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[]} expected {"1":[{"creatureKind":"hemogoblin","id":4.0,"x":16.0,"y":14.0,"name":"Hemogoblin","glyph":"h","color":"#BA5358","hp":34.0,"maxHp":34.0,"energy":50.0,"stats":{"offense":7.0,"defense":-11.0,"accuracy":-1.0,"dodge":2.0,"dr":0.0,"perception":40.0,"maxEnergy":50.0},"state":"hunting","lastSeen":{"x":12.0,"y":14.0},"abilities":[],"active":[],"conditions":{"bestiaryTraitsInitialized":1.0,"stealth":2.0,"riptide":1.0,"seesPlayer":1.0,"monsterUnseenTurns":0.0,"targetId":0.0,"maxAbilityCost":0.0}}],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[]}
+actors: actual {"1":[{"creatureKind":"hemogoblin","id":4.0,"x":16.0,"y":15.0,"name":"Hemogoblin","glyph":"h","color":"#BA5358","hp":34.0,"maxHp":34.0,"energy":50.0,"stats":{"offense":7.0,"defense":-11.0,"accuracy":-1.0,"dodge":2.0,"dr":0.0,"perception":40.0,"maxEnergy":50.0},"state":"hunting","lastSeen":{"x":12.0,"y":14.0},"abilities":[],"active":[],"conditions":{"bestiaryTraitsInitialized":1.0,"stealth":2.0,"riptide":1.0,"seesPlayer":1.0,"monsterUnseenTurns":0.0,"targetId":0.0,"maxAbilityCost":0.0}}],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[]} expected {"1":[{"creatureKind":"hemogoblin","id":4.0,"x":16.0,"y":14.0,"name":"Hemogoblin","glyph":"h","color":"#BA5358","hp":34.0,"maxHp":34.0,"energy":50.0,"stats":{"offense":7.0,"defense":-11.0,"accuracy":-1.0,"dodge":2.0,"dr":0.0,"perception":40.0,"maxEnergy":50.0},"state":"hunting","lastSeen":{"x":12.0,"y":14.0},"abilities":[],"active":[],"conditions":{"bestiaryTraitsInitialized":1.0,"stealth":2.0,"riptide":1.0,"seesPlayer":1.0,"monsterUnseenTurns":0.0,"targetId":0.0,"maxAbilityCost":0.0}}],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[]}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    advanced_environment_commands_exact_trace
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.54s
+
+error: test failed, to rerun pass `-p corpse-core --test advanced_environment_commands`
+     Running tests/ahvamitt_r34.rs (target/debug/deps/ahvamitt_r34-c386c41ee0cb6345)
+
+running 6 tests
+test seven_bag_is_one_of_each_before_final_boss_and_legacy33_is_unchanged ... ok
+test actual_attack_attempt_keeps_ahvamitt_alive_and_no_ordinary_attack_roll_is_needed ... ok
+test carried_mask_teleports_deterministically_and_drop_repickup_cannot_reset_cooldown ... ok
+test two_attacks_relocate_then_third_gives_one_mask_and_disappears ... ok
+test random_destinations_are_standable_vacant_and_do_not_mutate_a_dream_body_anchor ... ok
+test reward_disappearance_revert_and_future_restore_the_exact_branch ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/ally_commands.rs (target/debug/deps/ally_commands-abf49ccbcf052cb2)
+
+running 1 test
+test ally_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.59s
+
+     Running tests/ascend_commands.rs (target/debug/deps/ascend_commands-cf26804f304943aa)
+
+running 1 test
+test ascend_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.59s
+
+     Running tests/avatar_trace.rs (target/debug/deps/avatar_trace-eef0858b86bb2d95)
+
+running 3 tests
+test unsupported_command_is_transactional ... ok
+test avatar_player_terminal_death_matches_reference ... ok
+test avatar_reference_trace_non_temporal_state ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/blood_letting.rs (target/debug/deps/blood_letting-addb8e555ae9891a)
+
+running 1 test
+test blood_letting_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+     Running tests/blood_weapon_commands.rs (target/debug/deps/blood_weapon_commands-b13302ca927f00fb)
+
+running 1 test
+test blood_weapon_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+     Running tests/bombardier_traces.rs (target/debug/deps/bombardier_traces-7aafe5ca06695786)
+
+running 1 test
+test bombardier_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.81s
+
+     Running tests/bonded_commands.rs (target/debug/deps/bonded_commands-8578dc71908523d3)
+
+running 1 test
+test bonded_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+     Running tests/borge_event.rs (target/debug/deps/borge_event-28ac8b46c3cb39a2)
+
+running 20 tests
+test altar_is_a_fixed_fixture_like_existing_godbeast_hardware ... ok
+test all_25_body_cells_have_obelisk_feature_and_altar_survives_hazard_memory ... ok
+test blocked_ordinary_melee_geometry_preserves_the_shard ... ok
+test marked_heart_is_still_food_and_cannot_reselect_after_consumption_or_empty_floor ... ok
+test equipped_shard_kills_any_adjacent_creature_including_sphinx_and_allies ... ok
+test actual_stair_travel_preserves_the_marked_heart_and_event ... ok
+test exact_heart_not_same_species_one_shard_and_no_food_stats_when_offered ... ok
+test seven_exact_milestones_four_authored_types_and_legacy_plan_unchanged ... ok
+test malformed_provenance_and_half_initialized_event_are_rejected_at_load ... ok
+test one_heart_cannot_be_pledged_to_two_borge_events_after_actor_travel ... ok
+test provenance_survives_actor_floor_transfer_carry_drop_save_and_snapshot ... ok
+test shard_invalid_targets_do_not_consume_and_phoenix_cannot_revive_no_accuracy_roll ... ok
+test strongest_is_alive_eligible_and_stable_hp_dr_defense_id_tiebreak ... ok
+test bumping_obelisk_interacts_before_collision_in_normal_and_haste_phases ... ok
+test verdania_is_existing_tree_with_legacy_internal_identity_and_r33_display ... ok
+test offering_is_atomic_across_actual_revert_future_and_save ... ok
+test shard_administrator_uses_existing_terminal_boss_hook_not_immunity_or_corpse ... ok
+test save_replay_and_both_time_abilities_preserve_consumption_and_permanent_death ... ok
+test generated_borge_has_25_solid_cells_clear_accessible_ring_altar_and_stairs ... ok
+test generated_floor40_and_nonmilestones_never_add_an_extra_godbeast ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/caster_spell_traces.rs (target/debug/deps/caster_spell_traces-1e08b4daa825fa74)
+
+running 1 test
+test caster_spell_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.55s
+
+     Running tests/cleanup_parity.rs (target/debug/deps/cleanup_parity-4d89cc1f44c22781)
+
+running 1 test
+test protected_stairs_and_full_cleanup_match_v48 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+     Running tests/combat_starters.rs (target/debug/deps/combat_starters-fa4b4c9d022f45bb)
+
+running 1 test
+test starter_combat_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+
+     Running tests/consumption_passives.rs (target/debug/deps/consumption_passives-5e36b4dd966cde79)
+
+running 1 test
+test consumption_passives_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/cosmetic_blood_trails.rs (target/debug/deps/cosmetic_blood_trails-159e3f76874ea9bc)
+
+running 5 tests
+test temporal_snapshot_restores_stain_layer_without_sharing_future_mutation ... ok
+test repeated_movement_preserves_prior_stains_without_rng ... ok
+test normal_and_movement_only_steps_share_cosmetic_hook_without_other_changes ... ok
+test family_footprints_only_change_existing_cosmetic_layer ... ok
+test no_trails_for_mech_nonfamily_dead_or_nonfloor_tiles ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/crafting_parity.rs (target/debug/deps/crafting_parity-fc1f99267c14b4cc)
+
+running 1 test
+test crafts_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/creature_feeding_v33.rs (target/debug/deps/creature_feeding_v33-fd4ba5e637e2f691)
+
+running 14 tests
+test decoration_is_deterministic_and_observed_wall_memory_does_not_leak_hidden_changes ... ok
+test hunting_detection_interrupts_before_idle_food_action ... ok
+test exactly_one_hundred_normal_turns_then_ten_stationary_turns_reset_without_buffs ... ok
+test autonomous_ally_can_feed_but_following_and_combat_take_priority ... ok
+test rooted_aquatic_unreachable_and_rally_cases_cannot_teleport_or_override_orders ... ok
+test reachable_wall_uses_adjacent_safe_cell_and_never_walks_through_wall ... ok
+test damage_threat_movement_source_loss_and_paralysis_restart_full_meal ... ok
+test thirst_uses_real_blood_only_and_drinks_from_land_without_drowning_or_depleting ... ok
+test revision35_hungry_route_crosses_portal_once_and_respects_remote_occupant ... ok
+test actual_haste_dispatch_and_spawn_sleep_use_world_turns_not_commands ... ok
+test slow_feeds_every_normal_turn_and_haste_never_advances_the_meal_clock ... ok
+test actual_generation_keeps_wall_geometry_and_seeds_only_real_river_food_in_r33 ... ok
+test offscreen_exact_clock_completes_and_restarts_meals_without_player_hunger ... ok
+test serialization_snapshot_both_temporal_routes_and_legacy_gate_keep_ecology_consistent ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/death_transfer_traces.rs (target/debug/deps/death_transfer_traces-0a6a007248151781)
+
+running 1 test
+test death_transfer_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.61s
+
+     Running tests/debug_floor_v33.rs (target/debug/deps/debug_floor_v33-ab23ab96085ddc07)
+
+running 5 tests
+test strict_floor_bounds_and_floor_one_starter_only ... ok
+test temporal_abilities_cannot_skip_preparation_or_duplicate_reconstruction ... ok
+test actual_prior_hearts_loot_stats_and_target_are_exact_and_no_backtrack_duplicates ... ok
+test overflow_is_retained_with_fixed_twenty_slots_and_target_forty_valid ... ok
+test same_seed_and_repeated_load_never_accumulate_and_choices_are_real ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.35s
+
+     Running tests/descent_potions.rs (target/debug/deps/descent_potions-2f511aad78fefae0)
+
+running 1 test
+test descent_potions_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+
+     Running tests/divine_combat.rs (target/debug/deps/divine_combat-d54cb826b27fd1c0)
+
+running 2 tests
+test narrow_hit_and_healing_boundaries ... ok
+test source_stat_pool_and_prime_vectors ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests/divine_environment.rs (target/debug/deps/divine_environment-589d51b0ed1befb0)
+
+running 1 test
+test divine_environment_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+
+     Running tests/divine_reactions.rs (target/debug/deps/divine_reactions-289b8f56bc1cbe12)
+
+running 2 tests
+test reaction_and_packet_boundaries ... ok
+test source_nightmare_and_surrender_predicates ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running tests/divine_rescues.rs (target/debug/deps/divine_rescues-2944494fa0a0d1ff)
+
+running 1 test
+test source_ordered_rescues_and_damage_bank ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/dream_anchor.rs (target/debug/deps/dream_anchor-18d2ebde50099ad3)
+
+running 1 test
+test dream_anchor_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.94s
+
+     Running tests/dream_craft.rs (target/debug/deps/dream_craft-2bfabd8f73095bb5)
+
+running 1 test
+test dream_craft_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.50s
+
+     Running tests/enemy_traits.rs (target/debug/deps/enemy_traits-e8df287eedea75bf)
+
+running 1 test
+test source_intrinsic_and_presentation_normalization ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+     Running tests/entrance_observation.rs (target/debug/deps/entrance_observation-d5ed15474827065f)
+
+running 1 test
+test remembered_entrance_does_not_reveal_hidden_tile_changes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/environment_parity.rs (target/debug/deps/environment_parity-fbf7fcd645736dc9)
+
+running 10 tests
+test ichor_fish_catalog_matches_all_depth_bands ... ok
+test static_environment_matches_complete_v48_state ... ok
+test generated_currents_match_v48 ... ok
+test observed_hazards_match_v48 ... ok
+test active_environment_matches_v48 ... ok
+test ordinary_explosion_and_gas_closure_match_v48 ... ok
+test ichor_dispatch_matches_reference ... ok
+test divine_compound_dispatch_matches_reference ... FAILED
+test supported_offscreen_catchup_matches_v48 ... ok
+test status_dispatch_matches_reference ... ok
+
+failures:
+
+---- divine_compound_dispatch_matches_reference stdout ----
+
+thread 'divine_compound_dispatch_matches_reference' (6448) panicked at crates/corpse-core/tests/environment_parity.rs:4:49:
+assertion `left == right` failed: "riptide-rooted" step1.actors.1[0].y
+  left: Some(15.0)
+ right: Some(14.0)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    divine_compound_dispatch_matches_reference
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.04s
+
+error: test failed, to rerun pass `-p corpse-core --test environment_parity`
+     Running tests/epidite_r34.rs (target/debug/deps/epidite_r34-020bd3edb0af3149)
+
+running 5 tests
+test binary_blessing_doubles_stats_exp_energy_preserves_identity_provenance_quantity_and_stacks ... ok
+test pulse_ignores_dream_targets_and_new_death_hearts_wait_for_next_flash ... ok
+test flash_every_thirty_world_turns_uses_los_bypasses_dr_and_blesses_only_exposed_ground ... ok
+test actual_dispatch_and_offscreen_ticks_advance_the_saved_clock ... ok
+test generation_tower_and_clock_blessed_state_roundtrip ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/equipment_abilities.rs (target/debug/deps/equipment_abilities-45bf20ae787170ad)
+
+running 1 test
+test source_equipment_projection_and_load_reconciliation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/equipment_grant_commands.rs (target/debug/deps/equipment_grant_commands-b0d71ea1229af064)
+
+running 1 test
+test equipment_grant_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.05s
+
+     Running tests/exhausted_offers.rs (target/debug/deps/exhausted_offers-3de6b62a6b027486)
+
+running 1 test
+test exhausted_offers_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+
+     Running tests/expanded_consumables.rs (target/debug/deps/expanded_consumables-dbc43ffab8c7f9cb)
+
+running 1 test
+test expanded_consumables_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.11s
+
+     Running tests/final_toggles.rs (target/debug/deps/final_toggles-5e8814c98d0dec4f)
+
+running 1 test
+test final_toggles_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+
+     Running tests/fire_parity.rs (target/debug/deps/fire_parity-2ecb7d1f75116641)
+
+running 1 test
+test fire_exposure_matches_64_v48_cases ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/flavor_placement.rs (target/debug/deps/flavor_placement-e797b88a34a79562)
+
+running 6 tests
+test authored_setup_windows_follow_members_and_keep_disabled_recipes_disabled ... ok
+test corpse_revival_cannot_introduce_out_of_band_witches ... ok
+test dynamic_water_watcher_stencil_never_leaks_frozen_depth_species ... ok
+test final_windows_cover_every_leader_and_pair_without_legacy_changes ... ok
+test all_depths_keep_deterministic_exact_reward_feasibility ... ok
+test generated_live_sources_obey_relocated_windows_regression_seed_zero ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.48s
+
+     Running tests/flesh_finale.rs (target/debug/deps/flesh_finale-e816a2bf3ad0fd8b)
+
+running 19 tests
+test actual_death_seeds_real_cell_once_without_rng_corpse_or_heart ... ok
+test collapse_removes_fixtures_objects_and_corpses_without_rewards ... ok
+test lost_flight_npcs_are_removed_between_pulses_on_active_and_hidden_floors ... ok
+test half_here_endpoint_falls_out_without_killing_airborne_owner ... ok
+test death_on_upstairs_seeds_above_immediately_without_extra_layer ... ok
+test object_fallback_to_collapse_gap_is_discarded_not_transferred ... ok
+test explicit_dive_while_flying_is_still_a_fall_and_ordinary_gap_is_unchanged ... ok
+test parity_simultaneous_eight_neighbor_layers_no_rng_and_walls_erode ... ok
+test moving_into_entrance_wins_without_extra_world_turn ... ok
+test collapse_fall_terminal_even_on_floor40_and_preserves_flight_until_falling ... ok
+test actual_haste_action_does_not_advance_collapse_clock ... ok
+test only_defeated_boss_and_intact_floor_one_entrance_win ... ok
+test hidden_boss_death_keeps_global_collapse_and_announces_it_once ... ok
+test stairs_seed_only_the_reached_upper_floor_and_progress_offscreen ... ok
+test save_replay_restart_and_both_time_abilities_restore_frontiers_and_boss ... ok
+test playtest_floor40_keeps_boss_and_unranked_origin ... ok
+test older_revisions_keep_pit_and_do_not_spawn_administrator ... ok
+test new_floor40_has_exactly_one_reachable_boss_without_extra_ordinary_budget ... ok
+test complete_physical_ascent_from_forty_reaches_the_door_before_wave ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.64s
+
+     Running tests/floor_one_entrance.rs (target/debug/deps/floor_one_entrance-184fb8d250c4aaf0)
+
+running 8 tests
+test identity_validation_does_not_reinterpret_legacy_stairs ... ok
+test corridor_avoids_fixtures_and_invalid_install_is_atomic ... ok
+test connected_bottom_center_door_is_distinct_and_idempotent ... ok
+test ordinary_required_cell_fixtures_are_reconciled_but_machines_are_not ... ok
+test legacy_revisions_keep_original_entrance_geometry ... ok
+test populated_floor_one_keeps_the_north_arrival_safe_and_unoccupied ... ok
+test revision31_start_save_replay_and_temporal_restore_keep_identity ... ok
+test normal_generation_all_domains_has_safe_connected_entry ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.10s
+
+     Running tests/foundation.rs (target/debug/deps/foundation-167eb14df9d741c2)
+
+running 19 tests
+test history_retains_five ... ok
+test avatar_schema_roundtrip ... ok
+test malformed_geometry_rejects_without_panic ... ok
+test enemy_health_migration_reference_vectors ... ok
+test optional_null_absence ... ok
+test migration_history_rebase_reference ... ok
+test future_restore_costs_parity ... ok
+test future_activation_native_anchor_parity ... ok
+test legacy_history_import_revert_parity ... ok
+test snapshot_shares_floor_blocks ... ok
+test rng_reference_vectors ... ok
+test packed_save_roundtrip ... ok
+test snapshot_failure_does_not_drop_archive ... ok
+test native_inverse_export_continuation ... ok
+test stale_geometry_metadata_is_ignored ... ok
+test native_ring_revert_parity ... ok
+test malformed_save_reference_validation ... ok
+test save_after_revert_continues_exactly ... ok
+test engine_history_full_trace ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.58s
+
+     Running tests/fury_commands.rs (target/debug/deps/fury_commands-d5a23e0cee766999)
+
+running 1 test
+test fury_commands_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.94s
+
+     Running tests/generated_avatar_play.rs (target/debug/deps/generated_avatar_play-3699473e4a8a7f66)
+
+running 1 test
+test actual_generated_avatar_first_actions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.99s
+
+     Running tests/generated_walks.rs (target/debug/deps/generated_walks-8e66dd2de43191bf)
+
+running 1 test
+test generated_walks_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.18s
+
+     Running tests/generation_environment_parity.rs (target/debug/deps/generation_environment_parity-2b50d7fc83c586ed)
+
+running 1 test
+test native_vents_lighting_fire_safety_match_v48 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+
+     Running tests/generation_parity.rs (target/debug/deps/generation_parity-e255c7f9d9290da0)
+
+running 12 tests
+test geological_fields_match_v48_float32_bits_and_rng ... ok
+test heart_budgets_match_v48 ... ok
+test encounter_budgets_match_v48 ... ok
+test unsupported_floor_configuration_is_rejected ... ok
+test domain_plan_matches_v48 ... ok
+test legacy_loot_allocations_match_v48 ... ok
+test passage_cells_and_paths_match_v48 ... ok
+test recorded_loot_acceptance_and_fallback_match_v48 ... ok
+test room_loops_match_v48_including_bent_and_rejected_candidates ... ok
+test stair_spines_match_v48_current_legacy_and_clamped ... ok
+test room_masks_match_v48_including_order_and_rng ... ok
+test full_room_accretion_matches_v48_stages_graph_and_rng ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+
+     Running tests/generation_sweep_parity.rs (target/debug/deps/generation_sweep_parity-e016e0c5e3668bc8)
+
+running 1 test

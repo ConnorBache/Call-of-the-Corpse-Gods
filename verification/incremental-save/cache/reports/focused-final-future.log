@@ -1,0 +1,19 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/incremental-save/source/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 4m 26s
+     Running unittests src/lib.rs (incremental-save/test-target/debug/deps/corpse_core-c5176256c434b1cf)
+
+running 10 tests
+test temporal::export_reuse_tests::export_cache_misses_on_public_endpoint_cursor_and_cow_mutations ... ok
+test temporal::export_reuse_tests::next_completed_turn_retains_prior_sealed_edge_but_external_edits_miss ... ok
+test temporal::export_reuse_tests::opening_guard_checks_external_headers_roots_order_dream_and_cursors ... ok
+test temporal::export_reuse_tests::recorded_inverse_number_spellings_and_cursor_misses_are_exact ... ok
+test temporal::export_reuse_tests::recorded_revert_matches_uncached_inverse_for_all_temporal_traces ... ok
+test temporal::export_reuse_tests::reused_endpoints_keep_all_legacy_patches_in_temporal_reference_traces ... ok
+test temporal::export_reuse_tests::reused_endpoints_match_legacy_export_for_zero_to_five_frames_and_reload ... ok
+test temporal::export_reuse_tests::shared_export_cache_concurrent_divergent_clones_are_exact ... ok
+test temporal::export_reuse_tests::warm_export_cache_checks_both_archive_cursor_keys ... ok
+test temporal::export_reuse_tests::warm_export_cache_detects_debug_loadout_revision_changes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 138 filtered out; finished in 29.48s
+

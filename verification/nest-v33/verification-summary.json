@@ -1,0 +1,62 @@
+{
+  "scope": "Revision33 Nest/Queen/Royal Honey, localized permafrost and flower pockets",
+  "core_tests": {
+    "passed": 11,
+    "failed": 0,
+    "command": "CARGO_INCREMENTAL=0 CARGO_PROFILE_TEST_OPT_LEVEL=1 bash tools/cargo.sh test -p corpse-core --test nest_pockets_v33"
+  },
+  "desktop_tests": {
+    "passed": 1,
+    "failed": 0,
+    "command": "CARGO_INCREMENTAL=0 CARGO_PROFILE_TEST_OPT_LEVEL=1 bash tools/cargo.sh test -p corpse-desktop --bin corpse-desktop pocket_biome_observation_tests",
+    "coverage": "Amber Nest/snow/flower rendering; Greater Zillennia visible grass-to-floor flower removal; stale remembered grass preserves flowers; unknown fog hides metadata"
+  },
+  "real_world_preview": {
+    "seed": "0-5-11:nest-preview",
+    "generated_through_depth": 29,
+    "nest_cells": 98,
+    "nest_room_ids": [
+      2,
+      11,
+      1
+    ],
+    "permafrost_cells": 76,
+    "display_overrides": "All-seeing developer reveal and ambient light35 for inspection only; generated topology/populations/reward preserved"
+  },
+  "images": [
+    "nest-and-permafrost-1920x1080.png",
+    "flower-grove-1920x1080.png"
+  ],
+  "rare_window_regressions": [
+    6,
+    155
+  ],
+  "no_full_workspace_claim": true,
+  "source_sha256": {
+    "crates/corpse-core/src/pocket_biomes.rs": "c41504d3ca7ece9250dced509ca02d470055dc9f72a4ea9370adc484f207a11c",
+    "crates/corpse-core/src/royal_honey.rs": "a05dbee13026b8b3c7c272d77e3f76a85d67bad3a23cc72250902bc3676c5a2a",
+    "crates/corpse-core/src/saidribee_queen.rs": "a3b067d9a1bc2e59237db2f55f3dc71131a1cb92f0db56772e96200f735e8c9a",
+    "crates/corpse-core/tests/nest_pockets_v33.rs": "3f33047b40793f8b2c343844423c31b00bda1548a06f1e5d9fcf9cd7fbcbc5c1",
+    "docs/nest-and-pocket-biomes-r33.md": "2a3c6bc3a9f89c226f6398910fb76dfcc4412a411a219bf3d70939a7cd1b796a"
+  },
+  "legacy_related_tests": {
+    "passed": 6,
+    "failed": 0,
+    "binaries": [
+      "inventory_trace",
+      "caster_spell_traces",
+      "world_generation_parity"
+    ],
+    "includes": "Complete native generation matches every frozen-v48 floor field"
+  },
+  "independent_world_verification": {
+    "all_water_seed": "0-5-11:integration-r33-water-50",
+    "nest_depth": 34,
+    "generated_through_depth": 40,
+    "reported_by": "verify_integrated_r33_features",
+    "checks": "Reachability, Queen/Honey reservations, unique IDs, blood sources and save roundtrip passed",
+    "additional_fresh_worlds_reported_successful": 8,
+    "additional_world_reporter": "tune_accuracy_dodge_matchups",
+    "conditional_nest_blessings_above_ordinary_budget": 13
+  }
+}

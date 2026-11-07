@@ -1,0 +1,20 @@
+{
+  "status": "interrupted",
+  "simulation_revision": 38,
+  "started_utc": "2026-10-28T19:53:06.122136+00:00",
+  "scope": "All files in crates, fixtures and tools except __pycache__, plus Cargo.toml, Cargo.lock, rust-toolchain.toml and AGENTS.md. Generated verification/release documentation is excluded.",
+  "frozen_input_count": 1072,
+  "input_fingerprint_before": "3fd47b62e53b59d44ae8566110a18f5844eb55fff8f58e5df284b7a3c5da5938",
+  "profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "2",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "true",
+    "CARGO_PROFILE_TEST_OVERFLOW_CHECKS": "true"
+  },
+  "cargo_version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "rust_toolchain": "[toolchain]\nchannel = \"1.99.1\"\nprofile = \"minimal\"",
+  "checks": [],
+  "interruption_reason": "Execution environment restarted at approximately 2026-10-28 20:04 UTC while compiling; no test failure observed. Full gate will run again.",
+  "recorded_utc": "2026-10-28T20:07:35.713242+00:00"
+}

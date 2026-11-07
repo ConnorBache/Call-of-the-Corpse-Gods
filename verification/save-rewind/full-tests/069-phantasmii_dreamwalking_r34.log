@@ -1,0 +1,15 @@
+
+running 10 tests
+test blood_costs_still_apply_in_dream ... ok
+test dream_floor_mutations_do_not_change_waking_floor_and_restore_on_error ... ok
+test nightmares_hidden_awake_seen_dream_and_leave_nothing ... ok
+test begin_body_anchor_and_wake_are_persistent ... ok
+test plane_attacks_and_body_damage_notify_without_waking ... ok
+test projection_overlaps_normal_enemy_without_attack ... ok
+test half_here_keeps_creation_plane_across_sleep_and_wake ... ok
+test rejected_travel_and_consumption_are_turnless ... ok
+test real_dispatch_wait_keeps_body_and_projection_valid ... ok
+test debug_seed_replay_rejects_unrecorded_stash_edits_with_session_guidance ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.73s
+

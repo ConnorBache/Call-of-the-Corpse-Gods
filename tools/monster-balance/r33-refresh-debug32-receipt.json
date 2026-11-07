@@ -1,0 +1,234 @@
+{
+  "scope": "32 fresh r33 generated worlds; heart census only, no survival simulation or full-run balance claim.",
+  "source_sha256": "7c45ce0f281a356dea9cc475c8a8754d98bf4cd7712db5bcead9a8fce7eaf6f1",
+  "binary_sha256": "c08e8b057ede856d73d9b6ed29922a02a586b4a2570a18681ff3638ff9fba064",
+  "samples": 32,
+  "failures": [],
+  "nest_accounting": [
+    {
+      "seed": "7-2-9:heart-audit-000000",
+      "depth": 34,
+      "ordinary_budget": 42.0,
+      "initial_non_godbeast_blessings": 55.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "10-9-0:heart-audit-000001",
+      "depth": 34,
+      "ordinary_budget": 42.0,
+      "initial_non_godbeast_blessings": 55.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "9-4-7:heart-audit-000002",
+      "depth": 33,
+      "ordinary_budget": 39.0,
+      "initial_non_godbeast_blessings": 52.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "0-11-10:heart-audit-000003",
+      "depth": 28,
+      "ordinary_budget": 36.0,
+      "initial_non_godbeast_blessings": 49.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "3-6-5:heart-audit-000004",
+      "depth": 34,
+      "ordinary_budget": 41.0,
+      "initial_non_godbeast_blessings": 54.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "6-9-8:heart-audit-000005",
+      "depth": 33,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "9-4-3:heart-audit-000006",
+      "depth": 33,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "8-11-6:heart-audit-000007",
+      "depth": 33,
+      "ordinary_budget": 39.0,
+      "initial_non_godbeast_blessings": 52.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "11-2-5:heart-audit-000008",
+      "depth": 31,
+      "ordinary_budget": 37.0,
+      "initial_non_godbeast_blessings": 50.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "2-9-8:heart-audit-000009",
+      "depth": 33,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "4-11-2:heart-audit-000010",
+      "depth": 28,
+      "ordinary_budget": 36.0,
+      "initial_non_godbeast_blessings": 49.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "1-4-11:heart-audit-000011",
+      "depth": 33,
+      "ordinary_budget": 41.0,
+      "initial_non_godbeast_blessings": 54.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "10-1-4:heart-audit-000012",
+      "depth": 29,
+      "ordinary_budget": 35.0,
+      "initial_non_godbeast_blessings": 48.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "7-6-1:heart-audit-000013",
+      "depth": 32,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "0-11-10:heart-audit-000014",
+      "depth": 29,
+      "ordinary_budget": 37.0,
+      "initial_non_godbeast_blessings": 50.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "9-4-7:heart-audit-000015",
+      "depth": 34,
+      "ordinary_budget": 41.0,
+      "initial_non_godbeast_blessings": 54.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "6-1-0:heart-audit-000016",
+      "depth": 28,
+      "ordinary_budget": 34.0,
+      "initial_non_godbeast_blessings": 47.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "3-6-9:heart-audit-000017",
+      "depth": 29,
+      "ordinary_budget": 35.0,
+      "initial_non_godbeast_blessings": 48.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "8-11-2:heart-audit-000018",
+      "depth": 29,
+      "ordinary_budget": 35.0,
+      "initial_non_godbeast_blessings": 48.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "5-4-7:heart-audit-000019",
+      "depth": 33,
+      "ordinary_budget": 39.0,
+      "initial_non_godbeast_blessings": 52.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "9-8-11:heart-audit-000020",
+      "depth": 29,
+      "ordinary_budget": 37.0,
+      "initial_non_godbeast_blessings": 50.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "0-3-6:heart-audit-000021",
+      "depth": 34,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "7-6-1:heart-audit-000022",
+      "depth": 28,
+      "ordinary_budget": 34.0,
+      "initial_non_godbeast_blessings": 47.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "10-1-8:heart-audit-000023",
+      "depth": 29,
+      "ordinary_budget": 36.0,
+      "initial_non_godbeast_blessings": 49.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "1-8-3:heart-audit-000024",
+      "depth": 31,
+      "ordinary_budget": 37.0,
+      "initial_non_godbeast_blessings": 50.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "4-11-10:heart-audit-000025",
+      "depth": 28,
+      "ordinary_budget": 34.0,
+      "initial_non_godbeast_blessings": 47.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "11-6-5:heart-audit-000026",
+      "depth": 31,
+      "ordinary_budget": 38.0,
+      "initial_non_godbeast_blessings": 51.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "10-1-0:heart-audit-000027",
+      "depth": 33,
+      "ordinary_budget": 39.0,
+      "initial_non_godbeast_blessings": 52.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "5-4-7:heart-audit-000028",
+      "depth": 31,
+      "ordinary_budget": 39.0,
+      "initial_non_godbeast_blessings": 52.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "8-11-2:heart-audit-000029",
+      "depth": 29,
+      "ordinary_budget": 37.0,
+      "initial_non_godbeast_blessings": 50.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "10-5-0:heart-audit-000030",
+      "depth": 28,
+      "ordinary_budget": 34.0,
+      "initial_non_godbeast_blessings": 47.0,
+      "conditional_nest_blessings": 13.0
+    },
+    {
+      "seed": "7-10-5:heart-audit-000031",
+      "depth": 32,
+      "ordinary_budget": 40.0,
+      "initial_non_godbeast_blessings": 53.0,
+      "conditional_nest_blessings": 13.0
+    }
+  ],
+  "track_caveat": "The historical ordinary track means initial non-Godbeast actors, and now includes the new conditional Nest. all_initial also includes initial Zillennia; neither includes future summons or event fish."
+}

@@ -1,0 +1,24 @@
+
+running 19 tests
+test history_retains_five ... ok
+test avatar_schema_roundtrip ... ok
+test migration_history_rebase_reference ... ok
+test future_restore_costs_parity ... ok
+test optional_null_absence ... ok
+test future_activation_native_anchor_parity ... ok
+test legacy_history_import_revert_parity ... ok
+test enemy_health_migration_reference_vectors ... ok
+test packed_save_roundtrip ... ok
+test snapshot_shares_floor_blocks ... ok
+test native_ring_revert_parity ... ok
+test malformed_save_reference_validation ... ok
+test snapshot_failure_does_not_drop_archive ... ok
+test stale_geometry_metadata_is_ignored ... ok
+test rng_reference_vectors ... ok
+test save_after_revert_continues_exactly ... ok
+test malformed_geometry_rejects_without_panic ... ok
+test native_inverse_export_continuation ... ok
+test engine_history_full_trace ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.06s
+

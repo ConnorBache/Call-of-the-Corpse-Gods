@@ -1,0 +1,11 @@
+
+running 6 tests
+test authored_setup_windows_follow_members_and_keep_disabled_recipes_disabled ... ok
+test corpse_revival_cannot_introduce_out_of_band_witches ... ok
+test dynamic_water_watcher_stencil_never_leaks_frozen_depth_species ... ok
+test final_windows_cover_every_leader_and_pair_without_legacy_changes ... ok
+test all_depths_keep_deterministic_exact_reward_feasibility ... ok
+test generated_live_sources_obey_relocated_windows_regression_seed_zero ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.13s
+

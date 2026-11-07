@@ -1,0 +1,35 @@
+
+running 30 tests
+test appearance_store::display_mode_tests::resolution_bounds_limit_framebuffer_allocation ... ok
+test appearance_store::display_mode_tests::combined_display_write_failure_keeps_both_previous_values ... ok
+test appearance_store::display_mode_tests::failed_persistence_keeps_previous_mode_and_file ... ok
+test appearance_store::display_mode_tests::invalid_explicit_mode_rejects_entire_load_without_mutation ... ok
+test default_directory_preparation_is_explicit_and_path_is_per_user ... ok
+test corrupt_storage_is_left_untouched_on_load ... ok
+test appearance_store::display_mode_tests::legacy_boolean_migrates_and_explicit_mode_takes_precedence ... ok
+test appearance_store::display_mode_tests::missing_resolution_is_compatible_and_invalid_is_transactional ... ok
+test entity_reset_restores_inheritance_without_losing_numeric_tuning ... ok
+test defaults_and_control_catalog_are_exact_and_immutable ... ok
+test appearance_store::display_mode_tests::resolution_roundtrip_and_old_preferences_preserve_it ... ok
+test atomic_export_import_and_empty_parent_path ... ok
+test malformed_native_preferences_roll_back_all_fields ... ok
+test failed_storage_rolls_back_library_and_keeps_work_exportable ... ok
+test import_export_preserves_unknown_fields_and_is_undoable ... ok
+test inherited_materials_change_only_unedited_child_fields ... ok
+test malformed_import_and_failed_property_edits_do_not_mutate ... ok
+test native_float_input_equal_to_default_is_a_true_noop ... ok
+test appearance_store::display_mode_tests::every_mode_round_trips_and_survives_preset_and_motion_writes ... ok
+test preview_export_commit_discard_close_and_original_comparison ... ok
+test gestures_undo_redo_and_redo_invalidation ... ok
+test unsafe_depth_and_oversized_values_are_rejected ... ok
+test near_limit_export_uses_compact_json_and_can_be_imported_again ... ok
+test preset_crud_startup_and_preferences_roundtrip ... ok
+test working_edits_are_not_silently_persisted_without_save ... ok
+test source_validation_edit_reset_fixtures_match ... ok
+test history_character_budget_retains_nearest_changes ... ok
+test source_store_transition_fixtures_match ... ok
+test history_is_bounded_and_reset_is_reversible ... ok
+test preset_count_and_total_library_budget_are_transactional ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.61s
+

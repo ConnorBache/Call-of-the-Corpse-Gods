@@ -1,0 +1,11 @@
+
+running 6 tests
+test reference_depth_is_independent_of_spawn_window ... ok
+test pale_identity_and_ichor_event_construction_receive_tuning ... ok
+test revision_overlay_preserves_abilities_rewards_and_frozen_catalog ... ok
+test revised_stat_scale_does_not_rebudget_population ... ok
+test native_late_profile_trades_and_cancer_ignore_armor ... ok
+test native_dispatch_rat_whole_encounter_and_fast_cadence ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.52s
+

@@ -1,0 +1,368 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 1m 11s
+     Running unittests src/lib.rs (target/debug/deps/corpse_core-22ef95f16f60b69b)
+
+running 77 tests
+test combat::tests::chance_clamps_before_range ... ok
+test combat::tests::mitigation_before_scale_rounding ... ok
+test combat::tests::negative_rounding ... ok
+test combat::tests::packets_round_up ... ok
+test combat_audit::tests::disabled_by_default_and_take_disables ... ok
+test corpses::tests::hazard_boundaries ... ok
+test abilities::dream_plane_tests::silence_aura_and_maintained_unspeak_do_not_cross_planes ... ok
+test abilities::dream_plane_tests::sleeping_body_has_no_owner_toggles_but_half_here_keeps_them ... ok
+test divine_environment::tests::dream_plane_riptide_and_reverse_entropy_keep_endpoint_planes ... ok
+test abilities::dream_plane_tests::ahvamitt_allegiance_is_protected_before_cost_without_disabling_other_powers ... ok
+test divine_environment::tests::dream_plane_black_pit_and_water_queries_use_each_endpoint_floor ... ok
+test abilities::dream_plane_tests::matching_plane_and_legacy_targeting_still_work_and_cross_plane_link_can_stop ... ok
+test divine_reactions::dream_plane_tests::sleeping_body_reactions_are_inert_and_deflection_stays_on_its_endpoint_plane ... ok
+test abilities::dream_plane_tests::dream_plane_sparkle_and_bulwark_mutate_only_the_dream_floor ... ok
+test equipment::catalog_tests::authored_bow_and_arrow_bundle ... ok
+test equipment::catalog_tests::every_equipment_definition_parses ... ok
+test environment::presentation_parity::dream_plane_projection_cannot_consume_a_physical_bodys_gas_blast_pool ... ok
+test environment::presentation_parity::dream_plane_physical_half_here_burst_keeps_owner_credit_without_changing_its_plane ... ok
+test gas_reactions::tests::expiration_is_not_a_bridge ... ok
+test gas_reactions::tests::minimum_identity_survives_rank_and_zero ... ok
+test equipment::generated_loot::tests::exact_loot_and_reward_draws ... ok
+test inventory::heart_items::tests::exact_all_authored_heart_rewards ... ok
+test events::presentation_identity_tests::exact_actor_labels_keep_distinct_disguises_without_changing_event_geometry ... ok
+test inventory::item_magic::display_tests::exact_potion_display ... ok
+test environment::presentation_parity::dream_plane_explosion_geometry_uses_the_blast_layer_not_the_players_plane ... ok
+test mini_me::plane_tests::r34_mini_me_serializes_creation_plane_and_never_copies_body_or_nightmare ... ok
+test mini_me::plane_tests::r34_mini_me_spawn_occupancy_ignores_only_opposite_plane_actors ... ok
+test abilities::dream_plane_tests::every_actor_target_rejects_another_plane_before_cost_or_mutation ... ok
+test monster_chill::tests::dream_plane_chill_chooses_native_yeti_and_preserves_half_here_shared_slow ... ok
+test monster_grab::tests::dream_plane_grabs_cannot_apply_or_survive_a_plane_change ... ok
+test inventory::water_tests::exact_float_item_rng_and_quantities ... ok
+test inventory::item_magic::tests::exact_magic_detection_memory ... ok
+test monster_horn::plane_tests::r34_dream_projection_uncast_and_aura_use_dream_geometry ... ok
+test monster_horn::plane_tests::r34_horn_destination_occupancy_uses_actor_or_context_plane ... ok
+test monster_horn::plane_tests::r34_stone_seal_expires_on_creation_plane_after_caster_changes_plane ... ok
+test monster_horn::plane_tests::r34_target_permission_silence_and_sleeping_body_are_plane_local ... ok
+test monster_horn::plane_tests::r34_uncast_requires_a_same_plane_observing_endpoint_not_union_visibility ... ok
+test monster_grab::venom_tests::terminal_venom_matches_frozen_reference ... ok
+test monster_inventor::tests::dream_plane_fire_cone_never_applies_burning_or_rng_to_other_plane_victims ... ok
+test inventory::tests::reference_inventory_boundaries ... ok
+test divine_environment::tests::phase_loss_matches_frozen_reference ... ok
+test monster_bombardier::tests::bombardier_matches_frozen_reference ... ok
+test environment::presentation_parity::explosion_presentation_matches_reference ... ok
+test monster_inventor::tests::duplicate_pilot_identity_rejects_without_mutation ... ok
+test monster_grab::tests::grabs_match_frozen_reference ... ok
+test monster_moon::tests::moon_matches_frozen_reference ... ok
+test monster_spells::tests::dream_plane_dryad_heals_only_a_native_endpoint ... ok
+test abilities::reaction_attack_reference::retained_reaction_sources_and_offhand ... ok
+test monster_statuses::plane_tests::r34_inflicted_dot_keeps_source_credit_after_caster_changes_plane ... ok
+test monster_statuses::plane_tests::r34_source_less_status_uses_contact_plane_and_legacy_is_unchanged ... ok
+test monster_statuses::plane_tests::r34_status_infliction_rejects_cross_plane_without_mutation ... ok
+test movement::tests::corner_wall_but_not_tree ... ok
+test movement::tests::safe_route_beats_short_hazard ... ok
+test non_euclidean_generation::proposal_tests::assignment_uses_diagonal_neighbors_and_forced_next_source_but_never_cuts_wall_corners ... ok
+test non_euclidean_generation::proposal_tests::last_two_always_form_one_pair_and_terminal_singletons_reject ... ok
+test non_euclidean_generation::proposal_tests::proposal_threshold_and_removed_source_eligibility_are_literal ... ok
+test non_euclidean_generation::proposal_tests::source_removal_changes_destination_eligibility_and_forced_chain_is_preserved ... ok
+test monster_statuses::parity::status_and_lifecycle_reference ... ok
+test offscreen::portal_traversal_tests::credited_returning_ally_traverses_portal_once_with_remote_occupancy ... ok
+test offscreen::portal_traversal_tests::offscreen_pursuit_traverses_once_and_does_not_overlap_remote_occupant ... ok
+test offscreen::portal_traversal_tests::offscreen_stochastic_pursuit_replans_both_returns_without_telefrag ... ok
+test temporal::legacy_undefined_tests::missing_patch_value_restores_undefined_not_null ... ok
+test vision::native_plane_tests::hidden_other_plane_cells_do_not_expose_current_terrain_hazards_or_sources ... ok
+test vision::native_plane_tests::native_memory_all_seeing_and_senses_need_a_native_endpoint_not_a_sleeping_body ... ok
+test vision::native_plane_tests::native_memory_mask_excludes_opposite_clone_only_visibility ... ok
+test vision::native_plane_tests::opposite_half_here_observes_native_geometry_hazards_and_lights_without_mutation ... ok
+test progression::tests::exact_authored_weighted_choices ... ok
+test vision::native_plane_tests::player_plane_wins_when_both_half_here_views_see_the_tile ... ok
+test vision::tests::dark_impossible ... ok
+test vision::tests::destination_wall_visible ... ok
+test monster_spells::tests::caster_spells_match_frozen_reference ... ok
+test monster_inventor::tests::inventor_matches_frozen_reference ... ok
+test monster_ruin::tests::ruin_matches_frozen_reference ... ok
+test abilities::remember_passive_reference::copies_authored_divine_passives ... ok
+test monster_horn::tests::horn_caster_matches_frozen_reference ... ok
+test monster_stalking::tests::stalking_matches_frozen_reference ... ok
+test monster_sphinx::tests::sphinx_ai_matches_frozen_reference ... ok
+
+test result: ok. 77 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.21s
+
+     Running tests/caster_spell_traces.rs (target/debug/deps/caster_spell_traces-1e08b4daa825fa74)
+
+running 1 test
+test caster_spell_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.83s
+
+     Running tests/debug_floor_v33.rs (target/debug/deps/debug_floor_v33-ab23ab96085ddc07)
+
+running 5 tests
+test strict_floor_bounds_and_floor_one_starter_only ... ok
+test temporal_abilities_cannot_skip_preparation_or_duplicate_reconstruction ... ok
+test actual_prior_hearts_loot_stats_and_target_are_exact_and_no_backtrack_duplicates ... ok
+test overflow_is_retained_with_fixed_twenty_slots_and_target_forty_valid ... ok
+test same_seed_and_repeated_load_never_accumulate_and_choices_are_real ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.38s
+
+     Running tests/flavor_placement.rs (target/debug/deps/flavor_placement-e797b88a34a79562)
+
+running 6 tests
+test authored_setup_windows_follow_members_and_keep_disabled_recipes_disabled ... ok
+test corpse_revival_cannot_introduce_out_of_band_witches ... ok
+test dynamic_water_watcher_stencil_never_leaks_frozen_depth_species ... ok
+test final_windows_cover_every_leader_and_pair_without_legacy_changes ... ok
+test all_depths_keep_deterministic_exact_reward_feasibility ... ok
+test generated_live_sources_obey_relocated_windows_regression_seed_zero ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.47s
+
+     Running tests/grab_traces.rs (target/debug/deps/grab_traces-c60faf2028f2b189)
+
+running 1 test
+test grab_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.68s
+
+     Running tests/horn_caster_traces.rs (target/debug/deps/horn_caster_traces-3bf13df942680f38)
+
+running 1 test
+test horn_caster_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.83s
+
+     Running tests/inventor_traces.rs (target/debug/deps/inventor_traces-369bd6306cdf9ee8)
+
+running 1 test
+test inventor_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.69s
+
+     Running tests/mini_me_offscreen.rs (target/debug/deps/mini_me_offscreen-4383acf3efe475f8)
+
+running 1 test
+test mini_me_offscreen_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.89s
+
+     Running tests/moon_traces.rs (target/debug/deps/moon_traces-12d920f336aea854)
+
+running 1 test
+test moon_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.99s
+
+     Running tests/movement_fuzz.rs (target/debug/deps/movement_fuzz-b5fbfd9be5dcfad8)
+
+running 1 test
+test movement_fuzz_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.01s
+
+     Running tests/non_euclidean_generation_v36.rs (target/debug/deps/non_euclidean_generation_v36-7afda5066d1e56d4)
+
+running 11 tests
+test physical_contiguity_and_one_good_stochastic_branch_do_not_prove_safety ... ok
+test a_pocket_must_not_turn_previously_optional_portals_into_the_only_escape ... ok
+test unsuitable_floor_omits_instead_of_altering_graph_or_terrain ... ok
+test stairs_fixtures_portals_population_and_loot_are_never_rewritten ... ok
+test depth_revision_determinism_idempotence_and_unchanged_terrain ... ok
+test startup_adds_only_metadata_without_rebudgeting_or_spending_simulation_rng ... ok
+test save_roundtrip_structural_boundaries_and_dream_validation ... ok
+test all_six_domains_keep_geometry_and_every_accepted_pocket_is_traversable ... ok
+test cell_partition_and_all_stochastic_outcomes_have_paths_out ... ok
+test sampled_distribution_and_bounded_retry_receipt ... ok
+test populated_floor_sample_records_actual_exclusions_and_retries ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.06s
+
+     Running tests/non_euclidean_integration_r36.rs (target/debug/deps/non_euclidean_integration_r36-d2b83b1f7034fa5e)
+
+running 13 tests
+test half_here_keeps_its_creation_plane_and_does_not_project_pocket_sight ... ok
+test invalid_throw_and_interception_before_fork_do_not_draw_a_random_exit ... ok
+test entering_each_source_arrives_once_at_shared_destination_without_rng ... ok
+test actual_empty_throw_samples_once_and_places_one_real_item_at_the_chosen_exit ... ok
+test read_only_queries_and_blocked_sibling_do_not_consume_a_lottery_draw ... ok
+test pockets_do_not_create_an_optical_viewpoint_or_reduce_visual_distance ... ok
+test shared_underfoot_items_are_transferred_once_not_cloned ... ok
+test dream_transition_does_not_move_or_attack_the_waking_body ... ok
+test linked_enemy_occupancy_attacks_without_telefrag_or_random_return ... ok
+test reverse_transition_consumes_exactly_one_serialized_draw_and_exercises_both_exits ... ok
+test absent_pockets_preserve_revision35_commands_and_actor_tuning ... ok
+test save_replay_revert_and_future_preserve_topology_and_random_outcome ... ok
+test debug_floor_twenty_and_forty_keep_exact_revision35_rewards_choices_and_costs ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.49s
+
+     Running tests/non_euclidean_physics_r36.rs (target/debug/deps/non_euclidean_physics_r36-00f740b7a4074ad8)
+
+running 17 tests
+test local_origin_shot_does_not_draw_and_blocked_return_origin_cannot_reroll ... ok
+test adjacent_sibling_step_is_not_a_zero_cost_transfer ... ok
+test half_here_keeps_native_pocket_plane_after_dreamwalk ... ok
+test legacy_charged_moonbeam_out_of_range_still_discharges_without_attack ... ok
+test legacy_throw_keeps_second_raster_trajectory_check ... ok
+test collision_or_blocked_exit_stops_before_fork_without_rng ... ok
+test actual_npc_ranged_launch_resolves_fork_not_preview_stop ... ok
+test possible_shot_search_never_supplies_remote_optical_knowledge ... ok
+test linked_source_origins_are_deterministic_but_reverse_origin_is_not_previewed ... ok
+test actual_throw_transfers_one_item_and_invalid_potion_does_not_draw ... ok
+test preview_stops_at_random_entry_and_committed_trace_draws_once ... ok
+test npc_path_admits_both_outcomes_and_commits_only_actual_movement ... ok
+test real_witch_fork_miss_advances_phase_spends_and_sets_same_cooldown ... ok
+test real_horn_ai_admits_possible_shot_but_commits_fair_miss_and_recovery ... ok
+test thrown_potion_hits_shared_occupant_once_without_sampling_return ... ok
+test stochastic_path_rejects_an_unwalkable_sibling ... ok
+test witch_over_range_random_branch_is_a_paid_cooled_down_miss ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/ordinary_roster.rs (target/debug/deps/ordinary_roster-09b7d6802db76d0d)
+
+running 6 tests
+test ichor_bands_expand_with_same_uniform_draw_and_templates ... ok
+test shipped_manual_matches_runtime_eligibility ... ok
+test widened_windows_preserve_recipe_rules ... ok
+test deterministic_distribution_sample_all_depths ... ok
+test widened_population_places_on_all_generated_depths ... ok
+test save_lazy_generation_and_replay_keep_revision ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.25s
+
+     Running tests/phantasmii_dreamwalking_r34.rs (target/debug/deps/phantasmii_dreamwalking_r34-73112d502238bea4)
+
+running 10 tests
+test blood_costs_still_apply_in_dream ... ok
+test dream_floor_mutations_do_not_change_waking_floor_and_restore_on_error ... ok
+test half_here_keeps_creation_plane_across_sleep_and_wake ... ok
+test nightmares_hidden_awake_seen_dream_and_leave_nothing ... ok
+test plane_attacks_and_body_damage_notify_without_waking ... ok
+test projection_overlaps_normal_enemy_without_attack ... ok
+test begin_body_anchor_and_wake_are_persistent ... ok
+test rejected_travel_and_consumption_are_turnless ... ok
+test real_dispatch_wait_keeps_body_and_projection_valid ... ok
+test debug_seed_replay_rejects_unrecorded_stash_edits_with_session_guidance ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+     Running tests/phantasmii_generation_r34.rs (target/debug/deps/phantasmii_generation_r34-90e7187cea314130)
+
+running 7 tests
+test revision34_bag_has_seven_distinct_designs_at_unchanged_seven_milestones ... ok
+test revision34_natural_actor_profiles_are_still_revision33_and_legacy_shell_is_explicit ... ok
+test eight_fixed_next_band_body_profiles_have_no_inherited_combat_traits ... ok
+test shard_pickup_is_dream_only_one_real_stack_and_unlocks_without_consuming ... ok
+test persistent_four_on_all_forty_floors_and_three_quest_items_only_at_altar ... ok
+test generated_event_is_walkable_and_population_additions_do_not_rebudget_ordinary_content ... ok
+test debug_reconstruction_leaves_prior_dream_quest_and_nightmares_unearned ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+
+     Running tests/physical_balance.rs (target/debug/deps/physical_balance-bf5456064e837339)
+
+running 6 tests
+test reference_depth_is_independent_of_spawn_window ... ok
+test pale_identity_and_ichor_event_construction_receive_tuning ... ok
+test revision_overlay_preserves_abilities_rewards_and_frozen_catalog ... ok
+test revised_stat_scale_does_not_rebudget_population ... ok
+test native_late_profile_trades_and_cancer_ignore_armor ... ok
+test native_dispatch_rat_whole_encounter_and_fast_cadence ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.55s
+
+     Running tests/portal_consumers_v35.rs (target/debug/deps/portal_consumers_v35-ce089d82dc58aaea)
+
+running 8 tests
+test mini_me_cannot_spawn_on_an_occupied_link_alias ... ok
+test native_plane_yeti_and_silence_reach_the_linked_endpoint ... ok
+test dryad_heals_through_portal_without_changing_recipient_identity ... ok
+test horn_bolt_uses_portal_range_and_hits_the_actual_remote_actor ... ok
+test endpoint_ranges_feed_half_here_and_counterattacks ... ok
+test reverse_entropy_aura_uses_linked_range_but_not_other_plane ... ok
+test linked_grab_survives_until_endpoint_separation ... ok
+test directed_fire_cone_reaches_remote_space_without_cross_plane_damage ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/portal_generation_v35.rs (target/debug/deps/portal_generation_v35-bbc46fe36245bf07)
+
+running 10 tests
+test disconnected_if_both_avoided_is_rejected_even_if_individually_bypassable ... ok
+test unsuitable_maps_omit_instead_of_rewriting_or_forcing_a_portal ... ok
+test every_actor_profile_and_population_pool_remains_revision34 ... ok
+test depth_gate_determinism_and_legacy_nonmutation ... ok
+test startup35_adds_portals_without_rebudgeting_actors_or_ground ... ok
+test unreachable_decorative_components_do_not_receive_endpoints ... ok
+test optional_metadata_roundtrips_and_malformed_waking_or_dream_pairs_reject ... ok
+test seven_pairs_keep_all_endpoints_optional_with_ordered_colors ... ok
+test never_occupies_stairs_fixture_actor_loot_or_required_single_width_route ... ok
+test generated_six_biomes_and_multiple_seeds_preserve_walking_routes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+
+     Running tests/portal_integration_v35.rs (target/debug/deps/portal_integration_v35-135b411b940ba011)
+
+running 22 tests
+test ally_swap_and_nonattacking_occupancy_use_both_endpoints ... ok
+test dream_projection_crosses_same_plane_without_moving_sleeping_body ... ok
+test enemy_at_mate_is_attacked_before_transport ... ok
+test directed_projectile_reaches_remote_actor_with_actual_range ... ok
+test diagonal_portal_projectile_preserves_direction_and_segment_range ... ok
+test direction_helper_preserves_zero_axes_and_portal_route_orientation ... ok
+test half_here_has_native_plane_portal_view_and_alias_distance ... ok
+test multiple_portal_ray_cycle_is_bounded ... ok
+test forced_move_crosses_once_and_respects_remote_occupancy ... ok
+test actual_throw_attacks_remote_endpoint_and_empty_throw_lands_at_mate ... ok
+test npc_path_uses_local_entry_step_and_remote_arrival ... ok
+test projectile_range_without_portals_retains_legacy_euclidean_distance ... ok
+test optical_route_uses_remaining_distance_and_both_occlusions ... ok
+test ray_stops_at_walls_before_entry_or_after_exit ... ok
+test underfoot_pickup_sees_the_other_endpoint_without_duplicate_items ... ok
+test remote_endpoint_occupant_intercepts_without_duplicate_body ... ok
+test normal_enemy_can_melee_player_through_link_without_telefragging ... ok
+test opaque_portal_endpoint_disables_optical_transfer_without_corrupting_save ... ok
+test no_portal_revision35_preserves_simple_revision34_command_results ... ok
+test empty_entry_is_one_turn_then_leaving_does_not_bounce ... ok
+test future_branch_restores_player_and_linked_occupancy_after_crossing ... ok
+test save_fixture_replay_and_temporal_restore_keep_pair_identity ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/projectile_parity.rs (target/debug/deps/projectile_parity-eb5b2f28d2bcc460)
+
+running 1 test
+test projectiles_exact_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.77s
+
+     Running tests/travel.rs (target/debug/deps/travel-773f1d8cc8e55f82)
+
+running 4 tests
+test exact_movement_terrain_hooks ... ok
+test exact_forced_fall_cohorts ... ok
+test exact_collapse_and_corpse_placement ... ok
+test exact_travel_departure_arrival_and_ally_stairs ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.07s
+
+     Running tests/travel_traces.rs (target/debug/deps/travel_traces-d0fc317f9bc0e548)
+
+running 1 test
+test travel_command_reference_traces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.71s
+
+     Running tests/witch_skinwalker_v33.rs (target/debug/deps/witch_skinwalker_v33-ef9b0ccdbd7ee6cd)
+
+running 11 tests
+test disguise_reverses_at_chebyshev_two_and_preserves_true_state ... ok
+test half_here_reveals_from_observing_body_only ... ok
+test uncast_cancels_one_witch_attempt_without_double_charging_or_summon_cooldown ... ok
+test revived_skinwalker_retains_disguise_and_unspeak_prices_witch_summons ... ok
+test witch_spends_only_successful_summons_and_keeps_curses_between ... ok
+test new_species_have_bounded_revisioned_population_and_real_hearts ... ok
+test failed_summons_are_atomic_and_heartless_is_inherited ... ok
+test queen_is_conditional_only_with_explicit_guardian_heart_and_trait_cost ... ok
+test new_state_survives_save_snapshot_revert_and_future ... ok
+test new_creatures_execute_native_turns_and_offscreen_catchup_without_identity_changes ... ok
+test revision33_replays_native_summons_exactly ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

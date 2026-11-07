@@ -1,0 +1,3 @@
+db823857a0654d2913a078d36bfcc4dcc270ebebaac0a1a490afb75ec25c9b91  target/debug/deps/libcorpse_core-ccbda60d807cc80b.rlib
+eca5a61ca5017478e7723a3fca3c292c2315d15f071005597ed0bb0bba4a0caa  crates/corpse-core/src/debug_floor.rs
+0eb86649a52bafc0dbe56b8acf4e35544d609f49557cadbc03ded17a32662f3d  crates/corpse-core/tests/debug_floor40_fire_admission.rs

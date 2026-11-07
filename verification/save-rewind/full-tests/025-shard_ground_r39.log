@@ -1,0 +1,7 @@
+
+running 2 tests
+test waking_zillennia_cannot_erase_a_dream_dropped_shard ... ok
+test marker_roundtrips_only_on_r39_ground_or_observation_shard ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+

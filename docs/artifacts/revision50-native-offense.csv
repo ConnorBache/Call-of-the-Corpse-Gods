@@ -1,0 +1,15 @@
+kind,scenario,reference_depth,role,status,trials,paired_gross_damage_delta,paired_delta_standard_error,initial_enemy_profiles_identical,initial_combat_seeds_identical,before_gross,after_gross,before_attempts,after_attempts,before_deaths,after_deaths,before_kills,after_kills,before_combat_censors,after_combat_censors,before_aftermath_censors,after_aftermath_censors,before_postdeath_gross,after_postdeath_gross
+blorb,adjacent,1,negligible-body,native_paired,32,0.0,0.0,True,True,0.0,0.0,1.0,1.0,0,0,32,32,0,0,0,0,0.0,0.0
+rat,adjacent,1,plain-fighter,native_paired,32,-0.0609375,0.012101381011233068,True,True,0.0921875,0.031249999999999997,2.3125,1.5,0,0,32,32,0,0,0,0,0.0,0.0
+cave-bat,adjacent,1,fast-skirmisher,native_paired,32,-0.0390625,0.009173060300807908,True,True,0.059062500000000004,0.020000000000000004,2.5625,1.59375,0,0,32,32,0,0,0,0,0.0,0.0
+shellback-beetle,adjacent,1,slow-armored,native_paired,32,-0.043750000000000004,0.00836117660341823,True,True,0.10218749999999997,0.05843750000000002,6.1875,3.5625,0,0,32,32,0,0,0,0,0.0,0.0
+hemogoblin,adjacent,1,plain-fighter,native_paired,32,-0.0403125,0.008297448779594846,True,True,0.0934375,0.05312500000000001,2.78125,2.0,0,0,32,32,0,0,0,0,0.0,0.0
+needleling,adjacent,1,venom-and-aftermath,native_paired,32,-0.055625,0.013167174942550963,True,True,0.10312500000000001,0.0475,2.0,1.46875,0,0,32,32,0,0,0,0,0.028750000000000008,0.013749999999999998
+bear,adjacent,6,plain-fighter,native_paired,32,-0.06165638209167044,0.011454747277046111,True,True,0.14973469429162503,0.08807831219995457,5.53125,3.375,0,0,32,32,0,0,0,0,0.0,0.0
+troll,adjacent,19,regenerating-fighter,native_paired,32,-0.12548955862145628,0.01563225556958961,True,True,0.21839413742636737,0.09290457880491114,7.21875,3.625,0,0,32,32,0,0,0,0,0.0,0.0
+dire-bear,adjacent,20,armored-fighter,native_paired,32,-0.15772186671715638,0.016221745231016788,True,True,0.27833404830704317,0.12061218158988676,7.6875,3.96875,0,0,32,32,0,0,0,0,0.0,0.0
+minotaur,adjacent,33,late-fighter,native_paired,32,-0.12765579946936154,0.022577966862933594,True,True,0.23020985742865122,0.10255405795928965,7.84375,3.8125,0,0,32,32,0,0,0,0,0.0,0.0
+dragon,adjacent,38,fire-breath-and-aftermath,native_paired,32,-0.16797178168941332,0.019776926681355472,True,True,0.2440298127178199,0.07605803102840657,7.6875,3.78125,0,0,32,32,0,0,0,0,0.00787867065132398,0.008888265455131735
+pale:Spitter,chase,4,ranged-gas-and-aftermath,native_paired,32,-0.014256110270480736,0.0017953439459081136,True,True,0.0881716279261828,0.07391551765570208,2.0,1.25,0,0,32,32,0,0,0,0,0.0,0.0
+pale:Birther,three-cast-children,6,isolated-native-summon-payload,native_paired,32,-0.06582474575081537,0.010944583621340351,True,True,0.1429065471272668,0.0770818013764515,9.0,5.96875,0,0,32,32,0,0,0,0,0.0,0.0
+ursa-major,ursa-pair,36,linked-pair-stress,native_paired,32,-0.23993101467486172,0.02272786850795818,True,True,0.40714865320405963,0.1672176385291979,14.34375,7.0625,0,0,32,32,0,0,0,0,0.0,0.0

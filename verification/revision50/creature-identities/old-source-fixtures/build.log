@@ -1,0 +1,183 @@
+   Compiling crc32fast v1.5.2
+   Compiling cfg-if v1.0.5
+warning: unused import: `StorageError`
+ --> /workspace/scratch/69f53637ba6f/r50-pre-creature-names/crates/corpse-core/src/future_anchor.rs:3:45
+  |
+3 | use crate::{Run,Field,storage::{self,Result,StorageError}};
+  |                                             ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `validate_ids` is never used
+   --> /workspace/scratch/69f53637ba6f/r50-pre-creature-names/crates/corpse-core/src/creature_index.rs:155:19
+    |
+ 65 | impl ActorFloors {
+    | ---------------- method in this implementation
+...
+155 |     pub(crate) fn validate_ids(&self,player:f64,depth:f64)->Result<(),String> {self.ensure(player,depth)}
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `COUNT_NAMES` is never used
+  --> /workspace/scratch/69f53637ba6f/r50-pre-creature-names/crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+
+warning: `corpse-core` (lib) generated 3 warnings (run `cargo fix --lib -p corpse-core` to apply 1 suggestion)
+   Compiling r50-prerename-fixture-helper v0.1.0 (/workspace/scratch/69f53637ba6f/r50-prerename-fixture-helper)
+warning: unused import: `RunIdValue`
+ --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/tracked_engine.rs:9:43
+  |
+9 | pub use metadata::{Operation, OrderValue, RunIdValue};
+  |                                           ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:124:12
+    |
+124 |     {#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.append_write");file.write_all(bytes)?;}
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+    = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:126:12
+    |
+126 |     {#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.append_sync");file.sync_all()?;}
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:166:35
+    |
+166 | ...   let loaded={#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.reopen_read");super::read_recordin...
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:171:50
+    |
+171 | ...   let existing_kind={#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.reopen_decode");super::deco...
+    |                                ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:188:36
+    |
+188 | ...   let payload={#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.receipt_encode");serde_json::to_s...
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:190:39
+    |
+190 | ...   let replayable={#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.receipt_validate");parse_opera...
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:196:38
+    |
+196 | ...   let frame={#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.frame_encode");log::encode_append(s...
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:209:35
+    |
+209 | ...   let checkpoint={#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.checkpoint_encode");super::enc...
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:223:24
+    |
+223 | ...   {#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.checkpoint_write_sync_replace");super::atomic...
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/incremental_store.rs:234:24
+    |
+234 | ...   {#[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.checkpoint_write_sync_replace");super::atomic...
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+   --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/session_store.rs:380:15
+    |
+380 |         #[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.lock_ownership");
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+    |
+    = note: no expected values for `feature`
+    = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+  --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/recording_attachment.rs:28:8
+   |
+28 |  #[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.attach_full_validation");
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+   |
+   = note: no expected values for `feature`
+   = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `runtime-timing`
+  --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/recording_attachment.rs:32:8
+   |
+32 |  #[cfg(feature="runtime-timing")]let _span=corpse_core::timing::span("recording.bounded_check");
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^ help: remove the condition
+   |
+   = note: no expected values for `feature`
+   = help: consider adding `runtime-timing` as a feature in `Cargo.toml`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> src/../../r50-pre-creature-names/crates/corpse-desktop/src/tracked_engine.rs:43:30
+   |
+43 | ...   let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity ex...
+   |                            ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+43 -         let identity=NEXT_ID.fetch_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+43 +         let identity=NEXT_ID.try_update(Ordering::Relaxed,Ordering::Relaxed,|n|n.checked_add(1)).expect("Tracked session identity exhausted");
+   |
+
+warning: `r50-prerename-fixture-helper` (bin "r50-prerename-fixture-helper") generated 15 warnings (run `cargo fix --bin "r50-prerename-fixture-helper" -p r50-prerename-fixture-helper` to apply 2 suggestions)
+    Finished `dev` profile [unoptimized] target(s) in 6.20s

@@ -1,0 +1,26 @@
+{
+  "prior_checkpoint_fingerprint": "02e583c161f32e46c1161b0e308c1b487da64f7621daf524a5e1750b5a259ac7",
+  "final_refreeze_fingerprint": "7bfb2c344ed064026e9b7d17fe0703a2dac4680118e75d2afe2df691b54e66af",
+  "input_files": 1124,
+  "changed_paths": [
+    "crates/corpse-core/src/actor_presentation.rs",
+    "crates/corpse-core/src/ai.rs",
+    "crates/corpse-core/src/engine.rs",
+    "crates/corpse-core/src/events.rs",
+    "crates/corpse-core/src/ichor.rs",
+    "crates/corpse-core/src/lib.rs",
+    "crates/corpse-core/src/monster_grab.rs",
+    "crates/corpse-core/src/monster_horn.rs",
+    "crates/corpse-core/src/monster_statuses.rs",
+    "crates/corpse-core/src/travel.rs",
+    "crates/corpse-core/src/witch.rs",
+    "crates/corpse-core/tests/actor_presentation_logs_v33.rs",
+    "crates/corpse-desktop/src/creature_presentation.rs",
+    "crates/corpse-desktop/src/manual.rs"
+  ],
+  "reason": "Revision33-only actor-name presentation guard plus stale manual test correction; no stat catalogs, hit formula or RNG rules changed.",
+  "equivalence_receipts": [
+    "verification/integration-r33/skin-log-state-comparison.json",
+    "verification/integration-r33/presentation-combat-smoke-receipt.json"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "all_invariant_fields_equal": true,
+  "application_manifest_embedded_unchanged": true,
+  "application_manifest_sha256": "445c0ca467b3648a66862277abef47b4958c50a7cc15913bb84fa950b7227497",
+  "header_changes": {
+    "Characteristics": {
+      "after": 558,
+      "before": 38
+    },
+    "CheckSum": {
+      "after": 29622022,
+      "before": 120111109
+    },
+    "NumberOfSections": {
+      "after": 10,
+      "before": 20
+    },
+    "NumberOfSymbols": {
+      "after": 0,
+      "before": 36780
+    },
+    "PointerToSymbolTable": {
+      "after": 0,
+      "before": 115472384
+    },
+    "SizeOfHeaders": {
+      "after": 1024,
+      "before": 1536
+    },
+    "SizeOfImage": {
+      "after": 29581312,
+      "before": 115511296
+    },
+    "TimeDateStamp": {
+      "after": 1794038286,
+      "before": 1794038275
+    }
+  },
+  "headers_and_image_cover_all_retained_sections": true,
+  "invariant_header_fields": {
+    "AddressOfEntryPoint": 5104,
+    "BaseOfCode": 4096,
+    "DllCharacteristics": 352,
+    "FileAlignment": 512,
+    "ImageBase": 5368709120,
+    "LoaderFlags": 0,
+    "Machine": 34404,
+    "Magic": 523,
+    "MajorImageVersion": 0,
+    "MajorOperatingSystemVersion": 4,
+    "MajorSubsystemVersion": 5,
+    "MinorImageVersion": 0,
+    "MinorOperatingSystemVersion": 0,
+    "MinorSubsystemVersion": 2,
+    "NumberOfRvaAndSizes": 16,
+    "SectionAlignment": 4096,
+    "SizeOfHeapCommit": 4096,
+    "SizeOfHeapReserve": 1048576,
+    "SizeOfOptionalHeader": 240,
+    "SizeOfStackCommit": 4096,
+    "SizeOfStackReserve": 2097152,
+    "Subsystem": 3,
+    "Win32VersionValue": 0
+  },
+  "kind": "r51-independent-static-pe-comparison",
+  "limits": "Static validation only. Debug stripping can alter timestamps/checksums and file layout; deterministic ZIP ordering is not reproducible-executable proof.",
+  "non_debug_data_directories_unchanged": true,
+  "original_sha256": "244e97b011ff795a9c90965c7a2cbf6c08c24d2fddd18d9a31bc90e6fa1c2b03",
+  "packaged_sha256": "c299ba8f2ff428918218f00ba2fb15f51d693562f31e2affbc70b9a5aa3a18d5",
+  "raw_offsets_aligned_in_bounds_and_nonoverlapping": true,
+  "removed_debug_sections": [
+    ".debug_abbrev",
+    ".debug_aranges",
+    ".debug_frame",
+    ".debug_info",
+    ".debug_line",
+    ".debug_line_str",
+    ".debug_loclists",
+    ".debug_ranges",
+    ".debug_rnglists",
+    ".debug_str"
+  ],
+  "retained_bytes_virtual_sizes_rvas_flags_and_raw_sizes_equal": true,
+  "retained_section_count": 10,
+  "schema": 1,
+  "windows_runtime_verified": false
+}

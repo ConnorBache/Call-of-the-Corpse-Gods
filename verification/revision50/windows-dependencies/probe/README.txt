@@ -1,0 +1,1 @@
+This is a compile/link-only SDK probe, not the game. Exit0 confirms a Windows SDL import library link succeeded. The generated PE executable was not run and is retained outside the source deliverable. Actual game and Windows runtime verification remain pending.

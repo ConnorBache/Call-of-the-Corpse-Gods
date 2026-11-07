@@ -1,0 +1,750 @@
+{
+  "source_library_id": "libfile_3e0271ad0468819193074fc8ab8ba853",
+  "source_variant": "r31-visual-composition-only",
+  "binary_sha256": "5f59854ccdcf67783f9dc76ae3bb67f22102fd567c6b360b43b3e7146739b8d3",
+  "render_size": [
+    1280,
+    800
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "id": "bastidion",
+      "name": "Bastidion",
+      "first_depth": 1,
+      "path": "renders/01-bastidion.png",
+      "sha256": "239d81cc96da1a536e55061b54f6fab8904501385bf4c9652fbe44fabc3bdd49",
+      "pixel_sha256": "0015e7bbfbbd08b3e89a8e3ddd558b97ed0cce3c31b006c2facf5285b378b481"
+    },
+    {
+      "page": 2,
+      "id": "blorb",
+      "name": "Blorb",
+      "first_depth": 1,
+      "path": "renders/02-blorb.png",
+      "sha256": "7c0d7ba9eb9c1cf441f956f219545c3fe81f8c52ec24f1096e8bac1b4e3f0627",
+      "pixel_sha256": "20fa74c66333ec29548d55b7bfb51c5b3c4923e07358ed39ed045cea255c2733"
+    },
+    {
+      "page": 3,
+      "id": "cave-bat",
+      "name": "Cave Bat",
+      "first_depth": 1,
+      "path": "renders/03-cave-bat.png",
+      "sha256": "578879416d129dcd1ce149c2a11bfffa496d421cf3d53272ab4a36dc8c0aa37c",
+      "pixel_sha256": "d76608fd42c5a3d1228d943fbcacb46e5099f65287197ee3a48548ec5e149dca"
+    },
+    {
+      "page": 4,
+      "id": "rat",
+      "name": "Giant Rat",
+      "first_depth": 1,
+      "path": "renders/04-rat.png",
+      "sha256": "1873a6f4672b6b03b480cf73cd44c46ac55c7607e25838494a1f565e93c2ee0d",
+      "pixel_sha256": "4bae17fb72c026d04b2755a598b9683ddcb8b01e8a98f0a41906d031270603c4"
+    },
+    {
+      "page": 5,
+      "id": "hemogoblin",
+      "name": "Hemogoblin",
+      "first_depth": 1,
+      "path": "renders/05-hemogoblin.png",
+      "sha256": "d0d45887cc0533c90a66ae8cb095b454a0490c06373288c26451173e46631668",
+      "pixel_sha256": "664acc79c2d1c85e7b8e53c8d7d22946084f7d5635885d2410a90263d6649cf7"
+    },
+    {
+      "page": 6,
+      "id": "needleling",
+      "name": "Needleling",
+      "first_depth": 1,
+      "path": "renders/06-needleling.png",
+      "sha256": "9496eee9e232990e76775cd60b4925ca362c7a86eb44cc1b29e9db04ff588477",
+      "pixel_sha256": "52bf647170b063c34bfd8fded89179a769e0ac55c6bd8d21a8dfebf1656606c6"
+    },
+    {
+      "page": 7,
+      "id": "pale:Biter",
+      "name": "Pale Biter",
+      "first_depth": 1,
+      "path": "renders/07-pale:Biter.png",
+      "sha256": "80c35d0037bbe7f67d133ab769b503c4260cc1b52bb40cfa65252ce584f070eb",
+      "pixel_sha256": "ec2241e373a07ddb0207f5a5c9c47db903c9ebe834544ce8a99de2dff43db0f7"
+    },
+    {
+      "page": 8,
+      "id": "pale:Jackal",
+      "name": "Pale Jackal",
+      "first_depth": 1,
+      "path": "renders/08-pale:Jackal.png",
+      "sha256": "b1a8824ae1d6e95064cbd769994fe4bc46d498b34803c00e19d03418b00f62be",
+      "pixel_sha256": "5b4fede99d0792ca471b04daef3faf97e7c54ba57a22befcb0a75ccc6604d431"
+    },
+    {
+      "page": 9,
+      "id": "shellback-beetle",
+      "name": "Shellback Beetle",
+      "first_depth": 1,
+      "path": "renders/09-shellback-beetle.png",
+      "sha256": "f68c6faea32797bf849e231baae84dc6b03242d575f546a7620f0c8ebe9daf34",
+      "pixel_sha256": "9f15efc057ccdb1ed2d17b2ae26caf8d4fe99831aa8d3d43367de3d613887578"
+    },
+    {
+      "page": 10,
+      "id": "short-saidri",
+      "name": "Short-legged Saidribee",
+      "first_depth": 1,
+      "path": "renders/10-short-saidri.png",
+      "sha256": "2025a57f91c5225abea9cdb85cd16c2c4d696e3d43fea9f1befad931190e97b1",
+      "pixel_sha256": "20e19b0153c233ad56d1463491b8cb1a2b9d2f31770d192b9daf89b34bac0bef"
+    },
+    {
+      "page": 11,
+      "id": "dryad",
+      "name": "Dryad",
+      "first_depth": 2,
+      "path": "renders/11-dryad.png",
+      "sha256": "c8082a44801a17909391335b87463794363d973431112b38b5f4718fc75ccfd9",
+      "pixel_sha256": "07141e15ba827401a9b0bd5b5aca7aeca24af2adbfcc81714cff7006325f17de"
+    },
+    {
+      "page": 12,
+      "id": "hemogoblin-bloodmancer",
+      "name": "Hemogoblin Bloodmancer",
+      "first_depth": 2,
+      "path": "renders/12-hemogoblin-bloodmancer.png",
+      "sha256": "586fc3efacc14872b601caa6beee30b55666440a4c6ecab5aeefc0412c5a6e9b",
+      "pixel_sha256": "9be0082a9c78e819ebd493581571b9b364c8d766c7d3cccc85420ac88258e182"
+    },
+    {
+      "page": 13,
+      "id": "pale:Breather",
+      "name": "Pale Breather",
+      "first_depth": 3,
+      "path": "renders/13-pale:Breather.png",
+      "sha256": "c537cd1525445e52b03d29a1f1333fbb9b03f1527a01790684176f14343455db",
+      "pixel_sha256": "2a0f0f1103ea71b3b634baf5726e64cbcbb380ed33c27bc499b4b42a1d1b53d2"
+    },
+    {
+      "page": 14,
+      "id": "ichor-fish-standard",
+      "name": "Ichor-Fish",
+      "first_depth": 4,
+      "path": "renders/14-ichor-fish-standard.png",
+      "sha256": "8818c50e0bd8adc76c58427ca5f65a1e8b0a43ff7e8b1043c2c073242d66d4cf",
+      "pixel_sha256": "e3eeb1783021e5c3da294ddd7ec8df3f46e4faca6f3a48b7ccb5952c5c52e34e"
+    },
+    {
+      "page": 15,
+      "id": "zillennia:infant",
+      "name": "Infant Zillennia",
+      "first_depth": 4,
+      "path": "renders/15-zillennia:infant.png",
+      "sha256": "67904505435fc6a877193148da11c3be2602ed854561b21605fccbe62e2cc1f3",
+      "pixel_sha256": "5668a489c579795a7f145b56638d216dc618b5b28146e395a587a045841ca946"
+    },
+    {
+      "page": 16,
+      "id": "lesser-ichor-fish",
+      "name": "Lesser Ichor-Fish",
+      "first_depth": 4,
+      "path": "renders/16-lesser-ichor-fish.png",
+      "sha256": "0e2f4ffda6b9e6c3c6b195fbf75e9e206cf278ec3800819938f83ad29bbd5c8a",
+      "pixel_sha256": "e279a209caa0609bde52a30bd08aaa998719af39a6984ce5c2b586924eac1f0c"
+    },
+    {
+      "page": 17,
+      "id": "pale:Screamer",
+      "name": "Pale Screamer",
+      "first_depth": 4,
+      "path": "renders/17-pale:Screamer.png",
+      "sha256": "265eb3b005b6756f7468fe453fee84bb3a4cb0665376bc146f0722a7a639d999",
+      "pixel_sha256": "8efe04f858eb92c0822ba78e9a173c97e850727c539631a23ca7bb9522f032d8"
+    },
+    {
+      "page": 18,
+      "id": "pale:Spitter",
+      "name": "Pale Spitter",
+      "first_depth": 4,
+      "path": "renders/18-pale:Spitter.png",
+      "sha256": "63ec346ae34fdcb8423ba4b6d6c116754c5ec23160e20df7ac5e8f09c1e6b5ba",
+      "pixel_sha256": "b745e5bf652dda052305c6cd53aee9677356e0afc60f082573df2d7679a1c954"
+    },
+    {
+      "page": 19,
+      "id": "zillennia:child",
+      "name": "Child Zillennia",
+      "first_depth": 5,
+      "path": "renders/19-zillennia:child.png",
+      "sha256": "f6bdea541ca43c1386f8d7455cc18c72be54764c55ac1efe4a849b1046af545b",
+      "pixel_sha256": "966de91516aa1f8793c8f94680d413ff152587289d8b522e0ade61e2cc37ccc1"
+    },
+    {
+      "page": 20,
+      "id": "greater-ichor-fish",
+      "name": "Greater Ichor-Fish",
+      "first_depth": 5,
+      "path": "renders/20-greater-ichor-fish.png",
+      "sha256": "d5e05329f8416e332a57191f530935fc9dd3d5e613b9cea75f29efa3c6bf433c",
+      "pixel_sha256": "c3bb91a344901a12ea9a8d8a990b9faf81cbfcfff178e736ac863aab91a172f8"
+    },
+    {
+      "page": 21,
+      "id": "pale:Birther",
+      "name": "Pale Birther",
+      "first_depth": 5,
+      "path": "renders/21-pale:Birther.png",
+      "sha256": "d9b700fbad806644bf34248edf0dbfcd4fa750ee874ca8fc0924efba93515e3d",
+      "pixel_sha256": "6e81765008e9a74e27d193463c92d67ae755cfb617e3fa8a2d4ce611f4cf1588"
+    },
+    {
+      "page": 22,
+      "id": "giant-beetle",
+      "name": "Giant Beetle",
+      "first_depth": 6,
+      "path": "renders/22-giant-beetle.png",
+      "sha256": "072142702cd1530c1de3b6566124eb1990a48703555d587702ebd47c043f0261",
+      "pixel_sha256": "03149e2aa10eb9af7c92f511c99a9d70121e865787393ac57090b2d74d45c096"
+    },
+    {
+      "page": 23,
+      "id": "glim",
+      "name": "Glim",
+      "first_depth": 7,
+      "path": "renders/23-glim.png",
+      "sha256": "bede3227fb7f1c07f9f4897527c5674aa9eb4f7cdf5c6aa2a96f785f77531f04",
+      "pixel_sha256": "db16448ae07d43256ea9072f1084808decac9ba0199147616b44958cc9dde822"
+    },
+    {
+      "page": 24,
+      "id": "bear",
+      "name": "Bear",
+      "first_depth": 8,
+      "path": "renders/24-bear.png",
+      "sha256": "a5a514e8eb91f019d234954004cf3ec207b1d99685a66bf836d0f10ebe957814",
+      "pixel_sha256": "ce7d1fe4ce0310a3c3b9ab248634c2ce34ceee3a9f095d254b983d7a94ed8ab0"
+    },
+    {
+      "page": 25,
+      "id": "samara",
+      "name": "Devil's Samara",
+      "first_depth": 8,
+      "path": "renders/25-samara.png",
+      "sha256": "6b78b8bd5b43f86da94f2e98b573d4734cb0bd3802c632b59b264d402f449835",
+      "pixel_sha256": "9612e545679bb984cb74bf6f62eccf7fa2f1851ce0b7c9cc5d25bcb75a3a4fed"
+    },
+    {
+      "page": 26,
+      "id": "witch",
+      "name": "Witch",
+      "first_depth": 8,
+      "path": "renders/26-witch.png",
+      "sha256": "5bba81a6e7a0b71fa34467c36e35c66124426d0864f5376165f3bbf20aab3e48",
+      "pixel_sha256": "35b7a58644a3a5d29f7ee2a05c18804bab146cde266e1b51d4dc1d6c303750fc"
+    },
+    {
+      "page": 27,
+      "id": "zillennia:lesser",
+      "name": "Lesser Zillennia",
+      "first_depth": 9,
+      "path": "renders/27-zillennia:lesser.png",
+      "sha256": "39403bb3f4efb8e1558ad3ecdab76e50cc8ef2f3a51b9e577349fe694f430ed5",
+      "pixel_sha256": "68a1bf4bdd94685d79dd4dd50bf45f740900ced88887d0080e4619e07179e2bf"
+    },
+    {
+      "page": 28,
+      "id": "horn-1",
+      "name": "Unicorn",
+      "first_depth": 9,
+      "path": "renders/28-horn-1.png",
+      "sha256": "3d6270b418170fb63a19282e82e09ac608b66b97d446be875e42ee77e95e82ab",
+      "pixel_sha256": "fc3060f5355a68113a19503a9cec7db2755db5ea9f63f48485ad010247c6123a"
+    },
+    {
+      "page": 29,
+      "id": "horn-2",
+      "name": "Bicorn",
+      "first_depth": 10,
+      "path": "renders/29-horn-2.png",
+      "sha256": "5793f4ce23890a17d855da21d8f2f5fbb5235dbd296a8ef27b0ff53b1f80cbb2",
+      "pixel_sha256": "3a08d00df03f38a89120dad590d88bf8580727509962f8b35a5f87204b91b85b"
+    },
+    {
+      "page": 30,
+      "id": "lesser-ichor-shark",
+      "name": "Lesser Ichor-Shark",
+      "first_depth": 10,
+      "path": "renders/30-lesser-ichor-shark.png",
+      "sha256": "4670fb6e2c258e27ba7e02d2ce8cd2d2c703378ae1d25da540659b7547e2d721",
+      "pixel_sha256": "513121484c7f54e4e548f5839a294067aeef370579cf12d0912f43a0064f076c"
+    },
+    {
+      "page": 31,
+      "id": "hemogoblin-inventor",
+      "name": "Hemogoblin Inventor",
+      "first_depth": 11,
+      "path": "renders/31-hemogoblin-inventor.png",
+      "sha256": "d027f517c2bbb01acf71625a34fb13414627225ac72003df3d0ad928bf9ede7c",
+      "pixel_sha256": "bf9c4a15ddce294328d30bc240915830f8f5ffdd30be190807ac9e858c8416c8"
+    },
+    {
+      "page": 32,
+      "id": "hemogoblin-mech",
+      "name": "Hemogoblin Mech",
+      "first_depth": 11,
+      "path": "renders/32-hemogoblin-mech.png",
+      "sha256": "f51242be9a3332728c3e8dd85f3df2562c7efb2eefbcda2ce48f7cd2631d6554",
+      "pixel_sha256": "c8a9ff1772a9c88a7a576b0238c7f086aabd0996a05fe67bd1de8003387f465b"
+    },
+    {
+      "page": 33,
+      "id": "sphinx",
+      "name": "Sphinx",
+      "first_depth": 12,
+      "path": "renders/33-sphinx.png",
+      "sha256": "dc55538b842d5920b4367b41b97bf190ea09d527248fa4833a81506f8acc451e",
+      "pixel_sha256": "909e9b10d40c6d026238b6948dbc2b91b4d2cd231d2aa96046b5168e1e936624"
+    },
+    {
+      "page": 34,
+      "id": "tiger",
+      "name": "Tiger",
+      "first_depth": 12,
+      "path": "renders/34-tiger.png",
+      "sha256": "8228a5aaadb2fc8c1b70c2f14ede795a6c94e455cd5b23e5ff9cc9eb51c5e897",
+      "pixel_sha256": "2b8c1e5d624cbbc617a40431bc5b1031c808710bbefa1d9059aef0494caadeb2"
+    },
+    {
+      "page": 35,
+      "id": "bombardier",
+      "name": "Bombardier Beetle",
+      "first_depth": 13,
+      "path": "renders/35-bombardier.png",
+      "sha256": "97c74138c6ac65ae160cdd023351363d587438a21ce204bac20475c9a7783c2b",
+      "pixel_sha256": "6659b3da5c45b21797b936270c9b57ad4a23c784bcfb5ffe9bd44f4927115f86"
+    },
+    {
+      "page": 36,
+      "id": "long-saidri",
+      "name": "Long-legged Saidribee",
+      "first_depth": 13,
+      "path": "renders/36-long-saidri.png",
+      "sha256": "9a40b0ee0e712c967344b4cffbcb23310d060233a7119f052932c6db3cba6784",
+      "pixel_sha256": "6e327149006cabd95ee548e84344c27e5be19738c93c723168490112757ef34b"
+    },
+    {
+      "page": 37,
+      "id": "zillennia:unqualified",
+      "name": "Zillennia",
+      "first_depth": 13,
+      "path": "renders/37-zillennia:unqualified.png",
+      "sha256": "f6a79a3dad9d659b992093af7272996729d993f27ba0337a46d485d229fde1e3",
+      "pixel_sha256": "4809a5fbb45aff68ceacfeb290e990bfb4ccfa8e2ce339b9cf92a81d9785c8bf"
+    },
+    {
+      "page": 38,
+      "id": "kelpie",
+      "name": "Kelpie",
+      "first_depth": 14,
+      "path": "renders/38-kelpie.png",
+      "sha256": "04fbf8b6663141da3934d1d6c6b94193e18391116f6123bd810707767acab929",
+      "pixel_sha256": "8181f03d1b8f2b74f1f160475b99e155adba0e6d1b8d24fd8a79afef5fe83f73"
+    },
+    {
+      "page": 39,
+      "id": "ichor-shark",
+      "name": "Ichor Shark",
+      "first_depth": 15,
+      "path": "renders/39-ichor-shark.png",
+      "sha256": "29447485c3dab1754f973768d508522b60942b471a1174babf9ad133c755426e",
+      "pixel_sha256": "e42148243311b934204b0dcdce1c6cc1e23bbbcd034e4ebc57f8b0da6266920e"
+    },
+    {
+      "page": 40,
+      "id": "wendigo",
+      "name": "Wendigo",
+      "first_depth": 15,
+      "path": "renders/40-wendigo.png",
+      "sha256": "d1ff232483184a42fc4ef8b09cd14451124da94eabc4e2cda6fd494ce1e09ced",
+      "pixel_sha256": "07a15e768535f82efbbdcf93b0864f3e8f016e51249aedda7b978efe947f62ae"
+    },
+    {
+      "page": 41,
+      "id": "pale:Greater Biter",
+      "name": "Greater Pale Biter",
+      "first_depth": 16,
+      "path": "renders/41-pale:Greater Biter.png",
+      "sha256": "d3d40f480078e3f36c196134663c2174d1d9901a28a275bf94ddda2e57329e5c",
+      "pixel_sha256": "0977b0147effea035155d55393f932cf0d821c652e9f10d46fa439973d043fad"
+    },
+    {
+      "page": 42,
+      "id": "pale:Greater Spitter",
+      "name": "Greater Pale Spitter",
+      "first_depth": 17,
+      "path": "renders/42-pale:Greater Spitter.png",
+      "sha256": "87f26277ed5043b3233cddeb143e0589423d942f72f21409211a05ed7f4f609c",
+      "pixel_sha256": "2d28bf2710f01d42393a399fa6fe0ec6b4103d3795deeb0b0345e9179c44c246"
+    },
+    {
+      "page": 43,
+      "id": "zillennia:mature",
+      "name": "Mature Zillennia",
+      "first_depth": 17,
+      "path": "renders/43-zillennia:mature.png",
+      "sha256": "938b9fa5e5461bf0376acdc66d2cdc346be4dab18d6bc845b2aee4b39d060bc4",
+      "pixel_sha256": "cabc28c0028a4d0476ead41c7c48f94a5d2ac0ef4ffcab672b3d6d0334909768"
+    },
+    {
+      "page": 44,
+      "id": "troll",
+      "name": "Troll",
+      "first_depth": 17,
+      "path": "renders/44-troll.png",
+      "sha256": "85bdb247f0293a3a340206bbf80a5577a0d0ce2364c37428af714cd294771a7f",
+      "pixel_sha256": "2effb972590917ba3643d9733d81c79606e83686deec85c1ef74b40560172b2c"
+    },
+    {
+      "page": 45,
+      "id": "pale:Greater Breather",
+      "name": "Greater Pale Breather",
+      "first_depth": 18,
+      "path": "renders/45-pale:Greater Breather.png",
+      "sha256": "2aac8f71c5b5b3fb6db7c75360ed208bb17ba1fd049ca3777ede1ab894fac034",
+      "pixel_sha256": "c1baf8a6bb410224422d865cc456d3faea97067918ba71799fde04062008d670"
+    },
+    {
+      "page": 46,
+      "id": "pale:Greater Screamer",
+      "name": "Greater Pale Screamer",
+      "first_depth": 19,
+      "path": "renders/46-pale:Greater Screamer.png",
+      "sha256": "7f0eb9a13133e73c9b6fcef34bb41dfde653501775ff7996fb82e7ab44748ae2",
+      "pixel_sha256": "679b83bb6d93fe01b09bbc0360ddfbae18ac0b203dc7a3437595b145f208d4d8"
+    },
+    {
+      "page": 47,
+      "id": "greater-ichor-shark",
+      "name": "Greater Ichor Shark",
+      "first_depth": 20,
+      "path": "renders/47-greater-ichor-shark.png",
+      "sha256": "539b8996accf3cffe65414080f501c35fec1b4547799f98216095600c454a79f",
+      "pixel_sha256": "79d996904686bd2de31de6cdf56aa14a56b3842b6b2be5a5b3d9a4a830c76bf9"
+    },
+    {
+      "page": 48,
+      "id": "pale:Greater Birther",
+      "name": "Greater Pale Birther",
+      "first_depth": 20,
+      "path": "renders/48-pale:Greater Birther.png",
+      "sha256": "92b47a02a9939335938fc8e571fa5a9065b09b553ace46aad85dd1d0bba2d9fc",
+      "pixel_sha256": "e4fe9ef0bff3389985faabaf906c4f6e85a8c64b6d2f064a366fa8b97474e697"
+    },
+    {
+      "page": 49,
+      "id": "dire-bear",
+      "name": "Dire Bear",
+      "first_depth": 21,
+      "path": "renders/49-dire-bear.png",
+      "sha256": "3d71783a90196e414c1a4c9e1942de4850e6bef02fd98233ffb66915e4ebc63e",
+      "pixel_sha256": "938d26a79d4bd11ee05873891b59328e8f4f3f54b48bc800b95602937841e6c2"
+    },
+    {
+      "page": 50,
+      "id": "zillennia:greater",
+      "name": "Greater Zillennia",
+      "first_depth": 21,
+      "path": "renders/50-zillennia:greater.png",
+      "sha256": "cb96c4f3569bf6e544921a059a60a28a7b81ac1c8455e966a7f6896f11481424",
+      "pixel_sha256": "6460d142ece2db9364b9534f93645169176263ba0aae5c4941b1246ace82889f"
+    },
+    {
+      "page": 51,
+      "id": "river-drake",
+      "name": "River Drake",
+      "first_depth": 21,
+      "path": "renders/51-river-drake.png",
+      "sha256": "bb650c1c150b62e12c79d8c13f6e0ec5f507369725630260c8aeb6e6a24a0d73",
+      "pixel_sha256": "ab20a44ec09c8c61ed9555ebbba59bf0aa8e798427b1e4f339ba3afa69b7e68e"
+    },
+    {
+      "page": 52,
+      "id": "horn-3",
+      "name": "Tricorn",
+      "first_depth": 22,
+      "path": "renders/52-horn-3.png",
+      "sha256": "1169de33ec0e16553791ed0dc52e95aa1cf2ce0e4b7050d086ac9bf1295464f6",
+      "pixel_sha256": "2765d7105dceeaa9e9485335139e83800eb0bae176ca0712c8a4f2e94432de61"
+    },
+    {
+      "page": 53,
+      "id": "killspawn",
+      "name": "Killspawn",
+      "first_depth": 23,
+      "path": "renders/53-killspawn.png",
+      "sha256": "c9cb58b5e0075768ef42eec39a47189512b1d241145bd138648fc9abd13f10be",
+      "pixel_sha256": "c344198e9019f7f413fcedb28dc09bc06af49bbd7c6108e182c2f8b861e6383f"
+    },
+    {
+      "page": 54,
+      "id": "horn-4",
+      "name": "Quadricorn",
+      "first_depth": 24,
+      "path": "renders/54-horn-4.png",
+      "sha256": "1d3f8cccf085cc304a70b11fbd9508d09da9a4af502f04e9ca62f345de4946d3",
+      "pixel_sha256": "7bd31757a04b7ad6f5a90fdaa4e3e9596186dc92daf6367b9eb2cb3549567fbe"
+    },
+    {
+      "page": 55,
+      "id": "zillennia:hulking",
+      "name": "Hulking Zillennia",
+      "first_depth": 25,
+      "path": "renders/55-zillennia:hulking.png",
+      "sha256": "9f9e12473237e719881c35386e1fcaf19611b6b814c5f9835abe45b7fead9a42",
+      "pixel_sha256": "8e230c5851902b5388b92670ebfa9a6c46c60715b8381b033a86883c0cc7a40e"
+    },
+    {
+      "page": 56,
+      "id": "lesser-ichor-leviathan",
+      "name": "Lesser Ichor Leviathan",
+      "first_depth": 25,
+      "path": "renders/56-lesser-ichor-leviathan.png",
+      "sha256": "eeac015b8ada882348e21dff091b0e733731748ff517f814f964ac41475a0a29",
+      "pixel_sha256": "d8d1ccad992032c8dc6564a5a00d439358c7ae4a7ca83371002a11dd3d0fbde8"
+    },
+    {
+      "page": 57,
+      "id": "sabretooth",
+      "name": "Sabretooth Tiger",
+      "first_depth": 25,
+      "path": "renders/57-sabretooth.png",
+      "sha256": "7f46ac91ac1702546893ff58c4abe6f3a63633b77de386557fd8488e274610f9",
+      "pixel_sha256": "02b3ebffc9d6cb92efccb90d41d9ad9669edfef6c5b776ff48e2c6f3013445fe"
+    },
+    {
+      "page": 58,
+      "id": "banshee",
+      "name": "Banshee",
+      "first_depth": 26,
+      "path": "renders/58-banshee.png",
+      "sha256": "5d4a1a56234530aa7e6c65820831bb4402291e6be7a9543f55804c3cd19a008a",
+      "pixel_sha256": "557e696765db6f8dd0277047df4ab2d4ac263b60233d0dc6c79c1787b6ff1898"
+    },
+    {
+      "page": 59,
+      "id": "vampire",
+      "name": "Vampire",
+      "first_depth": 26,
+      "path": "renders/59-vampire.png",
+      "sha256": "f8dd1bb5f973eebd559b9f541db8b8a4b9c3e84fb25fe0008aee1e16211a77af",
+      "pixel_sha256": "92fc0d6b1794bf6989ca73619de361db0a619c3e0b6be9d1efe8ce6b59575de3"
+    },
+    {
+      "page": 60,
+      "id": "maulchild",
+      "name": "Maulchild",
+      "first_depth": 27,
+      "path": "renders/60-maulchild.png",
+      "sha256": "4a10c5100de97bd88e42df5c53e9806f0a239e1a4d051b7d745019d159fb096e",
+      "pixel_sha256": "75fb7d583ed8d54058f3b5025038609e068243f588e70cb350c12446dbf678f2"
+    },
+    {
+      "page": 61,
+      "id": "horn-5",
+      "name": "Pentacorn",
+      "first_depth": 28,
+      "path": "renders/61-horn-5.png",
+      "sha256": "0558003754607273eadee66425ad84e7eb989feec9f62c03f796a5113501cd2b",
+      "pixel_sha256": "cc0860dbe5640c78b1e8ffb912285f6c43f6a9e8f16e1d4c20e4e55665ec6298"
+    },
+    {
+      "page": 62,
+      "id": "zillennia:ancient",
+      "name": "Ancient Zillennia",
+      "first_depth": 29,
+      "path": "renders/62-zillennia:ancient.png",
+      "sha256": "7c8a85eab50090a22db29bf38c48eff31593046bce24d6834c382d52f8bd84bc",
+      "pixel_sha256": "9f69d1ae0731b9c12aeeb87d28eecceb8157249da84a6f7cbfea2b861cbce7fa"
+    },
+    {
+      "page": 63,
+      "id": "horn-6",
+      "name": "Hexacorn",
+      "first_depth": 29,
+      "path": "renders/63-horn-6.png",
+      "sha256": "64b5eb5367ad2c8bacbce014428e442fb77be98e41526b8800a7e53a57679896",
+      "pixel_sha256": "dc9f3d17447a696145bf199cef57cefb28324ca644622f1227430ed49e1d661c"
+    },
+    {
+      "page": 64,
+      "id": "ichor-leviathan",
+      "name": "Ichor Leviathan",
+      "first_depth": 30,
+      "path": "renders/64-ichor-leviathan.png",
+      "sha256": "6733bf34d3018b7c4a6a23fea4474629a7eedf80bc3482674ab8e837ca23769d",
+      "pixel_sha256": "737bc5b15cc1a2ee8f31a3e67bb20b15a4d91e7b90d6486ccebd90a8be820ff4"
+    },
+    {
+      "page": 65,
+      "id": "phoenix",
+      "name": "Phoenix",
+      "first_depth": 30,
+      "path": "renders/65-phoenix.png",
+      "sha256": "703e89c9a3a284afbf86b0532deb7c34ffb76053a0f4cac5c3b77a1fd257b012",
+      "pixel_sha256": "c8ddc9dbb006ee53727ba8f7443b46f5af80d64e95d12213d0819dbf5f0a6353"
+    },
+    {
+      "page": 66,
+      "id": "yeti",
+      "name": "Yeti",
+      "first_depth": 30,
+      "path": "renders/66-yeti.png",
+      "sha256": "30022cbf33eef6283938134da97520c90d88ec6e43ba33fa39cda8c5474519df",
+      "pixel_sha256": "b06a86631e63c9f7734c1fd470a6e4bc46d7182ce09b3843a90ec74ac348c74c"
+    },
+    {
+      "page": 67,
+      "id": "moonspawn",
+      "name": "Moonspawn",
+      "first_depth": 31,
+      "path": "renders/67-moonspawn.png",
+      "sha256": "29c6909a6c3f182162a58272e8dfe0c454e0b0bbe90ae31eeffc14fbb5a0c780",
+      "pixel_sha256": "8a4d62fa5cc2243ecb6994a490ec40507ba84e6e2c5c7ed747040267171b06a5"
+    },
+    {
+      "page": 68,
+      "id": "valta",
+      "name": "Valta",
+      "first_depth": 32,
+      "path": "renders/68-valta.png",
+      "sha256": "5d763758c4dde1eac51bf6bceeca63d4cef856a9ea3cde0b87f8278bd2e04e4e",
+      "pixel_sha256": "ffd55b77114a24ca76495551d43d4f0ce3cff917e135167ebb4a35abc910f53d"
+    },
+    {
+      "page": 69,
+      "id": "saidri-guardian",
+      "name": "Saidribee Guardian",
+      "first_depth": 33,
+      "path": "renders/69-saidri-guardian.png",
+      "sha256": "72509a9d7b20fb58740e19fb3e05b9a9a59b83c9c6a0034a9528712ddf2d1ef4",
+      "pixel_sha256": "0fe56e057b0128f708db6ae83fe61fa68cbbefc1564fb7296a60176d9e6df885"
+    },
+    {
+      "page": 70,
+      "id": "zillennia:timeless",
+      "name": "Timeless Zillennia",
+      "first_depth": 33,
+      "path": "renders/70-zillennia:timeless.png",
+      "sha256": "a06764b50b98f8dad67d51fe03287dd8914a17bc20e2055194fc27211d1fdc9d",
+      "pixel_sha256": "67e4905f48b03eae7ac771f10a60fc1845d2d93aa285372d9271937297edf5b7"
+    },
+    {
+      "page": 71,
+      "id": "cancer",
+      "name": "Cancer",
+      "first_depth": 34,
+      "path": "renders/71-cancer.png",
+      "sha256": "b47be7e8a5f34faeb53ec48d3fe73e160a6b4fc3546da51fbbf0415c75e19566",
+      "pixel_sha256": "a5ea4b0177e23de68d11b6bb9c428ab6aeb6ae7938212e08a37ae311ed007028"
+    },
+    {
+      "page": 72,
+      "id": "chimera",
+      "name": "Chimera",
+      "first_depth": 34,
+      "path": "renders/72-chimera.png",
+      "sha256": "aa96698fcd1d6869eb3f875542eeb3687ee9fbf94b52458f7625b95bc68b6b0e",
+      "pixel_sha256": "c88f42ef019ba2871d27583f74985649508b6d1731aeac522141a7ad13c8cec6"
+    },
+    {
+      "page": 73,
+      "id": "greater-ichor-leviathan",
+      "name": "Greater Ichor Leviathan",
+      "first_depth": 35,
+      "path": "renders/73-greater-ichor-leviathan.png",
+      "sha256": "b4c89bf54f5b80e4f39fcbe5e70bf216b133c7f72ef98fecc1cfdf02deca1003",
+      "pixel_sha256": "69c9e42ab09a9aff1d591d418760a70c387e1a5485aeac86b65154cd30668e4c"
+    },
+    {
+      "page": 74,
+      "id": "horn-7",
+      "name": "Heptacorn",
+      "first_depth": 35,
+      "path": "renders/74-horn-7.png",
+      "sha256": "51bee8d4d409eb08b3eb210feb3437f70bacb3f6855531bf8ade70648db84f06",
+      "pixel_sha256": "a27f4a0cc1715074a5a7ecdec830967b83c7ffce42ad820803ddc263b70c6967"
+    },
+    {
+      "page": 75,
+      "id": "ursa-major",
+      "name": "Ursa Major",
+      "first_depth": 36,
+      "path": "renders/75-ursa-major.png",
+      "sha256": "f4f136a31fa2f78cb670091ec522741f86e23f4267bfbb1f85e790682637d13b",
+      "pixel_sha256": "93a6f0f3a0e4523b4c17c1ebaf480dcce0741d19893d402ebb3b4cb7d223a1bc"
+    },
+    {
+      "page": 76,
+      "id": "ursa-minor",
+      "name": "Ursa Minor",
+      "first_depth": 36,
+      "path": "renders/76-ursa-minor.png",
+      "sha256": "0c971356c2a731a7899b7610940642414e89a4e8e9cfe77932418d4466de1750",
+      "pixel_sha256": "7a7d082c984abf73ce16eb802f29d855a8ec058c4281c324e6c1b7177134183d"
+    },
+    {
+      "page": 77,
+      "id": "minotaur",
+      "name": "Minotaur",
+      "first_depth": 37,
+      "path": "renders/77-minotaur.png",
+      "sha256": "c8544812395f5805f1333664237553de59cd69b5a6e2ab5ba85a90f636bd30b7",
+      "pixel_sha256": "23cfb874a85861a15763921abfc2d4eff45a6fcd6f836e70e16f766c2e55c7f4"
+    },
+    {
+      "page": 78,
+      "id": "zillennia:transcendent",
+      "name": "Transcendent Zillennia",
+      "first_depth": 37,
+      "path": "renders/78-zillennia:transcendent.png",
+      "sha256": "79e4568254ebf6b8925f1185c267c3884902ce432d03e218398638c392467314",
+      "pixel_sha256": "96403cfe8a61499f6d6bdba5bbdf73b069f86a848034839fcb2b60239e7d2caf"
+    },
+    {
+      "page": 79,
+      "id": "dragon",
+      "name": "Dragon",
+      "first_depth": 38,
+      "path": "renders/79-dragon.png",
+      "sha256": "dc8e5676cf1930c03d8ed5817824d1e2812966bb47f0788906306dada4fb2bdf",
+      "pixel_sha256": "72e5127081afd1aa652400adb970e496c0532f7fa24382b7faf8e8cc24c6c9c1"
+    }
+  ],
+  "source_integrity": "Cargo.lock and every crate source/asset hash unchanged during this capture",
+  "total": 79,
+  "contact_sheets": "contact-sheets/",
+  "verification": {
+    "platform": "Linux",
+    "focused_manual_tests": {
+      "passed": 29,
+      "failed": 0,
+      "ignored": 1
+    },
+    "full_workspace_tests": {
+      "passed": 484,
+      "failed": 0,
+      "ignored": 1,
+      "result_blocks": 107,
+      "exit_code": 0,
+      "test_opt_level": 2,
+      "incremental": false
+    },
+    "resolution_captures": {
+      "passed": 18,
+      "failed": 0
+    },
+    "windows_runtime_verified": false,
+    "windows_package": "unchanged",
+    "candidate_code_sha256": "0b837d77834ef21d700aa1a6f0cecb7c39d121bffe1cddfbacb56e53cd37e260"
+  },
+  "reference_note": "Render images are delivered separately; these relative reference paths describe that collection, not files embedded in this source archive."
+}

@@ -1,0 +1,19 @@
+
+running 14 tests
+test half_here_reveals_from_observing_body_only ... ok
+test disguise_reverses_at_chebyshev_two_and_preserves_true_state ... ok
+test revived_skinwalker_retains_disguise_and_unspeak_prices_witch_summons ... ok
+test new_species_have_bounded_revisioned_population_and_real_hearts ... ok
+test birth_collision_dispatch_rolls_back_and_success_preserves_floor_handle ... ok
+test uncast_cancels_one_witch_attempt_without_double_charging_or_summon_cooldown ... ok
+test twin_birth_rejects_second_identity_before_spend_or_rng ... ok
+test witch_spends_only_successful_summons_and_keeps_curses_between ... ok
+test birth_identity_collision_and_exhaustion_are_atomic ... ok
+test queen_is_conditional_only_with_explicit_guardian_heart_and_trait_cost ... ok
+test new_state_survives_save_snapshot_revert_and_future ... ok
+test new_creatures_execute_native_turns_and_offscreen_catchup_without_identity_changes ... ok
+test failed_summons_are_atomic_and_heartless_is_inherited ... ok
+test revision33_replays_native_summons_exactly ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

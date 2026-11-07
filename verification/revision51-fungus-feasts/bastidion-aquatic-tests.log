@@ -1,0 +1,15 @@
+
+running 10 tests
+test amulet_only_cooldown_clarification_preserves_mask_and_enemy_lockouts ... ok
+test dead_aquatic_feast_validates_without_water_sources_and_revives_stranded ... ok
+test dead_fungus_cannot_revive_even_after_all_roots_are_removed ... ok
+test r50_live_emission_overrides_every_saved_gas_and_legacy_keeps_exact_mapping ... ok
+test r50_offscreen_save_snapshot_and_future_replay_emit_hallucinogenic_gas ... ok
+test r50_population_all_aliases_depths_and_seeds_skip_random_gas_selection ... ok
+test r50_root_connections_keep_volume_and_recolor_old_saved_roots ... ok
+test rooted_corpses_never_revive_during_normal_or_haste_turns_and_severing_frees_them ... ok
+test rooted_corpses_remain_dead_offscreen_after_save_and_both_temporal_restores ... ok
+test solitary_inventor_and_mech_feast_corpses_validate_and_revive_safely_after_release ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.68s
+

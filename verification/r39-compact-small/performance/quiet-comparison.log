@@ -1,0 +1,7 @@
+baseline core pass 34.48
+baseline warm pass 7.275
+z core pass 55.89
+z warm pass 16.233
+s core pass 45.63
+s warm pass 7.74
+[{"profile": "baseline", "median_core_ratio_vs_baseline": 1.0, "core_ratio_range": [1.0, 1.0], "max_core_median_ms": 8.499701000000002, "median_warm_ratio_vs_baseline": 1.0, "warm_ms_range": [2.498, 7.275]}, {"profile": "z", "median_core_ratio_vs_baseline": 1.614989778315211, "core_ratio_range": [1.5582211823688041, 1.7487156541487077], "max_core_median_ms": 14.720785, "median_warm_ratio_vs_baseline": 2.077390485233227, "warm_ms_range": [5.685, 16.233]}, {"profile": "s", "median_core_ratio_vs_baseline": 1.1755347459600447, "core_ratio_range": [1.1548158934270232, 1.3383601376095464], "max_core_median_ms": 11.375661000000001, "median_warm_ratio_vs_baseline": 1.023778244329351, "warm_ms_range": [2.477, 7.74]}]

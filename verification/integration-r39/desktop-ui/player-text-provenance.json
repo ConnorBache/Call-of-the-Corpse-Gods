@@ -1,0 +1,10 @@
+{
+  "revision": 39,
+  "new_assistant_wording": [],
+  "authored_description_preserved": "A shard of the dark obelisk. Any creature which it bleeds will fall into an endless nightmare. It can only be used once.",
+  "legacy_only": [
+    "Choose an adjacent living creature. The shard is consumed only on success.",
+    "Use on an adjacent living creature, or equip in either hand to use on your next melee target. No accuracy roll; prevents revival. Consumed only after a successful use."
+  ],
+  "note": "Legacy instructions remain for explicit historical revisions33\u201338 only. No old unknown-origin labels are relabeled as user-authored."
+}

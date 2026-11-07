@@ -1,0 +1,35 @@
+{
+  "label": "Revision31 integrated post-rebalance preview, 25 October2026",
+  "simulation_revision": 31,
+  "workspace_tests": {
+    "passed": 484,
+    "failed": 0,
+    "ignored": 1,
+    "measured": 0,
+    "filtered": 0
+  },
+  "test_groups": 107,
+  "test_profile": {
+    "optimization": 1,
+    "debug_assertions": true,
+    "overflow_checks": true
+  },
+  "arena_example_tests_passed": 6,
+  "portable_stationary_cases": 138,
+  "portable_stationary_fights": 7640000,
+  "portable_stationary_csv_byte_exact": true,
+  "native_smoke_cases": 36,
+  "native_smoke_trials": 1152,
+  "bestiary_pages": 79,
+  "embedded_art_plates": 81,
+  "final_screenshots_png_byte_parity": true,
+  "windows_runtime_verified": false,
+  "windows_unsigned": true,
+  "documentation_only_post_test_delta": [
+    "docs/native-verification-history-20261020.md",
+    "README.md",
+    "NATIVE-VERIFICATION.md"
+  ],
+  "code_art_catalogs_unchanged_after_test": true,
+  "scope": "Role-specific48-row tuning, not all-roster or whole-game balance. See current NATIVE-VERIFICATION.md and physical report for censored scenarios and generated escape pacing limits."
+}

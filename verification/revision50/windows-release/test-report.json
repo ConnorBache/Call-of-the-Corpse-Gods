@@ -1,0 +1,27 @@
+{
+  "command": "CARGO_TARGET_DIR=../r50-optimized-target CARGO_PROFILE_TEST_OPT_LEVEL=1 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_TEST_DEBUG_ASSERTIONS=true CARGO_PROFILE_TEST_OVERFLOW_CHECKS=true CARGO_INCREMENTAL=0 CORPSE_R50_JEWELRY_OUTPUT=verification/revision50/jewelry-ui-final sh tools/cargo.sh test --workspace --locked --no-fail-fast -j 2 -- --test-threads=2",
+  "counts": {
+    "completed_targets": 188,
+    "failed": 0,
+    "ignored": 38,
+    "passed": 1975
+  },
+  "exit_code": 0,
+  "exit_code_file": {
+    "bytes": 2,
+    "path": "verification/revision50/windows-release/workspace.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "kind": "r50-test-report",
+  "limits": "Only executed tests in the recorded log; ignored tests did not run. Not Windows runtime verification.",
+  "log": {
+    "bytes": 266453,
+    "path": "verification/revision50/windows-release/workspace.log",
+    "sha256": "f351034ede02209c39fcbf9cc3ac7d7b34ef293d9e0f1eb43e0d1990d5d8aa8a"
+  },
+  "revision": 50,
+  "schema": 1,
+  "source_snapshot_sha256": "da1218a5ed77d63595ce439cbf1edab778e31dc88167b025f08668f740259c82",
+  "test_platform": "Linux x86_64",
+  "windows_runtime_verified": false
+}

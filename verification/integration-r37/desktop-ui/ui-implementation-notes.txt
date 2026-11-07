@@ -1,0 +1,17 @@
+Revision 37 terrain presentation
+
+ObservedCell adds ice, puddles and Hellfire booleans. Current values are read only for visible cells; hidden remembered cells read their saved counterparts; unknown cells expose none. Engine remember() updates these arrays only for observed cells. Existing snow memory is retained.
+
+Ice uses an ASCII underscore and cool cyan palette; snow retains its existing white material. Puddles use an ASCII tilde and muted blue-gray ground. Hellfire uses a near-black ground and a cosmetic black/red/orange fire cycle, without altering ordinary fire's palette. Cosmetic time never consumes game RNG. Actors and items remain above ground presentation.
+
+Mountainous areas use cool rock tones; Corn Dimensions use a violet-toned footprint and a fine boundary at known neighboring cells. Portals keep their authored pair colors. Speed-up links use green insets; stochastic Non-Euclidean space keeps cyan. Underlying terrain identities remain accessible.
+
+Speed-up groups are filtered along with random Non-Euclidean groups for path previews and projectile previews. Unknown endpoints are not exposed and are not consulted to promise a route.
+
+Complexity: observation and memory updates add O(V) time and three O(V) observed/memory boolean layers, V floor cells, per observation/accepted-turn memory update. Rendering adds constant work per known cell plus four boundary comparisons, O(V). Speed-up marker lookup extends existing pocket lookup to O(C*(G+S)) worst-case, C rendered cells, G random pocket cells/groups and S speed-up cells/groups. No new world queries occur in cosmetic animation. Preview filtering adds O(S) work/storage to its existing bounded ray/path search; no RNG draws.
+
+New literal player prose above three words: 'a puddle sits on the ground.' is exact user wording. 'You remember a puddle.' is assistant-authored remembered-state copy, recorded in new-player-text-provenance.json. New short labels are Ice, Puddle, Hellfire, Mountainous area, Corn Dimension, and Speed-up area. Existing actor-scene templates can now compose these new terrain labels, including 'a puddle'; those combinations are assistant implementation copy, not designer-supplied sentences, and should be included in the replacement workflow if they exceed three words. The inherited memory sentence 'You remember {memory}.' gains the new 'a puddle' value. Speed-up help adds assistant-authored 'Steps between paired endpoints stay local. Vision stays local.' to explain the movement exception. Ice and Hellfire use exact designer sentences from the latest notes.
+
+Capture provenance: controlled fixtures and generated floors are clearly separated. Both use the live native software painter. Generated floor screenshots use full reveal and controlled player placement for visual review, not unmodified gameplay. These do not verify Windows runtime.
+
+Ordered speed-up interior: stepping directly between the two endpoints of the same ordered pair remains a local step. Knowledge-only path planning and hazard warnings follow this exception, with no effect on projectile topology. Two regressions cover no-bounce preview and no false remote warning.

@@ -1,0 +1,10 @@
+
+running 5 tests
+test borge_exact_skin_heart_and_honey_keep_independent_provenance_and_optional_previews ... ok
+test actual_world_40_floors_seed_one ... ok
+test actual_world_with_all_water_nest_window_preserves_connected_floors ... ok
+test actual_world_40_floors_seed_legacy_regression ... ok
+test actual_world_40_floors_seed_forty_two ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.52s
+

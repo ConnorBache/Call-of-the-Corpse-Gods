@@ -1,0 +1,25 @@
+
+running 20 tests
+test altar_is_a_fixed_fixture_like_existing_godbeast_hardware ... ok
+test blocked_ordinary_melee_geometry_preserves_the_shard ... ok
+test exact_heart_not_same_species_one_shard_and_no_food_stats_when_offered ... ok
+test actual_stair_travel_preserves_the_marked_heart_and_event ... ok
+test equipped_shard_kills_any_adjacent_creature_including_sphinx_and_allies ... ok
+test malformed_provenance_and_half_initialized_event_are_rejected_at_load ... ok
+test one_heart_cannot_be_pledged_to_two_borge_events_after_actor_travel ... ok
+test seven_exact_milestones_four_authored_types_and_legacy_plan_unchanged ... ok
+test marked_heart_is_still_food_and_cannot_reselect_after_consumption_or_empty_floor ... ok
+test bumping_obelisk_interacts_before_collision_in_normal_and_haste_phases ... ok
+test all_25_body_cells_have_obelisk_feature_and_altar_survives_hazard_memory ... ok
+test strongest_is_alive_eligible_and_stable_hp_dr_defense_id_tiebreak ... ok
+test provenance_survives_actor_floor_transfer_carry_drop_save_and_snapshot ... ok
+test shard_invalid_targets_do_not_consume_and_phoenix_cannot_revive_no_accuracy_roll ... ok
+test shard_administrator_uses_existing_terminal_boss_hook_not_immunity_or_corpse ... ok
+test save_replay_and_both_time_abilities_preserve_consumption_and_permanent_death ... ok
+test generated_borge_has_25_solid_cells_clear_accessible_ring_altar_and_stairs ... ok
+test verdania_is_existing_tree_with_legacy_internal_identity_and_r33_display ... ok
+test generated_floor40_and_nonmilestones_never_add_an_extra_godbeast ... ok
+test offering_is_atomic_across_actual_revert_future_and_save ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+

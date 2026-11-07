@@ -1,0 +1,57 @@
+
+running 46 tests
+test session_store::envelope_tests::utc_calendar_matches_epoch_and_leap_day ... ok
+test session_store::incremental_log::tests::complete_invalid_json_command_and_extra_fields_are_rejected ... ok
+test session_store::incremental_log::tests::complete_non_utf8_payload_is_rejected_but_torn_utf8_tail_is_safe ... ok
+test session_store::incremental_log::tests::compatibility_build_revision_format_and_header_bytes_are_validated ... ok
+test session_store::incremental_log::tests::every_single_byte_frame_corruption_is_rejected_not_tail_recovered ... ok
+test session_store::incremental_log::tests::framing_preserves_checkpoint_and_escaped_utf8_batch_exactly ... ok
+test session_store::incremental_log::tests::header_length_corruption_is_not_mistaken_for_torn_payload ... ok
+test session_store::incremental_log::tests::every_final_frame_truncation_recovers_only_last_complete_frame ... ok
+test session_store::incremental_log::tests::incomplete_initial_file_is_never_recovered_without_checkpoint ... ok
+test session_store::incremental_log::tests::incomplete_batch_never_reaches_validator_and_valid_batches_arrive_in_order ... ok
+test session_store::incremental_log::tests::wrong_sequence_link_kind_and_repeated_checkpoint_are_rejected ... ok
+test session_store::incremental_log::tests::malformed_partial_header_or_trailer_is_not_ignored ... ok
+test session_store::incremental_log::tests::bounds_reject_file_batch_header_and_record_oversize ... ok
+test session_store::incremental_store::tests::coordination_lock_parent_aliases_and_repeated_acquisition_keep_same_file ... ok
+test session_store::incremental_store::tests::checkpoint_temp_collision_preserves_file_and_pending_receipts_for_retry ... ok
+test session_store::incremental_store::tests::coordination_lock_contention_preserves_file_and_receipts_then_retry_succeeds ... ok
+test session_store::autosave_tests::unchanged_key_skips_write_and_failed_temp_creation_preserves_destination ... ok
+test session_store::incremental_store::tests::complete_unknown_fields_divergent_stamps_and_unsupported_commands_are_preserved_and_rejected ... ok
+
+running 1 test
+test session_store::incremental_store::tests::process_probe_child ... test session_store::autosave_tests::accepted_state_is_saved_and_terminal_death_removes_resume ... ok
+test session_store::incremental_store::tests::error_external_order_and_cloned_sessions_force_exact_checkpoints ... ok
+test session_store::envelope_tests::provenance_survives_native_save_and_plain_source_import ... ok
+
+running 1 test
+test session_store::incremental_store::tests::process_probe_child ... test session_store::incremental_store::tests::legacy_full_flush_honors_incremental_coordination_lock ... ok
+test session_store::incremental_store::tests::external_replacement_corruption_and_provenance_are_checked ... ok
+test session_store::incremental_store::tests::killed_partial_append_recovers_previous_state_and_heals_without_duplicate_command ... ok
+test session_store::incremental_store::tests::process_probe_child ... ignored, supervised separate-process probe; requires test-local environment
+
+running 1 test
+test session_store::incremental_store::tests::process_probe_child ... test session_store::incremental_store::tests::killed_after_real_sync_before_ack_recovers_exactly_one_command ... ok
+test session_store::incremental_store::tests::terminal_replay_and_debug_isolation_preserves_existing_contract ... ok
+test session_store::incremental_store::tests::multiple_autosaves_cannot_append_receipts_onto_a_stale_base ... ok
+test session_store::incremental_store::tests::separate_process_lock_is_nonblocking_and_killed_owner_releases_it ... ok
+test session_store::incremental_store::tests::unchanged_key_is_noop_and_forced_save_recreates_missing_file ... ok
+test session_store::tests::source_archive_gate_preserves_eligible_resume_and_excludes_fixtures ... ok
+test session_store::tracked_engine::tests::display_order_mutation_requires_checkpoint ... ok
+test session_store::tracked_engine::tests::mutable_escape_and_stale_or_foreign_ack_cannot_certify_state ... ok
+test session_store::tracked_engine::tests::ordinary_dispatch_and_reads_keep_append_eligibility ... ok
+test session_store::tracked_engine::tests::receipt_base_identifies_the_exact_acknowledged_prefix ... ok
+test session_store::incremental_store::tests::torn_multibyte_final_record_recovers_prior_state_then_heals ... ok
+test session_store::tracked_engine::tests::receipt_stamp_roundtrips_and_rejects_divergent_metadata ... ok
+test session_store::tracked_engine::tests::receipt_bound_never_silently_drops_admitted_commands ... ok
+test session_store::tracked_engine::tests::rejected_dispatch_requires_checkpoint ... ok
+test session_store::incremental_store::tests::terminal_run_id_mutation_checkpoints_exact_id_and_genuine_death_still_deletes ... ok
+test session_store::debug_isolation_tests::debug_never_replaces_continue_or_highscores_even_on_force_and_death ... ok
+test session_store::incremental_store::tests::partial_and_sync_boundary_failures_keep_receipts_and_retry_without_double_commands ... ok
+test session_store::envelope_tests::typed_envelope_matches_legacy_bytes_at_zero_one_and_five_history_frames ... ok
+test session_store::incremental_store::tests::initial_checkpoint_small_appends_and_bounded_rollover_are_exact ... ok
+test session_store::incremental_store::tests::legacy_revision_sessions_remain_readable_without_silent_upgrade ... ok
+test session_store::incremental_store::tests::free_haste_revert_future_and_resume_preserve_exact_canonical_state ... ok
+
+test result: ok. 45 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 7.44s
+

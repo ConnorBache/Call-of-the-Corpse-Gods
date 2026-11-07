@@ -1,0 +1,19 @@
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/r50-work/crates/corpse-core)
+error: this file contains an unclosed delimiter
+   --> crates/corpse-core/src/equipment.rs:540:4
+    |
+216 | pub fn equip(r: &mut Run, id: f64, slot: &str) -> Result<bool, EngineError> {
+    |                                                                             - unclosed delimiter
+...
+239 |         for other in &r.inventory { validate_for_revision(other, r.simulation_revision.value_or(29.0))?;
+    |                                   - this delimiter might not be properly closed...
+...
+245 |     }
+    |     - ...as it matches this but it has different indentation
+...
+540 | };
+    |   ^
+
+error: could not compile `corpse-core` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `corpse-core` (lib test) due to 1 previous error

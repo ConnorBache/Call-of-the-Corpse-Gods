@@ -1,0 +1,10 @@
+
+running 5 tests
+test changed_floor_scalar_arrays_keep_whole_array_choice_and_net_zero_semantics ... ok
+test actor_and_ground_map_structure_order_and_net_zero_match_full_inverse ... ok
+test shared_floor_append_truncate_reorder_and_replacement_match_full_inverse ... ok
+test dream_creation_removal_and_shared_or_changed_layers_match_full_inverse ... ok
+test actual_captured_command_journals_save_and_five_undos_match_frozen_reference ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 28.29s
+

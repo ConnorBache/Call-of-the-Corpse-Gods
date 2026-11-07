@@ -1,0 +1,120 @@
+Generating exact pre-rename R50 run: 0-5-11:revision50-protocol-resume
+Wait: DispatchOutcome { took_turn: true, changed: true, events: [PresentationEvent { kind: "status", from: Some(EventPoint { x: 39.0, y: 26.0 }), to: EventPoint { x: 39.0, y: 26.0 }, glyph: Some("*"), color: None, label: Some("Wait"), depth: 1.0 }], pending_snapshot: None }
+Wait: DispatchOutcome { took_turn: true, changed: true, events: [PresentationEvent { kind: "status", from: Some(EventPoint { x: 39.0, y: 26.0 }), to: EventPoint { x: 39.0, y: 26.0 }, glyph: Some("*"), color: None, label: Some("Wait"), depth: 1.0 }], pending_snapshot: None }
+{
+  "fixture_type": "controlled, not campaign",
+  "source_snapshot_sha256": "f19312126dd8d9cfac9eb449f9bf543b65ee6c41e53780b81ee4e9433e25b59c",
+  "seed": "0-5-11:revision50-protocol-resume",
+  "simulation_revision": 50,
+  "injected_roster": [
+    {
+      "kind": "blorb",
+      "id": 247.0,
+      "name": "Blorb",
+      "glyph": "¤",
+      "color": "#b1a286",
+      "x": 72,
+      "y": 2
+    },
+    {
+      "kind": "bear",
+      "id": 248.0,
+      "name": "Bear",
+      "glyph": "u",
+      "color": "#a47c55",
+      "x": 73,
+      "y": 2
+    },
+    {
+      "kind": "dire-bear",
+      "id": 249.0,
+      "name": "Dire Bear",
+      "glyph": "U",
+      "color": "#e0a368",
+      "x": 72,
+      "y": 3
+    },
+    {
+      "kind": "bastidion",
+      "id": 250.0,
+      "name": "Bastidion",
+      "glyph": "&",
+      "color": "#9fc875",
+      "x": 73,
+      "y": 3
+    },
+    {
+      "kind": "pale:Biter",
+      "id": 251.0,
+      "name": "Pale Biter",
+      "glyph": "c",
+      "color": "#b9b8b1",
+      "x": 74,
+      "y": 3
+    },
+    {
+      "kind": "pale:Greater Biter",
+      "id": 252.0,
+      "name": "Greater Pale Biter",
+      "glyph": "C",
+      "color": "#f0e8dc",
+      "x": 75,
+      "y": 3
+    },
+    {
+      "kind": "pale:Breather",
+      "id": 253.0,
+      "name": "Pale Breather",
+      "glyph": "h",
+      "color": "#b9b8b1",
+      "x": 3,
+      "y": 4
+    },
+    {
+      "kind": "pale:Greater Breather",
+      "id": 254.0,
+      "name": "Greater Pale Breather",
+      "glyph": "H",
+      "color": "#f0e8dc",
+      "x": 4,
+      "y": 4
+    },
+    {
+      "kind": "hemogoblin-inventor",
+      "id": 255.0,
+      "name": "Hemogoblin Inventor",
+      "glyph": "i",
+      "color": "#EAB567",
+      "x": 5,
+      "y": 4
+    },
+    {
+      "kind": "yeti",
+      "id": 256.0,
+      "name": "Yeti",
+      "glyph": "A",
+      "color": "#D7E8F1",
+      "x": 7,
+      "y": 4
+    },
+    {
+      "kind": "samara",
+      "id": 257.0,
+      "name": "Devil's Samara",
+      "glyph": "Y",
+      "color": "#85b382",
+      "x": 8,
+      "y": 4
+    }
+  ],
+  "setup": "Generated valid R50 startup; added 11 old-source actors to free floor-1 cells >=15 tiles from player; granted See The Future and initialized its official reserve; marked unknown seed replay provenance; no source modifications.",
+  "future_created_by_real_command": true,
+  "future_restored_by_real_command": true,
+  "wait_tail_commands": 2,
+  "recording_checkpoint_bytes": 3874152,
+  "recording_bytes": 3874689,
+  "checkpoint_tick": 0.0,
+  "final_tick": 2.0,
+  "final_status": "playing",
+  "roundtrip_exact": true
+}

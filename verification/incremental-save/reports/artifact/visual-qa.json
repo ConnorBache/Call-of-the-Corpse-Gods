@@ -1,0 +1,66 @@
+{
+  "docx_sha256": "7dd68612e1e05ea009f2ffdec7f137d01bcb23805aa94e66f553d486f56aa1ea",
+  "render_command": "$CODEX_PRIMARY_RUNTIME_PYTHON /home/agent/.codex/skills/builtins/documents/render_docx.py incremental-save-engineering-report.docx --output_dir render-final --emit_pdf",
+  "renderer_exit": 0,
+  "page_count": 6,
+  "every_page_opened_at_original_resolution": true,
+  "visual_outcome": "Passed: all 6 final pages visually reviewed; no clipping, overlap, missing glyphs, table corruption, or header/footer displacement. Title is black and has no decorative rule. First table continuation repeats its header. All table text fits, including Floors heading.",
+  "pages": [
+    {
+      "file": "render-final/page-1.png",
+      "dimensions": [
+        1547,
+        2002
+      ],
+      "sha256": "29616fe1109a8aa107032ea969c5988c5a6115c8b26f38c92579e0244c831748",
+      "visual_status": "passed"
+    },
+    {
+      "file": "render-final/page-2.png",
+      "dimensions": [
+        1547,
+        2002
+      ],
+      "sha256": "485f91f5a9796a938cbd306746c1aeb591e57925931db6ba50ba0bdb78b3d44f",
+      "visual_status": "passed"
+    },
+    {
+      "file": "render-final/page-3.png",
+      "dimensions": [
+        1547,
+        2002
+      ],
+      "sha256": "b0bc9ac97ffb1ade70e874a97aa884dd2b754ee21a6550221b231c19ca2da5f2",
+      "visual_status": "passed"
+    },
+    {
+      "file": "render-final/page-4.png",
+      "dimensions": [
+        1547,
+        2002
+      ],
+      "sha256": "78a475e7a2c3a7da3f7562c7e030b992e0c79c3c991b8eecf21266cc9d71cf1c",
+      "visual_status": "passed"
+    },
+    {
+      "file": "render-final/page-5.png",
+      "dimensions": [
+        1547,
+        2002
+      ],
+      "sha256": "45d9ccc6f2f5cc056a37f3dbf9bb16df7c3112a9a981d73e833d9242ce9137d4",
+      "visual_status": "passed"
+    },
+    {
+      "file": "render-final/page-6.png",
+      "dimensions": [
+        1547,
+        2002
+      ],
+      "sha256": "f677d369e86c25ea74efa776a11276df7a322b155fe82dd1ac2ccf52e8ae611b",
+      "visual_status": "passed"
+    }
+  ],
+  "html": "Semantic/static QA passed; browser rendering not established because Chromium requires a sandbox-blocked socket and escalation wrapper failed. WeasyPrint unavailable in bundled runtime.",
+  "delivery_note": "PDF and PNG files are internal QA intermediates, not requested deliverables."
+}

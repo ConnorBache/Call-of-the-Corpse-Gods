@@ -1,0 +1,77 @@
+[
+  {
+    "godId": 0,
+    "abilities": [
+      "shrail-unyielding-assault"
+    ]
+  },
+  {
+    "godId": 1,
+    "abilities": [
+      "pelian-i-came-for-you",
+      "pelian-never-without-a-fight"
+    ]
+  },
+  {
+    "godId": 2,
+    "abilities": [
+      "isheilah-missed-me"
+    ]
+  },
+  {
+    "godId": 3,
+    "abilities": [
+      "numo-distract",
+      "numo-mind-read"
+    ]
+  },
+  {
+    "godId": 4,
+    "abilities": [
+      "etill-float-away"
+    ]
+  },
+  {
+    "godId": 5,
+    "abilities": [
+      "ursa-dream-see"
+    ]
+  },
+  {
+    "godId": 6,
+    "abilities": [
+      "lichor-the-number-of-blood"
+    ]
+  },
+  {
+    "godId": 7,
+    "abilities": [
+      "dawel-shadow-in-the-dark",
+      "dawel-not-there"
+    ]
+  },
+  {
+    "godId": 8,
+    "abilities": [
+      "grisha-death-swift"
+    ]
+  },
+  {
+    "godId": 9,
+    "abilities": [
+      "anavani-illuminate"
+    ]
+  },
+  {
+    "godId": 10,
+    "abilities": [
+      "kative-dilute-potion"
+    ]
+  },
+  {
+    "godId": 11,
+    "abilities": [
+      "morae-fortune-teller"
+    ]
+  }
+]

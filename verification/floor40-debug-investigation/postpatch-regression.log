@@ -1,0 +1,7 @@
+
+running 2 tests
+test legacy_debug_checkpoint_still_round_trips ... ok
+test debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 38.25s
+

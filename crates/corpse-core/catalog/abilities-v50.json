@@ -1,0 +1,811 @@
+[
+  {
+    "id": "shrail-rage-at-the-dying-of-the-light",
+    "godId": 0,
+    "name": "Rage at the Dying of the Light",
+    "description": "When active, whenever you would die, instead be reduced to 1 HP and spend X energy. X starts at 0. After the first free rescue, the cost becomes 1 and doubles after each subsequent rescue. Levelling up reduces this cost back to 0.",
+    "effectSummary": "When active, whenever you would die, instead be reduced to 1 HP and spend X energy. X starts at 0. After the first free rescue, the cost becomes 1 and doubles after each subsequent rescue. Levelling up reduces this cost back to 0.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "shrail-execute",
+    "godId": 0,
+    "name": "Execute",
+    "description": "When active, you kill enemies in one hit if they have less than 25% of their HP remaining. Every time you do so, spend 20 energy.",
+    "effectSummary": "When active, you kill enemies in one hit if they have less than 25% of their HP remaining. Every time you do so, spend 20 energy.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "shrail-grappler",
+    "godId": 0,
+    "name": "Grappler",
+    "description": "Enemies cannot move when they are adjacent to you and this ability is active. When you move, they move with you. If a character cannot move with you, they are not moved.",
+    "effectSummary": "Enemies cannot move when they are adjacent to you and this ability is active. When you move, they move with you. If a character cannot move with you, they are not moved.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "shrail-fight-long",
+    "godId": 0,
+    "name": "Fight Long",
+    "description": "Heal 1/5 the damage you deal in melee.",
+    "effectSummary": "Heal 1/5 the damage you deal in melee.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "shrail-unstoppable-force",
+    "godId": 0,
+    "name": "Unstoppable Force",
+    "description": "When active, when you attack an enemy, you also move into their tile. They are pushed back if possible, or switch places with you if not.",
+    "effectSummary": "When active, when you attack an enemy, you also move into their tile. They are pushed back if possible, or switch places with you if not.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "shrail-masochism",
+    "godId": 0,
+    "name": "Masochism",
+    "description": "When you drop below 100%, 75%, 50%, or 25% HP, you gain haste for 10 turns. Thresholds can retrigger after healing. Crossing multiple thresholds in one hit grants 10 total turns of haste.",
+    "effectSummary": "When you drop below 100%, 75%, 50%, or 25% HP, you gain haste for 10 turns. Thresholds can retrigger after healing. Crossing multiple thresholds in one hit grants 10 total turns of haste.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "pelian-you-shall-never-be-rid-of-me",
+    "godId": 1,
+    "name": "You Shall Never Be Rid of Me",
+    "description": "When active, if you die, instead come back with full health and this ability is disabled until you level up.",
+    "effectSummary": "When active, if you die, instead come back with full health and this ability is disabled until you level up.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "pelian-i-came-for-you",
+    "godId": 1,
+    "name": "I Came For You",
+    "description": "Spend 10 energy and select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward.",
+    "effectSummary": "Spend 10 energy and select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "pelian-fated-duel",
+    "godId": 1,
+    "name": "Fated Duel",
+    "description": "When activated, select an adjacent enemy. Create a 5x5 square around that enemy. Until you leave that area, no other enemy can attack you. This costs 3 energy per turn to keep active.",
+    "effectSummary": "When activated, select an adjacent enemy. Create a 5x5 square around that enemy. Until you leave that area, no other enemy can attack you. This costs 3 energy per turn to keep active.",
+    "flags": [
+      "toggle",
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "pelian-never-surrender",
+    "godId": 1,
+    "name": "Never Surrender",
+    "description": "Spend 8 energy and add your defense to your DR the first time you take damage every turn.",
+    "effectSummary": "Spend 8 energy and add your defense to your DR the first time you take damage every turn.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "pelian-bulwark-of-mind",
+    "godId": 1,
+    "name": "Bulwark of Mind",
+    "description": "Spend 20 energy and select a visible, unoccupied square. Enemies cannot enter it for 10 turns.",
+    "effectSummary": "Spend 20 energy and select a visible, unoccupied square. Enemies cannot enter it for 10 turns.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "pelian-relentless-pursuit",
+    "godId": 1,
+    "name": "Relentless Pursuit",
+    "description": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.\n\nImplementation: The path follows the moving target, routes around obstacles when possible, and may pass through another enemy only when the target would otherwise be inaccessible.",
+    "effectSummary": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "isheilah-missed-me",
+    "godId": 2,
+    "name": "Missed Me",
+    "description": "Gain one maximum reaction. Reactions refresh when you wait. When active, if you have a reaction and an enemy would attack you in melee, you instead move one tile away from them and spend a reaction. If no legal retreat square exists, the ability fails and does not spend a reaction.",
+    "effectSummary": "Gain one maximum reaction. Reactions refresh when you wait. When active, if you have a reaction and an enemy would attack you in melee, you instead move one tile away from them and spend a reaction. If no legal retreat square exists, the ability fails and does not spend a reaction.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "isheilah-tools-of-the-trade",
+    "godId": 2,
+    "name": "Tools of the Trade",
+    "description": "Consuming potions and hearts does not consume your action. Increase your ring carrying capacity by 5 and your potion carrying capacity by 5.",
+    "effectSummary": "Consuming potions and hearts does not consume your action. Increase your ring carrying capacity by 5 and your potion carrying capacity by 5.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "isheilah-make-slippery",
+    "godId": 2,
+    "name": "Make Slippery",
+    "description": "Select an enemy, when they try to move, they don't and you spend 8 energy.",
+    "effectSummary": "Select an enemy, when they try to move, they don't and you spend 8 energy.",
+    "flags": [
+      "toggle",
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "isheilah-quick-hand",
+    "godId": 2,
+    "name": "Quick Hand",
+    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
+    "effectSummary": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "isheilah-are-you-sure-about-that",
+    "godId": 2,
+    "name": "Are You Sure About That?",
+    "description": "Gain a reaction. Reactions refresh when you wait. When active, if an enemy misses you, resolve the attack against a random enemy in your melee range and spend a reaction.",
+    "effectSummary": "Gain a reaction. Reactions refresh when you wait. When active, if an enemy misses you, resolve the attack against a random enemy in your melee range and spend a reaction.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "isheilah-spellslinger",
+    "godId": 2,
+    "name": "Spellslinger",
+    "description": "You can activate an amulet without spending your turn, once per turn.",
+    "effectSummary": "You can activate an amulet without spending your turn, once per turn.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "numo-implant-thought",
+    "godId": 3,
+    "name": "Implant Thought",
+    "description": "Spend 15 energy and your action. Select a visible enemy and another creature adjacent to it. The selected enemy immediately attacks the chosen creature.",
+    "effectSummary": "Spend 15 energy and your action. Select a visible enemy and another creature adjacent to it. The selected enemy immediately attacks the chosen creature.",
+    "flags": [
+      "target",
+      "action"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "numo-distract",
+    "godId": 3,
+    "name": "Distract",
+    "description": "Spend 10 energy. Target enemy will miss their next attack.",
+    "effectSummary": "Spend 10 energy. Target enemy will miss their next attack.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "numo-mind-read",
+    "godId": 3,
+    "name": "Mind Read",
+    "description": "While active, spend 1 energy per turn and you have telepathy within 20. While inactive, you have telepathy within 5. The first turn is paid immediately on activation.",
+    "effectSummary": "While active, spend 1 energy per turn and you have telepathy within 20. While inactive, you have telepathy within 5. The first turn is paid immediately on activation.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "numo-mind-slave",
+    "godId": 3,
+    "name": "Mind Slave",
+    "description": "Spend 100 energy. Target enemy with 20% health or less becomes a perfect ally.",
+    "effectSummary": "Spend 100 energy. Target enemy with 20% health or less becomes a perfect ally.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "numo-weave-of-time",
+    "godId": 3,
+    "name": "Weave of Time",
+    "description": "You can freely travel along your time weave, which you leave behind as you move.",
+    "effectSummary": "You can freely travel along your time weave, which you leave behind as you move.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "numo-remember",
+    "godId": 3,
+    "name": "Remember",
+    "description": "Spend 5 energy. You gain the traits of a target enemy for 5 rounds.",
+    "effectSummary": "Spend 5 energy. You gain the traits of a target enemy for 5 rounds.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "etill-phase-through",
+    "godId": 4,
+    "name": "Phase Through",
+    "description": "While active, spend 5 energy every turn. You can move through walls and are flying. If this ability is deactivated while within a wall, you die of crushing.",
+    "effectSummary": "While active, spend 5 energy every turn. You can move through walls and are flying. If this ability is deactivated while within a wall, you die of crushing.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "etill-rushing-torrent",
+    "godId": 4,
+    "name": "Rushing Torrent",
+    "description": "While active, spend 15 energy every turn, and you are hasted.",
+    "effectSummary": "While active, spend 15 energy every turn, and you are hasted.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "etill-drown",
+    "godId": 4,
+    "name": "Drown",
+    "description": "You regenerate 3 times as fast in water, items don't float away from you and you do triple damage in water.",
+    "effectSummary": "You regenerate 3 times as fast in water, items don't float away from you and you do triple damage in water.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "etill-float-away",
+    "godId": 4,
+    "name": "Float Away",
+    "description": "When active, if an enemy damages you, fly until your next turn and move 1 tile away.",
+    "effectSummary": "When active, if an enemy damages you, fly until your next turn and move 1 tile away.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "etill-half-here",
+    "godId": 4,
+    "name": "Half Here",
+    "description": "Activate to put down a half clone within line of sight that shares your health pool, doesn't move, but provides you sight from that location. Deactivate to remove it.",
+    "effectSummary": "Activate to put down a half clone within line of sight that shares your health pool, doesn't move, but provides you sight from that location. Deactivate to remove it.",
+    "flags": [
+      "toggle",
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "etill-riptide",
+    "godId": 4,
+    "name": "Riptide",
+    "description": "When activating this ability, select an enemy and a rallying point. The enemy is moved toward the rally point and they cannot move until the ability is deactivated. This ability costs 15 energy to activate and 10 to keep active every turn.",
+    "effectSummary": "When activating this ability, select an enemy and a rallying point. The enemy is moved toward the rally point and they cannot move until the ability is deactivated. This ability costs 15 energy to activate and 10 to keep active every turn.",
+    "flags": [
+      "toggle",
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "ursa-waking-nightmares",
+    "godId": 5,
+    "name": "Waking Nightmares",
+    "description": "Spend a nightmare to create a hallucination of yourself at a visible unoccupied square. Enemies treat the hallucination as you until it is struck, at which point it disappears. You gain a nightmare every 100 turns.",
+    "effectSummary": "Spend a nightmare to create a hallucination of yourself at a visible unoccupied square. Enemies treat the hallucination as you until it is struck, at which point it disappears. You gain a nightmare every 100 turns.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "ursa-sudden-sleep",
+    "godId": 5,
+    "name": "Sudden Sleep",
+    "description": "As an action, spend 20 energy, render yourself paralyzed for 50 turns, and regain all your health.",
+    "effectSummary": "As an action, spend 20 energy, render yourself paralyzed for 50 turns, and regain all your health.",
+    "flags": [
+      "action"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "ursa-dream-of-time-gone-by",
+    "godId": 5,
+    "name": "Dream of Time Gone By",
+    "description": "Activate this ability for 50 energy. When you deactivate this ability, you return to the square where you activated it.",
+    "effectSummary": "Activate this ability for 50 energy. When you deactivate this ability, you return to the square where you activated it.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "ursa-sleep-walk",
+    "godId": 5,
+    "name": "Sleep Walk",
+    "description": "If you have 0 energy, you are hasted.",
+    "effectSummary": "If you have 0 energy, you are hasted.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "ursa-dream-see",
+    "godId": 5,
+    "name": "Dream-See",
+    "description": "You have telepathy with sleeping creatures. When active, spend 1 energy per turn and you have telepathy with all creatures that are not obstructed. The first turn is paid immediately on activation.",
+    "effectSummary": "You have telepathy with sleeping creatures. When active, spend 1 energy per turn and you have telepathy with all creatures that are not obstructed. The first turn is paid immediately on activation.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "ursa-oblivious",
+    "godId": 5,
+    "name": "Oblivious",
+    "description": "Enemies you cannot see cannot affect you.",
+    "effectSummary": "Enemies you cannot see cannot affect you.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "lichor-overflowing",
+    "godId": 6,
+    "name": "Overflowing",
+    "description": "You have 5 blood, and a maximum of 55 blood. Whenever you would die, you are instead reduced to 1 HP and lose a blood. Gain a blood by taking 50 damage.",
+    "effectSummary": "You have 5 blood, and a maximum of 55 blood. Whenever you would die, you are instead reduced to 1 HP and lose a blood. Gain a blood by taking 50 damage.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "lichor-bleed-them",
+    "godId": 6,
+    "name": "Bleed Them",
+    "description": "Your attacks inflict bleed proportional to your offense.",
+    "effectSummary": "Your attacks inflict bleed proportional to your offense.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "lichor-blood-letting",
+    "godId": 6,
+    "name": "Blood Letting",
+    "description": "When activating this ability, take 10 damage and cleanse yourself of all status conditions.",
+    "effectSummary": "When activating this ability, take 10 damage and cleanse yourself of all status conditions.",
+    "flags": [],
+    "blockedSemantics": []
+  },
+  {
+    "id": "lichor-hardened-blood",
+    "godId": 6,
+    "name": "Hardened Blood",
+    "description": "Gain extra DR equal to your missing HP divided by 10, rounded up.",
+    "effectSummary": "Gain extra DR equal to your missing HP divided by 10, rounded up.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "lichor-blood-weapon",
+    "godId": 6,
+    "name": "Blood Weapon",
+    "description": "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
+    "effectSummary": "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
+    "flags": [
+      "activate"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "lichor-the-number-of-blood",
+    "godId": 6,
+    "name": "The Number of Blood",
+    "description": "Every 5 turns, automatically hit and do double damage.",
+    "effectSummary": "Every 5 turns, automatically hit and do double damage.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "dawel-step-through-shadows",
+    "godId": 7,
+    "name": "Step Through Shadows",
+    "description": "When no enemies can see you, you are hasted.",
+    "effectSummary": "When no enemies can see you, you are hasted.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "dawel-silent-strike",
+    "godId": 7,
+    "name": "Silent Strike",
+    "description": "Attacking enemies who cannot see you deals 6x damage instead of 3x damage.",
+    "effectSummary": "Attacking enemies who cannot see you deals 6x damage instead of 3x damage.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "dawel-unspeak",
+    "godId": 7,
+    "name": "Unspeak",
+    "description": "When activating this ability, select an enemy. They cannot use abilities which cost energy. This costs energy equal to their highest energy cost ability every turn.",
+    "effectSummary": "When activating this ability, select an enemy. They cannot use abilities which cost energy. This costs energy equal to their highest energy cost ability every turn.",
+    "flags": [
+      "toggle",
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "dawel-reverse-entropy",
+    "godId": 7,
+    "name": "Reverse Entropy",
+    "description": "While active, enemies do not heal, regain energy, or revive, plants do not grow and neither gas nor fire spreads within 10.",
+    "effectSummary": "While active, enemies do not heal, regain energy, or revive, plants do not grow and neither gas nor fire spreads within 10.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "dawel-shadow-in-the-dark",
+    "godId": 7,
+    "name": "Shadow in the Dark",
+    "description": "While your light level is negative, double your light level. While active, spend 2 energy per turn and decrease the light level effecting you by 20",
+    "effectSummary": "While your light level is negative, double your light level. While active, spend 2 energy per turn and decrease the light level effecting you by 20",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "dawel-not-there",
+    "godId": 7,
+    "name": "Not There",
+    "description": "While active, enemies cannot target you with ranged attacks or abilities when outside 5 blocks. Costs 3 energy per turn.",
+    "effectSummary": "While active, enemies cannot target you with ranged attacks or abilities when outside 5 blocks. Costs 3 energy per turn.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "grisha-boundless-hunger",
+    "godId": 8,
+    "name": "Boundless Hunger",
+    "description": "You have no max energy.",
+    "effectSummary": "You have no max energy.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "grisha-entropy",
+    "godId": 8,
+    "name": "Entropy",
+    "description": "You are immune to the effects of caustic gas, and have a cloud of caustic gas originating from you. When this is active, caustic gas does not originate from you.",
+    "effectSummary": "You are immune to the effects of caustic gas, and have a cloud of caustic gas originating from you. When this is active, caustic gas does not originate from you.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "grisha-erase-metaphysical",
+    "godId": 8,
+    "name": "Erase Metaphysical",
+    "description": "While this is active, spend 10 energy when you hit an enemy. One of their abilities or traits is removed at random. Do not spend the 10 if they have none.",
+    "effectSummary": "While this is active, spend 10 energy when you hit an enemy. One of their abilities or traits is removed at random. Do not spend the 10 if they have none.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "grisha-death-swift",
+    "godId": 8,
+    "name": "Death Swift",
+    "description": "When you kill an enemy, gain haste for 3 turns.",
+    "effectSummary": "When you kill an enemy, gain haste for 3 turns.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "grisha-black-pit",
+    "godId": 8,
+    "name": "Black Pit",
+    "description": "When active, the ground you walk on turns into chasm when you walk off. It begins to regenerate when this ability is deactivated. This costs 5 energy per turn.",
+    "effectSummary": "When active, the ground you walk on turns into chasm when you walk off. It begins to regenerate when this ability is deactivated. This costs 5 energy per turn.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "grisha-witch-hatred",
+    "godId": 8,
+    "name": "Witch-Hatred",
+    "description": "You have telepathy to all \"Magickal Caster\" enemies, and always kill them in one hit.",
+    "effectSummary": "You have telepathy to all \"Magickal Caster\" enemies, and always kill them in one hit.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "anavani-shine",
+    "godId": 9,
+    "name": "Shine",
+    "description": "You emit light 100 which decreases by 10 every square away from you. You gain additional accuracy equal to the illumination of enemies. When active, this ability does not illuminate you.",
+    "effectSummary": "You emit light 100 which decreases by 10 every square away from you. You gain additional accuracy equal to the illumination of enemies. When active, this ability does not illuminate you.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "anavani-ascend",
+    "godId": 9,
+    "name": "Ascend",
+    "description": "You are always flying. Mark 'falling areas' on the map where there is a chasm above you. You may spend 50 energy while below such a chasm to fly up to the higher level.",
+    "effectSummary": "You are always flying. Mark 'falling areas' on the map where there is a chasm above you. You may spend 50 energy while below such a chasm to fly up to the higher level.",
+    "flags": [
+      "passive",
+      "activate"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "anavani-nova",
+    "godId": 9,
+    "name": "Nova",
+    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
+    "effectSummary": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "anavani-illuminate",
+    "godId": 9,
+    "name": "Sparkle",
+    "description": "Spend 20 energy and select a visible square. Place a permanent fire and light source there.",
+    "effectSummary": "Spend 20 energy and select a visible square. Place a permanent fire and light source there.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "anavani-star-power",
+    "godId": 9,
+    "name": "Star Power",
+    "description": "You are immune to fire and always burning. You can activate this ability to stop burning.",
+    "effectSummary": "You are immune to fire and always burning. You can activate this ability to stop burning.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "anavani-commandment",
+    "godId": 9,
+    "name": "Commandment",
+    "description": "Passive: When you attack an enemy, they are pushed back one tile. Active: Spend 20 energy when you attack, and enemies are instead pushed back as far as possible.",
+    "effectSummary": "Passive: When you attack an enemy, they are pushed back one tile. Active: Spend 20 energy when you attack, and enemies are instead pushed back as far as possible.",
+    "flags": [
+      "passive",
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "kative-cogworks",
+    "godId": 10,
+    "name": "Cogworks",
+    "description": "This ability can be toggled to mode one, two or three, or activated.\n\nMode 1: When activated, create a 3x3 pit in an area not occupied by any creatures. Costs 20 energy.\n\nMode 2: When activated, create a 5x1 wall with 200 HP, oriented perpendicular to the direction thrown. Costs 20 energy.\n\nMode 3: Select a terrain modification you have made and remove it. Removing a terrain modification is free.\n\nImplementation: Preview the placement in the sight display; color both the pit and wall in Kative's colors. When an enemy tries to move through a wall, it attacks the wall instead.",
+    "effectSummary": "This ability can be toggled to mode one, two or three, or activated.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "kative-mini-me",
+    "godId": 10,
+    "name": "Mini-Me",
+    "description": "Activate for 30 energy to create a copy with your current stats, but no abilities. This version of you is a perfect ally. Deactivating kills this creature.",
+    "effectSummary": "Activate for 30 energy to create a copy with your current stats, but no abilities. This version of you is a perfect ally. Deactivating kills this creature.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "kative-clay-army",
+    "godId": 10,
+    "name": "Clay Army",
+    "description": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.\n\nImplementation: Clay Soldiers are treated as unbreakable walls for pathfinding and collision.",
+    "effectSummary": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "kative-appropriate",
+    "godId": 10,
+    "name": "Appropriate",
+    "description": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10, to a minimum of zero.",
+    "effectSummary": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10, to a minimum of zero.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "kative-tinker",
+    "godId": 10,
+    "name": "Tinker",
+    "description": "Spend 100 energy to bless a ring or amulet with a random ability from a random god you do not embody. The ring or amulet retains its existing abilities as well as the new ability. The granted ability works while the item is carried; all carried rings and amulets are automatically active. Each item can be tinkered once; granted abilities never duplicate another generated item grant.",
+    "effectSummary": "Spend 100 energy to bless a ring or amulet with a random ability from a random god you do not embody. The ring or amulet retains its existing abilities as well as the new ability. The granted ability works while the item is carried; all carried rings and amulets are automatically active. Each item can be tinkered once; granted abilities never duplicate another generated item grant.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "kative-bottomless-pack",
+    "godId": 10,
+    "name": "Bottomless Pack",
+    "description": "When you use a potion, you can use it again at half efficacy. Increase your amulet carrying capacity by 2 and your potion carrying capacity by 5.",
+    "effectSummary": "When you use a potion, you can use it again at half efficacy. Increase your amulet carrying capacity by 2 and your potion carrying capacity by 5.",
+    "flags": [
+      "passive"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "morae-fortune-teller",
+    "godId": 11,
+    "name": "Fortune Teller",
+    "description": "You can have up to 3 fortunes. Spend a fortune to give yourself lucky, ensuring you hit with your next attack, or an enemy creature unlucky, ensuring they miss.",
+    "effectSummary": "You can have up to 3 fortunes. Spend a fortune to give yourself lucky, ensuring you hit with your next attack, or an enemy creature unlucky, ensuring they miss.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "morae-bonded-by-unseen-threads",
+    "godId": 11,
+    "name": "Bonded By Unseen Threads",
+    "description": "Spend 15 energy on activation and select an enemy. When you take damage, they take half. Spend 8 energy per turn to keep active, with the first turn paid immediately on activation.",
+    "effectSummary": "Spend 15 energy on activation and select an enemy. When you take damage, they take half. Spend 8 energy per turn to keep active, with the first turn paid immediately on activation.",
+    "flags": [
+      "toggle",
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "morae-turning-the-wheel",
+    "godId": 11,
+    "name": "Turning the Wheel",
+    "description": "While this is active, enemies cannot attack you. It costs 20 energy per turn.",
+    "effectSummary": "While this is active, enemies cannot attack you. It costs 20 energy per turn.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "morae-sever-fate",
+    "godId": 11,
+    "name": "Sever Fate",
+    "description": "Spend 30 energy and select an enemy below half HP. They become neutral to you until you deal damage to them.",
+    "effectSummary": "Spend 30 energy and select an enemy below half HP. They become neutral to you until you deal damage to them.",
+    "flags": [
+      "target"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "morae-see-the-future",
+    "godId": 11,
+    "name": "See The Future",
+    "description": "Spend all your energy to save your current state. Deactivating will return you there, undoing all that has been done.",
+    "effectSummary": "Spend all your energy to save your current state. Deactivating will return you there, undoing all that has been done.",
+    "flags": [
+      "toggle"
+    ],
+    "blockedSemantics": []
+  },
+  {
+    "id": "morae-all-seeing-eyes",
+    "godId": 11,
+    "name": "All-Seeing Eyes",
+    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
+    "effectSummary": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
+    "flags": [
+      "activate"
+    ],
+    "blockedSemantics": []
+  }
+]

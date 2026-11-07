@@ -1,0 +1,8 @@
+
+running 3 tests
+test replay_revision_rejects_before_generation ... ok
+test replay_steps_preserve_events_and_rejection_cursor ... ok
+test seeded_replay_initial_state_matches_reference ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.43s
+

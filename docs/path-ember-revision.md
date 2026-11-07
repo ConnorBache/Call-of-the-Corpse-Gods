@@ -1,0 +1,15 @@
+# Path tint and native ember revision
+
+Movement previews (hover and active travel), targeting previews, and selected known cells use a white background composite. Route opacity is 28/255; selected/hover opacity is 62/255. Tint is composited onto the existing background overlay before edges, underlays, identity glyphs, and actor overlays. Movement tiles no longer receive dark backgrounds or outlined boxes. Target rays retain warm side ticks and hover corners, so target semantics stay distinct. Unknown coordinates are never painted: cell tints iterate only observation cells and final marks retain the observed-coordinate gate. The renderer reads no live terrain or actors. Pathfinding, ray termination, normal/haste simulation, equipment, time travel, and save/replay formats are unchanged.
+
+The animated 320×180 flame/rock art remains intentionally pixelated. Floating embers are no longer baked into that image. Sixteen deterministic particles use continuous cosmetic-time coordinates transformed directly into drawable pixels, with opaque crisp 1×1 or 1×2 logical-scale strokes and no filtering/halo. This avoids enlargement into 4×4 or larger flame-texture texels. No gameplay RNG is used.
+
+## Complexity
+
+Let C be painted observation cells (including layers), P movement-preview length, T target-preview length, A total drawable pixel area of highlighted painted layers, and s drawable scale. Per game frame, constructing two hash sets costs expected O(P+T) time/memory; membership per painted cell is expected O(1), for O(C) total checks. Adversarial hash worst case is O((P+T)^2+C(P+T)); standard randomized HashSet hashing is assumed, with coordinates generated internally. Tints cost O(A) native pixel composites and O(1) raster scratch memory; overlapping entity/terrain layers are counted in A. The pre-existing known-cell set and final marker passes remain expected O(C+P+T) plus marker pixel area. P/T and cells are bounded by authored floor geometry, not by this rendering code. No pathfinding or visibility recomputation occurs here. Glyph cache misses and the rest of frame composition retain their existing costs; see native-resolution-rendering.md.
+
+Per menu frame, the unchanged flame field costs O(320×180×12) CPU time and O(320×180) temporary pixels, followed by O(W×H) picture rasterization into drawable area W×H. The ember pass adds O(16×max(1,round(s))²) time and O(1) memory. Existing framebuffer allocation/texture upload remain O(W×H); no additional full-size image allocation is introduced. These are asymptotic statements, not measured timings.
+
+## Deterministic verification
+
+Render tests check that movement tint never darkens any glyph/background pixel, selected cells brighten more, target tiles also tint, injected unknown preview coordinates remain unchanged, and the simulation save remains unchanged. Particle tests check exact opaque pixel counts, no halo colors, repeat-frame identity, and different-frame animation at 1280×800, 2560×1600, and 1920×1080 drawable sizes. Real Windows/DPI perceptual verification remains a separate platform check.

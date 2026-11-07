@@ -1,0 +1,4 @@
+import{createRun,dispatch}from'../../release-v48/source/call-of-the-corpse-gods/dist/src/engine.js';
+import{consumePresentationEvents}from'../../release-v48/source/call-of-the-corpse-gods/dist/src/action-events.js';
+import{writeFileSync,renameSync,readFileSync}from'node:fs';
+const seed='00-09-10:native-parity-v1',run=createRun(seed,'Avatar',false);const initial=structuredClone(run);const steps=[];for(const command of JSON.parse(readFileSync(new URL('../native-generated-qa-save.json',import.meta.url),'utf8')).replay){dispatch(run,command,true);steps.push({command,state:structuredClone(run),events:consumePresentationEvents(run)});}const out=new URL('../fixtures/generated-avatar-play-v1.json',import.meta.url),tmp=new URL('../fixtures/generated-avatar-play-v1.json.tmp',import.meta.url);writeFileSync(tmp,JSON.stringify({seed,initial,steps}));renameSync(tmp,out);console.log(seed,steps.length,'actual generated gameplay source steps');

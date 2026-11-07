@@ -1,0 +1,8 @@
+seed=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-56 depth=15 godbeast=Veridian tap=(73, 5) tile=down
+seed=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-56 result=Err("Required generated item invalid/occupied on floor15") retained=0
+seed=qa-mixed-33cdd108d7485523 depth=15 godbeast=Veridian tap=(6, 15) tile=down
+seed=qa-mixed-33cdd108d7485523 result=Err("Required generated item invalid/occupied on floor15") retained=0
+seed=生成-é-🌱-115 depth=30 godbeast=Veridian tap=(20, 16) tile=up
+seed=生成-é-🌱-115 result=Err("Required generated item invalid/occupied on floor30") retained=0
+seed=qa-mixed-3faf6c43aaa5d7eb depth=30 godbeast=Veridian tap=(44, 22) tile=down
+seed=qa-mixed-3faf6c43aaa5d7eb result=Err("Required generated item invalid/occupied on floor30") retained=0

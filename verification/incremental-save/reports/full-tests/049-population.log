@@ -1,0 +1,12 @@
+
+running 7 tests
+test ground_placement_metrics_falls_and_normalization ... ok
+test exact_actor_templates_and_draws ... ok
+test complete_population_and_heatmaps ... ok
+test exact_composition_streams_all_depths ... ok
+test complete_new_run_three_modes_with_reference_geometry ... ok
+test complete_spawn_floor_and_sphinx ... ok
+test complete_native_new_run_three_modes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.88s
+

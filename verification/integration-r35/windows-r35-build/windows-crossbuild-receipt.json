@@ -1,0 +1,58 @@
+{
+  "exe": {
+    "path": "corpse-desktop.exe",
+    "bytes": 97536707,
+    "sha256": "e4f305f8a274f2d970802b58b383f81e29f2b53b6acd1809b1fa53d8fe44f004",
+    "imports": [
+      "KERNEL32.dll",
+      "SDL2.dll",
+      "api-ms-win-core-synch-l1-2-0.dll",
+      "bcryptprimitives.dll",
+      "msvcrt.dll",
+      "ntdll.dll"
+    ],
+    "machine": "PE32+ x86-64",
+    "unsigned": true
+  },
+  "SDL2_dll": {
+    "bytes": 1785344,
+    "sha256": "53e8fa7e9ed43c30bd650c39396f0d9d2067d2fff0b926c9433b75202592e4aa",
+    "imports": [
+      "ADVAPI32.dll",
+      "GDI32.dll",
+      "IMM32.dll",
+      "KERNEL32.dll",
+      "OLEAUT32.dll",
+      "SETUPAPI.dll",
+      "SHELL32.dll",
+      "USER32.dll",
+      "VERSION.dll",
+      "WINMM.dll",
+      "msvcrt.dll",
+      "ole32.dll"
+    ]
+  },
+  "embedded_rgba_count": 84,
+  "embedded_icon_images": 7,
+  "manifest_matches_source": true,
+  "windows_runtime_verified": false,
+  "label": "corpse-gods-r35-windows-x64",
+  "simulation_revision": 35,
+  "build_succeeded": true,
+  "rust_toolchain": "1.99.1",
+  "target": "x86_64-pc-windows-gnu",
+  "compiler": "Official Debian Trixie GCC14 POSIX / MinGW-w64 12.0.0",
+  "sdl": "Official SDL2 2.32.10",
+  "frozen_code_manifest_sha256": "bb815b72361fc224321c58bfe952ab63c3da9ed00b38ab48f8361ab2e4aac5ec",
+  "frozen_code_file_count": 917,
+  "frozen_code_verified_before_and_after": true,
+  "cargo_lock_sha256": "9342120cd87b86ee9b54768431c805d075cd2aaaee0ff142151e2d8555dc5ccb",
+  "build_started": "2026-10-28T02:49:16Z",
+  "build_finished": "2026-10-28T02:50:34Z",
+  "original_exe": {
+    "bytes": 163218194,
+    "sha256": "78f25450a6247fff678194a3ae46265e22e6cf63e45ad018f9c1b2bb89ead757"
+  },
+  "limitations": "Unsigned cross-build and static PE/resource verification only. Windows runtime was not exercised.",
+  "full_native_gate": "Recorded separately; not inferred from compilation."
+}

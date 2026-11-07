@@ -1,0 +1,11 @@
+
+running 6 tests
+test darkness_render_tests::illumination_native_examples_same_tiles_levels_sources_and_potion_expiry ... ok
+test illumination_render_tests::illumination_actual_creature_item_player_and_backgrounds_are_graded_once ... ok
+test illumination_render_tests::illumination_entities_effects_custom_profiles_and_unbounded_observations ... ok
+test illumination_render_tests::illumination_native_calibration_pixels_and_all_incremental_paths ... ok
+test illumination_render_tests::illumination_native_gpu_matches_software_at_every_calibration_level ... ignored, Explicit isolated SDL process: SDL_VIDEODRIVER=offscreen, --test-threads=1; Linux software GL is not Windows hardware certification
+test illumination_render_tests::illumination_unknown_and_telepathic_cells_never_reveal_hidden_light ... ok
+
+test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 726 filtered out; finished in 9.61s
+

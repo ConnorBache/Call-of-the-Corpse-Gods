@@ -1,0 +1,20 @@
+
+running 2 tests
+test darkness_render_tests::darkness_materials_glow_dilution_profiles_and_ring_exclusion ... 
+thread 'darkness_render_tests::darkness_materials_glow_dilution_profiles_and_ring_exclusion' (7) panicked at crates/corpse-core/src/optical_cache.rs:23:51:
+attempt to calculate the remainder with a divisor of zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test darkness_render_tests::darkness_native_throw_before_after_expiry_and_incremental_pixels ... 
+thread 'darkness_render_tests::darkness_native_throw_before_after_expiry_and_incremental_pixels' (8) panicked at crates/corpse-core/src/optical_cache.rs:23:51:
+attempt to calculate the remainder with a divisor of zero
+FAILED
+
+failures:
+
+failures:
+    darkness_render_tests::darkness_materials_glow_dilution_profiles_and_ring_exclusion
+    darkness_render_tests::darkness_native_throw_before_after_expiry_and_incremental_pixels
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 692 filtered out; finished in 0.02s
+

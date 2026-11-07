@@ -1,0 +1,84 @@
+    Blocking waiting for file lock on build directory
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/non-euclidean-r36/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 1m 35s
+     Running tests/flavor_placement.rs (target/debug/deps/flavor_placement-e797b88a34a79562)
+
+running 6 tests
+test authored_setup_windows_follow_members_and_keep_disabled_recipes_disabled ... ok
+test corpse_revival_cannot_introduce_out_of_band_witches ... ok
+test dynamic_water_watcher_stencil_never_leaks_frozen_depth_species ... ok
+test final_windows_cover_every_leader_and_pair_without_legacy_changes ... ok
+test all_depths_keep_deterministic_exact_reward_feasibility ... ok
+test generated_live_sources_obey_relocated_windows_regression_seed_zero ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.51s
+
+     Running tests/non_euclidean_integration_r36.rs (target/debug/deps/non_euclidean_integration_r36-d2b83b1f7034fa5e)
+
+running 9 tests
+test pockets_do_not_create_an_optical_viewpoint_or_reduce_visual_distance ... ok
+test shared_underfoot_items_are_transferred_once_not_cloned ... ok
+test read_only_queries_and_blocked_sibling_do_not_consume_a_lottery_draw ... ok
+test dream_transition_does_not_move_or_attack_the_waking_body ... ok
+test linked_enemy_occupancy_attacks_without_telefrag_or_random_return ... ok
+test entering_each_source_arrives_once_at_shared_destination_without_rng ... ok
+test reverse_transition_consumes_exactly_one_serialized_draw_and_exercises_both_exits ... ok
+test absent_pockets_preserve_revision35_commands_and_actor_tuning ... ok
+test save_replay_revert_and_future_preserve_topology_and_random_outcome ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+
+     Running tests/ordinary_roster.rs (target/debug/deps/ordinary_roster-09b7d6802db76d0d)
+
+running 6 tests
+test ichor_bands_expand_with_same_uniform_draw_and_templates ... ok
+test shipped_manual_matches_runtime_eligibility ... ok
+test widened_windows_preserve_recipe_rules ... ok
+test deterministic_distribution_sample_all_depths ... ok
+test widened_population_places_on_all_generated_depths ... ok
+test save_lazy_generation_and_replay_keep_revision ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.50s
+
+     Running tests/phantasmii_generation_r34.rs (target/debug/deps/phantasmii_generation_r34-90e7187cea314130)
+
+running 7 tests
+test eight_fixed_next_band_body_profiles_have_no_inherited_combat_traits ... ok
+test revision34_natural_actor_profiles_are_still_revision33_and_legacy_shell_is_explicit ... ok
+test revision34_bag_has_seven_distinct_designs_at_unchanged_seven_milestones ... ok
+test shard_pickup_is_dream_only_one_real_stack_and_unlocks_without_consuming ... ok
+test persistent_four_on_all_forty_floors_and_three_quest_items_only_at_altar ... ok
+test generated_event_is_walkable_and_population_additions_do_not_rebudget_ordinary_content ... ok
+test debug_reconstruction_leaves_prior_dream_quest_and_nightmares_unearned ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.97s
+
+     Running tests/physical_balance.rs (target/debug/deps/physical_balance-bf5456064e837339)
+
+running 6 tests
+test reference_depth_is_independent_of_spawn_window ... ok
+test pale_identity_and_ichor_event_construction_receive_tuning ... ok
+test revision_overlay_preserves_abilities_rewards_and_frozen_catalog ... ok
+test revised_stat_scale_does_not_rebudget_population ... ok
+test native_late_profile_trades_and_cancer_ignore_armor ... ok
+test native_dispatch_rat_whole_encounter_and_fast_cadence ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.09s
+
+     Running tests/witch_skinwalker_v33.rs (target/debug/deps/witch_skinwalker_v33-ef9b0ccdbd7ee6cd)
+
+running 11 tests
+test disguise_reverses_at_chebyshev_two_and_preserves_true_state ... ok
+test failed_summons_are_atomic_and_heartless_is_inherited ... ok
+test half_here_reveals_from_observing_body_only ... ok
+test revived_skinwalker_retains_disguise_and_unspeak_prices_witch_summons ... ok
+test uncast_cancels_one_witch_attempt_without_double_charging_or_summon_cooldown ... ok
+test new_species_have_bounded_revisioned_population_and_real_hearts ... ok
+test witch_spends_only_successful_summons_and_keeps_curses_between ... ok
+test queen_is_conditional_only_with_explicit_guardian_heart_and_trait_cost ... ok
+test new_creatures_execute_native_turns_and_offscreen_catchup_without_identity_changes ... ok
+test new_state_survives_save_snapshot_revert_and_future ... ok
+test revision33_replays_native_summons_exactly ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

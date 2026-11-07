@@ -1,0 +1,28 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling serde_core v1.0.229
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling zmij v1.0.23
+   Compiling hashbrown v0.17.1
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling equivalent v1.0.3
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling foldhash v0.2.0
+   Compiling syn v3.0.9
+   Compiling indexmap v2.14.2
+   Compiling serde_derive v1.0.229
+   Compiling corpse-core v0.1.0 (/workspace/scratch/69f53637ba6f/generation-r38/source/corpse-gods-native/crates/corpse-core)
+    Finished `test` profile [optimized] target(s) in 42.71s
+     Running unittests src/lib.rs (target/debug/deps/corpse_core-22ef95f16f60b69b)
+
+running 5 tests
+test startup::recovery_tests_r38::retry_classification_does_not_mask_configuration_or_invariants ... ok
+test startup::recovery_tests_r38::custom_generators_keep_single_attempt_contract ... ok
+test startup::recovery_tests_r38::final_safety_gate_rejects_hazard_only_transition_routes ... ok
+test startup::recovery_tests_r38::failed_population_trial_leaves_no_ids_metrics_loot_or_ability_grants ... ok
+test startup::recovery_tests_r38::finite_exhaustion_and_fatal_failure_are_atomic ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 77 filtered out; finished in 0.25s
+

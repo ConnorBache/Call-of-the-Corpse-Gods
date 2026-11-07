@@ -1,0 +1,20 @@
+{
+  "changed": [
+    "Cargo.lock",
+    "docs/complexity-ledger.md",
+    "crates/corpse-desktop/Cargo.toml",
+    "crates/corpse-desktop/src/session_store.rs",
+    "crates/corpse-desktop/src/main.rs",
+    "crates/corpse-core/src/temporal.rs"
+  ],
+  "missing": [],
+  "added": [
+    "docs/snapshot-opening-cache-reuse.md",
+    "docs/incremental-save-journal.md",
+    "crates/corpse-desktop/examples/incremental_recovery_bench.rs",
+    "crates/corpse-desktop/src/incremental_store_tests.rs",
+    "crates/corpse-desktop/src/tracked_engine.rs",
+    "crates/corpse-desktop/src/incremental_store.rs",
+    "crates/corpse-desktop/src/incremental_log.rs"
+  ]
+}
