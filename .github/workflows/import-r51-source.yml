@@ -1,0 +1,60 @@
+name: One-time verified R51 history import
+on:
+  push:
+    branches: [codex/import-r51-history-20261111]
+    paths: [.github/workflows/import-r51-source.yml]
+permissions: {}
+concurrency:
+  group: one-time-r51-history-import
+  cancel-in-progress: false
+jobs:
+  import:
+    if: github.repository == 'ConnorBache/Call-of-the-Corpse-Gods' && github.ref == 'refs/heads/codex/import-r51-history-20261111'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Read dedicated transport branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify recovered bundle and import exact history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected=1b178bfc91fed9b12430a65ca4a9f3f543af2548
+          target=6a3fb83351a27ff3d85cf8c0dc281fe5eee409d5
+          test "$(gh api repos/ConnorBache/Call-of-the-Corpse-Gods/git/ref/heads/main --jq .object.sha)" = "$expected"
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          manifest=json.loads(pathlib.Path('chunk-manifest.json').read_text())
+          assert len(manifest)==440
+          total=0; digest=hashlib.sha256()
+          with open('/tmp/r51.bundle','xb') as output:
+              for index,entry in enumerate(manifest):
+                  assert entry['path']==f'bundle/part-{index:04d}.bin'
+                  data=pathlib.Path(entry['path']).read_bytes()
+                  assert len(data)==entry['bytes']
+                  assert hashlib.sha256(data).hexdigest()==entry['sha256']
+                  output.write(data); digest.update(data); total+=len(data)
+          assert total==314940494
+          assert digest.hexdigest()=='f0a33b348c02b5fcba9ca939f2c7eec77144b9d35c3e95f7f8be647988c5db20'
+          PY
+          test "$(git bundle list-heads /tmp/r51.bundle)" = "$target refs/heads/main"
+          git init --bare /tmp/r51-import.git
+          git -C /tmp/r51-import.git bundle verify /tmp/r51.bundle
+          git -C /tmp/r51-import.git fetch /tmp/r51.bundle refs/heads/main:refs/heads/recovered-main
+          git -C /tmp/r51-import.git fsck --full
+          git -C /tmp/r51-import.git merge-base --is-ancestor "$expected" "$target"
+          test "$(git -C /tmp/r51-import.git rev-list --count "$target")" = 3
+          test "$(gh api repos/ConnorBache/Call-of-the-Corpse-Gods/git/ref/heads/main --jq .object.sha)" = "$expected"
+          git -C /tmp/r51-import.git remote add origin https://github.com/ConnorBache/Call-of-the-Corpse-Gods.git
+          gh auth setup-git --hostname github.com
+          git -C /tmp/r51-import.git push --force-with-lease="refs/heads/main:$expected" origin "$target:refs/heads/main"
+          test "$(gh api repos/ConnorBache/Call-of-the-Corpse-Gods/git/ref/heads/main --jq .object.sha)" = "$target"
+          echo 'Restored exact verified R51 history. This is not the newer R52 release source.' >> "$GITHUB_STEP_SUMMARY"
