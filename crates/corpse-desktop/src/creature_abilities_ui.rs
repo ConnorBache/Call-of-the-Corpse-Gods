@@ -1005,7 +1005,7 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
             parts.push("Disguises itself as a much shallower creature beyond two grid squares of an observing player body. Nearer bodies reveal its true form; combat statistics remain unchanged.".into());
         }
         if source.name.starts_with("Greater ") && source.abilities.iter().any(|s|s=="enemy:pale:breath") {
-            parts.push("It emits hallucinogenic gas instead of caustic gas. Exposure refreshes Hallucinating to 2 turns while exposed, changing only perceived creature identities.".into());
+            parts.push("Exposure refreshes Hallucinating to 2 turns while exposed, changing only perceived creature identities.".into());
         }
     }
     if parts.is_empty() {
