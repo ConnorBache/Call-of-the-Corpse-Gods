@@ -245,7 +245,9 @@ fn gas_label(kind: &str) -> &str {
 /// Every dynamic detail is sourced from the one observed snapshot.
 // Presentation only: remembered terrain and later feature-title overrides remain intact.
 fn terrain_report_title(name: String, current: bool) -> String {
-    if current && name == "Tree" { String::new() } else { name }
+    if current && matches!(name.as_str(),
+        "Ice" | "Puddle" | "Hellfire" | "Bloody wall" | "Rock wall" | "Stone wall" | "Wall" | "Bare ground" | "Stone floor" | "Rock floor" | "Earthen floor" | "Sand" | "Soot" | "Ash" | "Grass" | "Tree" | "Deep water" | "Shallow water" | "Chasm" | "Upstairs" | "Downstairs" | "Bottomless pit" | "Open door" | "Closed door" | "Grate" | "Bridge"
+    ) { String::new() } else { name }
 }
 fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
     let mut details = Vec::new();
@@ -1824,8 +1826,15 @@ mod tests {
         assert_eq!(text, "A tree rises from the ground.");
         assert_eq!(terrain_report_title(name, true), "");
         assert_eq!(terrain_report_title("Tree".into(), false), "Tree");
-        assert_eq!(terrain_report_title("Wall".into(), true), "Wall");
+        assert_eq!(terrain_report_title("Wall".into(), true), "");
         assert_eq!(terrain_report_title("Portal".into(), true), "Portal");
+        for name in ["Ice", "Puddle", "Hellfire", "Bloody wall", "Rock wall", "Stone wall", "Wall", "Bare ground", "Stone floor", "Rock floor", "Earthen floor", "Sand", "Soot", "Ash", "Grass", "Tree", "Deep water", "Shallow water", "Chasm", "Upstairs", "Downstairs", "Bottomless pit", "Open door", "Closed door", "Grate", "Bridge"] {
+            assert_eq!(terrain_report_title(name.into(), true), "", "{name}");
+            assert_eq!(terrain_report_title(name.into(), false), name, "{name}");
+        }
+        for name in ["Speed-up area", "Unclear memory", "Non-Euclidean space", "Brazier", "Magical beacon"] {
+            assert_eq!(terrain_report_title(name.into(), true), name);
+        }
     }
     #[test]
     fn source_58_terrain_reports() {
