@@ -100,7 +100,7 @@ pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
         return Ok(true);
     }
     if !e.activated.value_or(false) {
-        engine::log(r,"Strike the Borge to learn it's demand.","environment");return Ok(false);
+        engine::log(r,"Strike the Borge to learn its demand.","environment");return Ok(false);
     }
     if e.reward_created.value_or(false) {
         engine::log(r,"The Borge is satisfied.","environment");return Ok(false);
