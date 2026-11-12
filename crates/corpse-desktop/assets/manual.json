@@ -1010,7 +1010,7 @@
       "glyph": "p",
       "color": "#b9b8b1",
       "description": "A small biped with pale, near translucent skin and a phallic trunk.",
-      "naturalHistory": "An ancient low beast. It's phallic appendage can spew acid and gas to subdue it's enemies.",
+      "naturalHistory": "An ancient low beast. Its phallic appendage can spew acid and gas to subdue its enemies.",
       "health": 34,
       "stats": {
         "offense": 10,
@@ -1158,7 +1158,7 @@
       "asset": "pale-screamer",
       "family": "pale",
       "forms": [],
-      "naturalHistory": "A creature of the pale species, most noticeable for its large mouth and piercing scream, which emboldens it's fellows."
+      "naturalHistory": "A creature of the pale species, most noticeable for its large mouth and piercing scream, which emboldens its fellows."
     },
     {
       "id": "pale:Birther",
@@ -1240,10 +1240,10 @@
       "forms": [
         {
           "label": "At zero Energy",
-          "description": "A human-sized biped with pale, near translucent skin and a flat stomach. It's head resembles a vagina."
+          "description": "A human-sized biped with pale, near translucent skin and a flat stomach. Its head resembles a vagina."
         }
       ],
-      "naturalHistory": "A hideous low beast, which spawns other creatures from its vagina like head. It's large midsection deflates as it births its spawn."
+      "naturalHistory": "A hideous low beast, which spawns other creatures from its vagina like head. Its large midsection deflates as it births its spawn."
     },
     {
       "id": "greater-ichor-fish",
@@ -1640,7 +1640,7 @@
       "name": "Witch",
       "glyph": "w",
       "color": "#B596E8",
-      "description": "A whore whom has forsaken her humanity for devilish power.",
+      "description": "A whore who has forsaken her humanity for devilish power.",
       "health": 94,
       "stats": {
         "offense": 15,
@@ -1895,7 +1895,7 @@
       "glyph": "F",
       "color": "#b99a48",
       "description": "A shark made of hardened ichor swims through the terrible liquid.",
-      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. It's body is made from the same toxic god-liquid in which it swims.",
+      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. Its body is made from the same toxic god-liquid in which it swims.",
       "health": 100,
       "stats": {
         "offense": 35,
@@ -1996,7 +1996,7 @@
       "asset": "hemogoblin-inventor",
       "family": "blood",
       "forms": [],
-      "naturalHistory": "A goblin, rended of its flesh, but not it's inventive habits. It creates mechanisms of malice with which to end human life."
+      "naturalHistory": "A goblin, rended of its flesh, but not its inventive habits. It creates mechanisms of malice with which to end human life."
     },
     {
       "id": "hemogoblin-mech",
@@ -2477,7 +2477,7 @@
       "glyph": "F",
       "color": "#e5bb4c",
       "description": "A shark made of hardened ichor swims through the terrible liquid.",
-      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. It's body is made from the same toxic god-liquid in which it swims.",
+      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. Its body is made from the same toxic god-liquid in which it swims.",
       "health": 124,
       "stats": {
         "offense": 45,
@@ -2705,7 +2705,7 @@
       "asset": "troll",
       "family": "wild",
       "forms": [],
-      "naturalHistory": "A humanoid grown from the blood walls of the Flesh. Its hands are the size of small men, and it's mouth full of teeth with which to devour the uncorrupted."
+      "naturalHistory": "A humanoid grown from the blood walls of the Flesh. Its hands are the size of small men, and its mouth full of teeth with which to devour the uncorrupted."
     },
     {
       "id": "pale:Greater Breather",
@@ -2830,7 +2830,7 @@
       "asset": "pale-greater-screamer",
       "family": "pale",
       "forms": [],
-      "naturalHistory": "A colossal maw allows the scream of this creature to echo around, disorienting its pray. It's colossal vocal chords are as thick as steel cables."
+      "naturalHistory": "A colossal maw allows the scream of this creature to echo around, disorienting its pray. Its colossal vocal chords are as thick as steel cables."
     },
     {
       "id": "zillennia:greater",
@@ -2950,10 +2950,10 @@
       "forms": [
         {
           "label": "At zero Energy",
-          "description": "A towering biped with pale, near translucent skin and a flat stomach. It's head resembles a vagina."
+          "description": "A towering biped with pale, near translucent skin and a flat stomach. Its head resembles a vagina."
         }
       ],
-      "naturalHistory": "A large biped which brings forth other lowbeasts. It deflates as it births its spawn, and when replenishes itself only with the blood of the Flesh."
+      "naturalHistory": "A large biped which brings forth other lowbeasts. It deflates as it births its spawn, and replenishes itself only with the blood of the Flesh."
     },
     {
       "id": "greater-ichor-shark",
@@ -3015,7 +3015,7 @@
       "asset": "greater-ichor-shark",
       "family": "ichor",
       "forms": [],
-      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. It's body is made from the same toxic god-liquid in which it swims."
+      "naturalHistory": "A huge, terrifying fish with rows of sharp, dagger like teeth. Its body is made from the same toxic god-liquid in which it swims."
     },
     {
       "id": "dire-bear",
@@ -3214,7 +3214,7 @@
       "asset": "horn-3",
       "family": "wild",
       "forms": [],
-      "naturalHistory": "A beautiful, three-horned horse of magickal power from another dimension. It's playful nature often results in the death of its victims."
+      "naturalHistory": "A beautiful, three-horned horse of magickal power from another dimension. Its playful nature often results in the death of its victims."
     },
     {
       "id": "killspawn",
@@ -3388,7 +3388,7 @@
     },
     {
       "id": "sabretooth",
-      "naturalHistory": "A pre-historic tiger, revived to defend the Flesh. It's bite is powerful, and it's fangs long.",
+      "naturalHistory": "A pre-historic tiger, revived to defend the Flesh. Its bite is powerful, and its fangs long.",
       "kind": "sabretooth",
       "name": "Sabretooth Tiger",
       "glyph": "T",
@@ -3556,7 +3556,7 @@
       "asset": "vampire",
       "family": "wild",
       "forms": [],
-      "naturalHistory": "Human nobles whom perform terrible sacrifices can curry favor with the Flesh, earning themselves a terrible reward. Leech-vampirism changes their mind, just as well as their body, leaving them as one of the most dangerous monsters of the Flesh."
+      "naturalHistory": "Human nobles who perform terrible sacrifices can curry favor with the Flesh, earning themselves a terrible reward. Leech-vampirism changes their mind, just as well as their body, leaving them as one of the most dangerous monsters of the Flesh."
     },
     {
       "id": "banshee",
@@ -3675,7 +3675,7 @@
       "asset": "maulchild",
       "family": "wild",
       "forms": [],
-      "naturalHistory": "A demon of innocent persuasion. It comes with others, and craves affection, holding it's victim still for it's fellows carving knives."
+      "naturalHistory": "A demon of innocent persuasion. It comes with others, and craves affection, holding its victim still for its fellows' carving knives."
     },
     {
       "id": "zillennia:ancient",
@@ -3795,7 +3795,7 @@
       "asset": "horn-5",
       "family": "wild",
       "forms": [],
-      "naturalHistory": "A beautiful horse with five horns from another dimension. It's carries with it a malevolent aura, and a desire to inflict suffering."
+      "naturalHistory": "A beautiful horse with five horns from another dimension. It carries with it a malevolent aura, and a desire to inflict suffering."
     },
     {
       "id": "horn-6",
@@ -4142,7 +4142,7 @@
       "asset": "zillennia-timeless",
       "family": "void",
       "forms": [],
-      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one does not change. It was created when those two gods locked eyes with each other, and their horrible romance began, before humanity had yet breathed. It cares not for the whims of time. It is likely it is unaware that it's parents lie long dead, and that it is a relic of a different era."
+      "naturalHistory": "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one does not change. It was created when those two gods locked eyes with each other, and their horrible romance began, before humanity had yet breathed. It cares not for the whims of time. It is likely it is unaware that its parents lie long dead, and that it is a relic of a different era."
     },
     {
       "id": "valta",
