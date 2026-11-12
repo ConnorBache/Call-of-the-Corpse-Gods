@@ -608,8 +608,8 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
     if r50(r) && id=="kative-clay-army" {
         row.description.push_str("\nEach Clay Soldier uses your current attack without abilities, and attacks anyone adjacent at the end of a turn. It is an unbreakable wall.");
     }
-    if let Some(summary)=reserve {
-        row.description.push_str(&format!("\n{summary}. Ability energy is spent first; player energy pays any remainder. Ability energy refills to 50 on level-up; player energy does not."));
+    if let Some(_)=reserve {
+        row.description.push_str("\nAbility energy is spent first; player energy pays any remainder. Ability energy refills to 50 on level-up; player energy does not.");
         if id == corpse_core::revision50_ability_energy::FUTURE_ID {
             row.description.push_str(" See The Future spends all its own reserve and all current player energy, leaving other reserves untouched. The saved state is after payment.");
         }
