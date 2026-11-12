@@ -1841,8 +1841,6 @@ impl Painter {
         self.native_fill(0,0,self.width as i32,self.height as i32,[5,4,12],232);
         self.rect(345, 70, 590, 660, [11, 13, 21]);
         self.border(345, 70, 590, 660, [53, 55, 68]);
-        self.text("A BLESSING EARNED", 373, 98, 14, GOLD);
-        self.text("Choose what answers.", 373, 128, 28, GOLD);
         for (i, a) in offers.iter().take(3).enumerate() {
             let y = 180 + i as i32 * 170;
             self.rect(
