@@ -1873,7 +1873,10 @@ mod tests {
                 ("heart", got.heart),
             ] {
                 let expected=e[key].as_str().unwrap();
-                let expected=if key=="conditions" {
+                let expected=if key=="description" {
+                    // Preserve the frozen fixture; apply only approved grammar corrections.
+                    expected.replace("whom has", "who has").replace("It's head", "Its head")
+                }else if key=="conditions" {
                     expected.replace("Slow: acts every other turn","Slow")
                         .replace("Slowed: acts every other turn","Slowed")
                         .replace("Lucky: next attack","Lucky").replace("Unlucky: next attack","Unlucky")
