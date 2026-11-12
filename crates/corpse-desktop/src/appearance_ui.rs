@@ -151,7 +151,7 @@ fn partially_applied(path: &str) -> bool {
 }
 fn changed_notice(path: &str) -> &'static str {
     if partially_applied(path) {
-        "Appearance updated in supported views. Some native source consumers are not yet integrated."
+        "Appearance updated in supported views."
     } else if retained_only(path) {
         "Saved in working appearance and export. This setting is not yet applied by the native renderer."
     } else {
