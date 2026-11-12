@@ -580,7 +580,7 @@ fn detailed_enemy(r: &Run, a: &Actor, e: &Enemy) -> String {
         format!("; {}", limits.join("; "))
     };
     if half_here::is_clone(a) && needs_ai {
-        format!("A creature acting independently could {}{limit}. This body cannot use that power independently.",uninflect(&effect))
+        format!("A creature acting independently could {}{limit}.",uninflect(&effect))
     } else {
         format!("It {}.", trim(&(effect + &limit)))
     }
