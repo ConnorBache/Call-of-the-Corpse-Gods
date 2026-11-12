@@ -159,8 +159,8 @@
     "id": "isheilah-make-slippery",
     "godId": 2,
     "name": "Make Slippery",
-    "description": "Select an enemy, when they try to move, they don't and you spend 8 energy.",
-    "effectSummary": "Select an enemy, when they try to move, they don't and you spend 8 energy.",
+    "description": "Select an enemy; when they try to move, they don't and you spend 8 energy.",
+    "effectSummary": "Select an enemy; when they try to move, they don't and you spend 8 energy.",
     "flags": [
       "toggle",
       "target"
