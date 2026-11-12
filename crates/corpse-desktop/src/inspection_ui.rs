@@ -243,6 +243,10 @@ fn gas_label(kind: &str) -> &str {
     }
 }
 /// Every dynamic detail is sourced from the one observed snapshot.
+// Presentation only: remembered terrain and later feature-title overrides remain intact.
+fn terrain_report_title(name: String, current: bool) -> String {
+    if current && name == "Tree" { String::new() } else { name }
+}
 fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
     let mut details = Vec::new();
     let h = o.hazards.as_ref();
@@ -1070,7 +1074,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
     if o.current || o.remembered {
         let (name, text) = terrain_copy(f, o);
         report = Report {
-            title: name,
+            title: terrain_report_title(name, o.current),
             scene: text.clone(),
             lines: vec![text],
             ..Default::default()
@@ -1805,6 +1809,23 @@ mod tests {
                     .cloned()
             },
         }
+    }
+    #[test]
+    fn current_plain_tree_title_is_hidden_without_changing_terrain_copy() {
+        let r = base();
+        let mut f = r.floor().unwrap().clone();
+        let at = 0;
+        f.tiles[at] = "tree".into();
+        let mut o = cell(&f, at, true, r.tick);
+        o.hazards = None; o.biome = None; o.flowers = false;
+        o.snow = false; o.ice = false; o.puddles = false; o.hellfire = false;
+        let (name, text) = terrain_copy(&f, &o);
+        assert_eq!(name, "Tree");
+        assert_eq!(text, "A tree rises from the ground.");
+        assert_eq!(terrain_report_title(name, true), "");
+        assert_eq!(terrain_report_title("Tree".into(), false), "Tree");
+        assert_eq!(terrain_report_title("Wall".into(), true), "Wall");
+        assert_eq!(terrain_report_title("Portal".into(), true), "Portal");
     }
     #[test]
     fn source_58_terrain_reports() {
