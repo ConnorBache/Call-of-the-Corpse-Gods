@@ -701,7 +701,7 @@
     "id": "kative-clay-army",
     "godId": 10,
     "name": "Clay Army",
-    "description": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.\n\nImplementation: Clay Soldiers are treated as unbreakable walls for pathfinding and collision.",
+    "description": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.",
     "effectSummary": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.",
     "flags": [
       "target"
