@@ -679,7 +679,7 @@
     "id": "kative-cogworks",
     "godId": 10,
     "name": "Cogworks",
-    "description": "This ability can be toggled to mode one, two or three, or activated.\n\nMode 1: When activated, create a 3x3 pit in an area not occupied by any creatures. Costs 20 energy.\n\nMode 2: When activated, create a 5x1 wall with 200 HP, oriented perpendicular to the direction thrown. Costs 20 energy.\n\nMode 3: Select a terrain modification you have made and remove it. Removing a terrain modification is free.\n\nImplementation: Preview the placement in the sight display; color both the pit and wall in Kative's colors. When an enemy tries to move through a wall, it attacks the wall instead.",
+    "description": "This ability can be toggled to mode one, two or three, or activated.\n\nMode 1: When activated, create a 3x3 pit in an area not occupied by any creatures. Costs 20 energy.\n\nMode 2: When activated, create a 5x1 wall with 200 HP, oriented perpendicular to the direction thrown. Costs 20 energy.\n\nMode 3: Select a terrain modification you have made and remove it. Removing a terrain modification is free.\n\nWhen an enemy tries to move through a wall, it attacks the wall instead.",
     "effectSummary": "This ability can be toggled to mode one, two or three, or activated.",
     "flags": [
       "target"
