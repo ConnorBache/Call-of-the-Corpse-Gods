@@ -191,7 +191,6 @@ impl Manual {
         p.rect(16, 28, 4, 44, theme.accent);
         
         p.prose("BESTIARY", 28, 38, 25, ink, true);
-        p.prose("ALL CREATURES", 24, 86, 14, ink, false);
         p.rect(224, 26, 1, 704, theme.rule);
         p.border(158, 80, 24, 28, ink);
         p.border(184, 80, 24, 28, ink);
@@ -200,24 +199,8 @@ impl Manual {
         p.rect(16, 139, 194, 1, ink);
         p.border(16, 708, 93, 26, ink);
         p.border(115, 708, 95, 26, ink);
-        p.prose("‹ PREV", 28, 713, 13, ink, false);
-        p.prose("NEXT ›", 128, 713, 13, ink, false);
-        p.prose(
-            "FIRST APPEARANCE",
-            24,
-            120,
-            10,
-            ink, false);
-        p.prose(
-            &format!(
-                "{:02} / {:02}",
-                self.selected + usize::from(!self.ids().is_empty()),
-                self.ids().len()
-            ),
-            130,
-            120,
-            13,
-            ink, false);
+        p.prose("‹", 28, 713, 13, ink, false);
+        p.prose("›", 128, 713, 13, ink, false);
         let first = self.selected.saturating_sub(10);
         for (i, id) in self.ids().iter().enumerate().skip(first).take(23) {
             if let Some(e) = self.catalog.entries.iter().find(|e| &e.id == id) {
@@ -226,12 +209,11 @@ impl Manual {
                     p.rect(16, y - 3, 194, 24, ink);
                 }
                 p.prose(
-                    &crate::render::truncate(if self.unlocked(id) {&e.name} else {"?"}, 20),
+                    &crate::render::truncate(if self.unlocked(id) {&e.name} else {""}, 20),
                     24,
                     y,
                     14,
                     if i == self.selected { paper } else { theme.secondary }, false);
-                if self.progress.unread(id) {p.prose("!",195,y,16,[255,215,65],true);}
             }
         }
         let Some(entry) = self.entry().cloned() else {
@@ -246,7 +228,6 @@ impl Manual {
             return;
         };
         if !self.unlocked(&entry.id) {
-            p.prose("?", 710, 310, 100, ink, true);
             paint_footer(p,ink);
             self.paint_storage_error(p);
             p.prose_contrast_outline=false;
@@ -1244,10 +1225,12 @@ mod discovery_privacy_tests {
         manual.paint_at_depth(&mut painter,0.,0);assert_eq!(painter.pixels,original);assert!(manual.art.is_none());
     }
     #[test]
-    fn unread_marker_and_known_page_change_pixels_then_view_clears_unread() {
+    fn known_page_changes_pixels_but_unread_marker_does_not() {
         let mut manual=Manual::new();let id=manual.ids()[0].clone();let mut painter=Painter::new();manual.paint(&mut painter);let locked=painter.pixels.clone();
         manual.progress.discover([id.as_str()]);manual.paint(&mut painter);assert_ne!(painter.pixels,locked);assert!(manual.progress.unread(&id));
+        let known=painter.pixels.clone();
         manual.mark_viewed();assert!(!manual.progress.unread(&id));assert!(manual.progress.seen(&id));
+        manual.paint(&mut painter);assert_eq!(painter.pixels,known);
     }
     #[test]
     fn discovery_transition_wide_and_portrait_capture() {
@@ -1261,7 +1244,10 @@ mod discovery_privacy_tests {
                 if state=="unread" {manual.progress.discover(["blorb"]);}
                 if state=="read" {manual.mark_viewed();}
                 manual.paint(&mut painter);
-                if let Some(prior)=previous {assert_ne!(painter.pixels,prior,"{label} {state} must change visible page/marker");}
+                if let Some(prior)=previous {
+                    if state=="read" {assert_eq!(painter.pixels,prior,"{label}: unread tracking must not render a marker");}
+                    else {assert_ne!(painter.pixels,prior,"{label}: discovery reveals the page");}
+                }
                 previous=Some(painter.pixels.clone());
                 assert_eq!(manual.progress.unread("blorb"),state=="unread");
                 if state=="unknown" {assert!(manual.art.is_none());}
