@@ -129,13 +129,6 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         }
         p.rect(layout.rows.0+4,y+card.height-3,(layout.rows.2-16).max(1),1,[36,30,46]);
     }
-    p.clip=Some(layout.bounds.tuple());
-    if content.height>layout.rows.3 {
-        let track=layout.rows.3;let thumb=((track as f64*track as f64/content.height as f64).round()as i32).clamp(12.min(track),track);
-        let sy=(track-thumb) as f64*p.enemy_list_offset as f64/(content.height-track) as f64;
-        p.rect(layout.rows.0+layout.rows.2-3,layout.rows.1,2,track,[36,30,46]);
-        p.rect(layout.rows.0+layout.rows.2-3,layout.rows.1+sy as i32,2,thumb,MUTED);
-    }
     p.clip=old_clip;
 }
 #[cfg(test)] mod tests {
