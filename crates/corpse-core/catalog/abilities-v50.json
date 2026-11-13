@@ -125,7 +125,7 @@
     "id": "pelian-relentless-pursuit",
     "godId": 1,
     "name": "Relentless Pursuit",
-    "description": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.\n\nImplementation: The path follows the moving target, routes around obstacles when possible, and may pass through another enemy only when the target would otherwise be inaccessible.",
+    "description": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.",
     "effectSummary": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.",
     "flags": [
       "target"
