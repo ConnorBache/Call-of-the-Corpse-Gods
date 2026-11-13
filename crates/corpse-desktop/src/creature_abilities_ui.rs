@@ -973,7 +973,7 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
             } else if r.simulation_revision.value_or(29.) >= 33. && source.name.starts_with("Greater ") && matches!(id.as_str(),"enemy:pale:breath"|"enemy:pale:breath-boost") {
                 if id=="enemy:pale:breath" {"Continually emits hallucinogenic gas.".into()} else {"Exhales an additional hallucinogenic cloud for 10 Energy.".into()}
             } else if r.simulation_revision.value_or(29.) >= 33. && id == "enemy:pale:scream" {
-                format!("Disorients foes within 10 tiles for 5 turns: -{} Accuracy. Allies retain the existing Damage and Perception boosts. Costs 15 Energy.", if source.name.starts_with("Greater ") {10} else {5})
+                format!("Disorients foes within 10 tiles for 5 turns: -{} Accuracy. Costs 15 Energy.", if source.name.starts_with("Greater ") {10} else {5})
             } else if compact {
                 compact_enemy(source, e)
             } else {
