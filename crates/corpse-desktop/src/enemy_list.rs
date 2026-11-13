@@ -134,6 +134,26 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
 #[cfg(test)] mod tests {
     use super::*;
     fn view()->View {crate::observe::observe(&corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap().run)}
+    #[test] fn overflowing_preview_has_no_scrollbar_and_still_scrolls() {
+        let mut v=view();let template=v.creatures[0].clone();
+        v.creatures=(0..40).map(|i|{let mut a=template.clone();a.id=1000.+i as f64;a}).collect();
+        let mut p=Painter::new();
+        let layout=Layout{bounds:Rect(8,100,240,180),rows:Rect(8,100,240,180)};
+        let content=layout.content(&p,&v.creatures);
+        assert!(content.height>layout.rows.3);
+        let bottom=content.scroll(0,-i32::MAX);
+        assert!(bottom>0);assert_eq!(content.scroll(bottom,i32::MAX),0);
+        for offset in [0,bottom/2,bottom] {
+            p.clear([7,11,19]);p.enemy_list_offset=offset;
+            let before=p.pixels.clone();paint(&mut p,&v,layout);
+            assert_eq!(p.enemy_list_offset,offset);
+            let x=p.native_x((layout.rows.0+layout.rows.2-2)as f64) as usize;
+            for y in layout.rows.1..layout.rows.1+layout.rows.3 {
+                let y=p.native_y(y as f64) as usize;let at=(y*p.width as usize+x)*4;
+                assert_eq!(&p.pixels[at..at+4],&before[at..at+4],"scrollbar gutter changed");
+            }
+        }
+    }
     #[test] fn preview_column_survives_supported_sizes_and_right_aligns_map() {
         let mut p=Painter::new();
         for(w,h)in[(1280,800),(1920,1080),(2560,1600),(1537,911),(960,720),(960,1200)] {
