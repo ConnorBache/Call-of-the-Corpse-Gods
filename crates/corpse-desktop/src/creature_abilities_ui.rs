@@ -1119,6 +1119,27 @@ pub fn describe(r: &Run, a: &Actor) -> (String, String) {
 mod tests {
     use super::*;
     #[test]
+    fn scream_display_cut_preserves_rule_numbers_without_mutation() {
+        for revision in [33., 52.] {
+            let r = corpse_core::startup::new_run_shell_revision("0-5-11:scream-copy", "Unblessed", false, revision).unwrap();
+            for (kind, penalty) in [("pale:Screamer", 5), ("pale:Greater Screamer", 10)] {
+                let mut a = corpse_core::population::create_actor_revision(kind, 20., 1., 1., false, revision).unwrap();
+                a.abilities = vec!["enemy:pale:scream".into()];
+                let before_run = r.clone();
+                let before_actor = a.clone();
+                let (compact, details) = describe(&r, &a);
+                for text in [compact, details] {
+                    assert!(text.contains("within 10 tiles for 5 turns"), "{text}");
+                    assert!(text.contains(&format!("-{penalty} Accuracy")), "{text}");
+                    assert!(text.contains("Costs 15 Energy."), "{text}");
+                    assert!(!text.contains("Allies retain the existing Damage and Perception boosts."));
+                }
+                assert_eq!(r, before_run);
+                assert_eq!(a, before_actor);
+            }
+        }
+    }
+    #[test]
     fn shine_suppression_status_preserves_legacy_wording_without_mutation() {
         for revision in [45., 46.] { for enabled in [false, true] {
             let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
