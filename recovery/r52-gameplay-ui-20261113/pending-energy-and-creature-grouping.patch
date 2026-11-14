@@ -1,0 +1,301 @@
+--- a/crates/corpse-core/src/abilities.rs
++++ b/crates/corpse-core/src/abilities.rs
+@@ -1285,6 +1285,34 @@
+ pub fn upkeep_cost_in(_r:&Run,actor:&Actor,id:&str)->f64 {
+     upkeep_cost_for(actor,id)
+ }
++/// Read-only forecast for the next normal upkeep boundary, not free/haste
++/// actions or contingent procs. Uses canonical atomic own-reserve-first plans
++/// in active order. Cannot spend or reveal any new world state.
++/// O(B+A*L) expected reserve/active metadata work, plus optional current-floor
++/// Unspeak target scan and copied-target trait projection. O(B*L) scratch.
++pub fn projected_player_upkeep(r:&Run)->f64 {
++    if r.status!="playing" || r.player.hp<=0. {return 0.;}
++    let actor=&r.player;let next_tick=r.tick+1.;let revision=r.simulation_revision.value_or(29.);
++    let mut energy=actor.energy;let mut reserves=actor.ability_reserves.as_ref().cloned();
++    for id in &actor.active {
++        if actor.conditions.get(&format!("remembered:{id}")).is_some_and(|until|next_tick>=*until) {continue;}
++        if id=="pelian-fated-duel" && !crate::revision50::duel_upkeep_valid(r,actor) {continue;}
++        let cost=if id=="dawel-unspeak" {
++            actor.conditions.get("unspeakTarget").and_then(|id|r.actors_at(r.depth).iter().find(|a|a.id==*id&&!a.dead.value_or(false)&&crate::dreamwalking::same_plane(r,actor,a)))
++                .map(|a|highest_energy_cost_for(&mut a.clone(),revision)).unwrap_or(0.)
++        } else {upkeep_cost_in(r,actor,id)};
++        let prepaid=if crate::revision50::enabled(r)&&actor.conditions.get(&format!("upkeepPaidThrough:{id}")).is_some_and(|until|*until>=next_tick&&*until<=next_tick+1.) {
++            actor.conditions.get(&format!("upkeepPaidAmount:{id}")).copied().unwrap_or(0.).max(0.)
++        } else {0.};
++        let due=(cost-prepaid).max(0.);if due==0. {continue;}
++        if crate::revision50::enabled(r) {
++            if let Ok(plan)=crate::revision50_ability_energy::plan_payment_for_revision(reserves.as_ref(),id,energy,due,revision) {
++                if let Some(reserves)=reserves.as_mut(){let _=crate::revision50_ability_energy::commit_payment(&plan,reserves,&mut energy);}
++            }
++        } else if energy>=due {energy-=due;}
++    }
++    (actor.energy-energy).max(0.)
++}
+ /// O(active abilities), paid in active-array order at the source upkeep point.
+ pub fn pay_upkeep(r: &mut Run, actor_id: f64) -> Result<bool, EngineError> {
+     crate::revision50::settle_duel_owner(r, actor_id);
+@@ -1746,3 +1774,36 @@
+   crate::events::begin();activate(&mut r,"lichor-blood-letting",&Field::Missing,&Field::Missing,&Field::Missing).unwrap();assert!(!crate::events::finish().iter().filter_map(|e|e.animation.as_ref()).any(|a|a.style.starts_with("fracture-status:")));
+  }
+ }
++
++#[cfg(test)] mod upkeep_forecast_tests {
++    use super::*;
++    fn room()->Run {
++        let mut r=crate::storage::deserialize(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++        r.simulation_revision=52.0.into();r.offers.clear();r.player.active.clear();r.player.ability_reserves=crate::Field::Missing;
++        r.player.energy=50.;r
++    }
++    fn add(r:&mut Run,id:&str,reserve:f64){
++        r.player.abilities.push(id.into());r.player.active.push(id.into());
++        crate::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,reserve).unwrap();
++    }
++    fn actual(r:&Run)->f64{let mut next=r.clone();next.tick+=1.;let id=next.player.id;let before=next.player.energy;pay_upkeep(&mut next,id).unwrap();before-next.player.energy}
++    #[test] fn forecast_matches_next_boundary_and_own_reserve_first_without_mutation(){
++        let mut r=room();add(&mut r,"morae-turning-the-wheel",10.);add(&mut r,"etill-riptide",4.);
++        let before=r.clone();assert_eq!(projected_player_upkeep(&r),16.);assert_eq!(projected_player_upkeep(&r),actual(&r));assert_eq!(r,before);
++        r.player.active.clear();assert_eq!(projected_player_upkeep(&r),0.);
++    }
++    #[test] fn forecast_honors_prepaid_next_turn_but_not_previous_turn_credit(){
++        let mut r=room();let id="morae-turning-the-wheel";add(&mut r,id,0.);
++        r.player.conditions.insert(format!("upkeepPaidThrough:{id}"),r.tick+1.);
++        r.player.conditions.insert(format!("upkeepPaidAmount:{id}"),20.);
++        assert_eq!(projected_player_upkeep(&r),0.);assert_eq!(actual(&r),0.);
++        r.player.conditions.insert(format!("upkeepPaidThrough:{id}"),r.tick);
++        assert_eq!(projected_player_upkeep(&r),20.);assert_eq!(actual(&r),20.);
++    }
++    #[test] fn forecast_does_not_invent_payment_for_unaffordable_or_expired_modes(){
++        let mut r=room();add(&mut r,"morae-turning-the-wheel",0.);add(&mut r,"etill-phase-through",0.);r.player.energy=15.;
++        assert_eq!(projected_player_upkeep(&r),5.);assert_eq!(actual(&r),5.);
++        r.player.conditions.insert("remembered:etill-phase-through".into(),r.tick+1.);
++        assert_eq!(projected_player_upkeep(&r),0.);
++    }
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1903,3 +1903,18 @@
+ and glyph commands O(G). Caller clips and damage masks remain authoritative.
+ No resource values or mechanics change. Validate zero/partial/full meters and
+ retained/tiled resource updates with resource_ui and enemy_list tests.
++
++### Upcoming energy upkeep forecast
++Read-only projection follows canonical active order, atomic payments, own-reserve
++priority, next-normal-turn prepayment credits and remembered-grant expiry.
++Uses O(B*L) copied reserve metadata, expected O(B+A*L) lookup/planning for B
++reserves, A active abilities and L ID bytes. Unspeak additionally scans current
++floor actors and projects one cloned target's traits/catalog costs. No Run clone,
++RNG, turn advancement or live state mutation. It forecasts maintenance with
++current state, not uncertain combat procs, future commands or energy recovery.
++Resource hatch raster is O(segmentWidth*barHeight), O(1) extra memory; text
++contrast clips in three segments with O(G) glyph work. Display delta keys include
++the projected debit in both retained and tile renderers.
++Creature cards now place resources directly after the name, state/conditions
++below those bars, and spacing after the complete group. This is O(1) geometry
++per existing line; content collection, hit testing and scrolling remain shared.
+--- a/crates/corpse-desktop/src/enemy_list.rs
++++ b/crates/corpse-desktop/src/enemy_list.rs
+@@ -86,17 +86,7 @@
+             }
+             text(p,&mut card,&mut y,width,&format!("{} {}",a.glyph,a.name),13,a.color);
+             for line in &mut card.lines {line.outline=a.identity_outline;}
+-            y+=3;
+-            if !a.state.is_empty() && !a.statuses.iter().any(|s| crate::statuses_ui::display_name(&s.name).eq_ignore_ascii_case(&a.state)) {
+-                let mut chars=a.state.chars();
+-                let state=chars.next().map(|c|c.to_uppercase().collect::<String>()+chars.as_str()).unwrap_or_default();
+-                text(p,&mut card,&mut y,width,&state,11,MUTED);
+-            }
+-            if let Some(label)=&a.perception_range {
+-                // Reserve stable card geometry, but reveal senses only on hover.
+-                let start=card.lines.len();text(p,&mut card,&mut y,width,label,11,MUTED);
+-                for line in &mut card.lines[start..] {line.hover_only=true;}
+-            }
++            y+=1;
+             if !a.shared_resources {
+                 for (name,value,max,color,invulnerable) in [
+                     ("Health",a.hp,a.max_hp,[255,48,85],a.invulnerable),
+@@ -110,11 +100,21 @@
+                     y+=26;
+                 }
+             }
++            if !a.state.is_empty() && !a.statuses.iter().any(|s| crate::statuses_ui::display_name(&s.name).eq_ignore_ascii_case(&a.state)) {
++                let mut chars=a.state.chars();
++                let state=chars.next().map(|c|c.to_uppercase().collect::<String>()+chars.as_str()).unwrap_or_default();
++                text(p,&mut card,&mut y,width,&state,11,MUTED);
++            }
+             let conditions=crate::statuses_ui::summary(&a.statuses);
+             if !conditions.is_empty() {
+                 text(p,&mut card,&mut y,width,&conditions,11,[193,138,255]);
+             }
+-            card.height=y+9;top+=card.height;cards.push(card);
++            if let Some(label)=&a.perception_range {
++                // Reserve stable card geometry, but reveal senses only on hover.
++                let start=card.lines.len();text(p,&mut card,&mut y,width,label,11,MUTED);
++                for line in &mut card.lines[start..] {line.hover_only=true;}
++            }
++            card.height=y+16;top+=card.height;cards.push(card);
+         }
+         Self{cards,height:top,layout}
+     }
+@@ -179,6 +179,16 @@
+             corpse_core::debug_floor::advance(&mut run).unwrap();
+         }
+         corpse_core::debug_floor::enter(&mut run).unwrap();
++        if std::env::var_os("SHOW_UPKEEP").is_some() {
++            let id="morae-turning-the-wheel";
++            if !run.player.abilities.iter().any(|a|a==id){run.player.abilities.push(id.into());}
++            if !run.player.ability_reserves.as_ref().is_some_and(|m|m.contains_key(id)) {
++                corpse_core::revision50_ability_energy::initialize_reserve(&mut run.player,id,10.,0.).unwrap();
++            }
++            run.player.ability_reserves.as_mut().unwrap().get_mut(id).unwrap().energy=0.;
++            run.player.active.push(id.into());
++            assert_eq!(corpse_core::abilities::projected_player_upkeep(&run),20.);
++        }
+         let mut p=Painter::new();p.resize(1920,1080);p.set_responsive_canvas(true);
+         let v=crate::observe::observe_with_profile(&run,&p.profile);p.game_at(&v,"",false,0.);
+         let file=std::fs::File::create(path).unwrap();let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);
+@@ -437,3 +447,18 @@
+         }
+     }
+ }
++
++#[cfg(test)] mod resource_grouping_tests {
++    use super::*;
++    #[test] fn creature_name_resources_then_state_form_one_close_group() {
++        let mut v=crate::observe::observe(&corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap().run);
++        let a=&mut v.creatures[0];a.state="hunting".into();a.statuses.clear();a.perception_range=None;a.shared_resources=false;a.uses_energy=true;
++        let p=Painter::new();let layout=Layout::resolve_frame(&p.profile,0,p.frame());let c=layout.content(&p,&v.creatures);let card=&c.cards[0];
++        let state=card.lines.iter().find(|l|l.text=="Hunting").unwrap();
++        assert_eq!(card.bars.len(),2);
++        assert!(card.bars[0].y<state.y);
++        assert_eq!(state.y,card.bars[1].y+26);
++        assert!(card.bars[0].y-card.lines[0].y<=22);
++        assert!(card.height>=state.y+11+16);
++    }
++}
+--- a/crates/corpse-desktop/src/observe.rs
++++ b/crates/corpse-desktop/src/observe.rs
+@@ -953,6 +953,7 @@
+         hp: run.player.hp,
+         max_hp: run.player.max_hp,
+         resource_changes: crate::render::resource_ui::player_changes(run),
++        pending_energy_loss: corpse_core::abilities::projected_player_upkeep(run),
+         player_stats:[crate::stat_presentation::damage_bonus(run,player_stats.offense),6.*player_stats.defense,player_stats.dr,player_stats.accuracy,player_stats.dodge],
+         energy: run.player.energy,
+         max_energy: if run
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -201,6 +201,7 @@
+     pub max_hp: f64,
+     /// Detached per-turn Health, Energy and Blessings change labels.
+     pub resource_changes: [String; 3],
++    pub pending_energy_loss: f64,
+     /// Effective display contributions: nominal melee Damage, HP, DR, Accuracy, Dodge.
+     pub player_stats: [f64;5],
+     pub energy: f64,
+@@ -2584,8 +2585,9 @@
+         {
+             let y = 76 + i as i32 * 26;
+             let text = resource_ui::value_text(label, value, max, &v.resource_changes[i]);
+-            resource_ui::paint_bar(self,label,&text,left+12,y,rail_width,24,color,
+-                value/if max.is_infinite(){100.}else{max.max(1.)},13);
++            let denominator=if max.is_infinite(){value.max(100.)}else{max.max(1.)};
++            resource_ui::paint_bar_pending(self,label,&text,left+12,y,rail_width,24,color,
++                value/denominator,13,if i==1{v.pending_energy_loss/denominator}else{0.});
+         }
+         for(i,(label,value))in ["Damage","HP","DR","Accuracy","Dodge"].into_iter().zip(v.player_stats).enumerate(){
+             let text=if i<2 {format!("{label} {value:+}")} else {format!("{label} {value}")};
+--- a/crates/corpse-desktop/src/render_damage.rs
++++ b/crates/corpse-desktop/src/render_damage.rs
+@@ -124,8 +124,8 @@
+ #[derive(Clone,PartialEq)]
+ struct AbilityInk {name:String,cost:String,state:String,mode:String,color:Rgb,active:bool,supported:bool}
+ #[derive(Clone,PartialEq)]
+-struct HudKey {resource_changes:[String;3],domain:String,mode:String,gods:Vec<(String,Rgb)>,numbers:[u64;8],stats:[u64;5],creatures:usize,meters:Vec<crate::statuses_ui::Meter>,status_offset:usize,abilities:Vec<AbilityInk>,total:usize}
+-impl HudKey {fn from(v:&View)->Self{Self{resource_changes:v.resource_changes.clone(),domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
++struct HudKey {pending_energy_loss:u64,resource_changes:[String;3],domain:String,mode:String,gods:Vec<(String,Rgb)>,numbers:[u64;8],stats:[u64;5],creatures:usize,meters:Vec<crate::statuses_ui::Meter>,status_offset:usize,abilities:Vec<AbilityInk>,total:usize}
++impl HudKey {fn from(v:&View)->Self{Self{pending_energy_loss:v.pending_energy_loss.to_bits(),resource_changes:v.resource_changes.clone(),domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
+ #[derive(Clone,PartialEq)]
+ struct EnemyInk {perception_range:Option<String>,identity_outline:Option<Rgb>,id:u64,name:String,glyph:String,state:String,color:Rgb,distance:u64,resources:[u64;4],shared:bool,uses_energy:bool,invulnerable:bool,statuses:Vec<crate::statuses_ui::Status>,meters:Vec<crate::statuses_ui::Meter>}
+ #[derive(Clone,PartialEq)]
+--- a/crates/corpse-desktop/src/resource_ui.rs
++++ b/crates/corpse-desktop/src/resource_ui.rs
+@@ -64,13 +64,28 @@
+ /// O(G + w*h) software work, O(G) fitting storage; GPU emits constant quads and
+ /// O(G) glyphs. Uses/restores the caller's logical clip without widening it.
+ pub fn paint_bar(p:&mut Painter,label:&str,value:&str,x:i32,y:i32,w:i32,h:i32,color:super::Rgb,fraction:f64,size:u16) {
++    paint_bar_pending(p,label,value,x,y,w,h,color,fraction,size,0.);
++}
++pub fn paint_bar_pending(p:&mut Painter,label:&str,value:&str,x:i32,y:i32,w:i32,h:i32,color:super::Rgb,fraction:f64,size:u16,pending:f64) {
+     let fill=(w as f64*fraction.clamp(0.,1.)).round() as i32;
+     p.rect(x,y,w,h,[36,41,53]);p.rect(x,y,fill,h,color);
++    let reserved=if pending>0. {(w as f64*pending).round().max(1.) as i32}else{0}.min(fill).max(0);
++    let pending_left=x+fill-reserved;
++    if reserved>0 {
++        p.rect(pending_left,y,reserved,h,[43,36,83]);
++        // Tile-style slash hatching, clipped to precisely the reserved segment.
++        for row in 1..h-1 {
++            for column in ((9-row.rem_euclid(9))%9..reserved).step_by(9) {
++                p.rect(pending_left+column,y+row,2.min(reserved-column),1,[113,97,205]);
++            }
++        }
++        p.border(pending_left,y,reserved,h,[135,117,241]);
++    }
+     let start=x+6+text_width(p,label,size)+8;
+     let(value,value_size,value_x)=fit_value(p,value,start,x+w-6);
+     let previous=p.clip;
+     let fill_ink=if crate::color::contrast([8,8,12],color)>=crate::color::contrast([250,247,255],color){[8,8,12]}else{[250,247,255]};
+-    for (left,width,ink) in [(x,fill,fill_ink),(x+fill,w-fill,[250,247,255])] {
++    for (left,width,ink) in [(x,fill-reserved,fill_ink),(pending_left,reserved,[250,247,255]),(x+fill,w-fill,[250,247,255])] {
+         let (mut l,mut t,mut r,mut b)=(left,y,left+width,y+h);
+         if let Some((cx,cy,cw,ch))=previous {l=l.max(cx);t=t.max(cy);r=r.min(cx+cw);b=b.min(cy+ch);}
+         if r<=l||b<=t {continue;}
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -116,3 +116,22 @@
+         }}
+     }
+ }
++
++#[test]
++fn pending_upkeep_hatch_and_forecast_only_changes_repaint_both_paths() {
++    let r=room();let mut old=crate::observe::observe(&r);
++    let(mut full,mut retained_p,mut tile)=(Painter::new(),Painter::new(),Painter::new());
++    let mut retained=RetainedGame::default();let mut plan=TilePlanner::default();
++    retained.update(&mut retained_p,&old,"",0.,true,true).unwrap();
++    plan.replace_view(None,&old,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,&old,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();
++    for loss in [20.,1.,0.,old.energy] {
++        let mut v=crate::observe::observe(&r);v.pending_energy_loss=loss;
++        full.game_at(&v,"",false,0.);retained.update(&mut retained_p,&v,"",0.,true,false).unwrap();
++        plan.replace_view(Some(&old),&v,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,&v,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();
++        assert_eq!(retained_p.pixels,full.pixels);assert_eq!(tile.pixels,full.pixels);old=v;
++    }
++    let mut p=Painter::new();p.clear([1,2,3]);paint_bar_pending(&mut p,"Energy","60/100",100,100,200,24,[0,229,255],0.6,13,0.2);
++    let at=(100*p.width+180)*4;assert_eq!(&p.pixels[at..at+3],&[135,117,241]);
++    let at=(100*p.width+219)*4;assert_eq!(&p.pixels[at..at+3],&[135,117,241]);
++    let at=(100*p.width+220)*4;assert_eq!(&p.pixels[at..at+3],&[36,41,53]);
++}
+--- a/crates/corpse-core/src/revision50.rs
++++ b/crates/corpse-core/src/revision50.rs
+@@ -64,6 +64,10 @@
+ fn duel_invalid(r: &Run, owner: &Actor, depth: f64) -> bool {
+     !crate::half_here::is_clone(owner) && owner.active.iter().any(|id| id == DUEL)
+         && (!duel_area(owner, depth) || !duel_target_valid(r, owner))
++}
++/// Read-only counterpart to the maintenance settlement gate.
++pub fn duel_upkeep_valid(r:&Run,owner:&Actor)->bool {
++    !duel_target_rules(r) || !duel_invalid(r,owner,r.depth)
+ }
+ fn clear_duel_owner(r: &mut Run, id: f64) {
+     if let Some(owner) = engine::actor_any_mut(r, id) { expire_duel(owner); }
+--- a/crates/corpse-desktop/src/tile_damage.rs
++++ b/crates/corpse-desktop/src/tile_damage.rs
+@@ -156,7 +156,7 @@
+  pub fn paint_base(&mut self,p:&mut Painter,v:&View,notice:&str,now:f64){let _paint_timing=corpse_core::timing::span("desktop.tile.paint_base");if p.tile_mask.is_empty(){return;}p.clip=None;p.damage_clip=None;p.paint_cell_indices=None;std::mem::swap(&mut p.tile_cell_bounds,&mut self.current.bounds);p.game_at(v,notice,false,now);std::mem::swap(&mut p.tile_cell_bounds,&mut self.current.bounds);p.clip=None;}
+  pub fn clear_frame(&mut self){for i in self.tiles.drain(..){if i<self.dirty.len(){self.dirty[i]=false;}}self.rects.clear();self.full=false;}
+ }
+-fn hud_eq(a:&View,b:&View)->bool{a.resource_changes==b.resource_changes&&a.player_stats.map(f64::to_bits)==b.player_stats.map(f64::to_bits)&&a.domain==b.domain&&a.mode==b.mode&&a.god_labels==b.god_labels&&[a.depth,a.level,a.hp,a.max_hp,a.energy,a.max_energy,a.blessings,a.blessing_goal].map(f64::to_bits)==[b.depth,b.level,b.hp,b.max_hp,b.energy,b.max_energy,b.blessings,b.blessing_goal].map(f64::to_bits)&&a.creatures.len()==b.creatures.len()&&a.player_meters.len()==b.player_meters.len()&&a.player_meters.iter().zip(&b.player_meters).all(|(a,b)|a.name==b.name&&a.duration.map(f64::to_bits)==b.duration.map(f64::to_bits)&&bits(a.reference,b.reference)&&a.reference_known==b.reference_known&&bits(a.percent,b.percent))&&a.player_status_offset==b.player_status_offset&&a.total_abilities==b.total_abilities&&a.abilities.len()==b.abilities.len()&&a.abilities.iter().zip(&b.abilities).all(|(a,b)|a.name==b.name&&a.cost==b.cost&&a.state==b.state&&a.mode==b.mode&&a.color==b.color&&a.active==b.active&&a.supported==b.supported)}
++fn hud_eq(a:&View,b:&View)->bool{a.pending_energy_loss.to_bits()==b.pending_energy_loss.to_bits()&&a.resource_changes==b.resource_changes&&a.player_stats.map(f64::to_bits)==b.player_stats.map(f64::to_bits)&&a.domain==b.domain&&a.mode==b.mode&&a.god_labels==b.god_labels&&[a.depth,a.level,a.hp,a.max_hp,a.energy,a.max_energy,a.blessings,a.blessing_goal].map(f64::to_bits)==[b.depth,b.level,b.hp,b.max_hp,b.energy,b.max_energy,b.blessings,b.blessing_goal].map(f64::to_bits)&&a.creatures.len()==b.creatures.len()&&a.player_meters.len()==b.player_meters.len()&&a.player_meters.iter().zip(&b.player_meters).all(|(a,b)|a.name==b.name&&a.duration.map(f64::to_bits)==b.duration.map(f64::to_bits)&&bits(a.reference,b.reference)&&a.reference_known==b.reference_known&&bits(a.percent,b.percent))&&a.player_status_offset==b.player_status_offset&&a.total_abilities==b.total_abilities&&a.abilities.len()==b.abilities.len()&&a.abilities.iter().zip(&b.abilities).all(|(a,b)|a.name==b.name&&a.cost==b.cost&&a.state==b.state&&a.mode==b.mode&&a.color==b.color&&a.active==b.active&&a.supported==b.supported)}
+ fn enemies_eq(a:&View,b:&View)->bool{a.ground_entities==b.ground_entities&&a.creatures.len()==b.creatures.len()&&a.creatures.iter().zip(&b.creatures).all(|(a,b)|bits(a.id,b.id)&&a.name==b.name&&a.glyph==b.glyph&&a.state==b.state&&a.perception_range==b.perception_range&&a.color==b.color&&a.identity_outline==b.identity_outline&&bits(a.distance,b.distance)&&[a.hp,a.max_hp,a.energy,a.max_energy].map(f64::to_bits)==[b.hp,b.max_hp,b.energy,b.max_energy].map(f64::to_bits)&&a.shared_resources==b.shared_resources&&a.uses_energy==b.uses_energy&&a.invulnerable==b.invulnerable&&a.statuses==b.statuses&&a.meters==b.meters)}
+ #[cfg(test)]
+ #[path="tile_damage_tests.rs"]
