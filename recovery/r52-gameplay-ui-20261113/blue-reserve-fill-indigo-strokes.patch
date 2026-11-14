@@ -1,0 +1,59 @@
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1936,3 +1936,8 @@
+ ## Stroke-only upcoming-cost warning (2026-11-14)
+ - Upcoming-cost warnings preserve the resource's original fill. Only the boundary and diagonal strokes are indigo; base fill and text contrast remain unchanged for player and divine reserve meters.
+ - Raster complexity remains O(hatched area), with no additional overlay allocation. Tests sample player-blue and two god-colored reserve bars to prove pixels between strokes are unchanged.
++
++## Unified blue reserve fill (2026-11-14)
++- Divine reserve meters now use the same configured bright energy-blue fill as the player meter. Previously their god colors remained underneath stroke-only warning hatches; the magenta reserve fill could be mistaken for warning tint.
++- Indigo strokes use RGB110,90,235, distinct from dark text; there is still no warning background fill. Render order is base fill, warning strokes, then readable text.
++- Pixel comparison of actual native screenshots checks untouched blue between warning strokes against an adjacent ordinary blue region rather than relying solely on helper unit tests.
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -2626,7 +2626,7 @@
+                 let value=format!("{current:.0}/{maximum:.0} NRG");
+                 let(label,height)=resource_ui::ability_bar_layout(self,&a.name,&value,rail_width,13);
+                 resource_ui::paint_bar_pending(self,&label,&value,
+-                    left+12,y,rail_width,height,a.color,current/maximum.max(1.),13,a.pending_reserve_loss/maximum.max(1.));
++                    left+12,y,rail_width,height,game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),13,a.pending_reserve_loss/maximum.max(1.));
+                 if a.active {for(line,name)in label.lines().enumerate(){
+                     self.rect(name_x,y+16+line as i32*15,resource_ui::text_width(self,name,13).min(name_width),1,[255,255,255]);
+                 }}
+--- a/crates/corpse-desktop/src/resource_ui.rs
++++ b/crates/corpse-desktop/src/resource_ui.rs
+@@ -87,10 +87,10 @@
+         // Tile-style slash hatching, clipped to precisely the reserved segment.
+         for row in 1..h-1 {
+             for column in ((9-row.rem_euclid(9))%9..reserved).step_by(9) {
+-                p.rect(pending_left+column,y+row,2.min(reserved-column),1,[83,63,205]);
++                p.rect(pending_left+column,y+row,2.min(reserved-column),1,[110,90,235]);
+             }
+         }
+-        p.border(pending_left,y,reserved,h,[83,63,205]);
++        p.border(pending_left,y,reserved,h,[110,90,235]);
+     }
+     let multiline=label.contains('\n');
+     let start=if multiline{x+6}else{x+6+text_width(p,label,size)+8};
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -132,8 +132,8 @@
+         assert_eq!(retained_p.pixels,full.pixels);assert_eq!(tile.pixels,full.pixels);old=v;
+     }
+     let mut p=Painter::new();p.clear([1,2,3]);paint_bar_pending(&mut p,"Energy","60/100",100,100,200,24,[0,229,255],0.6,13,0.2);
+-    let at=(100*p.width+180)*4;assert_eq!(&p.pixels[at..at+3],&[83,63,205]);
+-    let at=(100*p.width+219)*4;assert_eq!(&p.pixels[at..at+3],&[83,63,205]);
++    let at=(100*p.width+180)*4;assert_eq!(&p.pixels[at..at+3],&[110,90,235]);
++    let at=(100*p.width+219)*4;assert_eq!(&p.pixels[at..at+3],&[110,90,235]);
+     let at=(100*p.width+220)*4;assert_eq!(&p.pixels[at..at+3],&[36,41,53]);
+ }
+ 
+@@ -192,7 +192,7 @@
+   paint_bar_pending(&mut p,"","",100,100,200,24,color,1.,13,0.5);
+   // Sample below text: warning area must contain both unchanged fill and indigo strokes.
+   let mut base=0;let mut stroke=0;
+-  for y in 117..122 {for x in 201..298 {let at=(y*p.width+x)*4;let rgb=&p.pixels[at..at+3];if rgb==color{base+=1;}else if rgb==[83,63,205]{stroke+=1;}else{panic!("unexpected tint {rgb:?}");}}}
++  for y in 117..122 {for x in 201..298 {let at=(y*p.width+x)*4;let rgb=&p.pixels[at..at+3];if rgb==color{base+=1;}else if rgb==[110,90,235]{stroke+=1;}else{panic!("unexpected tint {rgb:?}");}}}
+   assert!(base>stroke&&stroke>0);
+  }
+ }
