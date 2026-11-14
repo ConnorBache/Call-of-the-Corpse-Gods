@@ -1,0 +1,213 @@
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1941,3 +1941,8 @@
+ - Divine reserve meters now use the same configured bright energy-blue fill as the player meter. Previously their god colors remained underneath stroke-only warning hatches; the magenta reserve fill could be mistaken for warning tint.
+ - Indigo strokes use RGB110,90,235, distinct from dark text; there is still no warning background fill. Render order is base fill, warning strokes, then readable text.
+ - Pixel comparison of actual native screenshots checks untouched blue between warning strokes against an adjacent ordinary blue region rather than relying solely on helper unit tests.
++
++## Adjacent one-third reserve bars and Ragelight presentation (2026-11-14)
++- Reserve meters occupy one third of the prior rail width, right-aligned beside the ability name; names wrap in the remaining space and active names remain underlined. Numeric NRG and indigo cost warnings remain inside the blue meter.
++- Ragelight is a presentation alias, leaving serialized ability IDs and canonical names used by simulation dispatch intact. Detached UI and final text measurement/rendering use the same alias so legacy log text is also shown correctly without changing saves.
++- O(T) alias lookup uses borrowed text when absent; wrapping/hit geometry retains the existing bounded rows. Four window sizes verify name/count enclosure and exact one-third sizing.
+--- a/crates/corpse-desktop/src/ability_ui.rs
++++ b/crates/corpse-desktop/src/ability_ui.rs
+@@ -59,6 +59,13 @@
+     pub supported: bool,
+     pub reserve: Option<(f64,f64)>,
+     pub pending_reserve_loss: f64,
++}
++/// Presentation-only alias: canonical names remain stable for proc matching,
++/// catalog identity, replays and saved state. O(text bytes), borrowed if absent.
++pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
++    const OLD:&str="Rage at the Dying of the Light";
++    if text.len()>=OLD.len() && text.contains(OLD) {std::borrow::Cow::Owned(text.replace(OLD,"Ragelight"))}
++    else {std::borrow::Cow::Borrowed(text)}
+ }
+ /// O(1) presentation-only override: never changes catalog text used by offer tags.
+ pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+@@ -291,6 +298,8 @@
+ }
+ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::UpkeepProjection)->AbilityView {
+     let mut row=observe_inner(r,id);
++    row.name=display_text(&row.name).into_owned();
++    row.description=display_text(&row.description).into_owned();
+     if r50(r) && r50_uses_energy(id) {
+         row.reserve=r.player.ability_reserves.as_ref().and_then(|m|m.get(id))
+             .filter(|s|corpse_core::revision50_ability_energy::valid_reserve(s))
+@@ -1391,3 +1400,23 @@
+         assert_eq!(observe(&r,"shrail-masochism").reserve,None);
+     }
+ }
++
++#[cfg(test)] mod ragelight_presentation_tests {
++    use super::*;
++    #[test] fn rename_is_display_only_and_preserves_proc_cost_and_save(){
++        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++        r.simulation_revision=52.0.into();let id="shrail-rage-at-the-dying-of-the-light";
++        r.player.abilities.push(id.into());r.player.conditions.insert("rageCost".into(),17.);
++        let before=serde_json::to_string(&r).unwrap();let row=observe(&r,id);
++        assert_eq!(row.name,"Ragelight");assert_eq!(row.id,id);assert!(row.cost.contains("17 NRG/rescue"));
++        assert_eq!(corpse_core::progression::definition_for_revision(52.,id).unwrap().name,"Rage at the Dying of the Light");
++        assert_eq!(crate::chronicle::present("Rage at the Dying of the Light activates."),"Ragelight activates.");
++        let (short,details)=crate::creature_abilities_ui::describe(&r,&r.player);
++        assert!(!short.contains("Rage at the Dying of the Light"));assert!(!details.contains("Rage at the Dying of the Light"));
++        assert!(details.contains("Ragelight"));
++        let item=corpse_core::Item{kind:"ring".into(),granted_ability:id.to_string().into(),..Default::default()};
++        assert!(crate::pack::describe_item(&r,&item).contains("Grants Ragelight."));
++        assert_eq!(serde_json::to_string(&r).unwrap(),before);
++        assert!(matches!(display_text("@"),std::borrow::Cow::Borrowed(_)));
++    }
++}
+--- a/crates/corpse-desktop/src/chronicle.rs
++++ b/crates/corpse-desktop/src/chronicle.rs
+@@ -166,7 +166,7 @@
+         "bite", "bites", "slash", "slashes", "skewer", "skewers", "pierce", "pierces",
+         "sting", "stings", "gore", "gores", "crush", "crushes", "claw", "claws",
+         "kill", "kills", "attack", "attacks"];
+-    let mut output = message.to_owned();
++    let mut output = crate::ability_ui::display_text(message).into_owned();
+     if names.iter().any(|name| message.strip_prefix(name).is_some_and(|tail|
+         VERBS.iter().any(|verb| tail.strip_prefix(" tries to ").or_else(|| tail.strip_prefix(' '))
+             .and_then(|s|s.strip_prefix(verb)).is_some_and(|s|s.starts_with(' '))))) {
+--- a/crates/corpse-desktop/src/creature_abilities_ui.rs
++++ b/crates/corpse-desktop/src/creature_abilities_ui.rs
+@@ -1136,7 +1136,7 @@
+             if !details.is_empty() {details.push(' ');} details.push_str(long);
+         }
+     }
+-    (compact, details)
++    (crate::ability_ui::display_text(&compact).into_owned(), crate::ability_ui::display_text(&details).into_owned())
+ }
+ #[cfg(test)]
+ mod tests {
+--- a/crates/corpse-desktop/src/pack.rs
++++ b/crates/corpse-desktop/src/pack.rs
+@@ -1815,7 +1815,7 @@
+             } else {
+                 "Inactive equipment grant:"
+             },
+-            progression::definition_for_revision(run.simulation_revision.value_or(29.), id).map_or(id.as_str(), |a| a.name.as_str())
++            crate::ability_ui::display_text(progression::definition_for_revision(run.simulation_revision.value_or(29.), id).map_or(id.as_str(), |a| a.name.as_str()))
+         ));
+         if let Some(a) = progression::definition_for_revision(run.simulation_revision.value_or(29.), id) {
+             lines.push(if run.simulation_revision.value_or(29.)>=50. {
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -746,6 +746,7 @@
+         } else { x + cw * 2 / 3 }
+     }
+     pub fn text(&mut self, s: &str, x: i32, y: i32, size: u16, c: Rgb) {
++        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
+         #[cfg(test)]
+         let mut _paint_profile = paint_profile_bench::span(paint_profile_bench::Kind::Text);
+         let mut cursor = x;
+@@ -793,6 +794,7 @@
+         s: &str,
+         baseline_size: u16,
+     ) -> f64 {
++        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
+         #[cfg(test)]
+         let _paint_profile = paint_profile_bench::span(paint_profile_bench::Kind::TextMetrics);
+         use crate::typography_ui::{Face, RoleStyle};
+@@ -845,6 +847,7 @@
+         width: i32,
+         size: u16,
+     ) -> String {
++        let displayed=crate::ability_ui::display_text(text);let text=displayed.as_ref();
+         if self.measure_text_role(role, text, size) <= width as f64 {
+             return text.to_string();
+         }
+@@ -871,6 +874,7 @@
+         width: i32,
+         baseline_size: u16,
+     ) -> Vec<String> {
++        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
+         let mut output = Vec::new();
+         for paragraph in s.split('\n') {
+             let mut line = String::new();
+@@ -914,6 +918,7 @@
+         size: u16,
+         color: Rgb,
+     ) {
++        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
+         #[cfg(test)]
+         let mut _paint_profile = paint_profile_bench::span(paint_profile_bench::Kind::TextRole);
+         use crate::typography_ui::{Face, RoleStyle};
+@@ -2619,23 +2624,22 @@
+             let passive=a.mode.eq_ignore_ascii_case("passive");
+             let reserve=if passive {None}else{a.reserve};
+             let name_x=left+18;
+-            let name_width=rail_width-12-if reserve.is_none()&&!passive {18}else{0};
++            let bar_width=rail_width/3;
++            let bar_x=left+12+rail_width-bar_width;
++            let name_width=if reserve.is_some(){bar_x-name_x-8}else{rail_width-12-if !passive{18}else{0}};
+             let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);
+             self.clip=Some((left+12,y,rail_width,crate::ability_ui::row(&self.profile)));
++            for(line,name)in names.iter().enumerate(){
++                self.text(name,name_x,y+3+line as i32*15,13,a.color);
++                if a.active&&reserve.is_some(){self.rect(name_x,y+17+line as i32*15,resource_ui::text_width(self,name,13).min(name_width),1,a.color);}
++            }
+             if let Some((current,maximum))=reserve {
+                 let value=format!("{current:.0}/{maximum:.0} NRG");
+-                let(label,height)=resource_ui::ability_bar_layout(self,&a.name,&value,rail_width,13);
+-                resource_ui::paint_bar_pending(self,&label,&value,
+-                    left+12,y,rail_width,height,game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),13,a.pending_reserve_loss/maximum.max(1.));
+-                if a.active {for(line,name)in label.lines().enumerate(){
+-                    self.rect(name_x,y+16+line as i32*15,resource_ui::text_width(self,name,13).min(name_width),1,[255,255,255]);
+-                }}
+-            } else {
+-                for(line,name)in names.iter().enumerate(){self.text(name,name_x,y+3+line as i32*15,13,a.color);}
+-                if !passive {
+-                    let cx=left+rail_width-2;let cy=y+11;
+-                    for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(a.active||d>=15){self.rect(cx+dx,cy+dy,1,1,if a.active{[100,255,114]}else{[110,110,125]});}}}
+-                }
++                resource_ui::paint_bar_pending(self,"",&value,bar_x,y,bar_width,19,
++                    game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),11,a.pending_reserve_loss/maximum.max(1.));
++            } else if !passive {
++                let cx=left+rail_width-2;let cy=y+11;
++                for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(a.active||d>=15){self.rect(cx+dx,cy+dy,1,1,if a.active{[100,255,114]}else{[110,110,125]});}}}
+             }
+             self.clip=None;
+         }
+--- a/crates/corpse-desktop/src/resource_ui.rs
++++ b/crates/corpse-desktop/src/resource_ui.rs
+@@ -31,6 +31,7 @@
+ /// Same rounded glyph advance as Painter::text, including fallback glyphs.
+ /// O(G) font-metric work, no rasterization and O(1) extra space.
+ pub fn text_width(p: &Painter, text: &str, size: u16) -> i32 {
++    let displayed=crate::ability_ui::display_text(text);let text=displayed.as_ref();
+     text.chars().map(|ch| {
+         let face = if p.font.lookup_glyph_index(ch)!=0 {&p.font} else {
+             p.fallback.iter().find(|f|f.lookup_glyph_index(ch)!=0).unwrap_or(&p.font)
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -142,7 +142,7 @@
+     for (w,h) in [(1280,800),(1920,1080),(960,1200),(2560,1600)] {
+         let mut p=Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
+         let width=p.logical_width()-p.hud_left()-24;
+-        for name in ["Execute","I Came For You","Rage at the Dying of the Light","Turning the Wheel","Never Ending Flesh"] {
++        for name in ["Execute","I Came For You","Ragelight","Turning the Wheel","Never Ending Flesh"] {
+             let (label,height)=ability_bar_layout(&p,name,"10/10 NRG",width,13);
+             assert_eq!(label.lines().collect::<Vec<_>>().join(" "),name);
+             assert!(height<=crate::ability_ui::row(&p.profile));
+@@ -196,3 +196,20 @@
+   assert!(base>stroke&&stroke>0);
+  }
+ }
++
++#[test]
++fn adjacent_reserve_bar_is_one_third_width_and_preserves_count_and_name() {
++    for(w,h)in[(1280,800),(1920,1080),(960,1200),(2560,1600)]{
++        let mut p=Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
++        let left=p.hud_left();let rail=p.logical_width()-left-24;let width=rail/3;
++        let x=left+12+rail-width;let name_x=left+18;let available=x-name_x-8;
++        assert!(width*3<=rail&&rail-width*3<3);
++        for name in ["Ragelight","I Came For You","Turning the Wheel","Never Ending Flesh"] {
++            let lines=p.wrap_text_role(crate::typography_ui::Role::Ability,name,available,13);
++            assert_eq!(lines.join(" "),name);
++            for line in lines{assert!(text_width(&p,&line,13)<=available);}
++        }
++        let(value,size,value_x)=fit_value(&p,"10/10 NRG",x+14,x+width-6);
++        assert_eq!(value,"10/10 NRG");assert!(value_x+text_width(&p,&value,size)<=x+width-6);
++    }
++}
