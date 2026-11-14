@@ -1,0 +1,169 @@
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1894,3 +1894,12 @@
+ native generated_mid_depth_screenshot tests. Bounds are responsive logical
+ coordinates transformed at the native drawable scale; costs are unmeasured
+ asymptotic estimates, not new benchmark claims.
++
++### In-bar resource labels
++Player and observed-creature resource meters are 24 logical pixels thick, with
++labels and totals inside. Two text passes clipped at the fill boundary select
++contrasting ink for filled and empty regions. Per meter: O(G) metric/glyph work
++and O(W*H) software fill pixels, O(G) fitting storage; native GPU quads constant
++and glyph commands O(G). Caller clips and damage masks remain authoritative.
++No resource values or mechanics change. Validate zero/partial/full meters and
++retained/tiled resource updates with resource_ui and enemy_list tests.
+--- a/crates/corpse-desktop/src/enemy_list.rs
++++ b/crates/corpse-desktop/src/enemy_list.rs
+@@ -56,7 +56,7 @@
+ #[derive(Clone,Debug)]
+ struct Line { hover_only:bool, text:String, y:i32, size:u16, color:super::Rgb, outline:Option<super::Rgb> }
+ #[derive(Clone,Debug)]
+-struct Bar { y:i32, fraction:f64, color:super::Rgb, uncertain:bool }
++struct Bar { y:i32, label:String, value:String, fraction:f64, color:super::Rgb }
+ #[derive(Clone,Debug)]
+ struct Card { top:i32, height:i32, lines:Vec<Line>, bars:Vec<Bar> }
+ #[derive(Clone,Debug)]
+@@ -102,12 +102,12 @@
+                     ("Health",a.hp,a.max_hp,[255,48,85],a.invulnerable),
+                     ("Energy",a.energy,a.max_energy,[36,223,255],false),
+                 ].into_iter().take(if a.uses_energy {2} else {1}) {
+-                    if invulnerable {
+-                        text(p,&mut card,&mut y,width,"Health · Invulnerable",11,INK);
+-                    } else {
+-                        text(p,&mut card,&mut y,width,&format!("{name} {:.0}/{}",if name == "Health" {crate::stat_presentation::current_health(value)} else {value},super::resource_max_label(max)),11,INK);
+-                        card.bars.push(Bar{y,fraction:(value/if max.is_infinite(){100.}else{max.max(1.)}).clamp(0.,1.),color,uncertain:false});y+=8;
+-                    }
++                    let display=if invulnerable {"Invulnerable".into()} else {
++                        format!("{:.0}/{}",if name=="Health" {crate::stat_presentation::current_health(value)} else {value},super::resource_max_label(max))
++                    };
++                    card.bars.push(Bar{y,label:name.into(),value:display,
++                        fraction:if invulnerable {1.} else {(value/if max.is_infinite(){100.}else{max.max(1.)}).clamp(0.,1.)},color});
++                    y+=26;
+                 }
+             }
+             let conditions=crate::statuses_ui::summary(&a.statuses);
+@@ -160,9 +160,7 @@
+         }
+         for bar in &card.bars {
+             let w=(layout.rows.2-16).max(1);let yy=y+bar.y;
+-            p.rect(layout.rows.0+4,yy,w,3,[36,41,53]);
+-            p.rect(layout.rows.0+4,yy,(w as f64*bar.fraction) as i32,3,bar.color);
+-            if bar.uncertain {for dx in (0..w).step_by(5){p.rect(layout.rows.0+4+dx,yy-1,2,1,bar.color);}}
++            super::resource_ui::paint_bar(p,&bar.label,&bar.value,layout.rows.0+4,yy,w,24,bar.color,bar.fraction,11);
+         }
+         p.rect(layout.rows.0+4,y+card.height-3,(layout.rows.2-16).max(1),1,[36,30,46]);
+     }
+@@ -230,10 +228,10 @@
+         v.creatures.truncate(1);v.creatures[0].shared_resources=false;v.creatures[0].invulnerable=false;
+         v.creatures[0].max_hp=100.;v.creatures[0].hp=0.25;
+         let c=l.content(&p,&v.creatures);
+-        assert!(c.cards[0].lines.iter().any(|line|line.text=="Health 1/100"));
++        assert!(c.cards[0].bars.iter().any(|bar|bar.label=="Health"&&bar.value=="1/100"));
+         assert_eq!(c.cards[0].bars[0].fraction,0.0025);
+         v.creatures[0].hp=0.;let c=l.content(&p,&v.creatures);
+-        assert!(c.cards[0].lines.iter().any(|line|line.text=="Health 0/100"));
++        assert!(c.cards[0].bars.iter().any(|bar|bar.label=="Health"&&bar.value=="0/100"));
+     }
+     #[test] fn every_dense_preview_and_every_long_condition_remains_reachable() {
+         let mut v=view();let mut template=v.creatures[0].clone();template.uses_energy=true;
+@@ -241,7 +239,7 @@
+         let p=Painter::new();let(_,_,ox,_)=p.map_layout(v.width,v.height);let l=Layout::resolve_frame(&p.profile,ox,p.frame());let c=l.content(&p,&v.creatures);
+         assert!(c.cards[0].height>l.rows.3);
+         for(i,card)in c.cards.iter().enumerate(){
+-            assert!(card.lines.iter().any(|l|l.text.contains("Health")));assert!(card.lines.iter().any(|l|l.text.contains("Energy")));
++            assert!(card.bars.iter().any(|b|b.label=="Health"));assert!(card.bars.iter().any(|b|b.label=="Energy"));
+             for line in &card.lines {let at=(card.top+line.y)as usize;let off=c.offset(at);let y=l.rows.1+at as i32-off as i32;assert_eq!(c.hit(l.rows.0+4,y,off),Some(i));}
+         }
+         assert_eq!(c.hit(l.rows.0-1,l.rows.1,0),None);assert_eq!(c.hit(l.rows.0,l.rows.1+l.rows.3,0),None);
+@@ -252,7 +250,7 @@
+         let engine=corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let before=engine.save().unwrap();let mut v=crate::observe::observe(&engine.run);
+         let mut a=v.creatures[0].clone();a.max_energy=f64::INFINITY;a.uses_energy=true;a.invulnerable=true;a.shared_resources=false;v.creatures=vec![a.clone()];
+         let mut p=Painter::new();let(_,_,ox,_)=p.map_layout(v.width,v.height);let l=Layout::resolve_frame(&p.profile,ox,p.frame());let c=l.content(&p,&v.creatures);
+-        assert!(c.cards[0].lines.iter().any(|l|l.text.contains("Invulnerable")));assert!(c.cards[0].lines.iter().any(|l|l.text.contains('∞')));
++        assert!(c.cards[0].bars.iter().any(|b|b.value=="Invulnerable"));assert!(c.cards[0].bars.iter().any(|b|b.value.contains('∞')));
+         v.creatures[0].shared_resources=true;let c=l.content(&p,&v.creatures);assert!(!c.cards[0].lines.iter().any(|l|l.text.contains("Shares")));assert!(c.cards[0].bars.is_empty());
+         v.creatures[0]=a;p.game_at(&v,"",false,0.);assert_eq!(engine.save().unwrap(),before);
+         if let Ok(path)=std::env::var("ENEMY_LIST_SCREENSHOT"){let file=std::fs::File::create(path).unwrap();let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();}
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -2583,26 +2583,9 @@
+         .enumerate()
+         {
+             let y = 76 + i as i32 * 26;
+-            self.text(label, left + 12, y, 13, color);
+             let text = resource_ui::value_text(label, value, max, &v.resource_changes[i]);
+-            let start = left + 12 + resource_ui::text_width(self, label, 13) + 8;
+-            let end = left + 12 + rail_width;
+-            let (text, size, x) = resource_ui::fit_value(self, &text, start, end);
+-            let previous_clip = self.clip;
+-            self.clip = Some((start, y - 1, (end - start).max(1), 17));
+-            self.text(&text, x, y, size, game_color(&self.profile, "ui.colors.primary"));
+-            self.clip = previous_clip;
+-            let h = if i == 0 { 10 } else { 8 };
+-            self.rect(left + 12, y + 16, rail_width, h, [36, 41, 53]);
+-            self.rect(
+-                left + 12,
+-                y + 16,
+-                (rail_width as f64
+-                    * (value / if max.is_infinite() { 100. } else { max.max(1.) }).clamp(0., 1.))
+-                    as i32,
+-                h,
+-                color,
+-            );
++            resource_ui::paint_bar(self,label,&text,left+12,y,rail_width,24,color,
++                value/if max.is_infinite(){100.}else{max.max(1.)},13);
+         }
+         for(i,(label,value))in ["Damage","HP","DR","Accuracy","Dodge"].into_iter().zip(v.player_stats).enumerate(){
+             let text=if i<2 {format!("{label} {value:+}")} else {format!("{label} {value}")};
+--- a/crates/corpse-desktop/src/resource_ui.rs
++++ b/crates/corpse-desktop/src/resource_ui.rs
+@@ -58,3 +58,25 @@
+ #[cfg(test)]
+ #[path = "resource_ui_tests.rs"]
+ mod tests;
++
++/// Resource labels are drawn inside the meter. Two clipped text passes switch
++/// ink at the fill boundary: readable on both bright fill and dark empty track.
++/// O(G + w*h) software work, O(G) fitting storage; GPU emits constant quads and
++/// O(G) glyphs. Uses/restores the caller's logical clip without widening it.
++pub fn paint_bar(p:&mut Painter,label:&str,value:&str,x:i32,y:i32,w:i32,h:i32,color:super::Rgb,fraction:f64,size:u16) {
++    let fill=(w as f64*fraction.clamp(0.,1.)).round() as i32;
++    p.rect(x,y,w,h,[36,41,53]);p.rect(x,y,fill,h,color);
++    let start=x+6+text_width(p,label,size)+8;
++    let(value,value_size,value_x)=fit_value(p,value,start,x+w-6);
++    let previous=p.clip;
++    let fill_ink=if crate::color::contrast([8,8,12],color)>=crate::color::contrast([250,247,255],color){[8,8,12]}else{[250,247,255]};
++    for (left,width,ink) in [(x,fill,fill_ink),(x+fill,w-fill,[250,247,255])] {
++        let (mut l,mut t,mut r,mut b)=(left,y,left+width,y+h);
++        if let Some((cx,cy,cw,ch))=previous {l=l.max(cx);t=t.max(cy);r=r.min(cx+cw);b=b.min(cy+ch);}
++        if r<=l||b<=t {continue;}
++        p.clip=Some((l,t,r-l,b-t));
++        p.text(label,x+6,y+(h-size as i32)/2-1,size,ink);
++        p.text(&value,value_x,y+(h-value_size as i32)/2-1,value_size,ink);
++    }
++    p.clip=previous;
++}
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -99,3 +99,20 @@
+     let after=pack.paint_state(&p);assert!(!after.changes(&before).is_empty());
+     r.resource_history=Field::Missing;assert!(!crate::pack::describe_item(&r,&r.inventory[0]).contains("-100%"));
+ }
++
++#[test]
++fn thick_resource_labels_are_inside_and_respect_parent_clip_at_all_fill_levels() {
++    for fraction in [0.,0.02,0.5,1.] {
++        let mut p=Painter::new();p.clear([3,4,5]);
++        let original=p.pixels.clone();
++        p.clip=Some((104,101,210,22));
++        paint_bar(&mut p,"Health","50/100",100,100,220,24,[255,48,85],fraction,13);
++        assert_eq!(p.clip,Some((104,101,210,22)));
++        assert_ne!(p.pixels,original);
++        for y in 0..p.height {for x in 0..p.width {
++            if !(104..314).contains(&x)||!(101..123).contains(&y) {
++                let i=(y*p.width+x)*4;assert_eq!(&p.pixels[i..i+4],&original[i..i+4]);
++            }
++        }}
++    }
++}
