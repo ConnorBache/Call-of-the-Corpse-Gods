@@ -1,0 +1,73 @@
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1928,3 +1928,7 @@
+ ## Text-fitted ability bar height (2026-11-14)
+ - O(G) width measurement chooses one-line name/count when it fits; otherwise existing measured wrapping places the count under the full name. Height derives from rendered lines, font size, and padding rather than a fixed tall rectangle.
+ - Four window sizes and representative longest ability names check enclosure, unchanged name text, row bounds, and no drawing beyond bar height. Existing resource and forecast repaint tests remain applicable.
++
++## Boundless Hunger display scale (2026-11-14)
++- Preserve uncapped gameplay energy and X/∞ display. Both fill and projected cost magnitude use a fixed100-point visual scale; fill and hatching saturate within the existing bar rectangle. Hatching denotes cost, not resulting bar shrinkage.
++- Readonly canonical upkeep still spends own reserves first. Tests cover250/110/90 energy,20 upkeep,5 reserve/15 player spill,150-cost saturation, and label enclosure at three window sizes. No overflow graphic or gameplay rule added.
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -2569,9 +2569,9 @@
+         {
+             let y = 76 + i as i32 * 26;
+             let text = resource_ui::value_text(label, value, max, &v.resource_changes[i]);
+-            let denominator=if max.is_infinite(){value.max(100.)}else{max.max(1.)};
++            let (fill,pending)=resource_ui::bar_fractions(value,max,if i==1{v.pending_energy_loss}else{0.});
+             resource_ui::paint_bar_pending(self,label,&text,left+12,y,rail_width,24,color,
+-                value/denominator,13,if i==1{v.pending_energy_loss/denominator}else{0.});
++                fill,13,pending);
+         }
+         for(i,(label,value))in ["Damage","HP","DR","Accuracy","Dodge"].into_iter().zip(v.player_stats).enumerate(){
+             let text=if i<2 {format!("{label} {value:+}")} else {format!("{label} {value}")};
+--- a/crates/corpse-desktop/src/resource_ui.rs
++++ b/crates/corpse-desktop/src/resource_ui.rs
+@@ -108,3 +108,12 @@
+     }
+     p.clip=previous;
+ }
++
++/// Infinity uses the historical 100-point display scale, not an energy cap.
++/// Hatching represents upcoming cost magnitude on the same scale, not the
++/// resulting fill. Costs above the displayed range saturate. No gameplay change.
++pub fn bar_fractions(value:f64,maximum:f64,upcoming:f64)->(f64,f64) {
++    let scale=if maximum.is_infinite(){100.}else{maximum.max(1.)};
++    let fill=(value/scale).clamp(0.,1.);
++    (fill,(upcoming.max(0.)/scale).min(fill))
++}
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -156,3 +156,31 @@
+         }
+     }
+ }
++
++#[test]
++fn boundless_above_100_keeps_infinity_and_fixed_scale_with_truthful_upkeep() {
++    let mut r=room();r.player.abilities.push("grisha-boundless-hunger".into());
++    let id="morae-turning-the-wheel";r.player.abilities.push(id.into());r.player.active.push(id.into());
++    corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,0.).unwrap();
++    r.player.energy=250.;
++    r.player.ability_reserves.as_mut().unwrap().get_mut(id).unwrap().energy=5.;
++    assert_eq!(corpse_core::abilities::projected_player_upkeep(&r),15.);
++    assert_eq!(bar_fractions(250.,f64::INFINITY,15.),(1.,0.15));
++    r.player.ability_reserves.as_mut().unwrap().get_mut(id).unwrap().energy=0.;
++    for energy in [250.,110.,90.] {
++        r.player.energy=energy;let before=r.clone();let v=crate::observe::observe(&r);
++        assert!(v.max_energy.is_infinite());assert_eq!(v.pending_energy_loss,20.);assert_eq!(r,before);
++        let(fill,pending)=bar_fractions(energy,v.max_energy,v.pending_energy_loss);
++        assert_eq!(fill,if energy>=100.{1.}else{0.9});
++        assert!((pending-0.2).abs()<1e-12);
++        assert_eq!(bar_fractions(energy,f64::INFINITY,150.).1,fill);
++        let label=value_text("Energy",energy,v.max_energy,"");assert!(label.contains('∞'));assert!(label.starts_with(&format!("{energy:.0}")));
++        for(w,h)in[(1280,800),(1920,1080),(960,1200)] {
++            let mut p=Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
++            let left=p.hud_left()+12;let width=p.logical_width()-p.hud_left()-24;
++            let(text,size,x)=fit_value(&p,&label,left+text_width(&p,"Energy",13)+14,left+width-6);
++            assert_eq!(text,label);assert!(x+text_width(&p,&text,size)<=left+width-6);
++            p.game_at(&v,"",false,0.);save_png(&p,&format!("boundless-{energy:.0}-{w}x{h}"));
++        }
++    }
++}
