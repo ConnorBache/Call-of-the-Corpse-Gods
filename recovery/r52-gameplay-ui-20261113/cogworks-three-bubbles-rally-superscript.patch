@@ -1,0 +1,158 @@
+--- a/crates/corpse-desktop/src/cogworks_ui.rs
++++ b/crates/corpse-desktop/src/cogworks_ui.rs
+@@ -42,6 +42,7 @@
+ 
+ /// O(label bytes), detached values only. Used after animated terrain rebuilds.
+ pub fn restore_marker(cell: &mut Cell, original: &Cell) {
++    if original.glyph=="⚑" {cell.glyph=original.glyph.clone();cell.fg=original.fg;}
+     if !original.cogworks {return;}
+     cell.cogworks=true;
+     cell.fg=original.fg;
+@@ -115,3 +116,24 @@
+     }
+ 
+ }
++
++pub fn bubble_hit(x:i32,y:i32,left:i32,top:i32)->Option<u8>{
++ (0..3).find(|i|{let dx=x-(left+23+i*16);let dy=y-(top+11);dx*dx+dy*dy<=49}).map(|i|i as u8+1)
++}
++/// Draw only on a tile already represented by the knowledge-gated projection.
++/// Preserve the highest-priority entity and its existing rank marker.
++pub fn rally(run:&Run,cells:&mut [Cell]){
++ let Some(flag)=run.rally.as_ref() else{return;};
++ if !flag.x.is_finite()||!flag.y.is_finite()||flag.x<0.||flag.y<0.{return;}
++ let (x,y)=(flag.x as usize,flag.y as usize);
++ let count=cells.iter().filter(|c|c.x==x&&c.y==y).count();
++ if let Some(cell)=cells.iter_mut().rev().find(|c|c.x==x&&c.y==y){
++  crate::hallucination_ui::map_cell(cell,|c|{if count>1{c.superscript.push('⚑');}else{c.glyph="⚑".into();c.fg=[255,209,57];}});
++ }
++}
++
++#[cfg(test)]mod marker_tests {
++ use super::*;
++ #[test]fn bubble_hits_are_distinct(){for i in 0..3{assert_eq!(bubble_hit(23+i*16,11,0,0),Some(i as u8+1));}assert_eq!(bubble_hit(80,11,0,0),None);}
++ #[test]fn rally_keeps_entity_rank_and_unknown_space_hidden(){let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.rally=Some(corpse_core::RunRally{x:2.,y:3.});let terrain=Cell{x:2,y:3,glyph:".".into(),..Default::default()};let mut cells=vec![terrain.clone(),Cell{x:2,y:3,glyph:"B".into(),superscript:"2".into(),..Default::default()}];rally(&r,&mut cells);assert_eq!(cells[1].glyph,"B");assert_eq!(cells[1].superscript,"2⚑");assert_eq!(cells[0].glyph,".");let mut bare=vec![terrain];rally(&r,&mut bare);assert_eq!(bare[0].glyph,"⚑");let mut rebuilt=Cell::default();restore_marker(&mut rebuilt,&bare[0]);assert_eq!(rebuilt.glyph,"⚑");r.rally.as_mut().unwrap().x=50.;let before=cells.clone();rally(&r,&mut cells);assert_eq!(before,cells);}
++}
+--- a/crates/corpse-desktop/src/main.rs
++++ b/crates/corpse-desktop/src/main.rs
+@@ -1893,6 +1893,11 @@
+                                     .map(|a| a.id.clone())
+                                 {
+                                     if !ability_ui::command_binding_allowed(&r.run, &id) { continue; }
++                                    if id=="kative-cogworks" {
++                                        if let Some(mode)=cogworks_ui::bubble_hit(x,y,painter.hud_left(),ability_ui::top(&painter.profile)+i as i32*ability_ui::row(&painter.profile)) {
++                                            notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&Command::Ability{id:id.clone(),target:Field::Value(mode as f64),x:Field::Missing,y:Field::Missing}){Ok(_)=>targeting_ui::cogworks_prompt(&r.run),Err(e)=>e.to_string()};
++                                        }
++                                    }
+                                     if id == "kative-tinker" {
+                                         let pv = pack_view
+                                             .get_or_insert_with(|| pack::PackView::observe(&r.run));
+--- a/crates/corpse-desktop/src/observe.rs
++++ b/crates/corpse-desktop/src/observe.rs
+@@ -870,6 +870,7 @@
+     };
+     drop(creature_span);
+     let _hud_span=corpse_core::timing::span("desktop.observe.hud_log_inventory");
++    crate::cogworks_ui::rally(run,&mut cells);
+     let abilities = crate::ability_ui::visible_abilities(run);
+     let pursuit_path=crate::targeting_ui::pursuit_path(run);
+     let player_stats=corpse_core::combat::effective_stats(run,&run.player);
+@@ -901,6 +902,7 @@
+         target_impact: None,
+         target_color: None,
+         selected_ability: None,
++        cogworks_mode: corpse_core::revision50_terrain::mode(run),
+         possible_exits: Vec::new(),
+         hover: None,
+         player_id: run.player.id,
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -186,6 +186,7 @@
+     pub target_impact: Option<(usize, usize)>,
+     pub target_color: Option<Rgb>,
+     pub selected_ability: Option<String>,
++    pub cogworks_mode: u8,
+     /// Possible exits, not a selected or promised movement/projectile outcome.
+     pub possible_exits: Vec<(usize, usize)>,
+     pub hover: Option<(usize, usize)>,
+@@ -2625,10 +2626,12 @@
+             let selecting=v.selected_ability.as_deref()==Some(a.id.as_str());
+             let passive=a.mode.eq_ignore_ascii_case("passive")&&!selecting;
+             let reserve=if passive {None}else{a.reserve};
+-            let name_x=left+18+if passive{0}else{18};
++            let cogworks=a.id=="kative-cogworks";
++            let orb_width=if passive{0}else if cogworks{50}else{18};
++            let name_x=left+18+orb_width;
+             let bar_width=rail_width/3;
+             let bar_x=left+12+rail_width-bar_width;
+-            let name_width=if reserve.is_some()||a.fortunes.is_some(){bar_x-name_x-8}else{rail_width-12-if !passive{18}else{0}};
++            let name_width=if reserve.is_some()||a.fortunes.is_some(){bar_x-name_x-8}else{rail_width-12-orb_width};
+             let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);
+             self.clip=Some((left+12,y,rail_width,crate::ability_ui::row(&self.profile)));
+             for(line,name)in names.iter().enumerate(){
+@@ -2651,8 +2654,12 @@
+                     game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),11,a.pending_reserve_loss/maximum.max(1.));
+             }
+             if !passive {
+-                let cx=left+23;let cy=y+11;
+-                for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(selecting||a.active||d>=15){self.rect(cx+dx,cy+dy,1,1,if selecting{[255,155,56]}else if a.active{[100,255,114]}else{[110,110,125]});}}}
++                for orb in 0..if cogworks{3}else{1} {
++                    let chosen=if cogworks{orb+1==v.cogworks_mode as i32}else{a.active};
++                    let targeting=selecting&&(!cogworks||chosen);
++                    let cx=left+23+orb*16;let cy=y+11;
++                    for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(targeting||chosen||d>=15){self.rect(cx+dx,cy+dy,1,1,if targeting{[255,155,56]}else if chosen{[100,255,114]}else{[110,110,125]});}}}
++                }
+             }
+             self.clip=None;
+         }
+--- a/crates/corpse-desktop/src/render_damage.rs
++++ b/crates/corpse-desktop/src/render_damage.rs
+@@ -124,8 +124,8 @@
+ #[derive(Clone,PartialEq)]
+ struct AbilityInk {fortunes:Option<(u8,u8)>,reserve:Option<(u64,u64)>,pending:u64,name:String,cost:String,state:String,mode:String,color:Rgb,active:bool,supported:bool}
+ #[derive(Clone,PartialEq)]
+-struct HudKey {selected_ability:Option<String>,pending_energy_loss:u64,resource_changes:[String;3],domain:String,mode:String,gods:Vec<(String,Rgb)>,numbers:[u64;8],stats:[u64;5],creatures:usize,meters:Vec<crate::statuses_ui::Meter>,status_offset:usize,abilities:Vec<AbilityInk>,total:usize}
+-impl HudKey {fn from(v:&View)->Self{Self{selected_ability:v.selected_ability.clone(),pending_energy_loss:v.pending_energy_loss.to_bits(),resource_changes:v.resource_changes.clone(),domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{fortunes:a.fortunes,reserve:a.reserve.map(|(n,m)|(n.to_bits(),m.to_bits())),pending:a.pending_reserve_loss.to_bits(),name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
++struct HudKey {cogworks_mode:u8,selected_ability:Option<String>,pending_energy_loss:u64,resource_changes:[String;3],domain:String,mode:String,gods:Vec<(String,Rgb)>,numbers:[u64;8],stats:[u64;5],creatures:usize,meters:Vec<crate::statuses_ui::Meter>,status_offset:usize,abilities:Vec<AbilityInk>,total:usize}
++impl HudKey {fn from(v:&View)->Self{Self{cogworks_mode:v.cogworks_mode,selected_ability:v.selected_ability.clone(),pending_energy_loss:v.pending_energy_loss.to_bits(),resource_changes:v.resource_changes.clone(),domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{fortunes:a.fortunes,reserve:a.reserve.map(|(n,m)|(n.to_bits(),m.to_bits())),pending:a.pending_reserve_loss.to_bits(),name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
+ #[derive(Clone,PartialEq)]
+ struct EnemyInk {perception_range:Option<String>,identity_outline:Option<Rgb>,id:u64,name:String,glyph:String,state:String,color:Rgb,distance:u64,resources:[u64;4],shared:bool,uses_energy:bool,invulnerable:bool,statuses:Vec<crate::statuses_ui::Status>,meters:Vec<crate::statuses_ui::Meter>}
+ #[derive(Clone,PartialEq)]
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -293,3 +293,15 @@
+   }
+  }
+ }
++
++#[test]
++fn cogworks_modes_and_rally_native_projection(){
++ let mut r=room();r.player.abilities=vec!["kative-cogworks".into()];r.player.ability_order=Field::Missing;r.rally=Some(corpse_core::RunRally{x:r.player.x,y:r.player.y});
++ for(w,h)in[(1280,800),(1920,1080),(960,1200)]{
++  let(mut p,mut full,mut tile)=(Painter::new(),Painter::new(),Painter::new());for p in [&mut p,&mut full,&mut tile]{p.resize(w,h);p.set_responsive_canvas(true);}let mut retained=RetainedGame::default();let mut plan=TilePlanner::default();let mut old=None;
++  for mode in 1..=3 {
++   assert!(corpse_core::revision50_terrain::select_mode(&mut r,mode as f64));let mut v=crate::observe::observe_with_profile(&r,&p.profile);v.selected_ability=Some("kative-cogworks".into());assert_eq!(v.cogworks_mode,mode);assert!(v.cells.iter().any(|c|c.glyph=="@"&&c.superscript.contains('⚑')));
++   full.game_at(&v,"",false,0.);retained.update(&mut p,&v,"",0.,true,false).unwrap();plan.replace_view(old.as_ref(),&v,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,&v,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();assert_eq!(p.pixels,full.pixels);assert_eq!(tile.pixels,full.pixels);if mode==2{save_png(&p,&format!("cogworks-rally-{w}x{h}"));}old=Some(v);
++  }
++ }
++}
+--- a/crates/corpse-desktop/src/tile_damage.rs
++++ b/crates/corpse-desktop/src/tile_damage.rs
+@@ -156,7 +156,7 @@
+  pub fn paint_base(&mut self,p:&mut Painter,v:&View,notice:&str,now:f64){let _paint_timing=corpse_core::timing::span("desktop.tile.paint_base");if p.tile_mask.is_empty(){return;}p.clip=None;p.damage_clip=None;p.paint_cell_indices=None;std::mem::swap(&mut p.tile_cell_bounds,&mut self.current.bounds);p.game_at(v,notice,false,now);std::mem::swap(&mut p.tile_cell_bounds,&mut self.current.bounds);p.clip=None;}
+  pub fn clear_frame(&mut self){for i in self.tiles.drain(..){if i<self.dirty.len(){self.dirty[i]=false;}}self.rects.clear();self.full=false;}
+ }
+-fn hud_eq(a:&View,b:&View)->bool{a.selected_ability==b.selected_ability&&a.pending_energy_loss.to_bits()==b.pending_energy_loss.to_bits()&&a.resource_changes==b.resource_changes&&a.player_stats.map(f64::to_bits)==b.player_stats.map(f64::to_bits)&&a.domain==b.domain&&a.mode==b.mode&&a.god_labels==b.god_labels&&[a.depth,a.level,a.hp,a.max_hp,a.energy,a.max_energy,a.blessings,a.blessing_goal].map(f64::to_bits)==[b.depth,b.level,b.hp,b.max_hp,b.energy,b.max_energy,b.blessings,b.blessing_goal].map(f64::to_bits)&&a.creatures.len()==b.creatures.len()&&a.player_meters.len()==b.player_meters.len()&&a.player_meters.iter().zip(&b.player_meters).all(|(a,b)|a.name==b.name&&a.duration.map(f64::to_bits)==b.duration.map(f64::to_bits)&&bits(a.reference,b.reference)&&a.reference_known==b.reference_known&&bits(a.percent,b.percent))&&a.player_status_offset==b.player_status_offset&&a.total_abilities==b.total_abilities&&a.abilities.len()==b.abilities.len()&&a.abilities.iter().zip(&b.abilities).all(|(a,b)|a.fortunes==b.fortunes&&a.reserve==b.reserve&&bits(a.pending_reserve_loss,b.pending_reserve_loss)&&a.name==b.name&&a.cost==b.cost&&a.state==b.state&&a.mode==b.mode&&a.color==b.color&&a.active==b.active&&a.supported==b.supported)}
++fn hud_eq(a:&View,b:&View)->bool{a.cogworks_mode==b.cogworks_mode&&a.selected_ability==b.selected_ability&&a.pending_energy_loss.to_bits()==b.pending_energy_loss.to_bits()&&a.resource_changes==b.resource_changes&&a.player_stats.map(f64::to_bits)==b.player_stats.map(f64::to_bits)&&a.domain==b.domain&&a.mode==b.mode&&a.god_labels==b.god_labels&&[a.depth,a.level,a.hp,a.max_hp,a.energy,a.max_energy,a.blessings,a.blessing_goal].map(f64::to_bits)==[b.depth,b.level,b.hp,b.max_hp,b.energy,b.max_energy,b.blessings,b.blessing_goal].map(f64::to_bits)&&a.creatures.len()==b.creatures.len()&&a.player_meters.len()==b.player_meters.len()&&a.player_meters.iter().zip(&b.player_meters).all(|(a,b)|a.name==b.name&&a.duration.map(f64::to_bits)==b.duration.map(f64::to_bits)&&bits(a.reference,b.reference)&&a.reference_known==b.reference_known&&bits(a.percent,b.percent))&&a.player_status_offset==b.player_status_offset&&a.total_abilities==b.total_abilities&&a.abilities.len()==b.abilities.len()&&a.abilities.iter().zip(&b.abilities).all(|(a,b)|a.fortunes==b.fortunes&&a.reserve==b.reserve&&bits(a.pending_reserve_loss,b.pending_reserve_loss)&&a.name==b.name&&a.cost==b.cost&&a.state==b.state&&a.mode==b.mode&&a.color==b.color&&a.active==b.active&&a.supported==b.supported)}
+ fn enemies_eq(a:&View,b:&View)->bool{a.ground_entities==b.ground_entities&&a.creatures.len()==b.creatures.len()&&a.creatures.iter().zip(&b.creatures).all(|(a,b)|bits(a.id,b.id)&&a.name==b.name&&a.glyph==b.glyph&&a.state==b.state&&a.perception_range==b.perception_range&&a.color==b.color&&a.identity_outline==b.identity_outline&&bits(a.distance,b.distance)&&[a.hp,a.max_hp,a.energy,a.max_energy].map(f64::to_bits)==[b.hp,b.max_hp,b.energy,b.max_energy].map(f64::to_bits)&&a.shared_resources==b.shared_resources&&a.uses_energy==b.uses_energy&&a.invulnerable==b.invulnerable&&a.statuses==b.statuses&&a.meters==b.meters)}
+ #[cfg(test)]
+ #[path="tile_damage_tests.rs"]
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1990,3 +1990,6 @@
+ 
+ ### Fortune Teller relative refill schedule (R52)
+ One keyed `turn_schedule::Schedule<()>` deadline per actor with depleted fortunes. Spending schedules now+20 only if no event exists; due events add one and reschedule by20 until cap3. The existing upkeep actor loop queries a constant-sized queue; no additional actor scan, periodic modulo polling, or decrementing countdown is introduced. UI computes remaining turns from the stored deadline. Save/clone preserves queue; older depleted R52 saves begin one fresh20 interval on first upkeep, while pre-R52 retains clock-aligned behavior. Due catch-up is bounded by three missing charges.
++
++### Cogworks modes and rally marker
++Cogworks projects its canonical mode to three compact clickable bubbles, with only the selected mode filled (orange during targeting, green otherwise). Existing numeric mode commands remain valid and both retained HUD keys include mode changes. Rally marks only an already knowledge-projected tile: standalone flag on terrain, superscript appended to the highest-priority entity without replacing its glyph/rank; animated terrain rebuilds retain standalone flags. Three-size native render tests compare retained paths and all mode transitions.
