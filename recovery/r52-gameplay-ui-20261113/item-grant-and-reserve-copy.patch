@@ -1,0 +1,177 @@
+--- a/crates/corpse-desktop/src/ability_ui.rs
++++ b/crates/corpse-desktop/src/ability_ui.rs
+@@ -656,9 +656,6 @@
+     }
+     if id == corpse_core::revision50_ability_energy::FUTURE_ID {
+         row.description.push_str("\nSpends all your energy.");
+-    } else if let Some(_)=reserve {
+-        let capacity = corpse_core::revision52_reserves::capacity(r.simulation_revision.value_or(29.));
+-        row.description.push_str(&format!("\nAbility energy is spent first; player energy pays any remainder. Ability energy refills to {capacity} on level-up; player energy does not."));
+     }
+     if let Some(reason)=activation_blocker.filter(|_|r50(r) && !active) {
+         row.description.push_str(&format!("\nUnavailable: {reason}."));
+@@ -953,7 +950,7 @@
+             assert_eq!(observe(&run,id).description,if revision>=43.{requested}else{original.as_str()});
+             let item=corpse_core::Item{id:6001.,name:"Blessed ring".into(),kind:"ring".into(),granted_ability:id.to_string().into(),..Default::default()};
+             let detail=crate::pack::describe_item(&run,&item);
+-            assert!(detail.contains(if revision>=43.{requested}else{original.as_str()}));
++            assert!(!detail.contains(if revision>=43.{requested}else{original.as_str()}));
+             assert_eq!(serde_json::to_vec(&run).unwrap(),before);
+         }
+         assert_eq!(progression::definition(id).unwrap().description,original);
+@@ -1000,7 +997,7 @@
+                 assert_eq!(observe(&run, id).description, expected, "ability detail: {id}");
+                 assert_eq!(offer.description, expected, "blessing choice: {id}");
+                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
+-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
++                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
+                 assert_eq!(progression::definition(id).unwrap().description, original);
+             }
+             assert_eq!(view.offers.len(), REQUESTED.len());
+@@ -1052,7 +1049,7 @@
+                 }
+                 assert_eq!(offer.description, expected, "blessing choice: {id}");
+                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
+-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
++                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
+                 assert_eq!(progression::definition(id).unwrap().description, original);
+             }
+             assert_eq!(view.offers.len(), REQUESTED.len());
+@@ -1087,7 +1084,7 @@
+                 assert_eq!(observe(&run, id).description, expected, "ability detail: {id}");
+                 assert_eq!(offer.description, expected, "blessing choice: {id}");
+                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
+-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
++                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
+                 assert_eq!(progression::definition(id).unwrap().description, original);
+             }
+             assert_eq!(view.offers.len(), REQUESTED.len());
+@@ -1132,7 +1129,7 @@
+                 }
+                 assert_eq!(offer.description, detail, "blessing choice: {id}");
+                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
+-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
++                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
+                 assert_eq!(progression::definition(id).unwrap().description, original);
+             }
+             assert_eq!(view.offers.len(), REQUESTED.len());
+@@ -1275,7 +1272,7 @@
+         assert!(crate::observe::observe(&run).offers[0].description.starts_with(requested));
+         let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(),
+             granted_ability: "pelian-never-surrender".to_string().into(), ..Default::default() };
+-        assert!(crate::pack::describe_item(&run, &item).contains(requested));
++        assert!(!crate::pack::describe_item(&run, &item).contains(requested));
+         assert!(crate::creature_abilities_ui::describe(&run, &run.player).1.contains(requested));
+         run.simulation_revision = 51.0.into();
+         assert_eq!(display_description(&run, "pelian-never-surrender", "legacy"),
+@@ -1308,7 +1305,7 @@
+         let before = serde_json::to_vec(&run).unwrap();
+         let row = observe(&run, ID);
+         assert!(row.cost.contains("Reserve 2/10 - -80%"), "{}", row.cost);
+-        assert!(row.description.contains("Ability energy refills to 10 on level-up"));
++        assert!(!row.description.contains("Ability energy refills to"));
+         let view = crate::observe::observe(&run);
+         for (width, height) in [(1280, 800), (960, 1200)] {
+             let mut painter = crate::render::Painter::new();
+@@ -1367,7 +1364,7 @@
+         assert!(crate::observe::observe(&run).offers[0].description.contains(EXCEPTION));
+         let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(),
+             granted_ability: ID.to_string().into(), ..Default::default() };
+-        assert!(crate::pack::describe_item(&run, &item).contains(EXCEPTION));
++        assert!(!crate::pack::describe_item(&run, &item).contains(EXCEPTION));
+         assert!(!observe(&run, "numo-distract").description.contains(EXCEPTION));
+         assert_eq!(serde_json::to_vec(&run).unwrap(), before);
+         run.simulation_revision = 51.0.into();
+@@ -1377,12 +1374,12 @@
+ 
+     #[test]
+     fn reserve_refill_detail_uses_revision_capacity_for_all_paid_ability_kinds() {
+-        for (revision, capacity) in [(50., 50.), (51., 50.), (52., 10.)] {
++        for revision in [50., 51., 52.] {
+             let run = room(revision);
+             let before = serde_json::to_vec(&run).unwrap();
+             for id in [ID, "numo-distract", corpse_core::revision50_ability_energy::FUTURE_ID] {
+                 let description = observe(&run, id).description;
+-                assert!(description.contains(&format!("Ability energy refills to {capacity} on level-up; player energy does not.")),
++                assert!(!description.contains("Ability energy refills to"),
+                     "revision={revision}, id={id}: {description}");
+                 if revision >= 52. { assert!(!description.contains("refills to 50")); }
+             }
+--- a/crates/corpse-desktop/src/pack.rs
++++ b/crates/corpse-desktop/src/pack.rs
+@@ -1820,11 +1820,6 @@
+             },
+             crate::ability_ui::display_text(progression::definition_for_revision(run.simulation_revision.value_or(29.), id).map_or(id.as_str(), |a| a.name.as_str()))
+         ));
+-        if let Some(a) = progression::definition_for_revision(run.simulation_revision.value_or(29.), id) {
+-            lines.push(if run.simulation_revision.value_or(29.)>=50. {
+-                crate::ability_ui::observe(run,id).description
+-            } else {crate::ability_ui::display_description(run, &a.id, &a.description).into()});
+-        }
+     }
+     if i.tinkered.value_or(false) {
+         lines.push("You've already tinkered with this item.".into());
+--- a/crates/corpse-desktop/src/quiet_ui_tests.rs
++++ b/crates/corpse-desktop/src/quiet_ui_tests.rs
+@@ -59,7 +59,7 @@
+     for a in corpse_core::progression::catalog_for_revision(50.){
+         let row=crate::ability_ui::observe(&r,&a.id);
+         assert_eq!(row.cost.contains("Reserve"),crate::ability_ui::r50_uses_energy(&a.id),"{}",a.name);
+-        assert_eq!(row.description.contains("Ability energy is spent first"),crate::ability_ui::r50_uses_energy(&a.id),"{}",a.name);
++        assert!(!row.description.contains("Ability energy is spent first"),"{}",a.name);
+     }
+     for id in ["isheilah-quick-hand","ursa-sleep-walk","lichor-blood-letting","kative-appropriate"]{
+         assert!(!crate::ability_ui::observe(&r,id).cost.contains("Reserve"));
+--- a/crates/corpse-desktop/src/revision50_item_knowledge_tests.rs
++++ b/crates/corpse-desktop/src/revision50_item_knowledge_tests.rs
+@@ -187,3 +187,40 @@
+  dagger.effect="With a drop of blood on the Altar of the Phantasmii, you can access amazing power.".to_string().into();
+  assert_eq!(describe_item(&r,&dagger),"Dagger of the Phantasmii\nApply while standing on the Altar of the Phantasmii to enter Dreamwalking.");
+ }
++
++#[test]
++fn item_grant_copy_lives_in_abilities_not_item_surfaces() {
++ let mut r=run();r.simulation_revision=52.0.into();r.offers.clear();r.player.ability_reserves=Field::Missing;
++ r.player.equipment_abilities=Field::Missing;r.player.ability_order=Field::Missing;r.ground.clear();
++ let mut ring=Item{id:910.,name:"Ring of Protection".into(),kind:"ring".into(),effect:"protection".to_string().into(),granted_ability:"shrail-execute".to_string().into(),additional_granted_abilities:vec!["numo-distract".into()],..Default::default()};
++ ring.tinkered=true.into();
++ let mut amulet=corpse_core::revision50_amulet_effects::make_amulet(corpse_core::revision50_amulet_effects::Effect::Blinking,911.).unwrap();
++ amulet.granted_ability="morae-see-the-future".to_string().into();
++ let p=Painter::new();
++ let (x,y)=(r.player.x,r.player.y);
++ for item in [ring.clone(),amulet.clone()] {
++  r.ground_at_mut(r.depth).push(corpse_core::GroundItem{x,y,item:item.clone(),..Default::default()});
++ }
++ assert_eq!(corpse_core::inventory::collect_underfoot(&mut r,20.).unwrap(),2);
++ let rows=crate::ability_ui::visible_abilities(&r);
++ for id in ["shrail-execute","numo-distract","morae-see-the-future"] {
++  let row=rows.iter().find(|a|a.id==id).expect("carried grant visible in ability section");
++  assert_eq!(row.description,crate::ability_ui::observe(&r,id).description);
++  assert!(!row.description.is_empty());
++ }
++ for item in [&ring,&amulet] {
++  let copy=describe_item(&r,item);
++  for id in item.granted_ability.as_ref().into_iter().chain(item.additional_granted_abilities.iter()) {
++   let row=rows.iter().find(|a|a.id==*id).unwrap();assert!(copy.contains(&format!("Grants {}.",row.name)));assert!(!copy.contains(&row.description));
++  }
++  assert!(copy.contains(if item.kind=="ring"{"DR"}else{"Blink along a 10 tile line."}));
++  r.ground.insert(r.depth.to_string(),vec![corpse_core::GroundItem{x:r.player.x,y:r.player.y,item:item.clone(),..Default::default()}].into());
++  let report=crate::inspection_ui::observe_tile(&r,r.player.x as usize,r.player.y as usize);
++  let ground=serde_json::to_string(&report).unwrap();
++  for row in &rows {if !row.description.is_empty(){assert!(!ground.contains(row.description.lines().next().unwrap()));}}
++ }
++ let mut view=PackView::observe(&r);view.configure(&p,p.frame().map.tuple());hover_first(&mut view);
++ let tooltip=view.tooltip().unwrap();assert!(tooltip.contains("Grants"));assert!(!tooltip.contains(crate::ability_ui::EXECUTE_DESCRIPTION));
++ assert_eq!(corpse_core::inventory::command(&mut r,&corpse_core::Command::Drop{id:910.}).unwrap(),Some(true));
++ let rows=crate::ability_ui::visible_abilities(&r);assert!(!rows.iter().any(|a|a.id=="shrail-execute"||a.id=="numo-distract"));assert!(rows.iter().any(|a|a.id=="morae-see-the-future"));
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -2011,3 +2011,7 @@
+ 
+ ## Text audit batch three
+ Text-only removal of Dagger flavor, Appropriate floor clause, and See The Future reserve caveats; tiered Blinking uses the existing range profile. Description construction remains O(L) time/memory for output length L, once per observation/inspection; no simulation, scheduling, RNG, or save-format changes. Focused display tests cover all nine tiers.
++
++## Item grant copy ownership
++Item descriptions retain grant names but no longer duplicate ability descriptions. Shared Pack/ground/inspect path remains O(L+G*C) worst-case time and O(L) output memory for L displayed text, G grants and C catalog entries; removes ability forecast/description work for each grant. Existing pickup/drop reconciliation supplies carried jewelry grants to the abilities section; no simulation or save changes.
++Shared reserve tutorial paragraph also removed from ability details; specific costs, reserves, and unique rule paragraphs unchanged. No additional runtime work.
