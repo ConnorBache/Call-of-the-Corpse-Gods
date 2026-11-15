@@ -1,0 +1,85 @@
+--- a/crates/corpse-core/src/abilities.rs
++++ b/crates/corpse-core/src/abilities.rs
+@@ -1078,7 +1078,9 @@
+             .as_str();
+         emit_activation(r, label, target, x, y);
+     }
+-    Ok(false)
++    // Placement is a normal action in R52; dismissal remains a free toggle.
++    Ok(r.simulation_revision.value_or(29.) >= 52.
++        && id == crate::half_here::ID && r.player.active.iter().any(|a| a == id))
+ }
+ 
+ /// Stable endpoint occupancy; old revisions preserve pending-death blockers.
+--- a/crates/corpse-core/src/engine.rs
++++ b/crates/corpse-core/src/engine.rs
+@@ -699,7 +699,8 @@
+     }
+     if let Command::Ability { id, target, x, y } = c {
+         if !crate::abilities::is_action(id) && !(r.simulation_revision.value_or(29.)>=52.
+-            && [crate::dreamwalking::DREAMWALK_ID,crate::dreamwalking::WAKE_UP_ID,crate::ahvamitt::TELEPORT_ID].contains(&id.as_str())) {
++            && ([crate::dreamwalking::DREAMWALK_ID,crate::dreamwalking::WAKE_UP_ID,crate::ahvamitt::TELEPORT_ID].contains(&id.as_str())
++                || (id == crate::half_here::ID && !r.player.active.iter().any(|a| a == id)))) {
+             crate::dreamwalking::with_actor(r,r.player.id,|r|crate::abilities::activate(r, id, target, x, y))?;
+             return finish(r, false);
+         }
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1970,3 +1970,14 @@
+ 
+ ### Target-selection ability orb
+ The existing pending ability is projected to a detached selected-ability ID at the pointer synchronization boundary. Its orb is orange while selecting, with orange taking precedence over enabled green; non-targeted passives remain undecorated. Both retained HUD keys include this ID so cancellation restores normal ink without rebuilding world observation. Regression covers targeting entry/cancel and both retained painters at three window sizes.
++
++### R52 Half Here placement turn (2026-11-15)
++Successful placement enters the existing normal action scheduler; dismissal stays free and invalid placements report no action. The free-command gate and activation result each scan active ability IDs (A): O(A) time, O(1) extra memory per command, no RNG or new cache. Existing endpoint validation/creation and turn scheduling retain their prior costs; no new traversal is introduced. Verify successful placement, invalid/missing targets, dismissal, haste phase behavior, and pre-R52 fixture compatibility with focused Half Here tests.
++
++### R52 Composite bow accuracy
++
++Each shot/forecast checks the revision and bow kind once, O(1) time and memory.
++The resolver passes an explicit accuracy-only flag through deflection recursion;
++it adds no scans, RNG or persistent state. Effective-stat, collision/trajectory,
++rendering and existing recursive combat costs remain unchanged. Only hit-chance
++range becomes zero; physical range and ranged admission stay intact.
+--- /dev/null
++++ b/crates/corpse-core/tests/revision52_half_here_turn.rs
+@@ -0,0 +1,40 @@
++use corpse_core::{Command,Field,Run,Stats,engine,half_here};
++fn room(revision:f64) -> Run {
++    let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++    r.simulation_revision=revision.into();
++    r.player.x=10.;r.player.y=10.;r.player.hp=100.;r.player.max_hp=100.;
++    r.player.stats=Stats {accuracy:100.,perception:300.,max_energy:100.,..Default::default()};
++    r.player.energy=40.;r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
++    r.player.ability_reserves=Field::Missing;r.player.equipment_abilities=Field::Missing;
++    r.player.amulet_ledger=Field::Missing;r.player.reaping_ledger=Field::Missing;
++    r.inventory.clear();r.actors=Default::default();r.ground.clear();
++    for depth in 1..=r.floors.len() {r.actors_at_mut(depth as f64);r.ground_at_mut(depth as f64);}
++    r.history.clear();r.replay.clear();r.haste_snapshot=Field::Missing;r.future=None;
++    r.phase="normal".to_string().into();r.next_id=1000.;r.offers.clear();
++    let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.seen.fill(true);
++    f.doors=Field::Missing;f.portals=Field::Missing;f.environment=Field::Missing;f.vents=Field::Missing;
++    f.currents=Field::Missing;f.mud=Field::Missing;f.slime=Field::Missing;f.roots=Field::Missing;
++    r
++}
++fn command(x:Option<f64>,y:Option<f64>)->Command{Command::Ability{id:half_here::ID.into(),target:Field::Missing,x:x.map_or(Field::Missing,Field::Value),y:y.map_or(Field::Missing,Field::Value)}}
++#[test] fn successful_placement_takes_one_turn_but_dismissal_remains_free(){
++ let mut r=room(52.);r.player.abilities.push(half_here::ID.into());let tick=r.tick;
++ engine::dispatch(&mut r,&command(Some(11.),Some(10.))).unwrap();
++ assert_eq!(r.tick,tick+1.);assert!(r.player.active.iter().any(|s|s==half_here::ID));
++ engine::dispatch(&mut r,&command(None,None)).unwrap();assert_eq!(r.tick,tick+1.);assert!(!r.player.active.iter().any(|s|s==half_here::ID));
++}
++#[test] fn missing_and_occupied_targets_do_not_advance_time(){
++ for (x,y) in [(None,None),(Some(10.),Some(10.)),(Some(-1.),Some(10.))]{
++ let mut r=room(52.);r.player.abilities.push(half_here::ID.into());let tick=r.tick;
++ engine::dispatch(&mut r,&command(x,y)).unwrap();assert_eq!(r.tick,tick);assert!(!r.player.active.iter().any(|s|s==half_here::ID));
++ }
++}
++#[test] fn legacy_placement_retains_free_action(){
++ let mut r=room(51.);r.player.abilities.push(half_here::ID.into());let tick=r.tick;
++ engine::dispatch(&mut r,&command(Some(11.),Some(10.))).unwrap();assert_eq!(r.tick,tick);assert!(r.player.active.iter().any(|s|s==half_here::ID));
++}
++#[test] fn placement_uses_one_haste_action_then_wait_finishes_normal_turn(){
++ let mut r=room(52.);r.player.abilities.push(half_here::ID.into());r.player.conditions.insert("hasted".into(),10.);r.phase="haste".to_string().into();let tick=r.tick;
++ engine::dispatch(&mut r,&command(Some(11.),Some(10.))).unwrap();assert_eq!(r.tick,tick);assert_eq!(r.phase.as_ref().map(String::as_str),Some("normal"));
++ engine::dispatch(&mut r,&Command::Wait).unwrap();assert_eq!(r.tick,tick+1.);
++}
