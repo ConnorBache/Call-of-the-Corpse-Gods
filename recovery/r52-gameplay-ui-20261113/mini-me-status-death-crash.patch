@@ -1,0 +1,78 @@
+--- a/crates/corpse-core/src/engine.rs
++++ b/crates/corpse-core/src/engine.rs
+@@ -2072,7 +2072,9 @@
+         let before_status=crate::events::enabled(r).then(||actor(r,id).unwrap().clone());
+         ai::enemy_turn_effects(r, id)?;
+         crate::revision52_enemy_followups::tick_bleed(r, id)?;
+-        if r.status != "playing" {
++        // Status damage may remove transient actors (for example a lethal
++        // venom tick on Mini-Me). The upkeep ID snapshot is then stale.
++        if r.status != "playing" || actor(r, id).is_none_or(|a| a.dead.value_or(false)) {
+             continue;
+         }
+         let suppressed = crate::divine_environment::healing_suppressed(r, actor(r, id).unwrap());
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1996,3 +1996,6 @@
+ 
+ ### Tinkered jewelry display names
+ The shared R50+ item-name projection appends the one Tinker grant to canonical ring/amulet names, retaining amulet tiers and using the current Ragelight alias. Existing base grants are not duplicated; Tinker's last added grant supplies the suffix. Stored item name, ID, grants and effects remain unchanged. Pack, ground/inspect, pickup/drop and Tinker log callers already share this projection. Tests cover tier preservation, old revision behavior, read-only state and duplicate prevention.
++
++## Transient actor status-death upkeep guard (2026-11-15)
++After status packets execute, normal upkeep revalidates its snapshotted actor ID before regeneration. Mini-Me may be physically removed by lethal venom/bleed; missing or dead actors skip the remaining upkeep. This adds one existing actor lookup per processed actor (same lookup/index assumptions as the adjacent upkeep operations), O(1) extra storage, no queue or scan beyond the existing lookup. Deterministic regressions cover wait/move, loaded pre-death state, lethal bleed and surviving venom. This prevents an Option unwrap panic; Windows runtime remains separately unverified.
+--- /dev/null
++++ b/crates/corpse-core/tests/revision52_mini_me_status_death.rs
+@@ -0,0 +1,53 @@
++use corpse_core::{Command,Field,Run,Stats,engine};
++fn room(revision:f64) -> Run {
++    let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++    r.simulation_revision=revision.into();
++    r.player.x=10.;r.player.y=10.;r.player.hp=100.;r.player.max_hp=100.;
++    r.player.stats=Stats {accuracy:100.,perception:300.,max_energy:100.,..Default::default()};
++    r.player.energy=40.;r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
++    r.player.ability_reserves=Field::Missing;r.player.equipment_abilities=Field::Missing;
++    r.player.amulet_ledger=Field::Missing;r.player.reaping_ledger=Field::Missing;
++    r.inventory.clear();r.actors=Default::default();r.ground.clear();
++    for depth in 1..=r.floors.len() {r.actors_at_mut(depth as f64);r.ground_at_mut(depth as f64);}
++    r.history.clear();r.replay.clear();r.haste_snapshot=Field::Missing;r.future=None;
++    r.phase="normal".to_string().into();r.next_id=1000.;r.offers.clear();
++    let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.seen.fill(true);
++    f.doors=Field::Missing;f.portals=Field::Missing;f.environment=Field::Missing;f.vents=Field::Missing;
++    f.currents=Field::Missing;f.mud=Field::Missing;f.slime=Field::Missing;f.roots=Field::Missing;
++    r
++}
++
++fn scenario(effect: &str, hp: f64) -> Run {
++ let mut r=room(52.); r.player.abilities.push("kative-mini-me".into());
++ let mut a=corpse_core::mini_me::preview(&r,15.,10.); a.hp=hp; a.max_hp=172.;
++ let id=a.id;
++ match effect {
++  "venom" => {a.conditions.insert("envenomed".into(),2.);a.conditions.insert(format!("venom:{}:999",r.tick+2.),2.);},
++  "bleed" => {a.conditions.insert("killspawnBleeding".into(),1.);a.conditions.insert(format!("killspawnBleed:{}:999",r.tick+1.),2.);},
++  _ => unreachable!()
++ }
++ r.player.conditions.insert("miniMeId".into(),id);r.player.active.push("kative-mini-me".into());r.actors_at_mut(r.depth).push(a); r
++}
++#[test] fn mini_me_lethal_venom_during_wait_and_move_does_not_panic() {
++ for command in [Command::Wait,Command::Move{dx:1.,dy:0.}] {
++ let mut r=scenario("venom",1.);let id=r.next_id;let tick=r.tick;
++ engine::dispatch(&mut r,&command).unwrap();
++ assert!(engine::actor(&r,id).is_none());assert_eq!(r.tick,tick+1.);assert_eq!(r.status,"playing");
++ engine::dispatch(&mut r,&Command::Wait).unwrap();assert_eq!(r.tick,tick+2.);
++ }
++}
++#[test] fn mini_me_lethal_scheduled_bleed_does_not_panic() {
++ let mut r=scenario("bleed",1.);let id=r.next_id;
++ engine::dispatch(&mut r,&Command::Wait).unwrap();assert!(engine::actor(&r,id).is_none());
++}
++#[test] fn mini_me_nonlethal_status_still_regenerates_and_acts() {
++ let mut r=scenario("venom",100.);let id=r.next_id;let tick=r.tick;
++ engine::dispatch(&mut r,&Command::Wait).unwrap();let a=engine::actor(&r,id).unwrap();
++ assert!(a.hp>98. && a.hp<100.);assert!(!a.dead.value_or(false));assert_eq!(r.tick,tick+1.);
++}
++#[test] fn loaded_pre_death_state_can_advance_safely() {
++ let r=scenario("venom",1.);let raw=serde_json::to_string(&r).unwrap();
++ let mut loaded:Run=serde_json::from_str(&raw).unwrap();let id=loaded.next_id;
++ engine::dispatch(&mut loaded,&Command::Move{dx:1.,dy:0.}).unwrap();
++ assert!(engine::actor(&loaded,id).is_none());assert_eq!(loaded.status,"playing");
++}
