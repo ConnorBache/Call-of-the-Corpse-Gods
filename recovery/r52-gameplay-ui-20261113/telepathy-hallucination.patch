@@ -1,0 +1,166 @@
+--- a/crates/corpse-core/src/actor_presentation.rs
++++ b/crates/corpse-core/src/actor_presentation.rs
+@@ -9,7 +9,8 @@
+     if r.simulation_revision.value_or(29.) < 33.
+         || a.id == r.player.id || crate::half_here::is_clone(a) { return None; }
+     let mut kind = crate::new_creatures::disguise_kind(r, a);
+-    if crate::half_here::origins(r).iter().any(|body|
++    if !(r.simulation_revision.value_or(29.) >= 52. && crate::vision::telepathic(r,a))
++        && crate::half_here::origins(r).iter().any(|body|
+         !body.dead.value_or(false) && crate::engine::condition(body, "hallucinating") > 0.) {
+         let mut hash = 2166136261u32;
+         for b in r.seed.bytes() { hash = (hash ^ b as u32).wrapping_mul(16777619); }
+--- a/crates/corpse-core/src/revision50_amulet_effects.rs
++++ b/crates/corpse-core/src/revision50_amulet_effects.rs
+@@ -633,6 +633,20 @@
+     fn cast(r:&mut Run,id:f64,x:f64,y:f64){assert_eq!(command(r,&Command::UseAt{id,x,y}).unwrap(),Some(true));}
+     fn hp(r:&Run,id:f64)->f64{engine::actor(r,id).unwrap().hp}
+     fn ring(id:f64,effect:&str)->Item{Item{id,kind:"ring".into(),effect:effect.to_string().into(),equipped:"ring1".to_string().into(),..Default::default()}}
++    #[test] fn r52_telepathy_admits_dark_ability_target_without_bypassing_effect_blockers(){
++        let mut r=room();r.simulation_revision=52.0.into();r.player.stats.perception=0.;
++        r.floor_mut().unwrap().lights.fill(-100.);enemy(&mut r,20.,18.,10.);
++        r.inventory.push(make_amulet_for_revision(Effect::Iceblast,1.,52.).unwrap());
++        assert!(!target_valid(&r,Effect::Iceblast,18.,10.));
++        r.player.conditions.insert("telepathic".into(),30.);
++        assert!(!crate::vision::directly_visible_actor(&r,engine::actor(&r,20.).unwrap()));
++        assert!(target_valid(&r,Effect::Iceblast,18.,10.));
++        let mut direct=r.clone();cast(&mut direct,1.,18.,10.);assert!(hp(&direct,20.)<500.);
++        let mut wall=r.clone();let w=wall.floor().unwrap().width();wall.floor_mut().unwrap().tiles[10*w+14]="wall".into();
++        cast(&mut wall,1.,18.,10.);assert_eq!(hp(&wall,20.),500.);
++        let mut blocker=r.clone();enemy(&mut blocker,21.,14.,10.);
++        cast(&mut blocker,1.,18.,10.);assert_eq!(hp(&blocker,20.),500.);assert!(hp(&blocker,21.)<500.);
++    }
+     #[test] fn lightning_continues_beyond_aim_pierces_allies_and_stops_at_wall(){
+         let mut r=room();add(&mut r,Effect::Lightning,1.);enemy(&mut r,20.,13.,10.);enemy(&mut r,21.,30.,10.);enemy(&mut r,22.,35.,10.);
+         engine::actor_mut_trusted(&mut r,21.).unwrap().state="ally".into();
+--- a/crates/corpse-desktop/src/creature_presentation.rs
++++ b/crates/corpse-desktop/src/creature_presentation.rs
+@@ -7,7 +7,7 @@
+     if r.simulation_revision.value_or(29.)>=43. && a.id==r.player.id{return None;}
+     if corpse_core::dreamwalking::is_nightmare(a) || corpse_core::dreamwalking::is_body(a) { return None; }
+     let original=corpse_core::actor_presentation::apparent_kind(r,a)?;
+-    let kind=if crate::hallucination_ui::active(r)&&crate::hallucination_ui::eligible(a) {
++    let kind=if crate::hallucination_ui::affects(r,a) {
+         crate::hallucination_ui::kind(r,a,0)
+     }else{original};
+     project_kind(r,a,kind)
+--- a/crates/corpse-desktop/src/hallucination_ui.rs
++++ b/crates/corpse-desktop/src/hallucination_ui.rs
+@@ -6,6 +6,10 @@
+ /// O(A) existing shared-origin lookup, once when rebuilding observed data.
+ pub fn active(r:&Run)->bool {r.simulation_revision.value_or(29.)>=43. && corpse_core::half_here::origins(r).iter().any(|a|!a.dead.value_or(false)&&corpse_core::engine::condition(a,"hallucinating")>0.)}
+ pub fn eligible(a:&Actor)->bool {!corpse_core::half_here::is_clone(a)&&!corpse_core::dreamwalking::is_nightmare(a)&&!corpse_core::dreamwalking::is_body(a)}
++/// Per-target R52 telepathy suppresses cosmetic hallucinations only for sensed actors.
++/// Uses existing sense query (origins/abilities/LOS); no simulation state changes.
++pub fn affects(r:&Run,a:&Actor)->bool {active(r)&&eligible(a)
++ && !(r.simulation_revision.value_or(29.)>=52. && corpse_core::vision::telepathic(r,a))}
+ pub fn sample(now:f64,reduced:bool)->usize {if reduced||!now.is_finite()||now<=0. {0}else{((now/SAMPLE_MS).floor()as u64%VARIANTS as u64)as usize}}
+ /// O(seed bytes), only while preparing a fixed six-entry display palette.
+ /// Cycling the fixed palette guarantees adjacent samples differ.
+@@ -30,7 +34,7 @@
+ #[cfg(test)]
+ mod tests {
+  use super::*;
+- fn room(revision:f64,count:usize)->Run {
++ pub(super) fn room(revision:f64,count:usize)->Run {
+   let mut r=corpse_core::startup::new_run_shell_revision("0-5-11:appearance43","Unblessed",false,revision).unwrap();
+   r.player.x=2.;r.player.y=2.;r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
+   r.player.conditions.insert("hallucinating".into(),100.);r.player.conditions.insert("telepathic".into(),100.);
+@@ -87,7 +91,7 @@
+  }
+  #[test]
+  fn revision52_roots_keep_their_material_and_glyph_through_all_hallucination_phases(){
+-  let mut r=room(52.,1);r.player.stats.perception=300.;r.player.conditions.remove("hallucinating");
++  let mut r=room(52.,1);r.player.stats.perception=300.;r.player.conditions.remove("hallucinating");r.player.conditions.remove("telepathic");
+   let mut source=corpse_core::population::create_actor_revision("bastidion",200.,4.,4.,false,52.).unwrap();
+   source.state="wandering".into();
+   let mut corpse=corpse_core::population::create_actor_revision("rat",201.,8.,4.,false,52.).unwrap();
+@@ -134,3 +138,31 @@
+   }}
+  }
+ }
++
++#[cfg(test)]
++mod telepathy_regression {
++ use super::*;
++ #[test]
++ fn r52_telepathy_overrides_hallucination_map_list_inspect_and_log() {
++  let mut r=super::tests::room(52.,1);
++  let a=&r.actors_at(1.)[0];let name=a.name.clone();
++  assert!(corpse_core::vision::telepathic(&r,a));
++  assert_eq!(corpse_core::actor_presentation::name(&r,a),name);
++  let mut v=crate::observe::observe(&r);let mut report=crate::inspection_ui::observe_tile(&r,5,5);
++  for phase in 0..6 {
++   apply_view(&mut v,phase);crate::inspection_ui::apply_hallucination(&mut report,phase);
++   let c=v.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap();
++   assert_eq!(c.label,name);assert!(c.hallucination.is_none());
++   assert_eq!(v.creatures.iter().find(|c|c.id==100.).unwrap().name,name);
++   assert_eq!(report.title,name);assert!(report.hallucination.is_none());
++  }
++  r.player.conditions.shift_remove("telepathic");
++  let v=crate::observe::observe(&r);assert!(v.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap().hallucination.is_some());
++  // Target-specific sense protects only its target, not every perceived actor.
++  r.player.conditions.insert("cameTarget".into(),100.);r.player.conditions.insert("cameTurns".into(),5.);
++  let mut other=r.actors_at(1.)[0].clone();other.id=101.;other.x=6.;r.actors_at_mut(1.).push(other);
++  let v=crate::observe::observe(&r);
++  assert!(v.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap().hallucination.is_none());
++  assert!(v.cells.iter().find(|c|c.actor_id==Some(101.)).unwrap().hallucination.is_some());
++ }
++}
+--- a/crates/corpse-desktop/src/inspection_ui.rs
++++ b/crates/corpse-desktop/src/inspection_ui.rs
+@@ -1002,14 +1002,14 @@
+ }
+ pub fn observe_tile(r: &Run, x: usize, y: usize) -> Report {
+     let mut report=observe_tile_inner(r,x,y,None);
+-    if crate::hallucination_ui::active(r){question_report(&mut report);}
++    if crate::hallucination_ui::active(r) && !(r.simulation_revision.value_or(29.)>=52. && report.creature.is_some() && report.hallucination.is_none()){question_report(&mut report);}
+     report
+ }
+ /// Reuse only terrain observed from this exact unchanged world's dream projection.
+ /// Dimensions are checked defensively; freshness belongs to the caller, not tick.
+ pub fn observe_tile_with_terrain(r: &Run, x: usize, y: usize, terrain: &vision::TerrainObservation) -> Report {
+     let mut report=observe_tile_inner(r,x,y,Some(terrain));
+-    if crate::hallucination_ui::active(r){question_report(&mut report);}
++    if crate::hallucination_ui::active(r) && !(r.simulation_revision.value_or(29.)>=52. && report.creature.is_some() && report.hallucination.is_none()){question_report(&mut report);}
+     report
+ }
+ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::TerrainObservation>) -> Report {
+@@ -1053,7 +1053,7 @@
+             .filter(|other| other.id != a.id && !other.dead.value_or(false)
+                 && corpse_core::dreamwalking::dream_actor(r, other) != corpse_core::dreamwalking::dream_actor(r, a))
+             .map(|other| {
+-                let shown = if crate::hallucination_ui::active(r)&&crate::hallucination_ui::eligible(other) {crate::creature_presentation::project_kind(r,other,crate::hallucination_ui::kind(r,other,phase))}else{crate::creature_presentation::project(r, other)};
++                let shown = if crate::hallucination_ui::affects(r,other) {crate::creature_presentation::project_kind(r,other,crate::hallucination_ui::kind(r,other,phase))}else{crate::creature_presentation::project(r, other)};
+                 creature_title(r, shown.as_ref().unwrap_or(other))
+             }).collect();
+         if !overlapping.is_empty() {
+@@ -1077,7 +1077,7 @@
+         }
+         detail.report()
+         };
+-        if crate::hallucination_ui::active(r)&&crate::hallucination_ui::eligible(a) {
++        if crate::hallucination_ui::affects(r,a) {
+             // One detached scratch Run, one admitted terrain observation; no Run retained.
+             let mut scratch=r.clone();
+             let variants=std::array::from_fn(|phase| {
+--- a/crates/corpse-desktop/src/observe.rs
++++ b/crates/corpse-desktop/src/observe.rs
+@@ -284,7 +284,7 @@
+ ) -> Cell {
+     let presented=if player&&run.simulation_revision.value_or(29.)>=43. {None}else{crate::creature_presentation::project(run,a)};
+     let mut cell=actor_cell_presented(profile,run,a,width,backgrounds,player,presented.as_ref());
+-    if !player && presented.is_some() && crate::hallucination_ui::active(run) && crate::hallucination_ui::eligible(a) {
++    if !player && presented.is_some() && crate::hallucination_ui::affects(run,a) {
+         let variants=std::array::from_fn(|phase| {
+             let shown=crate::creature_presentation::project_kind(run,a,crate::hallucination_ui::kind(run,a,phase)).unwrap();
+             let mut c=actor_cell_presented(profile,run,a,width,backgrounds,false,Some(&shown));
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1964,3 +1964,6 @@
+ 
+ ### Float Away direct-damage boundary
+ R52 Float Away now uses the existing direct-packet flag: gas, lingering fire and periodic status damage cannot grant its flight or displacement. Melee, immediate ranged spells and other existing damage kinds retain the proc; other after-damage effects and pre-R52 replay behavior are unchanged. Regression tests cover nine indirect kinds and five direct kinds.
++
++### Telepathy hallucination override
++R52 sensed actors skip only hallucination identity/cache projection; ordinary disguises and pre-R52 presentation remain unchanged. Per admitted actor, the existing telepathy query scans body origins/abilities and can perform Dream See optical LOS (A actors, B abilities/origins, R ray/portal routing cost); worst-case additional work is the existing sense-query cost per presentation surface, with O(B) origin storage. Inspection uses its existing hallucination-cache result to avoid a second sense scan. No RNG, simulation, range, shared-viewpoint, or line-of-effect changes. Regression tests cover global and target-specific telepathy, six animation phases, map/list/inspect/log identity, and dark Iceblast targets with wall/creature blockers.
