@@ -1,0 +1,136 @@
+--- a/crates/corpse-desktop/src/health_warning.rs
++++ b/crates/corpse-desktop/src/health_warning.rs
+@@ -0,0 +1,35 @@
++//! Threshold warning is desktop state only, never saved simulation state.
++use sdl2::{event::Event,keyboard::Keycode};
++#[derive(Default)]pub struct Warning { previous:Option<(f64,f64)>,level:Option<u8>,presented:bool,escape_down:bool }
++#[derive(Debug,PartialEq)]pub enum Decision {Pass,Block,Dismiss}
++impl Warning {
++ pub fn level(&self)->Option<u8>{self.level}
++ pub fn active(&self)->bool{self.level.is_some()}
++ pub fn observe(&mut self,health:Option<(f64,f64)>)->bool{
++  let old=self.level;
++  let Some((hp,max))=health.filter(|(hp,max)|*hp>0.&&*max>0.) else{self.previous=None;self.level=None;self.presented=false;return old.is_some();};
++  let ratio=hp/max;
++  if let Some((prior_hp,prior_ratio))=self.previous {
++   if hp<prior_hp {for threshold in [40u8,25u8]{let limit=threshold as f64/100.;if prior_ratio>limit&&ratio<=limit{self.level=Some(threshold);self.presented=false;}}}
++  }
++  self.previous=Some((hp,ratio));old!=self.level
++ }
++ pub fn presented(&mut self){if self.active(){self.presented=true;}}
++ pub fn event(&mut self,event:&Event)->Decision{
++  let fresh=matches!(event,Event::KeyDown{keycode:Some(Keycode::Escape),repeat:false,..})&&!self.escape_down;
++  match event{Event::KeyDown{keycode:Some(Keycode::Escape),..}=>self.escape_down=true,Event::KeyUp{keycode:Some(Keycode::Escape),..}=>self.escape_down=false,_=>{}}
++  if !self.active(){return Decision::Pass;}
++  if fresh&&self.presented{self.level=None;self.presented=false;return Decision::Dismiss;}
++  if matches!(event,Event::Quit{..}|Event::Window{..}|Event::RenderTargetsReset{..}|Event::RenderDeviceReset{..}){Decision::Pass}else{Decision::Block}
++ }
++}
++pub fn paint(p:&mut crate::render::Painter,level:u8){p.centered_sheet(|p|{p.rect(430,324,420,100,[12,10,20]);p.border(430,324,420,100,[255,75,85]);p.text(&format!("Health at or below {level}%"),452,342,20,[255,100,110]);p.text("Escape to continue",452,381,17,[255,248,232]);});}
++#[cfg(test)]mod tests{
++ use super::*;use sdl2::keyboard::Mod;
++ fn key(k:Keycode,repeat:bool)->Event{Event::KeyDown{timestamp:0,window_id:0,keycode:Some(k),scancode:None,keymod:Mod::NOMOD,repeat}}
++ fn release()->Event{Event::KeyUp{timestamp:0,window_id:0,keycode:Some(Keycode::Escape),scancode:None,keymod:Mod::NOMOD,repeat:false}}
++ #[test]fn thresholds_rearm_and_combined_crossing_uses_lower(){let mut w=Warning::default();w.observe(Some((100.,100.)));assert!(w.observe(Some((40.,100.))));assert_eq!(w.level(),Some(40));w.presented();assert_eq!(w.event(&key(Keycode::Escape,false)),Decision::Dismiss);w.event(&release());assert!(!w.observe(Some((39.,100.))));assert!(w.observe(Some((25.,100.))));assert_eq!(w.level(),Some(25));w.presented();w.event(&key(Keycode::Escape,false));w.event(&release());w.observe(Some((60.,100.)));w.observe(Some((20.,100.)));assert_eq!(w.level(),Some(25));}
++ #[test]fn held_queued_escape_and_other_inputs_cannot_skip(){let mut w=Warning::default();w.observe(Some((100.,100.)));w.event(&key(Keycode::Escape,false));w.observe(Some((30.,100.)));w.presented();assert_eq!(w.event(&key(Keycode::Escape,true)),Decision::Block);assert_eq!(w.event(&key(Keycode::Return,false)),Decision::Block);w.event(&release());assert_eq!(w.event(&key(Keycode::Escape,false)),Decision::Dismiss);w.event(&release());w.observe(Some((20.,100.)));assert_eq!(w.event(&key(Keycode::Escape,false)),Decision::Block);w.presented();w.event(&release());assert_eq!(w.event(&key(Keycode::Escape,false)),Decision::Dismiss);}
++ #[test]fn death_initial_low_hp_and_max_hp_changes_do_not_warn(){let mut w=Warning::default();assert!(!w.observe(Some((20.,100.))));w.observe(Some((100.,100.)));assert!(!w.observe(Some((100.,500.))));w.observe(Some((100.,100.)));w.observe(Some((10.,100.)));assert!(w.active());w.observe(None);assert!(!w.active());w.observe(Some((0.,100.)));assert!(!w.active());}
++ #[test]fn native_warning_screenshot(){if let Ok(dir)=std::env::var("CORPSE_HEALTH_REVIEW"){let mut r:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.player.hp=25.;r.player.max_hp=100.;let mut p=crate::render::Painter::new();p.resize(1920,1080);p.set_responsive_canvas(true);let v=crate::observe::observe_with_profile(&r,&p.profile);p.game_at(&v,"",false,0.);paint(&mut p,25);std::fs::create_dir_all(&dir).unwrap();let mut e=png::Encoder::new(std::fs::File::create(format!("{dir}/health-warning.png")).unwrap(),p.width as u32,p.height as u32);e.set_color(png::ColorType::Rgba);e.set_depth(png::BitDepth::Eight);e.write_header().unwrap().write_image_data(&p.pixels).unwrap();}}
++}
+--- a/crates/corpse-desktop/src/main.rs
++++ b/crates/corpse-desktop/src/main.rs
+@@ -1,3 +1,4 @@
++mod health_warning;
+ mod death_pause;
+ mod gpu_render;
+ #[cfg(feature = "runtime-timing")]
+@@ -602,6 +603,7 @@
+     let mut summary: Option<corpse_core::profile::RunSummary> = None;
+     let mut summary_scroll = 0usize;
+     let mut death_pause=death_pause::DeathPause::default();
++    let mut health_warning=health_warning::Warning::default();
+     let mut tile_report: Option<inspection_ui::Report> = None;
+     let mut tile_report_scroll = 0usize;
+     let mut inspecting = false;
+@@ -684,12 +686,19 @@
+         if rejected_drawable.is_some_and(|size|size!=(drawable_w,drawable_h)){rejected_drawable=None;}
+         // Use committed geometry even if this requested resize was rejected.
+         let tile_enabled=!gpu_available&&!gpu_failed&&tile_requested&&(painter.width as u64*HEIGHT as u64==painter.height as u64*WIDTH as u64);
++        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+         for mut event in events.poll_iter() {
++            if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+             let dead=screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead");
+             match death_pause.event(dead,&event) {
+                 death_pause::Decision::Advance=>{summary=run.as_ref().map(|r|corpse_core::profile::summarize_run(&r.run));summary_scroll=0;screen=Screen::Summary;dirty=true;continue;},
+                 death_pause::Decision::Block=>continue,
+                 death_pause::Decision::Pass=>{},
++            }
++            match health_warning.event(&event){
++                health_warning::Decision::Dismiss=>{dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;continue;},
++                health_warning::Decision::Block=>continue,
++                health_warning::Decision::Pass=>{},
+             }
+             // A held X is one press, not preview confirmation or cancellation.
+             if matches!(event, Event::KeyDown { keycode: Some(Keycode::X), repeat: true, .. }) { continue; }
+@@ -2457,7 +2466,8 @@
+             if screen!=Screen::Game||shutter.closed(now,reduced){history=None;cosmetic_dirty=true;}
+             else if shutter.animating(now,reduced){cosmetic_dirty=true;}
+         }
+-        if screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead") {
++        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
++        if screen==Screen::Game&&(health_warning.active()||run.as_ref().is_some_and(|r|r.run.status=="dead")) {
+             travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;keyboard_aim=false;
+             inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;
+         }
+@@ -2485,7 +2495,8 @@
+                 dirty = true;
+             }
+         }
+-        if screen == Screen::Game && resting.as_ref().is_some_and(|rest| now >= rest.next) {
++        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
++        if screen == Screen::Game && !health_warning.active() && resting.as_ref().is_some_and(|rest| now >= rest.next) {
+             if let Some(r) = run.as_mut() {
+                 let before = resting.take().unwrap();
+                 if r.run.status == "playing" && r.run.offers.is_empty() {
+@@ -2516,6 +2527,8 @@
+             }
+         }
+ 
++        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
++        if health_warning.active(){travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;keyboard_aim=false;inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;}
+         let action_reduced=reduced || settings.store.action_animation_mode!=appearance_store::ActionAnimationMode::Normal;
+         let action_instant=settings.store.action_animation_mode==appearance_store::ActionAnimationMode::Instant;
+         replays.configure_motion(action_reduced,action_instant);
+@@ -2807,6 +2820,7 @@
+                     }
+                 }
+             }
++            if screen==Screen::Game{if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
+             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
+             if let Some(frame)=painter.gpu.as_ref(){
+                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
+@@ -2815,7 +2829,7 @@
+                 }
+                 canvas.present();
+             }else{
+-            let upload=tile_overlay::upload_plan(&painter,!tile_frame||force_texture_upload);
++            let upload=tile_overlay::upload_plan(&painter,!tile_frame||force_texture_upload||health_warning.active());
+             let full_upload=upload.full;
+             let upload_rects=&upload.rectangles;
+             {let _upload_timing=corpse_core::timing::span("desktop.texture.upload");
+@@ -2826,6 +2840,7 @@
+             }
+             if full_upload||!upload_rects.is_empty()||force_present{let _present_timing=corpse_core::timing::span("desktop.texture.present");canvas.clear();canvas.copy(&texture,None,None)?;canvas.present();}
+             }
++            health_warning.presented();
+             death_pause.presented(screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead"));
+             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
+             dirty = false;
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -2002,3 +2002,6 @@
+ 
+ ### Amulet insufficient-energy copy
+ One shared admission-message formatter maps only InsufficientPlayerEnergy to the exact player-visible text "Insufficient Energy". Pack activation blockers and core target admission use it; other diagnostics and all resource mechanics remain unchanged. Core copy and actual Pack blocker regression tests cover the two paths.
++
++### Health threshold acknowledgement
++A constant-size desktop gate tracks resolved HP downward crossings at40% and25%. The lower crossed threshold wins if one action crosses both. It re-arms by observing healing above each threshold, does not warn on initial low-health loads or max-HP-only changes, and gives terminal death precedence. Only a fresh Escape after the warning is presented dismisses it. Automatic travel/rest and targeting are interrupted; simulation/save state is not altered. The warning forces safe overlay uploads and invalidates retained state on entry/exit; native screenshot and input/threshold tests cover the flow.
