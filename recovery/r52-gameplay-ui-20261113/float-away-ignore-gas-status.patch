@@ -1,0 +1,70 @@
+--- a/crates/corpse-core/src/engine.rs
++++ b/crates/corpse-core/src/engine.rs
+@@ -3623,7 +3623,7 @@
+         }
+     }
+     crate::half_here::sync(r);
+-    after_damage_with_source(r, victim, source, source_snapshot.as_ref());
++    after_damage_with_source(r, victim, source, source_snapshot.as_ref(), direct || !matches!(kind, "caustic" | "breatherGas" | "fire" | "poison" | "venom" | "bleeding" | "killspawnBleed" | "hemophilia" | "roots"));
+     Ok(())
+ }
+ 
+@@ -4416,13 +4416,14 @@
+     Ok(())
+ }
+ fn after_damage(r: &mut Run, victim: f64, source: Option<f64>) {
+-    after_damage_with_source(r, victim, source, None);
++    after_damage_with_source(r, victim, source, None, true);
+ }
+ fn after_damage_with_source(
+     r: &mut Run,
+     victim: f64,
+     source: Option<f64>,
+     source_snapshot: Option<&Actor>,
++    float_away_eligible: bool,
+ ) {
+     let Some(id) = source else { return };
+     let Some(a) = actor_any(r, victim).cloned() else {
+@@ -4450,6 +4451,7 @@
+         crate::animation_player::local(r,&s,"P52","speed",crate::events::Stage::Death);
+     }
+     if a.hp > 0.0
++        && (float_away_eligible || r.simulation_revision.value_or(29.) < 52.)
+         && !s.dead.value_or(false)
+         && in_bounds(r, s.x, s.y)
+         && a.active.iter().any(|id| id == "etill-float-away")
+@@ -4973,3 +4975,25 @@
+         assert_eq!(actor(&r,800.).unwrap().x,10.);assert_eq!(r.player.x,11.);
+     }
+ }
++
++#[cfg(test)] mod float_away_direct_only_tests {
++ use super::*;
++ fn room()->Run {
++  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++  r.simulation_revision=52.0.into();r.player.x=4.;r.player.y=4.;r.player.hp=100.;r.player.max_hp=100.;r.player.conditions.clear();r.player.abilities=vec!["etill-float-away".into()];r.player.active=r.player.abilities.clone();
++  r.actors_at_mut(r.depth).clear();let mut a=r.player.clone();a.id=9999.;a.x=3.;a.state="hunting".into();a.abilities.clear();a.active.clear();r.actors_at_mut(r.depth).push(a);
++  let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.portals=Field::Missing;f.non_euclidean=Field::Missing;r
++ }
++ #[test] fn gas_and_status_damage_do_not_fly_or_move_but_direct_spells_still_do(){
++  for kind in ["caustic","breatherGas","fire","poison","venom","bleeding","killspawnBleed","hemophilia","roots"] {
++   let mut r=room();let id=r.player.id;damage_environment(&mut r,id,5.,Some(9999.),kind,true).unwrap();
++   assert!(r.player.hp<100.,"{kind} still damages");assert_eq!((r.player.x,r.player.y),(4.,4.),"{kind}");assert_eq!(condition(&r.player,"flying"),0.,"{kind}");
++  }
++  for kind in ["attack","fire","lightning","cold","acid"] {
++   let mut r=room();let id=r.player.id;damage_direct(&mut r,id,5.,9999.,kind,true).unwrap();
++   assert_eq!((r.player.x,r.player.y),(5.,4.),"{kind}");assert_eq!(condition(&r.player,"flying"),2.,"{kind}");
++  }
++ }
++ #[test] fn immediate_banshee_shriek_keeps_proc(){let mut r=room();let id=r.player.id;damage_environment(&mut r,id,5.,Some(9999.),"banshee",true).unwrap();assert_eq!(r.player.x,5.);}
++ #[test] fn legacy_environment_proc_is_preserved(){let mut r=room();r.simulation_revision=51.0.into();let id=r.player.id;damage_environment(&mut r,id,5.,Some(9999.),"poison",true).unwrap();assert_eq!(r.player.x,5.);}
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1961,3 +1961,6 @@
+ Amulet reserve bars read existing physical item energy/capacity during inventory/visible-ground observation. O(1) additional projection and fixed rectangle paint per amulet; sidebar names wrap in remaining width, pack names use existing measured fit. No extra hidden-item reads or simulation mutation.
+ 
+ Execute revision52 per-proc debit is10 via the existing atomic reserve-first planner; revision51 and earlier retain20. O(1) cost selection, existing payment complexity unchanged. UI reads that same cost function and uses the exact authored description. Ragelight copy change is presentation-only.
++
++### Float Away direct-damage boundary
++R52 Float Away now uses the existing direct-packet flag: gas, lingering fire and periodic status damage cannot grant its flight or displacement. Melee, immediate ranged spells and other existing damage kinds retain the proc; other after-damage effects and pre-R52 replay behavior are unchanged. Regression tests cover nine indirect kinds and five direct kinds.
