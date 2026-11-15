@@ -1,0 +1,317 @@
+--- a/docs/current-design-amendments.md
++++ b/docs/current-design-amendments.md
+@@ -753,3 +753,15 @@
+ Fast begins on floor 1 and visits 1, 3, …, 39, with a final one-step descent to
+ the existing floor 40 finale. DEBUG accepts the same reachable depths. See
+ [Fast mode](revision52-fast-mode.md) for implementation and verification status.
++
++## 2026-11-15 — Composite bow uses normal accuracy (R52)
++
++Composite bow shots use the ordinary effective Accuracy / (2 × max(Dodge, 1))
++calculation, capped at 100%, with no distance penalty and no bow miss-halving
++bonus. Regular Bow accuracy is unchanged. Shared effective-stat modifiers and
++lucky/unlucky/distracted/paralyzed overrides still apply. This changes accuracy
++only: Composite shots remain ranged for surprise admission, collision, effects,
++ammunition and damage. Existing R52 saves receive this rule; pre-R52 runs retain
++the old bow accuracy. Older R52 replays may therefore produce different outcomes.
++Inventory text and target forecasts use this policy. Regression coverage is in
++revision52_composite_accuracy and the desktop tests of the same name.
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1970,3 +1970,11 @@
+ 
+ ### Target-selection ability orb
+ The existing pending ability is projected to a detached selected-ability ID at the pointer synchronization boundary. Its orb is orange while selecting, with orange taking precedence over enabled green; non-targeted passives remain undecorated. Both retained HUD keys include this ID so cancellation restores normal ink without rebuilding world observation. Regression covers targeting entry/cancel and both retained painters at three window sizes.
++
++### R52 Composite bow accuracy
++
++Each shot/forecast checks the revision and bow kind once, O(1) time and memory.
++The resolver passes an explicit accuracy-only flag through deflection recursion;
++it adds no scans, RNG or persistent state. Effective-stat, collision/trajectory,
++rendering and existing recursive combat costs remain unchanged. Only hit-chance
++range becomes zero; physical range and ranged admission stay intact.
+--- a/crates/corpse-desktop/src/inspection_ui.rs
++++ b/crates/corpse-desktop/src/inspection_ui.rs
+@@ -1322,7 +1322,9 @@
+     let extra = if corpse_core::revision50::enabled(&view) { 0. }
+         else { corpse_core::crafting::preview_fury_bonus(&view, view.player.energy).0 };
+     let range = (view.player.x - actor.x).hypot(view.player.y - actor.y);
+-    let mut shot = strike_preview_ranged(&view, &view.player, &actor, base, 1., extra, range, 0.5);
++    let normal = corpse_core::projectiles::normal_bow_accuracy(&view, bow);
++    let mut shot = strike_preview_accuracy(&view, &view.player, &actor, base, 1., extra,
++        range, if normal {1.} else {0.5}, normal);
+     if corpse_core::divine_reactions::nightmare_absorbs(&view, &actor, Some(&view.player)) {
+         shot.minimum = 0.;
+         shot.maximum = 0.;
+@@ -2324,13 +2326,26 @@
+     range: f64,
+     miss_multiplier: f64,
+ ) -> Strike {
++    strike_preview_accuracy(r, a, b, base, multiplier, extra, range, miss_multiplier, false)
++}
++fn strike_preview_accuracy(
++    r: &Run,
++    a: &Actor,
++    b: &Actor,
++    base: f64,
++    multiplier: f64,
++    extra: f64,
++    range: f64,
++    miss_multiplier: f64,
++    normal_accuracy: bool,
++) -> Strike {
+     let stats = combat::effective_stats(r, a);
+     let mut accuracy = stats.accuracy;
+     if ability(a, "Shine") {
+         accuracy += combat::integer_stat(vision::light(r, b));
+     }
+     let mut chance =
+-        combat::hit_chance_for_run(r, accuracy, combat::effective_stats(r, b).dodge, range) * multiplier;
++        combat::hit_chance_for_run(r, accuracy, combat::effective_stats(r, b).dodge, if normal_accuracy {0.} else {range}) * multiplier;
+     let guaranteed = (surprise(r, a, b) && !(a.id == r.player.id && range > 0.))
+         || angel_ready(r, a)
+         || corpse_core::divine_combat::blood_weapon_ready(r, a);
+@@ -3620,3 +3635,26 @@
+         assert!(format_attack(&forecast, false).contains("8–8 main energy"));
+     }
+ }
++
++#[cfg(test)]
++mod revision52_composite_accuracy_tests {
++    use super::*;
++    #[test]
++    fn composite_forecast_uses_normal_accuracy_but_stays_ranged() {
++        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++        r.simulation_revision=52.0.into();r.player.x=10.;r.player.y=10.;
++        r.player.stats.accuracy=15.;r.player.abilities.clear();r.player.active.clear();
++        r.player.conditions.clear();r.inventory.clear();
++        let mut target=Actor{id:901.,x:11.,y:10.,hp:1000.,max_hp:1000.,state:"hunting".into(),
++            stats:corpse_core::Stats{dodge:15.,..Default::default()},..Default::default()};
++        for range in [1.,4.,10.] {
++            target.x=10.+range;*r.actors_at_mut(r.depth)=vec![target.clone()];
++            let shot=strike_preview_accuracy(&r,&r.player,&target,30.,1.,0.,range,1.,true);
++            assert_eq!(shot.chance,0.5);
++            let regular=strike_preview_ranged(&r,&r.player,&target,30.,1.,0.,range,0.5);
++            assert!((regular.chance-(0.5+0.25*0.9f64.powf(range))).abs()<1e-12);
++        }
++        r.player.stats.accuracy=0.;target.state="wandering".into();
++        assert_eq!(strike_preview_accuracy(&r,&r.player,&target,30.,1.,0.,10.,1.,true).chance,0.);
++    }
++}
+--- a/crates/corpse-desktop/src/pack.rs
++++ b/crates/corpse-desktop/src/pack.rs
+@@ -1794,7 +1794,7 @@
+         lines.push(thrown);
+     }
+     if projectiles::is_bow(i) {
+-        lines.extend([format!("{} Apply to fire at a visible target. Uses one arrow; {} available.", if run.simulation_revision.value_or(29.) >= 50. { "No equipping required." } else { "2-handed · Equip in both hands;" }, arrow_count(run)), "Uses your existing unarmed attack in melee.".into(), weapon_damage_preview(run, i, true, offense), "Half the miss chance of a thrown weapon; guaranteed hits and misses still apply. Walls, trees, closed doors, and the first creature stop arrows; grates let them pass.".into(), "Arrows vanish on a hit. Misses leave recoverable arrows, which may scatter or fall.".into()]);
++        lines.extend([format!("{} Apply to fire at a visible target. Uses one arrow; {} available.", if run.simulation_revision.value_or(29.) >= 50. { "No equipping required." } else { "2-handed · Equip in both hands;" }, arrow_count(run)), "Uses your existing unarmed attack in melee.".into(), weapon_damage_preview(run, i, true, offense), if projectiles::normal_bow_accuracy(run, i) { "Normal Accuracy versus Dodge; no distance penalty or bow miss-chance bonus. Guaranteed hits and misses still apply. Walls, trees, closed doors, and the first creature stop arrows; grates let them pass.".into() } else { "Half the miss chance of a thrown weapon; guaranteed hits and misses still apply. Walls, trees, closed doors, and the first creature stop arrows; grates let them pass.".into() }, "Arrows vanish on a hit. Misses leave recoverable arrows, which may scatter or fall.".into()]);
+     }
+     if !stats.is_empty() {
+         lines.push(format!(
+@@ -3257,3 +3257,21 @@
+         }
+     }
+ }
++
++#[cfg(test)]
++mod revision52_composite_accuracy_tests {
++    use super::*;
++    #[test]
++    fn only_current_composite_description_uses_normal_accuracy() {
++        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++        for revision in [51.,52.] {r.simulation_revision=revision.into();
++            for name in ["Bow","Composite bow"] {
++                let item=corpse_core::equipment::make_equipment(name,950.).unwrap();
++                let text=describe_item(&r,&item);
++                let normal=revision>=52. && name=="Composite bow";
++                assert_eq!(text.contains("no distance penalty or bow miss-chance bonus"),normal);
++                assert_eq!(text.contains("Half the miss chance of a thrown weapon"),!normal);
++            }
++        }
++    }
++}
+--- a/crates/corpse-core/src/projectiles.rs
++++ b/crates/corpse-core/src/projectiles.rs
+@@ -158,6 +158,11 @@
+         && i.ranged_weapon
+             .as_ref()
+             .is_some_and(|s| matches!(s.as_str(), "bow" | "composite-bow"))
++}
++/// Live R52 Composite accuracy policy; regular bows and older saves stay unchanged.
++pub fn normal_bow_accuracy(r: &Run, item: &Item) -> bool {
++    r.simulation_revision.value_or(29.) >= 52. && is_bow(item)
++        && item.ranged_weapon.as_ref().is_some_and(|kind| kind == "composite-bow")
+ }
+ /// Pure shared throw preview/commit calculation. One effective-stat query and
+ /// constant arithmetic; R51 reduces the fixed component, not bonuses or throw scaling.
+@@ -317,7 +322,11 @@
+             .map(|a| a.id);
+         let hit = if let Some(victim) = target {
+             let base = crate::engine::player_weapon_strike_base(r, &item);
+-            crate::engine::attack_ranged_resolved(r, player, victim, base, range, 0.5, true)?
++            if normal_bow_accuracy(r, &item) {
++                crate::engine::attack_composite_resolved(r, victim, base, range)?
++            } else {
++                crate::engine::attack_ranged_resolved(r, player, victim, base, range, 0.5, true)?
++            }
+         } else {
+             false
+         };
+--- a/crates/corpse-core/src/engine.rs
++++ b/crates/corpse-core/src/engine.rs
+@@ -2536,6 +2536,26 @@
+     shard: bool,
+     wording: Option<crate::attack_text::Verb>,
+ ) -> Result<bool, EngineError> {
++    attack_base_with_accuracy(r, aid, bid, multiplier, explicit_base, secondary, range, miss_chance_multiplier, arrow, fury, landed, melee, projectile_resolved, shard, wording, false)
++}
++fn attack_base_with_accuracy(
++    r: &mut Run,
++    aid: f64,
++    bid: f64,
++    multiplier: f64,
++    explicit_base: Option<f64>,
++    secondary: bool,
++    range: f64,
++    miss_chance_multiplier: f64,
++    arrow: bool,
++    fury: Option<f64>,
++    landed: &std::cell::Cell<bool>,
++    melee: bool,
++    projectile_resolved: bool,
++    shard: bool,
++    wording: Option<crate::attack_text::Verb>,
++    normal_accuracy: bool,
++) -> Result<bool, EngineError> {
+     if r.simulation_revision.value_or(29.)>=52. {crate::revision52_speed::record_attack(aid);}
+ 
+     let _timing_function = crate::timing::span("combat.attack");
+@@ -2578,7 +2598,7 @@
+                     0.0
+                 },
+             bs.dodge,
+-            range,
++            if normal_accuracy { 0.0 } else { range },
+         ) * multiplier
+     };
+     let owner_b = crate::half_here::owner_id(r, &b);
+@@ -2684,7 +2704,7 @@
+             );
+         }
+         if let Some(target) = crate::divine_reactions::select_deflection_target(r, &b, secondary) {
+-            attack_base_with_fury(
++            attack_base_with_accuracy(
+                 r,
+                 aid,
+                 target,
+@@ -2700,6 +2720,7 @@
+                 false,
+                 shard,
+                 action,
++                normal_accuracy,
+             )?;
+         }
+         nova_after_attack(r, &a, &b)?;
+@@ -4334,6 +4355,15 @@
+     )?;
+     Ok(landed.get())
+ }
++/// Composite accuracy is distance-independent without changing projectile semantics.
++/// Collision is already resolved; retain the existing legacy retrace on plain floors.
++pub fn attack_composite_resolved(r: &mut Run, victim: f64, base: f64, range: f64) -> Result<bool, EngineError> {
++    let landed = std::cell::Cell::new(false);
++    let resolved = r.floor().is_some_and(crate::non_euclidean_generation::has_links);
++    attack_base_with_accuracy(r, r.player.id, victim, 1.0, Some(base), false,
++        range, 1.0, true, None, &landed, false, resolved, false, None, true)?;
++    Ok(landed.get())
++}
+ pub fn player_weapon_strike_base(r: &Run, item: &Item) -> f64 {
+     player_weapon_strike_base_for_revision(item, combat::effective_stats(r, &r.player).offense,
+         r.simulation_revision.value_or(29.0))
+--- /dev/null
++++ b/crates/corpse-core/tests/revision52_composite_accuracy.rs
+@@ -0,0 +1,83 @@
++//! Composite accuracy uses normal stats without changing projectile mechanics.
++use corpse_core::{Actor, Command, Field, Item, Run, Stats, combat, engine, projectiles, rng};
++fn room() -> Run {
++    let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++    r.simulation_revision=52.0.into();r.player.x=10.;r.player.y=10.;
++    r.player.hp=1000.;r.player.max_hp=1000.;r.player.base_max_hp=1000.0.into();
++    r.player.stats=Stats{offense:20.,accuracy:15.,..Default::default()};
++    r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
++    r.inventory.clear();r.actors_at_mut(r.depth).clear();r.history.clear();
++    r.future=None;r.haste_snapshot=Field::Missing;
++    let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);
++    f.environment=Field::Missing;f.doors=Field::Missing;f.portals=Field::Missing;
++    f.non_euclidean=Field::Missing;f.currents=Field::Missing;
++    r.actors_at_mut(r.depth).push(Actor{id:901.,x:11.,y:10.,hp:1000.,max_hp:1000.,
++        base_max_hp:1000.0.into(),name:"Target".into(),state:"hunting".into(),
++        heartless:true.into(),stats:Stats{dodge:15.,..Default::default()},..Default::default()});r
++}
++fn add_bow(r:&mut Run,name:&str) {
++    let mut bow=corpse_core::equipment::make_equipment(name,950.).unwrap();
++    bow.equipped="hand1".to_string().into();r.inventory.push(bow);
++    r.inventory.push(Item{id:951.,kind:"ammo".into(),effect:"arrows".to_string().into(),
++        quantity:3.0.into(),..Default::default()});
++}
++fn shoot(r:&mut Run,range:f64)->bool {
++    engine::actor_mut(r,901.).unwrap().x=10.+range;
++    projectiles::command(r,&Command::Shoot{id:950.,x:10.+range,y:10.}).unwrap();
++    engine::actor(r,901.).unwrap().hp<1000.
++}
++#[test]
++fn composite_uses_normal_ratio_at_every_distance_and_clamp() {
++    for phase in ["normal","haste"] { for range in [1.,4.,10.] {
++        for (accuracy,dodge,chance) in [(15.,15.,0.5),(30.,15.,1.),(100.,15.,1.),
++            (0.,15.,0.),(-5.,15.,0.),(1.,0.,0.5),(2.,-5.,1.)] {
++            for seed in [1.,1973.,8192.,12345.,50000.,100000.,123456789.] {
++                let mut r=room();r.rng=seed;r.phase=phase.to_string().into();
++                r.player.stats.accuracy=accuracy;engine::actor_mut(&mut r,901.).unwrap().stats.dodge=dodge;
++                add_bow(&mut r,"Composite bow");let mut oracle=r.clone();
++                let expected=rng::random(&mut oracle)<chance;
++                assert_eq!(shoot(&mut r,range),expected,"{phase}, range{range}, A{accuracy}, D{dodge}, seed{seed}");
++            }
++        }
++    }}
++}
++#[test]
++fn regular_bow_and_pre52_composite_keep_old_accuracy() {
++    for revision in [51.,52.] { for name in ["Bow","Composite bow"] {
++        for range in [1.,4.,10.] { for seed in [1.,1973.,8192.,12345.,50000.,100000.] {
++            let mut r=room();r.simulation_revision=revision.into();r.rng=seed;add_bow(&mut r,name);
++            let normal=revision>=52. && name=="Composite bow";
++            let base=combat::hit_chance_for_run(&r,15.,15.,if normal{0.}else{range});
++            let chance=if normal{base}else{1.-(1.-base)*0.5};
++            let mut oracle=r.clone();let expected=rng::random(&mut oracle)<chance;
++            assert_eq!(shoot(&mut r,range),expected,"rev{revision} {name} range{range}");
++        }}
++    }}
++}
++#[test]
++fn effective_stats_and_override_priority_match_shared_combat() {
++    for case in ["buff","unlucky","lucky","distracted","paralyzed","surprise"] {
++        let mut r=room();r.rng=12345.;add_bow(&mut r,"Composite bow");
++        r.player.stats.accuracy=0.;
++        match case {
++            "buff"=>{r.player.conditions.insert("buff:accuracy".into(),30.);},
++            "unlucky"=>{r.player.stats.accuracy=100.;r.player.conditions.insert("unlucky".into(),1.);},
++            "lucky"=>{r.player.conditions.insert("lucky".into(),1.);},
++            "distracted"|"paralyzed"=>{r.player.conditions.insert("lucky".into(),1.);r.player.conditions.insert("distracted".into(),1.);},
++            "surprise"=>engine::actor_mut(&mut r,901.).unwrap().state="wandering".into(),_=>{}
++        }
++        if case=="paralyzed"{engine::actor_mut(&mut r,901.).unwrap().conditions.insert("paralyzed".into(),1.);}
++        assert_eq!(shoot(&mut r,10.),matches!(case,"buff"|"lucky"|"paralyzed"),"{case}");
++    }
++}
++#[test]
++fn guaranteed_shot_damage_and_rng_are_unchanged() {
++    let mut r=room();r.rng=12345.;add_bow(&mut r,"Composite bow");
++    r.player.conditions.insert("lucky".into(),1.);engine::actor_mut(&mut r,901.).unwrap().x=14.;
++    let mut legacy_route=r.clone();
++    let base=engine::player_weapon_strike_base(&r,&r.inventory[0]);let player=r.player.id;
++    engine::attack_ranged_resolved(&mut legacy_route,player,901.,base,4.,0.5,true).unwrap();
++    assert!(shoot(&mut r,4.));
++    assert_eq!(engine::actor(&r,901.).unwrap().hp,engine::actor(&legacy_route,901.).unwrap().hp);
++    assert_eq!(r.rng,legacy_route.rng);
++}
