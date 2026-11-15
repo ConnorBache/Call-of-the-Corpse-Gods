@@ -1,0 +1,100 @@
+--- a/crates/corpse-core/src/engine.rs
++++ b/crates/corpse-core/src/engine.rs
+@@ -342,6 +342,7 @@
+                     "creatureFeedingY",
+                     "creatureFeedingInterruptedAt",
+                     "monsterUnseenTurns",
++                    "monsterSurprisedThrough",
+                     "monsterRecoverySleep",
+                     "monsterAllyRest",
+                     "bestiaryTraitsInitialized",
+@@ -1643,7 +1644,17 @@
+ 
+ /// One complete NPC action. Normal-only upkeep/rest stays outside bonus actions;
+ /// Fast adds at most one move-or-melee follow-up, never another full turn.
++fn surprise_response_blocked(r:&Run,a:&Actor)->bool {
++    r.simulation_revision.value_or(29.)>=52. && !a.dead.value_or(false) && a.hp>0. && a.conditions.get("monsterSurprisedThrough").is_some_and(|until|*until>=r.tick)
++}
++fn mark_player_surprise(r:&mut Run,source:Option<&Actor>,before:&Actor){
++    if r.simulation_revision.value_or(29.)<52. || before.id==r.player.id || !matches!(before.state.as_str(),"sleeping"|"wandering")
++        || !source.is_some_and(|a|crate::half_here::owner_id(r,a)==r.player.id){return;}
++    let through=r.tick+if r.resolving_tick.value_or(false){0.}else{1.};
++    if let Some(a)=actor_mut_trusted(r,before.id){a.conditions.insert("monsterSurprisedThrough".into(),through);}
++}
+ fn complete_actor_action(r: &mut Run, id: f64, bonus: bool, paralyzed: &[f64], cache: &mut PathCache) -> Result<(), EngineError> {
++    if actor(r,id).is_some_and(|a|surprise_response_blocked(r,a)){return Ok(());}
+     let before = actor(r, id).cloned();
+     let (result,receipt)=crate::revision52_speed::measure(id,bonus,||actor_action_inner(r,id,bonus,paralyzed,cache));
+     result?;
+@@ -2563,6 +2574,7 @@
+     let (Some(a), Some(b)) = (actor(r, aid).cloned(), actor(r, bid).cloned()) else {
+         return Ok(false);
+     };
++    if surprise_response_blocked(r,&a) && crate::half_here::owner_id(r,&b)==r.player.id {return Ok(false);}
+     if attack_blocker_impl(r, &a, &b, range, secondary, projectile_resolved).is_some() {
+         return Ok(false);
+     }
+@@ -2731,6 +2743,7 @@
+         return Ok(false);
+     }
+     landed.set(true);
++    mark_player_surprise(r,Some(&a),&b);
+     if crate::revision50_nightmares::strike(r,bid) {
+         crate::events::strike_ranged(r,&a,&b,true,0.,range);
+         log(r,"The waking nightmare dissolves.","player");return Ok(true);
+@@ -3457,6 +3470,7 @@
+     secondary: bool,
+     direct: bool,
+ ) -> Result<(), EngineError> {
++    if (direct || kind=="banshee") && victim==r.player.id && source.and_then(|id|actor_any(r,id)).or(retained_source).is_some_and(|a|surprise_response_blocked(r,a)){return Ok(());}
+     let _timing_function = crate::timing::span("combat.damage_packet");
+     let a = actor(r, victim)
+         .ok_or_else(|| EngineError("damage victim missing".into()))?
+@@ -3604,6 +3618,7 @@
+     let source_display = (r.simulation_revision.value_or(29.) >= 33.
+         && pool_id == r.player.id && n >= actor(r, pool_id).unwrap().hp)
+         .then(|| source_snapshot.as_ref().map(|a| crate::actor_presentation::source_name(r, a).to_string())).flatten();
++    if direct {mark_player_surprise(r,source_snapshot.as_ref(),&a);}
+     let actual_hp_damage = apply_hp_loss(r, victim, n, !matches!(kind, "blood-weapon" | "blood-letting"));
+     if direct {
+         if let Some(attacker) = source_snapshot.as_ref() {
+@@ -5028,3 +5043,30 @@
+  #[test] fn immediate_banshee_shriek_keeps_proc(){let mut r=room();let id=r.player.id;damage_environment(&mut r,id,5.,Some(9999.),"banshee",true).unwrap();assert_eq!(r.player.x,5.);}
+  #[test] fn legacy_environment_proc_is_preserved(){let mut r=room();r.simulation_revision=51.0.into();let id=r.player.id;damage_environment(&mut r,id,5.,Some(9999.),"poison",true).unwrap();assert_eq!(r.player.x,5.);}
+ }
++
++#[cfg(test)] mod surprise_response_tests {
++ use super::*;
++ fn room(state:&str)->Run{
++  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.x=4.;r.player.y=4.;r.player.hp=1000.;r.player.max_hp=1000.;r.player.conditions.clear();r.player.abilities.clear();r.player.active.clear();r.player.stats.accuracy=10000.;
++  let mut b=r.player.clone();b.id=991.;b.x=5.;b.state=state.into();b.hp=10000.;b.max_hp=10000.;b.stats.accuracy=10000.;b.conditions.insert("hasted".into(),3.);r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(b);let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);r
++ }
++ #[test]fn successful_hit_delays_only_surprised_target_normal_and_bonus_actions(){
++  for state in ["sleeping","wandering"] {
++   let mut r=room(state);let player=r.player.id;assert!(attack_base(&mut r,player,991.,1.,Some(1.),false,0.,1.,false).unwrap());
++   assert!(surprise_response_blocked(&r,actor(&r,991.).unwrap()));let hp=r.player.hp;r.tick=1.;
++   let mut cache=PathCache::new();complete_actor_action(&mut r,991.,false,&[],&mut cache).unwrap();complete_actor_action(&mut r,991.,true,&[],&mut cache).unwrap();assert_eq!(r.player.hp,hp);
++   assert!(!attack_base(&mut r,991.,player,1.,Some(5.),false,0.,1.,false).unwrap());
++   damage_direct(&mut r,player,5.,991.,"lightning",true).unwrap();assert_eq!(r.player.hp,hp);
++   r.tick=2.;assert!(attack_base(&mut r,991.,player,1.,Some(5.),false,0.,1.,false).unwrap());assert!(r.player.hp<hp);
++  }
++ }
++ #[test]fn direct_spell_marks_but_status_and_aware_hits_do_not(){
++  for (state,direct,expected) in [("sleeping",true,true),("wandering",true,true),("hunting",true,false),("sleeping",false,false)] {
++   let mut r=room(state);let player=r.player.id;if direct{damage_direct(&mut r,991.,1.,player,"lightning",true).unwrap();}else{damage_environment(&mut r,991.,1.,Some(player),"poison",true).unwrap();}assert_eq!(surprise_response_blocked(&r,actor(&r,991.).unwrap()),expected);
++  }
++ }
++ #[test]fn ranged_miss_does_not_mark_and_legacy_stays_unchanged(){
++  let mut r=room("wandering");r.player.conditions.insert("unlucky".into(),1.);let player=r.player.id;assert!(!attack_base(&mut r,player,991.,1.,Some(1.),false,4.,1.,true).unwrap());assert!(!surprise_response_blocked(&r,actor(&r,991.).unwrap()));
++  let mut r=room("sleeping");r.simulation_revision=51.0.into();let player=r.player.id;attack_base(&mut r,player,991.,1.,Some(1.),false,0.,1.,false).unwrap();assert!(!actor(&r,991.).unwrap().conditions.contains_key("monsterSurprisedThrough"));
++ }
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1984,3 +1984,6 @@
+ 
+ ### Death acknowledgement gate
+ A constant-size desktop input gate blocks gameplay interaction until a dead-run frame has been presented and a fresh Space press arrives. Held or queued Space cannot skip the death view. Terminal auto-travel/rest/targeting are cleared, and dispatch refuses commands on dead runs without mutating save/replay input. Window/quit events remain live; archival and autosave paths are unchanged. Tests cover input gating, release/repress, new-run reset and terminal run immutability.
++
++### Surprise response timing
++R52 successful player hits on sleeping/wandering targets record an internal global-tick boundary before waking them. Their normal/bonus response and immediate counter-attack are blocked through that attack's AI phase, then normal behavior resumes. Direct spell damage uses the same pre-hit snapshot; misses and periodic status damage do not mark a target. Other creatures and historical revisions are unaffected. Dead actors are excluded so corpse lifecycle stays unchanged.
