@@ -142,7 +142,7 @@
 +  assert!(describe_item(&r,&item).contains(&expected));
 +  let mut view=PackView::observe(&r);view.configure(&p,p.frame().map.tuple());hover_first(&mut view);assert!(view.tooltip().unwrap().contains(&expected));
 +  assert!(r==before);
-+  r.ground.insert(r.depth.to_string(),vec![corpse_core::GroundItem{x:r.player.x,y:r.player.y,item:item.clone(),..Default::default()}]);
++  r.ground.insert(r.depth.to_string(),vec![corpse_core::GroundItem{x:r.player.x,y:r.player.y,item:item.clone(),..Default::default()}].into());
 +  let report=crate::inspection_ui::observe_tile(&r,r.player.x as usize,r.player.y as usize);
 +  assert!(serde_json::to_string(&report).unwrap().contains(&expected),"ground tier {tier}");
 + }
