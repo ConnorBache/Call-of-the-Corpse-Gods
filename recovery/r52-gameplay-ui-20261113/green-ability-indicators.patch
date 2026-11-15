@@ -1,0 +1,65 @@
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -2623,7 +2623,7 @@
+             }
+             let passive=a.mode.eq_ignore_ascii_case("passive");
+             let reserve=if passive {None}else{a.reserve};
+-            let name_x=left+18;
++            let name_x=left+18+if passive{0}else{18};
+             let bar_width=rail_width/3;
+             let bar_x=left+12+rail_width-bar_width;
+             let name_width=if reserve.is_some(){bar_x-name_x-8}else{rail_width-12-if !passive{18}else{0}};
+@@ -2631,14 +2631,14 @@
+             self.clip=Some((left+12,y,rail_width,crate::ability_ui::row(&self.profile)));
+             for(line,name)in names.iter().enumerate(){
+                 self.text(name,name_x,y+3+line as i32*15,13,a.color);
+-                if a.active&&reserve.is_some(){self.rect(name_x,y+17+line as i32*15,resource_ui::text_width(self,name,13).min(name_width),1,a.color);}
+             }
+             if let Some((current,maximum))=reserve {
+                 let value=format!("{current:.0}/{maximum:.0} NRG");
+                 resource_ui::paint_bar_pending(self,"",&value,bar_x,y,bar_width,19,
+                     game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),11,a.pending_reserve_loss/maximum.max(1.));
+-            } else if !passive {
+-                let cx=left+rail_width-2;let cy=y+11;
++            }
++            if !passive {
++                let cx=left+23;let cy=y+11;
+                 for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(a.active||d>=15){self.rect(cx+dx,cy+dy,1,1,if a.active{[100,255,114]}else{[110,110,125]});}}}
+             }
+             self.clip=None;
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -213,3 +213,24 @@
+         assert_eq!(value,"10/10 NRG");assert!(value_x+text_width(&p,&value,size)<=x+width-6);
+     }
+ }
++
++#[test]
++fn ability_enable_circle_for_reserve_and_no_reserve_but_not_passive(){
++    let r=room();
++    for(w,h)in[(1280,800),(1920,1080),(960,1200)]{
++        let mut p=Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
++        let mut v=crate::observe::observe_with_profile(&r,&p.profile);v.abilities.truncate(1);
++        for reserve in [None,Some((10.,10.))] {
++            for passive in [false,true] {
++                v.abilities[0].mode=if passive{"passive"}else{"toggle"}.into();v.abilities[0].reserve=reserve;
++                v.abilities[0].active=false;p.game_at(&v,"",false,0.);let off=p.pixels.clone();
++                v.abilities[0].active=true;p.game_at(&v,"",false,0.);
++                if passive {assert_eq!(off,p.pixels,"passive must have no enabled decoration");}
++                else {
++                    assert_ne!(off,p.pixels,"both reserve kinds need on/off indication");
++                    assert!(p.pixels.chunks_exact(4).any(|c|c[..3]==[100,255,114]));
++                }
++            }
++        }
++    }
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1946,3 +1946,6 @@
+ - Reserve meters occupy one third of the prior rail width, right-aligned beside the ability name; names wrap in the remaining space and active names remain underlined. Numeric NRG and indigo cost warnings remain inside the blue meter.
+ - Ragelight is a presentation alias, leaving serialized ability IDs and canonical names used by simulation dispatch intact. Detached UI and final text measurement/rendering use the same alias so legacy log text is also shown correctly without changing saves.
+ - O(T) alias lookup uses borrowed text when absent; wrapping/hit geometry retains the existing bounded rows. Four window sizes verify name/count enclosure and exact one-third sizing.
++
++### Ability enable indicators (2026-11-15)
++Each displayed non-passive ability uses a fixed 11×11 circle to show enabled state, including reserve-bearing rows; no underline. Per redraw O(A + G) indicator/text-layout work for A visible rows and G glyphs, with A bounded by viewport capacity, plus existing glyph rasterization costs. Indicator adds O(1) memory per row; no simulation changes.
