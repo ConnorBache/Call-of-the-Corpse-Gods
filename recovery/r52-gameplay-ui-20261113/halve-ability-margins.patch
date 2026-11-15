@@ -1,0 +1,65 @@
+--- a/crates/corpse-desktop/src/ability_ui.rs
++++ b/crates/corpse-desktop/src/ability_ui.rs
+@@ -2,7 +2,7 @@
+ use crate::render::Rgb;
+ use corpse_core::{model::Run, progression};
+ pub const TOP: i32 = 182;
+-pub const ROW: i32 = 50;
++pub const ROW: i32 = 35;
+ pub const CAPACITY: usize = 9;
+ pub fn top(p: &crate::appearance_profile::Profile) -> i32 {
+     p.number("ui.layout.resourceRegionHeight").round() as i32 - 56
+@@ -13,17 +13,13 @@
+     } else {
+         p.number("typography.ability.fontSize")
+     };
+-    p.number("ui.layout.abilityRowHeight").max(50.)
+-        .max(
+-            (action * p.number("typography.ability.lineHeight"))
+-                .max(
+-                    p.number("typography.secondary.fontSize")
+-                        * p.number("typography.secondary.lineHeight"),
+-                )
+-                .ceil()
+-                + 6.,
+-        )
+-        .round() as i32
++    let minimum = (action * p.number("typography.ability.lineHeight"))
++        .max(p.number("typography.secondary.fontSize") * p.number("typography.secondary.lineHeight"))
++        .ceil() + 6.;
++    let previous = p.number("ui.layout.abilityRowHeight").max(50.).max(minimum);
++    // A compact reserve meter is 19 logical pixels; halve only the spare gap.
++    // Keep the typography minimum so larger authored fonts are never crushed.
++    (19. + (previous - 19.) / 2.).max(minimum).round() as i32
+ }
+ pub fn capacity(p: &crate::appearance_profile::Profile) -> usize {
+     ((634 - top(p)).max(0) / row(p).max(1)).max(1) as usize
+@@ -1420,3 +1416,19 @@
+         assert!(matches!(display_text("@"),std::borrow::Cow::Borrowed(_)));
+     }
+ }
++
++#[cfg(test)] mod compact_spacing_tests {
++    use super::*;
++    #[test] fn halve_spare_ability_margin_and_keep_hit_testing_aligned() {
++        let profile=crate::appearance_profile::Profile::defaults();
++        assert_eq!(row(&profile),35);
++        for(w,h)in[(1280,800),(1920,1080),(960,1200)] {
++            let mut p=crate::render::Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
++            let count=capacity(&p.profile);
++            for i in 0..count {
++                let y=top(&p.profile)+i as i32*row(&p.profile);
++                assert_eq!(p.ability_inspect_at(count,p.hud_left()+20,y+10),Some(i));
++            }
++        }
++    }
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1952,3 +1952,6 @@
+ 
+ ### Dedicated inspection strip (2026-11-15)
+ The bottom inspection line owns a font-sized strip between the main panels and toolbar, with shared borders and inner clipping. Height depends only on the fixed typography profile, so hover changes do not reflow the map. O(G log G) worst-case text fitting, O(G) text paint and O(W×H) software strip fill for G text glyphs, W strip width and H bounded line height; constant panel geometry and O(G) temporary fitted string. Both retained and tile damage cover the full strip when notice changes.
++
++### Compact ability margins (2026-11-15)
++Ability row spacing halves the unused gap around a 19px reserve meter (50px to 35px at default typography), preserving the existing minimum for enlarged fonts. O(1) geometry; drawing/input share the same row and capacity functions. At most viewport-height/row visible entries; no new allocations or gameplay change.
