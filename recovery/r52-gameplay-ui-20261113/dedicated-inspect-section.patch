@@ -1,0 +1,135 @@
+--- a/crates/corpse-desktop/src/ability_dialog_tests.rs
++++ b/crates/corpse-desktop/src/ability_dialog_tests.rs
+@@ -102,11 +102,15 @@
+         let(mut p,mut full)=(Painter::new(),Painter::new());
+         for p in [&mut p,&mut full]{p.resize(w,h);p.set_responsive_canvas(true);}
+         let mut plan=crate::render::tile_damage::TilePlanner::default();plan.replace_view(None,&view,&p);
++        let mut retained=crate::render::RetainedGame::default();
++        let mut rp=Painter::new();rp.resize(w,h);rp.set_responsive_canvas(true);
+         let mut empty=None;
+         for text in ["","Inspect: stone floor","Select an enemy.","Inspect: floor with a heart","","Inspect: floor",""] {
+             plan.mark_native_rect(p.footer_damage().unwrap());plan.finish_damage(&mut p);
+             plan.paint_base(&mut p,&view,text,0.);p.tile_clip_enabled=false;
+             full.game_at(&view,text,false,0.);
++            retained.update(&mut rp,&view,text,0.,true,false).unwrap();
++            assert!(rp.pixels==full.pixels,"retained footer {w}x{h} {text}");
+             assert!(p.pixels==full.pixels,"footer updates {w}x{h} {text}");
+             if text.is_empty(){if let Some(base)=&empty{assert_eq!(&p.pixels,base);}else{empty=Some(p.pixels.clone());}}
+             else {assert_ne!(Some(&p.pixels),empty.as_ref());}
+@@ -137,3 +141,22 @@
+     }
+     assert_eq!(run,frozen);
+ }
++
++#[test]
++fn inspection_strip_has_own_bounds_and_text_cannot_touch_border(){
++    let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
++    let view=crate::observe::observe(&run);
++    for(w,h)in[(1280,800),(1920,1080),(960,1200)]{
++        let mut p=Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
++        let top=p.frame().map.1+p.frame().map.3;
++        assert!(p.inspection_notice_y()>top);assert!(p.inspection_notice_y()+15<p.toolbar_y());
++        p.game_at(&view,"",false,0.);let empty=p.pixels.clone();
++        p.game_at(&view,&"Inspect: stone floor, water and a very long creature name. ".repeat(10),false,0.);
++        assert_ne!(empty,p.pixels);
++        for y in [top,p.toolbar_y()-1]{
++            let y=p.native_y(y as f64)as usize;
++            let start=y*p.width as usize*4;let end=start+p.width as usize*4;
++            assert_eq!(&empty[start..end],&p.pixels[start..end],"text must not overwrite border");
++        }
++    }
++}
+--- a/crates/corpse-desktop/src/enemy_list.rs
++++ b/crates/corpse-desktop/src/enemy_list.rs
+@@ -192,7 +192,7 @@
+             assert_eq!(corpse_core::abilities::projected_player_upkeep(&run),20.-reserve);
+         }
+         let mut p=Painter::new();p.resize(1920,1080);p.set_responsive_canvas(true);
+-        let v=crate::observe::observe_with_profile(&run,&p.profile);p.game_at(&v,"",false,0.);
++        let v=crate::observe::observe_with_profile(&run,&p.profile);p.game_at(&v,&std::env::var("INSPECT_SCREENSHOT_TEXT").unwrap_or_default(),false,0.);
+         let file=std::fs::File::create(path).unwrap();let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);
+         encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);
+         encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+--- a/crates/corpse-desktop/src/modal_ui.rs
++++ b/crates/corpse-desktop/src/modal_ui.rs
+@@ -30,7 +30,7 @@
+         let sidebar = crate::render::hud_left(p)+width-crate::render::WIDTH as i32;
+         let command = changed_number(p, "ui.layout.buttonHeight", 42.).round() as i32 + 4;
+         let top = chronicle + 11;
+-        let bottom = height - command - 32;
++        let bottom = crate::render::toolbar_y(p)+height-HEIGHT as i32-inspection_strip_height(p);
+         Self {
+             map: Rect(
+                 0,
+@@ -43,6 +43,11 @@
+             command,
+         }
+     }
++}
++/// One text line with vertical padding, independent of its contents (no map reflow on hover).
++pub fn inspection_strip_height(p:&Profile)->i32 {
++    let style=typography_ui::resolve(p,Role::Primary,RoleStyle::baseline(15.));
++    (style.font_size*style.line_height).ceil().max(style.font_size).max(18.) as i32+10
+ }
+ /// Source styles emit authored values only when different from schema defaults.
+ pub fn changed_number(p: &Profile, path: &str, baseline: f64) -> f64 {
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -1968,10 +1968,10 @@
+         ability_dialog::bounds(self, a)
+     }
+     pub fn inspection_notice_y(&self) -> i32 {
+-        self.logical_height()-85-(self.profile.number("ui.layout.buttonHeight").round() as i32-42)
++        self.frame().map.1+self.frame().map.3+5
+     }
+     pub fn footer_damage(&self) -> Option<damage::Rect> {
+-        let top = self.toolbar_y().min(self.inspection_notice_y()).min(self.logical_height()-14)-24;
++        let top = self.frame().map.1+self.frame().map.3;
+         self.logical_damage_rect(0,top,self.logical_width(),self.logical_height()-top)
+     }
+     /// O(T log T) worst-case fitting, O(T) temporary strings; no truncation if both fit.
+@@ -2710,10 +2710,15 @@
+         }
+         } // interaction marks
+         if map_damage { crate::perception_ui::paint(self,v); }
+-        let footer_top=self.toolbar_y().min(self.inspection_notice_y()).min(self.logical_height()-14)-24;
++        let footer_top=self.frame().map.1+self.frame().map.3;
+         if self.intersects_damage(0,footer_top,self.logical_width(),self.logical_height()-footer_top) {
+         #[cfg(test)]
+         let _paint_footer = paint_profile_bench::span(paint_profile_bench::Kind::Footer);
++        let strip_height=self.toolbar_y()-footer_top;
++        self.rect(8,footer_top,self.logical_width()-16,strip_height,[8,7,13]);
++        self.border(8,footer_top,self.logical_width()-16,strip_height,[88,81,98]);
++        let previous_clip=self.clip;
++        self.clip=Some((12,footer_top+1,self.logical_width()-24,strip_height-2));
+         self.text_role(
+             crate::typography_ui::Role::Primary,
+             &self.fit_text_role(crate::typography_ui::Role::Primary, notice, self.logical_width()-40, 15),
+@@ -2723,6 +2728,7 @@
+             game_color(&self.profile, "ui.colors.secondary"),
+         );
+ 
++        self.clip=previous_clip;
+         for (i, label) in TOOLBAR_ACTIONS.iter().enumerate() {
+             let (x, w) = toolbar_rect_for_width(i,self.logical_width());
+             let y = self.toolbar_y();
+--- a/crates/corpse-desktop/src/render_damage.rs
++++ b/crates/corpse-desktop/src/render_damage.rs
+@@ -236,7 +236,7 @@
+                 if old.ability!=selection.ability{add(&mut damage,left,crate::ability_ui::top(&p.profile)-4,p.logical_width()-left,p.logical_height()-crate::ability_ui::top(&p.profile)+4);}
+                 if old.chronicle!=selection.chronicle{add(&mut damage,0,0,left,top);}
+             }
+-            if self.notice!=notice{add(&mut damage,0,p.toolbar_y()-24,p.logical_width(),p.logical_height()-p.toolbar_y()+24);}
++            if self.notice!=notice{if let Some(rect)=p.footer_damage(){damage.add(rect);}}
+             if self.now!=Some(now.to_bits()) || (view_changed && (crate::appearance_light::animated(&p.profile)||crate::appearance_material::animated(&p.profile))) {
+                 let scene=next.as_ref().unwrap_or(previous);
+                 if v.dreamwalking||crate::appearance_light::animated(&p.profile)||crate::appearance_material::animated(&p.profile){
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1949,3 +1949,6 @@
+ 
+ ### Ability enable indicators (2026-11-15)
+ Each displayed non-passive ability uses a fixed 11×11 circle to show enabled state, including reserve-bearing rows; no underline. Per redraw O(A + G) indicator/text-layout work for A visible rows and G glyphs, with A bounded by viewport capacity, plus existing glyph rasterization costs. Indicator adds O(1) memory per row; no simulation changes.
++
++### Dedicated inspection strip (2026-11-15)
++The bottom inspection line owns a font-sized strip between the main panels and toolbar, with shared borders and inner clipping. Height depends only on the fixed typography profile, so hover changes do not reflow the map. O(G log G) worst-case text fitting, O(G) text paint and O(W×H) software strip fill for G text glyphs, W strip width and H bounded line height; constant panel geometry and O(G) temporary fitted string. Both retained and tile damage cover the full strip when notice changes.
