@@ -1,0 +1,291 @@
+--- a/crates/corpse-core/catalog/abilities-v48.json
++++ b/crates/corpse-core/catalog/abilities-v48.json
+@@ -186,7 +186,7 @@
+     "id": "isheilah-quick-hand",
+     "godId": 2,
+     "name": "Quick Hand",
+-    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
++    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn.",
+     "effectSummary": "gains a reaction and can spend one to gain Haste when hit",
+     "flags": [
+       "passive",
+@@ -504,7 +504,7 @@
+     "id": "lichor-blood-weapon",
+     "godId": 6,
+     "name": "Blood Weapon",
+-    "description": "Activate freely by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage, subject to the usual defensive effects. Only one attack can be prepared at a time.",
++    "description": "Activate freely by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage, subject to the usual defensive effects. Only one attack can be prepared at a time.",
+     "effectSummary": "can spend health to prepare one guaranteed, empowered strike",
+     "flags": [
+       "activate"
+@@ -711,7 +711,7 @@
+     "id": "anavani-nova",
+     "godId": 9,
+     "name": "Nova",
+-    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 30 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
++    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 30 energy. Every explosion deals 50% of each affected creature's maximum HP.",
+     "effectSummary": "is immune to explosions and can create an explosion when it attacks",
+     "flags": [
+       "passive",
+@@ -902,8 +902,8 @@
+     "id": "morae-all-seeing-eyes",
+     "godId": 11,
+     "name": "All-Seeing Eyes",
+-    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next time-consuming action finishes. The terrain stays remembered afterward.",
+-    "effectSummary": "can briefly reveal the current floor and its creatures and contents",
++    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
++    "effectSummary": "can briefly reveal the current floor and its creatures and contentsuntil your next turn.",
+     "flags": [
+       "activate"
+     ],
+--- a/crates/corpse-core/catalog/abilities-v50.json
++++ b/crates/corpse-core/catalog/abilities-v50.json
+@@ -171,8 +171,8 @@
+     "id": "isheilah-quick-hand",
+     "godId": 2,
+     "name": "Quick Hand",
+-    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
+-    "effectSummary": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
++    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn.",
++    "effectSummary": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn.",
+     "flags": [
+       "passive",
+       "toggle"
+@@ -451,8 +451,8 @@
+     "id": "lichor-blood-weapon",
+     "godId": 6,
+     "name": "Blood Weapon",
+-    "description": "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
+-    "effectSummary": "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
++    "description": "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
++    "effectSummary": "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
+     "flags": [
+       "activate"
+     ],
+@@ -632,8 +632,8 @@
+     "id": "anavani-nova",
+     "godId": 9,
+     "name": "Nova",
+-    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
+-    "effectSummary": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
++    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
++    "effectSummary": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
+     "flags": [
+       "passive",
+       "toggle"
+@@ -801,8 +801,8 @@
+     "id": "morae-all-seeing-eyes",
+     "godId": 11,
+     "name": "All-Seeing Eyes",
+-    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
+-    "effectSummary": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
++    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
++    "effectSummary": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
+     "flags": [
+       "activate"
+     ],
+--- a/crates/corpse-core/src/revision50_item_knowledge.rs
++++ b/crates/corpse-core/src/revision50_item_knowledge.rs
+@@ -67,8 +67,8 @@
+     let strength = if diluted { 0.5 } else { 1.0 };
+     let turns = |normal: f64| (normal * strength).ceil();
+     Some(match effect {
+-        "healing" => format!("Restores {} HP, up to maximum HP.", 50.0 * strength),
+-        "energy" => format!("Restores {} energy, up to maximum energy.", 50.0 * strength),
++        "healing" => format!("Restores {} HP.", 50.0 * strength),
++        "energy" => format!("Restores {} energy.", 50.0 * strength),
+         "incineration" => "Ignites the impact square and sets creatures there on fire.".into(),
+         "caustic gas" => "Releases a cloud of caustic gas at the impact location.".into(),
+         "paralysis" => format!("Releases paralysis gas and paralyzes an affected creature for {} turns.", turns(5.0)),
+@@ -78,7 +78,7 @@
+         "speed" => format!("Grants haste for {} turns.", turns(10.0)),
+         "invisibility" => format!("Grants invisibility for {} turns.", turns(20.0)),
+         "descent" => "Collapses the ground around the impact location.".into(),
+-        "cleansing" => "Removes harmful temporary effects from the affected creature, leaving beneficial effects intact.".into(),
++        "cleansing" => "Removes harmful temporary effects from the affected creature.".into(),
+         "fire immunity" => format!("Grants immunity to fire for {} turns.", turns(20.0)),
+         "darkness" => format!("Reduces illumination by {} in a 5×5 area for {} turns.", 50.0 * strength, turns(20.0)),
+         "flooding" => format!("Turns a 3×3 area into shallow water for {} turns.", turns(20.0)),
+--- a/crates/corpse-desktop/assets/abilities.json
++++ b/crates/corpse-desktop/assets/abilities.json
+@@ -187,7 +187,7 @@
+       "id": "isheilah-quick-hand",
+       "godId": 2,
+       "name": "Quick Hand",
+-      "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
++      "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn.",
+       "effectSummary": "gains a reaction and can spend one to gain Haste when hit",
+       "flags": [
+         "passive",
+@@ -505,7 +505,7 @@
+       "id": "lichor-blood-weapon",
+       "godId": 6,
+       "name": "Blood Weapon",
+-      "description": "Activate freely by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage, subject to the usual defensive effects. Only one attack can be prepared at a time.",
++      "description": "Activate freely by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage, subject to the usual defensive effects. Only one attack can be prepared at a time.",
+       "effectSummary": "can spend health to prepare one guaranteed, empowered strike",
+       "flags": [
+         "activate"
+@@ -712,7 +712,7 @@
+       "id": "anavani-nova",
+       "godId": 9,
+       "name": "Nova",
+-      "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 30 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
++      "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 30 energy. Every explosion deals 50% of each affected creature's maximum HP.",
+       "effectSummary": "is immune to explosions and can create an explosion when it attacks",
+       "flags": [
+         "passive",
+@@ -903,8 +903,8 @@
+       "id": "morae-all-seeing-eyes",
+       "godId": 11,
+       "name": "All-Seeing Eyes",
+-      "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next time-consuming action finishes. The terrain stays remembered afterward.",
+-      "effectSummary": "can briefly reveal the current floor and its creatures and contents",
++      "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
++      "effectSummary": "can briefly reveal the current floor and its creatures and contentsuntil your next turn.",
+       "flags": [
+         "activate"
+       ],
+--- a/crates/corpse-desktop/src/ability_ui.rs
++++ b/crates/corpse-desktop/src/ability_ui.rs
+@@ -80,15 +80,15 @@
+         match id {
+             "pelian-i-came-for-you" => return "Spend 10 energy and select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward. There is no turn limit.",
+             "anavani-illuminate" => return "Spend 20 energy and select any visible square. Place a permanent fire and light source there. The fire and its light go out immediately on contact with water.",
+-            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next time-consuming action finishes. Bonus free moves do not end the reveal.",
++            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
+             "anavani-shine" => return "You emit light 100 which decreases by 10 every square away from you. You gain additional accuracy equal to the illumination of enemies. When active, you stop emitting this light.",
+             _ => {},
+         }
+     }
+     if corpse_core::combat::nearest_damage_enabled(run) {
+         match id {
+-            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP, rounded to the nearest whole number. Your next attack is guaranteed to hit and deals double damage.",
+-            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded to the nearest whole number, unless it is immune.",
++            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
++            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
+             _ => {},
+         }
+     }
+@@ -106,7 +106,7 @@
+             "anavani-star-power" => return "You are immune to fire and always burning. You can activate this ability to stop burning.",
+             "kative-adaptive-armor" => return "Eating a creature's heart grants 3 DR against that creature type. The next two hearts of that type grant 2 and 1 DR, for a maximum of +6 DR.",
+             "kative-artifice-craft" => return "You can use hearts to Artifice Craft. Multiply the heart's permanent stat bonuses by 5 on the enhanced item while equipped.",
+-            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
++            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
+             _ => {}
+         }
+     }
+@@ -115,9 +115,9 @@
+     }
+     if run.simulation_revision.value_or(29.) >= 45. {
+         match id {
+-            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
++            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
+             "grisha-entropy" => return "You are immune to the effects of caustic gas, and have a cloud of caustic gas originating from you. When this is active, caustic gas does not originate from you.",
+-            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
++            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
+             _ => {}
+         }
+     }
+@@ -173,7 +173,7 @@
+         id: if permanent { corpse_core::dreamwalking::DREAMWALK_ID } else { corpse_core::dreamwalking::WAKE_UP_ID }.into(),
+         name: if permanent { "Dreamwalk" } else { "Wake Up" }.into(),
+         description: if permanent {
+-            "Toggle Dreamwalking. Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake."
++            "Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake."
+         } else {
+             "Awake from the realm of dreams."
+         }.into(),
+@@ -306,6 +306,7 @@
+     }
+     if id=="shrail-execute"&&r.simulation_revision.value_or(29.)>=52. {row.description=EXECUTE_DESCRIPTION.into();}
+     if id=="shrail-rage-at-the-dying-of-the-light" {row.description=RAGELIGHT_DESCRIPTION.into();}
++    if id=="morae-all-seeing-eyes" {row.description="Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.".into();}
+     row.name=display_text(&row.name).into_owned();
+     row.description=display_text(&row.description).into_owned();
+     if r50(r) && r50_uses_energy(id) {
+@@ -1029,9 +1030,9 @@
+ mod revision45_description_tests {
+     use super::*;
+     const REQUESTED: &[(&str, &str)] = &[
+-        ("lichor-blood-weapon", "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage."),
++        ("lichor-blood-weapon", "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage."),
+         ("grisha-entropy", "You are immune to the effects of caustic gas, and have a cloud of caustic gas originating from you. When this is active, caustic gas does not originate from you."),
+-        ("anavani-nova", "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune."),
++        ("anavani-nova", "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP."),
+     ];
+     #[test]
+     fn exact_authored_copy_reaches_rows_grants_and_offers_without_catalog_mutation() {
+@@ -1108,7 +1109,7 @@
+         ("anavani-star-power", "You are immune to fire and always burning. You can activate this ability to stop burning."),
+         ("kative-adaptive-armor", "Eating a creature's heart grants 3 DR against that creature type. The next two hearts of that type grant 2 and 1 DR, for a maximum of +6 DR."),
+         ("kative-artifice-craft", "You can use hearts to Artifice Craft. Multiply the heart's permanent stat bonuses by 5 on the enhanced item while equipped."),
+-        ("morae-all-seeing-eyes", "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes."),
++        ("morae-all-seeing-eyes", "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn."),
+     ];
+     #[test]
+     fn exact_authored_copy_reaches_rows_grants_and_offers_without_catalog_mutation() {
+@@ -1463,3 +1464,18 @@
+         let row=observe(&r,id);assert_eq!(row.description,EXECUTE_DESCRIPTION);assert!(row.cost.contains("10 NRG/execute"));assert!(!row.cost.contains("20 NRG/execute"));
+     }
+ }
++
++#[cfg(test)]mod audit_batch_two_tests {
++ use super::*;
++ #[test]fn requested_short_copy_has_no_stale_overrides(){
++  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
++  for id in ["isheilah-quick-hand","lichor-blood-weapon","anavani-nova","morae-all-seeing-eyes"] {r.player.abilities.push(id.into());}
++  r.player.ability_reserves=corpse_core::Field::Missing;corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,"morae-all-seeing-eyes",10.,10.).unwrap();
++  assert!(!observe(&r,"isheilah-quick-hand").description.contains("No energy cost."));
++  assert!(observe(&r,"lichor-blood-weapon").description.starts_with("Activate by paying 10% of your maximum HP. Your next attack"));
++  let nova=observe(&r,"anavani-nova").description;assert!(nova.contains("Every explosion deals 50% of each affected creature's maximum HP."));assert!(!nova.contains("unless it is immune"));
++  assert_eq!(observe(&r,"morae-all-seeing-eyes").description,"Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.");
++  for diluted in [false,true]{let n=if diluted{25}else{50};assert_eq!(corpse_core::revision50_item_knowledge::potion_effect_description("healing",diluted).unwrap(),format!("Restores {n} HP."));assert_eq!(corpse_core::revision50_item_knowledge::potion_effect_description("energy",diluted).unwrap(),format!("Restores {n} energy."));}
++  assert_eq!(corpse_core::revision50_item_knowledge::potion_effect_description("cleansing",false).unwrap(),"Removes harmful temporary effects from the affected creature.");
++ }
++}
+--- a/crates/corpse-desktop/src/authored_copy_r38_tests.rs
++++ b/crates/corpse-desktop/src/authored_copy_r38_tests.rs
+@@ -9,7 +9,7 @@
+ fn authored_copy_r38_dream_descriptions_are_exact() {
+     let mut r = scene();
+     r.dreamwalking = corpse_core::dreamwalking::State { unlocked: true, ..Default::default() }.into();
+-    assert_eq!(dream_row(&r).unwrap().description, "Toggle Dreamwalking. Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake.");
++    assert_eq!(dream_row(&r).unwrap().description, "Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake.");
+     r.dreamwalking = corpse_core::dreamwalking::State { active: true, depth: r.depth, ..Default::default() }.into();
+     assert_eq!(dream_row(&r).unwrap().description, "Awake from the realm of dreams.");
+ }
+--- a/crates/corpse-desktop/src/pack.rs
++++ b/crates/corpse-desktop/src/pack.rs
+@@ -1914,8 +1914,8 @@
+     }
+     let detail=match effect {
+         "detect magic"=>format!("Senses potions and magical equipment for {} turns. Remembers their good, bad, or bizarre magic and last positions afterward. Mixed magic is bizarre. Ordinary gear, hearts, and tools are not detected.",(20f64*strength).ceil()),
+-        "healing"=>format!("Restores {} health, up to maximum health.",50.*strength),
+-        "energy"=>format!("Restores {} energy, up to your energy limit.",50.*strength),
++        "healing"=>format!("Restores {} health.",50.*strength),
++        "energy"=>format!("Restores {} energy.",50.*strength),
+         "incineration"=>format!("Ignites the impact tile; a creature there burns for a random {}–{} turns, taking 4 HP per normal turn. Fire exposure renews the 6–10-turn burn.",(6f64*strength).ceil(),(10f64*strength).ceil()),
+         "caustic gas"=>"Releases caustic gas.".into(),
+         "paralysis"=>format!("Releases paralysis gas; a directly affected creature is paralyzed for {} turns.",(5f64*strength).ceil()),
+--- a/crates/corpse-desktop/src/tile_overlay.rs
++++ b/crates/corpse-desktop/src/tile_overlay.rs
+@@ -149,7 +149,7 @@
+   plan.replace_view(None,&view,&p);let(cw,ch,ox,oy)=p.map_layout(view.width,view.height);let tile=(ox+11*cw,oy+10*ch,ox+12*cw,oy+11*ch);
+   assert!(crate::overlay_damage::hover(&p,&report,tile).is_some(),"retained admission matches tile admission");
+   for step in 0..7 {
+-   let open=matches!(step,1|2|3|5);let mut shown=report.clone();if step==3 {shown.item_hover=vec!["Potion of Energy\nRestores 50 energy, up to maximum energy.".into()];}
++   let open=matches!(step,1|2|3|5);let mut shown=report.clone();if step==3 {shown.item_hover=vec!["Potion of Energy\nRestores 50 energy.".into()];}
+    let state=Frame{hover:if open{hover(&p,&shown,tile)}else{None},..Default::default()};
+    for rect in track.changes(&p,&state){plan.mark_native_rect(rect);}finish_dependencies(&mut p,&mut plan,&state);plan.paint_base(&mut p,&view,"",0.);
+    if !p.tile_mask.is_empty(){if let Some(h)=&state.hover{crate::inspection_ui::paint_hover_at(&h.report,&mut p,h.tile);}}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -2005,3 +2005,6 @@
+ 
+ ### Health threshold acknowledgement
+ A constant-size desktop gate tracks resolved HP downward crossings at40% and25%. The lower crossed threshold wins if one action crosses both. It re-arms by observing healing above each threshold, does not warn on initial low-health loads or max-HP-only changes, and gives terminal death precedence. Only a fresh Escape after the warning is presented dismisses it. Automatic travel/rest and targeting are interrupted; simulation/save state is not altered. The warning forces safe overlay uploads and invalidates retained state on entry/exit; native screenshot and input/threshold tests cover the flow.
++
++### Text audit batch two
++Removed only the requested redundant clauses for Cleansing, Healing/Energy potions, Quick Hand, Dreamwalking, Blood Weapon and Nova; changed All-Seeing Eyes to end exactly "until your next turn." Canonical catalogs, desktop overrides and relevant legacy/diluted variants agree. All-Seeing Eyes' generic appended reserve explanation is suppressed to preserve that exact ending; mechanics (including free-move reveal persistence) are unchanged. Exact-copy tests cover current projections and authored Dreamwalking.
