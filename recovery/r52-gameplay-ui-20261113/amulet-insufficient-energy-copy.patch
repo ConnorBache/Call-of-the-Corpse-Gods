@@ -1,0 +1,57 @@
+--- a/crates/corpse-core/src/revision50_amulet_effects.rs
++++ b/crates/corpse-core/src/revision50_amulet_effects.rs
+@@ -145,7 +145,7 @@
+     };
+     if !valid { return Some(Err("Choose a valid target for this amulet.".into())); }
+     Some(crate::revision50_amulets::plan_item_activation(r, id, item_spec(item).as_ref())
+-        .map_err(|error| format!("This amulet cannot activate: {error:?}.")))
++        .map_err(admission_message))
+ }
+ 
+ #[derive(Debug)]
+@@ -1010,3 +1010,12 @@
+     }
+ 
+ }
++
++/// Shared player-facing admission copy; invalid-state diagnostics stay distinct.
++pub fn admission_message(error:crate::revision50_amulets::AdmissionError)->String {
++ if error==crate::revision50_amulets::AdmissionError::InsufficientPlayerEnergy {"Insufficient Energy".into()}else{format!("This amulet cannot activate: {error:?}.")}
++}
++#[cfg(test)]mod insufficient_energy_copy_tests {
++ use super::*;use crate::revision50_amulets::AdmissionError;
++ #[test]fn only_insufficient_energy_uses_short_message(){assert_eq!(admission_message(AdmissionError::InsufficientPlayerEnergy),"Insufficient Energy");assert_eq!(admission_message(AdmissionError::InvalidState),"This amulet cannot activate: InvalidState.");}
++}
+--- a/crates/corpse-desktop/src/pack.rs
++++ b/crates/corpse-desktop/src/pack.rs
+@@ -1387,7 +1387,7 @@
+     if run.simulation_revision.value_or(29.)>=50. && corpse_core::revision50_amulet_effects::is_amulet(item) {
+         let blocker=corpse_core::revision50_amulets::plan_item_activation(run,item.id,
+             corpse_core::revision50_amulet_effects::item_spec_for_revision(item,run.simulation_revision.value_or(29.)).as_ref()).err()
+-            .map(|e|format!("This amulet cannot activate: {e:?}."));
++            .map(corpse_core::revision50_amulet_effects::admission_message);
+         push("Apply",ButtonAction::Target(PackTarget::UseAt(item.id)),blocker,
+             "Choose a target for this amulet.".into());
+     }
+@@ -3286,3 +3286,12 @@
+   }
+  }
+ }
++
++#[cfg(test)]mod insufficient_energy_pack_tests {
++ use super::*;
++ #[test]fn amulet_apply_blocker_is_exact_short_copy(){
++  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.energy=0.;r.player.abilities.clear();r.player.active.clear();
++  let item=Item{id:991.,kind:"amulet".into(),name:"Amulet of Lightning".into(),effect:"lightning".to_string().into(),amulet_state:corpse_core::revision50_amulets::AmuletState{instance_id:991,energy:0.,ready_at_half_tick:0}.into(),..Default::default()};r.inventory=vec![item.clone()];
++  let buttons=item_actions(&r,&item);let apply=buttons.iter().find(|b|b.label=="Apply").unwrap();assert_eq!(apply.blocker.as_deref(),Some("Insufficient Energy"));
++ }
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1999,3 +1999,6 @@
+ 
+ ## Transient actor status-death upkeep guard (2026-11-15)
+ After status packets execute, normal upkeep revalidates its snapshotted actor ID before regeneration. Mini-Me may be physically removed by lethal venom/bleed; missing or dead actors skip the remaining upkeep. This adds one existing actor lookup per processed actor (same lookup/index assumptions as the adjacent upkeep operations), O(1) extra storage, no queue or scan beyond the existing lookup. Deterministic regressions cover wait/move, loaded pre-death state, lethal bleed and surviving venom. This prevents an Option unwrap panic; Windows runtime remains separately unverified.
++
++### Amulet insufficient-energy copy
++One shared admission-message formatter maps only InsufficientPlayerEnergy to the exact player-visible text "Insufficient Energy". Pack activation blockers and core target admission use it; other diagnostics and all resource mechanics remain unchanged. Core copy and actual Pack blocker regression tests cover the two paths.
