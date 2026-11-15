@@ -1,0 +1,260 @@
+--- a/crates/corpse-desktop/src/ability_dialog_tests.rs
++++ b/crates/corpse-desktop/src/ability_dialog_tests.rs
+@@ -1,6 +1,6 @@
+ use super::*;
+ fn ability(description: &str) -> AbilityView {
+-    AbilityView { reserve:None,pending_reserve_loss:0., id: "test".into(), name: "Observe".into(), description: description.into(),
++    AbilityView { reserve:None,fortunes:None,pending_reserve_loss:0., id: "test".into(), name: "Observe".into(), description: description.into(),
+         color: super::super::GOLD, cost: "10 Energy".into(), state: "Ready".into(),
+         active: false, mode: "Active".into(), supported: true }
+ }
+--- a/crates/corpse-desktop/src/ability_ui.rs
++++ b/crates/corpse-desktop/src/ability_ui.rs
+@@ -2,7 +2,7 @@
+ use crate::render::Rgb;
+ use corpse_core::{model::Run, progression};
+ pub const TOP: i32 = 182;
+-pub const ROW: i32 = 50;
++pub const ROW: i32 = 35;
+ pub const CAPACITY: usize = 9;
+ pub fn top(p: &crate::appearance_profile::Profile) -> i32 {
+     p.number("ui.layout.resourceRegionHeight").round() as i32 - 56
+@@ -13,17 +13,13 @@
+     } else {
+         p.number("typography.ability.fontSize")
+     };
+-    p.number("ui.layout.abilityRowHeight").max(50.)
+-        .max(
+-            (action * p.number("typography.ability.lineHeight"))
+-                .max(
+-                    p.number("typography.secondary.fontSize")
+-                        * p.number("typography.secondary.lineHeight"),
+-                )
+-                .ceil()
+-                + 6.,
+-        )
+-        .round() as i32
++    let minimum = (action * p.number("typography.ability.lineHeight"))
++        .max(p.number("typography.secondary.fontSize") * p.number("typography.secondary.lineHeight"))
++        .ceil() + 6.;
++    let previous = p.number("ui.layout.abilityRowHeight").max(50.).max(minimum);
++    // A compact reserve meter is 19 logical pixels; halve only the spare gap.
++    // Keep the typography minimum so larger authored fonts are never crushed.
++    (19. + (previous - 19.) / 2.).max(minimum).round() as i32
+ }
+ pub fn capacity(p: &crate::appearance_profile::Profile) -> usize {
+     ((634 - top(p)).max(0) / row(p).max(1)).max(1) as usize
+@@ -59,6 +55,7 @@
+     pub supported: bool,
+     pub reserve: Option<(f64,f64)>,
+     pub pending_reserve_loss: f64,
++    pub fortunes: Option<(u8,u8)>,
+ }
+ /// Presentation-only alias: canonical names remain stable for proc matching,
+ /// catalog identity, replays and saved state. O(text bytes), borrowed if absent.
+@@ -168,7 +165,7 @@
+     let unavailable = r.status != "playing" || !r.offers.is_empty()
+         || r.player.conditions.get("deathResolutionBlocked").is_some_and(|v| *v > 0.);
+     Some(AbilityView {
+-        reserve: None, pending_reserve_loss: 0.,
++        reserve: None, fortunes:None,pending_reserve_loss: 0.,
+         id: if permanent { corpse_core::dreamwalking::DREAMWALK_ID } else { corpse_core::dreamwalking::WAKE_UP_ID }.into(),
+         name: if permanent { "Dreamwalk" } else { "Wake Up" }.into(),
+         description: if permanent {
+@@ -193,7 +190,7 @@
+         || ["paralyzed", "deathResolutionBlocked"].iter()
+             .any(|key| r.player.conditions.get(*key).is_some_and(|v| *v > 0.));
+     Some(AbilityView {
+-        reserve: None, pending_reserve_loss: 0.,
++        reserve: None, fortunes:None,pending_reserve_loss: 0.,
+         id: corpse_core::ahvamitt::TELEPORT_ID.into(), name: "Teleport".into(),
+         description: "Teleport to a random location on the floor.".into(),
+         color: [216, 191, 117], cost: if cooldown > 0 { format!("{cooldown}t cooldown") } else { "100t cooldown · Free".into() },
+@@ -244,7 +241,7 @@
+                 description.push_str(&format!(" Unavailable: {reason}{}", if reason.ends_with('.') { "" } else { "." }));
+             }
+             rows.push(AbilityView {
+-        reserve: None, pending_reserve_loss: 0.,
++        reserve: None, fortunes:None,pending_reserve_loss: 0.,
+                 id: format!("craft:{}:{slot}", item.id),
+                 name: format!("{kind} · {}", item.name),
+                 description,
+@@ -298,6 +295,11 @@
+ }
+ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::UpkeepProjection)->AbilityView {
+     let mut row=observe_inner(r,id);
++    if id=="morae-fortune-teller" {
++        let count=r.player.conditions.get("fortunes").copied().unwrap_or(3.).clamp(0.,3.) as u8;
++        let until=(20.-r.tick.rem_euclid(20.)).ceil() as u8;
++        row.fortunes=Some((count,until));
++    }
+     row.name=display_text(&row.name).into_owned();
+     row.description=display_text(&row.description).into_owned();
+     if r50(r) && r50_uses_energy(id) {
+@@ -325,7 +327,7 @@
+     }
+     let Some(a) = progression::definition_for_revision(r.simulation_revision.value_or(29.), id) else {
+         return AbilityView {
+-        reserve: None, pending_reserve_loss: 0.,
++        reserve: None, fortunes:None,pending_reserve_loss: 0.,
+             id: id.into(),
+             name: id.into(),
+             description: "Unknown ability".into(),
+@@ -588,7 +590,7 @@
+         }
+     );
+     let mut row = AbilityView {
+-        reserve: None, pending_reserve_loss: 0.,
++        reserve: None, fortunes:None,pending_reserve_loss: 0.,
+         id: id.into(),
+         name: a.name.clone(),
+         description: if n == "Adaptive Armor" {
+@@ -1420,3 +1422,19 @@
+         assert!(matches!(display_text("@"),std::borrow::Cow::Borrowed(_)));
+     }
+ }
++
++#[cfg(test)] mod compact_spacing_tests {
++    use super::*;
++    #[test] fn halve_spare_ability_margin_and_keep_hit_testing_aligned() {
++        let profile=crate::appearance_profile::Profile::defaults();
++        assert_eq!(row(&profile),35);
++        for(w,h)in[(1280,800),(1920,1080),(960,1200)] {
++            let mut p=crate::render::Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
++            let count=capacity(&p.profile);
++            for i in 0..count {
++                let y=top(&p.profile)+i as i32*row(&p.profile);
++                assert_eq!(p.ability_inspect_at(count,p.hud_left()+20,y+10),Some(i));
++            }
++        }
++    }
++}
+--- a/crates/corpse-desktop/src/compact_dialog_tests.rs
++++ b/crates/corpse-desktop/src/compact_dialog_tests.rs
+@@ -23,7 +23,7 @@
+ fn compact_dialogs_render_repeatably_and_restore_background_after_dismissal() {
+     let engine=corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let view=crate::observe::observe(&engine.run);let before=engine.save().unwrap();
+     let mut p=Painter::new();p.set_responsive_canvas(true);p.game_at(&view,"",false,0.);let base=p.pixels.clone();
+-    let ability=crate::ability_ui::AbilityView{reserve:None,pending_reserve_loss:0.,id:"test".into(),name:"A long observed ability name".into(),description:"Full ability details remain available by scrolling. ".repeat(45),color:GOLD,cost:"6 Energy".into(),state:"Ready".into(),active:false,mode:"Active".into(),supported:true};
++    let ability=crate::ability_ui::AbilityView{reserve:None,fortunes:None,pending_reserve_loss:0.,id:"test".into(),name:"A long observed ability name".into(),description:"Full ability details remain available by scrolling. ".repeat(45),color:GOLD,cost:"6 Energy".into(),state:"Ready".into(),active:false,mode:"Active".into(),supported:true};
+     for name in ["creatures","ability","hazard","inspection","pack","blessing"] {
+         p.pixels.copy_from_slice(&base);
+         match name {
+--- a/crates/corpse-desktop/src/enemy_list.rs
++++ b/crates/corpse-desktop/src/enemy_list.rs
+@@ -191,6 +191,7 @@
+             run.player.active.push(id.into());
+             assert_eq!(corpse_core::abilities::projected_player_upkeep(&run),20.-reserve);
+         }
++        if std::env::var_os("SHOW_FORTUNES").is_some(){run.player.abilities.push("morae-fortune-teller".into());run.player.conditions.insert("fortunes".into(),1.);run.tick=13.;}
+         let mut p=Painter::new();p.resize(1920,1080);p.set_responsive_canvas(true);
+         let v=crate::observe::observe_with_profile(&run,&p.profile);p.game_at(&v,&std::env::var("INSPECT_SCREENSHOT_TEXT").unwrap_or_default(),false,0.);
+         let file=std::fs::File::create(path).unwrap();let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);
+--- a/crates/corpse-desktop/src/render.rs
++++ b/crates/corpse-desktop/src/render.rs
+@@ -2626,13 +2626,24 @@
+             let name_x=left+18+if passive{0}else{18};
+             let bar_width=rail_width/3;
+             let bar_x=left+12+rail_width-bar_width;
+-            let name_width=if reserve.is_some(){bar_x-name_x-8}else{rail_width-12-if !passive{18}else{0}};
++            let name_width=if reserve.is_some()||a.fortunes.is_some(){bar_x-name_x-8}else{rail_width-12-if !passive{18}else{0}};
+             let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);
+             self.clip=Some((left+12,y,rail_width,crate::ability_ui::row(&self.profile)));
+             for(line,name)in names.iter().enumerate(){
+                 self.text(name,name_x,y+3+line as i32*15,13,a.color);
+             }
+-            if let Some((current,maximum))=reserve {
++            if let Some((count,until))=a.fortunes {
++                let box_w=((bar_width-6)/3).max(18);
++                for i in 0..3 {
++                    let bx=bar_x+i* (box_w+3);
++                    if i<count as i32 {self.rect(bx,y,box_w,19,[184,119,255]);}
++                    self.border(bx,y,box_w,19,[184,119,255]);
++                    if count<3&&i==count as i32 {
++                        let text=until.to_string();let tw=resource_ui::text_width(self,&text,12);
++                        self.text(&text,bx+(box_w-tw)/2,y+2,12,[232,220,255]);
++                    }
++                }
++            } else if let Some((current,maximum))=reserve {
+                 let value=format!("{current:.0}/{maximum:.0} NRG");
+                 resource_ui::paint_bar_pending(self,"",&value,bar_x,y,bar_width,19,
+                     game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),11,a.pending_reserve_loss/maximum.max(1.));
+@@ -3400,7 +3411,7 @@
+         view.hp = 2.;
+         view.max_hp = 99999.;
+         view.total_abilities = 90;
+-        view.abilities = vec![crate::ability_ui::AbilityView { reserve:None,pending_reserve_loss:0.,
++        view.abilities = vec![crate::ability_ui::AbilityView { reserve:None,fortunes:None,pending_reserve_loss:0.,
+             id: "test".into(), name: "Unyielding Assault".into(), description: "Details".repeat(100),
+             color: [255, 70, 150], cost: "3/5 charges · 6 NRG".into(), state: "Unavailable".into(),
+             active: false, mode: "Passive".into(), supported: true,
+@@ -3467,7 +3478,7 @@
+             "You strike the Screamling.".into(), "You kill the Screamling.".into(),
+             "A blessing stirs. The ancient passages remain visible beyond the reach of your light.".into(),
+         ], &[]);
+-        view.abilities = vec![crate::ability_ui::AbilityView { reserve:None,pending_reserve_loss:0.,
++        view.abilities = vec![crate::ability_ui::AbilityView { reserve:None,fortunes:None,pending_reserve_loss:0.,
+             id: "test".into(), name: "Unyielding Assault".into(), description: String::new(),
+             color: [255, 70, 150], cost: "1/1 reactions · 1 reaction/first attack".into(), state: String::new(),
+             active: false, mode: "Passive".into(), supported: true,
+--- a/crates/corpse-desktop/src/render_damage.rs
++++ b/crates/corpse-desktop/src/render_damage.rs
+@@ -122,10 +122,10 @@
+ use super::{Cell as PaintCell, Painter, View, Rgb};
+ use std::collections::{BTreeMap,BTreeSet};
+ #[derive(Clone,PartialEq)]
+-struct AbilityInk {reserve:Option<(u64,u64)>,pending:u64,name:String,cost:String,state:String,mode:String,color:Rgb,active:bool,supported:bool}
++struct AbilityInk {fortunes:Option<(u8,u8)>,reserve:Option<(u64,u64)>,pending:u64,name:String,cost:String,state:String,mode:String,color:Rgb,active:bool,supported:bool}
+ #[derive(Clone,PartialEq)]
+ struct HudKey {pending_energy_loss:u64,resource_changes:[String;3],domain:String,mode:String,gods:Vec<(String,Rgb)>,numbers:[u64;8],stats:[u64;5],creatures:usize,meters:Vec<crate::statuses_ui::Meter>,status_offset:usize,abilities:Vec<AbilityInk>,total:usize}
+-impl HudKey {fn from(v:&View)->Self{Self{pending_energy_loss:v.pending_energy_loss.to_bits(),resource_changes:v.resource_changes.clone(),domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{reserve:a.reserve.map(|(n,m)|(n.to_bits(),m.to_bits())),pending:a.pending_reserve_loss.to_bits(),name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
++impl HudKey {fn from(v:&View)->Self{Self{pending_energy_loss:v.pending_energy_loss.to_bits(),resource_changes:v.resource_changes.clone(),domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{fortunes:a.fortunes,reserve:a.reserve.map(|(n,m)|(n.to_bits(),m.to_bits())),pending:a.pending_reserve_loss.to_bits(),name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
+ #[derive(Clone,PartialEq)]
+ struct EnemyInk {perception_range:Option<String>,identity_outline:Option<Rgb>,id:u64,name:String,glyph:String,state:String,color:Rgb,distance:u64,resources:[u64;4],shared:bool,uses_energy:bool,invulnerable:bool,statuses:Vec<crate::statuses_ui::Status>,meters:Vec<crate::statuses_ui::Meter>}
+ #[derive(Clone,PartialEq)]
+--- a/crates/corpse-desktop/src/resource_ui_tests.rs
++++ b/crates/corpse-desktop/src/resource_ui_tests.rs
+@@ -234,3 +234,21 @@
+         }
+     }
+ }
++
++#[test]
++fn fortune_boxes_track_charges_single_countdown_and_retained_updates(){
++    let mut r=room();r.player.abilities=vec!["morae-fortune-teller".into()];r.player.ability_order=corpse_core::Field::Missing;
++    for(w,h)in[(1280,800),(1920,1080),(960,1200)]{
++        let(mut p,mut full,mut tile)=(Painter::new(),Painter::new(),Painter::new());
++        for p in [&mut p,&mut full,&mut tile]{p.resize(w,h);p.set_responsive_canvas(true);}
++        let mut retained=RetainedGame::default();let mut plan=TilePlanner::default();let mut old=None;
++        for(count,tick,until)in[(3.,0.,20),(2.,13.,7),(1.,19.,1),(0.,20.,20),(1.,21.,19)] {
++            r.tick=tick;r.player.conditions.insert("fortunes".into(),count);
++            let before=r.clone();let v=crate::observe::observe_with_profile(&r,&p.profile);assert!(r==before);
++            assert_eq!(v.abilities[0].fortunes,Some((count as u8,until)));
++            full.game_at(&v,"",false,0.);retained.update(&mut p,&v,"",0.,true,false).unwrap();
++            plan.replace_view(old.as_ref(),&v,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,&v,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();
++            assert!(p.pixels==full.pixels);assert!(tile.pixels==full.pixels);old=Some(v);
++        }
++    }
++}
+--- a/crates/corpse-desktop/src/tile_damage.rs
++++ b/crates/corpse-desktop/src/tile_damage.rs
+@@ -156,7 +156,7 @@
+  pub fn paint_base(&mut self,p:&mut Painter,v:&View,notice:&str,now:f64){let _paint_timing=corpse_core::timing::span("desktop.tile.paint_base");if p.tile_mask.is_empty(){return;}p.clip=None;p.damage_clip=None;p.paint_cell_indices=None;std::mem::swap(&mut p.tile_cell_bounds,&mut self.current.bounds);p.game_at(v,notice,false,now);std::mem::swap(&mut p.tile_cell_bounds,&mut self.current.bounds);p.clip=None;}
+  pub fn clear_frame(&mut self){for i in self.tiles.drain(..){if i<self.dirty.len(){self.dirty[i]=false;}}self.rects.clear();self.full=false;}
+ }
+-fn hud_eq(a:&View,b:&View)->bool{a.pending_energy_loss.to_bits()==b.pending_energy_loss.to_bits()&&a.resource_changes==b.resource_changes&&a.player_stats.map(f64::to_bits)==b.player_stats.map(f64::to_bits)&&a.domain==b.domain&&a.mode==b.mode&&a.god_labels==b.god_labels&&[a.depth,a.level,a.hp,a.max_hp,a.energy,a.max_energy,a.blessings,a.blessing_goal].map(f64::to_bits)==[b.depth,b.level,b.hp,b.max_hp,b.energy,b.max_energy,b.blessings,b.blessing_goal].map(f64::to_bits)&&a.creatures.len()==b.creatures.len()&&a.player_meters.len()==b.player_meters.len()&&a.player_meters.iter().zip(&b.player_meters).all(|(a,b)|a.name==b.name&&a.duration.map(f64::to_bits)==b.duration.map(f64::to_bits)&&bits(a.reference,b.reference)&&a.reference_known==b.reference_known&&bits(a.percent,b.percent))&&a.player_status_offset==b.player_status_offset&&a.total_abilities==b.total_abilities&&a.abilities.len()==b.abilities.len()&&a.abilities.iter().zip(&b.abilities).all(|(a,b)|a.reserve==b.reserve&&bits(a.pending_reserve_loss,b.pending_reserve_loss)&&a.name==b.name&&a.cost==b.cost&&a.state==b.state&&a.mode==b.mode&&a.color==b.color&&a.active==b.active&&a.supported==b.supported)}
++fn hud_eq(a:&View,b:&View)->bool{a.pending_energy_loss.to_bits()==b.pending_energy_loss.to_bits()&&a.resource_changes==b.resource_changes&&a.player_stats.map(f64::to_bits)==b.player_stats.map(f64::to_bits)&&a.domain==b.domain&&a.mode==b.mode&&a.god_labels==b.god_labels&&[a.depth,a.level,a.hp,a.max_hp,a.energy,a.max_energy,a.blessings,a.blessing_goal].map(f64::to_bits)==[b.depth,b.level,b.hp,b.max_hp,b.energy,b.max_energy,b.blessings,b.blessing_goal].map(f64::to_bits)&&a.creatures.len()==b.creatures.len()&&a.player_meters.len()==b.player_meters.len()&&a.player_meters.iter().zip(&b.player_meters).all(|(a,b)|a.name==b.name&&a.duration.map(f64::to_bits)==b.duration.map(f64::to_bits)&&bits(a.reference,b.reference)&&a.reference_known==b.reference_known&&bits(a.percent,b.percent))&&a.player_status_offset==b.player_status_offset&&a.total_abilities==b.total_abilities&&a.abilities.len()==b.abilities.len()&&a.abilities.iter().zip(&b.abilities).all(|(a,b)|a.fortunes==b.fortunes&&a.reserve==b.reserve&&bits(a.pending_reserve_loss,b.pending_reserve_loss)&&a.name==b.name&&a.cost==b.cost&&a.state==b.state&&a.mode==b.mode&&a.color==b.color&&a.active==b.active&&a.supported==b.supported)}
+ fn enemies_eq(a:&View,b:&View)->bool{a.ground_entities==b.ground_entities&&a.creatures.len()==b.creatures.len()&&a.creatures.iter().zip(&b.creatures).all(|(a,b)|bits(a.id,b.id)&&a.name==b.name&&a.glyph==b.glyph&&a.state==b.state&&a.perception_range==b.perception_range&&a.color==b.color&&a.identity_outline==b.identity_outline&&bits(a.distance,b.distance)&&[a.hp,a.max_hp,a.energy,a.max_energy].map(f64::to_bits)==[b.hp,b.max_hp,b.energy,b.max_energy].map(f64::to_bits)&&a.shared_resources==b.shared_resources&&a.uses_energy==b.uses_energy&&a.invulnerable==b.invulnerable&&a.statuses==b.statuses&&a.meters==b.meters)}
+ #[cfg(test)]
+ #[path="tile_damage_tests.rs"]
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -1952,3 +1952,8 @@
+ 
+ ### Dedicated inspection strip (2026-11-15)
+ The bottom inspection line owns a font-sized strip between the main panels and toolbar, with shared borders and inner clipping. Height depends only on the fixed typography profile, so hover changes do not reflow the map. O(G log G) worst-case text fitting, O(G) text paint and O(W×H) software strip fill for G text glyphs, W strip width and H bounded line height; constant panel geometry and O(G) temporary fitted string. Both retained and tile damage cover the full strip when notice changes.
++
++### Compact ability margins (2026-11-15)
++Ability row spacing halves the unused gap around a 19px reserve meter (50px to 35px at default typography), preserving the existing minimum for enlarged fonts. O(1) geometry; drawing/input share the same row and capacity functions. At most viewport-height/row visible entries; no new allocations or gameplay change.
++
++Fortune Teller presents three fixed boxes and the single next global 20-turn refresh countdown in the first empty box. Detached O(1) projection and constant paint primitives; countdown/charge changes are included in both retained damage keys. No simulation timing change.
