@@ -1,0 +1,161 @@
+--- a/crates/corpse-core/catalog/abilities-v50.json
++++ b/crates/corpse-core/catalog/abilities-v50.json
+@@ -712,8 +712,8 @@
+     "id": "kative-appropriate",
+     "godId": 10,
+     "name": "Appropriate",
+-    "description": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10, to a minimum of zero.",
+-    "effectSummary": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10, to a minimum of zero.",
++    "description": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10.",
++    "effectSummary": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10.",
+     "flags": [
+       "passive"
+     ],
+--- a/crates/corpse-core/catalog/ability-description-amendments-v50.json
++++ b/crates/corpse-core/catalog/ability-description-amendments-v50.json
+@@ -7,7 +7,7 @@
+   "kative-mini-me": "Activate for 30 energy to create a copy with your current stats, but no abilities. This version of you is a perfect ally. Deactivating kills this creature.",
+   "kative-tinker": "Spend 100 energy to bless a ring or amulet with a random ability from a random god you do not embody. The ring or amulet retains its existing abilities as well as the new ability. The granted ability works while the item is carried; all carried rings and amulets are automatically active. Each item can be tinkered once; granted abilities never duplicate another generated item grant.",
+   "kative-clay-army": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.\n\nImplementation: Clay Soldiers are treated as unbreakable walls for pathfinding and collision.",
+-  "kative-appropriate": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10, to a minimum of zero.",
++  "kative-appropriate": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10.",
+   "pelian-i-came-for-you": "Spend 10 energy and select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward.",
+   "numo-mind-read": "While active, spend 1 energy per turn and you have telepathy within 20. While inactive, you have telepathy within 5. The first turn is paid immediately on activation.",
+   "ursa-dream-see": "You have telepathy with sleeping creatures. When active, spend 1 energy per turn and you have telepathy with all creatures that are not obstructed. The first turn is paid immediately on activation.",
+--- a/crates/corpse-core/src/phantasmii_generation.rs
++++ b/crates/corpse-core/src/phantasmii_generation.rs
+@@ -5,7 +5,7 @@
+ 
+ pub const DAGGER_NAME: &str = "Dagger of the Phantasmii";
+ pub const SHARD_NAME: &str = "Shards of the Phantasmii";
+-pub const DAGGER_DESCRIPTION: &str = "With a drop of blood on the Altar of the Phantasmii, you can access amazing power.";
++pub const DAGGER_DESCRIPTION: &str = "Apply while standing on the Altar of the Phantasmii to enter Dreamwalking.";
+ pub const NIGHTMARE_COUNT: usize = 4;
+ pub const SHARD_COUNT: usize = 3;
+ pub const NIGHTMARE_DESCRIPTORS: [&str; 8] = ["Small", "Lesser", "Minor", "", "Major", "Greater", "Gargantuan", "Terrible"];
+--- a/crates/corpse-core/src/revision50_amulet_effects.rs
++++ b/crates/corpse-core/src/revision50_amulet_effects.rs
+@@ -35,7 +35,7 @@
+         Some(Effect::Poison)=>"Fires a projectile that poisons its target for 6 damage per turn for 20 turns.",
+         Some(Effect::Iceblast)=>"Deals 30 cold damage and slows creatures for 3 turns in a 3×3 area, leaving ice.",
+         Some(Effect::Acid)=>"Fires a projectile that deals 40 damage and reduces the target’s DR by 10 for 6 turns.",
+-        Some(Effect::Blinking)=>"Teleports you to a visible, accessible square within 10 tiles.",
++        Some(Effect::Blinking)=>"Blink along a 10 tile line.",
+         None=>return crate::revision50_control_amulets::description(item),
+     })
+ }
+--- a/crates/corpse-core/src/revision52_amulet_tiers.rs
++++ b/crates/corpse-core/src/revision52_amulet_tiers.rs
+@@ -82,7 +82,7 @@
+         "poison"=>format!("Fires a projectile that poisons its target for {} damage per normal turn for 20 turns.",p.periodic_damage),
+         "iceblast"=>format!("Deals {} cold damage and slows creatures for 3 turns in a 3×3 area, leaving ice.",p.direct_damage),
+         "acid"=>format!("Fires a projectile that deals {} damage and reduces the target’s DR by 10 for 6 turns.",p.direct_damage),
+-        "blinking"=>format!("Blinks along a visible aimed line within {} tiles to its last reachable empty square.",p.range?),
++        "blinking"=>format!("Blink along a {} tile line.",p.range?),
+         "discord"=>format!("Makes a creature and all other creatures hostile to each other for {} turns.",p.duration?),
+         "obstruction"=>format!("Creates a three-tile wall perpendicular to your aim for {} turns.",p.duration?),
+         "roots"=>format!("Roots a creature in place for 4 turns, dealing {} damage each normal turn.",p.periodic_damage),
+@@ -94,7 +94,7 @@
+     if !enabled(r) {return crate::revision50_amulet_effects::details_for_run(r,item).map(str::to_owned);}
+     let p=profile(r,item)?;
+     Some(match item.effect.as_ref()?.as_str() {
+-        "blinking"=>"Blocking creatures and terrain shorten the line.".into(),
++        "blinking"=>return None,
+         "beckoning"=>format!("Targets a visible creature within {} tiles with a clear path to you.",p.range?),
+         "teleportation"=>format!("Targets a visible creature within {} tiles.",p.range?),
+         _=>crate::revision50_amulet_effects::details_for_run(r,item)?.into(),
+--- a/crates/corpse-desktop/src/ability_ui.rs
++++ b/crates/corpse-desktop/src/ability_ui.rs
+@@ -654,12 +654,11 @@
+     if r50(r) && id=="kative-clay-army" {
+         row.description.push_str("\nEach Clay Soldier uses your current attack without abilities, and attacks anyone adjacent at the end of a turn. It is an unbreakable wall.");
+     }
+-    if let Some(_)=reserve {
++    if id == corpse_core::revision50_ability_energy::FUTURE_ID {
++        row.description.push_str("\nSpends all your energy.");
++    } else if let Some(_)=reserve {
+         let capacity = corpse_core::revision52_reserves::capacity(r.simulation_revision.value_or(29.));
+         row.description.push_str(&format!("\nAbility energy is spent first; player energy pays any remainder. Ability energy refills to {capacity} on level-up; player energy does not."));
+-        if id == corpse_core::revision50_ability_energy::FUTURE_ID {
+-            row.description.push_str(" See The Future spends all its own reserve and all current player energy, leaving other reserves untouched. The saved state is after payment.");
+-        }
+     }
+     if let Some(reason)=activation_blocker.filter(|_|r50(r) && !active) {
+         row.description.push_str(&format!("\nUnavailable: {reason}."));
+@@ -1479,3 +1478,19 @@
+   assert_eq!(corpse_core::revision50_item_knowledge::potion_effect_description("cleansing",false).unwrap(),"Removes harmful temporary effects from the affected creature.");
+  }
+ }
++
++#[cfg(test)] mod audit_batch_three_tests {
++ use super::*;
++ #[test] fn future_unique_paragraph_and_appropriate_copy(){
++  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
++  let id="morae-see-the-future";r.player.abilities=vec![id.into(),"kative-appropriate".into()];
++  r.player.ability_reserves=corpse_core::Field::Missing;
++  corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,10.).unwrap();
++  for energy in [0.,100.] {r.player.energy=energy;let before=r.clone();let d=observe(&r,id).description;
++   assert!(d.starts_with("Spend all your energy to save your current state."));
++   assert_eq!(d.lines().filter(|s|s.contains("Spends all")).collect::<Vec<_>>(),vec!["Spends all your energy."]);
++   for stale in ["other reserves","after payment","Ability energy is spent first"] {assert!(!d.contains(stale));}
++   assert!(!observe(&r,"kative-appropriate").description.contains("minimum of zero"));assert!(r==before);
++  }
++ }
++}
+--- a/crates/corpse-desktop/src/pack.rs
++++ b/crates/corpse-desktop/src/pack.rs
+@@ -1664,7 +1664,7 @@
+         return format!("{}\nGrants Teleport while in your inventory.", corpse_core::revision50_item_knowledge::display_name(run, i));
+     }
+     if corpse_core::phantasmii_generation::is_dagger(i) {
+-        return format!("{}\n{}\nApply while standing on the Altar of the Phantasmii to enter Dreamwalking.",
++        return format!("{}\n{}",
+             i.name, corpse_core::phantasmii_generation::DAGGER_DESCRIPTION);
+     }
+     if corpse_core::phantasmii_generation::is_shard(i) {
+--- a/crates/corpse-desktop/src/revision50_item_knowledge_tests.rs
++++ b/crates/corpse-desktop/src/revision50_item_knowledge_tests.rs
+@@ -144,7 +144,7 @@
+         ("poison",15,"Fires a projectile that poisons its target for 6 damage per turn for 20 turns.","Unlimited range."),
+         ("iceblast",30,"Deals 30 cold damage and slows creatures for 3 turns in a 3×3 area, leaving ice.","Targets a visible area."),
+         ("acid",20,"Fires a projectile that deals 40 damage and reduces the target’s DR by 10 for 6 turns.","Range: 8 tiles."),
+-        ("blinking",20,"Teleports you to a visible, accessible square within 10 tiles.",""),
++        ("blinking",20,"Blink along a 10 tile line.",""),
+         ("beckoning",15,"Pulls a targeted creature next to you.","Targets a visible creature within 8 tiles with a clear path to you."),
+         ("discord",30,"Makes a creature and all other creatures hostile to each other for 6 turns.","Targets a visible creature within 8 tiles."),
+         ("obstruction",25,"Creates a three-tile wall perpendicular to your aim for 8 turns.","Targets visible open ground along a cardinal or diagonal aim."),
+@@ -165,3 +165,25 @@
+         assert_eq!(serde_json::to_vec(&r).unwrap(),before);
+     }
+ }
++
++#[test]
++fn audit_batch_three_blink_all_tiers_and_dagger_copy() {
++ let mut r=run();r.simulation_revision=52.0.into();let p=Painter::new();
++ for tier in 1..=corpse_core::revision52_amulet_tiers::MAX_TIER {
++  let mut item=Item{id:900.,kind:"amulet".into(),effect:"blinking".to_string().into(),amulet_tier:(tier as f64).into(),..Default::default()};
++  corpse_core::revision50_amulets::initialize_item(&mut item).unwrap();
++  let expected=format!("Blink along a {} tile line.",9+tier);
++  assert_eq!(corpse_core::revision52_amulet_tiers::description(&r,&item).as_deref(),Some(expected.as_str()));
++  assert!(corpse_core::revision52_amulet_tiers::details(&r,&item).is_none());
++  r.inventory=vec![item.clone()];let before=r.clone();
++  assert!(describe_item(&r,&item).contains(&expected));
++  let mut view=PackView::observe(&r);view.configure(&p,p.frame().map.tuple());hover_first(&mut view);assert!(view.tooltip().unwrap().contains(&expected));
++  assert!(r==before);
++  r.ground.insert(r.depth.to_string(),vec![corpse_core::GroundItem{x:r.player.x,y:r.player.y,item:item.clone(),..Default::default()}]);
++  let report=crate::inspection_ui::observe_tile(&r,r.player.x as usize,r.player.y as usize);
++  assert!(serde_json::to_string(&report).unwrap().contains(&expected),"ground tier {tier}");
++ }
++ let mut dagger=corpse_core::phantasmii_generation::dagger(12.);
++ dagger.effect="With a drop of blood on the Altar of the Phantasmii, you can access amazing power.".to_string().into();
++ assert_eq!(describe_item(&r,&dagger),"Dagger of the Phantasmii\nApply while standing on the Altar of the Phantasmii to enter Dreamwalking.");
++}
+--- a/docs/complexity-ledger.md
++++ b/docs/complexity-ledger.md
+@@ -2008,3 +2008,6 @@
+ 
+ ### Text audit batch two
+ Removed only the requested redundant clauses for Cleansing, Healing/Energy potions, Quick Hand, Dreamwalking, Blood Weapon and Nova; changed All-Seeing Eyes to end exactly "until your next turn." Canonical catalogs, desktop overrides and relevant legacy/diluted variants agree. All-Seeing Eyes' generic appended reserve explanation is suppressed to preserve that exact ending; mechanics (including free-move reveal persistence) are unchanged. Exact-copy tests cover current projections and authored Dreamwalking.
++
++## Text audit batch three
++Text-only removal of Dagger flavor, Appropriate floor clause, and See The Future reserve caveats; tiered Blinking uses the existing range profile. Description construction remains O(L) time/memory for output length L, once per observation/inspection; no simulation, scheduling, RNG, or save-format changes. Focused display tests cover all nine tiers.
