@@ -18,6 +18,7 @@ fn ability(a: &Actor, name: &str, active: bool) -> bool {
         .any(|d| d.name == name && ids.contains(&d.id))
 }
 pub fn flying(r: &Run, a: &Actor) -> bool {
+    if r.simulation_revision.value_or(29.) >= 52. && a.dead.value_or(false) {return false;}
     if crate::dreamwalking::dream_actor(r,a) {return true;}
     engine::flying(a)
         || crate::revision50_rings::has_effect(r, a, crate::revision50_rings::FLIGHT)
@@ -120,6 +121,7 @@ pub fn can_traverse_from(r: &Run, a: &Actor, x: f64, y: f64, from: Point) -> boo
         && (f.tiles[y as usize * f.width() + x as usize] != "chasm" || flying(r, a))
 }
 pub fn enemy_moved(r: &mut Run, id: f64) -> Result<(), String> {
+    crate::revision50::duel_actor_changed(r,id);
     let a = engine::actor(r, id).ok_or("Moved actor missing")?.clone();
     if crate::revision50_nightmares::is_decoy(&a) { return Ok(()); }
     // Revision31 cosmetic footprints share the existing save/remember blood layer.
@@ -128,6 +130,8 @@ pub fn enemy_moved(r: &mut Run, id: f64) -> Result<(), String> {
         && !a.dead.value_or(false)
         && crate::enemy_traits::definition(&a).is_some_and(|d| matches!(d.id.as_str(),
             "hemogoblin" | "hemogoblin-bloodmancer" | "hemogoblin-inventor"));
+    let animate=crate::events::enabled(r);
+    let mut slimed=Vec::new();
     let f = r.floor_mut().ok_or("Moved floor missing")?;
     let w = f.width();
     let at = a.y as usize * w + a.x as usize;
@@ -154,6 +158,7 @@ pub fn enemy_moved(r: &mut Run, id: f64) -> Result<(), String> {
                     if !["wall", "tree", "chasm", "pit", "water", "shallow-water"]
                         .contains(&f.tiles[i].as_str())
                     {
+                        if animate && slime[i]!=1.0 {slimed.push(crate::events::EventPoint{x,y});}
                         slime[i] = 1.0
                     }
                 }
@@ -165,6 +170,7 @@ pub fn enemy_moved(r: &mut Run, id: f64) -> Result<(), String> {
     let submerged = has(&a, "submerge")
         && f.tiles[at] == "water"
         && !f.ichor.as_ref().is_some_and(|g| g[at] != 0.0);
+    crate::events::cue(r,&a,"E31","wave-green",crate::events::Stage::Special,&slimed);
     let a = engine::actor_mut_trusted(r, id).unwrap();
     if submerged {
         a.conditions.insert("underwater".into(), 1.0);
@@ -184,8 +190,53 @@ pub fn clear_floor_chase(a: &mut Actor) {
         "chaseExitY",
         "chaseLandingX",
         "chaseLandingY",
+        "chaseChasm",
     ] {
         a.conditions.shift_remove(k);
+    }
+}
+/// A deliberate downward chase is distinct from losing flight over a chasm.
+/// A saved marker distinguishes a closed/restored chasm from a stair departure.
+/// No timer or RNG draw; the condition map remains the serialized boundary.
+pub(crate) fn flying_chasm_chase(r: &Run, a: &Actor) -> bool {
+    r.simulation_revision.value_or(29.) >= 52.
+        && condition(a,"chaseChasm") == 1.
+        && a.state == "hunting" && !a.dead.value_or(false) && a.hp > 0.
+        && a.conditions.get("chaseDepth") == Some(&crate::fast_mode::below(r, r.depth))
+        && a.conditions.contains_key("chaseLandingX")
+        && a.conditions.contains_key("chaseLandingY")
+        && r.floor().is_some_and(|f| a.conditions.get("chaseExitX")
+            .zip(a.conditions.get("chaseExitY"))
+            .and_then(|(&x,&y)| crate::portals::cell(f,x,y))
+            .is_some_and(|at| f.tiles[at] == "chasm"))
+        && flying(r,a)
+}
+/// Enroll only existing player hunters that can perceive this chasm departure.
+/// O(A) candidate storage, O(A*(K+D+d+F)) time plus first index reconciliation
+/// and COW writes. D includes cold visibility/lighting fields; see ledger.
+fn queue_flying_chasm_followers(r: &mut Run, next: f64, landing: Point) {
+    if r.simulation_revision.value_or(29.) < 52. || next != crate::fast_mode::below(r, r.depth)
+        || r.floor().and_then(|f| crate::portals::cell(f,r.player.x,r.player.y)
+            .map(|at| &f.tiles[at])).is_none_or(|tile| tile != "chasm") { return; }
+    let ids: Vec<_> = r.actors_at(r.depth).iter().filter(|a|
+        a.state == "hunting" && !a.dead.value_or(false) && a.hp > 0.
+        && a.conditions.get("targetId") == Some(&r.player.id) && flying(r,a)
+        && !crate::revision50_nightmares::is_decoy(a)).map(|a| a.id).collect();
+    for id in ids {
+        let a = engine::actor(r,id).unwrap();
+        let known = a.last_seen.as_ref().is_some_and(|p|p.x == r.player.x && p.y == r.player.y);
+        let chance = vision::detection_chance(r,a,&r.player);
+        if chance <= 0. || (!known && chance < 100. && crate::rng::random(r)*100. >= chance) { continue; }
+        let (x,y) = (r.player.x,r.player.y);
+        let a = engine::actor_mut_trusted(r,id).unwrap();
+        clear_floor_chase(a);
+        a.last_seen = ActorLastSeen{x,y}.into();
+        for (key,value) in [("chaseExitX",x),("chaseExitY",y),("chaseDepth",next),
+            ("chaseLandingX",landing.x as f64),("chaseLandingY",landing.y as f64),
+            ("chaseChasm",1.),("seesPlayer",0.),("monsterUnseenTurns",0.)] {
+            a.conditions.insert(key.into(),value);
+        }
+        r.floor_mut().unwrap().dirty = true;
     }
 }
 pub fn dismiss_half_here(r: &mut Run) {
@@ -339,7 +390,7 @@ fn valid_queue(r: &Run, source: f64, a: &Actor) -> bool {
         return false;
     };
     condition(a, "allyStairSource") == source
-        && (condition(a, "allyStairDepth") - source).abs() == 1.0
+        && crate::fast_mode::adjacent(r, source, condition(a, "allyStairDepth"))
         && ALLY_FIELDS.iter().all(|k| {
             a.conditions
                 .get(*k)
@@ -588,7 +639,8 @@ pub fn restore_returning_ally_stair_followers(r: &mut Run) -> Result<(), String>
 }
 /// Existing-state travel API. Call through transactional engine dispatch for rollback on unsupported hooks.
 pub fn travel(r: &mut Run, delta: f64, falling: bool, vertical: bool) -> Result<bool, String> {
-    travel_inner(r, delta, falling, vertical, false)
+    let next = crate::fast_mode::destination(r, r.depth, delta);
+    travel_inner(r, next, falling, vertical, false)
 }
 /// Deliberate player chasm entry; revision43 charges 25% maximum HP once.
 /// Uses the existing travel/landing pipeline and water exception. O(1) extra
@@ -598,19 +650,25 @@ pub fn jump_chasm(r: &mut Run) -> Result<bool, String> {
     if r.floor().is_none_or(|f| f.tiles.get(r.player.y as usize*f.width()+r.player.x as usize).is_none_or(|tile|tile!="chasm")) {
         return Ok(false);
     }
-    travel_inner(r, 1.0, true, false, true)
+    let next = crate::fast_mode::below(r, r.depth);
+    travel_inner(r, next, true, false, true)
 }
-fn travel_inner(r: &mut Run, delta: f64, falling: bool, vertical: bool, voluntary_chasm: bool) -> Result<bool, String> {
+/// Explicit effective-depth teleport; unlike physical travel it never skips again.
+pub(crate) fn travel_to(r: &mut Run, next: f64, falling: bool, vertical: bool) -> Result<bool, String> {
+    if !crate::fast_mode::playable(r, next) { return Ok(false); }
+    travel_inner(r, next, falling, vertical, false)
+}
+fn travel_inner(r: &mut Run, next: f64, falling: bool, vertical: bool, voluntary_chasm: bool) -> Result<bool, String> {
     if crate::dreamwalking::active(r) {engine::log(r,crate::dreamwalking::STAIRS_MESSAGE,"player");return Ok(false)}
     if falling && crate::finale::intercept_fall(r)? { return Ok(true); }
-    let next = r.depth + delta;
-    if next < 1.0 || next > 40.0 {
+    let delta = next - r.depth;
+    if !crate::fast_mode::playable(r, next) {
         return Ok(false);
     }
-    let to = (((next + 5.0) / 5.0).ceil() * 5.0).min(40.0) as u32;
+    let to = crate::fast_mode::arrival_target(r, next as u32);
     crate::startup::ensure_floors(r, to)?;
     crate::offscreen::catch_up_floor(r, next)?;
-    let destination = r.floors.iter().find(|f| f.depth == next).unwrap();
+    let destination = r.floors.iter().find(|f| f.depth == next).ok_or("Travel destination was not generated")?;
     let w = destination.width();
     let mut desired = if falling || vertical {
         if in_bounds(destination, r.player.x, r.player.y) {
@@ -650,9 +708,14 @@ fn travel_inner(r: &mut Run, delta: f64, falling: bool, vertical: bool, voluntar
     let f = r.floor().unwrap();
     let stair_exit = !falling
         && !vertical
-        && delta.abs() == 1.0
+        && crate::fast_mode::adjacent(r, r.depth, next)
         && f.tiles[r.player.y as usize * f.width() + r.player.x as usize]
             == if delta > 0.0 { "down" } else { "up" };
+    let flying_chasm_exit = r.simulation_revision.value_or(29.) >= 52. && falling
+        && next == crate::fast_mode::below(r, r.depth) && f.tiles[r.player.y as usize*f.width()+r.player.x as usize] == "chasm";
+    if flying_chasm_exit {
+        queue_flying_chasm_followers(r,next,Point{x:(pos%w) as i32,y:(pos/w) as i32});
+    }
     let ids: Vec<_> = r
         .actors_at(source)
         .iter()
@@ -661,6 +724,9 @@ fn travel_inner(r: &mut Run, delta: f64, falling: bool, vertical: bool, voluntar
         .collect();
     for id in ids {
         let a = engine::actor(r, id).unwrap().clone();
+        // The R52 flying cohort above owns its stricter target/awareness gate
+        // and exact landing. Keep legacy/nonflying chase enrollment unchanged.
+        if flying_chasm_exit && flying(r,&a) { continue; }
         let known = a
             .last_seen
             .as_ref()
@@ -731,6 +797,7 @@ fn travel_inner(r: &mut Run, delta: f64, falling: bool, vertical: bool, voluntar
     crate::startup::ensure_floors(r, to)?;
     r.player.x = (pos % w) as f64;
     r.player.y = (pos / w) as f64;
+    crate::revision50::duel_actor_changed(r,r.player.id);
     crate::environment::refresh_burning_from_fire(r, r.player.id)?;
     let landing_water = r.floor().unwrap().tiles[pos] == "water";
     if falling && !landing_water {
@@ -800,7 +867,7 @@ fn travel_inner(r: &mut Run, delta: f64, falling: bool, vertical: bool, voluntar
     engine::monster_floor_entered(r);
     engine::monster_prepare_player_turn(r).map_err(|e| e.0)?;
     let domain = r.floor().unwrap().domain.clone();
-    engine::log(r, format!("Floor {next}: {domain}."), "environment");
+    engine::log(r, format!("Floor {}: {domain}.", crate::fast_mode::display_depth(r, next)), "environment");
     Ok(true)
 }
 
@@ -863,6 +930,7 @@ fn copy_depth_changes(r: &mut Run, head: Run) {
     r.exp = head.exp;
     r.run_stats = head.run_stats;
     r.collapse = head.collapse;
+    crate::revision50::settle_duel_targets(r);
 }
 /// Forced cohorts reserve all landings before transfer; IDs order the cohort.
 /// Shared endpoints take impact on the source owner before being dismissed.
@@ -924,11 +992,15 @@ pub fn fall_actors_one_level(
     if endpoint_pit {
         crate::half_here::dismiss(r);
     }
-    if falling.is_empty() || source_depth >= 40.0 {
+    let next = crate::fast_mode::below(r, source_depth);
+    if falling.is_empty() || !crate::fast_mode::playable(r, next) {
         return Ok(());
     }
-    let next = source_depth + 1.0;
-    crate::startup::ensure_floors(r, (((next + 5.0) / 5.0).ceil() * 5.0).min(40.0) as u32)?;
+    // A nonplayer fall only needs its physical destination, not a new player
+    // prefetch horizon. Successful player transfer extends the horizon below.
+    let to = if r.simulation_revision.value_or(29.) >= 52. { next as u32 }
+        else { crate::startup::arrival_generation_target(r.simulation_revision.value_or(29.), next as u32) };
+    crate::startup::ensure_floors(r, to)?;
     crate::offscreen::catch_up_floor(r, next)?;
     let destination = r.floors.iter().find(|f| f.depth == next).unwrap();
     let w = destination.width();
@@ -1008,6 +1080,12 @@ pub fn fall_actors_one_level(
     }
     let player_falls = plans.iter().any(|(a, _)| a.id == r.player.id);
     if player_falls {
+        if r.simulation_revision.value_or(29.) >= 52. {
+            let to = crate::fast_mode::arrival_target(r, next as u32);
+            crate::startup::ensure_floors(r, to)?;
+        }
+        let landing = plans.iter().find(|(a,_)|a.id == r.player.id).unwrap().1;
+        queue_flying_chasm_followers(r,next,landing);
         dismiss_half_here(r)
     }
     for (a, _) in &plans {
@@ -1063,6 +1141,7 @@ pub fn fall_actors_one_level(
             r.actors_at_mut(next).push(actor)
         }
     }
+    for (a,_) in &plans {crate::revision50::duel_actor_changed(r,a.id);}
     for f in &mut r.floors {
         if f.depth == source_depth || f.depth == next {
             crate::mutation_journal::make_mut(f).dirty = true
@@ -1127,7 +1206,7 @@ pub fn fall_actors_one_level(
         let f = r.floor().unwrap();
         let domain = f.domain.clone();
         let pit = f.tiles[r.player.y as usize * f.width() + r.player.x as usize] == "pit";
-        engine::log(r, format!("Floor {next}: {domain}."), "environment");
+        engine::log(r, format!("Floor {}: {domain}.", crate::fast_mode::display_depth(r, next)), "environment");
         if r.status == "playing" && pit {
             r.status = "won".into();
             engine::log(r, "You fall into the bottomless pit. Victory.", "player");
@@ -1216,7 +1295,7 @@ pub fn descent_cells(f: &Floor, x: f64, y: f64, diluted: bool) -> Vec<usize> {
 pub fn collapse_descent(r: &mut Run, x: f64, y: f64, diluted: bool) -> Result<bool, String> {
     let direct_roots = r.simulation_revision.value_or(29.) >= 51.;
     let source_depth = r.depth;
-    if source_depth >= 40.0 {
+    if !crate::fast_mode::playable(r, crate::fast_mode::below(r, source_depth)) {
         engine::log(
             r,
             "The floor does not collapse: there is no floor below.",
@@ -1229,11 +1308,11 @@ pub fn collapse_descent(r: &mut Run, x: f64, y: f64, diluted: bool) -> Result<bo
         engine::log(r, "There is no collapsible floor here.", "player");
         return Ok(false);
     }
-    crate::startup::ensure_floors(
-        r,
-        (((source_depth + 6.0) / 5.0).ceil() * 5.0).min(40.0) as u32,
-    )?;
-    crate::offscreen::catch_up_floor(r, source_depth + 1.0)?;
+    let next = crate::fast_mode::below(r, source_depth);
+    let to = if r.simulation_revision.value_or(29.) >= 52. { next as u32 }
+        else { crate::startup::arrival_generation_target(r.simulation_revision.value_or(29.), next as u32) };
+    crate::startup::ensure_floors(r, to)?;
+    crate::offscreen::catch_up_floor(r, next)?;
     let w = r.floor().unwrap().width();
     let changed: HashSet<_> = cells.iter().copied().collect();
     let victims: Vec<_> = std::iter::once(&r.player)

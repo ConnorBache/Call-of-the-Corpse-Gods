@@ -29,8 +29,10 @@ pub fn deserialize(raw: &str) -> Result<Run> {
     let mut v: Value = serde_json::from_str(raw)?;
     unpack(&mut v)?;
     normalize_inventory_display_order(&mut v);
-    let run: Run = serde_json::from_value(v)?;
+    let mut run: Run = serde_json::from_value(v)?;
     validate(&run)?;
+    crate::revision52_reserves::normalize_run(&mut run).map_err(StorageError)?;
+    crate::revision50::settle_current_duels(&mut run);
     Ok(run)
 }
 /// Source-ordered compatibility loader. Original timeline is captured before mutation.
@@ -52,6 +54,7 @@ pub(crate) fn decode_compatible_with(
     let mut run: Run = serde_json::from_value(value)?;
     validate(&run)?;
     crate::migration_pipeline::migrate_timeline(&mut run, context, depth)?;
+    crate::revision52_reserves::normalize_run(&mut run).map_err(StorageError)?;
     if let Some(order) = order {
         let mut value = canonical_value(&run)?;
         value["inventoryDisplayOrder"] = order;
@@ -97,6 +100,8 @@ pub fn from_canonical(raw: &str) -> Result<Run> {
     Ok(run)
 }
 pub fn validate(run: &Run) -> Result<()> {
+    crate::revision52_enemy_followups::validate_run(run).map_err(StorageError)?;
+    if !crate::fast_mode::valid_configuration(run) { return Err(invalid("Invalid Fast mode flag/revision")); }
     if run.version != 1.0
         || !["Unblessed", "Blessed", "Avatar"].contains(&run.mode.as_str())
         || !["playing", "dead", "won"].contains(&run.status.as_str())
@@ -111,7 +116,7 @@ pub fn validate(run: &Run) -> Result<()> {
         || run.depth > 40.0
         || run.depth.fract() != 0.0
         || run.floors.len() > 40
-        || run.floors.len() < (run.depth as usize)
+        || !run.floors.iter().any(|f| f.depth == run.depth)
     {
         return Err(invalid("Invalid floor count/depth"));
     }
@@ -120,7 +125,10 @@ pub fn validate(run: &Run) -> Result<()> {
     }
     for (i, f) in run.floors.iter().enumerate() {
         let n = f.tiles.len();
-        if f.depth != (i + 1) as f64
+        let expected_depth = if crate::fast_mode::enabled(run) {
+            if i == 0 { 1. } else { crate::fast_mode::below(run, run.floors[i - 1].depth) }
+        } else { (i + 1) as f64 };
+        if f.depth != expected_depth
             || !matches!(n, 2291 | 2500 | 3600)
             || f.lights.len() != n
             || f.seen.len() != n
@@ -151,6 +159,7 @@ pub fn validate(run: &Run) -> Result<()> {
         || ground_and_memory.filter(|i| marked(i)).any(|i| {
         !crate::borge::weapon_enabled(run) || !crate::borge::is_shard(i) || !i.dream_ground.value_or(false)
     }) { return Err(invalid("Invalid dream ground item")); }
+    crate::firebolt_travel::validate(run).map_err(StorageError)?;
     crate::validation::validate(run)?;
     Ok(())
 }
@@ -344,9 +353,9 @@ pub fn validate_current_revision(run: &Run) -> Result<()> {
     if run.gameplay_revision.as_ref() != Some(&3.0)
         || run.divine_revision.as_ref() != Some(&1.0)
         || run.enemy_health_revision.as_ref() != Some(&1.0)
-        || !matches!(run.simulation_revision.as_ref(), Some(29.0 | 30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0))
+        || !matches!(run.simulation_revision.as_ref(), Some(29.0 | 30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0))
     {
-        return Err(StorageError("Unsupported legacy migration: native execution requires gameplay 3, divine 1, enemy health 1, simulation 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 50 or 51".into()));
+        return Err(StorageError("Unsupported legacy migration: native execution requires gameplay 3, divine 1, enemy health 1, simulation 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 50, 51 or 52".into()));
     }
     Ok(())
 }

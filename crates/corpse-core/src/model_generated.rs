@@ -53,6 +53,9 @@ pub struct ItemEnhancementsEntry {
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Item {
+    /// R52 birth identity. Missing is always base tier one, including old saves.
+    #[serde(rename = "amuletTier", default, skip_serializing_if = "Field::is_missing")]
+    pub amulet_tier: Field<f64>,
     /// Explicit R50 amulet resource state; absent until authored by a caller.
     #[serde(rename = "amuletState", default, skip_serializing_if = "Field::is_missing")]
     pub amulet_state: Field<crate::revision50_amulets::AmuletState>,
@@ -314,6 +317,9 @@ pub struct ActorLastSeen {
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Actor {
+    /// Fortune refill deadlines; absent in older saves and initialized when needed.
+    #[serde(rename = "fortuneSchedule", default, skip_serializing_if = "Field::is_missing")]
+    pub fortune_schedule: Field<crate::turn_schedule::Schedule<()>>,
     #[serde(rename = "reapingLedger", default, skip_serializing_if = "Field::is_missing")]
     pub reaping_ledger: Field<crate::revision50_amulets::ReapingLedger>,
     #[serde(rename = "amuletLedger", default, skip_serializing_if = "Field::is_missing")]
@@ -887,6 +893,17 @@ pub struct FungalRoot {
     pub active: bool,
     #[serde(rename = "color")]
     pub color: String,
+    /// Absent on historical and already-grown links. The path remains the
+    /// original direct route; only its grown prefix is physical root material.
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub growth: Field<FungalRootGrowth>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FungalRootGrowth {
+    pub grown: usize,
+    pub turns: u8,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -1585,6 +1602,8 @@ pub struct Run {
     pub time_costs: Field<RunTimeCosts>,
     #[serde(rename = "phase", default, skip_serializing_if = "Field::is_missing")]
     pub phase: Field<String>,
+    #[serde(rename = "fastActionPhase", default, skip_serializing_if = "Field::is_missing")]
+    pub fast_action_phase: Field<crate::model::FastActionPhase>,
     #[serde(
         rename = "hasteSnapshot",
         default,
@@ -1597,6 +1616,12 @@ pub struct Run {
     pub rng: f64,
     #[serde(rename = "mode")]
     pub mode: Mode,
+    /// Opt-in accelerated descent. Missing in all historical normal saves.
+    #[serde(rename = "fastMode", default, skip_serializing_if = "Field::is_missing")]
+    pub fast_mode: Field<bool>,
+    /// Twenty-floor route; absent preserves historical save/replay coordinates.
+    #[serde(rename = "compressedDepths", default, skip_serializing_if = "Field::is_missing")]
+    pub compressed_depths: Field<bool>,
     #[serde(rename = "gods")]
     pub gods: Vec<f64>,
     #[serde(rename = "tick")]
@@ -1679,6 +1704,9 @@ pub struct Run {
     /// snapshot Revert before command N; Null explicitly unknown old trial provenance.
     #[serde(rename = "replaySnapshotFrom", default, skip_serializing_if = "Field::is_missing")]
     pub replay_snapshot_from: Field<usize>,
+    /// Firebolt-only command boundary; Null is an explicit legacy playback prefix.
+    #[serde(rename = "fireboltTravelFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub firebolt_travel_from: Field<usize>,
     #[serde(rename = "metrics")]
     pub metrics: IndexMap<String, f64>,
     #[serde(rename = "dev")]

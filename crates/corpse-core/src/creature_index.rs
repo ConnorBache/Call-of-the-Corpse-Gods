@@ -19,7 +19,7 @@ pub struct FloorCreatureId { pub epoch:u64, pub slot:u32, pub generation:u64 }
 #[derive(Debug,Clone)]
 struct Location { floor:usize, map_floor:usize, at:usize, handle:SlotHandle }
 #[derive(Debug,Clone,Default)]
-struct Registry { reserved:DecimalTrie<()>, positions:DecimalTrie<Location>, entries:Vec<(u64,Location)>, floors:IndexMap<String,SlotMap<u64>>, player:(u64,u64), active_map_floor:Option<usize> }
+struct Registry { reserved:DecimalTrie<()>, positions:DecimalTrie<Location>, entries:Vec<(u64,Location)>, floors:IndexMap<String,SlotMap<u64>>, player:(u64,u64), active_map_floor:Option<usize>, duel_owners:Arc<[f64]> }
 #[derive(Debug)]
 struct Cache { registry:Arc<Registry>, dirty:bool, error:Option<String>, epoch:u64 }
 impl Default for Cache {
@@ -75,11 +75,14 @@ impl ActorFloors {
     /// move of the new map. Keep current slot history across offscreen proxies.
     pub(crate) fn replace_from(&mut self,other:Self) {crate::capture_pilot::mark_unsupported("actor_map_copyback");self.map=other.map;self.invalidate();}
     /// Expected O(1) map lookup, plus O(actor payload) on first COW write.
-    /// Crate-private: caller must preserve IDs, nested pilots, vector order/length.
+    /// Crate-private: caller must preserve IDs, nested pilots, vector order/length,
+    /// and must not introduce an independent NPC Duel (use public mutation).
     pub(crate) fn trusted_slice_mut(&mut self,depth:&str)->Option<&mut [Actor]> {crate::capture_pilot::mark_actor_group(depth);self.map.get_mut(depth).map(|v|crate::mutation_journal::make_mut(v).as_mut_slice())}
     /// O(1) indexed floor access plus first-write COW; internal property-only writes.
+    /// Must not introduce an independent NPC Duel; use public mutation for that.
     pub(crate) fn trusted_index_mut(&mut self,index:usize)->Option<&mut [Actor]> {if let Some((key,_))=self.map.get_index(index){crate::capture_pilot::mark_actor_group(key);}self.map.get_index_mut(index).map(|(_,v)|crate::mutation_journal::make_mut(v).as_mut_slice())}
     /// Expected O(1) map lookup plus first-write COW; preserves legacy empty-floor insertion.
+    /// Must not introduce an independent NPC Duel; use public mutation for that.
     pub(crate) fn trusted_slice_or_default(&mut self,depth:&str)->&mut [Actor] {
         crate::capture_pilot::mark_actor_group(depth);
         if !self.map.contains_key(depth) {self.invalidate();}
@@ -101,6 +104,7 @@ impl ActorFloors {
         let mut identities=DecimalTrie::default();
         let mut present=DecimalTrie::default();
         let mut desired=Vec::new();
+        let mut duel_owners=Vec::new();
         let mut floors=old.floors.clone();
         if player!=-1. {
             let id=key(player)?;identities.insert_new(id,())?;
@@ -112,6 +116,11 @@ impl ActorFloors {
             floors.entry(name.clone()).or_default();let floor=floors.get_index_of(name).unwrap();
             for (at,a) in actors.iter().enumerate() {
                 reserve(a,&mut identities)?;
+                // Independent NPC Duel activation is birth/load/public-edit only.
+                // Trusted in-place writers may remove it, never introduce it.
+                if !crate::half_here::is_clone(a) && (a.conditions.contains_key("r50DuelTarget")
+                    || a.active.iter().any(|s|s==crate::revision50::DUEL)
+                    || a.abilities.iter().any(|s|s==crate::revision50::DUEL)) {duel_owners.push(a.id);}
                 let id=key(a.id)?;present.insert_new(id,floor)?;desired.push((id,floor,map_floor,at));
             }
         }
@@ -123,7 +132,16 @@ impl ActorFloors {
             let handle=if let Some(loc)=old.positions.get(id).filter(|loc|loc.floor==floor) {loc.handle} else {floors.get_index_mut(floor).unwrap().1.allocate(id)?};
             let loc=Location{floor,map_floor,at,handle};positions.insert_new(id,loc.clone())?;entries.push((id,loc));
         }
-        Ok(Registry {reserved:identities,positions,entries,floors,player:(player.to_bits(),depth.to_bits()),active_map_floor:self.map.get_index_of(&depth.to_string())})
+        Ok(Registry {reserved:identities,positions,entries,floors,player:(player.to_bits(),depth.to_bits()),active_map_floor:self.map.get_index_of(&depth.to_string()),duel_owners:duel_owners.into()})
+    }
+    /// O(1) shared candidate list when clean; structural reconciliation also scans
+    /// K active/owned abilities per actor, O(sum K), and stores O(D) candidates.
+    /// A conservative superset: inactive/expired owners are filtered at use.
+    /// Native independent activations are inserted actors; player activations and
+    /// shared endpoint projections are deliberately outside this derived list.
+    pub(crate) fn duel_owner_ids(&self,player:f64,depth:f64)->Result<Arc<[f64]>,String> {
+        self.ensure(player,depth)?;
+        Ok(self.cache.lock().unwrap_or_else(|e|e.into_inner()).registry.duel_owners.clone())
     }
     /// O(d) clean lookup; dirty-index rebuild O((A+P+B)*d+F+V). Invalid worlds return Err.
     pub(crate) fn position(&self,id:f64,player:f64,depth:f64,current_only:bool)->Result<Option<(usize,usize)>,String> {

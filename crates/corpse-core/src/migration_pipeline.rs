@@ -393,6 +393,8 @@ pub fn normalize_world(r: &mut Run) -> Result<()> {
     crate::corpse_placement::normalize_corpses(r, ensure).map_err(err)?;
     crate::revision50_creature_identity::normalize_world(r);
     crate::fungi::normalize_world(r);
+    crate::hanged::normalize_world(r);
+    crate::revision50::settle_current_duels(r);
     Ok(())
 }
 #[derive(Default)]

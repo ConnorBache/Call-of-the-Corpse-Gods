@@ -130,6 +130,7 @@ pub fn hold_action(r: &mut Run, id: f64, target: f64) -> bool {
         return false;
     }
     if crate::revision50_nightmares::strike(r, target) { return true; }
+    let fresh=condition(&b,"grabbed")<=0.;
     let b = actor_mut_trusted(r, target).unwrap();
     b.conditions.insert("grabbed".into(), 3.0);
     b.conditions.insert("grabbedBy".into(), id);
@@ -174,7 +175,7 @@ pub fn hold_action(r: &mut Run, id: f64, target: f64) -> bool {
             },
         );
     }
-    crate::events::actor_event(r, &a, "status", "Held", Some((&b).into()), None);
+    if fresh || !crate::events::enabled(r) {crate::events::actor_event(r, &a, "status", "Held", Some((&b).into()), None);}
     true
 }
 pub fn water_jet(r: &mut Run, id: f64, target: f64) -> Result<bool, String> {
@@ -190,21 +191,26 @@ pub fn water_jet(r: &mut Run, id: f64, target: f64) -> Result<bool, String> {
     }
     if crate::projectiles::possible_shot_range(r,&a,&b,6.).is_none()||!engine::enemy_spend(r,id,8.){return Ok(false)}
     let p=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
+    crate::events::tag_path(&a,"E47","bolt-blue");
     let range=crate::projectiles::traveled_distance(r,&a,b.x,b.y,&p);
     if r.simulation_revision.value_or(29.)>=36.{actor_mut_trusted(r,id).unwrap().conditions.insert("rangedRecovery".into(),1.);}
     let Some(target)=p.actor_id.filter(|_|range<=6.) else{
         crate::events::actor_event(r,&a,"projectile","Water jet",Some(crate::events::EventPoint{x:p.x,y:p.y}),None);
         return Ok(true)
     };
-    let hit = engine::attack_ranged_resolved(r, id, target, 22.0, range, 1.0, false).map_err(|e| e.0)?;
+    let hit = engine::attack_ranged_resolved(r, id, target, crate::balance52::local_amount(r, &a, "monsterSpecialDamage", if crate::combat::raw_attack_damage_enabled(r.simulation_revision.value_or(29.)) { 11. } else { 22. }), range, 1.0, false).map_err(|e| e.0)?;
     if hit && actor(r, target).is_some_and(|b| !b.dead.value_or(false)) {
         let b = actor(r, target).unwrap();
         let (toward_x, toward_y) = crate::portals::direction_toward(r, b, a.x, a.y);
         let (dx, dy) = (-toward_x, -toward_y);
+        let before=b.clone();
         actor_mut_trusted(r, target).unwrap().conditions.insert("forcedMove".into(), 1.0);
         engine::move_actor(r, target, dx, dy, false).map_err(|e| e.0)?;
         if let Some(b) = actor_mut_trusted(r, target) {
             b.conditions.shift_remove("forcedMove");
+        }
+        if let Some(after)=actor(r,target).filter(|after|after.x!=before.x || after.y!=before.y) {
+            crate::events::cue(r,after,"E47","wave-blue",crate::events::Stage::Special,&[(&before).into(),after.into()]);
         }
     }
     let b = actor(r, target).unwrap_or(&b);

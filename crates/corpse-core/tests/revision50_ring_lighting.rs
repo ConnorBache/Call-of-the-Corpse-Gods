@@ -126,3 +126,16 @@ fn additive_light_reduces_absolute_darkness_aura_and_does_not_duplicate_shared_b
     aura.x=r.player.x;aura.y=r.player.y;
     assert_eq!(vision::light(&r,&aura),-100.,"wearer tile remains excluded even for colocated aura bearer");
 }
+
+#[test]
+fn r52_stealth_stacks_but_light_still_raises_absolute_darkness() {
+    let mut r=room();r.simulation_revision=52.0.into();
+    r.inventory.extend([ring(2.,"stealth"),ring(3.,"stealth")]);
+    assert!((vision::light(&r,&r.player)+72.).abs()<1e-9);
+    assert_eq!(vision::tile_light(&r,2,2),-50.);
+    r.inventory.clear();r.inventory.extend([ring(4.,"light"),ring(5.,"light")]);
+    r.floor_mut().unwrap().lights.fill(-100.);
+    assert_eq!(vision::tile_light(&r,3,2),-80.);
+    assert_eq!(vision::tile_light(&r,2,2),-100.);
+    assert_cached(&r);
+}

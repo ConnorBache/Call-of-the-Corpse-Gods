@@ -166,7 +166,9 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         }
         if !choices.is_empty() && spell_spend(r, id, 12.0) {
             let q = &choices[(crate::rng::random(r) * choices.len() as f64).floor() as usize];
-            crate::events::actor_event(r, &b, "pulse", "Vanish", None, None);
+            let relocated=!crate::revision50_nightmares::is_decoy(&b) && (b.x!=q.x || b.y!=q.y);
+            if crate::events::enabled(r) {if relocated {crate::animation_enemy::mark(r,&b,"E39","bracket-fold-gold",crate::events::Stage::Travel);}}
+            else {crate::events::actor_event(r, &b, "pulse", "Vanish", None, None);}
             let t = actor_mut_trusted(r, target).unwrap();
             // The caster still targets/spends its action on the apparent player,
             // but a stationary hallucination cannot be teleported by Beckon.
@@ -181,7 +183,8 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
                 .conditions
                 .shift_remove("forcedMove");
             let b = actor(r, target).unwrap().clone();
-            crate::events::actor_event(r, &b, "pulse", "Appear", None, None);
+            if crate::events::enabled(r) {if relocated {crate::animation_enemy::mark(r,&b,"E39","bracket-unfold-gold",crate::events::Stage::Special);}}
+            else {crate::events::actor_event(r, &b, "pulse", "Appear", None, None);}
             r.floor_mut().unwrap().dirty = true;
             actor_mut_trusted(r, id)
                 .unwrap()
@@ -252,9 +255,11 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
     if has(&a, "horn-bolt") && range > std::f64::consts::SQRT_2 && range <= 10.0 && allowed {
         let possible=crate::projectiles::possible_shot_range(r,&a,&b,10.);
         if let Some(range)=possible.filter(|_|spell_spend(r,id,8.)) {
-            let base = 20.0 + crate::combat::effective_stats(r, &a).offense * 1.5;
+            let (fixed, coefficient) = if crate::combat::raw_attack_damage_enabled(r.simulation_revision.value_or(29.)) { (10., 0.75) } else { (20., 1.5) };
+            let base = fixed + crate::combat::effective_stats(r, &a).offense * coefficient;
             if r.simulation_revision.value_or(29.)>=36. {
                 let actual=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
+    crate::events::tag_path(&a,"E38","bolt-ivory");
                 let traveled=crate::projectiles::traveled_distance(r,&a,b.x,b.y,&actual);
                 actor_mut_trusted(r,id).unwrap().conditions.insert("rangedRecovery".into(),1.);
                 if let Some(victim)=actual.actor_id.filter(|_|traveled<=10.){engine::attack_ranged_resolved(r,id,victim,base,traveled,1.,false).map_err(|e|e.0)?;}
@@ -279,6 +284,7 @@ pub fn world_turn(r: &mut Run) {
     let ids: Vec<_> = std::iter::once(r.player.id)
         .chain(r.actors_at(r.depth).iter().map(|a| a.id))
         .collect();
+    let previously_silenced:std::collections::HashSet<u64>=ids.iter().filter(|&&id|actor(r,id).is_some_and(|a|condition(a,"auraSilenced")>0.)).map(|id|id.to_bits()).collect();
     for id in ids {
         actor_mut_trusted(r, id)
             .unwrap()
@@ -297,6 +303,8 @@ pub fn world_turn(r: &mut Run) {
                     if f.tiles.get(i as usize).is_some_and(|s| s == "wall") {
                         f.tiles[i as usize] = "floor".into();
                         crate::ichor::enqueue_opening_revision(f, i as usize, revision);
+                        let w=f.width();
+                        crate::events::at(r,"E40","fracture-stone",crate::events::Stage::Special,&[crate::events::EventPoint{x:(i as usize%w) as f64,y:(i as usize/w) as f64}]);
                     }
                 }
                 r.floor_mut().unwrap().dirty = true;
@@ -328,10 +336,12 @@ pub fn world_turn(r: &mut Run) {
                         && distance(r, source, target) <= 3.0
                         && crate::vision::line_of_sight(r, source, target)
                     {
+                        let fresh=actor(r,target.id).is_some_and(|a|condition(a,"auraSilenced")<=0.) && !previously_silenced.contains(&target.id.to_bits());
                         actor_mut_trusted(r, target.id)
                             .unwrap()
                             .conditions
                             .insert("auraSilenced".into(), 1.0);
+                        if fresh { crate::animation_enemy::mark(r,target,"E52","crossed-ring-violet",crate::events::Stage::Special); }
                     }
                 }
             });

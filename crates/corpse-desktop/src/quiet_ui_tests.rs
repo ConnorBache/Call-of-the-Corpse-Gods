@@ -18,9 +18,9 @@ fn capture(name:&str,p:&Painter){
     }
 }
 #[test]
-fn quiet_ui_toolbar_is_exactly_three_evenly_spaced_labels(){
-    assert_eq!(TOOLBAR_ACTIONS,["Pack","Bestiary","Menu"]);
-    assert_eq!(TOOLBAR_VISIBLE_ACTIONS,[4,7,9]);
+fn quiet_ui_toolbar_adds_help_with_four_evenly_spaced_labels(){
+    assert_eq!(TOOLBAR_ACTIONS,["Pack","Bestiary","?","Menu"]);
+    assert_eq!(TOOLBAR_VISIBLE_ACTIONS,[4,7,crate::help_ui::ACTION,9]);
     let mut p=Painter::new();
     for(w,h)in [(1280,800),(1920,1080),(1537,911),(960,1200)]{
         p.resize(w,h);p.set_responsive_canvas(true);
@@ -31,7 +31,9 @@ fn quiet_ui_toolbar_is_exactly_three_evenly_spaced_labels(){
             assert_eq!(p.toolbar_action(x+width/2,p.toolbar_y()+20),Some(*id));
             assert_eq!(p.toolbar_action(x,p.toolbar_y()-1),None);
         }
-        assert!(((centers[1]-centers[0])-(centers[2]-centers[1])).abs()<=1);
+        for centers in centers.windows(3) {
+            assert!(((centers[1]-centers[0])-(centers[2]-centers[1])).abs()<=1);
+        }
     }
 }
 #[test]
@@ -59,7 +61,7 @@ fn quiet_ui_unused_reserves_are_hidden_without_mutating_them(){
     for a in corpse_core::progression::catalog_for_revision(50.){
         let row=crate::ability_ui::observe(&r,&a.id);
         assert_eq!(row.cost.contains("Reserve"),crate::ability_ui::r50_uses_energy(&a.id),"{}",a.name);
-        assert_eq!(row.description.contains("Ability energy is spent first"),crate::ability_ui::r50_uses_energy(&a.id),"{}",a.name);
+        assert!(!row.description.contains("Ability energy is spent first"),"{}",a.name);
     }
     for id in ["isheilah-quick-hand","ursa-sleep-walk","lichor-blood-letting","kative-appropriate"]{
         assert!(!crate::ability_ui::observe(&r,id).cost.contains("Reserve"));
@@ -110,18 +112,29 @@ fn quiet_ui_two_way_hover_restores_full_retained_and_tile_frames(){
     assert_eq!(r,frozen);
 }
 #[test]
-fn quiet_ui_small_corpse_marker_is_bounded_relative_to_heart_ring(){
+fn quiet_ui_large_red_corpse_marker_and_pale_heart_rings_stay_tile_bounded(){
     for scale in [1.,1.5,2.] {
         let mut p=Painter::new();p.resize((1280.*scale)as usize,(800.*scale)as usize);
         let bounds=|p:&Painter|{
             let coords:Vec<_>=p.pixels.chunks_exact(4).enumerate().filter(|(_,v)|v[..3]!=[0,0,0]).map(|(i,_)|(i%p.width,i/p.width)).collect();
+            let tile=(p.native_x(40.)as usize,p.native_y(50.)as usize,p.native_x(55.)as usize,p.native_y(74.)as usize);
+            assert!(coords.iter().all(|&(x,y)|x>=tile.0&&x<tile.2&&y>=tile.1&&y<tile.3),"marker ink must stay inside its native tile at scale {scale}");
             (coords.iter().map(|v|v.0).max().unwrap()-coords.iter().map(|v|v.0).min().unwrap()+1,
              coords.iter().map(|v|v.1).max().unwrap()-coords.iter().map(|v|v.1).min().unwrap()+1)
         };
-        p.clear([0,0,0]);p.corpse_marker(40,50,15,24,None);let cross=bounds(&p);
+        let red=|v:&[u8]|v[0]>v[1].saturating_add(45)&&v[0]>v[2].saturating_add(45);
+        p.clear([0,0,0]);{ let bounds=corpse_marker_tests::marker_test_bounds(&mut p); p.corpse_marker(bounds,40,50,15,24,None); };let cross=bounds(&p);
+        // Latest design replaces the former small-X cap: endpoints span 60%
+        // of the tile width, with a narrow antialiased stroke and outline.
+        for extent in [cross.0,cross.1] {
+            assert!(extent as f64>=9.*scale&&extent as f64<=12.*scale+1.,"large cross extent at scale {scale}: {cross:?}");
+        }
+        assert!(p.pixels.chunks_exact(4).any(red),"corpse cross has red ink at scale {scale}");
         for glyph in ["r","^","y","^^"] {
             p.clear([0,0,0]);p.heartless_marker(glyph,40,50,15,24,None);let ring=bounds(&p);
-            assert!(cross.0<=ring.0*2&&cross.1<=ring.1*2,"{scale} {glyph}: {cross:?} vs {ring:?}");
+            assert!(ring.0<cross.0&&ring.1<cross.1,"heartless ring stays smaller: {scale} {glyph}: {ring:?} vs {cross:?}");
+            assert!(!p.pixels.chunks_exact(4).any(red),"heartless ring must not inherit the corpse red: {scale} {glyph}");
+            assert!(p.pixels.chunks_exact(4).any(|v|v[0]>80&&v[1]>70&&v[2]>50),"pale ring remains visible: {scale} {glyph}");
         }
     }
 }

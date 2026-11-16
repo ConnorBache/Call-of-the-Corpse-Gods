@@ -38,6 +38,20 @@ impl Trail {
     pub fn iter(&self) -> impl DoubleEndedIterator<Item=&Segment> + ExactSizeIterator {
         self.segments.iter()
     }
+    /// Consume exactly one segment, preserving both older and newer segments.
+    /// Expected O(1) for either endpoint; O(L) search/shift for a middle entry.
+    /// O(1) scratch, retained capacity unchanged. Shared Arc detachment is caller-owned.
+    pub fn remove(&mut self, cell: Cell) -> bool {
+        if self.by_cell.remove(&cell).is_none() { return false; }
+        if self.segments.back().is_some_and(|s| s.cell == cell) {
+            self.segments.pop_back();
+        } else if self.segments.front().is_some_and(|s| s.cell == cell) {
+            self.segments.pop_front();
+        } else if let Some(index) = self.segments.iter().position(|s| s.cell == cell) {
+            self.segments.remove(index);
+        }
+        true
+    }
     /// Expected O(1+k) / worst O((k+1)L), O(1) scratch. Remove collided segment
     /// and every older segment. Absent cells are no-ops. Retained suffix is not shifted.
     pub fn remove_through(&mut self, cell: Cell) -> usize {

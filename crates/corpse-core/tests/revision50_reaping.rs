@@ -221,3 +221,15 @@ fn one_lightning_activation_credits_each_hostile_hit_and_the_spent_source_amulet
     assert_eq!(corpse_core::revision50_amulet_effects::command(&mut r,&Command::UseAt{id:2.,x:12.,y:10.}).unwrap(),Some(true));
     assert_eq!((energy(&r,2.),energy(&r,3.),carry(&r)),(30.,25.,0.));assert_eq!(r.rng,rng);
 }
+
+#[test]
+fn r52_reaping_copies_multiply_credit_and_preserve_carry_when_removed() {
+    let mut r=room();r.simulation_revision=52.0.into();
+    for i in &mut r.inventory {if let Some(s)=i.amulet_state.as_mut(){s.energy=0.;}}
+    r.inventory.push(ring(4.));r.actors_at_mut(r.depth).push(target(901.,1000.));
+    direct(&mut r,901.,9.,"lightning");assert_eq!((carry(&r),energy(&r,2.)),(18.,0.));
+    direct(&mut r,901.,1.,"lightning");assert_eq!((carry(&r),energy(&r,2.)),(0.,1.));
+    direct(&mut r,901.,3.,"lightning");assert_eq!(carry(&r),6.);
+    r.inventory.retain(|i|i.id!=4.);direct(&mut r,901.,14.,"lightning");
+    assert_eq!((carry(&r),energy(&r,2.),energy(&r,3.)),(0.,2.,2.));
+}

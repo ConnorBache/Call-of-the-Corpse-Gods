@@ -53,6 +53,21 @@ fn coordinate(v: &Value, w: usize, h: usize) -> bool {
 fn decimal_key(k: &str) -> bool {
     !k.is_empty() && k.bytes().all(|b| b.is_ascii_digit()) && (k == "0" || !k.starts_with('0'))
 }
+/// R52 extends only the player's meter map. Removed/dormant meters can survive
+/// until the next turn, so validate identity syntax/catalog, not live ownership.
+/// O(A * L) catalog lookup, bounded L <= 128; no user-authored meter labels.
+fn resource_meter_key(key: &str, revision: f64, player: bool) -> bool {
+    if ["hp", "energy", "blessings"].contains(&key) { return true; }
+    if revision < 52. || !player { return false; }
+    if let Some(id) = key.strip_prefix("ability:") {
+        return !id.is_empty() && id.len() <= 128
+            && id.bytes().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || matches!(c, b'-' | b':'))
+            && (crate::progression::definition_for_revision(revision, id).is_some()
+                || crate::abilities::copied_trait_supported(id));
+    }
+    key.strip_prefix("amulet:").is_some_and(|id| id.len() <= 16 && decimal_key(id)
+        && id.parse::<u64>().is_ok_and(|id| id <= 9_007_199_254_740_991))
+}
 fn sparse(v: &Value, n: usize, p: &str, f: impl Fn(&Value) -> bool) -> Result<()> {
     for (k, x) in object(v, p)? {
         req(
@@ -115,6 +130,11 @@ pub fn validate(run: &Run) -> Result<()> {
 }
 pub fn validate_value(v: &Value) -> Result<()> {
     let revision = num(&v["simulationRevision"]).unwrap_or(29.0);
+    req(optional(v, "fastMode", |flag| flag.is_boolean() && (!flag.as_bool().unwrap() || revision == 52. && v["mode"] == "Avatar" && v["dev"] == false)), "Fast mode flag")?;
+    req(optional(v, "compressedDepths", |flag| flag.is_boolean() && (!flag.as_bool().unwrap() || v["fastMode"] == true)), "Dungeon route flag")?;
+    if let Some(phase)=v.get("fastActionPhase").filter(|v|!v.is_null()) {
+        req(revision>=52. && one(phase,&["haste","normal"]) && v["phase"]=="normal", "Fast action phase")?;
+    }
     req(revision_ability_fields(v, revision), "revision-specific ability, reserve or trail")?;
     req(
         optional(v, "veridianSapHarvested", Value::is_boolean),
@@ -145,7 +165,7 @@ pub fn validate_value(v: &Value) -> Result<()> {
         let abilities: Vec<String> = serde_json::from_value(v["player"]["abilities"].clone())?;
         req(items.iter().filter(|i| !crate::revision50_inventory::unlimited(i)).count() <= 100,
             "inventory capacity")?;
-        req(crate::revision50_inventory::finite_categories_fit(&items, &abilities),
+        req(crate::revision50_inventory::finite_categories_fit_revision(&items, &abilities, revision),
             "Revision 50 backpack category capacity")?;
     } else {
         req(inventory.len() <= 100, "inventory capacity")?;
@@ -194,7 +214,8 @@ pub fn validate_value(v: &Value) -> Result<()> {
             )?;
             for (k, m) in object(meters, "resource meters")? {
                 req(
-                    ["hp", "energy", "blessings"].contains(&k.as_str())
+                    resource_meter_key(k, revision,
+                        num(&v["player"]["id"]).is_some_and(|player| *id == player.to_string()))
                         && ["start", "max", "loss"].iter().all(|k| nonnegative(&m[*k]))
                         && optional(m, "displayReference", Value::is_boolean),
                     "resource meter",
@@ -237,7 +258,7 @@ pub fn validate_value(v: &Value) -> Result<()> {
             floor(f, n, w, h)?;
         }
     }
-    for (i, f) in floors.iter().enumerate() {
+    for f in floors {
         let tiles = array(&f["tiles"], "tiles")?;
         let n = tiles.len();
         let w = if n == 2291 {
@@ -252,7 +273,7 @@ pub fn validate_value(v: &Value) -> Result<()> {
             "floor metadata geometry",
         )?;
         floor(f, n, w, h)?;
-        let depth = (i + 1).to_string();
+        let depth = num(&f["depth"]).ok_or_else(|| fail("floor depth"))?.to_string();
         for actor in array(&v["actors"][&depth], "actors floor")? {
             req(
                 coordinate(actor, w, h)
@@ -269,7 +290,7 @@ pub fn validate_value(v: &Value) -> Result<()> {
     }
     let depth = num(&v["depth"]).ok_or_else(|| fail("depth"))? as usize;
     let f = floors
-        .get(depth.wrapping_sub(1))
+        .iter().find(|f| num(&f["depth"]) == Some(depth as f64))
         .ok_or_else(|| fail("player floor"))?;
     let n = array(&f["tiles"], "tiles")?.len();
     let w = if n == 2291 {
@@ -290,10 +311,10 @@ pub fn validate_value(v: &Value) -> Result<()> {
             for (d, entries) in object(memory, k)? {
                 let dep = d.parse::<usize>().ok().filter(|n| (1..=40).contains(n));
                 req(
-                    dep.is_some_and(|n| n.to_string() == *d && n <= floors.len()),
+                    dep.is_some_and(|n| n.to_string() == *d && floors.iter().any(|f| num(&f["depth"]) == Some(n as f64))),
                     k,
                 )?;
-                let f = &floors[dep.unwrap() - 1];
+                let f = floors.iter().find(|f| num(&f["depth"]) == Some(dep.unwrap() as f64)).unwrap();
                 let n = array(&f["tiles"], "tiles")?.len();
                 let w = if n == 2291 {
                     79
@@ -430,6 +451,9 @@ fn actor_state(a: &Value, revision: f64) -> Result<()> {
 }
 fn item(i: &Value, quantity: bool, revision: f64) -> Result<()> {
     catalog_item(i, revision)?;
+    req(optional(i,"amuletTier",|v|revision==52. && i["kind"]=="amulet" && integer(v)
+        && num(v).is_some_and(|n|(1. ..=9.).contains(&n))
+        && i["effect"].as_str().is_some_and(|e|["lightning","firebolt","acid","iceblast","floods","poison","roots","blinking","beckoning","discord","obstruction","teleportation"].contains(&e))),"R52 amulet tier")?;
     req(optional(i, "amuletState", |state| i["kind"] == "amulet"
         && state.is_object() && state.as_object().unwrap().keys().all(|k|["instance_id","energy","ready_at_half_tick"].contains(&k.as_str()))
         && count(&state["instance_id"]) && num(&state["instance_id"]) == num(&i["id"])
@@ -588,6 +612,13 @@ fn floor(f: &Value, n: usize, w: usize, h: usize) -> Result<()> {
                 "fungal root",
             )?;
             cell_list(&r["path"], n, "root path")?;
+            if let Some(growth) = r.get("growth") {
+                object(growth, "root growth")?;
+                req(count(&growth["grown"]) && num(&growth["grown"]).is_some_and(|grown|
+                    grown >= 1. && grown <= r["path"].as_array().unwrap().len() as f64)
+                    && count(&growth["turns"]) && num(&growth["turns"]).is_some_and(|turns| turns < 3.),
+                    "root growth")?;
+            }
         }
     }
     if let Some(e) = f.get("environment") {
@@ -1107,7 +1138,17 @@ fn revision_ability_fields(v: &Value, revision: f64) -> bool {
             if key == "reapingLedger" && (revision < 50.0 || !value.as_object().is_some_and(|ledger|
                 ledger.len()==1 && nonnegative(&value["damageCarry"]) && num(&value["damageCarry"]).is_some_and(|n| n < 20.0))) { return false; }
             if (key == "amuletState" || key == "amuletLedger") && revision < 50.0 { return false; }
+            if key == "amuletTier" && !(revision==52. && v["kind"]=="amulet" && integer(value)
+                && num(value).is_some_and(|n|(1. ..=9.).contains(&n))) {return false;}
             if key == "conditions" {
+                if value.as_object().is_some_and(|conditions| conditions.iter().any(|(k,v)|
+                    crate::balance52::condition_key(k) && (revision != 52.
+                        || !v.as_f64().is_some_and(|n|crate::balance52::valid_condition(k,n))))) {return false;}
+                if value.as_object().is_some_and(|conditions|conditions.iter().any(|(k,v)|
+                    !v.as_f64().is_some_and(|n|crate::revision52_amulet_tiers::valid_condition(k,n,revision)))) {return false;}
+                if revision==52. && value.as_object().is_some_and(|conditions|conditions.iter().any(|(k,v)|
+                    crate::revision52_enemy_followups::condition_key(k)
+                        && !v.as_f64().is_some_and(|n|crate::revision52_enemy_followups::valid_condition(k,n)))) {return false;}
                 if value.as_object().is_some_and(|conditions| conditions.keys().any(|k| {
                     ["acquired:","unequipped:","remembered:"].iter().any(|prefix| k.strip_prefix(prefix).is_some_and(|id|!admitted(id,revision)))
                 })) { return false; }

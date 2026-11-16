@@ -144,14 +144,14 @@ fn root_glyphs_follow_next_segment_at_bends_and_preserve_last_segment_and_inters
     let mut roots = vec![0.; f.tiles.len()]; for &at in &path { roots[at]=1.; }
     f.roots=roots.into();
     f.fungal_roots=vec![FungalRoot {fungus_id:100.,corpse_id:101.,
-        path:path.iter().map(|&at|at as f64).collect(),active:true,color:"#ee6cff".into()}].into();
+        path:path.iter().map(|&at|at as f64).collect(),active:true,color:"#ee6cff".into(),..Default::default()}].into();
     let glyphs: Vec<_> = path.iter().map(|&at|hazard_memory::observed_hazards_at_revision(&f,at,0.,51.)
         .root.as_ref().unwrap().glyph.clone()).collect();
     assert_eq!(glyphs, ["─", "╱", "─", "│", "│"]);
     assert_eq!(hazard_memory::observed_hazards_at_revision(&f,path[2],0.,50.)
         .root.as_ref().unwrap().glyph,"╱", "legacy replay keeps historical chord");
     f.fungal_roots.as_mut().unwrap().push(FungalRoot {fungus_id:102.,corpse_id:103.,
-        path:vec![path[2] as f64,(path[2]+w) as f64],active:true,color:"#ee6cff".into()});
+        path:vec![path[2] as f64,(path[2]+w) as f64],active:true,color:"#ee6cff".into(),..Default::default()});
     assert_eq!(hazard_memory::observed_hazards_at_revision(&f,path[2],0.,51.)
         .root.as_ref().unwrap().glyph,"┼");
     // The one-cell degeneracy retains the existing vertical marker and never panics.
@@ -165,7 +165,7 @@ fn hidden_root_memory_does_not_change_direction_until_observed_again() {
     let mut f=floor(1); let w=f.width(); let at=10*w+10;
     f.roots=vec![1.;f.tiles.len()].into();
     f.fungal_roots=vec![FungalRoot {fungus_id:100.,corpse_id:101.,path:vec![at as f64,(at+1) as f64],
-        active:true,color:"#ee6cff".into()}].into();
+        active:true,color:"#ee6cff".into(),..Default::default()}].into();
     let mut mask=vec![false;f.tiles.len()];mask[at]=true;
     hazard_memory::remember_observed_hazards_revision(&mut f,&mask,0.,51.);
     f.fungal_roots.as_mut().unwrap()[0].path[1]=(at+w) as f64;

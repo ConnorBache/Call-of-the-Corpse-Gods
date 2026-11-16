@@ -16,7 +16,7 @@ fn paint(p:&mut Painter,v:&View,pack:&crate::pack::PackView,state:&crate::pack::
     let c=&v.cells[v.cells.len()/2];
     let cue=crate::effects::Cue {event:corpse_core::events::PresentationEvent {
         kind:"burst".into(),from:None,to:corpse_core::events::EventPoint{x:c.x as f64,y:c.y as f64},
-        glyph:Some("Ω*".into()),color:Some("#af3187".into()),label:None,depth:v.depth},started:0.,held:true};
+        glyph:Some("Ω*".into()),color:Some("#af3187".into()),label:None,depth:v.depth, animation: None, },started:0.,held:true,static_marks:false};
     p.effects(v,&[cue],now,false);
     pack.paint_prepared(p,state);
     // A later translucent layer and text stay ordered above Pack, including

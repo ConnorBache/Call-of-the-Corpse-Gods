@@ -35,6 +35,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
                     if cost == 0.0 { 1.0 } else { cost * 2.0 },
                 );
                 half_here::sync(r);
+                crate::animation_player::local(r, engine::actor(r,id).unwrap(), "P01", "collapse-snap", crate::events::Stage::Health);
                 return true;
             }
             engine::actor_mut_trusted(r, id)
@@ -47,6 +48,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
             a.blood = (a.blood.value_or(0.0) - 1.0).into();
             a.hp = 1.0;
             half_here::sync(r);
+            crate::animation_player::local(r, engine::actor(r,id).unwrap(), "P37", "droplet-empty", crate::events::Stage::Health);
             return true;
         }
         if ability == PELIAN
@@ -58,6 +60,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
             a.conditions.insert("pelianUsed".into(), 1.0);
             a.active.retain(|s| s != &ability);
             half_here::sync(r);
+            crate::animation_player::local(r, engine::actor(r,id).unwrap(), "P07", "fold-reopen", crate::events::Stage::Health);
             return true;
         }
     }
@@ -79,10 +82,13 @@ pub fn accrue_damage(r: &mut Run, victim: f64, n: f64) {
     let Some(a) = engine::actor_mut_trusted(r, owner) else {
         return;
     };
+    let blood_before=a.blood.value_or(0.);
     let mut bank = a.damage_bank.value_or(0.0) + n;
     while bank >= 50.0 {
         bank -= 50.0;
         a.blood = (a.blood.value_or(0.0) + 1.0).min(55.0).into();
     }
     a.damage_bank = bank.into();
+    let gained=a.blood.value_or(0.)>blood_before;
+    if gained {crate::animation_player::local(r,engine::actor(r,owner).unwrap(),"P37","droplet-fill",crate::events::Stage::Health);}
 }

@@ -48,12 +48,14 @@ impl FutureAnchor {
     pub(crate) fn prepare_restore(&self)->Result<Run>{match &*self.0{
         Authority::Text(s)=>{let _span=crate::timing::span("future.restore.text_parse_validate");storage::deserialize(s)},
         Authority::Native{state,imported,..}=>{
-            let run={let _span=crate::timing::span("future.restore.clone_normalize");
+            let mut run={let _span=crate::timing::span("future.restore.clone_normalize");
                 let mut run=clone_anchor_state(state);
                 normalize_inventory_order(&mut run);
                 reset_derived(&mut run);run
             };
             if imported.is_none(){let _span=crate::timing::span("future.restore.storage_validate");validate_fresh_restore(&run)?;}
+            crate::revision52_reserves::normalize_run(&mut run).map_err(StorageError)?;
+            crate::revision50::settle_current_duels(&mut run);
             Ok(run)
         }
     }}
@@ -72,7 +74,7 @@ impl FutureAnchor {
             || !{let _span=crate::timing::span("future.import.finite_scan");finite::all_finite(&state)} {return;}
         // Imported nested Future/replay are discarded by actual restore anyway.
         // No recursive native anchor graph is retained in the second game.
-        state.future=None;state.history.clear();state.replay.clear();state.replay_snapshot_from=Field::Missing;
+        state.future=None;state.history.clear();state.replay.clear();state.replay_snapshot_from=Field::Missing;state.firebolt_travel_from=Field::Missing;
         reset_derived(&mut state);
         let encoded=OnceLock::new();let _=encoded.set(raw.clone());
         // deserialize already validated the normalized image. The above checks

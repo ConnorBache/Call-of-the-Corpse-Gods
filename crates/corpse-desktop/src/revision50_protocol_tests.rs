@@ -42,6 +42,7 @@ fn revision50_protocol_exact_pairs_preserve_every_historical_identity() {
         (46., "corpse-r46-shine-suppression-v1", "corpse-r46-shine-suppression-metadata-v2"),
         (50., "corpse-r50-ability-roster-v1", "corpse-r50-ability-roster-metadata-v2"),
         (51., "corpse-r51-nearest-damage-v1", "corpse-r51-nearest-damage-metadata-v2"),
+        (52., "corpse-r52-absolute-darkness-v1", "corpse-r52-absolute-darkness-metadata-v2"),
     ];
     for (revision, receipt_id, metadata_id) in expected {
         let receipt = log::Header::for_revision(Some(revision)).unwrap();
@@ -56,7 +57,7 @@ fn revision50_protocol_exact_pairs_preserve_every_historical_identity() {
             assert!(!header.legacy_revert_policy().unwrap());
             let initial = log::encode_initial(CHECKPOINT, header).unwrap();
             assert_eq!(log::inspect_header(&initial.bytes).unwrap(), *header);
-            for wrong in [0, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, u32::MAX] {
+            for wrong in [0, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, u32::MAX] {
                 if wrong == revision as u32 { continue; }
                 let mismatch = log::Header { simulation_revision: wrong, ..header.clone() };
                 assert!(mismatch.legacy_revert_policy().is_err());
@@ -76,7 +77,7 @@ fn revision50_protocol_exact_pairs_preserve_every_historical_identity() {
     let legacy = log::Header { replay_build: "corpse-r39-incremental-v1".into(), simulation_revision: 39 };
     assert!(legacy.legacy_revert_policy().unwrap());
     assert!(!legacy.metadata_operations());
-    for revision in [None, Some(38.), Some(47.), Some(48.), Some(49.), Some(52.), Some(49.5), Some(50.5), Some(f64::NAN), Some(f64::INFINITY), Some(f64::NEG_INFINITY)] {
+    for revision in [None, Some(38.), Some(47.), Some(48.), Some(49.), Some(53.), Some(52.5), Some(49.5), Some(50.5), Some(f64::NAN), Some(f64::INFINITY), Some(f64::NEG_INFINITY)] {
         assert!(log::Header::for_revision(revision).is_none());
         assert!(log::Header::for_metadata_revision(revision).is_none());
     }

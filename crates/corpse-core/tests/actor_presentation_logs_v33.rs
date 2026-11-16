@@ -118,3 +118,55 @@ fn revert_and_future_restore_observed_identity_and_existing_labels() {
     assert!(corpse_core::temporal::restore_future(&mut r,&mut history).unwrap());
     assert_eq!(presentation::name(&r,skin(&r)),expected);assert_eq!(skin(&r).name,"Skin Walker");
 }
+
+#[test]
+fn revision52_telepathy_overrides_hallucination_per_target_and_survives_save() {
+    let mut r=room();r.simulation_revision=52.0.into();
+    r.player.conditions.insert("hallucinating".into(),100.);
+    r.player.conditions.insert("cameTurns".into(),10.);
+    r.player.conditions.insert("cameTarget".into(),4.);
+    let other=population::create_actor_revision("rat",5.,7.,2.,false,52.).unwrap();
+    r.actors_at_mut(1.).push(other);
+    let before=r.clone();
+    assert_eq!(presentation::name(&r,skin(&r)),"Skin Walker");
+    assert!(presentation::apparent_kind(&r,engine::actor(&r,5.).unwrap()).is_some(),"nearby sensed terrain does not reveal another identity");
+    assert_eq!(r,before);
+    let restored=corpse_core::storage::deserialize(&corpse_core::storage::serialize(&r).unwrap()).unwrap();
+    assert_eq!(presentation::name(&restored,skin(&restored)),"Skin Walker");
+    let player=r.player.id;
+    engine::damage_environment(&mut r,4.,10.,Some(player),"fire",true).unwrap();
+    assert!(r.log.iter().any(|s|s=="Fire deals 10 damage to Skin Walker."),"{:?}",r.log);
+    r.player.conditions.shift_remove("cameTurns");
+    assert!(presentation::apparent_kind(&r,skin(&r)).is_some());
+}
+
+#[test]
+fn revision52_telepathy_sources_and_range_control_true_identity() {
+    let mut base=room();base.simulation_revision=52.0.into();
+    base.player.conditions.insert("hallucinating".into(),100.);
+    for source in ["condition","mind-read","dream-see","half-here"] {
+        let mut r=base.clone();
+        match source {
+            "condition"=>{r.player.conditions.insert("telepathic".into(),10.);},
+            "mind-read"=>r.player.abilities.push("numo-mind-read".into()),
+            "dream-see"=>r.player.abilities.push("ursa-dream-see".into()),
+            _=>{
+                r.player.abilities.push(corpse_core::half_here::ID.into());
+                r.player.active.push(corpse_core::half_here::ID.into());
+                r.player.conditions.insert("halfHereId".into(),9.);
+                let mut body=r.player.clone();body.id=9.;
+                body.conditions.insert("halfHereClone".into(),1.);
+                body.conditions.insert("halfHereOwner".into(),r.player.id);
+                body.conditions.insert("telepathic".into(),10.);r.actors_at_mut(1.).push(body);
+            }
+        }
+        assert_eq!(presentation::name(&r,skin(&r)),"Skin Walker","{source}");
+    }
+    base.player.abilities.push("numo-mind-read".into());
+    engine::actor_mut(&mut base,4.).unwrap().x=8.;
+    assert!(presentation::apparent_kind(&base,skin(&base)).is_some());
+    base.player.active.push("numo-mind-read".into());
+    assert_eq!(presentation::name(&base,skin(&base)),"Skin Walker");
+    engine::actor_mut(&mut base,4.).unwrap().dead=true.into();
+    assert!(presentation::apparent_kind(&base,skin(&base)).is_some(),"dead creatures are not telepathic targets");
+}

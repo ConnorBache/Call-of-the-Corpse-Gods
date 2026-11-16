@@ -127,3 +127,94 @@ fn revision51_black_pit_restores_speed_up_on_the_authored_three_updates() {
     assert_eq!(ne::exits(r.floor().unwrap(),at),vec![at+1]);
     assert!(corpse_core::travel::descent_cells(r.floor().unwrap(),11.,10.,true).contains(&at));
 }
+
+/// The R52 clarification preserves the existing ordered pairs and numbering,
+/// rather than relabeling a whole area or inventing a second portal mapping.
+#[test]
+fn revision52_speed_up_generated_numbers_identify_adjacent_destinations() {
+    for seed in ["adjacent-pairs-a", "adjacent-pairs-b", "adjacent-pairs-c"] {
+        let mut old=room(51.).floor().unwrap().clone();
+        old.speed_up=Field::Missing;old.speed_up_terrain=Field::Missing;
+        for tile in &mut old.tiles {if tile=="speed-up" {*tile="floor".into();}}
+        let mut current=old.clone();
+        sub_biomes_generation::install_links(seed,&mut old,&[],&[],51.);
+        sub_biomes_generation::install_links(seed,&mut current,&[],&[],52.);
+        assert_eq!(current,old,"the clarification must not change seeded R51 mapping");
+        assert!(ne::traversable(&current));
+        let w=current.width();let mut endpoints=std::collections::HashSet::new();
+        let pockets=current.speed_up.as_ref().unwrap();assert!(!pockets.is_empty());
+        for pocket in pockets {
+            assert_eq!(pocket.cells.len(),2*pocket.groups.len());
+            let mut prior_number=None;
+            for group in &pocket.groups {
+                assert_eq!(group.sources.len(),1);
+                let (a,b)=(group.sources[0],group.destination);
+                assert_eq!((a%w).abs_diff(b%w)+(a/w).abs_diff(b/w),1);
+                assert!(endpoints.insert(a)&&endpoints.insert(b),"overlapping pair");
+                assert_eq!(ne::exits(&current,a),vec![b]);
+                assert_eq!(ne::exits(&current,b),vec![a]);
+                let number=ne::group_number(&current,a).unwrap();
+                assert_eq!(ne::group_number(&current,b),Some(number));
+                if let Some(prior)=prior_number {assert_eq!(number,prior+1);}
+                prior_number=Some(number);
+                assert_eq!(current.tiles[a],"speed-up");assert_eq!(current.tiles[b],"speed-up");
+            }
+        }
+        let once=current.clone();
+        sub_biomes_generation::install_links("repeated-install",&mut current,&[],&[],52.);
+        assert_eq!(current,once,"repeated installation must not overlap or renumber");
+    }
+}
+
+#[test]
+fn revision52_speed_up_odd_eligible_line_leaves_unpaired_ground_unchanged() {
+    let mut f=corpse_core::Floor {depth:20.,domain:"Dungeon".into(),
+        tiles:vec!["wall".into();2291],lights:vec![100.;2291],seen:vec![true;2291],
+        ..Default::default()};
+    let w=f.width();
+    // Stairs protect three cells on each end: x=5..13 is nine eligible cells.
+    for x in 1..=17 {f.tiles[10*w+x]="floor".into();}
+    f.tiles[10*w+1]="up".into();f.tiles[10*w+17]="down".into();
+    sub_biomes_generation::install_links("odd-adjacent-line",&mut f,&[],&[],52.);
+    let speed=f.speed_up.as_ref().unwrap();assert_eq!(speed.len(),1);
+    assert_eq!(speed[0].cells.len(),8);assert_eq!(speed[0].groups.len(),4);
+    let unpaired:Vec<_>=(5..=13).map(|x|10*w+x).filter(|&at|ne::speedup_at(&f,at).is_none()).collect();
+    assert_eq!(unpaired.len(),1);assert_eq!(f.tiles[unpaired[0]],"floor");
+    assert_eq!(ne::group_number(&f,unpaired[0]),None);
+    assert!(ne::validate_floor(&f));assert!(ne::traversable(&f));
+}
+
+#[test]
+fn revision52_speed_up_mapping_survives_repeated_replacements_save_and_replay() {
+    let initial=room(52.);let w=initial.floor().unwrap().width();let at=10*w+11;
+    let topology=initial.floor().unwrap().speed_up.clone();
+    let number=ne::group_number(initial.floor().unwrap(),at);
+    let mut restored=initial.clone();
+    for replacement in ["wall","shallow-water","chasm","floor"] {
+        restored.floor_mut().unwrap().tiles[at]=replacement.into();
+        restored.floor_mut().unwrap().tiles[at+1]=replacement.into();
+        assert!(ne::exits(restored.floor().unwrap(),at).is_empty());
+        restored=storage::deserialize(&storage::serialize(&restored).unwrap()).unwrap();
+        restored.floor_mut().unwrap().tiles[at]="speed-up".into();
+        assert!(ne::exits(restored.floor().unwrap(),at).is_empty());
+        restored.floor_mut().unwrap().tiles[at+1]="speed-up".into();
+        assert_eq!(ne::exits(restored.floor().unwrap(),at),vec![at+1]);
+        assert_eq!(ne::group_number(restored.floor().unwrap(),at),number);
+        assert_eq!(restored.floor().unwrap().speed_up,topology);
+    }
+    let mut engine=corpse_core::temporal::Engine::new(initial.clone()).unwrap();
+    for (dx,x) in [(1.,12.),(1.,14.),(-1.,13.),(-1.,11.)] {
+        engine.dispatch(&corpse_core::Command::Move{dx,dy:0.}).unwrap();
+        assert_eq!(engine.run.player.x,x);
+    }
+    let saved=engine.save().unwrap();
+    assert_eq!(corpse_core::temporal::Engine::load(&saved).unwrap().save().unwrap(),saved);
+    let record=corpse_core::replay::ReplayRecord::from_run(&engine.run);
+    let mut replay=corpse_core::replay::ReplaySession::from_initial(initial,record).unwrap();
+    while replay.step().unwrap() {}
+    assert_eq!(replay.engine.save().unwrap(),saved);
+    replay.restart().unwrap();while replay.step().unwrap() {}
+    assert_eq!(replay.engine.save().unwrap(),saved);
+    assert_eq!(replay.engine.run.floor().unwrap().speed_up,topology);
+    assert_eq!(ne::group_number(replay.engine.run.floor().unwrap(),at),number);
+}

@@ -284,7 +284,7 @@ fn actor_cell_profile(
 ) -> Cell {
     let presented=if player&&run.simulation_revision.value_or(29.)>=43. {None}else{crate::creature_presentation::project(run,a)};
     let mut cell=actor_cell_presented(profile,run,a,width,backgrounds,player,presented.as_ref());
-    if !player && presented.is_some() && crate::hallucination_ui::active(run) && crate::hallucination_ui::eligible(a) {
+    if !player && presented.is_some() && crate::hallucination_ui::affects(run,a) {
         let variants=std::array::from_fn(|phase| {
             let shown=crate::creature_presentation::project_kind(run,a,crate::hallucination_ui::kind(run,a,phase)).unwrap();
             let mut c=actor_cell_presented(profile,run,a,width,backgrounds,false,Some(&shown));
@@ -296,6 +296,7 @@ fn actor_cell_profile(
     cell
 }
 fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&corpse_core::Actor,width:usize,backgrounds:&[Rgb],player:bool,presented:Option<&corpse_core::Actor>)->Cell {
+    let invisible_player = player && corpse_core::engine::condition(a, "invisible") > 0.;
     let nightmare = corpse_core::dreamwalking::is_nightmare(a);
     let body = corpse_core::dreamwalking::is_body(a);
     let dead = a.dead.value_or(false);
@@ -307,7 +308,9 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
     let a=presented.unwrap_or(a);
     let kind = a.creature_kind.as_ref().map(String::as_str).unwrap_or("");
     let mut glyph = a.glyph.clone();
-    let mut fg = if dead { [169, 155, 179] } else { hex(&a.color) };
+    // Death retains the saved actor identity, including individual color variants.
+    // The separate corpse X carries death status; no generic corpse palette.
+    let mut fg = hex(&a.color);
     if run.simulation_revision.value_or(29.) < 50. && kind == "blorb" && ["o", "B", "¤", "a"].contains(&glyph.as_str()) {
         glyph = "a".into();
     }
@@ -334,15 +337,8 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         .into();
     }
     let half = a.conditions.get("halfHereClone") == Some(&1.);
-    let superscript = if dead || body {
+    let superscript = if dead || body || player {
         String::new()
-    } else if player {
-        match run.mode.as_str() {
-            "Avatar" => "3",
-            "Blessed" => "1",
-            _ => "0",
-        }
-        .into()
     } else if half {
         "h".into()
     } else if a.state == "ally" {
@@ -355,14 +351,13 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         glyph = "@".into();
         let brightness =
             0.56 + 0.44 * ((corpse_core::vision::light(run, a).clamp(-100., 100.) + 100.) / 200.);
-        fg = [255., 243., 189.].map(|c| (c * brightness).round() as u8);
+        let ink = if invisible_player { [135., 183., 243.] } else { [255., 243., 189.] };
+        fg = ink.map(|c| (c * brightness).round() as u8);
     } else if telepathic {
         fg = [135, 183, 243];
     }
     let key = if player {
         "player".to_string()
-    } else if dead {
-        "corpse".into()
     } else if let Some(q) = a.zillennia_quality.as_ref() {
         format!("zillennia:{q}")
     } else if kind.is_empty() {
@@ -375,7 +370,7 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
     };
     let entity = crate::entity_profile::resolve(
         profile,
-        if player || dead {
+        if player {
             "objects"
         } else {
             "creatures"
@@ -385,9 +380,13 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         &glyph,
         fg,
     );
-    glyph = entity.glyph;
-    fg = entity.color;
-    let identity_outline = (!dead && !player && !telepathic && kind == "dire-bear"
+    // Player identity is fixed presentation, including the sleeping physical
+    // endpoint. Keep saved species/profile data and all non-player glyphs intact.
+    glyph = if player || body { "@".into() } else { entity.glyph };
+    // Invisibility is a player status cue, independent of custom identity ink.
+    // Retain the same illumination response and all other appearance settings.
+    if !invisible_player { fg = entity.color; }
+    let identity_outline = (!player && !telepathic && kind == "dire-bear"
         && run.simulation_revision.value_or(29.) >= 50. && glyph == "B" && fg == [0,0,0]
         && entity.background.is_none()
         && profile.value("entities.creatures.dire-bear.inherited").and_then(serde_json::Value::as_bool) == Some(true)
@@ -487,6 +486,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
     let visibility = || actor_visibility.get_or_init(|| corpse_core::vision::VisibilityProjection::new(run));
     let mut terrain_snapshot = None;
     let mut terrain_count = 0;
+    let mut ground_entities = Vec::new();
     let mut cells = vec![];
     let mut width = 79;
     let mut height = 29;
@@ -550,12 +550,36 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             })
             .map(|o| o.index)
             .collect();
+        // Collect direct evidence independently of map z-order, retaining stacked items.
+        use crate::render::enemy_list::{GroundEntity,GroundKind};
+        let distance=|x:usize,y:usize| (x as f64-run.player.x).abs().max((y as f64-run.player.y).abs());
+        for o in observation.cells.iter().filter(|o|o.current&&o.direct) {
+            if matches!(o.tile.as_deref(),Some("up"|"down")) {
+                let style=ground_compiled::prepare(profile,o,flesh);let glyph=style.glyph;let color=style.fg;let x=o.index%width;let y=o.index/width;
+                ground_entities.push(GroundEntity{reserve:None,hallucination:None,kind:GroundKind::Stair,x,y,id:o.index as u64,
+                    name:if o.tile.as_deref()==Some("up"){"Upward Staircase".into()}else{"Downward Staircase".into()},glyph,color,distance:distance(x,y)});
+            }
+            if let Some(vent)=o.hazards.as_ref().and_then(|h|h.vent.as_ref()) {
+                let x=o.index%width;let y=o.index/width;
+                let color=profile.value(&format!("terrain.gas:{}.color",vent.gas)).and_then(|v|v.as_str()).map(hex).unwrap_or_else(||gas_color(&vent.gas));
+                let style=crate::entity_profile::resolve(profile,"objects","vent",None,"=",color);
+                ground_entities.push(GroundEntity{reserve:None,hallucination:None,kind:GroundKind::Vent,x,y,id:o.index as u64,
+                    name:format!("{} vent",vent.gas),glyph:style.glyph,color:style.color,distance:distance(x,y)});
+            }
+        }
         let mut items = Vec::new();
         let mut item_cells = std::collections::HashSet::new();
         let depth = run.depth.to_string();
         if let Some(ground) = run.ground.get(&depth) {
             for g in ground.iter().filter(|g| crate::dream_ui::item_visible(run, &g.item)) {
                 let i = g.y as usize * width + g.x as usize;
+                if observation.cells.get(i).is_some_and(|o|o.current&&o.direct) {
+                    let key=if g.item.kind=="potion"{format!("potion:{}",g.item.effect.as_ref().map(String::as_str).unwrap_or(""))}else{g.item.name.clone()};
+                    let style=crate::entity_profile::resolve(profile,"items",&key,Some(&format!("kind:{}",g.item.kind)),&item_glyph(&g.item),item_color(&g.item.kind));
+                    ground_entities.push(GroundEntity{reserve:crate::render::resource_ui::amulet_reserve(&g.item,run.simulation_revision.value_or(29.)),hallucination:None,kind:GroundKind::Item,x:g.x as usize,y:g.y as usize,id:g.item.id.to_bits(),
+                        name:if corpse_core::revision50::enabled(run){crate::pack::displayed_name(run,&g.item)}else{g.item.name.clone()},
+                        glyph:style.glyph,color:style.color,distance:distance(g.x as usize,g.y as usize)});
+                }
                 if observation.cells.get(i).is_some_and(|c| c.direct) && item_cells.insert(i) {
                     items.push((i, &g.item, false, false));
                 }
@@ -586,6 +610,12 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         let mut corpses = std::collections::HashSet::new();
         for a in &observed_actors {
             let i = a.y as usize * width + a.x as usize;
+            if a.dead.value_or(false) && visibility().directly_visible_actor(a) && observation.cells.get(i).is_some_and(|o|o.current&&o.direct) {
+                let cell=actor_cell_profile(profile,run,a,width,&backgrounds,false);
+                let hallucination=cell.hallucination.as_ref().map(|variants|std::sync::Arc::new(std::array::from_fn(|i|(format!("{} corpse?",variants[i].label.trim_end_matches('?')),variants[i].glyph.clone(),variants[i].fg))));
+                ground_entities.push(GroundEntity{reserve:None,hallucination,kind:GroundKind::Corpse,x:cell.x,y:cell.y,id:a.id.to_bits(),
+                    name:format!("{} corpse",cell.label.trim_end_matches('?')),glyph:cell.glyph,color:cell.fg,distance:distance(cell.x,cell.y)});
+            }
             if a.dead.value_or(false)
                 && !active.contains(&i)
                 && !fires.contains(&i)
@@ -639,6 +669,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 ink,
             );
             cells.push(Cell {
+                ground_item_id: Some(item.id.to_bits()),
                 dream_entity: corpse_core::phantasmii_generation::is_shard(item)
                     || corpse_core::dreamwalking::dream_ground_item(item),
                 x: i % width,
@@ -709,10 +740,12 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         if flesh {
             // The historical player-only light ramp must not multiply the new
             // shared calibration. Preserve its exact neutral-light base instead.
-            let neutral = [255., 243., 189.].map(|v: f64| (v * 0.78).round() as u8);
+            let invisible = corpse_core::engine::condition(&run.player, "invisible") > 0.;
+            let palette = if invisible { [135., 183., 243.] } else { [255., 243., 189.] };
+            let neutral = palette.map(|v: f64| (v * 0.78).round() as u8);
             let style = crate::entity_profile::resolve(profile, "objects", "player", None, "@", neutral);
-            cell.fg = style.color;
-            if let Some(ink) = &mut cell.entity_ink { ink.color = style.color; }
+            cell.fg = if invisible { neutral } else { style.color };
+            if let Some(ink) = &mut cell.entity_ink { ink.color = cell.fg; }
         }
         cell.fg = crate::color_profile::world(profile, cell.fg, true);
         if corpse_core::portals::enabled(run) {
@@ -725,11 +758,8 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 }
             }
         }
-        let at = run.player.y as usize * width + run.player.x as usize;
-        for other in crate::non_euclidean_ui::actor_alias_cells(run, &observation, at) {
-            let mut alias = cell.clone(); alias.x = other % width; alias.y = other / width;
-            alias.bg = backgrounds[other]; crate::hallucination_ui::append_alias(&mut alias," (linked space)"); cells.push(alias);
-        }
+        // Linked topology does not leave a second player image at the departure
+        // endpoint. Actor/item aliases and ordinary portal presentation are unchanged.
         cells.push(cell);
         for cell in &mut cells {
             let i = cell.y * width + cell.x;
@@ -774,7 +804,13 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                     shared_resources: corpse_core::half_here::is_clone(a) || corpse_core::dreamwalking::is_body(a),
                     invulnerable: a.abilities.iter().any(|id| id == "enemy:beast:sphinx"),
                     id: a.id,
-                    statuses: crate::statuses_ui::observe(run, a),
+                    statuses: {
+                        let mut statuses=crate::statuses_ui::observe(run,a);
+                        if crate::monster_status_ui::feeding_description(run,a,direct,presented.is_some()) == Some("Feeding") {
+                            statuses.push(crate::statuses_ui::Status{name:"Feeding".into(),duration:None});
+                        }
+                        statuses
+                    },
                     meters: Vec::new(),
                     name: cell.label.clone(),
                     glyph: format!("{}{}", cell.glyph, cell.arrow),
@@ -802,6 +838,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                     hp: a.hp,
                     max_hp: a.max_hp,
                     energy: a.energy,
+                    uses_energy: crate::monster_status_ui::energy_capable(run.simulation_revision.value_or(29.), a),
                     max_energy: if a.abilities.iter().any(|id| id == "grisha-boundless-hunger") {
                         f64::INFINITY
                     } else {
@@ -819,6 +856,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                         v.hp=shown.hp;v.max_hp=shown.max_hp;v.energy=shown.energy;
                         if let Some(slot)=scratch.actors_at_mut(run.depth).iter_mut().find(|a|a.id==shown.id){*slot=shown.clone();}
                         v.max_energy=corpse_core::combat::effective_stats(scratch,&shown).max_energy;
+                        v.uses_energy=crate::monster_status_ui::energy_capable(run.simulation_revision.value_or(29.), &shown);
                         v.perception_range=crate::perception_ui::range_label(scratch,&shown);
                         if let Some(label)=v.perception_range.as_mut(){crate::hallucination_ui::question(label);}
                         v.statuses=crate::statuses_ui::observe(scratch,&shown);v
@@ -838,11 +876,22 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
     };
     drop(creature_span);
     let _hud_span=corpse_core::timing::span("desktop.observe.hud_log_inventory");
+    crate::cogworks_ui::rally(run,&mut cells);
     let abilities = crate::ability_ui::visible_abilities(run);
     let pursuit_path=crate::targeting_ui::pursuit_path(run);
     let player_stats=corpse_core::combat::effective_stats(run,&run.player);
     let perception_boundaries=crate::perception_ui::observe(run,terrain_snapshot.as_deref(),&creatures);
+    // P09 is anchored to the selected target's original 5x5 area, not its later
+    // movement. Only presently directly observed cells receive the static edge.
+    if run.simulation_revision.value_or(29.)>=52.&&run.player.active.iter().any(|s|s=="pelian-fated-duel")&&run.player.conditions.get("r50DuelDepth")==Some(&run.depth){
+        if let (Some(&x),Some(&y))=(run.player.conditions.get("r50DuelX"),run.player.conditions.get("r50DuelY")){
+            for c in &mut cells {if c.current&&c.direct&&(c.x as f64-x).abs()<=2.&&(c.y as f64-y).abs()<=2. {c.duel_edges=[c.x as f64==x+2.,c.y as f64==y+2.,c.x as f64==x-2.,c.y as f64==y-2.];}}
+        }
+    }
+    if crate::hallucination_ui::active(run) {for row in &mut ground_entities {crate::hallucination_ui::question(&mut row.name);}}
+    crate::render::enemy_list::sort_ground(&mut ground_entities);
     View {
+        ground_entities,
         perception_boundaries,
         hallucination_cells:cells.iter().enumerate().filter_map(|(i,c)|c.hallucination.is_some().then_some(i)).collect(),
         hallucination_phase:0,
@@ -858,6 +907,8 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         target_area: Vec::new(),
         target_impact: None,
         target_color: None,
+        selected_ability: None,
+        cogworks_mode: corpse_core::revision50_terrain::mode(run),
         possible_exits: Vec::new(),
         hover: None,
         player_id: run.player.id,
@@ -867,7 +918,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         player_meters: Vec::new(),
         provenance: "Native migration test scene / incomplete port".into(),
         domain: run.floor().map(|f| f.domain.clone()).unwrap_or_default(),
-        mode: run.mode.clone(),
+        mode: if run.fast_mode.value_or(false) && !run.compressed_depths.value_or(false) { "Fast mode".into() } else { run.mode.clone() },
         gods: run
             .gods
             .iter()
@@ -882,7 +933,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             .collect::<Vec<_>>()
             .join(" / "),
         blessings: run.exp,
-        blessing_goal: 2f64.powf(run.level),
+        blessing_goal: corpse_core::progression::level_up_cost(run),
         offers: run
             .offers
             .iter()
@@ -910,6 +961,8 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         cells,
         hp: run.player.hp,
         max_hp: run.player.max_hp,
+        resource_changes: crate::render::resource_ui::player_changes(run),
+        pending_energy_loss: corpse_core::abilities::projected_player_upkeep(run),
         player_stats:[crate::stat_presentation::damage_bonus(run,player_stats.offense),6.*player_stats.defense,player_stats.dr,player_stats.accuracy,player_stats.dodge],
         energy: run.player.energy,
         max_energy: if run
@@ -924,6 +977,8 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         },
         turn: run.tick,
         depth: run.depth,
+        display_depth: corpse_core::fast_mode::display_depth(run,run.depth),
+        max_depth: corpse_core::fast_mode::maximum_display_depth(run),
         creatures,
         chronicle_offset: 0,
         log: run.log.clone(),
@@ -1035,7 +1090,7 @@ mod tests {
         let creature = actor_cell(&run, &run.player, 79, &vec![[0, 0, 0]; 79 * 29], false);
         assert_eq!(creature.glyph, "(≬)");
         assert!(c.heartless);
-        assert_eq!(c.superscript, "3");
+        assert!(c.superscript.is_empty());
     }
     #[test]
     fn source_renderer_avatar_scene_projection() {
@@ -1235,7 +1290,7 @@ mod tests {
         observation.cells[205].hazards = None;
         let (cells,backgrounds,_) = terrain_frame(&observation,crate::appearance_profile::Profile::defaults(),17,0.);
         assert!(!cells.iter().any(|c|c.y*observation.width+c.x==205));
-        assert_eq!(backgrounds[205],crate::appearance_profile::Profile::defaults().rgb("fog.unexplored"));
+        assert_eq!(backgrounds[205],[0;3]);
     }
     #[test]
     fn entrance_uses_blue_omega_without_changing_stair_identity() {
@@ -1360,6 +1415,7 @@ fn terrain_frame_palette(
     // Frozen source-v48 parity uses the historical color pipeline explicitly.
     if !flesh { for light in &mut light { light.display = None; } }
     let _style_span=corpse_core::timing::span("desktop.observe.terrain_style_cells");
+    let quiet_chasm_edges = flesh && flesh_palette::brogue_chasm_edges_enabled(profile);
     // Separate diagnostic mode. 0=off, 1=all cells; >1=sparse grid-index sample.
     // Parse once per frame, never per profile lookup. No simulation/cache mutation.
     #[cfg(feature="runtime-timing")]
@@ -1373,7 +1429,7 @@ fn terrain_frame_palette(
     let prepared:Vec<_>={let _s=corpse_core::timing::span("desktop.observe.ground_prepare");
         observation.cells.iter().map(|o|o.tile.as_ref().map(|_|ground_compiled::prepare(profile,o,flesh))).collect()};
     let mut cells = Vec::new();
-    let mut backgrounds = vec![profile.rgb("fog.unexplored"); width * height];
+    let mut backgrounds = vec![if flesh {crate::illumination_ui::unexplored(profile)} else {profile.rgb("fog.unexplored")}; width * height];
     for o in &observation.cells {
         let Some(tile) = o.tile.as_ref() else {
             continue;
@@ -1453,6 +1509,7 @@ fn terrain_frame_palette(
         let material_span=corpse_core::timing::sampled_span("desktop.style_sample.material_prepare",style_sample);
         let material=ground.displayed;
         let original_material=ground.original;
+        let fg = flesh_palette::wall_ink(fg, o, observation, flesh && original_material.color_default);
         bg = flesh_palette::veins(bg, tile, x, y, seed, flesh && !fixture && !o.snow && o.biome.is_none()
             && original_material.background_default);
         drop(material_span);
@@ -1840,9 +1897,10 @@ fn terrain_frame_palette(
             let Some(nt) = other.tile.as_ref() else {
                 continue;
             };
+            let mut brogue_chasm_edge = false;
             let edge = if o.biome.as_deref() == Some("corn-dimension") && other.biome.as_deref() != Some("corn-dimension") {
                 Some(([201, 152, 236], if o.current { 0.55 } else { 0.24 }))
-            } else if tile == "wall" && !matches!(nt.as_str(), "wall" | "chasm" | "pit") {
+            } else if tile == "wall" && flesh_palette::wall_face_neighbor(o, other) {
                 Some((
                     material.edge.filter(|_|material.edge_nonempty).unwrap_or([197,195,211]),
                     if o.current { 0.4 } else { 0.21 },
@@ -1858,20 +1916,25 @@ fn terrain_frame_palette(
                 } else { [115, 239, 255] };
                 Some((edge, if o.current { 0.21 } else { 0.14 }))
             } else if tile == "chasm" && !matches!(nt.as_str(), "chasm" | "pit") {
-                Some(([170, 145, 220], if o.current { 0.62 } else { 0.46 }))
+                brogue_chasm_edge = flesh;
+                Some((if flesh {flesh_palette::brogue_chasm(x,y,seed)}else{[170,145,220]}, if o.current { 0.62 } else { 0.46 }))
             } else if !matches!(tile.as_str(), "wall" | "chasm" | "pit")
                 && matches!(nt.as_str(), "chasm" | "pit")
             {
-                Some(([170, 145, 220], 0.28))
+                brogue_chasm_edge = flesh && nt == "chasm";
+                Some((if flesh && nt == "chasm" {flesh_palette::brogue_chasm(nx as usize,ny as usize,seed)}else{[170,145,220]}, 0.28))
             } else {
                 None
             };
             if let Some((c, a)) = edge {
-                edges[d] = Some(crate::color::composite(
-                    bg,
-                    crate::color_profile::map_colors(profile, c, bg, ctx).0,
-                    a * material.opacity,
-                ));
+                // Decorative void boundaries must not pass through the generic
+                // important-symbol contrast rescue, which whitens Brogue ink.
+                let quiet = brogue_chasm_edge && quiet_chasm_edges;
+                let edge_bg = if quiet && tile == "chasm" { [0; 3] } else { bg };
+                let ink = if quiet {
+                    if o.current { c } else { crate::color::memory(c) }
+                } else { crate::color_profile::map_colors(profile, c, bg, ctx).0 };
+                edges[d] = Some(crate::color::composite(edge_bg, ink, a * material.opacity));
             }
         }
         backgrounds[o.index] = bg;
@@ -1907,6 +1970,16 @@ fn terrain_frame_palette(
                     profile.number("fog.rememberedOpacity")
                 },
         );
+        let (fg,bg)=if flesh && tile == "chasm" && !fixture && !o.snow && !o.ice && !o.hellfire
+            && glyph_opacity == 1. && flesh_palette::brogue_palette_enabled(profile) {
+            let ink=if profile.is_default("terrain.chasm.color") {
+                let color=flesh_palette::brogue_chasm(x,y,seed);
+                if o.current {color} else {crate::color::memory(color)}
+            }else{fg};
+            let ground=if profile.is_default("terrain.chasm.background") {[0;3]}else{bg};
+            (ink,ground)
+        }else{(fg,bg)};
+        backgrounds[o.index]=bg;
         cells.push(Cell {
             x,
             y,
@@ -2410,6 +2483,7 @@ fn terrain_frame_palette_json_reference(
     // Frozen source-v48 parity uses the historical color pipeline explicitly.
     if !flesh { for light in &mut light { light.display = None; } }
     let _style_span=corpse_core::timing::span("desktop.observe.terrain_style_cells");
+    let quiet_chasm_edges = flesh && flesh_palette::brogue_chasm_edges_enabled(profile);
     // Separate diagnostic mode. 0=off, 1=all cells; >1=sparse grid-index sample.
     // Parse once per frame, never per profile lookup. No simulation/cache mutation.
     #[cfg(feature="runtime-timing")]
@@ -2421,7 +2495,7 @@ fn terrain_frame_palette_json_reference(
     #[cfg(not(feature="runtime-timing"))]
     let style_offset=0usize;
     let mut cells = Vec::new();
-    let mut backgrounds = vec![profile.rgb("fog.unexplored"); width * height];
+    let mut backgrounds = vec![if flesh {crate::illumination_ui::unexplored(profile)} else {profile.rgb("fog.unexplored")}; width * height];
     for o in &observation.cells {
         let Some(tile) = o.tile.as_ref() else {
             continue;
@@ -2500,6 +2574,8 @@ fn terrain_frame_palette_json_reference(
         let material = displayed_material_settings(profile, o, flesh);
         let original_material = material_settings(profile, o);
         let default_material = material_settings(crate::appearance_profile::Profile::defaults(), o);
+        let fg = flesh_palette::wall_ink(fg, o, observation,
+            flesh && original_material["color"] == default_material["color"]);
         bg = flesh_palette::veins(bg, tile, x, y, seed, flesh && !fixture && !o.snow && o.biome.is_none()
             && original_material["background"] == default_material["background"]);
         drop(material_span);
@@ -2887,9 +2963,10 @@ fn terrain_frame_palette_json_reference(
             let Some(nt) = other.tile.as_ref() else {
                 continue;
             };
+            let mut brogue_chasm_edge = false;
             let edge = if o.biome.as_deref() == Some("corn-dimension") && other.biome.as_deref() != Some("corn-dimension") {
                 Some(([201, 152, 236], if o.current { 0.55 } else { 0.24 }))
-            } else if tile == "wall" && !matches!(nt.as_str(), "wall" | "chasm" | "pit") {
+            } else if tile == "wall" && flesh_palette::wall_face_neighbor(o, other) {
                 Some((
                     material["edgeColor"]
                         .as_str()
@@ -2909,20 +2986,25 @@ fn terrain_frame_palette_json_reference(
                 } else { [115, 239, 255] };
                 Some((edge, if o.current { 0.21 } else { 0.14 }))
             } else if tile == "chasm" && !matches!(nt.as_str(), "chasm" | "pit") {
-                Some(([170, 145, 220], if o.current { 0.62 } else { 0.46 }))
+                brogue_chasm_edge = flesh;
+                Some((if flesh {flesh_palette::brogue_chasm(x,y,seed)}else{[170,145,220]}, if o.current { 0.62 } else { 0.46 }))
             } else if !matches!(tile.as_str(), "wall" | "chasm" | "pit")
                 && matches!(nt.as_str(), "chasm" | "pit")
             {
-                Some(([170, 145, 220], 0.28))
+                brogue_chasm_edge = flesh && nt == "chasm";
+                Some((if flesh && nt == "chasm" {flesh_palette::brogue_chasm(nx as usize,ny as usize,seed)}else{[170,145,220]}, 0.28))
             } else {
                 None
             };
             if let Some((c, a)) = edge {
-                edges[d] = Some(crate::color::composite(
-                    bg,
-                    crate::color_profile::map_colors(profile, c, bg, ctx).0,
-                    a * material_number(profile, o, "opacity"),
-                ));
+                // Decorative void boundaries must not pass through the generic
+                // important-symbol contrast rescue, which whitens Brogue ink.
+                let quiet = brogue_chasm_edge && quiet_chasm_edges;
+                let edge_bg = if quiet && tile == "chasm" { [0; 3] } else { bg };
+                let ink = if quiet {
+                    if o.current { c } else { crate::color::memory(c) }
+                } else { crate::color_profile::map_colors(profile, c, bg, ctx).0 };
+                edges[d] = Some(crate::color::composite(edge_bg, ink, a * material_number(profile, o, "opacity")));
             }
         }
         backgrounds[o.index] = bg;
@@ -2958,6 +3040,16 @@ fn terrain_frame_palette_json_reference(
                     profile.number("fog.rememberedOpacity")
                 },
         );
+        let (fg,bg)=if flesh && tile == "chasm" && !fixture && !o.snow && !o.ice && !o.hellfire
+            && glyph_opacity == 1. && flesh_palette::brogue_palette_enabled(profile) {
+            let ink=if profile.is_default("terrain.chasm.color") {
+                let color=flesh_palette::brogue_chasm(x,y,seed);
+                if o.current {color} else {crate::color::memory(color)}
+            }else{fg};
+            let ground=if profile.is_default("terrain.chasm.background") {[0;3]}else{bg};
+            (ink,ground)
+        }else{(fg,bg)};
+        backgrounds[o.index]=bg;
         cells.push(Cell {
             x,
             y,
@@ -2982,6 +3074,10 @@ fn terrain_frame_palette_json_reference(
 }
 
 include!("appearance_ground_tests.rs");
+
+#[cfg(test)]
+#[path = "wall_flesh_palette_tests.rs"]
+mod wall_flesh_palette_tests;
 
 #[cfg(test)]
 mod blood_dot_sequence_tests {
@@ -3064,3 +3160,39 @@ mod player_background_tests {
 }
 
 include!("grass_amulet_observe_tests.rs");
+
+#[cfg(test)]
+#[path = "player_glyph_tests.rs"]
+mod player_glyph_tests;
+
+#[cfg(test)]
+#[path = "revision52_corpse_fall_observation_tests.rs"]
+mod revision52_corpse_fall_observation_tests;
+
+#[cfg(test)]
+mod fast_mode_label_tests {
+    #[test]
+    fn observed_fast_label_is_detached_and_does_not_change_saved_mode() {
+        let mut run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let normal=super::observe(&run);
+        assert_eq!(normal.mode,run.mode);
+        run.fast_mode=corpse_core::Field::Value(true);
+        let v=super::observe(&run);
+        assert_eq!(v.mode,"Fast mode");
+        assert_eq!(run.mode,normal.mode);
+    }
+}
+
+#[cfg(test)]
+mod compressed_depth_label_tests {
+    #[test]
+    fn new_route_displays_twenty_floors_without_changing_animation_depth() {
+        let mut run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.fast_mode=true.into();run.compressed_depths=true.into();
+        let view=super::observe(&run);
+        assert_eq!(view.depth,run.depth);assert_eq!(view.display_depth,1.);assert_eq!(view.max_depth,20);
+        assert_eq!(view.mode,"Avatar");
+        run.compressed_depths=false.into();
+        let view=super::observe(&run);assert_eq!(view.max_depth,40);assert_eq!(view.mode,"Fast mode");
+    }
+}

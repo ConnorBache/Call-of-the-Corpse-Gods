@@ -30,9 +30,10 @@ pub fn special_action(
         }
         if r.simulation_revision.value_or(29.)>=36. {
             let actual=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
+    crate::events::tag_path(&a,"E49","bolt-blue");
             let traveled=crate::projectiles::traveled_distance(r,&a,b.x,b.y,&actual);
             actor_mut_trusted(r,id).unwrap().conditions.insert("rangedRecovery".into(),1.);
-            if let Some(victim)=actual.actor_id.filter(|_|traveled<=16.){engine::attack_ranged_resolved(r,id,victim,120.,traveled,1.,false).map_err(|e|e.0)?;}
+            if let Some(victim)=actual.actor_id.filter(|_|traveled<=16.){engine::attack_ranged_resolved(r,id,victim,crate::balance52::local_amount(r,&a,"monsterSpecialDamage",if crate::combat::raw_attack_damage_enabled(r.simulation_revision.value_or(29.)) { 60. } else { 120. }),traveled,1.,false).map_err(|e|e.0)?;}
             crate::events::actor_event(r,&a,"projectile","Moonbeam",Some(crate::events::EventPoint{x:actual.x,y:actual.y}),None);
         }else{
             engine::attack_ranged(r, id, target, 120.0, ray_range, 1.0, false).map_err(|e| e.0)?;

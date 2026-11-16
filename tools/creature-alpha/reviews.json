@@ -54,9 +54,52 @@
       "status": "approved"
     },
     "horn-6": {
-      "review_notes": "Rejected: automatic candidate carves legitimate dark shoulder/foreleg joints and chest fur at x560\u2013770,y630\u2013890, right shoulder crease x900\u20131040,y650\u2013840, rear-left leg joint x180\u2013350,y800\u2013930. Keep exact frozen legacy RGBA; no threshold-based further cleanup.",
-      "reviewer": "independent native-resolution visual reviewer",
-      "status": "rejected-needs-manual-mask"
+      "approved_rgba": "tools/creature-alpha/reviewed/horn-6.png",
+      "approved_rgba_sha256": "2d8ecfcadb48540a778f695baeb48e7284b4440dbd9c4046203c9834c1debafe",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "promotion_kind": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
+      "remaining_manual_work": [
+        "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
+      ],
+      "review_notes": "Manually bounded source-pixel restoration fixes missing chest, shoulder and leg-joint anatomy; true tail/horn/inter-leg negative spaces retained.",
+      "reviewed_mask": "tools/creature-alpha/reviewed/horn-6-alpha.png",
+      "reviewed_mask_sha256": "e0e36a71eeb2c5a099aaefbcfeb9e5f1771864cb1913b8a56ac44a64e5ee265d",
+      "reviewer": "Source-coordinate implementation and independent native-resolution four-background review, 2026-11-08",
+      "source_sha256": "eae405bd1fd602e9d9f6d1918f159a72ed386e743aacf9b68b5d8cb4ba8231bb",
+      "status": "approved"
+    },
+    "horn-7": {
+      "approved_rgba": "tools/creature-alpha/reviewed/horn-7.png",
+      "approved_rgba_sha256": "e7b52bfe49364918a4b7ad33ba8845f416b4e89870902e61dffc7fa87dd3c6fb",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "promotion_kind": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
+      "remaining_manual_work": [
+        "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
+      ],
+      "review_notes": "Reviewed open mane and tail curl pockets cleared; original purple hair, horns, hooves and fine strands preserved.",
+      "reviewed_mask": "tools/creature-alpha/reviewed/horn-7-alpha.png",
+      "reviewed_mask_sha256": "6dee8eddaf0f7aa72e6ec45a06db3bcb017161450707a8fe430ca88aaab74ca4",
+      "reviewer": "Source-coordinate implementation and independent native-resolution four-background review, 2026-11-08",
+      "source_sha256": "5d15a5a471be1f1f5ed2bd478d630b7be5d87bf860b1ad03864c97fac7cbd325",
+      "status": "approved"
     },
     "phoenix": {
       "approved_rgba": "tools/creature-alpha/reviewed/phoenix.png",
@@ -150,6 +193,94 @@
       "seed_notes": "Specific negative-space pockets only; no authority to discard dark anatomy or all dark components.",
       "seed_reviewer": "independent native-resolution visual review",
       "source_sha256": "348b528e4381d76a0d3603cd4c92615ef11f6b3c7fc435d897cadc43874fa8f4",
+      "status": "approved"
+    },
+    "samara": {
+      "approved_rgba": "tools/creature-alpha/reviewed/samara.png",
+      "approved_rgba_sha256": "9185f3f5cd41bc7bd614a1964178927daab8010236a938aaf4ce3bec87584348",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "promotion_kind": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
+      "remaining_manual_work": [
+        "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
+      ],
+      "review_notes": "Reviewed upper-canopy negative spaces cleared without deleting dark bark, trunk hollows, roots or detached seeds. Lower root ambiguities remain unchanged.",
+      "reviewed_mask": "tools/creature-alpha/reviewed/samara-alpha.png",
+      "reviewed_mask_sha256": "0a9f633923f0c0336795ce2c888f64286d5d69ad3203ed1033f25f2f139ac46d",
+      "reviewer": "Source-coordinate implementation and independent native-resolution four-background review, 2026-11-08",
+      "source_sha256": "0cde43db8c95b460fa3db78ed1af94140cf4f0a16fbd3b50f6fce8f10575729e",
+      "status": "approved"
+    },
+    "ursa-minor": {
+      "approved_rgba": "tools/creature-alpha/reviewed/ursa-minor.png",
+      "approved_rgba_sha256": "09fa78c29c50edbeac0711aea558eb3f3d3463d093574504ed1af2a2d7deca8b",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "promotion_kind": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
+      "remaining_manual_work": [
+        "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
+      ],
+      "review_notes": "Manually bounded source-pixel restoration fixes missing dark neck, chest and belly fur. Pure-black underside contour is visually inferred from bordering authored fur; no new color pixels invented.",
+      "reviewed_mask": "tools/creature-alpha/reviewed/ursa-minor-alpha.png",
+      "reviewed_mask_sha256": "457ca5fb6edbff17d9eb8417ba0b65cc655cb3162e9c5f4bba9cace2e4525476",
+      "reviewer": "Source-coordinate implementation and independent native-resolution four-background review, 2026-11-08",
+      "source_sha256": "45e4725345b9db674fb5e11cefbf67e08e0241490baeca3013d13ee298646462",
+      "status": "approved"
+    },
+    "valta": {
+      "approved_rgba": "tools/creature-alpha/reviewed/valta.png",
+      "approved_rgba_sha256": "f86db6433314cc8272c6d0f58a14a610c61df1e1e913b2698779c95eb2a0284c",
+      "checks": {
+        "anatomy": true,
+        "black": true,
+        "dark_interior": true,
+        "detached_details": true,
+        "gray": true,
+        "red": true,
+        "source_overlay": true,
+        "white": true
+      },
+      "glow_reconstruction": {
+        "alpha_rule": "max-source-channel-min-one",
+        "method": "reviewed-black-matte-glow-v1",
+        "protected_anatomy": "tools/creature-alpha/reviewed/valta-protected-anatomy.png",
+        "protected_anatomy_sha256": "1d81e89ca94bda147e690bb8abf3174e8ece0334a95270048041aebf5f9a3b4b",
+        "source_max_exclusive": 80
+      },
+      "matte_rgb": [
+        0,
+        0,
+        0
+      ],
+      "promotion_kind": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
+      "remaining_manual_work": [
+        "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
+      ],
+      "review_notes": "Opaque black surround replaced by reviewed fractional-alpha glow, with protected dark anatomy. Black-background reconstruction of corrected pixels matches original within one byte; no body/star support removed.",
+      "reviewed_binary_mask": "tools/creature-alpha/reviewed/valta-binary-alpha.png",
+      "reviewed_binary_mask_sha256": "f3a410280fa38bd57e6a40f4bb938d230d09f987e567a6afab690acdf649653e",
+      "reviewed_mask": "tools/creature-alpha/reviewed/valta-alpha.png",
+      "reviewed_mask_sha256": "f466038f324c0c2ceaf0aa7aae08443afe61fbe00c9d56a852475f7fa5e93642",
+      "reviewer": "Source-coordinate implementation and independent native-resolution four-background review, 2026-11-08",
+      "rgb_correction_mask": "tools/creature-alpha/reviewed/valta-correction.png",
+      "rgb_correction_mask_sha256": "f92c1c26e95fd5bfcdba5186f87b8e13c1208bcb46a6dbd241044514476158bc",
+      "source_sha256": "1847b38a5892ae3ae880e3eb10ad8027897520706079a6e58ca966ca33754a4b",
       "status": "approved"
     }
   },

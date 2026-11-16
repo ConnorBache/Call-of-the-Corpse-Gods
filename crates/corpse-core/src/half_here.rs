@@ -52,6 +52,7 @@ pub fn within_range(r: &Run, x: f64, y: f64, range: f64) -> bool {
 /// O(total actors + floors), with COW detach only for actor blocks containing owned endpoints.
 pub fn dismiss(r: &mut Run) {
     let owner = r.player.id;
+    for a in r.actors_at(r.depth).iter().filter(|a|is_clone(a)&&!crate::dreamwalking::is_body(a)&&a.conditions.get("halfHereOwner")==Some(&owner)) {crate::animation_player::local(r,a,"P29","dissolve",crate::events::Stage::Special);}
     let mut changed = Vec::new();
     for (d, actors) in &mut r.actors {
         if actors
@@ -70,6 +71,7 @@ pub fn dismiss(r: &mut Run) {
     }
     r.player.conditions.shift_remove("halfHereId");
     r.player.active.retain(|s| s != ID);
+    crate::revision50::settle_duel_targets(r);
 }
 /// O(current actors + owner projection size); local status fields retain their endpoint identity.
 pub fn sync(r: &mut Run) {
@@ -120,6 +122,7 @@ pub fn sync(r: &mut Run) {
         .into();
     a.stats = p.stats;
     a.base_max_hp = p.base_max_hp;
+    let harmed=a.hp>p.hp;
     a.hp = p.hp;
     a.max_hp = p.max_hp;
     a.energy = p.energy;
@@ -132,6 +135,11 @@ pub fn sync(r: &mut Run) {
         Field::Value(v) => Field::Value(v),
         _ => Field::Missing,
     };
+    if harmed {
+        let a=a.clone();
+        crate::animation_player::local(r,&a,"P29","ripple",crate::events::Stage::Health);
+        crate::animation_player::local(r,&r.player,"P29","ripple",crate::events::Stage::Health);
+    }
 }
 /// Destination validation and activation cost/events belong to the caller.
 /// Birth admission is O(d) clean, O(A*d + F + H) dirty; it precedes dismissal.
@@ -161,6 +169,7 @@ pub fn create(r: &mut Run, x: f64, y: f64) -> Result<f64, String> {
     if crate::dreamwalking::enabled(r) {a.conditions.insert("phantasmiiPlane".into(), if crate::dreamwalking::active(r) {1.} else {0.});}
     a.conditions.insert("halfHereClone".into(), 1.0);
     a.conditions.insert("halfHereOwner".into(), p.id);
+    crate::animation_player::local(r,&a,"P29","summon",crate::events::Stage::Special);
     r.actors_at_mut(r.depth).push(a);
     r.player.conditions.insert("halfHereId".into(), id);
     r.player.active.push(ID.into());

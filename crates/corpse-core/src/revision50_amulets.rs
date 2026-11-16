@@ -58,7 +58,7 @@ pub struct ActivationPlan {
 }
 impl ActivationPlan {
     pub fn consumes_action(&self) -> bool { self.consumes_action }
-    pub fn amulet_energy_spent(&self) -> f64 { self.before.energy - self.after.energy }
+    pub fn amulet_energy_spent(&self) -> f64 { self.before.energy.min(self.spec.capacity) - self.after.energy }
     pub fn player_energy_spent(&self) -> f64 { self.player_before - self.player_after }
 }
 fn valid_ledger(ledger: &ActivationLedger, tick: u64) -> bool {
@@ -71,18 +71,20 @@ pub fn plan_activation(spec: Option<&AmuletSpec>, state: &AmuletState, ledger: &
     player_energy: f64, normal_tick: u64, blessings: Blessings) -> Result<ActivationPlan, AdmissionError> {
     use AdmissionError::*;
     let spec = *spec.ok_or(MissingSpec)?;
-    if spec.capacity != BASE_ENERGY || !spec.activation_cost.is_finite() || spec.activation_cost < 0.0 { return Err(InvalidSpec); }
-    if !state.energy.is_finite() || state.energy < 0.0 || state.energy > spec.capacity
+    if !matches!(spec.capacity, 10. | BASE_ENERGY) || !spec.activation_cost.is_finite() || spec.activation_cost < 0.0 { return Err(InvalidSpec); }
+    if !state.energy.is_finite() || state.energy < 0.0 || state.energy > BASE_ENERGY
         || !player_energy.is_finite() || player_energy < 0.0 || !valid_ledger(ledger,normal_tick) { return Err(InvalidState); }
     let cost = (spec.activation_cost - if blessings.appropriate {10.0} else {0.0}).max(0.0);
     let mut after = *state;
+    after.energy = after.energy.min(spec.capacity);
+    let available = after.energy;
     let mut player_after = player_energy;
     if cost == 0.0 {}
-    else if state.energy >= cost {
+    else if available >= cost {
         after.energy -= cost;
-        if after.energy == state.energy { return Err(InvalidState); }
+        if after.energy == available { return Err(InvalidState); }
     } else {
-        let remainder = cost - state.energy;
+        let remainder = cost - available;
         if player_energy < remainder { return Err(InsufficientPlayerEnergy); }
         player_after -= remainder;
         if player_after == player_energy { return Err(InvalidState); }
@@ -102,21 +104,24 @@ pub fn commit_activation(plan:&ActivationPlan,spec:Option<&AmuletSpec>,state:&mu
     if plan_activation(spec,state,ledger,*player_energy,normal_tick,blessings)? != *plan {return Err(AdmissionError::StalePlan);}
     *state=plan.after;*ledger=plan.ledger_after;*player_energy=plan.player_after;Ok(())
 }
-fn new_state(item:&Item)->Result<AmuletState,AdmissionError>{
+fn new_state(item:&Item, revision:f64)->Result<AmuletState,AdmissionError>{
     if item.kind!="amulet" || !item.id.is_finite() || item.id<0.0 || item.id.fract()!=0.0 || item.id>9007199254740991.0 {
         return Err(AdmissionError::InvalidState);
     }
-    Ok(AmuletState {instance_id:item.id as u64,energy:BASE_ENERGY,ready_at_half_tick:0})
+    Ok(AmuletState {instance_id:item.id as u64,energy:crate::revision52_reserves::capacity(revision),ready_at_half_tick:0})
 }
 /// One-time acquisition/materialization, never an equip, rest or level refill.
 pub fn initialize_item(item:&mut Item)->Result<(),AdmissionError>{
+    initialize_item_for_revision(item,50.)
+}
+pub fn initialize_item_for_revision(item:&mut Item,revision:f64)->Result<(),AdmissionError>{
     if !item.amulet_state.is_missing(){return Err(AdmissionError::AlreadyInitialized);}
-    item.amulet_state=new_state(item)?.into();Ok(())
+    item.amulet_state=new_state(item,revision)?.into();Ok(())
 }
 pub fn valid_item_state(item:&Item,revision:f64)->bool{
     match &item.amulet_state {
         Field::Missing=>true,Field::Null=>false,
-        Field::Value(s)=> revision>=50.0 && new_state(item).is_ok_and(|base|base.instance_id==s.instance_id)
+        Field::Value(s)=> revision>=50.0 && new_state(item,revision).is_ok_and(|base|base.instance_id==s.instance_id)
             && s.energy.is_finite() && s.energy>=0.0 && s.energy<=BASE_ENERGY,
     }
 }
@@ -128,15 +133,18 @@ fn blessings(r:&Run)->Blessings{
     Blessings{appropriate:r.player.abilities.iter().any(|id|id=="kative-appropriate"),
         spellslinger:r.player.abilities.iter().any(|id|id=="isheilah-spellslinger")}
 }
-/// O(I+B), read-only. Missing state is projected as authored initial50; commit
+/// O(I+B), read-only. Missing state is projected as the revision-specific initial reserve; commit
 /// materializes the spent state only after target/effect admission succeeds.
 pub fn plan_item_activation(r:&Run,id:f64,spec:Option<&AmuletSpec>)->Result<ActivationPlan,AdmissionError>{
     if !crate::revision50::enabled(r){return Err(AdmissionError::InvalidState);}
     let item=r.inventory.iter().find(|i|i.id==id).ok_or(AdmissionError::MissingItem)?;
     if item.kind!="amulet" {return Err(AdmissionError::NotAmulet);}
-    if !valid_item_state(item,50.0){return Err(AdmissionError::InvalidState);}
-    let state=item.amulet_state.as_ref().copied().unwrap_or(new_state(item)?);
-    let mut plan=plan_activation(spec,&state,&r.player.amulet_ledger.as_ref().copied().unwrap_or_default(),
+    let revision=r.simulation_revision.value_or(29.);
+    if !valid_item_state(item,revision) || !crate::revision52_amulet_tiers::valid_item(item,r.simulation_revision.value_or(29.)){return Err(AdmissionError::InvalidState);}
+    let state=item.amulet_state.as_ref().copied().unwrap_or(new_state(item,revision)?);
+    if spec.is_some_and(|s| !matches!(s.capacity, 10. | BASE_ENERGY)) {return Err(AdmissionError::InvalidSpec);}
+    let spec=spec.copied().map(|mut s| {s.capacity=crate::revision52_reserves::capacity(revision);s});
+    let mut plan=plan_activation(spec.as_ref(),&state,&r.player.amulet_ledger.as_ref().copied().unwrap_or_default(),
         r.player.energy,normal_tick(r)?,blessings(r))?;
     plan.missing_state=item.amulet_state.is_missing();Ok(plan)
 }
@@ -149,11 +157,16 @@ pub fn commit_item_activation(r:&mut Run,id:f64,plan:&ActivationPlan,spec:Option
     if loss>0.0 {crate::resources::record_player_energy_loss(r,loss);}
     r.inventory[index].amulet_state=plan.after.into();
     r.player.amulet_ledger=plan.ledger_after.into();r.player.energy=plan.player_after;
-    crate::half_here::sync(r);Ok(())
+    crate::half_here::sync(r);
+    if plan.amulet_energy_spent()>0. { crate::events::inventory(r,"amulet","reserve-drain",Some(id)); }
+    if loss>0. { crate::events::inventory(r,"amulet","energy-drain",None); }
+    if !plan.consumes_action() { crate::events::inventory(r,"P18","spark",Some(id)); }
+    Ok(())
 }
 /// O(I+A+G+J), O(1) scratch, plus bounded actor-ledger checks. Rejects malformed
 /// explicit state before commands; old amulet fields remain absent in old saves.
 pub fn validate_run(r:&Run)->Result<(),String>{
+    crate::revision52_amulet_tiers::validate_run(r)?;
     let revision=r.simulation_revision.value_or(29.0);
     let valid_actor=|a:&crate::Actor| a.copied_inventory.as_ref().is_none_or(|items|items.iter().all(|i|valid_item_state(i,revision)))
         && match &a.amulet_ledger {Field::Missing=>true,Field::Null=>false,Field::Value(l)=>revision>=50.0 && normal_tick(r).is_ok_and(|t|valid_ledger(l,t))}
@@ -193,18 +206,24 @@ pub fn reap_direct_hit(r:&mut Run,attacker:&crate::Actor,target:&crate::Actor,ac
     // Invalid saved state is rejected by admission, never repaired into a refill.
     if !valid_reaping_ledger(&ledger) {return;}
     // Split before addition to avoid overflow on an otherwise finite HP packet.
-    let remainder=ledger.damage_carry+actual_hp_damage%20.0;
-    let award=(actual_hp_damage/20.0).floor()+(remainder/20.0).floor();
+    let copies=crate::revision50_rings::stacking_count(r,attacker,crate::revision50_rings::REAPING) as f64;
+    let remainder=ledger.damage_carry+(actual_hp_damage%20.0)*copies;
+    let award=(actual_hp_damage/20.0).floor()*copies+(remainder/20.0).floor();
     ledger.damage_carry=remainder%20.0;
     r.player.reaping_ledger=ledger.into();
     if award<=0.0 {return;}
+    let capacity=crate::revision52_reserves::capacity(r.simulation_revision.value_or(29.));
+    let mut increased=Vec::new();
     for item in &mut r.inventory {
         if !crate::revision50_amulet_effects::is_amulet(item) || !valid_item_state(item,50.0) {continue;}
-        // Missing state already means the initial full 50, not a spent reserve.
+        // Missing state already means the revision-specific full reserve.
         if let Some(state)=item.amulet_state.as_mut() {
-            state.energy=(state.energy+award.min(BASE_ENERGY)).min(BASE_ENERGY);
+            let before=state.energy;
+            state.energy=(state.energy.min(capacity)+award.min(capacity)).min(capacity);
+            if state.energy>before && r.simulation_revision.value_or(29.)>=52. { increased.push(item.id); }
         }
     }
+    for id in increased { crate::events::inventory(r,"reaping","reserve-rise",Some(id)); }
 }
 
 #[cfg(test)]

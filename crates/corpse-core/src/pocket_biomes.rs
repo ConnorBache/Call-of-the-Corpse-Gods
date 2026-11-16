@@ -200,7 +200,7 @@ pub fn populate_revision(f:&mut Floor,actors:&mut Vec<Actor>,ground:&mut Vec<Gro
                 let mut a=crate::population::create_actor_revision(kind,*next_id,(at%w) as f64,(at/w) as f64,false,33.0)?;
                 crate::revision50_combat::mark_new_caster(&mut a,kind,revision);
                 if revision>=50.0 {crate::revision50_creature_identity::apply_actor(&mut a);}
-                *next_id+=1.0;a.conditions.insert("nestResident".into(),1.0);actors.push(a);occupied.insert(at);
+                crate::balance52::apply_new_actor_kind(&mut a, &format!("nest:{kind}"), f.depth, revision);*next_id+=1.0;a.conditions.insert("nestResident".into(),1.0);actors.push(a);occupied.insert(at);
             }
             if occupied.contains(&h) {return Err("Nest honey cell occupied".into());}
             ground.push(GroundItem{x:(h%w) as f64,y:(h/w) as f64,item:crate::royal_honey::item(*next_id),..Default::default()});*next_id+=1.0;occupied.insert(h);

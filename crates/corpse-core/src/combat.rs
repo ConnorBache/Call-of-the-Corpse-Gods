@@ -3,8 +3,56 @@
 pub fn integer_stat(n: f64) -> f64 {
     n.signum() * n.abs().round() + 0.0
 }
+/// Frozen pre-R52 probability for legacy callers and replay compatibility.
 pub fn hit_chance(accuracy: f64, dodge: f64, range: f64) -> f64 {
     ((0.65 * 0.9f64.powf(dodge - accuracy)).clamp(0.0, 1.0) * 0.9f64.powf(range)).clamp(0.0, 1.0)
+}
+/// R52 ordinary chance: Accuracy / (2 * Dodge), then the existing range loss.
+/// Dodge is clamped to a minimum of one only within this calculation.
+/// Nonpositive Accuracy cannot hit. Stored/effective stats are not clamped.
+/// Divide before multiplying by 0.5 so large finite Dodge cannot overflow.
+/// O(1) time and memory; no RNG or actor/stat mutation.
+pub fn ratio_hit_chance(accuracy: f64, dodge: f64, range: f64) -> f64 {
+    if !accuracy.is_finite() || !dodge.is_finite() || !range.is_finite() || range < 0.0 || accuracy <= 0.0 {
+        return 0.0;
+    }
+    let base = (accuracy / dodge.max(1.0) * 0.5).clamp(0.0, 1.0);
+    (base * 0.9f64.powf(range)).clamp(0.0, 1.0)
+}
+/// Actual non-player birth Accuracy uses the designer's provisional R52
+/// fifteen-point baseline plus its authored species/floor offset. O(1).
+/// Like birth Dodge, this is never applied to an existing or copied body.
+pub fn creature_birth_accuracy(revision: f64, offset: f64) -> f64 {
+    offset + if revision >= 52.0 { 15.0 } else { 0.0 }
+}
+/// Actual non-player birth Dodge: retain the authored offset above R52's
+/// ten-point baseline, with a minimum starting value of ten. This is not an
+/// effective-stat floor: later penalties and recorded/copy/revival stats stay exact.
+/// Call only when assigning a raw NEW body stat. O(1), no mutation or RNG.
+pub fn creature_birth_dodge(revision: f64, offset: f64) -> f64 {
+    if revision >= 52.0 { (offset + 10.0).max(10.0) } else { offset }
+}
+/// One authority for actual attacks and detached melee/projectile previews.
+pub fn hit_chance_for_run(r: &crate::Run, accuracy: f64, dodge: f64, range: f64) -> f64 {
+    if r.simulation_revision.value_or(29.0) >= 52.0 {
+        ratio_hit_chance(accuracy, dodge, range)
+    } else {
+        hit_chance(accuracy, dodge, range)
+    }
+}
+/// Current R52 amendment: attack values are authored in HP units before DR.
+/// Other revisions retain their original packet scaling and replay arithmetic.
+pub fn raw_attack_damage_enabled(revision: f64) -> bool { revision == 52.0 }
+/// O(1), actual non-player attack profile. Explicit copy/weapon fields already
+/// contain raw HP coefficients and must not be scaled a second time.
+pub fn creature_attack_base(revision: f64, actor: &crate::Actor, offense: f64) -> f64 {
+    let (base, coefficient) = if raw_attack_damage_enabled(revision) { (5.0, 0.5) } else { (10.0, 1.0) };
+    actor.conditions.get("weaponDamage").copied().unwrap_or(base)
+        + offense * actor.conditions.get("weaponOffenseMultiplier").copied().unwrap_or(coefficient)
+}
+fn damage_scale_for_run(r: &crate::Run, kind: Option<&str>) -> f64 {
+    if raw_attack_damage_enabled(r.simulation_revision.value_or(29.0)) && kind == Some("attack") { 1.0 }
+    else { damage_scale(kind) }
 }
 fn damage_scale(kind: Option<&str>) -> f64 {
     match kind {
@@ -25,7 +73,7 @@ pub fn nearest_damage_enabled(r: &crate::Run) -> bool {
     r.simulation_revision.value_or(29.0) >= 51.0
 }
 pub fn tuned_damage_for_run(r: &crate::Run, amount: f64, kind: Option<&str>) -> f64 {
-    if nearest_damage_enabled(r) { nearest_damage(amount * damage_scale(kind)) }
+    if nearest_damage_enabled(r) { nearest_damage(amount * damage_scale_for_run(r, kind)) }
     else { tuned_damage(amount, kind) }
 }
 pub fn explosion_damage_for_run(r: &crate::Run, max_hp: f64) -> f64 {
@@ -44,7 +92,7 @@ pub fn ordinary_strike_damage_for_run(
 pub fn damage_packet(r: &crate::Run, victim: &crate::Actor, amount: f64, kind: &str, exact_scale: bool) -> f64 {
     let scaled = if nearest_damage_enabled(r) {
         (if kind == "explosion" { victim.max_hp * 0.5 }
-        else { amount * damage_scale(if exact_scale { None } else { Some(kind) }) }).max(0.0)
+        else { amount * damage_scale_for_run(r, if exact_scale { None } else { Some(kind) }) }).max(0.0)
     } else if kind == "explosion" { explosion_damage(victim.max_hp) }
     else { tuned_damage(amount, if exact_scale { None } else { Some(kind) }) };
     let resisted = crate::revision50_rings::resist_damage(r, victim, kind, scaled);
@@ -91,10 +139,11 @@ use crate::model::*;
 pub fn effective_stats(r: &Run, a: &Actor) -> Stats {
     let _timing_function = crate::timing::span("stats.effective");
     let owner = crate::engine::actor(r, crate::half_here::owner_id(r, a)).unwrap_or(a);
-    let sustain = crate::revision50_rings::has_effect(r, a, crate::revision50_rings::SUSTAIN_STRENGTH);
+    let sustain_factor = crate::revision50_rings::stack_multiplier(r, a, crate::revision50_rings::SUSTAIN_STRENGTH, 0.5);
+    let sustain = sustain_factor < 1.0;
     // Scale each temporary negative contribution after its existing integer
     // normalization. Do not halve base/equipment penalties or round halves away.
-    let temporary = |n: f64| if sustain && n < 0.0 { n * 0.5 } else { n };
+    let temporary = |n: f64| if sustain && n < 0.0 { n * sustain_factor } else { n };
     let mut s = owner.stats.clone();
     // R50 Mini-Me stores already-derived numeric stats, including fractional
     // Sustain relief. Normalize ordinary/legacy base stats, not that snapshot.
@@ -187,18 +236,13 @@ pub fn effective_stats(r: &Run, a: &Actor) -> Stats {
             let source = if matches!(key, "defense" | "maxHp" | "maxEnergy") { owner } else { a };
             let n = integer_stat(crate::engine::condition(source, &format!("buff:{key}")));
             if n < 0.0 && crate::engine::condition(source, &format!("buffTicks:{key}")) > 0.0 {
-                add_stat(&mut s, key, -n * 0.5);
+                add_stat(&mut s, key, -n * (1.0 - sustain_factor));
             }
         }
     }
-    // Fixed named powers use the endpoint-aware query, not item bonuses or
-    // copy counts. Add them before the normal combat modifiers/calculations.
-    if crate::revision50_rings::has_effect(r, a, crate::revision50_rings::PROTECTION) {
-        s.dr += 4.0;
-    }
-    if crate::revision50_rings::has_effect(r, a, crate::revision50_rings::SLAYING) {
-        s.offense += 4.0;
-    }
+    // Each carried copy contributes before normal combat modifiers.
+    s.dr += 4.0 * crate::revision50_rings::stacking_count(r, a, crate::revision50_rings::PROTECTION) as f64;
+    s.offense += 4.0 * crate::revision50_rings::stacking_count(r, a, crate::revision50_rings::SLAYING) as f64;
     s.dr += temporary(-crate::revision50_amulet_effects::corrosion_penalty(r,a));
     if a.conditions.get("weakened").copied().unwrap_or(0.0) > 0.0 {
         s.offense += temporary(-5.0);
@@ -276,3 +320,7 @@ pub fn adaptive_armor_dr(defender: &crate::model::Actor, source: &crate::model::
         .clamp(0.0, 3.0);
     n * (7.0 - n) / 2.0
 }
+
+#[cfg(test)]
+#[path = "revision52_accuracy_tests.rs"]
+mod revision52_accuracy_tests;

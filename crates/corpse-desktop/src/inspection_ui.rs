@@ -16,8 +16,11 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, sync::OnceLock};
 
 pub const BOUNDS: (i32, i32, i32, i32) = (24, 138, 520, 572);
+const ENEMY_MELEE_HEADING: &str = "Enemy melee";
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Report {
+    #[serde(skip)]
+    pub identity_known: bool,
     #[serde(skip)]
     pub hallucination: Option<std::sync::Arc<[Report;6]>>,
     pub title: String,
@@ -60,6 +63,7 @@ impl CreatureReport {
     fn report(self) -> Report {
         Report {
             hallucination: None,
+            identity_known: false,
             title: self.title.clone(),
             scene: self.scene.clone(),
             lines: [
@@ -81,8 +85,26 @@ impl CreatureReport {
         }
     }
 }
+/// Reuse the already visibility-filtered inspection report. Action/error notices
+/// keep precedence; no extra world observation, pathfinding or simulation query.
+pub fn footer_text<'a>(notice: &'a str, report: Option<&'a Report>) -> &'a str {
+    if !notice.is_empty() { notice } else { report.map_or("", |report| report.scene.as_str()) }
+}
+#[cfg(test)]
+mod footer_tests {
+    use super::*;
+    #[test]
+    fn inspect_footer_restores_observed_text_without_hiding_action_notices() {
+        let report = Report { scene: "Floor with a visible heart".into(), ..Default::default() };
+        assert_eq!(footer_text("", Some(&report)), report.scene);
+        assert_eq!(footer_text("Select an enemy.", Some(&report)), "Select an enemy.");
+        assert_eq!(footer_text("Save failed.", Some(&report)), "Save failed.");
+        assert_eq!(footer_text("", None), "");
+    }
+}
 /// Detached observation uncertainty, never canonical log or inventory text.
 fn question_report(r:&mut Report){
+ if r.identity_known{return;}
  let q=crate::hallucination_ui::question;q(&mut r.title);q(&mut r.scene);for line in &mut r.lines{q(line);}for line in &mut r.item_hover{q(line);}
  if let Some(c)=r.creature.as_mut(){for text in [&mut c.title,&mut c.description,&mut c.scene,&mut c.behavior,&mut c.resources,&mut c.conditions,&mut c.your_attack,&mut c.their_attack,&mut c.abilities,&mut c.ability_details,&mut c.heart,&mut c.bow_shot]{q(text);}}
 }
@@ -243,6 +265,12 @@ fn gas_label(kind: &str) -> &str {
     }
 }
 /// Every dynamic detail is sourced from the one observed snapshot.
+// Presentation only: remembered terrain and later feature-title overrides remain intact.
+fn terrain_report_title(name: String, current: bool) -> String {
+    if current && matches!(name.as_str(),
+        "Ice" | "Puddle" | "Hellfire" | "Bloody wall" | "Rock wall" | "Stone wall" | "Wall" | "Bare ground" | "Stone floor" | "Rock floor" | "Earthen floor" | "Sand" | "Soot" | "Ash" | "Grass" | "Tree" | "Deep water" | "Shallow water" | "Chasm" | "Upstairs" | "Downstairs" | "Bottomless pit" | "Open door" | "Closed door" | "Grate" | "Bridge"
+    ) { String::new() } else { name }
+}
 fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
     let mut details = Vec::new();
     let h = o.hazards.as_ref();
@@ -808,10 +836,10 @@ fn creature_presented(r:&Run,a:&Actor,tile:Option<&vision::ObservedCell>, projec
             f.to_uppercase().collect::<String>() + c.as_str()
         })
     };
-    if !projected && vision::directly_visible_actor(r,a) {
-        if let Some(feeding)=corpse_core::creature_feeding::description(r,a) {
-            behavior.push_str(&format!(" · {feeding}"));
-        }
+    let feeding=crate::monster_status_ui::feeding_description(r,a,
+        !projected && vision::directly_visible_actor(r,a),projected);
+    if let Some(activity)=feeding.filter(|activity|*activity!="Feeding") {
+        behavior.push_str(&format!(" · {activity}"));
     }
     let illumination = tile
         .filter(|o| o.current)
@@ -828,27 +856,24 @@ fn creature_presented(r:&Run,a:&Actor,tile:Option<&vision::ObservedCell>, projec
                 format!("{behavior} · {range}{modifier}")
             }
             else { format!("{behavior} · Illumination {illumination}") },
-        resources: format!(
-            "{}Health {}/{} · Energy {}/{}",
-            if owner.id != a.id {
-                "Shared with you · "
-            } else {
-                ""
-            },
-            owner.hp.ceil(),
-            owner.max_hp,
-            owner.energy.ceil(),
-            if ability(owner, "Boundless Hunger") {
-                "∞".into()
-            } else {
-                stats.max_energy.ceil().to_string()
+        resources: {
+            let mut text = format!("{}Health {}/{}",
+                if owner.id != a.id { "Shared with you · " } else { "" },
+                crate::stat_presentation::current_health(owner.hp), owner.max_hp);
+            if owner.id == r.player.id || crate::monster_status_ui::energy_capable(r.simulation_revision.value_or(29.), a) {
+                text.push_str(&format!(" · Energy {}/{}", owner.energy.ceil(),
+                    if ability(owner, "Boundless Hunger") { "∞".into() }
+                    else { stats.max_energy.ceil().to_string() }));
             }
-        ),
-        conditions: statuses_ui::observe(r, a)
-            .iter()
-            .map(compact_condition)
-            .collect::<Vec<_>>()
-            .join(" · "),
+            text
+        },
+        conditions: {
+            let mut statuses=statuses_ui::observe(r,a);
+            if feeding==Some("Feeding") {
+                statuses.push(statuses_ui::Status{name:"Feeding".into(),duration:None});
+            }
+            statuses.iter().map(compact_condition).collect::<Vec<_>>().join(", ")
+        },
         your_attack: if !projected && corpse_core::ahvamitt::is_actor(a)
             && corpse_core::dreamwalking::same_plane(r, &r.player, a) {
             "Attack him to continue his game; he teleports away instead of taking ordinary attack damage.".into()
@@ -873,7 +898,7 @@ fn hover_resources(r: &Run, a: &Actor) -> Vec<HoverResource> {
     }
     let maximum = combat::effective_stats(r, a).max_energy;
     let boundless = ability(a, "Boundless Hunger");
-    vec![
+    let mut resources = vec![
         if has(a, "enemy:beast:sphinx") {
             HoverResource {
                 label: "Health · Invulnerable".into(),
@@ -888,14 +913,17 @@ fn hover_resources(r: &Run, a: &Actor) -> Vec<HoverResource> {
                 color: [255, 48, 85],
             }
         },
-        HoverResource {
+    ];
+    if a.id == r.player.id || crate::monster_status_ui::energy_capable(r.simulation_revision.value_or(29.), a) {
+        resources.push(HoverResource {
             label: "Energy".into(),
             value: Some(a.energy),
             maximum: (!boundless).then_some(maximum),
             reference: if boundless { 100. } else { maximum },
             color: [36, 223, 255],
-        },
-    ]
+        });
+    }
+    resources
 }
 fn item_magic(i: &Item) -> bool {
     corpse_core::inventory::is_magical(i)
@@ -1029,7 +1057,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             .filter(|other| other.id != a.id && !other.dead.value_or(false)
                 && corpse_core::dreamwalking::dream_actor(r, other) != corpse_core::dreamwalking::dream_actor(r, a))
             .map(|other| {
-                let shown = if crate::hallucination_ui::active(r)&&crate::hallucination_ui::eligible(other) {crate::creature_presentation::project_kind(r,other,crate::hallucination_ui::kind(r,other,phase))}else{crate::creature_presentation::project(r, other)};
+                let shown = if crate::hallucination_ui::affects(r,other) {crate::creature_presentation::project_kind(r,other,crate::hallucination_ui::kind(r,other,phase))}else{crate::creature_presentation::project(r, other)};
                 creature_title(r, shown.as_ref().unwrap_or(other))
             }).collect();
         if !overlapping.is_empty() {
@@ -1053,7 +1081,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         }
         detail.report()
         };
-        if crate::hallucination_ui::active(r)&&crate::hallucination_ui::eligible(a) {
+        if crate::hallucination_ui::affects(r,a) {
             // One detached scratch Run, one admitted terrain observation; no Run retained.
             let mut scratch=r.clone();
             let variants=std::array::from_fn(|phase| {
@@ -1064,13 +1092,15 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             });
             let mut report=variants[0].clone();report.hallucination=Some(std::sync::Arc::new(variants));return report;
         }
-        return decorate(creature(r,a,Some(o)),0);
+        let mut report=decorate(creature(r,a,Some(o)),0);
+        report.identity_known=corpse_core::actor_presentation::identity_known(r,a);
+        return report;
     }
     let mut report = unknown();
     if o.current || o.remembered {
         let (name, text) = terrain_copy(f, o);
         report = Report {
-            title: name,
+            title: terrain_report_title(name, o.current),
             scene: text.clone(),
             lines: vec![text],
             ..Default::default()
@@ -1139,8 +1169,8 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             if player {
                 report.title = "Your vessel".into();
                 report.lines.push(format!(
-                    "Health {:.1}/{} · Energy {}",
-                    r.player.hp, r.player.max_hp, r.player.energy
+                    "Health {:.0}/{} · Energy {}",
+                    crate::stat_presentation::current_health(r.player.hp), r.player.max_hp, r.player.energy
                 ));
                 let statuses = statuses_ui::observe(r, &r.player)
                     .iter()
@@ -1298,7 +1328,12 @@ fn bow_text_presented(r:&Run,bow:&Item,a:&Actor,trace:&crate::targeting_ui::Trac
     let extra = if corpse_core::revision50::enabled(&view) { 0. }
         else { corpse_core::crafting::preview_fury_bonus(&view, view.player.energy).0 };
     let range = (view.player.x - actor.x).hypot(view.player.y - actor.y);
-    let mut shot = strike_preview_ranged(&view, &view.player, &actor, base, 1., extra, range, 0.5);
+    let normal = corpse_core::projectiles::normal_bow_accuracy(&view, bow);
+    let mut shot = strike_preview_accuracy(&view, &view.player, &actor, base, 1., extra,
+        range, if normal {1.} else {0.5}, normal);
+    let scale = corpse_core::engine::bow_damage_multiplier(view.simulation_revision.value_or(29.), bow);
+    shot.minimum *= scale;
+    shot.maximum *= scale;
     if corpse_core::divine_reactions::nightmare_absorbs(&view, &actor, Some(&view.player)) {
         shot.minimum = 0.;
         shot.maximum = 0.;
@@ -1387,7 +1422,7 @@ fn wrapped(report: &Report, p: &Painter) -> Vec<PaintLine> {
         add(&c.conditions, [193, 138, 255], 14, true);
         add("Your attacks", [36, 223, 255], 15, false);
         add(&c.your_attack, [36, 223, 255], 15, true);
-        add("Enemy attacks", [255, 82, 120], 15, false);
+        add(ENEMY_MELEE_HEADING, [255, 82, 120], 15, false);
         add(&c.their_attack, [255, 82, 120], 15, true);
         add(&c.abilities, MUTED, 15, true);
         add(&c.heart, GOLD, 14, false);
@@ -1579,7 +1614,7 @@ pub fn paint_hover_at(report: &Report, p: &mut Painter, tile: (i32, i32, i32, i3
     add(&c.conditions, [193, 138, 255], 14, 7);
     add("Your attacks", [36, 223, 255], 15, 2);
     add(&c.your_attack, [36, 223, 255], 15, 7);
-    add("Enemy attacks", [255, 82, 120], 15, 2);
+    add(ENEMY_MELEE_HEADING, [255, 82, 120], 15, 2);
     add(&c.their_attack, [255, 82, 120], 15, 7);
     add(&c.abilities, MUTED, 15, 4);
     add(&c.heart, GOLD, 14, 0);
@@ -1591,8 +1626,8 @@ pub fn paint_hover_at(report: &Report, p: &mut Painter, tile: (i32, i32, i32, i3
     // Source #151923f5 composited over the already-painted scene.
     // O(clipped native rectangle area), O(1) extra memory; same logical preclip.
     let left=x.max(0); let top=y.max(0);
-    p.blend_rect(left,top,(x+w).min(crate::render::WIDTH as i32)-left,
-        (y+h).min(crate::render::HEIGHT as i32)-top,p.profile.rgb("ui.colors.tooltip"),245);
+    p.blend_rect(left,top,(x+w).min(p.logical_width())-left,
+        (y+h).min(p.logical_height())-top,p.profile.rgb("ui.colors.tooltip"),245);
     modal_ui::border(p, Rect(x, y, w, h), p.profile.rgb("ui.colors.border"));
     paint_prose_role(
         p,
@@ -1622,7 +1657,7 @@ pub fn paint_hover_at(report: &Report, p: &mut Painter, tile: (i32, i32, i32, i3
             p.text(&r.label, xx, yy, 14, r.color);
             let count = format!(
                 "{} / {}",
-                value.ceil(),
+                if r.label == "Health" {crate::stat_presentation::current_health(value)} else {value.ceil()},
                 r.maximum.map_or("∞".into(), |n| n.ceil().to_string())
             );
             p.text(&count, xx + cell - 110, yy, 14, INK);
@@ -1662,8 +1697,8 @@ fn paint_item_hover(report: &Report, p: &mut Painter, tile: (i32,i32,i32,i32)) {
     let (x,y,w,h)=modal_ui::hover_bounds_painter(p,tile,rows.len()as i32*line_height+24).tuple();
     let old=p.clip;p.clip=Some((x,y,w,h));
     let left=x.max(0);let top=y.max(0);
-    p.blend_rect(left,top,(x+w).min(crate::render::WIDTH as i32)-left,
-        (y+h).min(crate::render::HEIGHT as i32)-top,p.profile.rgb("ui.colors.tooltip"),245);
+    p.blend_rect(left,top,(x+w).min(p.logical_width())-left,
+        (y+h).min(p.logical_height())-top,p.profile.rgb("ui.colors.tooltip"),245);
     modal_ui::border(p,Rect(x,y,w,h),p.profile.rgb("ui.colors.border"));
     for (index,line) in rows.iter().enumerate() {
         paint_prose_role(p,Role::Tooltips,line,x+14,y+12+index as i32*line_height,15,p.profile.rgb("ui.colors.primary"));
@@ -1807,6 +1842,30 @@ mod tests {
         }
     }
     #[test]
+    fn current_plain_tree_title_is_hidden_without_changing_terrain_copy() {
+        let r = base();
+        let mut f = r.floor().unwrap().clone();
+        let at = 0;
+        f.tiles[at] = "tree".into();
+        let mut o = cell(&f, at, true, r.tick);
+        o.hazards = None; o.biome = None; o.flowers = false;
+        o.snow = false; o.ice = false; o.puddles = false; o.hellfire = false;
+        let (name, text) = terrain_copy(&f, &o);
+        assert_eq!(name, "Tree");
+        assert_eq!(text, "A tree rises from the ground.");
+        assert_eq!(terrain_report_title(name, true), "");
+        assert_eq!(terrain_report_title("Tree".into(), false), "Tree");
+        assert_eq!(terrain_report_title("Wall".into(), true), "");
+        assert_eq!(terrain_report_title("Portal".into(), true), "Portal");
+        for name in ["Ice", "Puddle", "Hellfire", "Bloody wall", "Rock wall", "Stone wall", "Wall", "Bare ground", "Stone floor", "Rock floor", "Earthen floor", "Sand", "Soot", "Ash", "Grass", "Tree", "Deep water", "Shallow water", "Chasm", "Upstairs", "Downstairs", "Bottomless pit", "Open door", "Closed door", "Grate", "Bridge"] {
+            assert_eq!(terrain_report_title(name.into(), true), "", "{name}");
+            assert_eq!(terrain_report_title(name.into(), false), name, "{name}");
+        }
+        for name in ["Speed-up area", "Unclear memory", "Non-Euclidean space", "Brazier", "Magical beacon"] {
+            assert_eq!(terrain_report_title(name.into(), true), name);
+        }
+    }
+    #[test]
     fn source_58_terrain_reports() {
         let fixtures: serde_json::Value =
             serde_json::from_str(include_str!("../../../fixtures/inspection-ui-v48.json")).unwrap();
@@ -1873,7 +1932,10 @@ mod tests {
                 ("heart", got.heart),
             ] {
                 let expected=e[key].as_str().unwrap();
-                let expected=if key=="conditions" {
+                let expected=if key=="description" {
+                    // Preserve the frozen fixture; apply only approved grammar corrections.
+                    expected.replace("whom has", "who has").replace("It's head", "Its head")
+                }else if key=="conditions" {
                     expected.replace("Slow: acts every other turn","Slow")
                         .replace("Slowed: acts every other turn","Slowed")
                         .replace("Lucky: next attack","Lucky").replace("Unlucky: next attack","Unlucky")
@@ -1881,6 +1943,11 @@ mod tests {
                         .replace("Charging moonbeam: next normal action","Charging moonbeam")
                         .replace("Riptide: rooted","Riptide")
                         .replace("Squirming helplessly: outside habitat","Squirming helplessly")
+                        .replace(" · ", ", ")
+                }else if key=="resources" && a.id != r.player.id
+                    && !corpse_core::half_here::is_clone(&a)
+                    && !crate::monster_status_ui::energy_capable(r.simulation_revision.value_or(29.), &a) {
+                    expected.split(" · Energy").next().unwrap().to_string()
                 }else if key=="heart" {
                     // Presentation units changed, not the frozen heart reward.
                     // Compute this oracle from fixture numbers, independently
@@ -2177,6 +2244,10 @@ struct Attack {
     strike: Strike,
     defender_hp: f64,
     defender_max_hp: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    hanged_energy: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    hanged_surrender_main_cost: Option<[f64; 2]>,
     reason: Option<String>,
     offhand: Option<Offhand>,
 }
@@ -2235,15 +2306,11 @@ fn strike_damage(
     }
     let defense = combat::effective_stats(r, b);
     let pool = owner(r, b);
-    let surrender = if apply_surrender
-        && is_active(r, b, "Never Surrender")
-        && pool.energy >= 8.
-        && pool.conditions.get("surrenderTick") != Some(&r.tick)
-    {
-        defense.defense
-    } else {
-        0.
-    };
+    // Share actual hit admission: own reserve first on R50+, main energy on legacy
+    // runs, and the canonical owner's once-per-tick/endpoint eligibility checks.
+    let surrender = corpse_core::divine_reactions::surrender_bonus(
+        r, b, defense.defense, apply_surrender,
+    );
     let mitigation = if has(a, "enemy:beast:armor-piercing") {
         0.
     } else {
@@ -2268,13 +2335,26 @@ fn strike_preview_ranged(
     range: f64,
     miss_multiplier: f64,
 ) -> Strike {
+    strike_preview_accuracy(r, a, b, base, multiplier, extra, range, miss_multiplier, false)
+}
+fn strike_preview_accuracy(
+    r: &Run,
+    a: &Actor,
+    b: &Actor,
+    base: f64,
+    multiplier: f64,
+    extra: f64,
+    range: f64,
+    miss_multiplier: f64,
+    normal_accuracy: bool,
+) -> Strike {
     let stats = combat::effective_stats(r, a);
     let mut accuracy = stats.accuracy;
     if ability(a, "Shine") {
         accuracy += combat::integer_stat(vision::light(r, b));
     }
     let mut chance =
-        combat::hit_chance(accuracy, combat::effective_stats(r, b).dodge, range) * multiplier;
+        combat::hit_chance_for_run(r, accuracy, combat::effective_stats(r, b).dodge, if normal_accuracy {0.} else {range}) * multiplier;
     let guaranteed = (surprise(r, a, b) && !(a.id == r.player.id && range > 0.))
         || angel_ready(r, a)
         || corpse_core::divine_combat::blood_weapon_ready(r, a);
@@ -2346,12 +2426,7 @@ fn ordinary_base(r: &Run, a: &Actor, offense: f64) -> f64 {
     if owner(r, a).id == r.player.id {
         30. + offense
     } else {
-        a.conditions.get("weaponDamage").copied().unwrap_or(10.)
-            + offense
-                * a.conditions
-                    .get("weaponOffenseMultiplier")
-                    .copied()
-                    .unwrap_or(1.)
+        combat::creature_attack_base(r.simulation_revision.value_or(29.), a, offense)
     }
 }
 fn preparation(r: &Run) -> (f64, f64, f64) {
@@ -2451,11 +2526,36 @@ fn combat_view(r: &Run) -> Run {
     }
     view
 }
+/// Read-only main-bar payment at each damage endpoint, before Hanged converts
+/// the remaining packet. Zero ordinary damage never triggers Surrender payment.
+/// At most two existing strike/stat queries; no state, event or RNG mutation.
+fn hanged_surrender_main_cost(
+    r: &Run, a: &Actor, b: &Actor, base: f64, extra: f64,
+) -> Option<[f64; 2]> {
+    let pool = owner(r, b);
+    if !corpse_core::hanged::protects(r, b)
+        || has(a, "enemy:beast:armor-piercing")
+        || !corpse_core::abilities::endpoint_active(r, b, corpse_core::divine_reactions::SURRENDER)
+        || pool.conditions.get("surrenderTick") == Some(&r.tick)
+    {
+        return None;
+    }
+    let plan = corpse_core::revision50_ability_energy::plan_payment_for_revision(
+        pool.ability_reserves.as_ref(), corpse_core::divine_reactions::SURRENDER,
+        pool.energy, 8., r.simulation_revision.value_or(29.),
+    ).ok()?;
+    let main_cost = plan.actor_energy_spent();
+    if main_cost == 0. { return None; }
+    Some([0.75, 1.25].map(|variance| {
+        if strike_damage(r, a, b, base, variance, extra, false) > 0. { main_cost } else { 0. }
+    }))
+}
 fn project_attack(r: &Run, a: &Actor, b: &Actor) -> Attack {
     let pool = owner(r, b);
     let mut out = Attack {
         defender_hp: pool.hp.max(0.),
         defender_max_hp: pool.max_hp,
+        hanged_energy: corpse_core::hanged::protects(r, b).then_some(pool.energy.max(0.)),
         ..Default::default()
     };
     if let Some(reason) = blocked(r, a, b) {
@@ -2463,6 +2563,7 @@ fn project_attack(r: &Run, a: &Actor, b: &Actor) -> Attack {
         return out;
     }
     if corpse_core::revision50::enabled(r)
+        && !corpse_core::hanged::enabled(r.simulation_revision.value_or(29.))
         && corpse_core::abilities::endpoint_active(r, b, "isheilah-missed-me")
         && owner(r, b).reactions.value_or(0.) > 0.
     {
@@ -2476,32 +2577,24 @@ fn project_attack(r: &Run, a: &Actor, b: &Actor) -> Attack {
         let (energy, fury, _) = preparation(r);
         view.player.energy = energy;
         let defender = if b.id == r.player.id { &view.player } else { b };
-        let mut strike = strike_preview(
-            &view,
-            &view.player,
-            defender,
-            if corpse_core::revision50::enabled(r) {
-                corpse_core::revision50_player_attack::base(r)
-            } else {
-                weapon_base(weapon_hands(r).0, combat::effective_stats(r, &r.player).offense)
-            },
-            1.,
-            fury,
+        let base = if corpse_core::revision50::enabled(r) {
+            corpse_core::revision50_player_attack::base(r)
+        } else {
+            weapon_base(weapon_hands(r).0, combat::effective_stats(r, &r.player).offense)
+        };
+        out.hanged_surrender_main_cost = hanged_surrender_main_cost(
+            &view, &view.player, defender, base, fury,
         );
+        let mut strike = strike_preview(&view, &view.player, defender, base, 1., fury);
         if corpse_core::divine_reactions::nightmare_absorbs(&view, defender, Some(&view.player)) {
             strike.minimum = 0.;
             strike.maximum = 0.;
         }
         strike
     } else {
-        strike_preview(
-            r,
-            a,
-            b,
-            ordinary_base(r, a, combat::effective_stats(r, a).offense),
-            1.,
-            0.,
-        )
+        let base = ordinary_base(r, a, combat::effective_stats(r, a).offense);
+        out.hanged_surrender_main_cost = hanged_surrender_main_cost(r, a, b, base, 0.);
+        strike_preview(r, a, b, base, 1., 0.)
     };
     out.strike = strike;
     if corpse_core::divine_reactions::nightmare_absorbs(r, b, Some(a)) {
@@ -2892,6 +2985,15 @@ fn format_attack(a: &Attack, yours: bool) -> String {
         }
         .into();
     }
+    if let Some(energy) = a.hanged_energy {
+        let paid = a.hanged_surrender_main_cost.unwrap_or([0., 0.]);
+        let low = corpse_core::hanged::split(a.defender_hp, energy - paid[0], a.strike.minimum);
+        let high = corpse_core::hanged::split(a.defender_hp, energy - paid[1], a.strike.maximum);
+        let subject = if yours { "You hit them" } else { "They hit you" };
+        return format!("{subject} {hit}% of the time for {}–{} damage. With Hanged, this hit removes {}–{} HP and {}–{} main energy.",
+            a.strike.minimum, a.strike.maximum,
+            low.hp.min(a.defender_hp), high.hp.min(a.defender_hp), low.energy + paid[0], high.energy + paid[1]);
+    }
     let hits = (a.defender_hp.max(0.) / a.strike.maximum).ceil();
     let count = format!("{hits} {}", if hits == 1. { "hit" } else { "hits" });
     let range = format!(
@@ -2909,6 +3011,65 @@ fn format_attack(a: &Attack, yours: bool) -> String {
 #[cfg(test)]
 mod hover_tests {
     use super::*;
+    #[test]
+    fn revision52_enemy_melee_heading_is_shared_without_changing_special_previews() {
+        assert_eq!(ENEMY_MELEE_HEADING, "Enemy melee");
+        // Both render paths use one label; their existing attack/special text is untouched.
+        let binding = ["add(", "ENEMY_MELEE_HEADING,"].concat();
+        assert_eq!(include_str!("inspection_ui.rs").matches(&binding).count(), 2);
+        let p = Painter::new();
+        for (reason, expected) in [
+            ("inactive-mech", "They cannot attack until piloted."),
+            ("harmless", "They have no ordinary damaging attack."),
+            ("attacker-dead", "They cannot attack while dead."),
+        ] {
+            let attack = Attack { reason: Some(reason.into()), ..Default::default() };
+            let their_attack = format_attack(&attack, false);
+            assert_eq!(their_attack, expected);
+            let report = CreatureReport { their_attack, ..Default::default() }.report();
+            let lines = wrapped(&report, &p);
+            assert_eq!(lines.iter().filter(|line| line.text == ENEMY_MELEE_HEADING).count(), 1);
+            assert!(!lines.iter().any(|line| line.text == "Enemy attacks"));
+            assert!(lines.iter().any(|line| line.text == expected));
+        }
+    }
+
+    #[test]
+    fn revision52_accuracy_preview_shares_ratio_range_and_bow_adjustment() {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into(); r.inventory.clear();
+        r.player.conditions.clear(); r.player.abilities.clear(); r.player.active.clear();
+        r.player.stats.accuracy = 20.;
+        let enemy = Actor { id: 991., state: "hunting".into(), hp: 100., max_hp: 100.,
+            stats: corpse_core::Stats { dodge: 20., ..Default::default() }, ..Default::default() };
+        let before = serde_json::to_vec(&r).unwrap();
+        assert_eq!(strike_preview(&r, &r.player, &enemy, 30., 1., 0.).chance, 0.5);
+        for miss in [1., 0.5] {
+            let expected = 1. - (1. - 0.5 * 0.9f64.powf(4.)) * miss;
+            assert!((strike_preview_ranged(&r, &r.player, &enemy, 30., 1., 0., 4., miss).chance - expected).abs() < 1e-12);
+        }
+        assert_eq!(serde_json::to_vec(&r).unwrap(), before);
+        r.simulation_revision = 51.0.into();
+        assert_eq!(strike_preview(&r, &r.player, &enemy, 30., 1., 0.).chance, 0.65);
+    }
+    #[test]
+    fn revision52_accuracy_preview_keeps_zero_stat_and_status_overrides() {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into(); r.inventory.clear();
+        r.player.conditions.clear(); r.player.abilities.clear(); r.player.active.clear();
+        r.player.stats.accuracy = 0.;
+        let mut enemy = Actor { id: 991., state: "hunting".into(), hp: 100., max_hp: 100., ..Default::default() };
+        assert_eq!(strike_preview(&r, &r.player, &enemy, 30., 1., 0.).chance, 0.);
+        enemy.state = "wandering".into();
+        assert_eq!(strike_preview(&r, &r.player, &enemy, 30., 1., 0.).chance, 1.);
+        enemy.state = "hunting".into();
+        r.player.conditions.insert("lucky".into(), 1.);
+        assert_eq!(strike_preview(&r, &r.player, &enemy, 30., 1., 0.).chance, 1.);
+        r.player.conditions.insert("distracted".into(), 1.);
+        assert_eq!(strike_preview(&r, &r.player, &enemy, 30., 1., 0.).chance, 0.);
+        enemy.conditions.insert("paralyzed".into(), 2.);
+        assert_eq!(strike_preview(&r, &r.player, &enemy, 30., 1., 0.).chance, 1.);
+    }
     #[test]
     fn revision50_missed_me_forecast_is_conditional_retreat_not_halved_odds() {
         let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
@@ -3014,7 +3175,7 @@ mod hover_tests {
             "enemy:beast:sphinx".into(),
             "grisha-boundless-hunger".into(),
         ];
-        a.active.clear();
+        a.active = vec!["anavani-nova".into()];
         r.inventory.clear();
         let meters = hover_resources(&r, &a);
         assert_eq!(meters[0].label, "Health · Invulnerable");
@@ -3282,5 +3443,263 @@ mod revision51_rounding_tests {
         r.inventory.push(Item{id:800.,name:"Ring of Corrosion Resistance".into(),kind:"ring".into(),effect:corpse_core::revision50_rings::CORROSION_RESISTANCE.to_string().into(),..Default::default()});
         let gas=corpse_core::GasPresence{r#type:"caustic".into(),..Default::default()};
         let before=r.clone();assert!(gas_exposure(&r,&r.player,&gas).contains("3 HP per normal turn"));assert_eq!(r,before);
+    }
+}
+
+#[cfg(test)]
+mod revision52_hanged_preview_tests {
+    use super::*;
+    #[test]
+    fn hanged_forecast_uses_shared_energy_and_never_promises_a_retreat() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.player.x=10.;r.player.y=10.;r.player.hp=1.;r.player.energy=8.;
+        r.player.abilities=vec![corpse_core::hanged::ID.into()];r.player.active=r.player.abilities.clone();
+        r.player.reactions=1.0.into();r.player.conditions.clear();r.inventory.clear();
+        let mut enemy=r.player.clone();enemy.id=900.;enemy.x=11.;enemy.state="hunting".into();
+        enemy.abilities.clear();enemy.active.clear();enemy.conditions.insert("weaponDamage".into(),20.);
+        r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(enemy.clone());
+        let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.doors=Field::Missing;
+        let before=serde_json::to_string(&r).unwrap();let forecast=project_attack(&r,&enemy,&r.player);
+        assert_ne!(forecast.reason.as_deref(),Some("missed-me-retreat"));assert_eq!(forecast.hanged_energy,Some(8.));
+        let text=format_attack(&forecast,false);assert!(text.contains("With Hanged"),"{text}");
+        assert!(text.contains("main energy"));assert!(!text.contains("could kill you in"));
+        assert_eq!(before,serde_json::to_string(&r).unwrap());
+        r.simulation_revision=51.0.into();assert_eq!(project_attack(&r,&enemy,&r.player).reason.as_deref(),Some("missed-me-retreat"));
+    }
+}
+
+#[cfg(test)]
+mod never_surrender_preview_tests {
+    use super::*;
+    use corpse_core::{divine_reactions as reactions, revision50_ability_energy as energy};
+
+    fn room(revision: f64, reserve: Option<f64>, main_energy: f64) -> Run {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = revision.into();
+        r.player.x = 10.; r.player.y = 10.; r.player.hp = 100.; r.player.max_hp = 100.;
+        r.player.stats.defense = 12.; r.player.stats.dr = 0.; r.player.stats.dodge = 15.;
+        r.player.energy = main_energy;
+        r.player.abilities = vec![reactions::SURRENDER.into()];
+        r.player.active = r.player.abilities.clone(); r.player.conditions.clear();
+        r.player.ability_reserves = Field::Missing; r.player.ability_order = Field::Missing;
+        r.player.equipment_abilities = Field::Missing;
+        if let Some(value) = reserve {
+            energy::initialize_reserve(&mut r.player, reactions::SURRENDER, 10., value).unwrap();
+        }
+        r.inventory.clear(); r.actors.clear(); r.ground.clear(); r.offers.clear();
+        let f = r.floor_mut().unwrap(); f.tiles.fill("floor".into()); f.lights.fill(100.); f.seen.fill(true);
+        f.environment = Field::Missing; f.doors = Field::Missing; f.portals = Field::Missing;
+        f.non_euclidean = Field::Missing;
+        let mut attacker = r.player.clone();
+        attacker.id = 900.; attacker.x = 11.; attacker.name = "Audit attacker".into();
+        attacker.state = "hunting".into(); attacker.abilities.clear(); attacker.active.clear();
+        attacker.ability_reserves = Field::Missing; attacker.conditions.clear();
+        attacker.stats.offense = 0.; attacker.stats.defense = 0.; attacker.stats.accuracy = 100.;
+        attacker.conditions.insert("weaponDamage".into(), 40.);
+        r.actors_at_mut(r.depth).push(attacker);
+        r
+    }
+
+    fn range(r: &Run, defender: &Actor) -> [f64; 2] {
+        let attacker = engine::actor(r, 900.).unwrap();
+        [0.75, 1.25].map(|variance| strike_damage(r, attacker, defender, 40., variance, 0., true))
+    }
+
+    #[test]
+    fn own_reserve_split_fallback_and_missing_reserve_match_hit_admission() {
+        for revision in [50., 51., 52.] {
+            for (reserve, main_energy, expected) in [
+                (Some(10.), 0., [9., 19.]),
+                (Some(3.), 5., [9., 19.]),
+                (Some(0.), 8., [9., 19.]),
+                (Some(7.), 0., [15., 25.]),
+                (None, 100., [15., 25.]),
+            ] {
+                // Explicit weaponDamage=40 is already raw in R52; no post-DR halving.
+                let expected = if revision == 52. { expected.map(|n| n * 2.) } else { expected };
+                let r = room(revision, reserve, main_energy);
+                let before = serde_json::to_vec(&r).unwrap();
+                assert_eq!(range(&r, &r.player), expected, "revision={revision}, reserve={reserve:?}, main={main_energy}");
+                let report = observe_tile(&r, 11, 10).creature.unwrap();
+                assert!(report.their_attack.contains(&format!("{}–{}%", expected[0], expected[1])));
+                assert_eq!(serde_json::to_vec(&r).unwrap(), before, "hover is read-only");
+            }
+        }
+        for (reserve, main_energy, expected) in [
+            (None, 8., [9., 19.]), (Some(10.), 0., [15., 25.]),
+        ] {
+            let r = room(49., reserve, main_energy);
+            assert_eq!(range(&r, &r.player), expected, "legacy uses main energy only");
+        }
+    }
+
+    #[test]
+    fn spent_turn_and_toggle_state_match_hit_admission() {
+        let mut r = room(52., Some(10.), 100.);
+        r.player.conditions.insert("surrenderTick".into(), r.tick);
+        assert_eq!(range(&r, &r.player), [30., 50.]);
+        r.tick += 1.;
+        assert_eq!(range(&r, &r.player), [18., 38.]);
+        r.player.active.clear();
+        assert_eq!(range(&r, &r.player), [30., 50.]);
+    }
+
+    #[test]
+    fn half_here_uses_owner_reserve_but_sleeping_body_has_no_toggle() {
+        let mut r = room(52., Some(10.), 0.);
+        let mut body = r.player.clone(); body.id = 901.; body.active.clear();
+        body.energy = 0.; body.ability_reserves = Field::Missing;
+        body.conditions.insert("halfHereOwner".into(), r.player.id);
+        body.conditions.insert("halfHereClone".into(), 1.);
+        r.actors_at_mut(r.depth).push(body.clone());
+        assert_eq!(range(&r, &body), [18., 38.]);
+        r.dreamwalking = corpse_core::dreamwalking::State { active: true, depth: r.depth, ..Default::default() }.into();
+        body.conditions.shift_remove("halfHereClone");
+        body.conditions.insert("phantasmiiBody".into(), 1.);
+        assert_eq!(range(&r, &body), [30., 50.]);
+    }
+}
+
+#[cfg(test)]
+mod never_surrender_hanged_preview_tests {
+    use super::*;
+    use corpse_core::{divine_reactions as reactions, revision50_ability_energy as energy};
+
+    fn room(reserve: f64, main_energy: f64, defense: f64, base: f64) -> Run {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into(); r.inventory.clear(); r.actors.clear();
+        r.player.abilities = vec![reactions::SURRENDER.into(), corpse_core::hanged::ID.into()];
+        r.player.active = vec![reactions::SURRENDER.into()]; r.player.conditions.clear();
+        r.player.ability_order = Field::Missing; r.player.equipment_abilities = Field::Missing;
+        r.player.ability_reserves = Field::Missing;
+        energy::initialize_reserve(&mut r.player, reactions::SURRENDER, 10., reserve).unwrap();
+        r.player.x = 10.; r.player.y = 10.; r.player.hp = 1.; r.player.energy = main_energy;
+        r.player.stats.defense = defense; r.player.stats.dr = 0.; r.player.stats.dodge = 15.;
+        let f = r.floor_mut().unwrap(); f.tiles.fill("floor".into()); f.lights.fill(100.);
+        f.environment = Field::Missing; f.doors = Field::Missing; f.portals = Field::Missing;
+        f.non_euclidean = Field::Missing;
+        let mut attacker = r.player.clone(); attacker.id = 900.; attacker.x = 11.;
+        attacker.state = "hunting".into(); attacker.name = "Audit attacker".into();
+        attacker.abilities.clear(); attacker.active.clear(); attacker.conditions.clear();
+        attacker.ability_reserves = Field::Missing; attacker.hp = 100.;
+        attacker.stats.offense = 0.; attacker.stats.accuracy = 100.;
+        attacker.conditions.insert("weaponDamage".into(), base);
+        r.actors_at_mut(r.depth).push(attacker);
+        r
+    }
+
+    #[test]
+    fn surrender_main_payment_precedes_hanged_and_total_energy_is_shown() {
+        for (reserve, main, cost) in [(0., 8., 8.), (3., 5., 5.), (10., 8., 0.)] {
+            let mut r = room(reserve, main, 12., 20.);
+            let before = serde_json::to_vec(&r).unwrap();
+            let forecast = project_attack(&r, engine::actor(&r, 900.).unwrap(), &r.player);
+            assert_eq!(forecast.hanged_surrender_main_cost.unwrap_or([0., 0.]), [cost, cost]);
+            let text = format_attack(&forecast, false);
+            if cost > 0. {
+                assert!(text.contains("removes 1–1 HP"), "{text}");
+                assert!(text.contains(&format!("{main}–{main} main energy")), "{text}");
+            } else {
+                assert!(text.contains("removes 1–1 HP"), "{text}");
+            }
+            assert_eq!(serde_json::to_vec(&r).unwrap(), before);
+            engine::attack(&mut r, 900., 0., 1.).unwrap();
+            if cost > 0. { assert_eq!(r.status, "dead"); assert_eq!(r.player.hp, 0.); }
+        }
+    }
+
+    #[test]
+    fn payment_is_variance_specific_and_not_charged_when_already_used_or_off() {
+        let mut r = room(0., 8., 12., 16.);
+        r.player.stats.dr = 12.;
+        let attacker = engine::actor(&r, 900.).unwrap();
+        assert_eq!(hanged_surrender_main_cost(&r, attacker, &r.player, 16., 0.), Some([0., 8.]));
+        r.player.conditions.insert("surrenderTick".into(), r.tick);
+        let attacker = engine::actor(&r, 900.).unwrap();
+        assert_eq!(hanged_surrender_main_cost(&r, attacker, &r.player, 16., 0.), None);
+        r.player.conditions.clear(); r.player.active.clear();
+        let attacker = engine::actor(&r, 900.).unwrap();
+        assert_eq!(hanged_surrender_main_cost(&r, attacker, &r.player, 16., 0.), None);
+    }
+
+    #[test]
+    fn armor_piercing_leaves_all_main_energy_for_hanged() {
+        let mut r = room(0., 8., 12., 2.);
+        engine::actor_mut(&mut r, 900.).unwrap().abilities.push("enemy:beast:armor-piercing".into());
+        let forecast = project_attack(&r, engine::actor(&r, 900.).unwrap(), &r.player);
+        assert_eq!(forecast.hanged_surrender_main_cost, None);
+        assert!(format_attack(&forecast, false).contains("removes 0–1 HP"));
+    }
+
+    #[test]
+    fn negative_defense_does_not_invent_payment_for_a_zero_ordinary_packet() {
+        let r = room(0., 8., -12., 0.);
+        let attacker = engine::actor(&r, 900.).unwrap();
+        let forecast = project_attack(&r, attacker, &r.player);
+        assert_eq!((forecast.strike.minimum, forecast.strike.maximum), (12., 12.));
+        assert_eq!(forecast.hanged_surrender_main_cost, Some([0., 0.]));
+        assert!(format_attack(&forecast, false).contains("8–8 main energy"));
+    }
+}
+
+#[cfg(test)]
+mod revision52_composite_accuracy_tests {
+    use super::*;
+    #[test]
+    fn bow_forecast_uses_normal_accuracy_but_stays_ranged() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.player.x=10.;r.player.y=10.;
+        r.player.stats.accuracy=15.;r.player.abilities.clear();r.player.active.clear();
+        r.player.conditions.clear();r.inventory.clear();
+        let mut target=Actor{id:901.,x:11.,y:10.,hp:1000.,max_hp:1000.,state:"hunting".into(),
+            stats:corpse_core::Stats{dodge:15.,..Default::default()},..Default::default()};
+        for range in [1.,4.,10.] {
+            target.x=10.+range;*r.actors_at_mut(r.depth)=vec![target.clone()];
+            let shot=strike_preview_accuracy(&r,&r.player,&target,30.,1.,0.,range,1.,true);
+            assert_eq!(shot.chance,0.5);
+            for name in ["Bow","Composite bow"] {
+                let item=corpse_core::equipment::make_equipment(name,950.).unwrap();
+                assert!(corpse_core::projectiles::normal_bow_accuracy(&r,&item));
+            }
+            // Generic legacy projectile preview is unchanged.
+            let regular=strike_preview_ranged(&r,&r.player,&target,30.,1.,0.,range,0.5);
+            assert!((regular.chance-(0.5+0.25*0.9f64.powf(range))).abs()<1e-12);
+        }
+        r.player.stats.accuracy=0.;target.state="wandering".into();
+        assert_eq!(strike_preview_accuracy(&r,&r.player,&target,30.,1.,0.,10.,1.,true).chance,0.);
+    }
+}
+
+#[cfg(test)]
+mod revision52_bow_tier_preview_tests {
+    use super::*;
+    #[test]
+    fn target_forecast_doubles_composite_after_armor_and_rounding() {
+        let mut r: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into(); r.player.x=10.; r.player.y=10.;
+        r.player.stats.offense=0.; r.player.abilities.clear(); r.player.active.clear();
+        r.player.conditions.clear(); r.inventory.clear();
+        let target=Actor{id:901.,x:11.,y:10.,hp:1000.,max_hp:1000.,state:"hunting".into(),
+            stats:corpse_core::Stats{dr:10.,..Default::default()},..Default::default()};
+        *r.actors_at_mut(r.depth)=vec![target.clone()];
+        r.inventory.push(Item{id:951.,kind:"ammo".into(),effect:"arrows".to_string().into(),
+            quantity:2.0.into(),..Default::default()});
+        let trace=crate::targeting_ui::Trace{path:vec![],stop_reason:crate::targeting_ui::StopReason::Target,possible_exits:vec![]};
+        r.player.stats.accuracy=15.;
+        for distance in [1.,4.,10.] {
+            let mut target=target.clone(); target.x=10.+distance; target.stats.dodge=15.;
+            *r.actors_at_mut(r.depth)=vec![target.clone()];
+            for (name,range) in [("Bow","4–14 damage"),("Composite bow","8–28 damage")] {
+                let mut bow=corpse_core::equipment::make_equipment(name,950.).unwrap();
+                // R52 damage is melee-based, not stale enchantment/damage item fields.
+                bow.damage=999.0.into(); bow.enchantment=999.0.into(); bow.offense_multiplier=999.0.into();
+                r.inventory.retain(|item| item.id!=950.);r.inventory.push(bow.clone());
+                let before=serde_json::to_vec(&r).unwrap();
+                let text=bow_text_presented(&r,&bow,&target,&trace);
+                assert!(text.contains(range),"{text}");
+                assert!(text.contains("50.0% hit"),"{text}");
+                assert_eq!(serde_json::to_vec(&r).unwrap(),before);
+            }
+        }
     }
 }

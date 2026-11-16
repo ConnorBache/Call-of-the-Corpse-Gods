@@ -1,0 +1,364 @@
+{
+  "method": "spatially reviewed negative-space components with two-pixel low-matte boundary refinement",
+  "reviewed_regions": [
+    {
+      "seed": [
+        614,
+        172
+      ],
+      "bbox": [
+        601,
+        167,
+        617,
+        180
+      ],
+      "core_pixels": 122,
+      "removed_pixels": 182
+    },
+    {
+      "seed": [
+        429,
+        339
+      ],
+      "bbox": [
+        419,
+        328,
+        445,
+        352
+      ],
+      "core_pixels": 269,
+      "removed_pixels": 377
+    },
+    {
+      "seed": [
+        475,
+        344
+      ],
+      "bbox": [
+        465,
+        337,
+        481,
+        353
+      ],
+      "core_pixels": 146,
+      "removed_pixels": 231
+    },
+    {
+      "seed": [
+        463,
+        357
+      ],
+      "bbox": [
+        451,
+        348,
+        471,
+        364
+      ],
+      "core_pixels": 123,
+      "removed_pixels": 185
+    },
+    {
+      "seed": [
+        335,
+        433
+      ],
+      "bbox": [
+        315,
+        401,
+        394,
+        475
+      ],
+      "core_pixels": 2553,
+      "removed_pixels": 2961
+    },
+    {
+      "seed": [
+        431,
+        526
+      ],
+      "bbox": [
+        405,
+        500,
+        473,
+        552
+      ],
+      "core_pixels": 1308,
+      "removed_pixels": 1684
+    },
+    {
+      "seed": [
+        411,
+        524
+      ],
+      "bbox": [
+        398,
+        517,
+        412,
+        535
+      ],
+      "core_pixels": 159,
+      "removed_pixels": 213
+    },
+    {
+      "seed": [
+        403,
+        626
+      ],
+      "bbox": [
+        397,
+        602,
+        455,
+        649
+      ],
+      "core_pixels": 1460,
+      "removed_pixels": 1758
+    },
+    {
+      "seed": [
+        422,
+        693
+      ],
+      "bbox": [
+        382,
+        642,
+        542,
+        731
+      ],
+      "core_pixels": 4794,
+      "removed_pixels": 5597
+    },
+    {
+      "seed": [
+        506,
+        651
+      ],
+      "bbox": [
+        474,
+        642,
+        523,
+        668
+      ],
+      "core_pixels": 487,
+      "removed_pixels": 627
+    },
+    {
+      "seed": [
+        929,
+        655
+      ],
+      "bbox": [
+        928,
+        647,
+        948,
+        668
+      ],
+      "core_pixels": 180,
+      "removed_pixels": 279
+    },
+    {
+      "seed": [
+        197,
+        668
+      ],
+      "bbox": [
+        196,
+        660,
+        212,
+        675
+      ],
+      "core_pixels": 127,
+      "removed_pixels": 200
+    },
+    {
+      "seed": [
+        174,
+        689
+      ],
+      "bbox": [
+        167,
+        671,
+        201,
+        708
+      ],
+      "core_pixels": 486,
+      "removed_pixels": 695
+    },
+    {
+      "seed": [
+        73,
+        821
+      ],
+      "bbox": [
+        62,
+        764,
+        137,
+        876
+      ],
+      "core_pixels": 2116,
+      "removed_pixels": 2541
+    },
+    {
+      "seed": [
+        476,
+        881
+      ],
+      "bbox": [
+        417,
+        815,
+        493,
+        956
+      ],
+      "core_pixels": 4820,
+      "removed_pixels": 5396
+    },
+    {
+      "seed": [
+        413,
+        880
+      ],
+      "bbox": [
+        375,
+        836,
+        445,
+        911
+      ],
+      "core_pixels": 1233,
+      "removed_pixels": 1592
+    },
+    {
+      "seed": [
+        137,
+        917
+      ],
+      "bbox": [
+        113,
+        882,
+        161,
+        955
+      ],
+      "core_pixels": 1449,
+      "removed_pixels": 1748
+    },
+    {
+      "seed": [
+        429,
+        939
+      ],
+      "bbox": [
+        417,
+        932,
+        436,
+        947
+      ],
+      "core_pixels": 133,
+      "removed_pixels": 207
+    },
+    {
+      "seed": [
+        91,
+        1036
+      ],
+      "bbox": [
+        74,
+        993,
+        109,
+        1069
+      ],
+      "core_pixels": 838,
+      "removed_pixels": 1097
+    },
+    {
+      "seed": [
+        528,
+        1051
+      ],
+      "bbox": [
+        518,
+        1021,
+        543,
+        1086
+      ],
+      "core_pixels": 624,
+      "removed_pixels": 831
+    },
+    {
+      "seed": [
+        494,
+        1067
+      ],
+      "bbox": [
+        478,
+        1027,
+        520,
+        1105
+      ],
+      "core_pixels": 1430,
+      "removed_pixels": 1782
+    },
+    {
+      "seed": [
+        499,
+        1115
+      ],
+      "bbox": [
+        487,
+        1105,
+        514,
+        1130
+      ],
+      "core_pixels": 355,
+      "removed_pixels": 485
+    },
+    {
+      "seed": [
+        139,
+        1138
+      ],
+      "bbox": [
+        130,
+        1117,
+        179,
+        1158
+      ],
+      "core_pixels": 1343,
+      "removed_pixels": 1583
+    },
+    {
+      "seed": [
+        340,
+        1167
+      ],
+      "bbox": [
+        271,
+        1124,
+        377,
+        1192
+      ],
+      "core_pixels": 1887,
+      "removed_pixels": 2257
+    },
+    {
+      "seed": [
+        241,
+        1160
+      ],
+      "bbox": [
+        223,
+        1153,
+        245,
+        1171
+      ],
+      "core_pixels": 172,
+      "removed_pixels": 222
+    }
+  ],
+  "source_rgb_preserved": true,
+  "remaining": "Dark purple hair retained; tiny uncertain rim pixels outside selected curls preserved.",
+  "source_sha256": "5d15a5a471be1f1f5ed2bd478d630b7be5d87bf860b1ad03864c97fac7cbd325",
+  "legacy_sha256": "053f5f32fb04e882cb58092c277041cce4bcadd619be03730e194aead23f04f9",
+  "candidate_sha256": "e7b52bfe49364918a4b7ad33ba8845f416b4e89870902e61dffc7fa87dd3c6fb",
+  "alpha_sha256": "6dee8eddaf0f7aa72e6ec45a06db3bcb017161450707a8fe430ca88aaab74ca4",
+  "removed": 34709,
+  "restored": 0,
+  "partial": 0
+}

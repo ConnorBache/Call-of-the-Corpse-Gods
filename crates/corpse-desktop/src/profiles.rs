@@ -37,15 +37,7 @@ impl Profiles {
     }
     pub fn paint(&self, p: &mut Painter) {
         p.clear([8, 8, 8]);
-        p.text("WHAT THE GODS GAVE YOU", 60, 65, 18, GOLD);
         p.text("High Scores", 60, 110, 36, INK);
-        p.text(
-            "Ranked by all blessings received during each descent.",
-            60,
-            170,
-            18,
-            MUTED,
-        );
         if self.profile.high_scores.is_empty() {
             p.text("No recorded descents.", 60, 250, 20, INK);
         }
@@ -53,7 +45,7 @@ impl Profiles {
             if let Some(record) = self.profile.high_scores.get(self.selected) {
                 let s = &record.summary;
                 p.text(
-                    &format!("{} / {} / Depth {:.0}", s.mode, s.status, s.depth),
+                    &format!("{} / {} / Depth {:.0}", s.mode_label(), s.status, s.depth),
                     60,
                     230,
                     24,
@@ -111,7 +103,7 @@ impl Profiles {
                     &format!(
                         "{:>8.0}     {:<10}  {:>3.0}   {:>6.0}   {}",
                         r.summary.score.unwrap_or(0.),
-                        r.summary.mode,
+                        r.summary.mode_label(),
                         r.summary.depth,
                         r.summary.tick,
                         r.summary.status
@@ -129,13 +121,6 @@ impl Profiles {
             678,
             14,
             [240, 130, 110],
-        );
-        p.text(
-            "Native migration runs remain unranked while mechanical coverage is incomplete.",
-            60,
-            705,
-            14,
-            MUTED,
         );
         p.text(
             "Drop a profile JSON to view.  [↑/↓] Select  [Enter] Details  [Esc] Main menu",

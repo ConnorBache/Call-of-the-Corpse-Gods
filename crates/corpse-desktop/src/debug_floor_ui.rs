@@ -16,6 +16,20 @@ fn carrying_summary(r: &Run) -> String {
             count("ring"),c.rings,count("amulet"),c.amulets,count("potion"),c.potions,count("heart"),c.hearts)
     } else { format!("Pack {:.0}/20",corpse_core::inventory::occupancy(r)) }
 }
+/// Canonical instance name and reserve, never a target-floor preview of old loot.
+pub(crate) fn item_row(r: &Run, item: &corpse_core::Item, depth: Option<u32>) -> String {
+    let source=depth.map(|d|if d==0{"starter".into()}else{format!("F{:.0}",corpse_core::fast_mode::display_depth(r,d as f64))}).unwrap_or_else(|| {
+        if corpse_core::revision50::enabled(r) {
+            if r.simulation_revision.value_or(29.) != 52. && matches!(item.kind.as_str(),"ring"|"amulet") { "active".into() } else { "carry".into() }
+        } else { item.equipped.as_ref().map_or("carry".into(),Clone::clone) }
+    });
+    let reserve=if r.simulation_revision.value_or(29.)==52. {
+        corpse_core::revision50_amulet_effects::item_spec_for_revision(item,r.simulation_revision.value_or(29.)).map(|spec|
+            format!(" · {}/{} energy",item.amulet_state.as_ref().map_or(spec.capacity,|s|s.energy.min(spec.capacity)),spec.capacity)).unwrap_or_default()
+    } else {String::new()};
+    format!("{}{}{reserve} · {source}",corpse_core::revision50_item_knowledge::display_name(r,item),
+        if corpse_core::inventory::quantity(item)>1.{format!(" ×{}",corpse_core::inventory::quantity(item))}else{String::new()})
+}
 #[derive(Default)]
 pub struct View { pub open: bool, pub pack: bool, pub selected: usize, pub notice: String }
 impl View {
@@ -25,7 +39,7 @@ impl View {
     fn action(&mut self, r: &mut Run, equip: bool) {
         let Some(id) = self.id(r) else { return; };
         let result = if equip { debug::equip(r,id) } else if self.pack { debug::put(r,id) } else { debug::take(r,id) };
-        self.notice = match result { Ok(true) => if equip { if corpse_core::revision50::enabled(r) { "Carried jewelry is automatically active.".into() } else { "Equipped using normal slot rules.".into() } } else { "Moved; nothing discarded.".into() }, Ok(false) => "No item moved.".into(), Err(e) => e };
+        self.notice = match result { Ok(true) => if equip { if r.simulation_revision.value_or(29.)==52. { "Jewelry carried.".into() } else if corpse_core::revision50::enabled(r) { "Carried jewelry is automatically active.".into() } else { "Equipped using normal slot rules.".into() } } else { "Moved; nothing discarded.".into() }, Ok(false) => "No item moved.".into(), Err(e) => e };
         self.selected = self.selected.min(self.len(r).saturating_sub(1));
     }
     fn close(&mut self, r: &mut Run) { match debug::enter(r) { Ok(()) => {self.open=false;self.notice.clear();}, Err(e) => self.notice=e } }
@@ -57,13 +71,14 @@ impl View {
         p.text("DEBUG LOADOUT / RECOVERED LOOT",108,75,26,GOLD);
         let pack = carrying_summary(r);
         if corpse_core::revision50::enabled(r) {
-            p.text(&format!("Floor {}   Level {}   HP {}   Energy {}",r.depth,r.level,r.player.max_hp,corpse_core::combat::effective_stats(r,&r.player).max_energy),108,110,17,INK);
+            p.text(&format!("Floor {}   Level {}   HP {}   Energy {}",corpse_core::fast_mode::display_depth(r,r.depth),r.level,r.player.max_hp,corpse_core::combat::effective_stats(r,&r.player).max_energy),108,110,17,INK);
             p.text(&pack,108,133,14,INK);
         } else {
-            p.text(&format!("Floor {}   Level {}   HP {}   Energy {}   {pack}",r.depth,r.level,r.player.max_hp,corpse_core::combat::effective_stats(r,&r.player).max_energy),108,114,18,INK);
+            p.text(&format!("Floor {}   Level {}   HP {}   Energy {}   {pack}",corpse_core::fast_mode::display_depth(r,r.depth),r.level,r.player.max_hp,corpse_core::combat::effective_stats(r,&r.player).max_energy),108,114,18,INK);
         }
         p.text(&format!("Exact seed: {}",r.seed),108,if corpse_core::revision50::enabled(r) {154} else {145},15,MUTED);
-        let hint = if corpse_core::revision50::enabled(r) { "Carried rings and amulets are automatically active. Overflow stays in the stash." }
+        let hint = if r.simulation_revision.value_or(29.)==52. { "Enter: carry or return the selected item. Overflow stays in the stash." }
+            else if corpse_core::revision50::enabled(r) { "Carried rings and amulets are automatically active. Overflow stays in the stash." }
             else { "Nothing auto-equipped. All overflow stays here. No invented gear or combat consumption." };
         p.text(hint,108,if corpse_core::revision50::enabled(r) {177} else {172},15,MUTED);
         p.text(&format!("Recovered stash ({} item entries)",s.stash.len()),110,204,18,if !self.pack{GOLD}else{INK});
@@ -74,12 +89,7 @@ impl View {
             for (row,(item,depth)) in items.iter().skip(first).take(ROWS).enumerate() {
                 let (x,y)=(if pack{650}else{105},230+row as i32*33);
                 if pack==self.pack&&first+row==self.selected {p.rect(x,y,520,31,[37,40,46]);}
-                let source=depth.map(|d|if d==0{"starter".into()}else{format!("F{d}")}).unwrap_or_else(|| {
-                    if corpse_core::revision50::enabled(r) {
-                        if matches!(item.kind.as_str(),"ring"|"amulet") { "active".into() } else { "carry".into() }
-                    } else { item.equipped.as_ref().map_or("carry".into(),Clone::clone) }
-                });
-                let text=format!("{}{} · {}",corpse_core::revision50_item_knowledge::display_name(r,item),if corpse_core::inventory::quantity(item)>1.{format!(" ×{}",corpse_core::inventory::quantity(item))}else{String::new()},source);
+                let text=item_row(r,item,*depth);
                 p.text(&text.chars().take(52).collect::<String>(),x+7,y+7,15,INK);
             }
         }
@@ -91,7 +101,7 @@ impl View {
 pub fn choice_banner(r:&Run,p:&mut Painter) {
     if let Some(s)=debug::state(r).filter(|_|debug::preparing(r)) {
         p.text(&format!("DEBUG RECONSTRUCTION · LEVEL {} · {}/{} PRIOR HEARTS",r.level,s.consumed,r.playtest.as_ref().unwrap().prior_hearts),345,20,17,GOLD);
-        p.text(&format!("Target floor {} · {}",r.depth,r.seed),345,46,13,INK);
+        p.text(&format!("Target floor {} · {}",corpse_core::fast_mode::display_depth(r,r.depth),r.seed),345,46,13,INK);
         p.text("Real level-up offer; your choice affects later rewards. No target-floor rewards included.",300,749,14,MUTED);
     }
 }

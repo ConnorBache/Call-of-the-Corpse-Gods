@@ -28,7 +28,7 @@ pub fn setup_eligible_at_depth_revision(d: &SetupDefinition, depth: u32, revisio
     if !(1..=40).contains(&depth) { return Err("Setup eligibility supports depths1..40".into()); }
     match revision {
         29.0 | 30.0 | 31.0 => setup_eligible_at_depth(d,depth),
-        32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 => Ok(crate::flavor_placement::setup_eligible(d,depth)),
+        32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0 => Ok(crate::flavor_placement::setup_eligible(d,depth)),
         _ => Err("Unsupported setup revision".into()),
     }
 }
@@ -36,7 +36,7 @@ pub fn generate_setups(f: &mut Floor, r: &mut dyn FnMut() -> f64) -> Result<(), 
     generate_setups_revision(f,r,29.0)
 }
 pub fn generate_setups_revision(f: &mut Floor, r: &mut dyn FnMut() -> f64, revision: f64) -> Result<(), String> {
-    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0].contains(&revision) { return Err("Unsupported setup revision".into()); }
+    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0,52.0].contains(&revision) { return Err("Unsupported setup revision".into()); }
     if !(1.0..=40.0).contains(&f.depth) || f.depth.fract() != 0. {
         return Err("Unsupported setup depth".into());
     }

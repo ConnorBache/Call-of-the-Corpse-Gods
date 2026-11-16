@@ -59,6 +59,23 @@ impl From<bool> for DisplayMode {
         }
     }
 }
+/// Cosmetic action timing only; never stored in a Run or used by simulation.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ActionAnimationMode {
+    #[default]
+    Normal,
+    Reduced,
+    Instant,
+}
+impl ActionAnimationMode {
+    pub fn next(self) -> Self {
+        match self { Self::Normal => Self::Reduced, Self::Reduced => Self::Instant, Self::Instant => Self::Normal }
+    }
+    pub fn label(self) -> &'static str {
+        match self { Self::Normal => "Normal", Self::Reduced => "Reduced", Self::Instant => "Instant" }
+    }
+}
 /// Requested SDL window size / exclusive display dimensions, independent of UI layout.
 /// A missing stored resolution selects automatic native drawable pixels.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, serde::Deserialize)]
@@ -129,6 +146,7 @@ pub struct Store {
     pub fullscreen: bool,
     pub display_mode: DisplayMode,
     pub resolution: Option<Resolution>,
+    pub action_animation_mode: ActionAnimationMode,
     pub error: String,
 }
 fn same(a: &Profile, b: &Profile) -> bool {
@@ -258,6 +276,7 @@ impl Store {
             fullscreen: false,
             display_mode: DisplayMode::Windowed,
             resolution: None,
+            action_animation_mode: ActionAnimationMode::Normal,
             error: String::new(),
         }
     }
@@ -307,6 +326,14 @@ impl Store {
         } else {
             None
         };
+        let action_animation_mode = if envelope {
+            match v.get("actionAnimationMode") {
+                Some(value) => serde_json::from_value::<ActionAnimationMode>(value.clone())
+                    .map_err(|_| "Invalid action animation setting")?,
+                None => ActionAnimationMode::Normal,
+            }
+        } else { ActionAnimationMode::Normal };
+        self.action_animation_mode = action_animation_mode;
         self.resolution = resolution;
         self.reduced_motion = reduced;
         self.fullscreen = display_mode != DisplayMode::Windowed;
@@ -615,6 +642,12 @@ impl Store {
         display_mode: DisplayMode,
         resolution: Option<Resolution>,
     ) -> Result<(), String> {
+        self.persist_presentation(next, reduced, display_mode, resolution, self.action_animation_mode)
+    }
+    fn persist_presentation(
+        &mut self, next: Library, reduced: bool, display_mode: DisplayMode,
+        resolution: Option<Resolution>, action_animation_mode: ActionAnimationMode,
+    ) -> Result<(), String> {
         if resolution.is_some_and(|value| !value.valid()) {
             return Err("Invalid display resolution".into());
         }
@@ -623,7 +656,7 @@ impl Store {
             return Err("Appearance library is full. Export and remove older presets.".into());
         }
         let text =
-            json!({"version":1,"reducedMotion":reduced,"fullscreen":display_mode != DisplayMode::Windowed,"displayMode":display_mode,"resolution":resolution,"library":lib})
+            json!({"version":1,"reducedMotion":reduced,"fullscreen":display_mode != DisplayMode::Windowed,"displayMode":display_mode,"resolution":resolution,"actionAnimationMode":action_animation_mode,"library":lib})
                 .to_string();
         if utf16_len(&text) > MAX_JSON_CHARACTERS {
             return Err("Appearance library is full.".into());
@@ -639,6 +672,7 @@ impl Store {
         self.fullscreen = display_mode != DisplayMode::Windowed;
         self.display_mode = display_mode;
         self.resolution = resolution;
+        self.action_animation_mode = action_animation_mode;
         self.error.clear();
         Ok(())
     }
@@ -649,6 +683,14 @@ impl Store {
         resolution: Option<Resolution>,
     ) -> Result<(), String> {
         self.persist_display(self.library.clone(), self.reduced_motion, mode, resolution)
+    }
+    /// Display and animation preferences share one commit, including rollback on failure.
+    pub fn set_presentation_preferences(
+        &mut self, mode: DisplayMode, resolution: Option<Resolution>,
+        action_animation_mode: ActionAnimationMode,
+    ) -> Result<(), String> {
+        self.persist_presentation(self.library.clone(), self.reduced_motion, mode,
+            resolution, action_animation_mode)
     }
     pub fn preferences(&mut self, reduced: bool, fullscreen: bool) -> Result<(), String> {
         self.display_preferences(reduced, fullscreen.into())
@@ -785,6 +827,56 @@ mod display_mode_tests {
     }
     fn envelope() -> Value {
         json!({"version":1,"reducedMotion":true,"fullscreen":true,"library":{"version":1,"nextId":1,"defaultPresetId":null,"presets":[]}})
+    }
+    #[test]
+    fn action_animation_modes_roundtrip_and_unrelated_preferences_preserve_them() {
+        let path = path("action-animation");
+        let mut store = Store::load(&path);
+        assert_eq!(store.action_animation_mode, ActionAnimationMode::Normal);
+        for mode in [ActionAnimationMode::Reduced, ActionAnimationMode::Instant, ActionAnimationMode::Normal] {
+            store.set_presentation_preferences(DisplayMode::Windowed, None, mode).unwrap();
+            store.display_preferences(true, DisplayMode::Borderless).unwrap();
+            store.set_display_preferences(DisplayMode::Windowed, None).unwrap();
+            let loaded = Store::load(&path);
+            assert!(loaded.error.is_empty());
+            assert_eq!(loaded.action_animation_mode, mode);
+            assert!(loaded.reduced_motion);
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn action_animation_missing_defaults_and_invalid_setting_is_transactional() {
+        let path = path("action-animation-invalid");
+        let mut value = envelope();
+        std::fs::write(&path, value.to_string()).unwrap();
+        assert_eq!(Store::load(&path).action_animation_mode, ActionAnimationMode::Normal);
+        for invalid in [json!("fast"), json!(false), json!(null), json!(1)] {
+            value["actionAnimationMode"] = invalid;
+            let raw = value.to_string();
+            std::fs::write(&path, &raw).unwrap();
+            let loaded = Store::load(&path);
+            assert!(loaded.error.contains("Invalid action animation setting"));
+            assert_eq!(loaded.action_animation_mode, ActionAnimationMode::Normal);
+            assert!(!loaded.reduced_motion);
+            assert_eq!(loaded.display_mode, DisplayMode::Windowed);
+            assert_eq!(std::fs::read_to_string(&path).unwrap(), raw);
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn action_animation_atomic_failure_preserves_entire_previous_preference() {
+        let path = path("action-animation-failure");
+        let mut store = Store::load(&path);
+        store.set_presentation_preferences(DisplayMode::Windowed, None, ActionAnimationMode::Reduced).unwrap();
+        let raw = std::fs::read_to_string(&path).unwrap();
+        store.path = Some(path.join("cannot-write.json"));
+        assert!(store.set_presentation_preferences(DisplayMode::Fullscreen,
+            Some(Resolution { width: 1920, height: 1080 }), ActionAnimationMode::Instant).is_err());
+        assert_eq!(store.action_animation_mode, ActionAnimationMode::Reduced);
+        assert_eq!(store.display_mode, DisplayMode::Windowed);
+        assert_eq!(store.resolution, None);
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), raw);
+        std::fs::remove_file(path).unwrap();
     }
     #[test]
     fn resolution_bounds_limit_framebuffer_allocation() {

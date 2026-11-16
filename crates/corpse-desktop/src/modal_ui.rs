@@ -30,12 +30,12 @@ impl Frame {
         let sidebar = crate::render::hud_left(p)+width-crate::render::WIDTH as i32;
         let command = changed_number(p, "ui.layout.buttonHeight", 42.).round() as i32 + 4;
         let top = chronicle + 11;
-        let bottom = height - command - 32;
+        let bottom = crate::render::toolbar_y(p)+height-HEIGHT as i32-inspection_strip_height(p);
         Self {
             map: Rect(
                 0,
                 top,
-                (sidebar - p.number("ui.layout.mapSpacing").round() as i32).max(1),
+                (sidebar - crate::render::enemy_list::RESERVED_WIDTH).max(1),
                 (bottom - top).max(1),
             ),
             sidebar,
@@ -43,6 +43,11 @@ impl Frame {
             command,
         }
     }
+}
+/// One text line with vertical padding, independent of its contents (no map reflow on hover).
+pub fn inspection_strip_height(p:&Profile)->i32 {
+    let style=typography_ui::resolve(p,Role::Primary,RoleStyle::baseline(15.));
+    (style.font_size*style.line_height).ceil().max(style.font_size).max(18.) as i32+10
 }
 /// Source styles emit authored values only when different from schema defaults.
 pub fn changed_number(p: &Profile, path: &str, baseline: f64) -> f64 {

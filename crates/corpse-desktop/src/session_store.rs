@@ -5,6 +5,8 @@ use corpse_core::{
     Run,
 };
 use std::path::Path;
+#[path="replay_archive.rs"]
+pub mod replay_archive;
 #[path="tracked_engine.rs"]
 pub mod tracked_engine;
 #[path="incremental_log.rs"]
@@ -76,22 +78,13 @@ pub fn archive(
         Err(e) => return Err(e.to_string()),
     };
     let profile = corpse_core::profile::parse_profile(raw.as_deref()).map_err(|e| e.to_string())?;
-    let Some(archive) = prepare(&profile, run, kind, RELEASE_RANKING_ENABLED, saved_at)? else {
+    let date = saved_at.map(str::to_owned).unwrap_or_else(utc_now);
+    let Some(archive) = prepare(&profile, run, kind, RELEASE_RANKING_ENABLED, Some(&date))? else {
         return Ok(false);
     };
-    // Write replay first. Retrying a failed profile write can safely replace this same run's replay.
-    std::fs::create_dir_all(replay_dir).map_err(|e| e.to_string())?;
-    let id = run.run_id.as_ref().ok_or("Missing run identity")?;
-    // Reversible byte encoding avoids collisions between imported identities.
-    let safe_id: String = id
-        .as_bytes()
-        .iter()
-        .map(|byte| format!("{byte:02x}"))
-        .collect();
-    atomic_write(
-        &replay_dir.join(format!("descent-{safe_id}.json")),
-        &serde_json::to_vec(&archive.replay).map_err(|e| e.to_string())?,
-    )?;
+    // Publish the replay without replacing any older file, then record the run.
+    replay_archive::write(replay_dir, run, &date,
+        &serde_json::to_vec(&archive.replay).map_err(|e| e.to_string())?)?;
     atomic_write(
         profile_path,
         &serde_json::to_vec(&archive.profile).map_err(|e| e.to_string())?,
@@ -216,17 +209,24 @@ pub fn decode_bytes(raw: &[u8]) -> Result<(corpse_core::temporal::Engine, Kind),
 pub fn decode(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> { decode_bytes(raw.as_bytes()) }
 /// Legacy JSON input path; O(bytes + validation/history import), unchanged format.
 fn decode_legacy(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> {
-    decode_checkpoint_policy(raw,None)
+    decode_checkpoint_policy(raw,None).map(|(engine,kind,_)|(engine,kind))
 }
 /// O(checkpoint bytes + import), once at loading/attachment. Recording policy is
 /// supplied by its authenticated header, never inferred from turn/tick counts.
 /// An old experimental snapshot checkpoint without provenance remains unknown;
 /// it can load/save but cannot falsely claim a reproducible seed-only export.
-fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind),String>{
+/// The final flag reports a markerless R52 journal policy for EOF adoption.
+fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind,bool),String>{
     let v:serde_json::Value=serde_json::from_str(raw).map_err(|e|e.to_string())?;
     let(mut run,kind)=if v.get("nativeSaveVersion").is_some(){let envelope:SaveEnvelope=serde_json::from_value(v).map_err(|e|e.to_string())?;if envelope.native_save_version!=1{return Err("Unsupported native save version.".into())}(envelope.run,envelope.session)}else{(v,Kind::Genuine)};
+    let mut firebolt_migrated=false;
     if let Some(legacy)=legacy{
         let object=run.as_object_mut().ok_or("Save checkpoint must be an object")?;
+        // A journal's durable tail predates this load. Suppress ordinary live
+        // checkpoint adoption until every recorded command has been replayed.
+        firebolt_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && !object.contains_key("fireboltTravelFrom");
+        if firebolt_migrated {object.insert("fireboltTravelFrom".into(),serde_json::Value::Null);}
         if legacy{
             if let Some(marker)=object.get("replaySnapshotFrom"){
                 let count=object.get("replay").and_then(serde_json::Value::as_array).map_or(0,Vec::len);
@@ -242,7 +242,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
     let mut engine=corpse_core::temporal::Engine::load(&raw).map_err(|e|e.to_string())?;
     if let Some(legacy)=legacy{engine.set_legacy_revert(legacy);}
     corpse_core::engine::validate_supported(&engine.run).map_err(|e|e.to_string())?;
-    Ok((engine,kind))
+    Ok((engine,kind,firebolt_migrated))
 }
 
 pub fn utc_now() -> String {

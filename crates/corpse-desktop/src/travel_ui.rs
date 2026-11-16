@@ -37,6 +37,148 @@ fn ability(a: &Actor, name: &str, active: bool) -> bool {
 fn layer(v: &Field<Vec<f64>>, i: usize) -> f64 {
     v.as_ref().and_then(|v| v.get(i)).copied().unwrap_or(0.)
 }
+
+/// R52 complete-action stage, independent of terrain and the optional pursuit
+/// credit. A Fast continuation remembers which action owns it even after a
+/// conditional source of Haste or Fast is lost. O(1), no world query or mutation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum ActionStage { ReadyHaste, ReadyNormal, FastHaste, FastNormal }
+impl ActionStage {
+    fn from_index(index: usize) -> Self {
+        match index { 0 => Self::ReadyHaste, 1 => Self::ReadyNormal,
+            2 => Self::FastHaste, 3 => Self::FastNormal, _ => unreachable!() }
+    }
+    pub(crate) fn observe(r: &Run) -> Self {
+        match r.fast_action_phase.as_ref() {
+            Some(corpse_core::model::FastActionPhase::Haste) => Self::FastHaste,
+            Some(corpse_core::model::FastActionPhase::Normal) => Self::FastNormal,
+            None if r.phase.as_ref().is_some_and(|p| p == "normal") => Self::ReadyNormal,
+            None => Self::ReadyHaste,
+        }
+    }
+    /// Successful Move passes Fast eligibility; Wait passes false. The bool
+    /// reports completion of a normal action (world/current time may advance).
+    pub(crate) fn advance(self, hasted: bool, fast_move: bool) -> (Self, bool) {
+        match self {
+            Self::FastHaste => (Self::ReadyNormal, false),
+            Self::FastNormal => (Self::ReadyHaste, true),
+            Self::ReadyHaste | Self::ReadyNormal => {
+                let bonus = self == Self::ReadyHaste && hasted;
+                if fast_move { (if bonus {Self::FastHaste} else {Self::FastNormal}, false) }
+                else { (if bonus {Self::ReadyNormal} else {Self::ReadyHaste}, !bonus) }
+            }
+        }
+    }
+}
+/// Timing of an otherwise valid movement or Wait at the actual player origin.
+/// Position-dependent Haste here uses the player's own current terrain only.
+pub(crate) fn action_skips_world(r: &Run, moving: bool) -> bool {
+    action_world_ticks(r,moving)==0
+}
+/// Bounded (0, 1, 2) world advances before pursuit-specific credit. The stranded
+/// self-habitat branch precedes the scheduler and always advances once.
+pub(crate) fn action_world_ticks(r: &Run, moving: bool) -> usize {
+    if r.simulation_revision.value_or(29.) < 52. {
+        return usize::from(!(moving && r.phase.as_ref().is_none_or(|v| v != "normal")
+            && crate::statuses_ui::is_hasted(r, &r.player)));
+    }
+    if r.floor().is_none() || corpse_core::ichor::stranded(r,&r.player) { return 1; }
+    let stage=ActionStage::observe(r);
+    let hasted=crate::statuses_ui::is_hasted(r,&r.player);
+    let fast=moving && corpse_core::ai::fast_movement_enabled(r,&r.player);
+    // Only an unstarted Haste stage applies adjacency Chill before eligibility.
+    // Use the same permitted-source projection as the route graph; unknown
+    // monsters never remove a predicted bonus or create a warning.
+    let chilled=stage==ActionStage::ReadyHaste
+        && r.actors_at(r.depth).iter().any(|a| has(a,"enemy:beast:yeti")
+            && !a.dead.value_or(false) && a.hp>0. && vision::visible_actor(r,a)
+            && crate::creature_presentation::project(r,a).is_none())
+        && Knowledge::observe(r,&vision::terrain_visibility(r),|a|vision::visible_actor(r,a))
+            .is_some_and(|k|k.chill[k.start]);
+    if stage.advance(hasted&&!chilled,fast&&!chilled).1 {
+        1+usize::from(c(&r.player,"slowed")>0.||chilled)
+    } else {0}
+}
+
+fn component_root(parents: &mut [usize], mut at: usize) -> usize {
+    while parents[at]!=at {parents[at]=parents[parents[at]];at=parents[at];} at
+}
+/// Zero-length known transport links form equivalence classes. Within the
+/// sqrt(2) Chill radius, at most one nonzero grid edge can occur. Union-find
+/// plus one eight-neighbor pass replaces a per-cell portal shortest-path query.
+fn cold_components(f:&corpse_core::Floor,known:&[bool],tiles:&[String])->Vec<usize> {
+    let n=known.len();let mut roots:Vec<_>=(0..n).collect();let mut sizes=vec![1;n];
+    let mut join=|a:usize,b:usize| {
+        if known.get(a)!=Some(&true)||known.get(b)!=Some(&true){return;}
+        let(mut a,mut b)=(component_root(&mut roots,a),component_root(&mut roots,b));
+        if a==b{return;}if sizes[a]<sizes[b]{std::mem::swap(&mut a,&mut b);}
+        roots[b]=a;sizes[a]+=sizes[b];
+    };
+    for p in f.portals.as_ref().into_iter().flatten(){join(p.a,p.b);}
+    for (pocket,speed) in f.non_euclidean.as_ref().into_iter().flatten().map(|p|(p,false))
+        .chain(f.speed_up.as_ref().into_iter().flatten().map(|p|(p,true))) {
+        for group in &pocket.groups {
+            if speed && f.speed_up_terrain.value_or(false)
+                && group.sources.iter().copied().chain(std::iter::once(group.destination))
+                    .any(|at|tiles.get(at).is_none_or(|t|t!="speed-up")){continue;}
+            for &source in &group.sources {join(source,group.destination);}
+        }
+    }
+    for at in 0..n {roots[at]=component_root(&mut roots,at);}roots
+}
+fn cold_near_components(roots:&[usize],width:usize,source_cells:impl Iterator<Item=usize>)->Vec<bool> {
+    let n=roots.len();let mut source=vec![false;n];let mut near=vec![false;n];
+    for at in source_cells {if at<n {source[roots[at]]=true;}}
+    for at in 0..n {
+        if source[roots[at]] {near[roots[at]]=true;}
+        for (dx,dy) in DIRECTIONS {
+            let(x,y)=((at%width)as i32+dx,(at/width)as i32+dy);
+            if x>=0&&y>=0&&x<width as i32&&(y as usize)*width<n
+                && source[roots[y as usize*width+x as usize]] {near[roots[at]]=true;}
+        }
+    }
+    near
+}
+fn observed_chill_mask(r:&Run,known:&[bool],tiles:&[String],observable:impl Fn(&Actor)->bool)->Vec<bool> {
+    let mut result=vec![false;known.len()];
+    let sources:Vec<_>=r.actors_at(r.depth).iter().filter(|a| !a.dead.value_or(false)&&a.hp>0.
+        && !corpse_core::half_here::is_clone(a)&&has(a,"enemy:beast:yeti")&&observable(a)
+        // Apparent identities may hide this trait. Do not use true Chill to
+        // distinguish two otherwise identical disguised/hallucinated actors.
+        && crate::creature_presentation::project(r,a).is_none()).collect();
+    if sources.is_empty(){return result;}
+    let Some(view_floor)=r.floor() else{return result;};
+    let roots=cold_components(view_floor,known,tiles);
+    for body in corpse_core::half_here::origins(r) {
+        if body.dead.value_or(false)||body.hp<=0.||corpse_core::revision50_nightmares::is_decoy(body)
+            || corpse_core::revision50_rings::has_effect(r,body,corpse_core::revision50_rings::ICE_IMMUNITY){continue;}
+        let Some(f)=corpse_core::dreamwalking::floor_for(r,body) else{continue;};
+        let cells:Vec<_>=sources.iter().filter(|source|source.id!=body.id
+            && corpse_core::dreamwalking::same_plane(r,body,source)
+            && !corpse_core::revision50_combat::oblivious_blocks(r,body,Some(source)))
+            .filter_map(|source|corpse_core::portals::cell(f,source.x,source.y)).collect();
+        if cells.is_empty(){continue;}
+        let same_plane=corpse_core::dreamwalking::same_plane(r,body,&r.player);
+        let other_roots;
+        let body_roots=if same_plane {&roots} else {
+            // Other owned endpoints can share Chill across planes, but only
+            // remembered links in that other plane may shorten the distance.
+            let remembered=f.remembered_tiles.as_ref();
+            let other_known:Vec<_>=(0..f.tiles.len()).map(|at|f.seen.get(at)==Some(&true)
+                && remembered.and_then(|v|v.get(at)).is_some()).collect();
+            let other_tiles:Vec<_>=(0..f.tiles.len()).map(|at|remembered.and_then(|v|v.get(at))
+                .cloned().unwrap_or_else(||"wall".into())).collect();
+            other_roots=cold_components(f,&other_known,&other_tiles);&other_roots
+        };
+        let near=cold_near_components(body_roots,f.width(),cells.into_iter());
+        if body.id==r.player.id {
+            for at in 0..result.len(){result[at]|=known[at]&&near[body_roots[at]];}
+        } else if corpse_core::portals::cell(f,body.x,body.y).is_some_and(|at|near[body_roots[at]]) {
+            result.fill(true);
+        }
+    }
+    result
+}
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Snapshot {
     threats: Vec<(u64, String, bool)>,
@@ -101,6 +243,10 @@ struct Knowledge {
     start: usize,
     phase: usize,
     hasted: bool,
+    revised_actions: bool,
+    fast: bool,
+    swimming_haste: bool,
+    chill: Vec<bool>,
     airborne: bool,
     wall_phase: bool,
     forced: bool,
@@ -121,6 +267,9 @@ impl Knowledge {
             return None;
         }
         let context = corpse_core::hazard_memory::observation_context_revision(f, r.simulation_revision.value_or(29.0));
+        let revised_actions = r.simulation_revision.value_or(29.) >= 52.;
+        let slowed = c(p, "slowed") > 0.;
+        let airborne = travel::flying(r, p);
         let mut out = Self {
             width,
             height: f.height(),
@@ -141,20 +290,32 @@ impl Knowledge {
             stochastic: HashSet::new(),
             ordered_pairs: HashSet::new(),
             start: p.y as usize * width + p.x as usize,
-            phase: usize::from(r.phase.as_ref().is_some_and(|s| s == "normal"))
-                + if c(p, "cameFree") != 0. { 2 } else { 0 },
-            hasted: crate::statuses_ui::is_hasted(r, p),
-            airborne: travel::flying(r, p),
+            phase: if revised_actions {ActionStage::observe(r) as usize
+                + if c(p, "cameFree") != 0. {4} else {0}} else {
+                usize::from(r.phase.as_ref().is_some_and(|s| s == "normal"))
+                    + if c(p, "cameFree") != 0. {2} else {0}},
+            hasted: if revised_actions {!slowed && (c(p,"hasted") > 0.
+                || crate::statuses_ui::has_non_water_haste(r,p))}
+                else {crate::statuses_ui::is_hasted(r, p)},
+            revised_actions,
+            fast: corpse_core::ai::fast_movement_enabled(r,p),
+            swimming_haste: revised_actions && !slowed && !airborne
+                && corpse_core::revision50_rings::has_effect(r,p,corpse_core::revision50_rings::SWIMMING),
+            chill: vec![false;n],
+            airborne,
             wall_phase: ability(p, "Phase Through", true),
             forced: c(p, "forcedMove") != 0.,
             rooted: has(p, "enemy:beast:rooted"),
             ichor_bound: has(p, "enemy:beast:ichor-bound"),
             slime_bound: has(p, "enemy:beast:slime-bound"),
             aquatic: has(p, "enemy:beast:aquatic"),
-            came_turns: c(p, "cameTurns"),
+            came_turns: if revised_actions && slowed {0.} else {c(p, "cameTurns")},
             quarry: None,
         };
-        let avoids_water = !out.airborne && !out.aquatic && !ability(p, "Drown", false);
+        // R52 shallow water has ordinary route cost. Deep water remains an
+        // unconditional transition rejection; retain frozen legacy preferences.
+        let avoids_water = r.simulation_revision.value_or(29.) < 52.
+            && !out.airborne && !out.aquatic && !ability(p, "Drown", false);
         for i in 0..n {
             let current = mask.get(i) == Some(&true);
             let seen = f.seen.get(i) == Some(&true);
@@ -293,6 +454,7 @@ impl Knowledge {
                 out.quarry = Some((a.x, a.y));
             }
         }
+        if revised_actions {out.chill=observed_chill_mask(r,&out.known,&out.tiles,&observable);}
         Some(out)
     }
     fn habitat(&self, i: usize) -> bool {
@@ -307,6 +469,11 @@ impl Knowledge {
     fn deep(&self, i: usize) -> bool {
         self.tiles[i] == "water" && self.ichor[i] == 0.
     }
+    fn hasted_at(&self, at: usize) -> bool {
+        self.hasted || (self.swimming_haste && self.known[at] && self.ichor[at] == 0.
+            && matches!(self.tiles[at].as_str(), "water" | "shallow-water"))
+    }
+    fn phases(&self) -> usize { if self.revised_actions {8} else {4} }
     fn diagonal(&self, from: usize, to: usize) -> bool {
         movement::diagonal_step_allowed(
             &self.tiles,
@@ -390,24 +557,31 @@ impl Knowledge {
             }
             mate
         } else { entered };
-        if state & 1 == 0 && self.hasted {
-            return Some((crossed, 1 + (state & 2)));
+        let came_bit = if self.revised_actions {4} else {2};
+        let chilled=self.revised_actions && state&3==ActionStage::ReadyHaste as usize && self.chill[from];
+        if self.revised_actions {
+            let (next, ticks) = ActionStage::from_index(state & 3).advance(self.hasted_at(from)&&!chilled,self.fast&&!chilled);
+            if !ticks { return Some((crossed,next as usize + (state & came_bit))); }
+        } else if state & 1 == 0 && self.hasted {
+            return Some((crossed, 1 + (state & came_bit)));
         }
-        if state & 2 == 0
+        let pursued = if self.revised_actions {crossed} else {entered};
+        if state & came_bit == 0
+            && !chilled
             && self.came_turns > 0.
             && self.quarry.is_some_and(|(qx, qy)| {
-                ((entered % self.width) as f64 - qx).hypot((entered / self.width) as f64 - qy)
+                ((pursued % self.width) as f64 - qx).hypot((pursued / self.width) as f64 - qy)
                     < ((from % self.width) as f64 - qx).hypot((from / self.width) as f64 - qy)
             })
         {
-            return Some((crossed, 3));
+            return Some((crossed, 1 + came_bit));
         }
         let arrival = if self.airborne { crossed } else {
             self.current(crossed).filter(|at| !self.occupied.contains(at)).unwrap_or(crossed)
         };
         (self.known[arrival] && !self.deep(arrival)).then_some((arrival, 0))
     }
-    /// One multi-goal search over the same four-phase movement graph as click
+    /// One multi-goal search over the same bounded movement graph as click
     /// travel. Unknown cells contribute frontier adjacency only, never terrain.
     fn frontier_path(&self, visited: &HashSet<usize>) -> Vec<Step> {
         let frontier: Vec<bool> = (0..self.known.len()).map(|at| {
@@ -422,7 +596,7 @@ impl Knowledge {
         }).collect();
         if !frontier.iter().any(|b| *b) { return vec![]; }
         displaced_to_goal(
-            self.start, self.phase, 4, self.width, self.height,
+            self.start, self.phase, self.phases(), self.width, self.height,
             |at| frontier[at],
             |from, entered, phase| {
                 // Unlike a deliberate click, exploration never selects an attack,
@@ -463,7 +637,7 @@ impl Knowledge {
             target,
             self.portals[target],
             self.phase,
-            4,
+            self.phases(),
             self.width,
             self.height,
             |from, to, state| self.transition(from, to, state, target),
@@ -901,6 +1075,13 @@ impl AutoExplore {
         });
     }
 }
+
+#[cfg(test)]
+#[path = "revision52_shallow_water_pathing_tests.rs"]
+mod revision52_shallow_water_pathing_tests;
+#[cfg(test)]
+#[path = "revision52_action_pathing_tests.rs"]
+mod revision52_action_pathing_tests;
 
 #[cfg(test)]
 mod tests {

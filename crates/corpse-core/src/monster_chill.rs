@@ -35,6 +35,7 @@ pub fn apply_adjacency(r: &mut Run) {
         if !crate::monster_statuses::apply_status(r, id, "slowed", 1., Some(source.0)) {
             continue;
         }
+        crate::events::note_chill(r,id);
         if !owner_slowed {
             if id != r.player.id {
                 // A valid hit on Half Here slows the shared action stream even if its
@@ -49,6 +50,27 @@ pub fn apply_adjacency(r: &mut Run) {
             owner_slowed = true;
         }
     }
+}
+
+/// Semantic cold-contact state for command-boundary presentation, not the one-turn
+/// duration counter. O(B*(A+I+C+P)) for B<=2 bodies, A actors, inventory I,
+/// conditions C and portal-distance cost P. No gameplay mutation or retained state.
+/// Provenance is required: merely standing next to a Yeti before its first actual
+/// application is not already-chilled. Only body IDs leave this helper.
+pub fn observed_chilled_ids(r:&Run)->Vec<f64> {
+    if !crate::events::enabled(r) {return vec![];}
+    crate::half_here::origins(r).into_iter().filter(|body| {
+        !body.dead.value_or(false) && body.hp>0.
+        && !crate::revision50_rings::has_effect(r,body,crate::revision50_rings::ICE_IMMUNITY)
+        && body.conditions.get("slowSourceId").and_then(|id|crate::engine::actor(r,*id)).is_some_and(|source| {
+            source.id!=body.id && !source.dead.value_or(false) && source.hp>0.
+            && !crate::half_here::is_clone(source)
+            && source.abilities.iter().any(|id|id=="enemy:beast:yeti")
+            && crate::dreamwalking::same_plane(r,body,source)
+            && !crate::revision50_combat::oblivious_blocks(r,body,Some(source))
+            && crate::portals::actor_distance(r,body,source)<=std::f64::consts::SQRT_2
+        })
+    }).map(|body|body.id).collect()
 }
 
 #[cfg(test)]

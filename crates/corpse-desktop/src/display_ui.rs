@@ -1,6 +1,6 @@
 //! Display-only draft settings. No simulation, renderer profile, SDL, or disk mutation.
 use crate::{
-    appearance_store::{DisplayMode, Resolution},
+    appearance_store::{ActionAnimationMode, DisplayMode, Resolution},
     render::{Painter, Rgb},
 };
 use sdl2::keyboard::Keycode;
@@ -11,6 +11,7 @@ pub enum Action {
     Apply {
         mode: DisplayMode,
         resolution: Option<Resolution>,
+        action_animation_mode: ActionAnimationMode,
     },
     Back,
 }
@@ -26,7 +27,7 @@ impl Bounds {
         x >= self.x && x < self.x + self.w && y >= self.y && y < self.y + self.h
     }
 }
-const ROWS: [Bounds; 4] = [
+const ROWS: [Bounds; 5] = [
     Bounds {
         x: 272,
         y: 286,
@@ -38,6 +39,12 @@ const ROWS: [Bounds; 4] = [
         y: 386,
         w: 736,
         h: 68,
+    },
+    Bounds {
+        x: 272,
+        y: 486,
+        w: 736,
+        h: 52,
     },
     Bounds {
         x: 650,
@@ -60,6 +67,7 @@ pub struct DisplaySettings {
     desktop: Resolution,
     resolutions: Vec<Resolution>,
     selected_resolution: usize,
+    action_animation_mode: ActionAnimationMode,
     selected: usize,
     pub notice: String,
 }
@@ -107,9 +115,14 @@ impl DisplaySettings {
             desktop,
             resolutions,
             selected_resolution,
+            action_animation_mode: ActionAnimationMode::Normal,
             selected: 0,
             notice: String::new(),
         }
+    }
+    pub fn with_action_animation_mode(mut self, mode: ActionAnimationMode) -> Self {
+        self.action_animation_mode = mode;
+        self
     }
     fn resolution(&self) -> Option<Resolution> {
         if self.mode == DisplayMode::Borderless || self.selected_resolution == 0 {
@@ -132,18 +145,26 @@ impl DisplaySettings {
                 self.selected_resolution =
                     (self.selected_resolution + if forward { 1 } else { count - 1 }) % count;
             }
+            2 => {
+                self.action_animation_mode = if forward {
+                    self.action_animation_mode.next()
+                } else {
+                    self.action_animation_mode.next().next()
+                };
+            }
             _ => {}
         }
     }
     fn activate(&mut self) -> Action {
         match self.selected {
-            0 | 1 => {
+            0 | 1 | 2 => {
                 self.adjust(true);
                 Action::None
             }
-            2 => Action::Apply {
+            3 => Action::Apply {
                 mode: self.mode,
                 resolution: self.resolution(),
+                action_animation_mode: self.action_animation_mode,
             },
             _ => Action::Back,
         }
@@ -151,8 +172,8 @@ impl DisplaySettings {
     pub fn key(&mut self, key: Keycode) -> Action {
         match key {
             Keycode::Escape => return Action::Back,
-            Keycode::Up => self.selected = (self.selected + 3) % 4,
-            Keycode::Down | Keycode::Tab => self.selected = (self.selected + 1) % 4,
+            Keycode::Up => self.selected = (self.selected + ROWS.len() - 1) % ROWS.len(),
+            Keycode::Down | Keycode::Tab => self.selected = (self.selected + 1) % ROWS.len(),
             Keycode::Left => self.adjust(false),
             Keycode::Right => self.adjust(true),
             Keycode::Return | Keycode::KpEnter | Keycode::Space => return self.activate(),
@@ -163,7 +184,7 @@ impl DisplaySettings {
     pub fn click(&mut self, x: i32, y: i32) -> Action {
         if let Some(index) = ROWS.iter().position(|r| r.contains(x, y)) {
             self.selected = index;
-            if index < 2 {
+            if index < 3 {
                 self.adjust(x >= 560);
                 Action::None
             } else {
@@ -226,11 +247,15 @@ impl DisplaySettings {
             p.text("<", 535, 408, 20, GOLD);
             p.text(">", 969, 408, 20, GOLD);
         }
+        p.text("ACTION ANIMATIONS", 296, 504, 13, ASH);
+        p.text(self.action_animation_mode.label(), 565, 500, 22, BONE);
+        p.text("<", 535, 501, 20, GOLD);
+        p.text(">", 969, 501, 20, GOLD);
         if !self.notice.is_empty() {
             p.text(
                 &crate::render::truncate(&self.notice, 82),
                 274,
-                510,
+                637,
                 14,
                 [208, 140, 110],
             );
@@ -263,27 +288,150 @@ mod tests {
         )
     }
     #[test]
+    fn action_animation_draft_cycles_both_directions_and_cancel_has_no_commit() {
+        let mut v = view().with_action_animation_mode(ActionAnimationMode::Reduced);
+        assert_eq!(v.click(900, 510), Action::None);
+        assert_eq!(v.action_animation_mode, ActionAnimationMode::Instant);
+        v.key(Keycode::Right);
+        assert_eq!(v.action_animation_mode, ActionAnimationMode::Normal);
+        v.key(Keycode::Left);
+        assert_eq!(v.action_animation_mode, ActionAnimationMode::Instant);
+        v.click(300, 510);
+        assert_eq!(v.action_animation_mode, ActionAnimationMode::Reduced);
+        assert_eq!(v.key(Keycode::Escape), Action::Back);
+        let mut reopened = view().with_action_animation_mode(ActionAnimationMode::Normal);
+        assert_eq!(
+            reopened.click(800, 580),
+            Action::Apply {
+                mode: DisplayMode::Windowed,
+                resolution: None,
+                action_animation_mode: ActionAnimationMode::Normal
+            }
+        );
+        assert_eq!(
+            v.click(800, 580),
+            Action::Apply {
+                mode: DisplayMode::Windowed,
+                resolution: None,
+                action_animation_mode: ActionAnimationMode::Reduced
+            }
+        );
+    }
+    #[test]
+    fn action_animation_settings_native_frames_at_multiple_scales() {
+        for (width, height) in [(1280, 800), (1600, 900), (1920, 1200)] {
+            for mode in [
+                ActionAnimationMode::Normal,
+                ActionAnimationMode::Reduced,
+                ActionAnimationMode::Instant,
+            ] {
+                let mut v = view().with_action_animation_mode(mode);
+                v.selected = 2;
+                v.notice = "Applied.".into();
+                let mut p = Painter::new();
+                p.resize(width, height);
+                v.draw(&mut p);
+                assert!(p.pixels.chunks_exact(4).any(|p| p[..3] == GOLD));
+                if let Ok(dir) = std::env::var("CORPSE_R52_SETTINGS_OUTPUT") {
+                    std::fs::create_dir_all(&dir).unwrap();
+                    let file = std::fs::File::create(format!(
+                        "{dir}/action-animations-{}-{width}x{height}.png",
+                        mode.label().to_lowercase()
+                    ))
+                    .unwrap();
+                    let mut encoder = png::Encoder::new(file, width as u32, height as u32);
+                    encoder.set_color(png::ColorType::Rgba);
+                    encoder.set_depth(png::BitDepth::Eight);
+                    encoder
+                        .write_header()
+                        .unwrap()
+                        .write_image_data(&p.pixels)
+                        .unwrap();
+                }
+            }
+        }
+    }
+    #[test]
+    fn action_animation_keyboard_traverses_all_rows_and_wraps() {
+        let mut v = view();
+        v.key(Keycode::Up);
+        assert_eq!(v.key(Keycode::Return), Action::Back);
+        v.key(Keycode::Down);
+        assert_eq!(v.selected, 0);
+        v.key(Keycode::Tab);
+        v.key(Keycode::Tab);
+        v.key(Keycode::Right);
+        assert_eq!(v.action_animation_mode, ActionAnimationMode::Reduced);
+        v.key(Keycode::Down);
+        assert_eq!(
+            v.key(Keycode::Return),
+            Action::Apply {
+                mode: DisplayMode::Windowed,
+                resolution: None,
+                action_animation_mode: ActionAnimationMode::Reduced
+            }
+        );
+    }
+    #[test]
     fn automatic_is_default_and_can_be_restored_after_manual_selection() {
         let mut v = view();
-        assert_eq!(v.click(800, 580), Action::Apply { mode: DisplayMode::Windowed, resolution: None });
+        assert_eq!(
+            v.click(800, 580),
+            Action::Apply {
+                mode: DisplayMode::Windowed,
+                resolution: None,
+                action_animation_mode: ActionAnimationMode::Normal
+            }
+        );
         v.click(900, 410);
-        assert_eq!(v.resolution(), Some(Resolution { width: 1280, height: 800 }));
+        assert_eq!(
+            v.resolution(),
+            Some(Resolution {
+                width: 1280,
+                height: 800
+            })
+        );
         v.key(Keycode::Left);
         assert_eq!(v.resolution(), None);
-        assert_eq!(v.click(800, 580), Action::Apply { mode: DisplayMode::Windowed, resolution: None });
+        assert_eq!(
+            v.click(800, 580),
+            Action::Apply {
+                mode: DisplayMode::Windowed,
+                resolution: None,
+                action_animation_mode: ActionAnimationMode::Normal
+            }
+        );
     }
     #[test]
     fn reopening_preserves_explicit_size_missing_from_new_monitor_modes() {
-        let saved = Resolution { width: 1440, height: 900 };
-        let mut v = DisplaySettings::new(DisplayMode::Windowed, Some(saved),
-            Resolution { width: 1920, height: 1080 }, vec![]);
-        assert_eq!(v.click(800, 580), Action::Apply { mode: DisplayMode::Windowed, resolution: Some(saved) });
+        let saved = Resolution {
+            width: 1440,
+            height: 900,
+        };
+        let mut v = DisplaySettings::new(
+            DisplayMode::Windowed,
+            Some(saved),
+            Resolution {
+                width: 1920,
+                height: 1080,
+            },
+            vec![],
+        );
+        assert_eq!(
+            v.click(800, 580),
+            Action::Apply {
+                mode: DisplayMode::Windowed,
+                resolution: Some(saved),
+                action_animation_mode: ActionAnimationMode::Normal
+            }
+        );
     }
     #[test]
     fn cancel_does_not_apply_and_keyboard_mouse_share_actions() {
         let mut v = view();
         assert_eq!(v.key(Keycode::Right), Action::None);
         assert_eq!(v.key(Keycode::Escape), Action::Back);
+        v.key(Keycode::Down);
         v.key(Keycode::Down);
         v.key(Keycode::Down);
         assert_eq!(v.key(Keycode::Return), v.click(800, 580));

@@ -127,23 +127,16 @@ fn before_sheet(p: &mut Painter, paint: impl FnOnce(&mut Painter)) {
 fn revision50_smaller_dialogs_native_before_after_and_repeat_close() {
     assert_eq!(DIALOG_SCALE, 0.84);
     let run = fixture(); let frozen = run.clone(); let view = crate::observe::observe(&run);
-    let ability = crate::ability_ui::AbilityView {
-        id: "visual-fixture".into(), name: "An observed ability".into(),
-        description: format!("FIRST LINE. {} FINAL LINE.", "Full observed ability details remain available by scrolling. ".repeat(30)),
-        color: GOLD, cost: "6 Energy".into(), state: "Ready".into(), active: false, mode: "Active".into(), supported: true,
-    };
     let report = crate::inspection_ui::observe_tile(&run, run.player.x as usize, run.player.y as usize);
     for (w, h) in [(1280, 800), (1920, 1080), (960, 720)] {
         let mut p = Painter::new(); p.resize(w, h); p.set_responsive_canvas(true);
         p.game_at(&view, "", false, 0.); let base = p.pixels.clone();
         let canvas = (p.scale, p.origin, p.logical_width(), p.logical_height());
-        for name in ["inspection", "ability-top", "ability-bottom", "hazard"] {
+        for name in ["inspection", "hazard"] {
             for before in [true, false] {
                 p.pixels.copy_from_slice(&base);
                 let paint = |s: &mut Painter| match name {
                     "inspection" => crate::inspection_ui::paint(&report, s, 0),
-                    "ability-top" => s.ability_detail_sheet(&ability, 0),
-                    "ability-bottom" => s.ability_detail_sheet(&ability, usize::MAX),
                     _ => s.hazard_prompt_sheet("Walk amid razorleaves? Ending your turn there costs 2% of your maximum health (rounded up)."),
                 };
                 if before { before_sheet(&mut p, paint); } else { p.centered_sheet(paint); }

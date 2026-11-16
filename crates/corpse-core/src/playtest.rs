@@ -37,7 +37,7 @@ pub fn validate_profile(r: &Run) -> Result<(), String> {
         if r.simulation_revision.value_or(0.) < 31. || !(p.version == 1 && p.profile == PROFILE || p.version == 2 && p.profile == crate::debug_floor::PROFILE)
             || !(1..=40).contains(&p.start_floor) || !p.prior_blessings.is_finite()
             || p.prior_blessings < 0. || p.prior_blessings.fract() != 0. || !p.candidates.is_empty()
-            || p.sources.iter().any(|s| s.depth == 0 || s.depth >= p.start_floor || !s.item_id.is_finite() || s.item_id < 0. || s.item_id.fract() != 0.) {
+            || p.sources.iter().any(|s| s.depth == 0 || s.depth >= p.start_floor || !crate::fast_mode::playable(r, s.depth as f64) || !s.item_id.is_finite() || s.item_id < 0. || s.item_id.fract() != 0.) {
             return Err("Invalid or unsupported playtest starting profile.".into());
         }
         if p.version == 2 { crate::debug_floor::validate(r, p)?; }
@@ -138,7 +138,7 @@ fn select_loadout(r: &mut Run) -> Result<(), String> {
     let before = revision50.then(|| crate::equipment::capture_before(r));
     for (item, _) in &selected {
         let mut acquired = item.clone();
-        if revision50 { crate::revision50_ability_energy::acquire_item(&mut r.player, &mut acquired)?; }
+        if revision50 { crate::revision50_ability_energy::acquire_item_for_revision(&mut r.player, &mut acquired, r.simulation_revision.value_or(29.))?; }
         r.inventory.push(acquired);
     }
     if let Some(before) = before {
@@ -159,7 +159,7 @@ pub fn create_run(seed: &str, mode: &str, start_floor: u32) -> Result<Run, Strin
     create_run_revision(seed, mode, false, start_floor, PROFILE, 33.)
 }
 pub fn create_run_revision(seed: &str, mode: &str, dev: bool, start_floor: u32, profile: &str, revision: f64) -> Result<Run, String> {
-    if !(1..=40).contains(&start_floor) || profile != PROFILE || ![31., 32., 33., 34., 35., 36., 37., 38., 39., 40., 41., 42., 43., 44., 45., 46., 50., 51.].contains(&revision) {
+    if !(1..=40).contains(&start_floor) || profile != PROFILE || ![31., 32., 33., 34., 35., 36., 37., 38., 39., 40., 41., 42., 43., 44., 45., 46., 50., 51., 52.].contains(&revision) {
         return Err("Unsupported playtest floor, profile or simulation revision.".into());
     }
     if seed.trim().is_empty() || seed.split_once(':').map_or(seed, |(_, suffix)| suffix).len() > 160 || seed.chars().any(char::is_control) {
@@ -167,8 +167,9 @@ pub fn create_run_revision(seed: &str, mode: &str, dev: bool, start_floor: u32, 
     }
     let mut r = crate::startup::new_run_shell_revision(seed, mode, dev, revision)?;
     r.playtest = Profile { version: 1, start_floor, profile: PROFILE.into(), prior_hearts: 0, prior_blessings: 0., sources: vec![], candidates: vec![], debug: None }.into();
-    for id in r.player.abilities.clone() { crate::progression::initialize_ability_state(&mut r.player, &id, r.tick)?; }
-    crate::startup::ensure_floors(&mut r, start_floor.max(10))?;
+    for id in r.player.abilities.clone() { crate::progression::initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, &id, r.tick)?; }
+    let to = crate::startup::initial_generation_target(revision, start_floor);
+    crate::startup::ensure_floors(&mut r, to)?;
     r.depth = start_floor as f64;
     let f = r.floor().ok_or("Missing playtest starting floor")?;
     let at = f.tiles.iter().position(|t| t == "up").ok_or("Playtest floor has no arrival stair")?;

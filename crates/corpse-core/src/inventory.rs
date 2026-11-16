@@ -149,7 +149,7 @@ pub fn collect_underfoot(r: &mut Run, capacity: f64) -> Result<usize, EngineErro
                 item.quantity = taken.into();
             }
             if crate::revision50::enabled(r) {
-                crate::revision50_ability_energy::acquire_item(&mut r.player, &mut item)
+                crate::revision50_ability_energy::acquire_item_for_revision(&mut r.player, &mut item, r.simulation_revision.value_or(29.))
                     .map_err(EngineError)?;
             }
             r.inventory.push(item);
@@ -212,6 +212,13 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
         return Ok(Some(false));
     };
     let item = r.inventory[index].clone();
+    // Capture before acquisition: a heart that grants a new blessing cannot make
+    // the already admitted action retroactively free.
+    let hp_before_item_use = r.player.hp;
+    let energy_before_item_use = r.player.energy;
+    let tools_free = matches!(c, Command::Use { .. })
+        && matches!(item.kind.as_str(), "heart" | "potion")
+        && r.player.abilities.iter().any(|a| a == "isheilah-tools-of-the-trade");
     let display_name = crate::revision50_item_knowledge::display_name(r, &item);
     if crate::phantasmii_generation::is_shard(&item) { return Ok(Some(false)); }
     if crate::phantasmii_generation::is_dagger(&item) && matches!(c, Command::Use { .. }) {
@@ -313,8 +320,9 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
                 } else {
                     0.0
                 };
-                if let Some(b) = item.bonus.as_ref() {
-                    equipment::add_bonus(&mut r.player.stats, b)
+                let rewards = effective_heart_rewards(r, &item);
+                if let Some(b) = rewards.bonus.as_ref() {
+                    equipment::add_bonus(&mut r.player.stats, b);
                 }
                 let energy = r.player.energy + item.energy.value_or(0.0);
                 r.player.energy = if r
@@ -327,7 +335,7 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
                 } else {
                     energy.min(combat::effective_stats(r, &r.player).max_energy)
                 };
-                progression::award(r, item.exp.value_or(0.0));
+                progression::award(r, rewards.blessings);
                 let creature = heart_creature_type(&item).unwrap_or("Unknown creature".into());
                 let s = r.run_stats.get_or_insert_with(|| RunStatistics {
                     version: 1.0,
@@ -348,14 +356,12 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
                         "player",
                     );
                 }
-                crate::events::actor_event(
-                    r,
-                    &r.player,
-                    "heal",
-                    &format!("Eat {}", item.name),
-                    None,
-                    None,
-                );
+                if !crate::events::enabled(r) || r.player.hp>hp_before_item_use {
+                    crate::events::actor_event(r,&r.player,"heal",&format!("Eat {}",item.name),None,None);
+                }
+                if r.player.energy>energy_before_item_use {
+                    crate::events::inventory(r,"shared","energy-rise",None);
+                }
             } else if item.kind == "potion" {
                 potion(r, index)?;
             } else if item.kind == "tool" && item.effect.as_ref().is_some_and(|v| v == "tree-tap") {
@@ -365,9 +371,14 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
                     return Ok(Some(false));
                 }
                 if let Some(sap) = result.sap {
+                    let sap_id=sap.id;
                     take_one(r, index);
                     r.inventory.push(sap);
-                    crate::events::actor_event(r, &r.player, "heal", if r.simulation_revision.value_or(29.)>=33. {"Verdania Sap"} else {"Veridian Sap"}, None, None);
+                    crate::events::inventory(r,"E82","droplet-leaf",Some(sap_id));
+                    crate::events::inventory(r,"E82","fracture",Some(item.id));
+                    if !crate::events::enabled(r) {
+                        crate::events::actor_event(r, &r.player, "heal", if r.simulation_revision.value_or(29.)>=33. {"Verdania Sap"} else {"Veridian Sap"}, None, None);
+                    }
                 } else {
                     return Ok(Some(false));
                 }
@@ -376,6 +387,10 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
             }
         }
         _ => unreachable!(),
+    }
+    if tools_free && r.inventory.iter().find(|i|i.id==item.id).is_none_or(|after|
+        quantity(after)<quantity(&item) || after.diluted.value_or(false)!=item.diluted.value_or(false)) {
+        crate::events::inventory(r,"P14","speed",Some(item.id));
     }
     Ok(Some(true))
 }
@@ -595,7 +610,7 @@ mod water_tests {
 }
 #[path = "heart_items.rs"]
 mod heart_items;
-pub use heart_items::{heart_for, heart_for_revision};
+pub use heart_items::{heart_for, heart_for_revision, effective_heart_rewards, HeartRewards};
 #[path = "item_magic.rs"]
 mod item_magic;
 pub use item_magic::magical as is_magical;

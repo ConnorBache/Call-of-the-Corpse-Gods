@@ -26,7 +26,7 @@
    let c=v.cells.first_mut().expect("fixture has observed cells");
    c.current=true;c.direct=true;c.actor_id=Some(987654.);c.glyph="b".into();c.fg=[230,180,40];
    c.superscript="123456789012345678901234".into();let(x,y)=(c.x,c.y);
-   let cue=effects::Cue{event:corpse_core::events::PresentationEvent{kind:"status".into(),from:None,to:corpse_core::events::EventPoint{x:x as f64,y:y as f64},glyph:Some("!".into()),color:Some("#88ffaa".into()),label:None,depth:v.depth},started:0.,held:false};
+   let cue=effects::Cue{event:corpse_core::events::PresentationEvent{kind:"status".into(),from:None,to:corpse_core::events::EventPoint{x:x as f64,y:y as f64},glyph:Some("!".into()),color:Some("#88ffaa".into()),label:None,depth:v.depth, animation: None, },started:0.,held:false,static_marks:false};
    let mut p=Painter::new();p.resize(size_w,size_h);let mut full=Painter::new();full.resize(size_w,size_h);let mut base=render::RetainedGame::default();let mut tracker=overlay_damage::Tracker::default();
    for(i,now)in [0.,20.,120.,300.].into_iter().enumerate(){let cues=if i==0||i==3{vec![]}else{vec![cue.clone()]};let state=overlay_damage::Frame{effects:overlay_damage::effects(&p,&v,&cues,now,false),..Default::default()};let mut d=base.update(&mut p,&v,"",0.,i==0,false).unwrap();d.extend(&tracker.changes(&p,&state));state.expand_dependencies(&p,&mut d);base.restore(&mut p,&d).unwrap();for r in d.rects(){p.damage_clip=Some(*r);if state.effects_intersect(*r){p.effects(&v,&cues,now,false);}}p.damage_clip=None;full.game_at(&v,"",false,0.);full.effects(&v,&cues,now,false);assert_eq!(p.pixels,full.pixels,"scale {size_w} frame {i}");tracker.commit(state);}
   }

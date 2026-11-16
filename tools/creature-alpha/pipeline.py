@@ -175,8 +175,25 @@ def validate_approval(source,approved,spec):
         bp=ROOT/spec['reviewed_binary_mask']
         if sha(bp)!=spec['reviewed_binary_mask_sha256']:raise ValueError('stale binary silhouette')
         binary=np.array(Image.open(bp).convert('L'))>0
-        edge_band=ndi.binary_dilation(binary,structure=np.ones((3,3)))&ndi.binary_dilation(~binary,structure=np.ones((3,3)))
-        if np.any(correction&~edge_band):raise ValueError('RGB correction outside one-pixel edge support')
+        glow=spec.get('glow_reconstruction')
+        if glow:
+            # Explicit, hash-bound exception for reviewed luminous matte, not
+            # authority to recolor arbitrary pixels or widen ordinary edges.
+            if glow.get('method')!='reviewed-black-matte-glow-v1' or glow.get('alpha_rule')!='max-source-channel-min-one' or glow.get('source_max_exclusive')!=80 or spec.get('matte_rgb')!=[0,0,0]:raise ValueError('unsupported glow reconstruction')
+            pp=ROOT/glow['protected_anatomy']
+            if sha(pp)!=glow['protected_anatomy_sha256']:raise ValueError('stale protected anatomy')
+            protected=np.array(Image.open(pp).convert('L'))>0
+            if protected.shape!=keep.shape:raise ValueError('protected anatomy dimensions')
+            signal=original[:,:,:3].max(2)
+            expected=binary&~protected&(signal<80)
+            if not np.array_equal(correction,expected):raise ValueError('correction differs from reviewed glow region')
+            expected_alpha=np.where(binary,255,0).astype(np.uint8)
+            expected_alpha[expected]=np.maximum(1,signal[expected])
+            if not np.array_equal(result[:,:,3],expected_alpha):raise ValueError('glow alpha is not source reconstruction')
+            if not np.array_equal(keep,binary):raise ValueError('glow changed reviewed support')
+        else:
+            edge_band=ndi.binary_dilation(binary,structure=np.ones((3,3)))&ndi.binary_dilation(~binary,structure=np.ones((3,3)))
+            if np.any(correction&~edge_band):raise ValueError('RGB correction outside one-pixel edge support')
         if np.any(binary&~keep):raise ValueError('edge correction deleted reviewed foreground')
         alpha=result[:,:,3].astype(float)/255
         matte=np.array(spec.get('matte_rgb',[0,0,0]),float)

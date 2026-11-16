@@ -116,6 +116,7 @@ pub fn clear_maintained_link(r: &mut Run, actor_id: f64, ability_id: &str) -> bo
 /// Actual death only, after rescue and before corpse placement/removal. Callers
 /// simulating a hidden floor explicitly forward this event to their actual world.
 pub fn end_maintained_links_to_dead_target(r: &mut Run, target_id: f64) {
+    crate::revision50::end_duels_with_target(r,target_id);
     let all = locations(r);
     let owners = owners(r, &all);
     let target = all.iter().find(|l| get(r, l).id == target_id).cloned();

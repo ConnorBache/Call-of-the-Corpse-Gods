@@ -96,12 +96,12 @@ include!("revision42_resume_tests.rs");
 /// Protocol eligibility is separate from the Engine/storage admission gate.
 #[test]
 fn revision50_resume_header_admission_preserves_legacy_boundaries() {
-    for revision in [39., 40., 41., 42., 43., 44., 45., 46., 50., 51.] {
+    for revision in [39., 40., 41., 42., 43., 44., 45., 46., 50., 51., 52.] {
         let receipt = log::Header::for_revision(Some(revision)).unwrap();
         let metadata = log::Header::for_metadata_revision(Some(revision)).unwrap();
         assert!(!resumable_header(&receipt));
         assert_eq!(resumable_header(&metadata), revision >= 41.);
-        for wrong in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51] {
+        for wrong in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52] {
             if wrong != revision as u32 {
                 let mismatch = log::Header { simulation_revision: wrong, ..metadata.clone() };
                 assert!(!resumable_header(&mismatch));

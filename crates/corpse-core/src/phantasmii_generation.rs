@@ -5,7 +5,7 @@ use std::collections::HashSet;
 
 pub const DAGGER_NAME: &str = "Dagger of the Phantasmii";
 pub const SHARD_NAME: &str = "Shards of the Phantasmii";
-pub const DAGGER_DESCRIPTION: &str = "With a drop of blood on the Altar of the Phantasmii, you can access amazing power.";
+pub const DAGGER_DESCRIPTION: &str = "Apply while standing on the Altar of the Phantasmii to enter Dreamwalking.";
 pub const NIGHTMARE_COUNT: usize = 4;
 pub const SHARD_COUNT: usize = 3;
 pub const NIGHTMARE_DESCRIPTORS: [&str; 8] = ["Small", "Lesser", "Minor", "", "Major", "Greater", "Gargantuan", "Terrible"];
@@ -42,6 +42,12 @@ pub fn nightmare(depth: u32, id: f64, x: f64, y: f64) -> Actor {
     a.conditions.insert("bestiaryTraitsInitialized".into(), 1.0);
     a
 }
+pub fn nightmare_revision(depth:u32,id:f64,x:f64,y:f64,revision:f64) -> Actor {
+    let mut a=nightmare(depth,id,x,y);
+    a.stats.accuracy=crate::combat::creature_birth_accuracy(revision,a.stats.accuracy);
+    a.stats.dodge=crate::combat::creature_birth_dodge(revision,a.stats.dodge);
+    a
+}
 /// The dagger's adjacent tile is reserved by startup's ordinary-loot sampler.
 pub fn dagger_cell(f: &Floor) -> Option<usize> {
     let e = f.godbeast_event.as_ref().filter(|e| e.kind == "Phantasmii")?;
@@ -53,6 +59,9 @@ fn position(f: &Floor, at: usize) -> (f64, f64) { ((at % f.width()) as f64, (at 
 /// so water-heavy floors cannot silently omit required actors/shards. No terrain
 /// mutation, ordinary budget/RNG consumption, repeated activation or respawning.
 pub fn populate(seed: &str, f: &mut Floor, actors: &mut Vec<Actor>, ground: &mut Vec<GroundItem>, next_id: &mut f64) -> Result<(), String> {
+    populate_revision(seed,f,actors,ground,next_id,34.)
+}
+pub fn populate_revision(seed: &str, f: &mut Floor, actors: &mut Vec<Actor>, ground: &mut Vec<GroundItem>, next_id: &mut f64, revision:f64) -> Result<(), String> {
     if actors.iter().any(|a| a.conditions.get("phantasmiiNightmare") == Some(&1.0)) {
         return Err("Dream population already generated".into());
     }
@@ -104,7 +113,7 @@ pub fn populate(seed: &str, f: &mut Floor, actors: &mut Vec<Actor>, ground: &mut
     }
     for &at in &selected[count-NIGHTMARE_COUNT..] {
         let (x, y) = position(f, at);
-        actors.push(nightmare(f.depth as u32, *next_id, x, y));
+        actors.push(nightmare_revision(f.depth as u32, *next_id, x, y, revision));
         *next_id += 1.0;
     }
     Ok(())

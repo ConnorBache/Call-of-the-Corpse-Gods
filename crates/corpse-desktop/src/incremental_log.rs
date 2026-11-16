@@ -31,6 +31,9 @@ pub const ROSTER_REPLAY_BUILD_ID: &str = "corpse-r50-ability-roster-v1";
 pub const ROSTER_SIMULATION_REVISION: u32 = 50;
 pub const ROUNDING_REPLAY_BUILD_ID: &str = "corpse-r51-nearest-damage-v1";
 pub const ROUNDING_SIMULATION_REVISION: u32 = 51;
+pub const DARKNESS_REPLAY_BUILD_ID: &str = "corpse-r52-absolute-darkness-v1";
+pub const DARKNESS_SIMULATION_REVISION: u32 = 52;
+pub const METADATA_R52_BUILD_ID: &str = "corpse-r52-absolute-darkness-metadata-v2";
 pub const METADATA_R51_BUILD_ID: &str = "corpse-r51-nearest-damage-metadata-v2";
 pub const METADATA_R50_BUILD_ID: &str = "corpse-r50-ability-roster-metadata-v2";
 pub const METADATA_R46_BUILD_ID: &str = "corpse-r46-shine-suppression-metadata-v2";
@@ -90,6 +93,9 @@ impl Header {
             Some(v) if v == SHINE_SIMULATION_REVISION as f64 => Some(Self {
                 replay_build: SHINE_REPLAY_BUILD_ID.into(), simulation_revision: SHINE_SIMULATION_REVISION,
             }),
+            Some(v) if v == DARKNESS_SIMULATION_REVISION as f64 => Some(Self {
+                replay_build: DARKNESS_REPLAY_BUILD_ID.into(), simulation_revision: DARKNESS_SIMULATION_REVISION,
+            }),
             Some(v) if v == ROUNDING_SIMULATION_REVISION as f64 => Some(Self {
                 replay_build: ROUNDING_REPLAY_BUILD_ID.into(), simulation_revision: ROUNDING_SIMULATION_REVISION,
             }),
@@ -113,6 +119,7 @@ impl Header {
             Some(46.0) => METADATA_R46_BUILD_ID,
             Some(50.0) => METADATA_R50_BUILD_ID,
             Some(51.0) => METADATA_R51_BUILD_ID,
+            Some(52.0) => METADATA_R52_BUILD_ID,
             _ => return None,
         };
         Some(Self { replay_build: replay_build.into(), simulation_revision: revision.unwrap() as u32 })
@@ -120,7 +127,7 @@ impl Header {
     /// O(identifier bytes), grammar selector after exact pair admission.
     pub fn metadata_operations(&self) -> bool {
         matches!((self.replay_build.as_str(), self.simulation_revision),
-            (METADATA_R39_BUILD_ID,39) | (METADATA_R40_BUILD_ID,40) | (METADATA_R41_BUILD_ID,41) | (METADATA_R42_BUILD_ID,42) | (METADATA_R43_BUILD_ID,43) | (METADATA_R44_BUILD_ID,44) | (METADATA_R45_BUILD_ID,45) | (METADATA_R46_BUILD_ID,46) | (METADATA_R50_BUILD_ID,50) | (METADATA_R51_BUILD_ID,51))
+            (METADATA_R39_BUILD_ID,39) | (METADATA_R40_BUILD_ID,40) | (METADATA_R41_BUILD_ID,41) | (METADATA_R42_BUILD_ID,42) | (METADATA_R43_BUILD_ID,43) | (METADATA_R44_BUILD_ID,44) | (METADATA_R45_BUILD_ID,45) | (METADATA_R46_BUILD_ID,46) | (METADATA_R50_BUILD_ID,50) | (METADATA_R51_BUILD_ID,51) | (METADATA_R52_BUILD_ID,52))
     }
     /// O(identifier bytes), admits only exact build/revision pairs before replay.
     pub fn legacy_revert_policy(&self) -> Result<bool, String> {
@@ -135,7 +142,8 @@ impl Header {
                 | (SHINE_REPLAY_BUILD_ID, SHINE_SIMULATION_REVISION)
                 | (ROSTER_REPLAY_BUILD_ID, ROSTER_SIMULATION_REVISION)
                 | (ROUNDING_REPLAY_BUILD_ID, ROUNDING_SIMULATION_REVISION)
-                | (METADATA_R39_BUILD_ID,39) | (METADATA_R40_BUILD_ID,40) | (METADATA_R41_BUILD_ID,41) | (METADATA_R42_BUILD_ID,42) | (METADATA_R43_BUILD_ID,43) | (METADATA_R44_BUILD_ID,44) | (METADATA_R45_BUILD_ID,45) | (METADATA_R46_BUILD_ID,46) | (METADATA_R50_BUILD_ID,50) | (METADATA_R51_BUILD_ID,51) => Ok(false),
+                | (DARKNESS_REPLAY_BUILD_ID, DARKNESS_SIMULATION_REVISION)
+                | (METADATA_R39_BUILD_ID,39) | (METADATA_R40_BUILD_ID,40) | (METADATA_R41_BUILD_ID,41) | (METADATA_R42_BUILD_ID,42) | (METADATA_R43_BUILD_ID,43) | (METADATA_R44_BUILD_ID,44) | (METADATA_R45_BUILD_ID,45) | (METADATA_R46_BUILD_ID,46) | (METADATA_R50_BUILD_ID,50) | (METADATA_R51_BUILD_ID,51) | (METADATA_R52_BUILD_ID,52) => Ok(false),
             _ => Err(invalid("unsupported replay build/simulation revision pair")),
         }
     }

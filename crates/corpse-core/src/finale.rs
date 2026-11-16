@@ -1,6 +1,6 @@
 //! Revision-31 Administrator and deterministic staircase-propagating escape collapse.
 //! No simulation RNG is used by placement or collapse. The original stairs are captured
-//! before their tiles disappear; each pulse uses only the previous eight-neighbor frontier.
+//! before their tiles disappear; each pulse uses only the previous frontier.
 use crate::{Actor, Floor, Run, Stats};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, sync::Arc};
@@ -18,6 +18,9 @@ pub struct CollapseFloor {
     pub upper_seeded: bool,
     pub cells: Vec<bool>,
     pub frontier: Vec<usize>,
+    /// R52 alternates cardinal-only and diagonal-inclusive pulses per reached floor.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub diagonal_next: bool,
 }
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -138,7 +141,7 @@ fn seed(r: &mut Run, depth: u32, cell: usize) -> Result<(), String> {
     let f = r.floors.iter().find(|f| f.depth == depth as f64).ok_or("Collapse floor missing")?;
     if cell >= f.tiles.len() { return Err("Collapse stair seed is outside floor".into()); }
     let wave = CollapseFloor { depth, up: stair(f, "up"), upper_seeded: false,
-        cells: vec![false; f.tiles.len()], frontier: vec![cell] };
+        cells: vec![false; f.tiles.len()], frontier: vec![cell], diagonal_next: false };
     let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
     c.waves.push(wave);
     c.waves.last_mut().unwrap().cells[cell] = true;
@@ -152,12 +155,13 @@ fn propagate_stairs(r: &mut Run) -> Result<Vec<u32>, String> {
     let mut reached = Vec::new();
     let mut index = 0;
     while index < r.collapse.as_ref().unwrap().waves.len() {
+        let upper = crate::fast_mode::above(r, r.collapse.as_ref().unwrap().waves[index].depth as f64);
         let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
         let wave = &mut c.waves[index];
         index += 1;
         if wave.upper_seeded || wave.depth <= 1 || !wave.up.is_some_and(|i| wave.cells[i]) { continue; }
         wave.upper_seeded = true;
-        let depth = wave.depth - 1;
+        let depth = upper as u32;
         let origin = wave.up.unwrap();
         if !r.floors.iter().any(|f| f.depth == depth as f64) { crate::startup::ensure_floors(r,depth)?; }
         let f = r.floors.iter().find(|f| f.depth == depth as f64).ok_or("Collapse upper floor missing")?;
@@ -179,6 +183,7 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
         fall_player(r)?;
     }
     while r.status == "playing" && r.collapse.as_ref().is_some_and(|c| r.tick >= c.next_pulse_tick) {
+        let alternating = r.simulation_revision.value_or(29.) >= 52.;
         let mut changes = Vec::new();
         let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
         c.next_pulse_tick += 2.;
@@ -190,12 +195,14 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
             for &cell in &wave.frontier {
                 let (x,y) = ((cell % w) as i32, (cell / w) as i32);
                 for d in crate::movement::DIRECTIONS {
+                    if alternating && !wave.diagonal_next && d.x != 0 && d.y != 0 { continue; }
                     let (nx,ny) = (x+d.x,y+d.y);
                     if nx < 0 || ny < 0 || nx >= w as i32 || ny >= h as i32 { continue; }
                     let i = ny as usize*w+nx as usize;
                     if !wave.cells[i] { wave.cells[i] = true; next.push(i); }
                 }
             }
+            if alternating { wave.diagonal_next = !wave.diagonal_next; }
             wave.frontier = next.clone();
             changes.push((wave.depth,next));
         }

@@ -1,4 +1,33 @@
+## November 2026: gameplay animation style
+
+Designer instruction: “All animation should follow this rule: Either we light up a tile, or we animate moving a glyph.” Activated abilities being used or proccing, distant effects and selected ambient features receive feedback. Implement within Brogue’s glyph-and-light vocabulary. This supersedes the R52 proposal’s decorative strokes, deforming glyphs and whole-scene crossfades, without changing its actual trigger, knowledge or geometry rules. Ordinary walking and ordinary melee remain quiet. See [implementation and complexity](revision52-brogue-animation-style.md).
+
 # Current native design amendments
+
+## 2026-11-07 — Speed-up uses adjacent Non-Euclidean pairs (revision 52 review)
+
+Speed-up tiles use the same destination mapping and numbering as Non-Euclidean
+space, with each pair next to each other. Existing generation already builds
+successive adjacent pairs, and the UI already uses the same saved-link number
+for both terrain types. Preserve their own teal terrain identity and the
+existing movement, shared-occupancy, projectile and local-vision rules. This
+clarification changes no runtime mapping or older save admission. See
+[adjacent destination mapping and regression coverage](revision51-speed-up-tiles.md).
+
+## 2026-11-07 — Darkness sets a radius-3 circle to -100 light (revision 52)
+
+The designer instructed “Have darkness turn the darkened area into -100 light
+immediately,” then “Darkness, instead of being a 3x3 square, should be a radius 3
+circle.” R52 overrides effective illumination to exactly -100 in a plane-local
+Euclidean circle: cell-center offsets satisfy dx² + dy² <= 9 (29 cells in an
+unclipped room). The mask retains its wall-independent area and existing projectile
+impact rules; it is clipped only by floor bounds. The mask lasts 20 normal world
+ticks, or 10 when diluted, and overlapping doses retain the latest expiry without
+stacking. Existing, moving and newly created lights remain suppressed inside the
+active mask; expiry exposes their current values. Raw ambient/source powers are
+not rewritten. The literal R51 Perception formula is unchanged, including sight
+at -100 with sufficient Perception. R50/R51 saves/replays retain their decrement
+rule. See [Darkness implementation and checks](revision52-darkness.md).
 
 ## 2026-11-07 — sight, awareness and Perception hearts (simulation revision 51)
 
@@ -334,3 +363,435 @@ cells and saved severed-pair history. Do not reroute severed links or impose a
 two-corpse acquisition cap; two remains the initial generated feast requirement.
 Hidden remembered roots remain unchanged until observed again. See
 [reproduction, behavior and verification](revision51-root-cleanup.md).
+
+
+## 2026-11-07: Reachable targeting and Sparkle (revision52)
+
+Select the reachable physical line. Iceblast detonates on the first creature or
+last reachable square before terrain. Blink lands on the last legal empty
+square, retaining its ten-tile range. Lightning remains piercing. Sparkle lasts
+until extinguished; ordinary water quenches it, while Ichor-covered water does
+not. Older revisions retain their rules. See revision52-targeting-sparkle.md.
+
+
+## 2026-11-07: Paid Dragon flight and melee follow-ups (revision52)
+
+Dragon takeoff costs 8 from its natural 50-energy pool, with at most six normal
+turns of flight. Takeoff is a paid normal action; use it only for a strictly
+faster normal-turn route with a planned safe landing. Blorb adds one exact-scale
+caustic packet after positive melee damage. Each positive Killspawn melee hit
+adds a rounded half-hit budget across the next three normal turns, with
+independent additive wounds and ordinary cleansing. Prior revisions retain
+their original behavior. See revision52-enemy-followups.md for protection,
+action-timing, forced-interruption and compatibility details.
+
+
+## 2026-11-07: Immutable amulet birth tiers (revision52)
+
+Newly born amulets use Tier 1 on floors 1–4, then one higher tier per five-floor band through Tier 9 on floor 40. Names use “Tier X Amulet of Y”. Existing items retain their original tier and energy; missing tier means base Tier 1. Higher tiers increase independently fitted damage, or the approved utility range/duration, with unchanged costs and reserves. Earlier revisions retain their exact rules. See [amulet tier mechanics and numeric profiles](revision52-amulet-tiers.md) and [native presentation](revision52-amulet-tier-ui.md). Shot-count bands are approximate and refer to each individual creature, with periodic applications reported separately.
+
+## 2026-11-07: Floods deepens shallow water (revision 52)
+
+Floods is consumed by preexisting shallow water, turning that terminal tile into
+deep water. Each of its three lanes still stops independently; existing deep
+water still stops the lane. Converted deep water uses Floods' existing 12-normal-
+turn lifetime, refreshing one temporary record while preserving the original
+permanent terrain. Preview and animation include the consumed shallow cell.
+Earlier saves/replays retain their exact stopping rules. See
+[Floods behavior, restoration and checks](revision52-floods.md).
+
+## 2026-11-07: R52 Weave of Time unrolls on entry
+
+Successful entry onto a weave destroys that segment. Reverse entry along its
+stored edge is free and consumes only the entered segment, allowing consecutive
+backtracking. Wrong-angle entry consumes it and all chronologically older
+segments immediately on arrival; newer segments remain. Attacks and failed
+movement do not count as entry. The ordinary local-edge scope stays unchanged.
+This supersedes the R41 departure-only collision rule for R52. See
+[exact rule and complexity](revision52-weave-consumption.md).
+
+## 2026-11-07: R52 ratio accuracy and birth baselines
+
+Ordinary hit probability uses Accuracy divided by twice Dodge, with Dodge
+min-capped at one within this calculation. Preserve the existing range loss and
+explicit hit/miss overrides. New players start at actual Accuracy 15. New
+non-player creatures start from a ten-point Dodge baseline plus their authored
+species/floor offset; do not flatten their variation or repeatedly apply the
+baseline to saved, copied or revived bodies. Earlier revisions retain their
+formula and births. See [the exact accuracy contract](revision52-accuracy-formula.md)
+for compatibility and verification. The early-creature Accuracy issue at this
+checkpoint is resolved by the later 2026-11-08 baseline approval below.
+
+
+## 2026-11-08: Player also starts with Dodge 10 (R52)
+
+The designer confirmed the player also starts with actual Dodge 10. New normal
+and DEBUG R52 players therefore begin with Accuracy 15 and Dodge 10; earned
+progression is additive afterward. Keep existing saved statistics and earlier
+simulation revisions unchanged. The separate creature Accuracy approval follows.
+
+
+## 2026-11-08: Provisional creature Accuracy baseline of 15 (R52)
+
+The designer approved, “For now”, that creatures also start with 15 Accuracy,
+with existing species modifiers on top. New non-player bodies therefore use
+Accuracy 15 plus their authored species/floor offset and Dodge 10 plus its
+authored offset. Preserve copied, loaded, grown and revived statistics and the
+special statless illusion behavior. This resolves the prior zero-hit design
+blocker; it does not authorize independent species/floor retuning. New release
+gates must certify this combined source before packaging.
+
+## 2026-11-08: R52 player, species Dodge, Jackals and heart capacity
+
+New R52 players start with Dodge 15. Innate fixed player melee damage rises by
+20%, from 31.5 to 37.8, without scaling Offense/equipment bonuses or Bow/thrown
+bases. Every new monster type uses its first-appearance Dodge on all floors,
+keeping exact contextual species keys and deliberate modifiers. New Jackals are
+heartless. Base heart carrying capacity is 10, retaining other capacity bonuses.
+See [the stat follow-up](revision52-stat-followups.md) for save compatibility and
+precise scope. The preceding Accuracy Baselines receipt is historical for these
+later changes; its ratio formula remains unchanged.
+
+
+## 2026-11-08 — ten-energy reserves and one reaction per Wait (revision 52)
+
+Amulet and blessing reserves are capped at 10, including existing R52 reserves.
+New acquisition and blessing level-up use 10; amulet Reaping recharge caps at 10.
+Player energy, activation/upkeep costs and other recharge triggers are unchanged.
+Wait restores one reaction up to the existing maximum, rather than all reactions.
+Pre-R52 saves/replays retain their rules. Valid R52 save/load and temporal restore
+boundaries clamp old excess without refilling spent reserves. See
+[reserve and Wait mechanics, compatibility and complexity](revision52-reserves-wait.md).
+
+
+
+## 2026-11-08 — Hanged replaces Missed Me (revision 52)
+
+Hanged is a permanent passive with no extra reaction or toggle. Damage that
+would reduce HP below 1, including excess from the same hit, uses main energy
+at four energy per HP. Drain available energy, then apply uncovered damage to
+HP without a new rounding rule. Health costs, equipment vitality changes and
+unpreventable deaths retain their existing behavior. Revisions below 52 retain
+Missed Me. See [the execution and save contract](revision52-hanged.md).
+
+## 2026-11-08: Avatar-only new games, selected gods, and player symbol
+
+New playable normal and DEBUG runs are Avatars. The main menu selects three
+distinct gods using the existing ordered seed prefix. Each choice uses its
+authored god color and the designer's exact name, alias and domain. The aliases
+are: SHRAIL the Godthorn, God of Fury; PELIAN the King of Desire, God of Zeal;
+ISHEILAH the Trickster, God of Guile; NUMO the Pregenitor, Goddess of Memory;
+ETILL the Ocean-Black, Goddess of Flow; URSA the Sleeping Mother, Goddess of
+Dreams; LICHOR the Gushing One, God of Blood; DAWEL the Mouthless, Goddess of
+Silence; GRISHA the Devourer, God of Ruin; ANAVANI of the Moon, Goddess of
+Ascendance; KATIVE the Craftsman, God of Artifice; MORAE the Sacrifice,
+Goddess of Fate. Preserve “Pregenitor” exactly as authored.
+
+This is a new-game interface policy, not a save migration. Continue, imported
+saves and replay reconstruction retain their recorded modes, gods and revisions.
+The complete seed, including god order, remains the dungeon identity; selecting
+different gods can change geometry and loot. Historical constructors remain for
+save/replay compatibility, not as user-selectable new-game modes.
+
+The actual player is displayed as @ with no mode superscript, including the
+player's tagged sleeping body during Dreamwalk. The player glyph is fixed even
+when a stored appearance profile contains an older glyph override; profile data
+is retained and player color/font/material controls remain available. Other
+creatures, allies, copies and their authored tier superscripts are unchanged.
+
+See [new-game boundaries](avatar-new-run-boundary-r52.md),
+[menu and god selection](revision52-avatar-menu.md), and
+[player glyph presentation](player-glyph-presentation.md).
+
+## 2026-11-08: Monster condition text and meaningful energy display
+
+Present monster conditions as comma-separated text with measured wrapping,
+retaining applicable duration counts. Player condition meters are unchanged.
+Show a monster's energy only if it has an executable energy-using capability;
+a generic stored energy pool alone is not sufficient. Energy users retain their
+bar while empty, asleep, silenced or otherwise temporarily unable to act.
+Apply the same rule to relevant live entity/inspection surfaces and public
+Bestiary templates without exposing hidden live state or changing simulation.
+
+## 2026-11-08: Gradual corpse roots and gas-entry warnings
+
+New R52 corpse-root links, including generated ones, grow along their existing
+direct path one tile per three elapsed normal turns. Acquiring a target does not
+instantly fill its path. Haste-only actions and animation time do not advance
+this cadence. Only the physically grown prefix is visible and interactive; a
+corpse becomes rooted when that prefix reaches it, and cannot revive while
+rooted. Existing saved full links remain grown rather than being erased.
+Roots remain recognizable as roots under hallucination. See
+[root growth and compatibility](revision52-root-growth.md).
+
+When the player currently occupies any gas, suppress only the warning about
+stepping into gas, including a different gas type. Entering gas from clean air,
+waiting warnings and independent hazards keep their existing behavior. Gas
+effects, route preferences and visibility/knowledge boundaries are unchanged.
+See [gas-entry warnings](gas-entry-warnings.md).
+
+## 2026-11-08: Fated Duel target termination
+
+In R52, Fated Duel ends when its selected target dies/is removed or leaves the
+existing anchored area/floor. Killing an unrelated enemy does not end it. Area,
+activation/upkeep costs and owner-exit behavior are unchanged. Returning or
+reviving later does not reactivate an expired Duel. Historical revisions retain
+their recorded mechanics; current state is settled before subsequent protection,
+upkeep and persisted/displayed boundaries.
+
+See [Fated Duel lifecycle and compatibility](revision52-fated-duel.md).
+
+## 2026-11-08: One-floor lookahead and overlapping lake currents
+
+New R52 runs generate the starting floor and one floor below it. Normal player
+travel ensures the arrival floor plus one, capped at floor 40, rather than
+speculatively generating a five-floor block. Keep already generated saved floors.
+Explicit DEBUG reconstruction, requested generation sweeps and real offscreen
+fall destinations may still require their actual target floors. Preserve the
+existing seeded domain/Godbeast schedule rather than requiring those future
+floors to exist early.
+
+For each deep-water lake, cover its eligible cells with seeded, axis-aligned
+squares of side two or greater. Each square has a clockwise or counterclockwise
+rotation. The closest edge by Manhattan distance determines the clockwise
+direction: bottom leftward, top rightward, right downward, left upward; reverse
+for counterclockwise. Ties are seeded random choices. Equal directions agree;
+perpendicular directions choose the source nearer its edge, with random ties.
+Opposite directions with equal rotations cancel. Opposite directions with
+opposite rotations advance to the specified turn sequence: clockwise up to left
+to down to right, and the inverse for counterclockwise.
+
+Coverage, square sampling bounds and multi-square folding are deterministic
+implementation details documented in [square currents](revision52-square-currents.md).
+R52 replaces the old drainage/bank-repair and authored setup-arrow overrides,
+which would otherwise erase these circulations. Other authored setup features
+remain. Existing saved current layers and historical revisions are not rewritten.
+This current rule does not itself carve natural land paths or prove island
+access; do not describe it as doing so.
+
+These are amendments within R52, not a new simulation revision. Reconstructing
+an older R52 seed replay can therefore differ when it generates amended floors
+or depends on amended mechanics. Loading a recorded world preserves its saved
+floor layers; future missing floors use the current R52 generator.
+
+## 2026-11-08: Isolated-island Ring of Swimming
+
+The latest designer rule narrows the guarantee: new R52 generation supplies a
+Ring of Swimming only on an island that has no ordinary swimming route to
+another meaningful dry-land component under actual current timing. Include the
+starting landmass in this test; do not assume an exempt mainland. A single
+connected shore around a lake is not a trapped island merely because no second
+landmass exists. Shallow-water specks alone are not escape destinations.
+The ring grants ordinary, nonstacking haste while its
+owner is in shallow or deep water, not while flying above it. Ichor-covered
+terrain retains its existing non-water semantics. Use the existing carried-ring
+slots/capacity and other ring behavior; do not add this guarantee to the ordinary
+random ring pool or silently remove another item.
+
+Place the ring on a safe, obtainable dry cell on the island. Validate static
+ordinary-movement/current return routes with haste, and entrance-to-downstairs
+progress without assuming a ring is already owned. The latter includes actual
+ring acquisition with normal capacity and available swaps, and also applies
+when no safeguard ring is needed. Reject the generation candidate through
+bounded retries when placement or the required routes are impossible.
+This is a terrain/current safeguard, not immunity from
+enemies, dynamic hazards or disabling statuses. Keep existing saved floors
+unchanged. See [Swimming and island safeguards](revision52-swimming-islands.md)
+for the exact topology, phase, placement and verification limits.
+
+
+## 2026-11-08: Enclosed enemy sight preview
+
+The designer requests a complete enclosed red area showing all of the player's
+known space that the selected enemy can see. Outline the full confirmed-visible
+known-cell mask, including map limits and internal occluders, rather than only
+visible/nonvisible interfaces that leave gaps beside unknown cells. Keep actual
+perception rules and detached-knowledge privacy. Remembered geometry is not a
+license to read hidden current illumination or terrain. Where sight cannot be
+established from player knowledge, close the known-area contour without claiming
+that the enemy cannot see beyond it. See
+[enemy perception overlay](revision52-enemy-perception-overlay.md).
+
+
+## 2026-11-09: Chasm base color and ordinary illumination
+
+The designer clarifies: “Chasms shouldn't be artificially dark in illumination.”
+This supersedes the earlier requirement to keep chasms dark through lighting.
+Keep their authored dark Brogue base palette in current sight and memory, but
+apply the ordinary visible-terrain illumination transformation, including the
+existing negative-light foreground contrast treatment. Do not apply hidden live
+light to remembered terrain or change actual illumination, sight, knowledge,
+passability or fall behavior. See [ordinary chasm illumination](revision52-normal-chasm-illumination.md)
+for the exact presentation scope and native checks. The earlier
+[dark chasm memory](revision52-dark-chasm-memory.md) remains historical evidence
+for preserving the dark remembered base rather than forcing it to gray.
+
+
+## 2026-11-08: Larger red corpse X and retained living color
+
+The latest designer request supersedes the earlier smaller corpse X: draw a
+larger red X over each corpse, while the corpse itself retains the color it had
+in life. Keep the corpse's color and marker color independent, preserve stored
+individual variation, and handle older saves without inventing unavailable
+individual data. No death, decay, resurrection, visibility or loot rule changes
+are authorized by this visual amendment. See
+[corpse colors and cross](revision52-corpse-colors-cross.md).
+
+
+## 2026-11-08: Automatic paths through shallow, not deep water
+
+Player automatic pathfinding/travel may route through shallow water at normal
+cost but must not plan through known genuine deep-water contact. The existing
+ichor-covered-water dry-footing exception remains. This does not prohibit deliberate manual swimming
+or change the island-safeguard escape model. Keep ordinary terrain knowledge and
+other automatic-travel safety boundaries. See
+[shallow-water pathing](revision52-shallow-water-pathing.md).
+
+
+## 2026-11-08: Distinct wall and stale-flesh glyph colors
+
+The designer requests different colors for the exposed-wall # and stale flesh
+behind the walls. Distinguish their foreground colors using the existing known
+terrain/material identities. Preserve illumination grading, remembered/fog
+rules, unknown-area hiding and actual terrain behavior. See
+[wall and stale-flesh colors](revision52-wall-flesh-colors.md).
+
+
+## 2026-11-08: Visible wall-feeding state
+
+Show Feeding as a specific visible creature state when the creature is actually
+feeding by licking the walls. Retain other relevant states and comma-separated
+condition presentation. Do not infer feeding from mere hunger or wall proximity,
+and do not reveal hidden or disguised behavior. See
+[feeding state](revision52-feeding-state.md) for the exact mechanical signal,
+presentation surfaces and verification.
+
+
+## 2026-11-08: Fast movement versus true Haste
+
+The designer distinguishes innate Fast from actual Haste. Fast can move two tiles;
+after the first move it may instead attack, allowing creatures such as Cave Bats
+to catch a fleeing player and hit. Do not grant an extra attack when the first
+normal action was already an attack or movement failed. True Haste grants two
+complete actions, rather than a movement-only extra pass. Show innate Fast as
+Fast rather than Hasted in creature presentation.
+
+The implementation composition is Fast movement on each complete Haste action,
+allowing up to four moves or two move-then-attacks. This is a documented natural
+composition assumption, not a separate quoted designer stacking rule. Preserve
+existing Slow/Slowed suppression and unrelated movement/AI constraints. See
+[Fast versus Haste](revision52-fast-versus-haste.md) for the exact scheduling,
+revision compatibility and interaction tests.
+
+## 2026-11-09: Radius-four Floods proposal deferred from release (revision 52)
+
+Designer clarification for the pending proposal: “A circle of radius 4.” The
+later release instruction retains the previously released targeted Floods wave
+until its direct-damage/immediate-push decision is answered. Native Apply emits
+UseAt and follows the exact released 3-by-5 wave, tier damage, two-tile push,
+quenching, shallow-to-deep lane consumption, cost and duration. No radial Use
+activation or current-overlay schema is included. Independent completed changes
+remain included. See the [release contract](revision52-released-floods.md) and
+[preserved proposal](revision52-radial-floods.md).
+
+## 2026-11-09: Loose corpses follow currents and lose flight
+
+“Corpses (even those of flying enemies), items, etc. should be affected by
+currents. Flying corpses aren't flying and fall.” R52 loose corpses follow the
+existing legal water-current displacement once per normal environment turn.
+Dead bodies have no physical flight; retain their innate traits for revival.
+Existing ground-item currents, corpse/item placement and immediate chasm falls
+remain the shared paths. Connected fungal roots, separate occupancy layers,
+living-flyer immunity and dream-world boundaries remain intact. Already-unsupported
+waking corpses also settle through shared placement at command/phase boundaries,
+including after a Haste/free Black Pit move, without an extra world tick.
+Structural fixtures are not loose objects. See [scope, exceptions, complexity and verification](revision52-corpse-currents.md).
+
+
+## 2026-11-09: R52 minimum starting creature Dodge
+
+New real non-player bodies start at `max(10, 10 + authored Dodge offset)`,
+retaining exact contextual first-appearance keys and all higher starting values.
+Players remain at their existing starting Dodge 15. This does not floor live
+effective stats or retune loaded, copied, grown, revived or restored bodies;
+statless hallucinations remain statless. The ratio denominator guard stays one.
+See [birth paths, numerical impact and checks](revision52-birth-dodge-minimum.md).
+
+
+## 2026-11-09 — Never Surrender waits for DR-reducible damage (revision 52)
+
+Never Surrender does not override damage that ignores DR. Such damage must not
+spend its 8 energy or consume its first-source activation. It waits for the first
+otherwise-damaging source that uses DR, including ordinary ranged attacks.
+A hit completely blocked by the added DR still pays; an ordinary zero-damage hit
+does not. Legacy revisions preserve their existing behavior. Its exact current
+description is: “Increase your DR for the first source of damage every turn.”
+See [execution, preview and verification details](revision52-never-surrender-audit.md).
+
+
+## 2026-11-09: Random gods on each main-menu return
+
+Every return to the main menu selects three random distinct gods. These remain
+editable and do not reroll while staying on the menu or closing its god picker.
+An ordinary initial blank/suffix-seed visit also randomizes the choices. An
+explicit full CLI seed remains exact on initial menu entry; subsequent returns
+replace only its ordered god prefix and preserve the suffix. This is UI state,
+not a change to saved/replayed gods, modes, revisions, or gameplay randomness.
+See [menu lifecycle and verification](revision52-menu-god-randomization.md).
+
+
+## Fast mode (November 9, 2026)
+
+Add an opt-in main-menu toggle named Fast mode. Each physical descent advances two
+effective floors for gameplay and generation. A scheduled five-floor Godbeast
+skipped by that transition appears on the destination floor, for example floor 5
+on a 4→6 descent. Creature stats stay at their ordinary destination-depth values.
+Double only the blessing amount and stats awarded by each consumed heart; retain
+ordinary rounding, energy recovery and all other rules. Do not add other
+compensation. Existing saves and replays without the flag remain Normal.
+
+Fast begins on floor 1 and visits 1, 3, …, 39, with a final one-step descent to
+the existing floor 40 finale. DEBUG accepts the same reachable depths. See
+[Fast mode](revision52-fast-mode.md) for implementation and verification status.
+
+## 2026-11-15 — Composite bow uses normal accuracy (R52)
+
+Composite bow shots use the ordinary effective Accuracy / (2 × max(Dodge, 1))
+calculation, capped at 100%, with no distance penalty and no bow miss-halving
+bonus. Regular Bow accuracy is unchanged. Shared effective-stat modifiers and
+lucky/unlucky/distracted/paralyzed overrides still apply. This changes accuracy
+only: Composite shots remain ranged for surprise admission, collision, effects,
+ammunition and damage. Existing R52 saves receive this rule; pre-R52 runs retain
+the old bow accuracy. Older R52 replays may therefore produce different outcomes.
+Inventory text and target forecasts use this policy. Regression coverage is in
+revision52_composite_accuracy and the desktop tests of the same name.
+
+## 2026-11-15 — Both bows use normal accuracy and minimal description
+
+The later instruction extends normal hit calculation to regular Bow as well as
+Composite bow. For R52 both use effective Accuracy / (2 × max(Dodge, 1)), capped
+at 100%, with no distance penalty or bow-specific miss reduction. Normal shared
+hit overrides remain, along with ranged surprise semantics, existing damage,
+ammunition and physical collision. Pre-R52 runs retain their old calculations.
+
+For either bow the entire description is exactly: “Apply to fire an arrow at a
+visible target. [Count] arrows available.” Replace [Count] with the current arrow
+count; do not append equipment, damage, accuracy, enhancement or other prose.
+Target hit forecasts remain available and match the updated calculation.
+
+## Twenty-floor default dungeon (2026-11-16)
+
+New Avatar games use a single twenty-floor route. There is no Fast Mode option.
+Displayed floors advance 1 through 20. The historical effective-content coordinates
+remain internal to preserve authored terrain, enemy and item balance, with route
+`1,3,5,7,10,11,13,15,17,20,21,23,25,27,30,31,33,35,37,40`.
+The final physical floor uses full depth-40 content and the Administrator/finale;
+there is no separate depth-39 floor. Godbeast milestones appear on displayed floors
+3, 5, 8, 10, 13, 15, 18, 20. Heart stat rewards remain doubled. Heart blessings
+are half their prior Fast Mode awards; the first level-up costs one blessing,
+with later costs unchanged. Sap retains its fill-to-next-level effect.
+
+`compressedDepths` explicitly versions this route and reward contract in saves,
+replays, temporal snapshots and future anchors. Existing saves/replays without
+this flag keep their original route and reward rules rather than being destructively
+renumbered. New normal/debug starts always use the twenty-floor contract.

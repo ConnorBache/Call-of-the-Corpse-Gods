@@ -42,6 +42,7 @@ pub fn terrain(run: &Run, observation: &TerrainObservation, cells: &mut [Cell]) 
 
 /// O(label bytes), detached values only. Used after animated terrain rebuilds.
 pub fn restore_marker(cell: &mut Cell, original: &Cell) {
+    if original.glyph=="⚑" {cell.glyph=original.glyph.clone();cell.fg=original.fg;}
     if !original.cogworks {return;}
     cell.cogworks=true;
     cell.fg=original.fg;
@@ -114,4 +115,25 @@ mod tests {
         terrain(&run,&observation,&mut cells);assert_eq!(cells,remembered);
     }
 
+}
+
+pub fn bubble_hit(x:i32,y:i32,left:i32,top:i32)->Option<u8>{
+ (0..3).find(|i|{let dx=x-(left+23+i*16);let dy=y-(top+11);dx*dx+dy*dy<=49}).map(|i|i as u8+1)
+}
+/// Draw only on a tile already represented by the knowledge-gated projection.
+/// Preserve the highest-priority entity and its existing rank marker.
+pub fn rally(run:&Run,cells:&mut [Cell]){
+ let Some(flag)=run.rally.as_ref() else{return;};
+ if !flag.x.is_finite()||!flag.y.is_finite()||flag.x<0.||flag.y<0.{return;}
+ let (x,y)=(flag.x as usize,flag.y as usize);
+ let count=cells.iter().filter(|c|c.x==x&&c.y==y).count();
+ if let Some(cell)=cells.iter_mut().rev().find(|c|c.x==x&&c.y==y){
+  crate::hallucination_ui::map_cell(cell,|c|{if count>1{c.superscript.push('⚑');}else{c.glyph="⚑".into();c.fg=[255,209,57];}});
+ }
+}
+
+#[cfg(test)]mod marker_tests {
+ use super::*;
+ #[test]fn bubble_hits_are_distinct(){for i in 0..3{assert_eq!(bubble_hit(23+i*16,11,0,0),Some(i as u8+1));}assert_eq!(bubble_hit(80,11,0,0),None);}
+ #[test]fn rally_keeps_entity_rank_and_unknown_space_hidden(){let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.rally=Some(corpse_core::RunRally{x:2.,y:3.});let terrain=Cell{x:2,y:3,glyph:".".into(),..Default::default()};let mut cells=vec![terrain.clone(),Cell{x:2,y:3,glyph:"B".into(),superscript:"2".into(),..Default::default()}];rally(&r,&mut cells);assert_eq!(cells[1].glyph,"B");assert_eq!(cells[1].superscript,"2⚑");assert_eq!(cells[0].glyph,".");let mut bare=vec![terrain];rally(&r,&mut bare);assert_eq!(bare[0].glyph,"⚑");let mut rebuilt=Cell::default();restore_marker(&mut rebuilt,&bare[0]);assert_eq!(rebuilt.glyph,"⚑");r.rally.as_mut().unwrap().x=50.;let before=cells.clone();rally(&r,&mut cells);assert_eq!(before,cells);}
 }

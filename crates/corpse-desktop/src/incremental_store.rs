@@ -69,6 +69,11 @@ fn parse_batch(raw:&str)->Result<Batch,String> {
 /// O(file bytes + legacy checkpoint import + admitted recorded command costs).
 /// A partial final record is not replayed. Complete invalid records are rejected.
 pub(super) fn decode(raw:&[u8])->Result<(corpse_core::temporal::Engine,Kind),String> {
+    decode_with_migration(raw).map(|(engine,kind,_)|(engine,kind))
+}
+/// Same bounded decode; the flag revokes append authority when the admitted
+/// live policy is newer than the serialized journal root. No second replay.
+pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::Engine,Kind,bool),String> {
     // Selection is bounded metadata only; parse below authenticates the complete
     // committed prefix before checkpoint decode or any gameplay execution.
     let header=log::inspect_header(raw)?;
@@ -81,7 +86,7 @@ pub(super) fn decode(raw:&[u8])->Result<(corpse_core::temporal::Engine,Kind),Str
         let operations=parse_operations(payload,metadata)?;commands=commands.checked_add(operations.len()).ok_or("Recording command count overflow")?;
         if commands>maximum_commands {return Err("Recording exceeds admitted command bound".into());}Ok(())
     })?;
-    let (mut engine,kind)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
+    let (mut engine,kind,firebolt_migrated)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
     if engine.run.simulation_revision.as_ref().copied()!=Some(header.simulation_revision as f64) {
         return Err("Save journal requires its original simulation revision".into());
     }
@@ -95,7 +100,11 @@ pub(super) fn decode(raw:&[u8])->Result<(corpse_core::temporal::Engine,Kind),Str
     // under their original semantics; fresh Autosave attachment checkpoints the
     // new build before writing any new-policy command receipts.
     engine.set_legacy_revert(false);
-    Ok((engine,kind))
+    if firebolt_migrated {
+        engine.run.firebolt_travel_from=corpse_core::Field::Missing;
+        corpse_core::firebolt_travel::admit_current(&mut engine.run)?;
+    }
+    Ok((engine,kind,firebolt_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]

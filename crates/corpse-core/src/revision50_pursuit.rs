@@ -251,6 +251,7 @@ pub fn grant_for_move(before: &crate::Run, after: &mut crate::Run, dx: f64, dy: 
     let options=crate::portals::step_options(before,&before.player,before.player.x+dx,before.player.y+dy);
     if !options.contains(&(after.player.x,after.player.y)) {return false;}
     after.player.conditions.insert(BONUS_KEY.into(),before.tick);
+    crate::animation_player::moved(after,&before.player,&after.player,"P12","speed");
     true
 }
 

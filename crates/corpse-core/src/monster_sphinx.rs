@@ -27,6 +27,7 @@ pub fn provoked_with_source(r: &mut Run, id: f64, source: Option<&crate::Actor>)
         a.conditions.insert("targetId".into(), b.id);
         a.last_seen = Field::Value(crate::model::ActorLastSeen { x: b.x, y: b.y });
         let a = a.clone();
+        crate::animation_enemy::mark(r, &a, "E12", "eye-gold", crate::events::Stage::Special);
         crate::monster_horn::report(
             r,
             &a,
@@ -76,6 +77,7 @@ pub fn turn(r: &mut Run, id: f64, target: Option<f64>, movement_only: bool) -> b
                 .insert("monsterSphinxLostSight".into(), 1.0);
         }
     }
+    if target.is_some() && a.state != "hunting" { crate::animation_enemy::mark(r, &a, "E12", "eye-gold", crate::events::Stage::Special); }
     let a = actor_mut_trusted(r, id).unwrap();
     if let Some(b) = target {
         a.state = "hunting".into();

@@ -140,7 +140,9 @@ pub fn revive_corpse(a: &mut Actor, tick: f64) {
         "witchSummoned",
         "cornDimensionResident",
     ];
-    a.conditions.retain(|k, _| KEEP.contains(&k.as_str()));
+    // New R52-only birth coefficients are body properties, not curable statuses.
+    // These keys cannot be admitted in older revisions, preserving legacy revival.
+    a.conditions.retain(|k, _| KEEP.contains(&k.as_str()) || crate::balance52::condition_key(k));
     a.dead = Field::Value(false);
     a.state = "wandering".into();
     a.perfect = Field::Value(false);

@@ -307,6 +307,24 @@
   },
   {
     "candidate_review_status": "not-reviewed",
+    "candidate_sha256": "56424be031b7cafc0368cdc39113a490b8b9ac616ce0f22075c0bbfbaa5bb3e0",
+    "height": 1254,
+    "id": "hemogoblin",
+    "legacy_rgba_sha256": "71c2317908439dd56b23f1d7aceeaa5bf60ab9e4b782cd0b6af11ac464818562",
+    "legacy_webp_sha256": "b9d61c2057facf05739da694cd0554dba0a10bbc8a9a2d8ee2fefb9ddc72cd18",
+    "manual_queue_reasons": [
+      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+    ],
+    "original_path": "crates/corpse-desktop/assets/creatures/hemogoblin.png",
+    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin.png",
+    "runtime_sha256": "9dc61fb785482de327358e624328abf20ca06b98bc7dfe34c1f9d796380ef796",
+    "source_sha256": "2fd63f46cbf9f550319ec433ce2a53389c0b94a93f615426ea440f64daafa77e",
+    "status": "legacy-reference-needs-manual-mask",
+    "width": 1254
+  },
+  {
+    "candidate_review_status": "not-reviewed",
     "candidate_sha256": "e2566c2d26ba3bd7c3483c4307d47401acbcad08df91c274c2ee4c922bae4bb9",
     "height": 1254,
     "id": "hemogoblin-bloodmancer",
@@ -356,24 +374,6 @@
     "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin-mech.png",
     "runtime_sha256": "142fe173da186529dc66ec2935e96829b153e36836034f3b9487ca7d9c1fd1be",
     "source_sha256": "7a08a5669183750a721322a80eb978150990188904caa5bba20f8c6f48c795d0",
-    "status": "legacy-reference-needs-manual-mask",
-    "width": 1254
-  },
-  {
-    "candidate_review_status": "not-reviewed",
-    "candidate_sha256": "56424be031b7cafc0368cdc39113a490b8b9ac616ce0f22075c0bbfbaa5bb3e0",
-    "height": 1254,
-    "id": "hemogoblin",
-    "legacy_rgba_sha256": "71c2317908439dd56b23f1d7aceeaa5bf60ab9e4b782cd0b6af11ac464818562",
-    "legacy_webp_sha256": "b9d61c2057facf05739da694cd0554dba0a10bbc8a9a2d8ee2fefb9ddc72cd18",
-    "manual_queue_reasons": [
-      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
-    ],
-    "original_path": "crates/corpse-desktop/assets/creatures/hemogoblin.png",
-    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
-    "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/hemogoblin.png",
-    "runtime_sha256": "9dc61fb785482de327358e624328abf20ca06b98bc7dfe34c1f9d796380ef796",
-    "source_sha256": "2fd63f46cbf9f550319ec433ce2a53389c0b94a93f615426ea440f64daafa77e",
     "status": "legacy-reference-needs-manual-mask",
     "width": 1254
   },
@@ -470,39 +470,41 @@
     "width": 1254
   },
   {
-    "candidate_review_status": "rejected-needs-manual-mask",
-    "candidate_sha256": "295daa7df1d29e29011b5e6e5b04a169cbfa657fe857fb0cd6aa744677b18697",
+    "candidate_review_status": "approved",
+    "candidate_sha256": "2d8ecfcadb48540a778f695baeb48e7284b4440dbd9c4046203c9834c1debafe",
     "height": 1254,
     "id": "horn-6",
-    "legacy_rgba_sha256": "42a310958c7af59fb6b0c311c78d943a149649d4fff7b145c8e532dd808f2fb8",
+    "legacy_rgba_sha256": null,
     "legacy_webp_sha256": "6bee7c189a220a62110e92cfe38c091ee471191620cbf851d96b85b70706fe14",
     "manual_queue_reasons": [
-      "Rejected: automatic candidate carves legitimate dark shoulder/foreleg joints and chest fur at x560\u2013770,y630\u2013890, right shoulder crease x900\u20131040,y650\u2013840, rear-left leg joint x180\u2013350,y800\u2013930. Keep exact frozen legacy RGBA; no threshold-based further cleanup."
+      "Manually bounded source-pixel restoration fixes missing chest, shoulder and leg-joint anatomy; true tail/horn/inter-leg negative spaces retained.",
+      "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
     ],
     "original_path": "crates/corpse-desktop/assets/creatures/horn-6.png",
-    "reason": "Rejected: automatic candidate carves legitimate dark shoulder/foreleg joints and chest fur at x560\u2013770,y630\u2013890, right shoulder crease x900\u20131040,y650\u2013840, rear-left leg joint x180\u2013350,y800\u2013930. Keep exact frozen legacy RGBA; no threshold-based further cleanup.",
+    "reason": "Manually bounded source-pixel restoration fixes missing chest, shoulder and leg-joint anatomy; true tail/horn/inter-leg negative spaces retained.",
     "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-6.png",
-    "runtime_sha256": "3a766df288f579a82779eb4a99acf3bdcb3aa0c117bd5ab9b25703b4fadecbe0",
+    "runtime_sha256": "2d8ecfcadb48540a778f695baeb48e7284b4440dbd9c4046203c9834c1debafe",
     "source_sha256": "eae405bd1fd602e9d9f6d1918f159a72ed386e743aacf9b68b5d8cb4ba8231bb",
-    "status": "legacy-reference-needs-manual-mask",
+    "status": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
     "width": 1254
   },
   {
-    "candidate_review_status": "not-reviewed",
-    "candidate_sha256": "446a1423979d17b73397be0bb6e1c9e00c9815b60a83cad30ceb7e76188a0762",
+    "candidate_review_status": "approved",
+    "candidate_sha256": "e7b52bfe49364918a4b7ad33ba8845f416b4e89870902e61dffc7fa87dd3c6fb",
     "height": 1254,
     "id": "horn-7",
-    "legacy_rgba_sha256": "0e34d505be09326a897fa3dbd26020f3ac6c344145990fd3e25a2d7a5c95efde",
+    "legacy_rgba_sha256": null,
     "legacy_webp_sha256": "df7ecaac864d1ec2d357e4e2dd4e2847e787edf50ce5eeeed79edaceb73eb4e5",
     "manual_queue_reasons": [
-      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+      "Reviewed open mane and tail curl pockets cleared; original purple hair, horns, hooves and fine strands preserved.",
+      "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
     ],
     "original_path": "crates/corpse-desktop/assets/creatures/horn-7.png",
-    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "reason": "Reviewed open mane and tail curl pockets cleared; original purple hair, horns, hooves and fine strands preserved.",
     "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/horn-7.png",
-    "runtime_sha256": "053f5f32fb04e882cb58092c277041cce4bcadd619be03730e194aead23f04f9",
+    "runtime_sha256": "e7b52bfe49364918a4b7ad33ba8845f416b4e89870902e61dffc7fa87dd3c6fb",
     "source_sha256": "5d15a5a471be1f1f5ed2bd478d630b7be5d87bf860b1ad03864c97fac7cbd325",
-    "status": "legacy-reference-needs-manual-mask",
+    "status": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
     "width": 1254
   },
   {
@@ -1050,21 +1052,22 @@
     "width": 1254
   },
   {
-    "candidate_review_status": "not-reviewed",
-    "candidate_sha256": "b5d7aee22574208cfdf1ce61b169ccdac869c54e1f4cb3e1bb8c0bcb85de163a",
+    "candidate_review_status": "approved",
+    "candidate_sha256": "9185f3f5cd41bc7bd614a1964178927daab8010236a938aaf4ce3bec87584348",
     "height": 1254,
     "id": "samara",
-    "legacy_rgba_sha256": "c07d21791168bef2b71e7ae5d769fb28bc2f5613c755a71bd6bda0db1cacbdc3",
+    "legacy_rgba_sha256": null,
     "legacy_webp_sha256": "e27d31b22369f28f1be159d0392285990e6bd8479e4f5c5c3bee8c7742bcb4d3",
     "manual_queue_reasons": [
-      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+      "Reviewed upper-canopy negative spaces cleared without deleting dark bark, trunk hollows, roots or detached seeds. Lower root ambiguities remain unchanged.",
+      "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
     ],
     "original_path": "crates/corpse-desktop/assets/creatures/samara.png",
-    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "reason": "Reviewed upper-canopy negative spaces cleared without deleting dark bark, trunk hollows, roots or detached seeds. Lower root ambiguities remain unchanged.",
     "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/samara.png",
-    "runtime_sha256": "53d2cf44d254f06d5c15731ce0c8c2590c53a75be918a85b9f1e75985288b26f",
+    "runtime_sha256": "9185f3f5cd41bc7bd614a1964178927daab8010236a938aaf4ce3bec87584348",
     "source_sha256": "0cde43db8c95b460fa3db78ed1af94140cf4f0a16fbd3b50f6fce8f10575729e",
-    "status": "legacy-reference-needs-manual-mask",
+    "status": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
     "width": 1254
   },
   {
@@ -1176,39 +1179,41 @@
     "width": 1254
   },
   {
-    "candidate_review_status": "not-reviewed",
-    "candidate_sha256": "602573dea2e83ebbac262b30aedc4d86ee395431c20c2f9fd97e45163a4d953d",
+    "candidate_review_status": "approved",
+    "candidate_sha256": "09fa78c29c50edbeac0711aea558eb3f3d3463d093574504ed1af2a2d7deca8b",
     "height": 1254,
     "id": "ursa-minor",
-    "legacy_rgba_sha256": "c53462a89cc38444dc068a8966362b055c2d4061259738043f5e4d17d950b2fe",
+    "legacy_rgba_sha256": null,
     "legacy_webp_sha256": "ac927c56b1ce805cc7d6dc880dbc5e1249a555f820a3a519fd4ab0382bd62d46",
     "manual_queue_reasons": [
-      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+      "Manually bounded source-pixel restoration fixes missing dark neck, chest and belly fur. Pure-black underside contour is visually inferred from bordering authored fur; no new color pixels invented.",
+      "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
     ],
     "original_path": "crates/corpse-desktop/assets/creatures/ursa-minor.png",
-    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "reason": "Manually bounded source-pixel restoration fixes missing dark neck, chest and belly fur. Pure-black underside contour is visually inferred from bordering authored fur; no new color pixels invented.",
     "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/ursa-minor.png",
-    "runtime_sha256": "a65fdbf8544aebf26eb7e0c9fd0520d1c628801d5ec1c69897625c1d2fe38e6a",
+    "runtime_sha256": "09fa78c29c50edbeac0711aea558eb3f3d3463d093574504ed1af2a2d7deca8b",
     "source_sha256": "45e4725345b9db674fb5e11cefbf67e08e0241490baeca3013d13ee298646462",
-    "status": "legacy-reference-needs-manual-mask",
+    "status": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
     "width": 1254
   },
   {
-    "candidate_review_status": "not-reviewed",
-    "candidate_sha256": "51925319caf97604c20de64ad7d80dca2290ab536357459db7dedc4cd60f83b4",
+    "candidate_review_status": "approved",
+    "candidate_sha256": "f86db6433314cc8272c6d0f58a14a610c61df1e1e913b2698779c95eb2a0284c",
     "height": 1254,
     "id": "valta",
-    "legacy_rgba_sha256": "1f0b494b922c2299af9b0b963d69f8b65e4c0447cac42a1d167b48c4756a24d0",
+    "legacy_rgba_sha256": null,
     "legacy_webp_sha256": "5d7b494de87ca40e185f63a8c8ac4407f7ec13708bc412db6c356a0e5bb38641",
     "manual_queue_reasons": [
-      "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed."
+      "Opaque black surround replaced by reviewed fractional-alpha glow, with protected dark anatomy. Black-background reconstruction of corrected pixels matches original within one byte; no body/star support removed.",
+      "Targeted confirmed defects repaired; this is not a pixel-by-pixel artist certification of every ambiguous rim."
     ],
     "original_path": "crates/corpse-desktop/assets/creatures/valta.png",
-    "reason": "Original silhouette ambiguous/unreviewed; legacy extraction frozen, NOT fixed.",
+    "reason": "Opaque black surround replaced by reviewed fractional-alpha glow, with protected dark anatomy. Black-background reconstruction of corrected pixels matches original within one byte; no body/star support removed.",
     "runtime_path": "crates/corpse-desktop/assets/creatures-rgba/valta.png",
-    "runtime_sha256": "45460090fd632c6ca93a1ef5693bad67f365f7ba93105a1637ceec5dbe97c047",
+    "runtime_sha256": "f86db6433314cc8272c6d0f58a14a610c61df1e1e913b2698779c95eb2a0284c",
     "source_sha256": "1847b38a5892ae3ae880e3eb10ad8027897520706079a6e58ca966ca33754a4b",
-    "status": "legacy-reference-needs-manual-mask",
+    "status": "reviewed-targeted-alpha-repair-needs-manual-edge-review",
     "width": 1254
   },
   {

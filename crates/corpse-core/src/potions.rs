@@ -59,6 +59,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
     };
     let pool = target.map(|id| crate::half_here::owner_id(r, actor(r, id).unwrap()));
     let energy_before = pool.map(|id| actor(r, id).unwrap().energy).unwrap_or(0.0);
+    let hp_before = pool.map(|id| actor(r,id).unwrap().hp).unwrap_or(0.0);
     let strength = if item.diluted.value_or(false) {
         0.5
     } else {
@@ -76,7 +77,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
                 if target == Some(r.player.id) {
                     crate::progression::award(
                         r,
-                        ((2.0_f64.powf(r.level) - r.exp).max(0.0) * strength).ceil(),
+                        ((crate::progression::level_up_cost(r) - r.exp).max(0.0) * strength).ceil(),
                     );
                 }
             }
@@ -224,20 +225,20 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
     if discovered {
         log(r, format!("Identified: Potion of {display_effect}."), "player");
     }
-    crate::events::actor_event(
-        r,
-        &r.player,
-        if thrown {
-            "projectile"
-        } else if matches!(effect.as_str(), "healing" | "energy" | "Veridian Sap") {
-            "heal"
-        } else {
-            "pulse"
-        },
-        &if crate::revision50::enabled(r) { item_label } else { format!("Potion of {display_effect}") },
-        Some(crate::events::EventPoint { x, y }),
-        if thrown { Some(&item.glyph) } else { None },
-    );
+    let healing_item=matches!(effect.as_str(),"healing"|"energy"|"Veridian Sap");
+    let hp_increased=pool.and_then(|id|actor(r,id)).is_some_and(|a|a.hp>hp_before);
+    let energy_increased=pool.and_then(|id|actor(r,id)).is_some_and(|a|a.energy>energy_before);
+    if !crate::events::enabled(r) || thrown || !healing_item || hp_increased {
+        crate::events::actor_event(
+            r,&r.player,
+            if thrown {"projectile"} else if healing_item {"heal"} else {"pulse"},
+            &if crate::revision50::enabled(r) { item_label } else { format!("Potion of {display_effect}") },
+            Some(crate::events::EventPoint{x,y}),if thrown {Some(&item.glyph)} else {None},
+        );
+    }
+    if energy_increased && pool==Some(r.player.id) {
+        crate::events::inventory(r,"shared","energy-rise",None);
+    }
     for i in &mut r.inventory {
         if discovery_enabled && i.kind == "potion" && i.effect.as_ref() == Some(&effect) {
             i.identified = true.into();
@@ -253,8 +254,10 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
     {
         r.inventory[index].diluted = true.into();
         r.inventory[index].name = format!("Diluted potion of {display_effect}");
+        crate::events::inventory(r,"P66","split-potion",Some(item.id));
     } else {
         r.inventory.retain(|i| i.id != item.id);
+        if item.diluted.value_or(false) { crate::events::inventory(r,"P66","fade-potion",Some(item.id)); }
     }
     if effect == "descent" {
         crate::travel::collapse_descent(r, x, y, strength < 1.0).map_err(EngineError)?;

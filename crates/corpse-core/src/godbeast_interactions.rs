@@ -42,7 +42,7 @@ pub fn pull_lever(r: &mut Run, x: f64, y: f64) -> Result<bool, String> {
         let depth = r.depth as u32;
         let item = crate::equipment::make_godbeast_permanent_for_run(r, depth, &mut rng)?;
         r.next_id += 1.;
-        crate::item_placement::place_ground_item(
+        let placement=crate::item_placement::place_ground_item(
             r,
             r.depth,
             GroundItem {
@@ -53,6 +53,9 @@ pub fn pull_lever(r: &mut Run, x: f64, y: f64) -> Result<bool, String> {
             },
             |r, d| crate::startup::ensure_floors(r, d as u32),
         )?;
+        if let crate::item_placement::PlacementResult::Placed{depth,x,y}=placement {
+            if depth==r.depth {crate::events::at(r,"E78","diamond-gold",crate::events::Stage::Special,&[crate::events::EventPoint{x,y}]);}
+        }
         r.floor_mut()
             .unwrap()
             .godbeast_event
@@ -132,6 +135,7 @@ pub fn tap_veridian(r: &mut Run) -> TapResult {
         ..Default::default()
     };
     r.next_id += 1.;
+    crate::animation_enemy::mark(r, &r.player, "E82", "droplet-leaf", crate::events::Stage::Special);
     TapResult {
         success: true,
         message: if r.simulation_revision.value_or(29.)>=33. {"The tree tap breaks as you collect Verdania Sap."} else {"The tree tap breaks as you collect Veridian Sap."},

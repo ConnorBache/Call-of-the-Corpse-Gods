@@ -1,4 +1,4 @@
-//! R50/R51 potion command -> detached observation -> native pixels. No SDL loop.
+//! R50/R51/R52 potion command -> detached observation -> native pixels. No SDL loop.
 use crate::{appearance_profile::Profile, render::{Painter, RetainedGame, View, tile_damage}};
 use corpse_core::{Command, Field, Floor, FloorLightSourcesEntry, Item, Run};
 use std::sync::Arc;
@@ -43,7 +43,7 @@ fn region(p: &Painter, v: &View, x: i32, y: i32) -> Vec<u8> {
 
 #[test]
 fn darkness_native_throw_before_after_expiry_and_incremental_pixels() {
-    for revision in [50., 51.] {
+    for revision in [50., 51., 52.] {
         let profile = Profile::default();
         let mut r = room(revision, 100.);
         let before = crate::observe::observe_with_profile(&r, &profile);
@@ -54,19 +54,22 @@ fn darkness_native_throw_before_after_expiry_and_incremental_pixels() {
         let frozen = serde_json::to_vec(&r).unwrap();
         let after = crate::observe::observe_with_profile(&r, &profile);
         let snapshot = after.terrain_snapshot.as_ref().unwrap();
-        let source = snapshot.light_sources.iter().find(|s| s.kind == "potion-darkness").unwrap();
-        assert_eq!(source.cells.len(), 25);
+        let kind=if revision>=52.{"potion-darkness-override"}else{"potion-darkness"};
+        let source = snapshot.light_sources.iter().find(|s| s.kind == kind).unwrap();
+        assert_eq!(source.cells.len(), if revision>=52.{29}else{25});
         assert!(source.strengths.iter().all(|v| *v == 50.));
         assert!(!source.origin_known && source.x == -1. && source.y == -1. && source.actor_id.is_none());
         let at = 6 * 21 + 10;
-        assert_eq!(snapshot.cells[at].illumination, Some(50.));
+        assert_eq!(snapshot.cells[at].illumination, Some(if revision>=52.{-100.}else{50.}));
         assert_eq!(snapshot.cells[at].ambient, Some(100.), "raw ambient semantics stay unchanged");
         let (_, _, lights) = crate::observe::terrain_frame(snapshot, &profile, after.cosmetic_seed, 0.);
-        assert_eq!(lights[at].ambient_attenuation, 0.75);
-        assert_eq!(lights[6 * 21 + 13].ambient_attenuation, 1.);
+        assert_eq!(lights[at].ambient_attenuation, if revision>=52.{0.}else{0.75});
+        if revision>=52. {assert_eq!(lights[at].display.unwrap().multiplier,0.05);}
+        assert_eq!(lights[6 * 21 + 14].ambient_attenuation, 1.);
         for cell in after.cells.iter().take(after.terrain_count) {
             let old = before.cells.iter().find(|old| old.x == cell.x && old.y == cell.y).unwrap();
-            if (8..=12).contains(&cell.x) && (4..=8).contains(&cell.y) {
+            let dx=cell.x as i32-10;let dy=cell.y as i32-6;
+            if if revision>=52.{dx*dx+dy*dy<=9}else{dx.abs()<=2&&dy.abs()<=2} {
                 assert!(crate::color_profile::luminance(cell.bg) < crate::color_profile::luminance(old.bg));
             } else { assert_eq!((cell.fg, cell.bg), (old.fg, old.bg), "unaffected ground"); }
         }
@@ -77,7 +80,7 @@ fn darkness_native_throw_before_after_expiry_and_incremental_pixels() {
         // Reconstruct precisely the former missing source payload. This is a
         // post-dose observation with the real 50 illumination, not a mock dose.
         let mut broken_snapshot = (**snapshot).clone();
-        broken_snapshot.light_sources.retain(|s| s.kind != "potion-darkness");
+        broken_snapshot.light_sources.retain(|s| s.kind != kind);
         let (old_ground, old_backgrounds, _) = crate::observe::terrain_frame(&broken_snapshot, &profile, after.cosmetic_seed, 0.);
         assert_eq!(old_ground, after.cells[..after.terrain_count], "calibration follows resolved illumination even without a darkness hue payload");
         let mut broken = crate::observe::observe_with_profile(&r, &profile);
@@ -91,7 +94,7 @@ fn darkness_native_throw_before_after_expiry_and_incremental_pixels() {
         let after_p = paint(&after, &format!("r{revision}-post-dose-fixed"));
         assert_eq!(region(&after_p, &after, 10, 6), region(&old_p, &broken, 10, 6));
         assert_ne!(region(&before_p, &before, 10, 6), region(&after_p, &after, 10, 6));
-        assert_eq!(region(&before_p, &before, 13, 6), region(&after_p, &after, 13, 6));
+        assert_eq!(region(&before_p, &before, 14, 6), region(&after_p, &after, 14, 6));
 
         let mut retained = RetainedGame::default();
         let mut retained_p = Painter::new(); retained_p.resize(1920, 1200);
@@ -156,6 +159,94 @@ fn darkness_materials_glow_dilution_profiles_and_ring_exclusion() {
     throw(&mut r, false);
     assert_eq!(corpse_core::vision::tile_light(&r, 8, 6), 50., "own Light ring still excludes its tile");
     assert_eq!(corpse_core::vision::tile_light(&r, 9, 6), 60., "ring still adds after potion darkness");
+}
+
+#[test]
+fn darkness_r52_materials_sources_custom_profiles_and_dilution(){
+    let at=6*21+10;
+    for ambient in [-30.,0.,100.,250.] {for tile in ["floor","wall","grass","water","shallow-water"] {for diluted in [false,true] {
+        let mut r=room(52.,ambient);r.floor_mut().unwrap().tiles[at]=tile.into();
+        r.floor_mut().unwrap().light_sources=vec![FloorLightSourcesEntry{x:10.,y:6.,power:250.,falloff:10.,kind:"torch".to_owned().into()}].into();
+        let raw=r.floor().unwrap().lights.clone();let sources=r.floor().unwrap().light_sources.clone();
+        let custom=Profile::default().set("lighting.ambient",serde_json::json!(1.5)).unwrap()
+            .set("lighting.sources.torch.intensity",serde_json::json!(2.)).unwrap()
+            .set("lighting.visualRadius",serde_json::json!(2.)).unwrap()
+            .set(&format!("terrain.{tile}.background"),serde_json::json!("#725f46")).unwrap();
+        for profile in [Profile::default(),custom] {
+            let before=crate::observe::observe_with_profile(&r,&profile);let mut dark=r.clone();
+            dark.inventory.push(Item{id:901.,kind:"potion".into(),effect:"darkness".to_owned().into(),diluted:diluted.into(),..Default::default()});
+            assert!(corpse_core::potions::apply(&mut dark,0,10.,6.,true).unwrap());
+            let saved=serde_json::to_vec(&dark).unwrap();let rng=dark.rng;
+            for time in [0.,400.,900.] {
+                let observation=corpse_core::vision::observe_terrain(&dark).unwrap();
+                assert_eq!(observation.cells[at].illumination,Some(-100.));
+                // The inherited gameplay observation bounds its ambient sample;
+                // saved floor/source values below must remain unmodified. The
+                // separate unbounded-observation test covers display >100 tails.
+                assert_eq!(observation.cells[at].ambient,Some(ambient.clamp(-100.,100.)));
+                let lights=crate::appearance_light::light_field(&observation,&profile,time);
+                assert_eq!(lights[at].display,Some(crate::color::light_ui::DisplayLight::neutral(-100.)));
+                assert_eq!(lights[at].energy,[0.;3]);assert_eq!(lights[at].wall_energy,[0.;3]);
+            }
+            let after=crate::observe::observe_with_profile(&dark,&profile);
+            let a=before.cells.iter().take(before.terrain_count).find(|c|c.x==10&&c.y==6).unwrap();
+            let b=after.cells.iter().take(after.terrain_count).find(|c|c.x==10&&c.y==6).unwrap();
+            assert!(crate::color_profile::luminance(b.bg)<crate::color_profile::luminance(a.bg),"{tile} ambient={ambient}");
+            assert_eq!(serde_json::to_vec(&dark).unwrap(),saved);assert_eq!(dark.rng,rng);
+            assert_eq!(dark.floor().unwrap().lights,raw);assert_eq!(dark.floor().unwrap().light_sources,sources);
+            dark.tick+=if diluted{10.}else{20.};corpse_core::revision50_potions::expire(&mut dark);
+            let expired=crate::observe::observe_with_profile(&dark,&profile);
+            assert_eq!(expired.cells[..expired.terrain_count],before.cells[..before.terrain_count]);
+        }
+    }}}
+}
+
+#[test]
+fn darkness_r52_zero_perception_uses_memory_not_live_hidden_illumination(){
+    let mut r=room(52.,100.);r.player.stats.perception=0.;
+    let before=crate::observe::observe(&r);let before_p=paint(&before,"r52-perception-zero-before-dose");
+    let rng=r.rng;throw(&mut r,false);
+    let saved=serde_json::to_vec(&r).unwrap();let after=crate::observe::observe(&r);
+    let o=after.terrain_snapshot.as_ref().unwrap();let at=6*21+10;
+    let mut affected=0;
+    for y in 3usize..=9 {for x in 7usize..=13 {
+        let dx=x as i32-10;let dy=y as i32-6;
+        if dx*dx+dy*dy>9 {continue;} affected+=1;
+        let cell=&o.cells[y*21+x];assert!(!cell.current&&!cell.direct&&cell.remembered);
+        assert_eq!(cell.knowledge,"remembered");assert_eq!(cell.illumination,None);assert_eq!(cell.ambient,None);
+    }}
+    assert_eq!(affected,29);
+    assert!(o.light_sources.iter().all(|source|source.kind!="potion-darkness-override"),"No live mask may cross into remembered terrain");
+    assert_eq!(corpse_core::vision::tile_light(&r,10,6),-100.);
+    let after_p=paint(&after,"r52-perception-zero-after-dose");
+    let original=region(&before_p,&before,10,6);let remembered=region(&after_p,&after,10,6);
+    let mean=|pixels:&[u8]|pixels.chunks_exact(4).map(|p|p[..3].iter().map(|v|*v as f64).sum::<f64>()).sum::<f64>()/(pixels.len()/4*3)as f64;
+    assert_ne!(original,remembered,"The normal P=0 dose must visibly change the affected terrain");
+    assert!(mean(&remembered)<mean(&original),"Remembered terrain is visibly dimmer than the previously lit terrain");
+    assert_eq!(region(&before_p,&before,14,6),region(&after_p,&after,14,6));
+    for (x,y) in [(13,6),(7,6),(10,3),(10,9),(12,8)] {
+        assert_ne!(region(&before_p,&before,x,y),region(&after_p,&after,x,y),"Inclusive circle boundary changes native pixels at ({x},{y})");
+    }
+    for (x,y) in [(13,7),(13,9),(7,3),(14,6)] {
+        assert_eq!(region(&before_p,&before,x,y),region(&after_p,&after,x,y),"Outside circle pixels remain unchanged at ({x},{y})");
+    }
+    assert_eq!(serde_json::to_vec(&r).unwrap(),saved);assert_eq!(r.rng,rng);
+    let mut retained=RetainedGame::default();let mut retained_p=Painter::new();retained_p.resize(1920,1200);
+    retained.update(&mut retained_p,&before,"",0.,true,true).unwrap();
+    retained.update(&mut retained_p,&after,"",0.,true,false).unwrap();assert_eq!(retained_p.pixels,after_p.pixels);
+    if let Ok(dir)=std::env::var("CORPSE_R51_DARKNESS_OUTPUT") {
+        std::fs::write(format!("{dir}/r52-perception-zero-evidence.json"),serde_json::to_vec_pretty(&serde_json::json!({
+            "perception":0,"radius":3,"distanceRule":"dx*dx+dy*dy<=9","affectedCells":29,"effectiveLightAfter":-100,"observedLightAfter":o.cells[at].illumination,
+            "knowledgeAfter":o.cells[at].knowledge,"liveMaskProjected":false,
+            "beforeCenterMeanRgb":mean(&original),"afterCenterMeanRgb":mean(&remembered),
+            "beforeCenterCrc32":crc32fast::hash(&original),"afterCenterCrc32":crc32fast::hash(&remembered),
+            "outsidePixelsUnchanged":true,"savedStateAndRngUnchangedByPainting":true,
+            "nativeFrame":[1920,1200],"presentationMs":0})).unwrap()).unwrap();
+    }
+    r.tick+=20.;corpse_core::revision50_potions::expire(&mut r);
+    let expired=crate::observe::observe(&r);let expired_p=paint(&expired,"r52-perception-zero-expired");
+    assert_eq!(expired.cells[..expired.terrain_count],before.cells[..before.terrain_count]);
+    assert_eq!(region(&before_p,&before,10,6),region(&expired_p,&expired,10,6));
 }
 
 #[derive(Debug, PartialEq)]

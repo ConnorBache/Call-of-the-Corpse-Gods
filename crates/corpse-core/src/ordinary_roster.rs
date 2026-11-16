@@ -156,7 +156,7 @@ pub fn candidates_revision(depth: u32, water: bool, revision: f64) -> Result<&'s
             static POOLS: [OnceLock<Vec<Candidate>>;80] = [const { OnceLock::new() };80];
             Ok(POOLS[(depth as usize-1)*2+water as usize].get_or_init(|| build(depth,water,32.0)))
         },
-        33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 => {
+        33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0 => {
             static POOLS: [OnceLock<Vec<Candidate>>;80] = [const { OnceLock::new() };80];
             Ok(POOLS[(depth as usize-1)*2+water as usize].get_or_init(|| build(depth,water,33.0)))
         },

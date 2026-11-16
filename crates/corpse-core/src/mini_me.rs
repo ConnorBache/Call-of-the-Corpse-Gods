@@ -28,9 +28,9 @@ fn stats_preview(r: &Run, x: f64, y: f64) -> Actor {
     if crate::dreamwalking::enabled(r) {
         a.conditions.insert("phantasmiiPlane".into(),if crate::dreamwalking::dream_actor(r,&r.player){1.0}else{0.0});
     }
-    a.conditions.insert("weaponDamage".into(),crate::revision50_player_attack::fixed_damage_for_revision(
-        r.simulation_revision.value_or(29.0),crate::revision50_player_attack::DAMAGE));
-    a.conditions.insert("weaponOffenseMultiplier".into(),crate::revision50_player_attack::OFFENSE_MULTIPLIER);
+    a.conditions.insert("weaponDamage".into(),crate::revision50_player_attack::innate_damage_for_revision(
+        r.simulation_revision.value_or(29.0)));
+    a.conditions.insert("weaponOffenseMultiplier".into(), if crate::combat::raw_attack_damage_enabled(r.simulation_revision.value_or(29.)) { 1.0 } else { crate::revision50_player_attack::OFFENSE_MULTIPLIER });
     a
 }
 /// Eight row-major candidates: O(F+A+G+P), O(1) extra space, for floor lookup F,
@@ -166,12 +166,14 @@ pub fn commit(r: &mut Run, a: Actor) -> Result<(), String> {
     crate::creature_index::check_next_creature_id(r)?;
     r.next_id+=1.0;
     r.player.conditions.insert("miniMeId".into(), a.id);
+    crate::animation_player::local(r,&a,"P62","gear",crate::events::Stage::Special);
     r.actors_at_mut(r.depth).push(a);
     Ok(())
 }
 /// Every floor is searched, retaining actor order and removing only the recorded ID.
 pub fn dismiss(r: &mut Run) {
     if let Some(id) = r.player.conditions.get("miniMeId").copied() {
+        if let Some(a)=crate::engine::actor(r,id) {crate::animation_player::local(r,a,"P62","dissolve",crate::events::Stage::Special);}
         let matches = r
             .actors
             .values()

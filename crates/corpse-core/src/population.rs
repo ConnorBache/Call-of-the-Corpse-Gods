@@ -309,7 +309,7 @@ pub fn plan_budgeted_hordes_revision(
     }
     let candidates = match revision {
         29.0 => budgeted_candidates(depth, water)?,
-        30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 => crate::ordinary_roster::candidates_revision(depth, water, revision)?,
+        30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0 => crate::ordinary_roster::candidates_revision(depth, water, revision)?,
         _ => return Err("Unsupported population revision".into()),
     };
     let banshees = reserved.iter().filter(|k| *k == "banshee").count() as i32;
@@ -388,6 +388,10 @@ pub fn plan_budgeted_hordes_revision(
 pub fn zillennia_revision(depth: u32, revision: f64) -> Result<Actor, String> {
     let mut a = catalog().zillennia.get(depth.checked_sub(1).ok_or("Invalid Zillennia depth")? as usize)
         .cloned().ok_or("Invalid Zillennia depth")?;
+    if revision == 52. {
+        a = catalog().zillennia.iter().find(|first| first.zillennia_quality == a.zillennia_quality)
+            .expect("requested quality exists").clone();
+    }
     if revision >= 32.0 {
         let quality = a.zillennia_quality.as_ref().map_or("unqualified", String::as_str);
         let kind = format!("zillennia:{quality}");
@@ -396,12 +400,23 @@ pub fn zillennia_revision(depth: u32, revision: f64) -> Result<Actor, String> {
     Ok(a)
 }
 
+/// Same named fungus uses its weakest first template on every R52 floor.
+/// Legacy depth tiers remain exact. O(1), no RNG or actor mutation.
+pub fn fungus_revision(depth: u32, revision: f64) -> Result<Actor, String> {
+    if !(1..=40).contains(&depth) { return Err("Invalid fungus depth".into()); }
+    let index = if revision == 52. { 0 } else { depth as usize - 1 };
+    let mut a = catalog().fungi.get(index).cloned().ok_or("Invalid fungus depth")?;
+    a.stats.accuracy = crate::combat::creature_birth_accuracy(revision, a.stats.accuracy);
+    a.stats.dodge = crate::combat::creature_birth_dodge(revision, a.stats.dodge);
+    Ok(a)
+}
+
 pub fn create_actor(kind: &str, id: f64, x: f64, y: f64, sleeping: bool) -> Result<Actor, String> {
     create_actor_revision(kind, id, x, y, sleeping, 29.0)
 }
 /// Explicit actor revision preserves frozen differential callers and saved-run generation.
 pub fn create_actor_revision(kind: &str, id: f64, x: f64, y: f64, sleeping: bool, revision: f64) -> Result<Actor, String> {
-    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0].contains(&revision) { return Err("Unsupported actor revision".into()); }
+    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) { return Err("Unsupported actor revision".into()); }
     let mut a = catalog()
         .actors
         .get(kind)
@@ -442,18 +457,14 @@ pub fn create_population_actor_revision(
     rng: &mut GenerationRng,
     revision: f64,
 ) -> Result<Actor, String> {
-    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0].contains(&revision) { return Err("Unsupported actor revision".into()); }
+    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) { return Err("Unsupported actor revision".into()); }
     if revision >= 51. && crate::revision51_stairs::stair_cell(f,at) {
         return Err("Enemies cannot spawn on stairs".into());
     }
     let w = f.width();
     let (x, y) = ((at % w) as f64, (at / w) as f64);
     let mut a = if ["fungus", "bastidion", "vent-fungus"].contains(&kind) {
-        let mut a = catalog()
-            .fungi
-            .get(f.depth as usize - 1)
-            .cloned()
-            .ok_or("Invalid fungus depth")?;
+        let mut a = fungus_revision(f.depth as u32, revision)?;
         // R50's fixed identity needs no random draw; earlier seeds retain exactly
         // their original six-way selection and generation RNG advancement.
         let gas = if revision >= 50.0 { crate::fungi::HALLUCINOGENIC_KIND }
@@ -503,6 +514,7 @@ pub fn create_population_actor_revision(
         }
         f.slime = Field::Value(slime);
     }
+    crate::balance52::apply_new_actor_kind(&mut a, kind, f.depth, revision);
     Ok(a)
 }
 
@@ -899,7 +911,7 @@ pub fn populate_hordes_revision(
     plan: Option<&HordePlan>,
     revision: f64,
 ) -> Result<Vec<Actor>, String> {
-    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0].contains(&revision) { return Err("Unsupported population revision".into()); }
+    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) { return Err("Unsupported population revision".into()); }
     let (land, water) = habitats(f);
     let blocked = blocked_cells(f);
     let machines = plan_machine_spawns_revision(f, &blocked, revision)?;
@@ -1140,7 +1152,7 @@ pub fn populate_machine_enemies_revision(
     ground: &[crate::GroundItem],
     revision: f64,
 ) -> Result<Vec<Actor>, String> {
-    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0].contains(&revision) { return Err("Unsupported actor revision".into()); }
+    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) { return Err("Unsupported actor revision".into()); }
     let w = f.width();
     let machines = plan_machine_spawns_revision(f, &blocked_cells(f), revision)?;
     if f.encounters.as_ref().is_some_and(|rs| {

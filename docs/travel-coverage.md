@@ -17,3 +17,16 @@ Let D<=40 floors, V<=3600 cells/floor, A total actors, F queued followers, C fal
 - Any floor transition can generate missing floors and run E catch-up steps; those generation/environment costs are additive and can dominate the local algorithms. Observation, event/history serialization and normal engine phases are additional costs documented by their owners.
 
 These are conservative analytical bounds, not benchmark results. Profile complete generated runs, large follower cohorts, occupied landing maps and expired-flight cohorts before optimization claims.
+
+## Revision 52 flying chasm pursuit
+
+See [revision52-flying-chasm-pursuit.md](revision52-flying-chasm-pursuit.md) for the
+new departure/transfer contract and condition support: existing player hunters
+perceive and approach the fall exit, follow its actual reserved landing, and
+retain collision-safe deferred arrival without impact damage while flying.
+The source chasm and current flight are rechecked; no nonflying actor gains
+flight, no distant flyer teleports, and ordinary finite-flight falls remain.
+The focused `offscreen::revision52_flying_chasm_tests` suite covers dispatch,
+offscreen speed composition, saved/rewound pending pursuit and R52's one-floor
+ahead generation boundary. Consult its execution receipt and final aggregate
+validation separately; documentation is not an aggregate pass.

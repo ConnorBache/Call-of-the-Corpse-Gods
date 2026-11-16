@@ -3,6 +3,39 @@
 use crate::{appearance_profile::Profile, render::Rgb};
 use serde_json::Value;
 
+/// The existing wall-edge rule, using only detached player-known neighbors.
+/// Remembered terrain never borrows a currently observed neighbor's live identity.
+pub(super) fn wall_face_neighbor(
+    wall: &corpse_core::vision::ObservedCell,
+    neighbor: &corpse_core::vision::ObservedCell,
+) -> bool {
+    (wall.current || !neighbor.current)
+        && neighbor.tile.as_deref().is_some_and(|tile| !matches!(tile, "wall" | "chasm" | "pit"))
+}
+
+/// Keep the authored bone ink on exposed walls; solid backing uses the existing
+/// muted earth/flesh ink. O(1): at most four known-neighbor probes, no live map,
+/// allocations, new terrain, RNG, or cached classification. Grading follows later.
+pub(super) fn wall_ink(
+    fg: Rgb,
+    cell: &corpse_core::vision::ObservedCell,
+    observation: &corpse_core::vision::TerrainObservation,
+    enabled: bool,
+) -> Rgb {
+    if !enabled || cell.tile.as_deref() != Some("wall") || cell.door_open.is_some()
+        || cell.grate || cell.bridge || cell.snow || cell.ice || cell.puddles || cell.hellfire
+    { return fg; }
+    let (x, y) = (cell.index % observation.width, cell.index / observation.width);
+    for (dx, dy) in [(1, 0), (0, 1), (-1, 0), (0, -1)] {
+        let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+        if nx < 0 || ny < 0 || nx >= observation.width as i32 || ny >= observation.height as i32 { continue; }
+        if observation.cells.get(ny as usize * observation.width + nx as usize)
+            .is_some_and(|neighbor| wall_face_neighbor(cell, neighbor))
+        { return fg; }
+    }
+    [187, 124, 114]
+}
+
 /// Replace only unedited authored color channels. Glyphs and all appearance controls survive.
 /// O(1) work and scratch: a fixed three-channel material patch, no RNG or geometry.
 pub(super) fn material(settings: &mut Value, defaults: &Value, tile: &str, substrate: Option<&str>, fixture: bool) {
@@ -111,5 +144,57 @@ mod tests {
         assert!(a.iter().any(|c| *c != base));
         assert_eq!(veins(base,"water",3,5,71,true),base);
         assert_eq!(veins(base,"wall",3,5,71,false),base);
+    }
+}
+
+/// Brogue CE chasmForeColor (7,7,15,4,4,8,0,false), percentages.
+/// O(1) static cosmetic hashes, never gameplay RNG or wall-clock animation.
+pub(super) fn brogue_chasm(x:usize,y:usize,seed:u32)->Rgb {
+    std::array::from_fn(|channel| {
+        let base=[7.,7.,15.][channel];let variation=[4.,4.,8.][channel];
+        ((base+variation*crate::color::cosmetic_hash(x as i32,y as i32,seed.wrapping_add(channel as u32)))*2.55).round()as u8
+    })
+}
+#[cfg(test)]
+mod chasm_tests {
+    #[test]
+    fn brogue_chasm_is_static_blue_black_and_in_source_ranges() {
+        let colors:Vec<_>=(0..80).map(|x|super::brogue_chasm(x,5,731)).collect();
+        assert_eq!(colors,(0..80).map(|x|super::brogue_chasm(x,5,731)).collect::<Vec<_>>());
+        assert!(colors.windows(2).any(|w|w[0]!=w[1]));
+        for c in colors {assert!((18..=28).contains(&c[0]));assert!((18..=28).contains(&c[1]));assert!((38..=59).contains(&c[2]));}
+    }
+}
+
+/// Late source-color replacement is safe only with the unedited grading pipeline.
+/// Explicit global, fog or material adjustments keep the ordinary transformed result.
+pub(super) fn brogue_palette_enabled(p:&Profile)->bool {
+    ["global","fog","terrain.chasm.brightness","terrain.chasm.saturation",
+     "terrain.chasm.contrast","terrain.chasm.opacity","terrain.chasm.colorVariation",
+     "terrain.chasm.brightnessVariation","terrain.chasm.animationSpeed","terrain.chasm.lightingResponse"]
+        .into_iter().all(|key|p.is_default(key))
+}
+
+/// The boundary adapter follows the same source palette only while its colors
+/// and grading are unedited. O(1) fixed profile checks, no rendering/state cache.
+pub(super) fn brogue_chasm_edges_enabled(p: &Profile) -> bool {
+    brogue_palette_enabled(p) && ["terrain.chasm.color", "terrain.chasm.background"]
+        .into_iter().all(|key| p.is_default(key))
+}
+
+#[cfg(test)]
+mod chasm_edge_tests {
+    use super::*;
+    #[test]
+    fn chasm_boundary_source_adapter_preserves_explicit_profile_controls() {
+        assert!(brogue_chasm_edges_enabled(&Profile::default()));
+        for (key, value) in [("terrain.chasm.color", serde_json::json!("#aa7733")),
+            ("terrain.chasm.background", serde_json::json!("#123456")),
+            ("terrain.chasm.opacity", serde_json::json!(0.25)),
+            ("global.exposure", serde_json::json!(0.5)),
+            ("fog.visibleContrast", serde_json::json!(0.5))] {
+            let profile = Profile::default().set(key,value).unwrap();
+            assert!(!brogue_chasm_edges_enabled(&profile), "{key}");
+        }
     }
 }

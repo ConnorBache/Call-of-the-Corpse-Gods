@@ -23,7 +23,7 @@ pub struct PaymentPlan {
 }
 impl PaymentPlan {
     pub fn actor_energy_spent(&self) -> f64 { self.actor_before - self.actor_after }
-    pub fn reserve_energy_spent(&self) -> f64 { self.reserve_before.energy - self.reserve_after.energy }
+    pub fn reserve_energy_spent(&self) -> f64 { self.reserve_before.energy.min(self.reserve_after.capacity) - self.reserve_after.energy }
 }
 pub fn valid_reserve(s: &AbilityReserve) -> bool {
     s.capacity.is_finite() && s.capacity >= 0.0 && s.energy.is_finite()
@@ -54,11 +54,16 @@ fn valid_acquisition_ids(ids: &[String]) -> bool {
 /// O(B + G*A*max ID bytes) metadata validation, expected O(ID bytes) inserts;
 /// O(new ID bytes) retained allocation, A=72 catalog entries and G supplied IDs.
 pub fn acquire(actor: &mut Actor, ids: &[String]) -> Result<(), EnergyError> {
+    acquire_for_revision(actor, ids, 50.)
+}
+pub fn acquire_for_revision(actor: &mut Actor, ids: &[String], revision: f64) -> Result<(), EnergyError> {
     validate_reserves(actor)?;
     if !valid_acquisition_ids(ids) { return Err(EnergyError::InvalidReserve); }
+    crate::revision52_reserves::normalize_actor_reserves(actor, revision);
+    let capacity = crate::revision52_reserves::capacity(revision);
     for id in ids {
         if !actor.ability_reserves.as_ref().is_some_and(|m| m.contains_key(id)) {
-            initialize_reserve(actor, id, BASE_ENERGY, BASE_ENERGY)?;
+            initialize_reserve(actor, id, capacity, capacity)?;
         }
     }
     Ok(())
@@ -71,21 +76,25 @@ pub fn reconcile_acquired(r: &mut Run) -> Result<(), EnergyError> {
     if !crate::revision50::enabled(r) { return Ok(()); }
     let ids: Vec<String> = r.player.abilities.iter().cloned()
         .chain(r.inventory.iter().flat_map(crate::tinker::grants).cloned()).collect();
-    acquire(&mut r.player, &ids)
+    acquire_for_revision(&mut r.player, &ids, r.simulation_revision.value_or(29.))
 }
 /// Acquisition preflight and materialization on a detached item, before pickup.
 /// Item identity and existing charge are preserved when dropped and reacquired.
 pub fn acquire_item(actor: &mut Actor, item: &mut crate::Item) -> Result<(), String> {
+    acquire_item_for_revision(actor, item, 50.)
+}
+pub fn acquire_item_for_revision(actor: &mut Actor, item: &mut crate::Item, revision: f64) -> Result<(), String> {
     let ids: Vec<String> = crate::tinker::grants(item).cloned().collect();
     validate_reserves(actor).map_err(|e| format!("Invalid blessing reserve: {e:?}"))?;
     if !valid_acquisition_ids(&ids) { return Err("Unknown Revision 50 blessing grant".into()); }
-    if !crate::revision50_amulets::valid_item_state(item, 50.0) {
+    if !crate::revision50_amulets::valid_item_state(item, revision) {
         return Err("Invalid amulet energy state".into());
     }
     if item.kind == "amulet" && item.amulet_state.is_missing() {
-        crate::revision50_amulets::initialize_item(item).map_err(|e| format!("Invalid amulet acquisition: {e:?}"))?;
+        crate::revision50_amulets::initialize_item_for_revision(item, revision).map_err(|e| format!("Invalid amulet acquisition: {e:?}"))?;
     }
-    acquire(actor, &ids).map_err(|e| format!("Invalid blessing acquisition: {e:?}"))
+    crate::revision52_reserves::normalize_item(item, revision);
+    acquire_for_revision(actor, &ids, revision).map_err(|e| format!("Invalid blessing acquisition: {e:?}"))
 }
 /// Expected O(L) lookup/copy for ability ID bytes L; O(B*L) hash-collision worst
 /// case for B reserves. No scan, mutation, regeneration or random draw.
@@ -93,18 +102,25 @@ pub fn plan_payment(
     reserves: Option<&IndexMap<String, AbilityReserve>>, ability_id: &str,
     actor_energy: f64, cost: f64,
 ) -> Result<PaymentPlan, EnergyError> {
+    plan_payment_for_revision(reserves, ability_id, actor_energy, cost, 50.)
+}
+pub fn plan_payment_for_revision(
+    reserves: Option<&IndexMap<String, AbilityReserve>>, ability_id: &str,
+    actor_energy: f64, cost: f64, revision: f64,
+) -> Result<PaymentPlan, EnergyError> {
     use EnergyError::*;
     if !cost.is_finite() || cost <= 0.0 { return Err(InvalidCost); }
     if !actor_energy.is_finite() || actor_energy < 0.0 { return Err(InvalidActorEnergy); }
     let before = *reserves.and_then(|m| m.get(ability_id)).ok_or(MissingReserve)?;
     if ability_id.is_empty() || !valid_reserve(&before) { return Err(InvalidReserve); }
-    let mut after = before;
+    let mut after = crate::revision52_reserves::project_reserve(before, revision);
+    let available = after.energy;
     let mut actor_after = actor_energy;
-    if before.energy >= cost {
+    if available >= cost {
         after.energy -= cost;
-        if after.energy == before.energy { return Err(InvalidReserve); }
+        if after.energy == available { return Err(InvalidReserve); }
     } else {
-        let remainder = cost - before.energy;
+        let remainder = cost - available;
         if actor_energy < remainder { return Err(InsufficientEnergy); }
         actor_after -= remainder;
         if actor_after == actor_energy { return Err(InvalidActorEnergy); }
@@ -116,11 +132,14 @@ pub fn plan_payment(
 /// See The Future drains exactly its own reserve and player energy, including
 /// the valid zero/zero case. Other reserves never enter this payment plan.
 pub fn plan_future_payment(actor: &Actor) -> Result<PaymentPlan, EnergyError> {
+    plan_future_payment_for_revision(actor, 50.)
+}
+pub fn plan_future_payment_for_revision(actor: &Actor, revision: f64) -> Result<PaymentPlan, EnergyError> {
     if !actor.energy.is_finite() || actor.energy < 0.0 { return Err(EnergyError::InvalidActorEnergy); }
     let before = *actor.ability_reserves.as_ref().and_then(|m| m.get(FUTURE_ID)).ok_or(EnergyError::MissingReserve)?;
     if !valid_reserve(&before) { return Err(EnergyError::InvalidReserve); }
     Ok(PaymentPlan { ability_id: FUTURE_ID.into(), reserve_before: before,
-        reserve_after: AbilityReserve { energy: 0.0, ..before },
+        reserve_after: AbilityReserve { energy: 0.0, ..crate::revision52_reserves::project_reserve(before, revision) },
         actor_before: actor.energy, actor_after: 0.0 })
 }
 /// Revalidate before either mutation; rejected or stale plans leave both unchanged.
@@ -146,9 +165,12 @@ pub fn validate_reserves(actor: &Actor) -> Result<(), EnergyError> {
     Ok(())
 }
 pub fn refill_on_level_up(actor: &mut Actor) -> Result<(), EnergyError> {
+    refill_on_level_up_for_revision(actor, 50.)
+}
+pub fn refill_on_level_up_for_revision(actor: &mut Actor, revision: f64) -> Result<(), EnergyError> {
     validate_reserves(actor)?;
     if let Some(reserves) = actor.ability_reserves.as_mut() {
-        for reserve in reserves.values_mut() { reserve.capacity = BASE_ENERGY; reserve.energy = BASE_ENERGY; }
+        for reserve in reserves.values_mut() { reserve.capacity = crate::revision52_reserves::capacity(revision); reserve.energy = reserve.capacity; }
     }
     Ok(())
 }
@@ -160,7 +182,7 @@ pub fn can_pay(r: &Run, endpoint: f64, ability_id: &str, cost: f64) -> bool {
     let Some(actor) = crate::engine::actor(r, owner) else { return false; };
     if !crate::revision50::enabled(r) { return actor.energy >= cost; }
     if !cost.is_finite() || cost < 0.0 { return false; }
-    cost == 0.0 || plan_payment(actor.ability_reserves.as_ref(), ability_id, actor.energy, cost).is_ok()
+    cost == 0.0 || plan_payment_for_revision(actor.ability_reserves.as_ref(), ability_id, actor.energy, cost, r.simulation_revision.value_or(29.)).is_ok()
 }
 /// Ability-aware replacement for spend_shared. Silence/target/effect eligibility
 /// stays at call sites. Half Here and Dream Walk use the owner's reserve, not copies.
@@ -171,7 +193,7 @@ pub fn spend(r: &mut Run, endpoint: f64, ability_id: &str, cost: f64) -> bool {
     let owner = crate::half_here::owner_id(r, body);
     let Some(actor) = crate::engine::actor(r, owner) else { return false; };
     if cost == 0.0 { return true; }
-    let Ok(plan) = plan_payment(actor.ability_reserves.as_ref(), ability_id, actor.energy, cost) else { return false; };
+    let Ok(plan) = plan_payment_for_revision(actor.ability_reserves.as_ref(), ability_id, actor.energy, cost, r.simulation_revision.value_or(29.)) else { return false; };
     let actor_before = actor.clone();
     let a = crate::engine::actor_mut_trusted(r, owner).unwrap();
     let Some(reserves) = a.ability_reserves.as_mut() else { return false; };

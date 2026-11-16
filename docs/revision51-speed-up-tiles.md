@@ -26,11 +26,29 @@ update remembered map markers, previews or descriptions. Item and actor layers
 retain their existing single physical identities, foreground priority and teal
 ground beneath them. Cosmetic animation restores detached topology markers.
 
-## Numbering status
+## Adjacent destination mapping, clarified for revision 52
 
-Destination-number semantics are under clarification with the designer. Do not
-publish provisional connection labels as a completed numbering implementation.
-No new movement, direction, portal or vision semantics are authorized by labels.
+The designer clarified that Speed-up uses the same Non-Euclidean mapping, with
+the paired endpoints always next to each other. The existing generator already
+builds successive one-source pairs along a row or column. For example, cells at
+x=11 and x=12 share one link number; x=13 and x=14 share the next. The number
+identifies the linked destination, not the entire Speed-up region. Both terrain
+types use the same floor-wide `group_number` and observed-exit adapter. A normal
+two-source Non-Euclidean group retains its two possible return destinations.
+
+This clarification needs no new runtime mechanic, UI explanation, save field,
+save rejection, random draw or remapping. Existing R51 and R52 mappings are
+identical for the same generation input. Numbering follows serialized group
+order, not viewport order, observation order or current material. Hover and
+click routes use the actual saved endpoints and only known destinations. The
+local reversal exception, shared occupancy, rays and local sight remain intact.
+
+The generator proposes only even-length lines (4, 6, 8 or 10 cells). In an
+odd-length eligible corridor, cells outside an accepted complete pair stay
+ordinary ground. Repeated installation is a no-op; proposals overlapping saved
+spatial links are excluded. There is no Speed-up casting ability or cast state.
+Replacing either or both endpoints suspends the pair without changing its
+saved destination or number; restoring both exact terrain cells reactivates it.
 
 ## Verification
 
@@ -41,3 +59,10 @@ save/resume, terrain memory, Revert/Future, same-tick vision, hidden replacement
 item/actor layering, and animated renderer preservation. Capture opt-in:
 `CORPSE_SPEED_UP_REVIEW=<directory>` with the desktop `revision51_speed_up` filter.
 Execution results are recorded separately; this file alone is not a test pass.
+
+The `revision52_speed_up` regressions in those same core and desktop files add
+seeded R51/R52 mapping equality, adjacent disjoint endpoint pairs, odd eligible
+lines, repeated installation/replacement, exact save/fixture replay and restart,
+mixed-type destination glyphs, viewport subsets, hidden destinations, click
+preview versus actual normal/haste movement, and native resized/animated digit
+ink. These review the existing behavior rather than introducing new rules.

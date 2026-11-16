@@ -78,6 +78,7 @@ pub fn finish(r:&mut Run,before:Option<DragSnapshot>)->Result<(),EngineError> {
         if r.depth!=before.depth {break}
         let Some(a)=engine::actor(r,step.id) else{continue};
         if a.hp<=0. || a.dead.value_or(false) || (a.x,a.y)!=step.from || !traversable(r,a,step.to.0,step.to.1) {continue}
+        let observed_before=a.clone();
         let old=engine::actor_mut_trusted(r,step.id).unwrap().conditions.insert("forcedMove".into(),1.);
         let result=engine::move_actor(r,step.id,dx,dy,true);
         if let Some(a)=engine::actor_mut_trusted(r,step.id) {
@@ -85,6 +86,10 @@ pub fn finish(r:&mut Run,before:Option<DragSnapshot>)->Result<(),EngineError> {
             if let Some(old)=old {a.conditions.insert("forcedMove".into(),old);}
         }
         result?;
+        if r.depth==before.depth {if let Some(after)=engine::actor(r,step.id) {if (after.x,after.y)!=step.from {
+            crate::events::cue(r,after,"P03","bracket",crate::events::Stage::Travel,&[after.into()]);
+            crate::events::link(r,&observed_before,after,"P03","stitch-grapple",crate::events::Stage::Travel);
+        }}}
     }
     Ok(())
 }
@@ -137,4 +142,17 @@ mod tests {
         let a=engine::actor(&r,100.).unwrap();assert_eq!((a.x,a.y),original);
     }
 
+}
+
+#[cfg(test)] mod animation_grapple_tether_tests {
+ use super::*;
+ #[test] fn tether_records_only_actual_admitted_drag(){
+  for blocked in [false,true] {
+   let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.x=12.;r.player.y=12.;r.player.conditions.clear();r.player.abilities=vec![ID.into()];r.player.active=r.player.abilities.clone();r.inventory.clear();
+   let mut enemy=r.player.clone();enemy.id=900.;enemy.y=11.;enemy.state="hunting".into();enemy.active.clear();enemy.abilities.clear();r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(enemy);
+   let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=crate::Field::Missing;f.non_euclidean=crate::Field::Missing;if blocked {let w=f.width();f.tiles[11*w+13]="wall".into();}
+   let before=snapshot(&r);r.player.x+=1.;crate::events::begin();finish(&mut r,before).unwrap();let events=crate::events::finish();let tether=events.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P03"&&a.style=="stitch-grapple"));
+   assert_eq!(tether.is_some(),!blocked);if let Some(e)=tether {assert_eq!(e.from,Some(crate::events::EventPoint{x:12.,y:11.}));assert_eq!(e.to,crate::events::EventPoint{x:13.,y:11.});}
+  }
+ }
 }

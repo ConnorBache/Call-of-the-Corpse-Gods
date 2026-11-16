@@ -158,7 +158,8 @@ pub fn create_equipment_revision(
     depth: u32, owned: &[String], revision: f64,
 ) -> Result<Item, String> {
     if revision >= 50.0 {
-        let item = revision50::create(kind, rng, *next_id)?;
+        let mut item = revision50::create(kind, rng, *next_id, revision)?;
+        crate::revision52_amulet_tiers::initialize_birth(&mut item, revision, depth)?;
         *next_id += 1.0;
         return Ok(item);
     }
@@ -236,7 +237,9 @@ pub fn generate_floor_loot_for_run(
     }
     crate::unique_composite_bow::initialize(run);
     if let Some(primary) = revision51::primary_kind(&run.seed, depth) {
-        return revision51::generate(primary, rng, &mut run.next_id);
+        let mut items=revision51::generate(primary, rng, &mut run.next_id, revision)?;
+        for item in &mut items {crate::revision52_amulet_tiers::initialize_birth(item,revision,depth)?;}
+        return Ok(items);
     }
     let mut generated = run.composite_bow_generated.value_or(false);
     let items = generate_floor_loot_with_budget(depth, rng, &mut run.next_id, excluded, count,
@@ -312,7 +315,8 @@ pub fn make_godbeast_permanent_for_run(
     let kinds = if run.composite_bow_generated.value_or(false) {
         &revision50::JEWELRY_KINDS[..]
     } else { &revision50::KINDS[..] };
-    let item = revision50::create(pick(kinds, rng), rng, id)?;
+    let mut item = revision50::create(pick(kinds, rng), rng, id, revision)?;
+    crate::revision52_amulet_tiers::initialize_birth(&mut item, revision, depth)?;
     if crate::unique_composite_bow::is_composite(&item) { run.composite_bow_generated = true.into(); }
     Ok(item)
 }
@@ -324,7 +328,9 @@ pub fn make_godbeast_permanent_revision(
 ) -> Result<Item, String> {
     if revision >= 50.0 {
         let kind = *pick(&revision50::KINDS, rng);
-        return revision50::create(kind, rng, id);
+        let mut item=revision50::create(kind, rng, id, revision)?;
+        crate::revision52_amulet_tiers::initialize_birth(&mut item, revision, depth)?;
+        return Ok(item);
     }
     let names: Vec<_> = catalog()
         .keys()

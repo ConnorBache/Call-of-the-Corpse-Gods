@@ -209,3 +209,8 @@ impl Floor {
         self.tiles.len() / self.width().max(1)
     }
 }
+
+/// Which complete player action owns a saved Fast movement continuation.
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum FastActionPhase { Haste, Normal }

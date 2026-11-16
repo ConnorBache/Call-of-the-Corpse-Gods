@@ -162,6 +162,14 @@ fn activate_inner(
     x: &Field<f64>,
     y: &Field<f64>,
 ) -> Result<bool, EngineError> {
+    // Target admission precedes revision-specific dispatch and all mutation.
+    // Maintained links can always be switched off after losing their target.
+    if r.simulation_revision.value_or(29.) >= 52.
+        && !r.player.active.iter().any(|s| s == id)
+        && matches!(id, "numo-implant-thought" | "pelian-fated-duel" | "pelian-relentless-pursuit")
+        && target.as_ref().and_then(|tid| crate::engine::actor(r, *tid))
+            .is_some_and(|a| !crate::ability_sight::actor(r, a))
+    { return Ok(false); }
     if crate::revision50::enabled(r) {
         if let Some(took) = crate::revision50::activate(r, id, target, x, y)? { return Ok(took); }
     }
@@ -178,6 +186,8 @@ fn activate_inner(
     if !r.player.abilities.iter().any(|a| a == id) {
         return Ok(false);
     }
+    // R52 Hanged is permanently passive, even when an old raw save has a stale toggle.
+    if crate::hanged::enabled(r.simulation_revision.value_or(29.)) && id == crate::hanged::ID { return Ok(false); }
     // Passive Weave has no activation effect or resource cost. UI binds no command.
     if id == crate::progression::WEAVE_ID { return Ok(false); }
     // Validate actor targets before initialization, resource costs, or target mutation.
@@ -318,13 +328,15 @@ fn activate_inner(
                 return Ok(false);
             }
             if crate::revision50::enabled(r) {
-                crate::revision50_ability_energy::acquire(&mut r.player, &copied)
+                crate::revision50_ability_energy::acquire_for_revision(&mut r.player, &copied, r.simulation_revision.value_or(29.))
                     .map_err(|e| EngineError(format!("Remember acquisition: {e:?}")))?;
             }
             *crate::engine::actor_mut_trusted(r, tid).unwrap() = initialized;
+            let acquired=!copied.is_empty();
+            let copied_animation=if crate::events::enabled(r) {copied.clone()}else{Vec::new()};
             for id in copied {
                 r.player.abilities.push(id.clone());
-                crate::progression::initialize_ability_state(&mut r.player, &id, r.tick)
+                crate::progression::initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, &id, r.tick)
                     .map_err(EngineError)?;
                 r.player
                     .conditions
@@ -332,6 +344,14 @@ fn activate_inner(
             }
             crate::equipment::sync_health(r, false);
             crate::half_here::sync(r);
+            if acquired {
+                if let Some(target)=crate::engine::actor(r,tid).filter(|a|crate::events::actor_observed(r,a)) {
+                    for trait_id in &copied_animation {
+                        crate::events::link(r,target,&r.player,"P24",&format!("fracture-trait:{trait_id}"),crate::events::Stage::Special);
+                    }
+                    crate::animation_player::local(r,target,"P24","fold-outline",crate::events::Stage::Special);
+                } else {crate::animation_player::local(r,&r.player,"P24","fracture",crate::events::Stage::Special);}
+            }
             log(r, "You use Remember.", "player");
         }
         "dawel-unspeak" => {
@@ -468,7 +488,7 @@ fn activate_inner(
                     return Ok(false);
                 };
                 let phase = r.player.active.iter().any(|s| s == "etill-phase-through");
-                let valid = r.floors.iter().find(|f| f.depth == depth).is_some_and(|f| {
+                let valid = crate::fast_mode::playable(r, depth) && r.floors.iter().find(|f| f.depth == depth).is_some_and(|f| {
                     valid_point(f, x, y)
                         && (phase
                             || !matches!(
@@ -493,7 +513,7 @@ fn activate_inner(
                     let (old_x, old_y) = (r.player.x, r.player.y);
                     r.player.x = x;
                     r.player.y = y;
-                    if !crate::travel::travel(r, depth - r.depth, false, true)
+                    if !crate::travel::travel_to(r, depth, false, true)
                         .map_err(EngineError)?
                     {
                         r.player.x = old_x;
@@ -501,8 +521,11 @@ fn activate_inner(
                         return Ok(false);
                     }
                 }
+                crate::animation_player::local(r,&r.player,"P33","fold",crate::events::Stage::Travel);
                 r.player.x = x;
                 r.player.y = y;
+                crate::revision50::duel_actor_changed(r,r.player.id);
+                crate::animation_player::local(r,&r.player,"P33","unfold",crate::events::Stage::Travel);
                 r.player.active.retain(|s| s != id);
                 for k in ["dreamX", "dreamY", "dreamDepth"] {
                     r.player.conditions.shift_remove(k);
@@ -531,9 +554,18 @@ fn activate_inner(
                 return Ok(false);
             }
             crate::engine::damage_environment(r, r.player.id, 10.0, None, "blood-letting", false)?;
+            // Bounded player-known status names only: never source IDs, hidden
+            // actors, serialized bookkeeping keys or arbitrary condition strings.
+            const PEEL_STATUSES:&[&str]=&["hemophilia","slowed","paralyzed","magicSensitive","bleeding","burning","poisoned","weakened","emboldened","lucky","unlucky","distracted","flying","telepathic","invisible","confused","hasted","silenced","riptide","gasVulnerable","disoriented","hallucinating","stuck","grabbed","envenomed"];
+            let peel:Vec<_>=if crate::events::enabled(r) {PEEL_STATUSES.iter().copied().filter(|key|crate::engine::condition(&r.player,key)>0.).collect()}else{Vec::new()};
             clear_status_conditions(&mut r.player);
             crate::equipment::sync_health(r, false);
             crate::half_here::sync(r);
+            crate::animation_player::local(r,&r.player,"P39","ripple",crate::events::Stage::Death);
+            let removed:Vec<_>=peel.into_iter().filter(|status|!r.player.conditions.contains_key(*status)).collect();
+            if !removed.is_empty() {
+                crate::animation_player::local(r,&r.player,"P39",&format!("fracture-status:{}",removed.join("+")),crate::events::Stage::Death);
+            }
             log(r, "You use Blood Letting.", "player");
         }
         "isheilah-make-slippery" => {
@@ -612,7 +644,7 @@ fn activate_inner(
             let valid = r.depth > 1.0
                 && r.floors
                     .iter()
-                    .find(|f| f.depth == r.depth - 1.0)
+                    .find(|f| f.depth == crate::fast_mode::above(r, r.depth))
                     .is_some_and(|f| {
                         valid_point(f, r.player.x, r.player.y)
                             && f.tiles[r.player.y as usize * f.width() + r.player.x as usize]
@@ -638,6 +670,7 @@ fn activate_inner(
                 resources::record_loss(r, &p, "energy", 50.0);
                 r.player.energy -= 50.0;
             }
+            crate::animation_player::local(r,&r.player,"P56","rise",crate::events::Stage::Travel);
             log(r, "You use Ascend.", "player");
         }
         "lichor-blood-weapon" => {
@@ -666,7 +699,7 @@ fn activate_inner(
                                     f.tiles[y as usize * f.width() + x as usize].as_str(),
                                     "chasm" | "pit"
                                 )
-                        }) && vision::visible(r, x as usize, y as usize)
+                        }) && crate::ability_sight::tile(r, x as usize, y as usize)
                             && crate::engine::passable(r, x, y)
                             && !occupied_cell(r, x, y)
                     }
@@ -738,6 +771,7 @@ fn activate_inner(
                     a.conditions.insert("temporaryAlly".into(), 5.0);
                 }
             }
+            if let Some(a)=crate::engine::actor(r,tid) {crate::animation_player::local(r,a,if id=="morae-sever-fate" {"P70"}else{"P22"},if id=="morae-sever-fate" {"slash"}else{"stitch"},crate::events::Stage::Special);}
             let name = &crate::progression::catalog_for_revision(r.simulation_revision.value_or(29.0))
                 .iter()
                 .find(|a| a.id == id)
@@ -827,6 +861,9 @@ fn activate_inner(
                 r.player
                     .conditions
                     .insert("fortunes".into(), fortunes - 1.0);
+                if r.simulation_revision.value_or(29.) >= 52. {
+                    crate::fortune_schedule::ensure(&mut r.player, r.tick);
+                }
                 let key = if tid == r.player.id {
                     "lucky"
                 } else {
@@ -882,6 +919,7 @@ fn activate_inner(
             }
             r.player.conditions.insert("allSeeingReveal".into(), 1.0);
             r.player.conditions.insert("allSeeingDepth".into(), r.depth);
+            crate::animation_player::local(r,&r.player,"P72","eye",crate::events::Stage::Special);
             log(r, "You use All-Seeing Eyes.", "player");
         }
         BULWARK => {
@@ -891,7 +929,7 @@ fn activate_inner(
             let f = r
                 .floor()
                 .ok_or_else(|| EngineError("missing floor".into()))?;
-            if !valid_point(f, x, y) || !vision::visible(r, x as usize, y as usize) {
+            if !valid_point(f, x, y) || !crate::ability_sight::tile(r, x as usize, y as usize) {
                 return Ok(false);
             }
             let at = y as usize * f.width() + x as usize;
@@ -911,6 +949,7 @@ fn activate_inner(
                 .get_or_insert_with(Default::default)
                 .insert(at.to_string(), expires);
             r.floor_mut().unwrap().dirty = true;
+            crate::events::at(r,"P11","bracket",crate::events::Stage::Special,&[crate::events::EventPoint{x,y}]);
             log(r, "You use Bulwark of Mind.", "player");
         }
         SLEEP => {
@@ -919,6 +958,7 @@ fn activate_inner(
             }
             r.player.hp = r.player.max_hp;
             r.player.conditions.insert("paralyzed".into(), 51.0);
+            crate::animation_player::local(r,&r.player,"P32","fold",crate::events::Stage::Special);
             log(r, "You use Sudden Sleep.", "player");
             emit_activation(r, "Sudden Sleep", target, x, y);
             return Ok(true);
@@ -999,7 +1039,7 @@ fn activate_inner(
                         .copied()
                         .unwrap_or(0.0)
                         == 0.0);
-            if !vision::visible(r, x as usize, y as usize)
+            if !crate::ability_sight::tile(r, x as usize, y as usize)
                 || (!crate::revision50::enabled(r) && legacy_terrain_blocked)
             {
                 return Ok(false);
@@ -1008,6 +1048,10 @@ fn activate_inner(
                 return Ok(false);
             }
             crate::environment::place_sparkle(r, x, y).map_err(EngineError)?;
+            let wet=r.floor().is_some_and(|f|if r.simulation_revision.value_or(29.)>=52. {
+                crate::revision51_fire_water::quenches(f,y as usize*f.width()+x as usize,r.simulation_revision.value_or(29.))
+            }else{matches!(f.tiles[y as usize*f.width()+x as usize].as_str(),"water"|"shallow-water")});
+            crate::events::at(r,"P58",if wet {"puff"}else{"ember"},crate::events::Stage::Special,&[crate::events::EventPoint{x,y}]);
             log(r, "You use Sparkle.", "player");
         }
         _ => unreachable!(),
@@ -1045,7 +1089,9 @@ fn activate_inner(
             .as_str();
         emit_activation(r, label, target, x, y);
     }
-    Ok(false)
+    // Placement is a normal action in R52; dismissal remains a free toggle.
+    Ok(r.simulation_revision.value_or(29.) >= 52.
+        && id == crate::half_here::ID && r.player.active.iter().any(|a| a == id))
 }
 
 /// Stable endpoint occupancy; old revisions preserve pending-death blockers.
@@ -1105,6 +1151,7 @@ fn pay(r: &mut Run, id: &str, n: f64) -> bool {
 }
 
 fn emit_activation(r: &Run, label: &str, target: &Field<f64>, x: &Field<f64>, y: &Field<f64>) {
+    if crate::events::enabled(r) {return;} // R52 emits only actual outcome hooks / changed transitions.
     let to = target
         .as_ref()
         .and_then(|id| r.actors_at(r.depth).iter().find(|a| a.id == *id))
@@ -1251,8 +1298,49 @@ pub fn upkeep_cost_for(actor: &Actor, id: &str) -> f64 {
 pub fn upkeep_cost_in(_r:&Run,actor:&Actor,id:&str)->f64 {
     upkeep_cost_for(actor,id)
 }
+/// Read-only forecast for the next normal upkeep boundary, not free/haste
+/// actions or contingent procs. Uses canonical atomic own-reserve-first plans
+/// in active order. Cannot spend or reveal any new world state.
+/// O(B+A*L) expected reserve/active metadata work, plus optional current-floor
+/// Unspeak target scan and copied-target trait projection. O(B*L) scratch.
+#[derive(Default,Debug,PartialEq)]
+pub struct UpkeepProjection {
+    pub player_energy:f64,
+    pub reserve_energy:indexmap::IndexMap<String,f64>,
+}
+pub fn projected_player_upkeep(r:&Run)->f64 {projected_upkeep(r).player_energy}
+pub fn projected_upkeep(r:&Run)->UpkeepProjection {
+    let mut result=UpkeepProjection::default();
+    if r.status!="playing" || r.player.hp<=0. {return result;}
+    let actor=&r.player;let next_tick=r.tick+1.;let revision=r.simulation_revision.value_or(29.);
+    let mut energy=actor.energy;let mut reserves=actor.ability_reserves.as_ref().cloned();
+    for id in &actor.active {
+        if actor.conditions.get(&format!("remembered:{id}")).is_some_and(|until|next_tick>=*until) {continue;}
+        if id=="pelian-fated-duel" && !crate::revision50::duel_upkeep_valid(r,actor) {continue;}
+        let cost=if id=="dawel-unspeak" {
+            actor.conditions.get("unspeakTarget").and_then(|id|r.actors_at(r.depth).iter().find(|a|a.id==*id&&!a.dead.value_or(false)&&crate::dreamwalking::same_plane(r,actor,a)))
+                .map(|a|highest_energy_cost_for(&mut a.clone(),revision)).unwrap_or(0.)
+        } else {upkeep_cost_in(r,actor,id)};
+        let prepaid=if crate::revision50::enabled(r)&&actor.conditions.get(&format!("upkeepPaidThrough:{id}")).is_some_and(|until|*until>=next_tick&&*until<=next_tick+1.) {
+            actor.conditions.get(&format!("upkeepPaidAmount:{id}")).copied().unwrap_or(0.).max(0.)
+        } else {0.};
+        let due=(cost-prepaid).max(0.);if due==0. {continue;}
+        if crate::revision50::enabled(r) {
+            if let Ok(plan)=crate::revision50_ability_energy::plan_payment_for_revision(reserves.as_ref(),id,energy,due,revision) {
+                if let Some(reserves)=reserves.as_mut(){
+                    if crate::revision50_ability_energy::commit_payment(&plan,reserves,&mut energy).is_ok() {
+                        *result.reserve_energy.entry(id.clone()).or_default()+=plan.reserve_energy_spent();
+                    }
+                }
+            }
+        } else if energy>=due {energy-=due;}
+    }
+    result.player_energy=(actor.energy-energy).max(0.);
+    result
+}
 /// O(active abilities), paid in active-array order at the source upkeep point.
 pub fn pay_upkeep(r: &mut Run, actor_id: f64) -> Result<bool, EngineError> {
+    crate::revision50::settle_duel_owner(r, actor_id);
     let mut lost_phase = false;
     let Some(a) = crate::engine::actor(r, actor_id) else {
         return Ok(false);
@@ -1355,6 +1443,8 @@ pub fn disable_unfunded(r: &mut Run) -> Result<(), EngineError> {
 
 /// Authored status removal, O(C + R*K): C conditions, R remembered grants, K abilities.
 pub fn clear_status_conditions(actor: &mut Actor) {
+    crate::revision52_enemy_followups::clear_bleed(actor);
+    actor.conditions.shift_remove(crate::revision52_enemy_followups::FLIGHT);
     const KEYS: &[&str] = &[
         "hemophilia",
         "hemophiliaSourceId",
@@ -1680,5 +1770,70 @@ mod remember_passive_reference {
                 case["name"]
             );
         }
+    }
+}
+
+#[cfg(test)] mod remember_animation_fidelity_tests {
+ use super::*;
+ #[test] fn remember_encodes_only_real_new_traits_and_visible_apparent_outline(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  r.player.x=2.;r.player.y=2.;r.player.conditions.clear();r.player.active.clear();r.player.abilities=vec!["numo-remember".into()];r.player.ability_reserves=Field::Missing;r.inventory.clear();
+  crate::revision50_ability_energy::initialize_reserve(&mut r.player,"numo-remember",20.,20.).unwrap();
+  let mut enemy=r.player.clone();enemy.id=900.;enemy.x=3.;enemy.state="hunting".into();enemy.abilities=vec!["shrail-fight-long".into()];enemy.ability_reserves=Field::Missing;enemy.glyph="g".into();
+  r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(enemy);let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=Field::Missing;f.non_euclidean=Field::Missing;
+  crate::events::begin();activate(&mut r,"numo-remember",&900.0.into(),&Field::Missing,&Field::Missing).unwrap();let events=crate::events::finish();
+  assert!(r.player.abilities.iter().any(|s|s=="shrail-fight-long"));
+  assert!(events.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.style=="fracture-trait:shrail-fight-long")));
+  assert!(events.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.style=="fold-outline")&&e.glyph.as_deref()==Some("g")));
+  crate::events::begin();activate(&mut r,"numo-remember",&900.0.into(),&Field::Missing,&Field::Missing).unwrap();assert!(!crate::events::finish().iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P24")));
+ }
+}
+
+#[cfg(test)] mod animation_blood_letting_peel_tests {
+ use super::*;
+ #[test] fn only_actual_removed_player_statuses_peel_without_source_metadata(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.abilities=vec!["lichor-blood-letting".into()];r.player.active.clear();r.player.conditions.clear();r.player.hp=100.;r.inventory.clear();
+  for (key,value) in [("poisoned",3.),("paralyzed",4.),("poisonSourceId",999.),("unrelatedMetadata",7.)] {r.player.conditions.insert(key.into(),value);}
+  crate::events::begin();activate(&mut r,"lichor-blood-letting",&Field::Missing,&Field::Missing,&Field::Missing).unwrap();let e=crate::events::finish();let peels:Vec<_>=e.iter().filter_map(|e|e.animation.as_ref()).map(|a|a.style.as_str()).filter(|s|s.starts_with("fracture-status:")).collect();
+  assert_eq!(peels,vec!["fracture-status:paralyzed+poisoned"]);assert_eq!(r.player.conditions.get("unrelatedMetadata"),Some(&7.));
+  crate::events::begin();activate(&mut r,"lichor-blood-letting",&Field::Missing,&Field::Missing,&Field::Missing).unwrap();assert!(!crate::events::finish().iter().filter_map(|e|e.animation.as_ref()).any(|a|a.style.starts_with("fracture-status:")));
+ }
+}
+
+#[cfg(test)] mod upkeep_forecast_tests {
+    use super::*;
+    fn room()->Run {
+        let mut r=crate::storage::deserialize(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.offers.clear();r.player.active.clear();r.player.ability_reserves=crate::Field::Missing;
+        r.player.energy=50.;r
+    }
+    fn add(r:&mut Run,id:&str,reserve:f64){
+        r.player.abilities.push(id.into());r.player.active.push(id.into());
+        crate::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,reserve).unwrap();
+    }
+    fn actual(r:&Run)->f64{let mut next=r.clone();next.tick+=1.;let id=next.player.id;let before=next.player.energy;pay_upkeep(&mut next,id).unwrap();before-next.player.energy}
+    #[test] fn forecast_matches_next_boundary_and_own_reserve_first_without_mutation(){
+        let mut r=room();add(&mut r,"morae-turning-the-wheel",10.);add(&mut r,"etill-riptide",4.);
+        let before=r.clone();
+        let forecast=projected_upkeep(&r);
+        assert_eq!(forecast.reserve_energy.get("morae-turning-the-wheel"),Some(&10.));
+        assert_eq!(forecast.reserve_energy.get("etill-riptide"),Some(&4.));
+        assert_eq!(forecast.player_energy,16.);
+        assert_eq!(projected_player_upkeep(&r),16.);assert_eq!(projected_player_upkeep(&r),actual(&r));assert_eq!(r,before);
+        r.player.active.clear();assert_eq!(projected_player_upkeep(&r),0.);
+    }
+    #[test] fn forecast_honors_prepaid_next_turn_but_not_previous_turn_credit(){
+        let mut r=room();let id="morae-turning-the-wheel";add(&mut r,id,0.);
+        r.player.conditions.insert(format!("upkeepPaidThrough:{id}"),r.tick+1.);
+        r.player.conditions.insert(format!("upkeepPaidAmount:{id}"),20.);
+        assert_eq!(projected_player_upkeep(&r),0.);assert_eq!(actual(&r),0.);
+        r.player.conditions.insert(format!("upkeepPaidThrough:{id}"),r.tick);
+        assert_eq!(projected_player_upkeep(&r),20.);assert_eq!(actual(&r),20.);
+    }
+    #[test] fn forecast_does_not_invent_payment_for_unaffordable_or_expired_modes(){
+        let mut r=room();add(&mut r,"morae-turning-the-wheel",0.);add(&mut r,"etill-phase-through",0.);r.player.energy=15.;
+        assert_eq!(projected_player_upkeep(&r),5.);assert_eq!(actual(&r),5.);
+        r.player.conditions.insert("remembered:etill-phase-through".into(),r.tick+1.);
+        assert_eq!(projected_player_upkeep(&r),0.);
     }
 }

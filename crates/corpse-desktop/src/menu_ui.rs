@@ -9,8 +9,28 @@ pub struct Item {
     pub h: i32,
     pub size: u16,
 }
-pub const MODE_INDEX: usize = 7;
-pub const SEED_INDEX: usize = 8;
+pub const FAST_INDEX: usize = 11;
+pub const FAST_RECT: (i32, i32, i32, i32) = (103, 8, 559, 44);
+pub const FAST_DEBUG_NOTICE: &str = "Choose a floor from 1 to 20.";
+/// O(input bytes), input is always the sequential player-facing floor number.
+pub fn parse_start_floor(input: &str, _fast: bool) -> Result<u32, String> {
+    let floor = input.trim().parse::<u32>().map_err(|_| FAST_DEBUG_NOTICE.to_string())?;
+    if !(1..=20).contains(&floor) { return Err(FAST_DEBUG_NOTICE.into()); }
+    Ok(floor)
+}
+/// O(1), keyboard steps through all twenty physical floors.
+pub fn step_start_floor(input: &str, forward: bool, _fast: bool) -> String {
+    let n = input.trim().parse::<i32>().unwrap_or(1);
+    (n + if forward { 1 } else { -1 }).clamp(1, 20).to_string()
+}
+pub fn fast_at(x: i32, y: i32) -> bool {
+    let (a, b, w, h) = FAST_RECT;
+    x >= a && x < a + w && y >= b && y < b + h
+}
+pub fn fast_label(enabled: bool) -> &'static str {
+    if enabled { "Fast mode: ON" } else { "Fast mode: OFF" }
+}
+pub const SEED_INDEX: usize = 7;
 pub const SEED_RECT:(i32,i32,i32,i32)=(490,443,172,66);
 /// O(1), shared logical input bounds; separate from existing button/art layout.
 pub fn seed_at(x:i32,y:i32)->bool{let(a,b,w,h)=SEED_RECT;x>=a&&x<a+w&&y>=b&&y<b+h}
@@ -18,26 +38,19 @@ pub fn seed_at(x:i32,y:i32)->bool{let(a,b,w,h)=SEED_RECT;x>=a&&x<a+w&&y>=b&&y<b+
 pub fn edit_seed(seed:&mut String,text:&str,replace:bool)->bool{if text.chars().any(char::is_control)||text.len()+(if replace{0}else{seed.len()})>180{return false;}if replace{seed.clear();}seed.push_str(text);true}
 /// O(seed bytes), unchanged trimming/blank-random semantics, one random call only for blank.
 pub fn selected_seed(seed:&str,random:impl FnOnce()->String)->String{if seed.trim().is_empty(){random()}else{seed.trim().into()}}
-pub const MODES: [&str; 3] = ["Unblessed", "Blessed", "Avatar"];
-pub const ITEMS: [Item; 8] = [
-    Item { label: "DESCEND", x: 103, y: 443, w: 218, h: 66, size: 32 },
+pub const ITEMS: [Item; 7] = [
+    Item { label: "DESCEND", x: 103, y: 443, w: 375, h: 66, size: 32 },
     Item { label: "CONTINUE", x: 174, y: 515, w: 434, h: 54, size: 31 },
     Item { label: "VIEW REPLAY", x: 266, y: 581, w: 342, h: 39, size: 24 },
     Item { label: "VIEW HIGH SCORES", x: 266, y: 624, w: 342, h: 39, size: 24 },
     Item { label: "VIEW BESTIARY", x: 266, y: 667, w: 342, h: 39, size: 24 },
     Item { label: "SETTINGS", x: 266, y: 710, w: 342, h: 39, size: 24 },
     Item { label: "PLAY FROM X'TH FLOOR", x: 174, y: 753, w: 434, h: 39, size: 22 },
-    Item { label: "MODE", x: 333, y: 443, w: 145, h: 66, size: 18 },
 ];
 
-pub fn cycle_mode(mode: &str, forward: bool) -> &'static str {
-    let i = MODES.iter().position(|m| *m == mode).unwrap_or(2);
-    MODES[(i + if forward { 1 } else { 2 }) % MODES.len()]
-}
-
-/// O(1), fixed nine-control traversal; Continue is skipped only when unavailable.
+/// O(1), fixed twelve-control traversal; unavailable Continue is skipped.
 pub fn next_item(selected: usize, forward: bool, can_continue: bool) -> usize {
-    const ORDER: [usize; 9] = [0, MODE_INDEX, SEED_INDEX, 1, 2, 3, 4, 5, 6];
+    const ORDER: [usize; 11] = [0, 8, 9, 10, SEED_INDEX, 1, 2, 3, 4, 5, 6];
     let mut i = ORDER.iter().position(|v| *v == selected).unwrap_or(0);
     loop {
         i = (i + if forward { 1 } else { ORDER.len() - 1 }) % ORDER.len();
@@ -47,6 +60,7 @@ pub fn next_item(selected: usize, forward: bool, can_continue: bool) -> usize {
 
 pub fn item_at(x: i32, y: i32) -> Option<usize> {
     if seed_at(x,y){return Some(SEED_INDEX);}
+    if let Some(slot)=crate::avatar_menu::slot_at(x,y){return Some(crate::avatar_menu::GOD_START+slot);}
     ITEMS.iter().position(|r| x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h)
 }
 
@@ -88,6 +102,29 @@ pub fn lettering(p: &mut Painter, text: &str, x: i32, y: i32, width: i32, height
 mod tests {
     use super::*;
     #[test]
+    fn compressed_debug_floor_validation_and_keyboard_follow_twenty_floors() {
+        for floor in 1..=20 {
+            assert_eq!(parse_start_floor(&floor.to_string(),true),Ok(floor));
+        }
+        for bad in ["0","21","40","2.5","bad",""] { assert!(parse_start_floor(bad,true).is_err()); }
+        assert_eq!(step_start_floor("1",true,true),"2");
+        assert_eq!(step_start_floor("20",true,true),"20");
+        assert_eq!(step_start_floor("1",false,true),"1");
+    }
+    #[test]
+    fn fast_mode_is_not_an_interactive_menu_control() {
+        assert_eq!(item_at(103,8),None);
+        for can_continue in [false,true] {
+            let mut selected=0;let mut visited=Vec::new();
+            loop {assert!(!visited.contains(&selected));visited.push(selected);
+                selected=next_item(selected,true,can_continue);if selected==0 {break;}}
+            assert!(!visited.contains(&FAST_INDEX));
+            assert_eq!(visited.len(),if can_continue {11}else{10});
+        }
+        let mut p=Painter::new();p.menu(18,0,false,"Avatar");let before=p.pixels.clone();
+        p.menu_fast_mode(true,true);assert_eq!(before,p.pixels);
+    }
+    #[test]
     fn complete_large_hit_regions_and_no_gap_activation() {
         for (i, r) in ITEMS.iter().enumerate() {
             assert_eq!(item_at(r.x, r.y), Some(i));
@@ -100,7 +137,7 @@ mod tests {
     }
     #[test]
     fn settings_is_accessible_from_the_main_menu() {
-        assert_eq!(ITEMS.len(), 8);
+        assert_eq!(ITEMS.len(), 7);
         assert_eq!(item_at(300, 730), Some(5));
     }
     #[test]
@@ -136,21 +173,11 @@ mod tests {
         }
     }
     #[test]
-    fn mode_button_is_beside_descend_and_cycles_all_existing_modes() {
-        let descend = &ITEMS[0];
-        let mode = &ITEMS[MODE_INDEX];
-        assert_eq!(descend.y, mode.y);
-        assert!(mode.x > descend.x + descend.w);
-        assert_eq!(item_at(mode.x + 3, mode.y + 3), Some(MODE_INDEX));
-        assert_eq!(cycle_mode("Avatar", true), "Unblessed");
-        assert_eq!(cycle_mode("Unblessed", true), "Blessed");
-        assert_eq!(cycle_mode("Blessed", true), "Avatar");
-        for m in MODES { assert_eq!(cycle_mode(cycle_mode(m, true), false), m); }
-    }
-    #[test]
-    fn keyboard_traversal_includes_mode_and_skips_disabled_continue() {
-        assert_eq!(next_item(0, true, false), MODE_INDEX);
-        assert_eq!(next_item(MODE_INDEX, true, false), SEED_INDEX);
+    fn keyboard_traversal_includes_three_gods_and_skips_disabled_continue() {
+        assert_eq!(next_item(0, true, false), 8);
+        assert_eq!(next_item(8, true, false), 9);
+        assert_eq!(next_item(9, true, false), 10);
+        assert_eq!(next_item(10, true, false), SEED_INDEX);
         assert_eq!(next_item(SEED_INDEX, true, false), 2);
         assert_eq!(next_item(SEED_INDEX, true, true), 1);
         assert_eq!(next_item(2, false, false), SEED_INDEX);
@@ -159,8 +186,8 @@ mod tests {
     }
     /// O(control count), input and first row never overlap each other or anatomical art.
     #[test]
-    fn seed_input_is_beside_mode_and_outside_art(){
-        let(x,y,w,h)=SEED_RECT;assert_eq!(y,ITEMS[MODE_INDEX].y);assert!(x>ITEMS[MODE_INDEX].x+ITEMS[MODE_INDEX].w);assert!(x+w<=662);assert!(x+w<676);
+    fn seed_input_is_beside_descend_and_outside_art(){
+        let(x,y,w,h)=SEED_RECT;assert_eq!(y,ITEMS[0].y);assert!(x>ITEMS[0].x+ITEMS[0].w);assert!(x+w<=662);assert!(x+w<676);
         assert_eq!(item_at(x,y),Some(SEED_INDEX));assert_eq!(item_at(x+w-1,y+h-1),Some(SEED_INDEX));assert_eq!(item_at(x+w,y),None);
         for(width,height)in[(640,480),(960,540),(1280,800),(1920,1080)]{let scale=(width as f64/1280.).min(height as f64/800.);let ox=(width as f64-1280.*scale)/2.;let oy=(height as f64-800.*scale)/2.;assert!(ox+x as f64*scale>=0.&&ox+(x+w)as f64*scale<=width as f64);assert!(oy+y as f64*scale>=0.&&oy+(y+h)as f64*scale<=height as f64);}
     }

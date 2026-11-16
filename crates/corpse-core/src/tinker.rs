@@ -149,7 +149,7 @@ pub fn activate(r: &mut Run, target: Option<f64>) -> Result<bool, EngineError> {
         return Ok(false);
     }
     if crate::revision50::enabled(r) {
-        crate::revision50_ability_energy::acquire(&mut r.player, &[ability.id.clone()])
+        crate::revision50_ability_energy::acquire_for_revision(&mut r.player, &[ability.id.clone()], r.simulation_revision.value_or(29.))
             .map_err(|e| EngineError(format!("Blessing acquisition: {e:?}")))?;
     }
     let before = crate::equipment::capture_before(r);
@@ -163,7 +163,7 @@ pub fn activate(r: &mut Run, target: Option<f64>) -> Result<bool, EngineError> {
     item.tinkered = true.into();
     name_equipment(item, &ability.name);
     crate::equipment::refresh_known_magic(item);
-    let name = item.name.clone();
+    let name = if crate::revision52_amulet_tiers::enabled(r) {crate::revision50_item_knowledge::display_name(r,&r.inventory[index])} else {r.inventory[index].name.clone()};
     r.generated_ability_grants
         .get_or_insert_with(Vec::new)
         .push(ability.id.clone());
@@ -178,6 +178,8 @@ pub fn activate(r: &mut Run, target: Option<f64>) -> Result<bool, EngineError> {
         success,
         "player",
     );
+    crate::events::inventory(r,"P65","gear",target);
+    crate::events::inventory(r,"P65",&format!("spark-god-{}",ability.god_id as u32),target);
     Ok(true)
 }
 

@@ -11,6 +11,15 @@ fn room()->Run {
     select_mode(&mut r,2.);r
 }
 fn place(r:&mut Run) {assert!(activate_cogworks(r,20.,14.).unwrap());}
+fn animation_room(revision:f64)->Run {
+    let mut r=room();r.simulation_revision=revision.into();r.floor_mut().unwrap().lights.fill(100.);
+    if revision>=52. {
+        // The unchanged 20-point construction cost now needs ten main energy.
+        r.player.energy=10.;r.player.ability_reserves.as_mut().unwrap().insert(COGWORKS.into(),
+            crate::revision50_ability_energy::authored_reserve(10.,10.).unwrap());
+    }
+    r
+}
 fn enemy(r:&mut Run)->f64 {
     let id=100.;r.actors_at_mut(r.depth).push(Actor{id,x:19.,y:14.,hp:100.,max_hp:100.,state:"hunting".into(),
         stats:crate::Stats{offense:10.,..Default::default()},..Default::default()});id
@@ -143,4 +152,36 @@ fn hp(r:&Run)->f64 {r.floor().unwrap().revision50_terrain.as_ref().unwrap()[0].h
     crate::dreamwalking::ensure_layer(&mut r);
     crate::dreamwalking::with_plane(&mut r,true,|r|r.floor_mut().unwrap().revision50_terrain=crate::Field::Null);
     assert!(validate_run(&r).is_err());
+}
+
+
+#[test] fn animation_wall_chip_requires_actual_positive_damage_and_keeps_simulation_identical() {
+ let mut r=animation_room(52.);place(&mut r);r.player.x=18.;let id=enemy(&mut r);let a=engine::actor(&r,id).unwrap().clone();let mut expected=r.clone();
+ crate::events::begin();assert!(attack_wall(&mut r,&a,20.,14.).unwrap());let e=crate::events::finish();assert!(hp(&r)<200.);
+ let chips:Vec<_>=e.iter().filter(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P61"&&a.style=="fracture-chip")).collect();assert_eq!(chips.len(),1);assert_eq!(chips[0].to,crate::events::EventPoint{x:20.,y:14.});assert_eq!(chips[0].from,None);assert_eq!(chips[0].animation.as_ref().unwrap().cells.len(),1);
+ crate::events::without_recording(||assert!(attack_wall(&mut expected,&a,20.,14.).unwrap()));assert_eq!(r,expected);
+ engine::actor_mut_trusted(&mut r,id).unwrap().conditions.insert("weaponDamage".into(),0.);engine::actor_mut_trusted(&mut r,id).unwrap().conditions.insert("weaponOffenseMultiplier".into(),0.);let a=engine::actor(&r,id).unwrap().clone();let before=hp(&r);crate::events::begin();assert!(attack_wall(&mut r,&a,20.,14.).unwrap());assert_eq!(hp(&r),before);assert!(crate::events::finish().is_empty());
+}
+#[test] fn animation_wall_chip_is_quiet_for_hidden_cell_forced_attempt_and_legacy() {
+ for case in ["hidden","forced","legacy"] {
+  let mut r=animation_room(if case=="legacy"{51.}else{52.});place(&mut r);let id=enemy(&mut r);
+  if case=="hidden" {r.player.x=1.;r.player.y=1.;let f=r.floor_mut().unwrap();let w=f.width();for y in 0..f.height(){f.tiles[y*w+10]="wall".into();}}
+  else {r.player.x=18.;}
+  if case=="forced" {engine::actor_mut_trusted(&mut r,id).unwrap().conditions.insert("forcedMove".into(),1.);}
+  let a=engine::actor(&r,id).unwrap().clone();crate::events::begin();let hit=attack_wall(&mut r,&a,20.,14.).unwrap();assert_eq!(hit,case!="forced");assert!(crate::events::finish().is_empty(),"{case}");
+ }
+}
+
+
+#[test] fn animation_construction_and_removal_preserve_kind_and_mode_only_has_no_cue() {
+ for (selected,built,removed) in [(1,"pit-sink","pit-rise"),(2,"slab","slab-sink")] {
+  let mut r=animation_room(52.);r.player.x=16.;
+  crate::events::begin();assert!(select_mode(&mut r,selected as f64));assert!(crate::events::finish().is_empty());
+  crate::events::begin();assert!(activate_cogworks(&mut r,20.,14.).unwrap());let events=crate::events::finish();let cues:Vec<_>=events.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P61").collect();assert_eq!(cues.len(),1);assert_eq!(cues[0].style,built);assert!(!cues[0].cells.is_empty());
+  let reserve=&r.player.ability_reserves.as_ref().unwrap()[COGWORKS];assert_eq!((reserve.capacity,reserve.energy,r.player.energy),(10.,0.,0.));
+  let footprint=r.floor().unwrap().revision50_terrain.as_ref().unwrap()[0].cells.clone();assert!(cues[0].cells.iter().all(|p|footprint.contains(&Cell{x:p.x as i32,y:p.y as i32})));
+  crate::events::begin();assert!(select_mode(&mut r,3.));assert!(crate::events::finish().is_empty());
+  crate::events::begin();assert!(activate_cogworks(&mut r,20.,14.).unwrap());let events=crate::events::finish();let cues:Vec<_>=events.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P61").collect();assert_eq!(cues.len(),1);assert_eq!(cues[0].style,removed);assert!(cues[0].cells.iter().all(|p|footprint.contains(&Cell{x:p.x as i32,y:p.y as i32})));assert!(r.floor().unwrap().revision50_terrain.as_ref().unwrap().is_empty());
+  let reserve=&r.player.ability_reserves.as_ref().unwrap()[COGWORKS];assert_eq!((reserve.capacity,reserve.energy,r.player.energy),(10.,0.,0.));
+ }
 }

@@ -1,6 +1,39 @@
 use super::*;
 fn view()->View{let r:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();crate::observe::observe(&r)}
 fn equal(p:&Painter,f:&Painter,label:&str){if let Some((i,(a,b)))=p.pixels.iter().zip(&f.pixels).enumerate().find(|(_, (a,b))|a!=b){panic!("{label} pixelbyte{i}: tile{a}, full{b}");}assert_eq!(p.pixels.len(),f.pixels.len());}
+#[test]fn interaction_cancel_clears_minimum_native_strokes_at_fractional_scales(){
+ let mut spill=[false;2];
+ for (w,h) in [(1280,800),(960,1200),(719,1201),(320,200),(1537,911)] {
+  let mut p=Painter::new();let mut f=Painter::new();
+  for painter in [&mut p,&mut f]{painter.resize(w,h);painter.set_responsive_canvas(true);}
+  if w==960 {
+   let(cw,ch,_,_)=p.map_layout(79,29);
+   // Exercise every quarter-pixel phase of real corner marks. Both horizontal
+   // and vertical one-native-pixel overhang must fit the shared footprint.
+   for dx in 0..4 {for dy in 0..4 {
+    let(x,y)=(100+dx,100+dy);let tile=p.logical_damage_rect(x,y,cw,ch).unwrap();
+    let bounds=p.interaction_damage_rect(x,y,cw,ch).unwrap();p.clear([0,0,0]);
+    p.interaction_mark(x,y,cw,ch,false,true,true);
+    for(i,pixel)in p.pixels.chunks_exact(4).enumerate().filter(|(_,p)|p[..3]==[230,155,131]) {
+     let(px,py)=(i%w,i/w);assert!(px>=bounds.x&&px<bounds.right()&&py>=bounds.y&&py<bounds.bottom());
+     spill[0]|=px>=tile.right();spill[1]|=py>=tile.bottom();let _=pixel;
+    }
+   }}
+  }
+  let mut plan=TilePlanner::default();let mut old=None;
+  for (step,aim) in [true,false,true,false].into_iter().enumerate(){
+   let mut next=view();next.width=79;next.height=29;next.terrain_snapshot=None;next.terrain_count=0;
+   next.cells=(9..=11).flat_map(|y|(26..=30).map(move |x|Cell{x,y,glyph:".".into(),fg:[230,220,210],bg:[119,95,112],current:true,direct:true,..Default::default()})).collect();
+   next.path.clear();next.target_path=if aim{vec![(27,10),(28,10)]}else{vec![]};next.target_area.clear();
+   next.target_impact=aim.then_some((28,10));next.hover=aim.then_some((28,10));next.possible_exits.clear();next.target_color=aim.then_some([246,192,91]);
+   plan.replace_view(old.as_ref(),&next,&p);plan.finish_damage(&mut p);
+   if step>0{assert!(p.tile_mask.area()<w*h,"interaction repaint must remain local");}
+   plan.paint_base(&mut p,&next,"",0.);p.tile_clip_enabled=false;f.game_at(&next,"",false,0.);
+   equal(&p,&f,&format!("fractional interaction {w}x{h} step{step}"));plan.clear_frame();old=Some(next);
+  }
+ }
+ assert_eq!(spill,[true,true],"the regression must exercise both overhang axes");
+}
 #[test]fn exact_spans_preserve_l_shapes_and_binary_row_intersections(){let mut s=RowSpans::default();s.reset(1280,800);s.add(Rect::new(0,0,990,128));s.add(Rect::new(990,0,290,800));s.finish();assert_eq!(s.area(),990*128+290*800);assert!(!s.contains(500,400));assert!(!s.intersects(Rect::new(200,300,10,10)));assert!(s.intersects(Rect::new(989,300,3,10)));assert_eq!(s.upload_rectangles().iter().map(|r|r.area()).sum::<usize>(),s.area());let spans:Vec<_>=row_segments(Some(&s),300,500,1100).collect();assert_eq!(spans,vec![(990,1100)]);}
 #[test]fn borrowed_transitions_match_full_at_three_native_scales(){
  for scale in [1.,1.5,2.]{let mut p=Painter::new();let mut f=Painter::new();p.resize((1280.*scale)as usize,(800.*scale)as usize);f.resize(p.width,p.height);let mut plan=TilePlanner::default();let mut old=None;

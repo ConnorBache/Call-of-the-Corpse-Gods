@@ -74,7 +74,10 @@ pub fn on_arrival(r: &mut Run, id: f64) -> bool {
     if r.simulation_revision.value_or(29.0) < 33.0 { return false; }
     let Some(a) = crate::engine::actor(r, id).filter(|a| clears_ground(r, a)) else { return false };
     let Some(at) = r.floor().and_then(|f| cell(f, a.x, a.y)) else { return false };
-    erase_cells(r, r.depth, &HashSet::from([at]))
+    let a=a.clone();
+    let changed=erase_cells(r, r.depth, &HashSet::from([at]));
+    if changed { crate::animation_enemy::mark(r, &a, "E81", "dissolve-violet", crate::events::Stage::Special); }
+    changed
 }
 
 /// Initial generated placement, including floors not currently being observed.

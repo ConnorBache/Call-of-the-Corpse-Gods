@@ -31,9 +31,18 @@ pub fn actor(id:f64,x:f64,y:f64) -> Actor {
     a.conditions.insert("ahvamitt".into(),1.);a.conditions.insert("ahvamittFinds".into(),0.);
     a.conditions.insert("bestiaryTraitsInitialized".into(),1.);a
 }
+pub fn actor_revision(id:f64,x:f64,y:f64,revision:f64) -> Actor {
+    let mut a=actor(id,x,y);
+    a.stats.accuracy=crate::combat::creature_birth_accuracy(revision,a.stats.accuracy);
+    a.stats.dodge=crate::combat::creature_birth_dodge(revision,a.stats.dodge);
+    a
+}
 pub fn populate(f:&Floor,actors:&mut Vec<Actor>,next_id:&mut f64) {
+    populate_revision(f,actors,next_id,34.);
+}
+pub fn populate_revision(f:&Floor,actors:&mut Vec<Actor>,next_id:&mut f64,revision:f64) {
     if let Some(e)=f.godbeast_event.as_ref().filter(|e|e.kind=="Ahvamitt" && !e.reward_created.value_or(false)) {
-        actors.push(actor(*next_id,e.x,e.y));*next_id+=1.;
+        actors.push(actor_revision(*next_id,e.x,e.y,revision));*next_id+=1.;
     }
 }
 /// O(V*(A+B)) filtering plus O(V) BFS, A current actors, B bounded active traits;
@@ -62,13 +71,19 @@ pub fn attack(r:&mut Run,id:f64)->Result<bool,EngineError> {
     engine::actor_mut_trusted(r,id).unwrap().conditions.insert("ahvamittFinds".into(),(finds+1) as f64);
     engine::log(r,[FIRST,SECOND,THIRD][finds as usize],"environment");
     if finds==2 {
+        crate::animation_enemy::mark(r, &a, "E76", "mask-fold", crate::events::Stage::Special);
         let item=mask_for_revision(r.next_id,r.simulation_revision.value_or(29.));r.next_id+=1.;
         crate::item_placement::place_ground_item(r,r.depth,GroundItem{x:a.x,y:a.y,item,..Default::default()},
             |r,d|crate::startup::ensure_floors(r,d as u32)).map_err(EngineError)?;
         r.actors_at_mut(r.depth).retain(|a|a.id!=id);
+        crate::revision50::end_duels_with_target(r,id);
         if let Some(e)=r.floor_mut().and_then(|f|f.godbeast_event.as_mut()).filter(|e|e.kind=="Ahvamitt") { e.reward_created=true.into(); }
     }
-    if let Some((x,y))=at { let a=engine::actor_mut_trusted(r,id).unwrap();a.x=x;a.y=y; }
+    if let Some((x,y))=at {
+        crate::animation_enemy::mark(r, &a, "E75", "mask-fold", crate::events::Stage::Special);
+        let a=engine::actor_mut_trusted(r,id).unwrap();a.x=x;a.y=y;
+        let a=a.clone(); crate::revision50::duel_actor_changed(r,id); crate::animation_enemy::mark(r, &a, "E75", "mask-unfold", crate::events::Stage::Special);
+    } else if finds<2 { crate::animation_enemy::mark(r, &a, "E75", "diamond-gold", crate::events::Stage::Special); }
     r.floor_mut().unwrap().dirty=true;
     Ok(true)
 }
@@ -79,13 +94,16 @@ pub fn teleport(r:&mut Run)->Result<bool,EngineError> {
     crate::dreamwalking::with_actor(r,id,|r| {
         let a=r.player.clone();
         let Some((x,y))=destination(r,&a) else{return Ok(false)};
+        crate::animation_enemy::mark(r,&a,"P74","mask-iris",crate::events::Stage::Travel);
         r.player.x=x;r.player.y=y;
+        crate::revision50::duel_actor_changed(r,id);
         r.player.conditions.insert("ahvamittTeleportReadyAt".into(),r.tick+COOLDOWN);
         crate::half_here::sync(r);
         crate::zillennia_ground::on_arrival(r,id);
         crate::environment::refresh_burning_from_fire(r,id).map_err(EngineError)?;
         engine::log(r,if crate::revision50::enabled(r) {"The Masque of the Trickster whisks you away."} else {"The Mask of Trickery whisks you away."},"player");
-        crate::events::actor_event(r,&r.player,"pulse","Teleport",None,None);
+        if crate::events::enabled(r) {crate::animation_enemy::mark(r,&r.player,"P74","mask-unfold",crate::events::Stage::Special);}
+        else {crate::events::actor_event(r,&r.player,"pulse","Teleport",None,None);}
         Ok(true)
     })
 }

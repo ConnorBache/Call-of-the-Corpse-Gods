@@ -85,14 +85,17 @@ pub fn turn(
                 if id == r.player.id { "player" } else { "enemy" },
             );
         }
-        crate::events::actor_event(
+        if crate::events::enabled(r) {
+            if let Some(remains)=actor(r,corpse) {crate::events::link(r,remains,&a,"E10","droplet-feast",crate::events::Stage::Special);}
+            crate::animation_enemy::mark(r,&a,"E10","unfold-pale-red",crate::events::Stage::Special);
+        } else {crate::events::actor_event(
             r,
             &a,
             "pulse",
             &format!("Wendigo level {}", level + 1.0),
             None,
             None,
-        );
+        ); }
         r.floor_mut().unwrap().dirty = true;
         return Ok(true);
     }

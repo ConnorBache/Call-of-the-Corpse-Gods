@@ -1,5 +1,5 @@
 //! Revision51 generated fungus feasts. Legacy populations keep their frozen props.
-use crate::{Actor, Floor, FungalRoot, movement::Point};
+use crate::{Actor, Floor, movement::Point};
 use std::collections::HashSet;
 
 pub fn is_fungus(kind: &str) -> bool {
@@ -93,7 +93,9 @@ pub(crate) fn plan(
 }
 
 /// Two selection draws per feast from an isolated seed/floor stream; existing
-/// actor/loot streams and root save schema are unchanged. In addition to pool
+/// actor/loot streams are unchanged. R52 starts each root at its source and
+/// records its normal-turn growth state; earlier revisions keep full paths.
+/// In addition to pool
 /// work, O(F*(A+L+W+R)+V) time: F fungi, A actors scanned per source lookup,
 /// L cloned actor payload, W existing actor construction/trait work, R<=11 root
 /// cells, V floor cells. O(K*J+F*(L+R)+V) scratch/output, with root-layer O(V)
@@ -119,17 +121,16 @@ pub(crate) fn populate(
             let mut corpse = crate::population::create_actor_revision(kind, *next_id,
                 (at % w) as f64, (at / w) as f64, false, revision)?;
             *next_id += 1.;
+            crate::balance52::apply_new_actor_kind(&mut corpse, kind, f.depth, revision);
             corpse.dead = true.into();
             corpse.hp = 0.;
             corpse.heartless = true.into();
             corpse.corpse_age = 0.0.into();
             let path = crate::fungi::root_path(w, &source, &corpse);
+            let root = crate::fungi::new_link(&source, &corpse, path, revision, crate::fungi::ROOT_COLOR);
             let roots = f.roots.get_or_insert_with(|| vec![0.; f.tiles.len()]);
-            for &cell in &path { roots[cell as usize] = 1.; }
-            f.fungal_roots.get_or_insert_with(Vec::new).push(FungalRoot {
-                fungus_id: source.id, corpse_id: corpse.id, path, active: true,
-                color: crate::fungi::ROOT_COLOR.into(),
-            });
+            for &cell in root.grown_path() { roots[cell as usize] = 1.; }
+            f.fungal_roots.get_or_insert_with(Vec::new).push(root);
             actors.push(corpse);
         }
     }

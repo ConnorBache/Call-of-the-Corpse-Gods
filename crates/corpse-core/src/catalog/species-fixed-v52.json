@@ -1,0 +1,544 @@
+[
+  {
+    "kind": "banshee",
+    "floor": 29,
+    "offense": 720,
+    "defense": 36,
+    "accuracy": 107,
+    "dodge": 52,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 6,
+    "offense": 54,
+    "defense": 10,
+    "accuracy": 14,
+    "dodge": 18,
+    "dr": 0
+  },
+  {
+    "kind": "blorb",
+    "floor": 1,
+    "offense": 2,
+    "defense": -15,
+    "accuracy": -3,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "bombardier",
+    "floor": 13,
+    "offense": 10.0,
+    "defense": -7.0,
+    "accuracy": 79,
+    "dodge": 64,
+    "dr": 0.0
+  },
+  {
+    "kind": "cancer",
+    "floor": 35,
+    "offense": 456,
+    "defense": 175,
+    "accuracy": 122,
+    "dodge": 92,
+    "dr": 97
+  },
+  {
+    "kind": "cave-bat",
+    "floor": 1,
+    "offense": 13,
+    "defense": -14,
+    "accuracy": -2,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "chimera",
+    "floor": 35,
+    "offense": 809,
+    "defense": 144,
+    "accuracy": 131,
+    "dodge": 100,
+    "dr": 48
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 20,
+    "offense": 240,
+    "defense": 96,
+    "accuracy": 144,
+    "dodge": 35,
+    "dr": 15
+  },
+  {
+    "kind": "dragon",
+    "floor": 38,
+    "offense": 739,
+    "defense": 153,
+    "accuracy": 153,
+    "dodge": 116,
+    "dr": 83
+  },
+  {
+    "kind": "dryad",
+    "floor": 3,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": 5,
+    "dr": 0,
+    "heal_amount": 25
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 8,
+    "offense": 41,
+    "defense": 19,
+    "accuracy": 15,
+    "dodge": 30,
+    "dr": 21
+  },
+  {
+    "kind": "glim",
+    "floor": 7,
+    "offense": 79,
+    "defense": 4,
+    "accuracy": 15,
+    "dodge": 24,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin",
+    "floor": 1,
+    "offense": 11,
+    "defense": -7,
+    "accuracy": -1,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 5,
+    "offense": -1,
+    "defense": 3,
+    "accuracy": 12,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-inventor",
+    "floor": 14,
+    "offense": 6.0,
+    "defense": -4.0,
+    "accuracy": 96,
+    "dodge": 45,
+    "dr": 0.0
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 14,
+    "offense": 79,
+    "defense": 28,
+    "accuracy": 43,
+    "dodge": 40,
+    "dr": 33
+  },
+  {
+    "kind": "horn-1",
+    "floor": 12,
+    "offense": 62,
+    "defense": 10,
+    "accuracy": 63,
+    "dodge": 61,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 12,
+    "offense": 107,
+    "defense": 14,
+    "accuracy": 63,
+    "dodge": 61,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 22,
+    "offense": 252,
+    "defense": 28,
+    "accuracy": 114,
+    "dodge": 53,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 24,
+    "offense": 481,
+    "defense": 34,
+    "accuracy": 118,
+    "dodge": 68,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 29,
+    "offense": 438,
+    "defense": 62,
+    "accuracy": 134,
+    "dodge": 80,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 30,
+    "offense": 642,
+    "defense": 52,
+    "accuracy": 118,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "horn-7",
+    "floor": 36,
+    "offense": 526,
+    "defense": 114,
+    "accuracy": 141,
+    "dodge": 109,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 16,
+    "offense": 216,
+    "defense": 20,
+    "accuracy": 134,
+    "dodge": 29,
+    "dr": 0
+  },
+  {
+    "kind": "killspawn",
+    "floor": 25,
+    "offense": 481,
+    "defense": 69,
+    "accuracy": 128,
+    "dodge": 72,
+    "dr": 25
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 13,
+    "offense": 81,
+    "defense": 29,
+    "accuracy": 79,
+    "dodge": 59,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 25,
+    "offense": 0,
+    "defense": 29,
+    "accuracy": 110,
+    "dodge": 81,
+    "dr": 0
+  },
+  {
+    "kind": "minotaur",
+    "floor": 33,
+    "offense": 570,
+    "defense": 152,
+    "accuracy": 128,
+    "dodge": 92,
+    "dr": 56
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 33,
+    "offense": 830,
+    "defense": 100,
+    "accuracy": 133,
+    "dodge": 50,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 1,
+    "offense": 24,
+    "defense": -10,
+    "accuracy": -3,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 24,
+    "offense": 163,
+    "defense": 32,
+    "accuracy": 99,
+    "dodge": 66,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 6,
+    "offense": 10,
+    "defense": 3,
+    "accuracy": 14,
+    "dodge": 18,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 3,
+    "offense": 17,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": 5,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Breather",
+    "floor": 5,
+    "offense": 10.0,
+    "defense": 7.0,
+    "accuracy": 12,
+    "dodge": 0,
+    "dr": 0.0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 23,
+    "offense": 20,
+    "defense": 28,
+    "accuracy": 98,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 18,
+    "offense": 125,
+    "defense": 70,
+    "accuracy": 156,
+    "dodge": 47,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 22,
+    "offense": 20,
+    "defense": 37,
+    "accuracy": 96,
+    "dodge": 77,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 20,
+    "offense": 20,
+    "defense": 43,
+    "accuracy": 79,
+    "dodge": 50,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 19,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 179,
+    "dodge": 37,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 1,
+    "offense": 26,
+    "defense": -10,
+    "accuracy": -2,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 4,
+    "offense": 10,
+    "defense": 4,
+    "accuracy": 10,
+    "dodge": 7,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 4,
+    "offense": -2,
+    "defense": -11,
+    "accuracy": 10,
+    "dodge": 7,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 32,
+    "offense": 654,
+    "defense": 120,
+    "accuracy": 116,
+    "dodge": 93,
+    "dr": 0
+  },
+  {
+    "kind": "rat",
+    "floor": 1,
+    "offense": 17,
+    "defense": -10,
+    "accuracy": -1,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "river-drake",
+    "floor": 22,
+    "offense": 440,
+    "defense": 50,
+    "accuracy": 61,
+    "dodge": 84,
+    "dr": 20
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 25,
+    "offense": 726,
+    "defense": 21,
+    "accuracy": 133,
+    "dodge": 72,
+    "dr": 0
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 28,
+    "offense": 308,
+    "defense": 98,
+    "accuracy": 149,
+    "dodge": 95,
+    "dr": 36
+  },
+  {
+    "kind": "saidribee-queen",
+    "floor": 28,
+    "offense": 165,
+    "defense": 55,
+    "accuracy": 125,
+    "dodge": 72,
+    "dr": 0
+  },
+  {
+    "kind": "shellback-beetle",
+    "floor": 1,
+    "offense": 16,
+    "defense": -8,
+    "accuracy": -2,
+    "dodge": 0,
+    "dr": 9
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 1,
+    "offense": -1,
+    "defense": -9,
+    "accuracy": -2,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 26,
+    "offense": 332,
+    "defense": 46,
+    "accuracy": 138,
+    "dodge": 49,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 10,
+    "offense": 118,
+    "defense": 1,
+    "accuracy": 23,
+    "dodge": 39,
+    "dr": 0
+  },
+  {
+    "kind": "troll",
+    "floor": 19,
+    "offense": 200,
+    "defense": 69,
+    "accuracy": 86,
+    "dodge": 69,
+    "dr": 18
+  },
+  {
+    "kind": "ursa-major",
+    "floor": 36,
+    "offense": 378,
+    "defense": 197,
+    "accuracy": 133,
+    "dodge": 90,
+    "dr": 72
+  },
+  {
+    "kind": "ursa-minor",
+    "floor": 36,
+    "offense": 324,
+    "defense": 144,
+    "accuracy": 133,
+    "dodge": 90,
+    "dr": 50
+  },
+  {
+    "kind": "valta",
+    "floor": 34,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 105,
+    "dodge": 91,
+    "dr": 0,
+    "special_damage": 922.5
+  },
+  {
+    "kind": "vampire",
+    "floor": 30,
+    "offense": 594,
+    "defense": 52,
+    "accuracy": 112,
+    "dodge": 89,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 17,
+    "offense": 368,
+    "defense": 11,
+    "accuracy": 154,
+    "dodge": 35,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 27,
+    "offense": 15,
+    "defense": 33,
+    "accuracy": 102,
+    "dodge": 59,
+    "dr": 0
+  },
+  {
+    "kind": "yeti",
+    "floor": 27,
+    "offense": 398,
+    "defense": 46,
+    "accuracy": 97,
+    "dodge": 51,
+    "dr": 29
+  }
+]

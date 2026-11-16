@@ -64,6 +64,61 @@ fn sparkle_has_no_terrain_limit_but_water_including_ichor_quenches_immediately()
     }
 }
 #[test]
+fn r52_sparkle_ichor_water_stays_lit_without_a_timer_and_ordinary_water_quenches() {
+    for tile in ["floor","water","shallow-water"] {for ichor in [false,true] {
+        let mut r=room(52.);reveal(&mut r);let i=10*r.floor().unwrap().width()+15;
+        r.floor_mut().unwrap().tiles[i]=tile.into();
+        if ichor {let n=r.floor().unwrap().tiles.len();let f=r.floor_mut().unwrap();f.ichor=vec![0.;n].into();f.ichor.as_mut().unwrap()[i]=100.;}
+        let energy=r.player.energy;let result=engine::dispatch(&mut r,&at(abilities::SPARKLE,15.,10.)).unwrap();
+        assert!(!result.took_turn);assert_eq!(r.player.energy,energy-20.);
+        let quenched=tile!="floor"&&!ichor;
+        assert!(result.events.iter().filter_map(|e|e.animation.as_ref()).any(|a|a.proposal=="P58"&&a.style==if quenched{"puff"}else{"ember"}));
+        for _ in 0..32 {let frozen=environment::frozen_environment(&r);FireAdapter::new(&mut r,frozen).unwrap().advance().unwrap();}
+        if quenched {no_fire(&r,i);}else {
+            let f=r.floor().unwrap();assert!(f.environment.as_ref().unwrap().fire[i]>0.);
+            assert!(f.permanent_fire.as_ref().unwrap().contains(&(i as f64)));
+            assert!(f.light_sources.as_ref().unwrap().iter().any(|s|s.x==15.&&s.y==10.));
+        }
+        let saved=storage::serialize(&r).unwrap();let mut restored=storage::deserialize(&saved).unwrap();
+        let frozen=environment::frozen_environment(&restored);FireAdapter::new(&mut restored,frozen).unwrap().advance().unwrap();
+        assert_eq!(restored.floor().unwrap().permanent_fire,r.floor().unwrap().permanent_fire);
+    }}
+}
+#[test]
+fn r52_sparkle_contact_removes_source_and_light_only_when_ichor_is_absent() {
+    let mut r=room(52.);let i=10*r.floor().unwrap().width()+15;environment::place_sparkle(&mut r,15.,10.).unwrap();
+    let n=r.floor().unwrap().tiles.len();let f=r.floor_mut().unwrap();f.tiles[i]="water".into();f.ichor=vec![0.;n].into();f.ichor.as_mut().unwrap()[i]=1.;
+    corpse_core::revision51_fire_water::extinguish_floor(r.floor_mut().unwrap(),52.);
+    assert!(r.floor().unwrap().permanent_fire.as_ref().unwrap().contains(&(i as f64)));
+    r.floor_mut().unwrap().ichor.as_mut().unwrap()[i]=0.;
+    corpse_core::revision51_fire_water::extinguish_floor(r.floor_mut().unwrap(),52.);no_fire(&r,i);
+    let frozen=environment::frozen_environment(&r);FireAdapter::new(&mut r,frozen).unwrap().advance().unwrap();no_fire(&r,i);
+}
+#[test]
+fn r52_sparkle_and_collision_targets_survive_snapshot_future_and_replay() {
+    use corpse_core::{revision50_amulet_effects::{self as amulets,Effect},replay::{ReplayRecord,ReplaySession}};
+    for kind in [Effect::Iceblast,Effect::Blinking] {
+        let mut initial=room(52.);initial.player.conditions.insert("allSeeingReveal".into(),1.);initial.player.conditions.insert("allSeeingDepth".into(),initial.depth);
+        let id=target(&mut initial);engine::actor_mut(&mut initial,id).unwrap().x=14.;
+        initial.inventory.push(amulets::make_amulet(kind,9001.).unwrap());
+        let w=initial.floor().unwrap().width();let n=initial.floor().unwrap().tiles.len();let f=initial.floor_mut().unwrap();
+        f.tiles[12*w+15]="water".into();f.ichor=vec![0.;n].into();f.ichor.as_mut().unwrap()[12*w+15]=100.;
+        let mut e=Engine::new(initial.clone()).unwrap();
+        for c in [at(abilities::SPARKLE,15.,12.),Command::UseAt{id:9001.,x:18.,y:10.},Command::Wait] {
+            e.dispatch(&c).unwrap();e=Engine::load(&e.save().unwrap()).unwrap();
+        }
+        let expected=e.save().unwrap();let record=ReplayRecord::try_from_run(&e.run).unwrap();
+        let mut replay=ReplaySession::from_initial(initial,record).unwrap();while replay.step().unwrap(){}
+        assert_eq!(replay.engine.save().unwrap(),expected);
+        let snapshot=Snapshot::capture(&e.run);let fire=e.run.floor().unwrap().permanent_fire.clone();
+        temporal::remember_future(&mut e.run,&History::default()).unwrap();
+        e.run.floor_mut().unwrap().permanent_fire=Field::Missing;
+        assert!(temporal::restore_future(&mut e.run,&mut History::default()).unwrap());
+        assert_eq!(e.run.floor().unwrap().permanent_fire,fire);
+        e.run.floor_mut().unwrap().permanent_fire=Field::Missing;snapshot.restore(&mut e.run).unwrap();assert_eq!(e.run.floor().unwrap().permanent_fire,fire);
+    }
+}
+#[test]
 fn paid_abilities_reject_silence_or_insufficient_energy_before_world_mutation() {
     for id in [CAME, abilities::ALL_SEEING, abilities::SPARKLE] { for silenced in [false, true] {
         let mut r=room(51.); let tid=target(&mut r); r.player.energy=if silenced {100.} else {0.};

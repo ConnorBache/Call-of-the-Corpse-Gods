@@ -74,8 +74,8 @@ pub fn effects(p:&Painter,v:&View,cues:&[crate::effects::Cue],now:f64,reduced:bo
 /// Layout wrapping remains in the existing painter; no duplicate prose wrapping here.
 pub fn hover(p:&Painter,report:&crate::inspection_ui::Report,tile:(i32,i32,i32,i32))->Option<Hover>{
     if !crate::inspection_ui::hover_available(report){return None;}
-    let r=crate::modal_ui::hover_bounds(&p.profile,tile,i32::MAX/4);
-    p.logical_damage_rect(r.0,8,r.2,crate::render::HEIGHT as i32-16).map(|bounds|Hover{report:report.clone(),tile,bounds})
+    let r=crate::modal_ui::hover_bounds_painter(p,tile,i32::MAX/4);
+    p.logical_damage_rect(r.0,8,r.2,p.logical_height()-16).map(|bounds|Hover{report:report.clone(),tile,bounds})
 }
 #[cfg(test)]mod tests{
     use super::*;

@@ -1,0 +1,23 @@
+THE CALL OF THE CORPSE GODS - COMPLETE R52 SOURCE
+
+This archive contains the Rust workspace, pinned Cargo.lock/toolchain,
+fixtures, embedded artwork, source tools, and documentation. It is a source
+checkpoint, not an installed Rust compiler/SDK and not a Windows runtime test.
+
+Use the pinned Rust 1.99.1 toolchain. Read AGENTS.md and docs before editing.
+With that toolchain available and native SDL2 development libraries installed:
+    cargo test --workspace
+    cargo build --release -p corpse-desktop
+
+The repository tools/cargo.sh wrapper expects a workspace-local .cargo and
+.rustup beside this source directory. Standard cargo with the pinned installed
+toolchain is an alternative; do not silently upgrade Cargo.lock or toolchain.
+Windows cross-compilation additionally requires the x86_64-pc-windows-gnu Rust
+target, MinGW cross tools and the pinned SDL2 development/runtime SDK described
+in the build receipts and tools/windows-linker.sh. The SDK is not bundled.
+
+The final source snapshot and verification receipts identify this checkpoint.
+Seven prior files were behaviorally reconstructed, not recovered byte-for-byte;
+see docs/revision52-source-reconstruction.md. Older receipts remain historical.
+New requested R52 mechanics are documented in docs/current-design-amendments.md
+and the linked follow-up reports. Pre-R52 run behavior remains versioned.

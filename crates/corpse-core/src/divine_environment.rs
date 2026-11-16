@@ -16,6 +16,8 @@ fn leave_black_pit_inner(r: &mut Run, id: f64, old: usize) {
     }
     let f = r.floor_mut().unwrap();
     let tile = f.tiles[old].clone();
+    let changed=tile!="chasm";
+    let point=crate::events::EventPoint{x:(old%f.width()) as f64,y:(old/f.width()) as f64};
     let altered = f.altered_chasms.get_or_insert_with(Default::default);
     if tile != "chasm" && !altered.contains_key(&old.to_string()) {
         altered.insert(old.to_string(), FloorAlteredChasmsEntry { tile, age: 0. });
@@ -27,6 +29,7 @@ fn leave_black_pit_inner(r: &mut Run, id: f64, old: usize) {
         }
     }
     f.dirty = true;
+    if changed {crate::events::at(r,"P53","collapse",crate::events::Stage::Special,&[point]);}
 }
 /// O(A) stable target lookup; forced movement invokes the shared exact movement pipeline.
 pub fn apply_riptide(r: &mut Run) -> Result<(), String> {
@@ -45,6 +48,7 @@ pub fn apply_riptide(r: &mut Run) -> Result<(), String> {
     let (dx, dy) = crate::portals::direction_toward(r, a,
         crate::engine::condition(&r.player, "riptideX"),
         crate::engine::condition(&r.player, "riptideY"));
+    let before=a.clone();
     crate::engine::actor_mut_trusted(r, id)
         .unwrap()
         .conditions
@@ -54,6 +58,7 @@ pub fn apply_riptide(r: &mut Run) -> Result<(), String> {
         a.conditions.shift_remove("forcedMove");
         a.conditions.insert("riptide".into(), 1.);
     }
+    if let Some(after)=crate::engine::actor(r,id) {crate::animation_player::moved(r,&before,after,"P30","wave");}
     Ok(())
 }
 pub fn water_at(r: &Run, a: &Actor) -> bool {

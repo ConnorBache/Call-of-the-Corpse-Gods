@@ -52,7 +52,7 @@ impl Snapshot {
     pub fn value(&self) -> Result<Value> {
         let mut v = serde_json::to_value(&*self.state)?;
         let o = v.as_object_mut().unwrap();
-        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom"] {
+        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom"] {
             o.shift_remove(k);
         }
         if let Some(c) = self.cursor {
@@ -102,7 +102,10 @@ impl Snapshot {
         o.insert("history".into(), json!([]));
         o.insert("replay".into(), json!([]));
         o.shift_remove("replaySnapshotFrom");
+        o.shift_remove("fireboltTravelFrom");
         let state = serde_json::from_value(v)?;
+        crate::revision52_amulet_tiers::validate_run(&state).map_err(StorageError)?;
+        crate::revision50_control_amulets::validate_terrain(&state).map_err(StorageError)?;
         Ok(Self {
             state: Arc::new(state),
             cursor,
@@ -110,6 +113,12 @@ impl Snapshot {
         })
     }
     pub fn restore(&self, run: &mut Run) -> Result<()> {
+        crate::revision52_amulet_tiers::validate_run(&self.state).map_err(StorageError)?;
+        crate::revision50_control_amulets::validate_terrain(&self.state).map_err(StorageError)?;
+        let mut restored = (*self.state).clone();
+        restored.firebolt_travel_from = run.firebolt_travel_from.clone();
+        crate::revision52_reserves::normalize_run(&mut restored).map_err(StorageError)?;
+        crate::revision50::settle_current_duels(&mut restored);
         if let Some(c) = self.cursor {
             let a = run
                 .log_archive
@@ -140,7 +149,7 @@ impl Snapshot {
         let replay_policy = std::mem::take(&mut run.replay_snapshot_from);
         let history = std::mem::take(&mut run.history);
         let run_id = std::mem::take(&mut run.run_id);
-        *run = (*self.state).clone();
+        *run = restored;
         run.replay = replay;
         run.replay_snapshot_from = replay_policy;
         run.history = history;
@@ -458,7 +467,7 @@ pub fn revert(run: &mut Run, history: &mut History) -> Result<bool> {
 /// Expected O(ID bytes), read-only admission for the two pools paid by Future.
 pub(crate) fn validate_future_capture(run: &Run) -> Result<()> {
     if crate::revision50::enabled(run) {
-        crate::revision50_ability_energy::plan_future_payment(&run.player)
+        crate::revision50_ability_energy::plan_future_payment_for_revision(&run.player, run.simulation_revision.value_or(29.))
             .map_err(|e| StorageError(format!("Invalid See The Future payment: {e:?}")))?;
     }
     Ok(())
@@ -472,7 +481,7 @@ fn future_spends_energy(run: &Run) -> bool {
 pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     validate_future_capture(run)?;
     if crate::revision50::enabled(run) {
-        let plan = crate::revision50_ability_energy::plan_future_payment(&run.player)
+        let plan = crate::revision50_ability_energy::plan_future_payment_for_revision(&run.player, run.simulation_revision.value_or(29.))
             .map_err(|e| StorageError(format!("Invalid See The Future payment: {e:?}")))?;
         // O(owned Run data + COW mutations + anchor scan): prepare paid state and
         // capture off to the side so every fallible step precedes publication.
@@ -510,6 +519,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.history.clear();
     copy.replay.clear();
     copy.replay_snapshot_from = Field::Missing;
+    copy.firebolt_travel_from = Field::Missing;
     run.future = Some(storage::serialize(&copy)?.into());
     Ok(())
 }
@@ -530,6 +540,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     let ledger=costs(run);
     restored.replay=std::mem::take(&mut run.replay);
     restored.replay_snapshot_from=run.replay_snapshot_from.clone();
+    restored.firebolt_travel_from=run.firebolt_travel_from.clone();
     restored.run_id=run.run_id.clone();restored.future=None;
     *history=next_history;*run=restored;retain_costs(run,ledger);crate::health_dirty::invalidate(run);
 }
@@ -546,6 +557,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
     let ledger = costs(run);
     restored.replay = std::mem::take(&mut run.replay);
     restored.replay_snapshot_from = run.replay_snapshot_from.clone();
+    restored.firebolt_travel_from = run.firebolt_travel_from.clone();
     restored.run_id = run.run_id.clone();
     restored.future = None;
     let policy = history.full_snapshot;
@@ -704,7 +716,7 @@ fn snapshot_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Run {
 fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
     let _timing = crate::timing::span("history.journal_header");
     let mut value = serde_json::to_value(snapshot_header(snapshot, mask_dream_floors))?;
-    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom"] {
+    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom"] {
         value.as_object_mut().unwrap().shift_remove(key);
     }
     Ok(value)
@@ -795,6 +807,8 @@ const SNAPSHOT_OPTIONAL_ROOTS: &[&str] = &[
     "resolvingTick",
     "timeCosts",
     "phase",
+    "fastActionPhase",
+    "fastMode",
     "damageSinceLastTurn",
     "damageSinceLastTurnMaxHp",
     "resourceHistory",
@@ -817,6 +831,8 @@ fn snapshot_overwrite_patches(before: &Snapshot, _after: &Snapshot) -> Result<Ve
     let removals: Vec<Patch> = SNAPSHOT_OPTIONAL_ROOTS.iter().filter(|k|
         // The new root is absent by contract in29–40. Preserve old history bytes.
         !(**k == "timeweave" && retains_revert_history(&before.state))
+        && !(**k == "fastActionPhase" && before.state.simulation_revision.value_or(29.) < 52.)
+        && !(**k == "fastMode" && before.state.simulation_revision.value_or(29.) < 52.)
         && !(**k == "compositeBowGenerated" && before.state.simulation_revision.value_or(29.) < 51.)
         && !object.contains_key(**k))
         .map(|k| Patch::remove(vec![json!(k)])).collect();
@@ -976,9 +992,12 @@ impl Engine {
         // Old plain checkpoints contain legacy command prefixes. Future commands
         // use snapshot semantics; explicit old-journal replay overrides this below.
         if run.replay_snapshot_from.is_missing() {run.replay_snapshot_from=Field::Value(run.replay.len());}
+        crate::firebolt_travel::admit_current(&mut run).map_err(StorageError)?;
         storage::validate(&run)?;
         storage::validate_current_revision(&run)?;
+        crate::revision52_reserves::normalize_run(&mut run).map_err(StorageError)?;
         crate::unique_composite_bow::initialize(&mut run);
+        crate::hanged::normalize_world(&mut run);
         let mut history = History::import(&run)?;
         history.full_snapshot = true;
         if !retains_revert_history(&run) {
@@ -1128,6 +1147,7 @@ impl Engine {
                     ])
                 };
                 let before_signature = signature(&self.run);
+                let future_was_active=self.run.future.is_some();
                 crate::events::begin();
                 if self.run.player.abilities.contains(id) {
                     if (id == "numo-revert"
@@ -1155,6 +1175,10 @@ impl Engine {
                         remember_future(&mut self.run, &self.history).map_err(err)?;
                     }
                 }
+                if crate::events::enabled(&self.run) && id=="morae-see-the-future" && future_was_active!=self.run.future.is_some() {
+                    let player_id=self.run.player.id;
+                    crate::dreamwalking::with_actor(&mut self.run,player_id,|r|crate::animation_player::local(r,&r.player,"P71",if future_was_active {"ripple"}else{"fold"},crate::events::Stage::Special));
+                }
                 if signature(&self.run) != before_signature {
                     let label = if id == "numo-revert" {
                         "Revert"
@@ -1172,14 +1196,14 @@ impl Engine {
                             (Some(x), Some(y)) => Some(crate::events::EventPoint { x: *x, y: *y }),
                             _ => None,
                         });
-                    crate::events::actor_event(
+                    if !crate::events::enabled(&self.run) || id!="morae-see-the-future" { crate::events::actor_event(
                         &self.run,
                         &self.run.player,
                         "pulse",
                         label,
                         point,
                         None,
-                    );
+                    ); }
                 }
                 crate::equipment::sync_ownership(&mut self.run)?;
                 crate::abilities::disable_unfunded(&mut self.run)?;

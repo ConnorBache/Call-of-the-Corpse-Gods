@@ -305,7 +305,11 @@ fn spawn_floor_inner(r: &mut Run, depth: u32) -> Result<(), String> {
     } else { HashSet::new() };
     if let Some(room) = f.sphinx_room.as_ref().cloned() {
         let mut guardian = p::create_actor("sphinx", r.next_id, room.x, room.y, false)?;
-        // Preserve the special room's legacy birth stats; only its appearance is current.
+        // Preserve the special room's legacy body, plus the explicit R52 birth baselines.
+        guardian.stats.accuracy = crate::combat::creature_birth_accuracy(
+            r.simulation_revision.value_or(29.0), guardian.stats.accuracy);
+        guardian.stats.dodge = crate::combat::creature_birth_dodge(
+            r.simulation_revision.value_or(29.0), guardian.stats.dodge);
         if r.simulation_revision.value_or(29.0) >= 50.0 {
             crate::revision50_creature_identity::apply_actor(&mut guardian);
         }
@@ -349,8 +353,8 @@ fn spawn_floor_inner(r: &mut Run, depth: u32) -> Result<(), String> {
     }
     crate::finale::populate(r, &mut f, &mut actors, &ground)?;
     if r.simulation_revision.value_or(29.0) >= 34.0 {
-        crate::ahvamitt::populate(&f, &mut actors, &mut r.next_id);
-        crate::phantasmii_generation::populate(&seed, &mut f, &mut actors, &mut ground, &mut r.next_id)?;
+        crate::ahvamitt::populate_revision(&f, &mut actors, &mut r.next_id, r.simulation_revision.value_or(29.0));
+        crate::phantasmii_generation::populate_revision(&seed, &mut f, &mut actors, &mut ground, &mut r.next_id, r.simulation_revision.value_or(29.0))?;
     }
     crate::sub_biomes_generation::decorate(&seed, &mut f, &mut actors, &ground, &mut r.next_id, r.simulation_revision.value_or(29.0))?;
     if reference_floor && r.simulation_revision.value_or(29.0)>=37.0 {
@@ -362,9 +366,30 @@ fn spawn_floor_inner(r: &mut Run, depth: u32) -> Result<(), String> {
     }
     crate::portals_generation::install(&seed, &mut f, &actors, &ground, r.simulation_revision.value_or(29.0));
     crate::non_euclidean_generation::install(&seed, &mut f, &actors, &ground, r.simulation_revision.value_or(29.0));
-    if r.simulation_revision.value_or(29.0)>=40.0 {crate::shore_currents::repair(&mut f);}
+    if r.simulation_revision.value_or(29.0)>=52.0 {
+        crate::square_currents::generate(&mut f, crate::rng::seed_hash(&seed));
+    } else if r.simulation_revision.value_or(29.0)>=40.0 {crate::shore_currents::repair(&mut f);}
     crate::sub_biomes_generation::install_links(&seed, &mut f, &actors, &ground, r.simulation_revision.value_or(29.0));
     refresh_razorleaves(&mut f, &actors);
+    if r.simulation_revision.value_or(29.0) >= 52.0 {
+        let cells = match crate::revision52_swimming::placement_cells(&f, &actors, &ground) {
+            Ok(cells) => cells,
+            Err(error) => {
+                #[cfg(test)]
+                export_island_failure(&seed, &f, &actors, &ground, &error);
+                return Err(error);
+            }
+        };
+        if let Some(cleanup) = f.generation.as_mut().and_then(|g|g.stages.iter_mut().find(|s|s.id == "cleanup")) {
+            cleanup.details.get_or_insert_with(Default::default)
+                .insert("islandSwimmingRings".into(), cells.len() as f64);
+        }
+        for at in cells {
+            let ring = crate::revision52_swimming::make_ring(r.next_id);
+            r.next_id += 1.0;
+            place_generated(r, &mut f, &mut ground, ring, at)?;
+        }
+    }
     if r.simulation_revision.value_or(29.0) >= 38.0 {
         validate_complete_floor_transitions(&f)?;
     }
@@ -411,7 +436,9 @@ pub(crate) fn starting_inventory(revision: f64) -> Result<Vec<Item>, String> {
     Ok(items)
 }
 
-/// Exact seed normalization and starter state; no geometry or simulation is fabricated.
+/// Historical/fixture construction with exact seed normalization and starter state.
+/// Keep all recorded modes for save/replay compatibility; new playable runs use
+/// `create_avatar_run`. No geometry or simulation is fabricated here.
 pub fn new_run_shell(seed: &str, mode: &str, dev: bool) -> Result<Run, String> {
     new_run_shell_revision(seed, mode, dev, 39.0)
 }
@@ -421,7 +448,7 @@ pub fn new_run_shell_revision(
     dev: bool,
     revision: f64,
 ) -> Result<Run, String> {
-    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0].contains(&revision) {
+    if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) {
         return Err("Unsupported simulation revision".into());
     }
     if !["Avatar", "Blessed", "Unblessed"].contains(&mode) {
@@ -473,6 +500,8 @@ pub fn new_run_shell_revision(
         max_hp: 100.0,
         energy: 100.0,
         stats: crate::Stats {
+            accuracy: if revision >= 52. { 15. } else { 0. },
+            dodge: if revision >= 52. { 15. } else { 0. },
             perception: if revision >= 51. {0.} else {300.},
             max_energy: 100.0,
             ..Default::default()
@@ -489,6 +518,7 @@ pub fn new_run_shell_revision(
         divine_revision: 1.0.into(),
         enemy_health_revision: 1.0.into(),
         simulation_revision: revision.into(),
+        firebolt_travel_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         composite_bow_generated: if revision >= 51. { false.into() } else { crate::Field::Missing },
         rng: crate::rng::seed_hash(&full_seed) as f64,
         seed: full_seed,
@@ -545,6 +575,7 @@ pub const COMPLETE_FLOOR_ATTEMPT_LIMIT: u32 = 8;
 fn retryable_generation_error(error: &str) -> bool {
     error.starts_with("Structural generation quality exhausted:")
         || error.starts_with("Required generated item invalid/occupied on floor")
+        || error.starts_with("Isolated island")
         || [
             "Generated floor has no safe route between transitions",
             "No legal space for generated loot",
@@ -590,13 +621,15 @@ fn ensure_floors_attempts(
 ) -> Result<(), String> {
     crate::creature_index::check_player(r)?;
     let mut draft = r.clone();
-    for depth in draft.floors.len() as u32 + 1..=40.min(to) {
+    let mut depth = draft.floors.last().map_or(if crate::fast_mode::enabled(&draft) { draft.depth as u32 } else { 1 }, |f| crate::fast_mode::below(&draft, f.depth) as u32);
+    while depth <= 40.min(to) {
+        let previous_depth = crate::fast_mode::above(&draft, depth as f64);
         let actual_up = if depth == 1 && draft.simulation_revision.value_or(29.0) >= 31.0 {
             Some(crate::entrance::generation_anchor())
         } else { draft
             .floors
             .iter()
-            .find(|f| f.depth == depth as f64 - 1.0)
+            .find(|f| f.depth == previous_depth)
             .and_then(|f| {
                 f.tiles
                     .iter()
@@ -637,6 +670,7 @@ fn ensure_floors_attempts(
         draft = accepted.ok_or_else(|| format!(
             "Generation failed after {attempts} complete floor attempts on floor {depth}: {last_error}"
         ))?;
+        depth = crate::fast_mode::below(&draft, depth as f64) as u32;
     }
     draft.actors.validate_allocator(draft.player.id,draft.depth,draft.next_id)?;
     draft.actors.adopt_epoch_from(&r.actors);
@@ -659,7 +693,8 @@ pub fn create_run_with_revision(
     revision: f64,
 ) -> Result<Run, String> {
     let mut r = new_run_shell_revision(seed, mode, dev, revision)?;
-    ensure_floors_with(&mut r, 10, generate)?;
+    let to = initial_generation_target(revision, 1);
+    ensure_floors_with(&mut r, to, generate)?;
     finish_new_run(r, revision)
 }
 fn finish_new_run(mut r: Run, revision: f64) -> Result<Run, String> {
@@ -685,7 +720,7 @@ fn finish_new_run(mut r: Run, revision: f64) -> Result<Run, String> {
         "environment",
     );
     for id in r.player.abilities.clone() {
-        crate::progression::initialize_ability_state(&mut r.player, &id, r.tick)?;
+        crate::progression::initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, &id, r.tick)?;
     }
     crate::engine::monster_floor_entered(&mut r);
     crate::engine::monster_prepare_player_turn(&mut r).map_err(|e| e.0)?;
@@ -693,7 +728,29 @@ fn finish_new_run(mut r: Run, revision: f64) -> Result<Run, String> {
     crate::engine::remember(&mut r);
     Ok(r)
 }
-/// Seed-only native startup uses exact procedural geometry and population.
+/// Current playable startup is Avatar-only with twenty displayed floors.
+/// Authored content coordinates remain internal; route and rewards are explicit.
+/// Historical replays must use their explicit revision/mode constructor instead.
+pub fn create_avatar_run(seed: &str) -> Result<Run, String> {
+    let mut r = new_run_shell_revision(seed, "Avatar", false, 52.)?;
+    r.fast_mode = true.into();
+    r.compressed_depths = true.into();
+    let to = crate::fast_mode::arrival_target(&r, r.depth as u32);
+    ensure_floors(&mut r, to)?;
+    finish_new_run(r, 52.)
+}
+/// Historical Fast startup is retained only for old seed replays.
+pub fn create_avatar_run_fast(seed: &str) -> Result<Run, String> {
+    let mut r = new_run_shell_revision(seed, "Avatar", false, 52.)?;
+    r.fast_mode = true.into();
+    let to = crate::fast_mode::arrival_target(&r, r.depth as u32);
+    ensure_floors(&mut r, to)?;
+    finish_new_run(r, 52.)
+}
+
+/// Historical seed-only startup uses exact procedural geometry and population.
+/// Its default revision and mode argument remain available for compatibility;
+/// user-facing new-game entry points must use `create_avatar_run`.
 pub fn create_run(seed: &str, mode: &str, dev: bool) -> Result<Run, String> {
     create_run_revision(seed, mode, dev, 39.0)
 }
@@ -704,11 +761,35 @@ pub fn create_run_revision(
     revision: f64,
 ) -> Result<Run, String> {
     let mut r = new_run_shell_revision(seed, mode, dev, revision)?;
-    ensure_floors(&mut r, 10)?;
+    let to = initial_generation_target(revision, 1);
+    ensure_floors(&mut r, to)?;
     finish_new_run(r, revision)
 }
+/// Current startup keeps the active floor plus one below it. DEBUG retains
+/// prior floors needed for reconstruction. Existing saves are never pruned.
+pub fn initial_generation_target(revision: f64, depth: u32) -> u32 {
+    if revision >= 52. { depth.saturating_add(1).min(40) } else { depth.max(10) }
+}
+
+/// Speculative player-arrival horizon only. Explicit physical destinations and
+/// authored generation sweeps still call ensure_floors with their exact target.
+pub fn arrival_generation_target(revision: f64, depth: u32) -> u32 {
+    if revision >= 52. { depth.saturating_add(1).min(40) }
+    else { ((((depth as f64 + 5.) / 5.).ceil() * 5.).min(40.)) as u32 }
+}
+
 pub fn ensure_floors(r: &mut Run, to: u32) -> Result<(), String> {
     let revision = r.simulation_revision.value_or(29.0);
+    if crate::fast_mode::enabled(r) {
+        if revision < 52. { return Err("Fast mode requires revision52".into()); }
+        let compressed = crate::fast_mode::compressed(r);
+        return ensure_floors_attempts(r, to, COMPLETE_FLOOR_ATTEMPT_LIMIT, &|depth, seed, actual_up, attempt| {
+            let previous = if depth == 1 { 0 } else if compressed { crate::fast_mode::content_depth((depth + 1) / 2 - 1) } else if depth == 40 { 39 } else { depth - 2 };
+            crate::generation::generate_fast_floor_from_attempt(depth, seed, actual_up, revision,
+                attempt * crate::generation::GENERATION_CANDIDATE_LIMIT,
+                crate::fast_mode::boss_depth(previous, depth))
+        });
+    }
     if revision < 38.0 {
         return ensure_floors_with(r, to, &|depth, seed, actual_up|
             crate::generation::generate_floor_full_revision(depth, seed, actual_up, revision));
@@ -823,4 +904,44 @@ mod recovery_tests_r38 {
             assert!(retryable_generation_error(error),"{error}");
         }
     }
+}
+
+/// Opt-in test diagnostic only. Production builds contain no export code.
+/// Disabled tests only check the environment flag; enabled exports cost O(J)
+/// serialization/extra memory and O(J) filesystem writes for J JSON bytes.
+/// At most eight final candidates are considered for the selected floor.
+#[cfg(test)]
+fn export_island_failure(seed: &str, floor: &Floor, actors: &[Actor], ground: &[GroundItem], error: &str) {
+    use std::io::Write;
+    let Ok(dir) = std::env::var("COTCG_ISLAND_FAILURE_EXPORT_DIR") else { return; };
+    if floor.depth != 37. { return; }
+    let directory=std::path::Path::new(&dir);
+    assert!(directory.is_absolute(),"Use an explicit absolute diagnostic export directory");
+    let attempt=floor.generation.as_ref().and_then(|g|g.stages.iter().find(|s|s.id=="cleanup"))
+        .and_then(|s|s.details.as_ref()).and_then(|d|d.get("generationAttempt")).copied().unwrap_or(0.);
+    std::fs::create_dir_all(directory).expect("diagnostic export directory");
+    let path=directory.join(format!("seed-{}-floor37-attempt{}.json",crate::rng::seed_hash(seed),attempt));
+    let mut output=match std::fs::OpenOptions::new().write(true).create_new(true).open(&path) {
+        Ok(file)=>file,
+        Err(e) if e.kind()==std::io::ErrorKind::AlreadyExists=> {
+            eprintln!("ISLAND_FAILURE_EXPORT retained existing {}; use a fresh directory for a new capture",path.display());return;
+        }
+        Err(e)=>panic!("Diagnostic candidate export {}: {e}",path.display()),
+    };
+    let value=serde_json::json!({"seed":seed,"generationAttempt":attempt,"error":error,"floor":floor,"actors":actors,"ground":ground});
+    output.write_all(&serde_json::to_vec_pretty(&value).unwrap()).expect("diagnostic candidate export");
+    eprintln!("ISLAND_FAILURE_EXPORT {}: {}",path.display(),error);
+}
+
+#[cfg(test)]
+#[test]
+#[ignore = "Opt-in candidate capture; set COTCG_ISLAND_FAILURE_EXPORT_DIR to a fresh absolute directory"]
+fn export_rejected_swimming_candidate() {
+    let directory=std::env::var("COTCG_ISLAND_FAILURE_EXPORT_DIR")
+        .expect("Set COTCG_ISLAND_FAILURE_EXPORT_DIR explicitly to run this diagnostic");
+    assert!(std::path::Path::new(&directory).is_absolute());
+    let mut r=new_run_shell_revision("0-1-2:swimming-survey-b","Avatar",false,52.).unwrap();
+    ensure_floors(&mut r,40).expect("Diagnostic generation failed; rejected final candidates were exported");
+    assert_eq!(r.floors.len(),40);
+    eprintln!("DIAGNOSTIC_GENERATION_ACCEPTED seed={} floors={}",r.seed,r.floors.len());
 }

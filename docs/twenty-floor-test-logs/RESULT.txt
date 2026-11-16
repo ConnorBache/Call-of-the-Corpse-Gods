@@ -1,0 +1,1 @@
+Core library: 829 passed, 1 pre-existing failure (progression::tests::exact_authored_weighted_choices, Ragelight expected27 actual25), 4 ignored. Focused compressed core8, menu11, compressed UI3, startup4 all passed. Full workspace and Windows runtime not verified.

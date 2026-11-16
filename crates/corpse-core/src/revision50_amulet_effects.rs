@@ -35,7 +35,7 @@ pub fn description(item:&Item)->Option<&'static str> {
         Some(Effect::Poison)=>"Fires a projectile that poisons its target for 6 damage per turn for 20 turns.",
         Some(Effect::Iceblast)=>"Deals 30 cold damage and slows creatures for 3 turns in a 3×3 area, leaving ice.",
         Some(Effect::Acid)=>"Fires a projectile that deals 40 damage and reduces the target’s DR by 10 for 6 turns.",
-        Some(Effect::Blinking)=>"Teleports you to a visible, accessible square within 10 tiles.",
+        Some(Effect::Blinking)=>"Blink along a 10 tile line.",
         None=>return crate::revision50_control_amulets::description(item),
     })
 }
@@ -49,20 +49,32 @@ pub fn details(item:&Item)->Option<&'static str> {
         None=>return crate::revision50_control_amulets::details(item),
     })
 }
+pub fn details_for_run(r:&Run,item:&Item)->Option<&'static str> {
+    if r.simulation_revision.value_or(29.)>=52. {match effect(item) {
+        Some(Effect::Iceblast)=>return Some("Detonates on the first creature in the aimed line, or at the last reachable square before terrain. Targets a visible square."),
+        Some(Effect::Blinking)=>return Some("Aim within 10 tiles. Blocking creatures and terrain shorten the line; you land on its last accessible empty square."),
+        _=>{},
+    }}
+    details(item)
+}
 
 pub fn item_spec(item: &Item) -> Option<AmuletSpec> {
+    item_spec_for_revision(item,50.)
+}
+pub fn item_spec_for_revision(item: &Item, revision: f64) -> Option<AmuletSpec> {
+    let capacity=crate::revision52_reserves::capacity(revision);
     if let Some(kind)=crate::revision50_control_amulets::effect(item) {
-        return Some(AmuletSpec {capacity:50.,activation_cost:crate::revision50_control_amulets::activation_cost(kind)});
+        return Some(AmuletSpec {capacity,activation_cost:crate::revision50_control_amulets::activation_cost(kind)});
     }
     let activation_cost = match effect(item)? {
         Effect::Lightning => 25., Effect::Firebolt => 20., Effect::Poison => 15.,
         Effect::Iceblast => 30., Effect::Acid | Effect::Blinking => 20.,
     };
-    Some(AmuletSpec { capacity: 50., activation_cost })
+    Some(AmuletSpec { capacity, activation_cost })
 }
 pub fn condition_key(key: &str) -> bool { matches!(key, POISON_DAMAGE | ACID_TURNS | ACID_PENALTY) }
 pub fn validate_statuses(r:&Run)->Result<(),String> {
-    let valid=|a:&Actor| a.conditions.get(POISON_DAMAGE).is_none_or(|v|*v==6.)
+    let valid=|a:&Actor| a.conditions.get(POISON_DAMAGE).is_none_or(|v|crate::revision52_amulet_tiers::valid_condition(POISON_DAMAGE,*v,r.simulation_revision.value_or(29.)))
         && a.conditions.get(ACID_TURNS).is_none_or(|v|v.is_finite()&&*v>=0.&&*v<=6.&&v.fract()==0.)
         && a.conditions.get(ACID_PENALTY).is_none_or(|v|*v==5.||*v==10.);
     if !valid(&r.player)||!r.actors.values().all(|actors|actors.iter().all(valid)) {
@@ -71,12 +83,15 @@ pub fn validate_statuses(r:&Run)->Result<(),String> {
     Ok(())
 }
 pub fn make_amulet(kind: Effect, id: f64) -> Option<Item> {
+    make_amulet_for_revision(kind,id,50.)
+}
+pub fn make_amulet_for_revision(kind: Effect, id: f64, revision: f64) -> Option<Item> {
     let name = match kind { Effect::Lightning => "lightning", Effect::Firebolt => "firebolt",
         Effect::Poison => "poison", Effect::Iceblast => "iceblast", Effect::Acid => "acid", Effect::Blinking => "blinking" };
     let mut item = Item { id, kind: "amulet".into(), effect: name.to_string().into(),
         glyph: "\"".into(), identified: true.into(), ..Default::default() };
     item.name = display_name(&item)?.into();
-    crate::revision50_amulets::initialize_item(&mut item).ok()?;
+    crate::revision50_amulets::initialize_item_for_revision(&mut item,revision).ok()?;
     Some(item)
 }
 fn coordinates(r: &Run, x: f64, y: f64) -> Option<usize> {
@@ -86,7 +101,9 @@ fn ray_pass(f: &crate::Floor, p: Point) -> bool {
     crate::portals::cell(f, p.x as f64, p.y as f64).is_some_and(|at|
         !matches!(f.tiles[at].as_str(), "wall" | "tree") && !crate::environment::blocks_sight(f, at))
 }
-fn target_valid(r: &Run, kind: Effect, x: f64, y: f64) -> bool {
+#[cfg(test)]
+fn target_valid(r: &Run, kind: Effect, x: f64, y: f64) -> bool {target_valid_with_range(r,kind,x,y,10.)}
+fn target_valid_with_range(r: &Run, kind: Effect, x: f64, y: f64, blink_range:f64) -> bool {
     let Some(at) = coordinates(r, x, y) else { return false; };
     if kind != Effect::Iceblast && crate::portals::same_position(r, &r.player, x, y) { return false; }
     if matches!(kind, Effect::Iceblast | Effect::Blinking) {
@@ -95,6 +112,11 @@ fn target_valid(r: &Run, kind: Effect, x: f64, y: f64) -> bool {
         if !ray_pass(f, crate::portals::point(f, at)) { return false; }
     }
     if kind == Effect::Blinking {
+        // R52 selects a direction/endpoint, not a hidden-occupancy probe. Resolve
+        // the last legal landing only after payment, just like a launched bolt.
+        if r.simulation_revision.value_or(29.)>=52. {
+            return (r.player.x-x).hypot(r.player.y-y)<=blink_range;
+        }
         let f=crate::dreamwalking::floor_for(r,&r.player).unwrap();
         return (r.player.x - x).hypot(r.player.y - y) <= 10.
             && engine::actor_passable(r, &r.player, x, y)
@@ -115,12 +137,15 @@ pub fn admission(r: &Run, c: &Command) -> Option<Result<ActivationPlan, String>>
     let item = r.inventory.iter().find(|i| i.id == id)?;
     if !is_amulet(item) {return None}
     let Some((x,y)) = aim else { return Some(Err("Choose a target for this amulet.".into())); };
-    let valid=if let Some(kind)=effect(item) {target_valid(r,kind,x,y)} else {
-        crate::revision50_control_amulets::target_valid(r,crate::revision50_control_amulets::effect(item).unwrap(),x,y)
+    let Some(profile)=crate::revision52_amulet_tiers::profile(r,item) else {return Some(Err("Invalid amulet tier.".into()));};
+    let valid=if let Some(kind)=effect(item) {target_valid_with_range(r,kind,x,y,profile.range.unwrap_or(10.))
+        && (r.simulation_revision.value_or(29.)<52. || kind!=Effect::Blinking
+            || !known_blink_stays_put(r,item,x,y))} else {
+        crate::revision50_control_amulets::target_valid_with_profile(r,crate::revision50_control_amulets::effect(item).unwrap(),x,y,profile)
     };
     if !valid { return Some(Err("Choose a valid target for this amulet.".into())); }
     Some(crate::revision50_amulets::plan_item_activation(r, id, item_spec(item).as_ref())
-        .map_err(|error| format!("This amulet cannot activate: {error:?}.")))
+        .map_err(admission_message))
 }
 
 #[derive(Debug)]
@@ -144,7 +169,8 @@ fn trace(r: &Run, kind: Effect, x: f64, y: f64) -> Ray {
     }
     let dx = plan.aim.x - plan.origin.x;
     let dy = plan.aim.y - plan.origin.y;
-    let scale = (f.tiles.len().saturating_mul(2).max(1)) as i32;
+    let scale = if matches!(kind,Effect::Iceblast|Effect::Blinking) {1}
+        else {(f.tiles.len().saturating_mul(2).max(1)) as i32};
     let endpoint = Point { x:origin.x + dx*scale, y:origin.y + dy*scale };
     let blocked = std::cell::Cell::new(None);
     let range_origin = std::cell::Cell::new(origin);
@@ -191,23 +217,40 @@ fn trace(r: &Run, kind: Effect, x: f64, y: f64) -> Ray {
     }
     Ray { points, impact: blocked.get(), targets, rng: state }
 }
-fn poison(r: &mut Run, id: f64, source: f64) {
+/// Blink keeps the physical ray, then backs up from its first occupant or an
+/// inaccessible landing. O(V*(A*P+M+G)), no RNG beyond the committed ray's forks.
+#[cfg(test)]
+fn blink_landing(r:&Run,ray:&Ray)->Point {blink_landing_with_range(r,ray,10.)}
+fn blink_landing_with_range(r:&Run,ray:&Ray,range:f64)->Point {
+    ray.points.iter().rev().copied().find(|p|
+        (p.x as f64-r.player.x).hypot(p.y as f64-r.player.y)<=range
+        && engine::actor_passable(r,&r.player,p.x as f64,p.y as f64)
+        && crate::portals::occupied_at(r,&r.player,p.x as f64,p.y as f64,Some(r.player.id)).is_none())
+        .unwrap_or(Point{x:r.player.x as i32,y:r.player.y as i32})
+}
+#[cfg(test)]
+fn poison(r: &mut Run, id: f64, source: f64) {poison_with_damage(r,id,source,6.)}
+fn poison_with_damage(r: &mut Run, id: f64, source: f64,damage:f64) {
     if engine::actor(r,id).zip(engine::actor_any(r,source))
         .is_some_and(|(target,source)|crate::revision50::duel_blocks(r,source,target)) {return;}
     if crate::monster_statuses::apply_status(r,id,"poisoned",20.,Some(source)) {
         let a = engine::actor_mut_trusted(r,id).unwrap();
         a.conditions.insert("poisoned".into(),20.);
-        a.conditions.insert(POISON_DAMAGE.into(),6.);
-    }
+        a.conditions.insert(POISON_DAMAGE.into(),damage);
+        let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A03","split-ring",crate::events::Stage::Special,&[a.into()]);
+    } else if let Some(a)=engine::actor(r,id){crate::events::cue(r,a,"A03","rejected-poison",crate::events::Stage::Impact,&[a.into()]);}
 }
-fn acid(r: &mut Run, id: f64, source: &Actor) -> Result<(),EngineError> {
+#[cfg(test)]
+fn acid(r: &mut Run, id: f64, source: &Actor) -> Result<(),EngineError> {acid_with_damage(r,id,source,40.)}
+fn acid_with_damage(r: &mut Run, id: f64, source: &Actor,damage:f64) -> Result<(),EngineError> {
     let Some(a) = engine::actor(r,id) else { return Ok(()); };
     if crate::revision50::duel_blocks(r,source,a) || crate::revision50_combat::oblivious_blocks(r,a,Some(source)) || crate::revision50_nightmares::is_decoy(a) {return Ok(());}
-    let penalty = if crate::revision50_rings::has_effect(r,a,crate::revision50_rings::CORROSION_RESISTANCE) {5.} else {10.};
-    engine::damage_direct_with_source_snapshot(r,id,40.,source,"acid",true)?;
+    let penalty = 10. * crate::revision50_rings::stack_multiplier(r,a,crate::revision50_rings::CORROSION_RESISTANCE,0.5);
+    engine::damage_direct_with_source_snapshot(r,id,damage,source,"acid",true)?;
     if let Some(a) = engine::actor_mut_trusted(r,id).filter(|a|!a.dead.value_or(false)&&a.hp>0.) {
         a.conditions.insert(ACID_TURNS.into(),6.);
         a.conditions.insert(ACID_PENALTY.into(),penalty);
+        let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A05","cracked-shield",crate::events::Stage::Special,&[a.into()]);
     }
     Ok(())
 }
@@ -239,20 +282,28 @@ fn ice_reaches(f:&crate::Floor,center:Point,p:Point)->bool {
     if (p.x-center.x).abs()>1 || (p.y-center.y).abs()>1 || !ray_pass(f,p) {return false;}
     p.x==center.x || p.y==center.y || ray_pass(f,Point{x:p.x,y:center.y}) || ray_pass(f,Point{x:center.x,y:p.y})
 }
-fn iceblast(r: &mut Run, x: f64, y: f64, source: &Actor) -> Result<(),EngineError> {
+#[cfg(test)]
+fn iceblast(r: &mut Run, x: f64, y: f64, source: &Actor) -> Result<(),EngineError> {iceblast_with_damage(r,x,y,source,30.)}
+fn iceblast_with_damage(r: &mut Run, x: f64, y: f64, source: &Actor,damage:f64) -> Result<(),EngineError> {
     let f = r.floor().unwrap();
     let center = Point {x:x as i32,y:y as i32};
+    let cells:Vec<_>=(-1..=1).flat_map(|dy|(-1..=1).map(move |dx|Point{x:center.x+dx,y:center.y+dy})).filter(|&p|ice_reaches(f,center,p)).filter_map(|p|crate::portals::cell(f,p.x as f64,p.y as f64)).collect();
+    // R52 physical occupancy is alias-aware, just like delivery. A creature on
+    // the remote mate which intercepts this ray must receive the local impact.
+    // At most nine alias checks per actor; each actor receives one packet.
     let targets: Vec<_> = std::iter::once(&r.player).chain(r.actors_at(r.depth)).filter(|a|
         !a.dead.value_or(false)&&a.hp>0.&&crate::dreamwalking::same_plane(r,source,a)
-        && ice_reaches(f,center,Point{x:a.x as i32,y:a.y as i32}))
+        && if r.simulation_revision.value_or(29.)>=52. {cells.iter().any(|&at| {
+            let p=crate::portals::point(f,at);crate::portals::same_position(r,a,p.x as f64,p.y as f64)
+        })} else {ice_reaches(f,center,Point{x:a.x as i32,y:a.y as i32})})
         .map(|a|a.id).collect();
-    let cells:Vec<_>=(-1..=1).flat_map(|dy|(-1..=1).map(move |dx|Point{x:center.x+dx,y:center.y+dy})).filter(|&p|ice_reaches(f,center,p)).filter_map(|p|crate::portals::cell(f,p.x as f64,p.y as f64)).collect();
+    crate::events::cue(r,source,"A04","crystal",crate::events::Stage::Special,&crate::animation_amulets::cell_points(r,&cells));
     crate::revision50_potions::freeze_cells(r,&cells);
     for id in targets {
         let Some(a) = engine::actor(r,id) else {continue};
         if crate::revision50::duel_blocks(r,source,a) || crate::revision50_rings::has_effect(r,a,crate::revision50_rings::ICE_IMMUNITY) {continue;}
-        engine::damage_direct_with_source_snapshot(r,id,30.,source,"cold",true)?;
-        crate::monster_statuses::apply_status(r,id,"slowed",3.,Some(source.id));
+        engine::damage_direct_with_source_snapshot(r,id,damage,source,"cold",true)?;
+        if crate::monster_statuses::apply_status(r,id,"slowed",3.,Some(source.id)){if let Some(a)=engine::actor(r,id){crate::events::cue(r,a,"A04","snowflake",crate::events::Stage::Special,&[a.into()]);}}
     }
     Ok(())
 }
@@ -265,42 +316,79 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>,EngineError> {
     let item = r.inventory.iter().find(|i|i.id==id).unwrap();
     let kind = effect(item);
     let control=crate::revision50_control_amulets::effect(item);
-    let name=display_name(item).unwrap_or("amulet");
+    let name=crate::revision52_amulet_tiers::display_name(r,item).unwrap_or_else(||"amulet".into());
+    let profile=crate::revision52_amulet_tiers::profile(r,item).ok_or_else(||EngineError("Invalid amulet tier".into()))?;
     let spec = item_spec(item);
     crate::revision50_amulets::commit_item_activation(r,id,&plan,spec.as_ref())
         .map_err(|e|EngineError(format!("Amulet activation changed: {e:?}")))?;
     let source = r.player.clone();
     if let Some(kind)=control {
-        crate::revision50_control_amulets::execute(r,kind,x,y)?;
+        crate::revision50_control_amulets::execute_with_profile(r,kind,x,y,profile)?;
         engine::log(r,format!("You activate {name}."),"player");
         return Ok(Some(plan.consumes_action()));
     }
     let kind=kind.unwrap();
     match kind {
         Effect::Blinking => {
+            let (x,y)=if r.simulation_revision.value_or(29.)>=52. {
+                let ray=trace(r,kind,x,y);r.rng=ray.rng as f64;
+                let landing=blink_landing_with_range(r,&ray,profile.range.unwrap());
+                let end=ray.points.iter().rposition(|p|*p==landing).map_or(0,|i|i+1);
+                crate::animation_amulets::route(r,&source,kind,&ray.points[..end],None);
+                (landing.x as f64,landing.y as f64)
+            } else {(x,y)};
+            crate::events::cue(r,&source,"A06","fold",crate::events::Stage::Travel,&[(&source).into()]);
             let old = coordinates(r,r.player.x,r.player.y).unwrap();
-            r.player.x=x; r.player.y=y;
-            crate::half_here::sync(r);
-            crate::zillennia_ground::on_arrival(r,r.player.id);
-            crate::environment::refresh_burning_from_fire(r,r.player.id).map_err(EngineError)?;
-            engine::finish_actor_arrival(r,r.player.id,old,false,None)?;
+            if r.simulation_revision.value_or(29.)<52. || r.player.x!=x || r.player.y!=y {
+                r.player.x=x; r.player.y=y;
+                crate::half_here::sync(r);
+                crate::zillennia_ground::on_arrival(r,r.player.id);
+                crate::environment::refresh_burning_from_fire(r,r.player.id).map_err(EngineError)?;
+                engine::finish_actor_arrival(r,r.player.id,old,false,None)?;
+            }
+            crate::events::cue(r,&r.player,"A06","unfold",crate::events::Stage::Special,&[(&r.player).into()]);
         },
-        Effect::Iceblast => iceblast(r,x,y,&source)?,
+        Effect::Iceblast => {
+            let (x,y)=if r.simulation_revision.value_or(29.)>=52. {
+                let ray=trace(r,kind,x,y);r.rng=ray.rng as f64;
+                let center=ray.points.last().copied().unwrap_or(Point{x:source.x as i32,y:source.y as i32});
+                crate::animation_amulets::route(r,&source,kind,&ray.points,None);
+                (center.x as f64,center.y as f64)
+            } else {(x,y)};
+            iceblast_with_damage(r,x,y,&source,profile.direct_damage)?;
+        },
+        Effect::Firebolt if crate::firebolt_travel::current(r) => {
+            let flight=crate::firebolt_travel::launch(r,&source,x,y)?;
+            crate::animation_amulets::route(r,&source,kind,&flight.points,flight.impact);
+            if let Some(id)=flight.target {
+                let before=engine::actor(r,id).unwrap().clone();
+                let packets_before=crate::events::damage_count(id);
+                engine::damage_direct_with_source_snapshot(r,id,profile.direct_damage,&source,"fire",true)?;
+                ignite_target(r,id,&source);
+                crate::animation_amulets::outcome(r,&before,kind,packets_before);
+            }
+            crate::environment::resolve_bursts(r,flight.bursts,None,false).map_err(EngineError)?;
+        },
         _ => {
             let ray = trace(r,kind,x,y); r.rng=ray.rng as f64;
+            crate::animation_amulets::route(r,&source,kind,&ray.points,ray.impact);
             for &id in &ray.targets {
                 if engine::actor(r,id).is_none_or(|a|a.dead.value_or(false)||a.hp<=0.) {continue;}
+                let before=engine::actor(r,id).unwrap().clone();
+                let packets_before=crate::events::damage_count(id);
                 match kind {
-                    Effect::Lightning => engine::damage_direct_with_source_snapshot(r,id,50.,&source,"lightning",true)?,
-                    Effect::Firebolt => {engine::damage_direct_with_source_snapshot(r,id,80.,&source,"fire",true)?;ignite_target(r,id,&source);},
-                    Effect::Poison => poison(r,id,source.id),
-                    Effect::Acid => acid(r,id,&source)?, _ => unreachable!(),
+                    Effect::Lightning => engine::damage_direct_with_source_snapshot(r,id,profile.direct_damage,&source,"lightning",true)?,
+                    Effect::Firebolt => {engine::damage_direct_with_source_snapshot(r,id,profile.direct_damage,&source,"fire",true)?;ignite_target(r,id,&source);},
+                    Effect::Poison => poison_with_damage(r,id,source.id,profile.periodic_damage),
+                    Effect::Acid => acid_with_damage(r,id,&source,profile.direct_damage)?, _ => unreachable!(),
                 }
+                crate::animation_amulets::outcome(r,&before,kind,packets_before);
             }
             if kind==Effect::Firebolt {fire_path(r,&ray)?;}
         },
     }
-    engine::log(r,format!("You activate {}.",match kind { Effect::Lightning=>"Lightning",Effect::Firebolt=>"Firebolt",Effect::Poison=>"Poison",Effect::Iceblast=>"Iceblast",Effect::Acid=>"Acid",Effect::Blinking=>"Blinking" }),"player");
+    if crate::revision52_amulet_tiers::enabled(r) {engine::log(r,format!("You activate {name}."),"player");} else {
+    engine::log(r,format!("You activate {}.",match kind { Effect::Lightning=>"Lightning",Effect::Firebolt=>"Firebolt",Effect::Poison=>"Poison",Effect::Iceblast=>"Iceblast",Effect::Acid=>"Acid",Effect::Blinking=>"Blinking" }),"player");}
     Ok(Some(plan.consumes_action()))
 }
 /// Normal-clock only, including inactive-floor simulation; never haste phases.
@@ -316,6 +404,15 @@ pub fn corrosion_penalty(r:&Run,a:&Actor)->f64 {
 /// UI-only admission. Never query a hidden occupant or unrevealed tile/door.
 /// Definitive collision remains in atomic command admission.
 pub fn target_blocker_ui(r:&Run,item:&Item,x:f64,y:f64)->Option<&'static str> {
+    target_blocker_ui_base(r,item,x,y).or_else(|| {
+        (r.simulation_revision.value_or(29.)>=52.&&effect(item)==Some(Effect::Blinking)
+            &&known_blink_stays_put(r,item,x,y)).then_some("There is no reachable empty square to blink to.")
+    })
+}
+fn known_blink_stays_put(r:&Run,item:&Item,x:f64,y:f64)->bool {
+    aim_preview(r,item,x,y).impact==Some((r.player.x as usize,r.player.y as usize))
+}
+fn target_blocker_ui_base(r:&Run,item:&Item,x:f64,y:f64)->Option<&'static str> {
     let Some(kind)=effect(item) else {return crate::revision50_control_amulets::target_blocker_ui(r,item,x,y)};
     let Some(at)=coordinates(r,x,y) else {return Some("Choose a target on this floor.")};
     if kind!=Effect::Iceblast && r.player.x==x && r.player.y==y {return Some("Choose a direction away from yourself.");}
@@ -329,8 +426,8 @@ pub fn target_blocker_ui(r:&Run,item:&Item,x:f64,y:f64)->Option<&'static str> {
         }
     }
     if kind==Effect::Blinking {
-        if (r.player.x-x).hypot(r.player.y-y)>10. {return Some("Blinking reaches at most 10 tiles.")}
-        if std::iter::once(&r.player).chain(r.actors_at(r.depth)).any(|a|a.id!=r.player.id
+        if (r.player.x-x).hypot(r.player.y-y)>crate::revision52_amulet_tiers::profile(r,item).and_then(|p|p.range).unwrap_or(10.) {return Some(if crate::revision52_amulet_tiers::enabled(r){"The target is beyond this amulet’s blink range."}else{"Blinking reaches at most 10 tiles."})}
+        if r.simulation_revision.value_or(29.)<52. && std::iter::once(&r.player).chain(r.actors_at(r.depth)).any(|a|a.id!=r.player.id
             && !a.dead.value_or(false)&&a.hp>0.&&crate::vision::visible_actor(r,a)
             && crate::dreamwalking::same_plane(r,&r.player,a)&&crate::portals::same_position(r,a,x,y)) {
             return Some("Choose an empty visible tile.")
@@ -351,6 +448,15 @@ pub struct AimPreview {
 pub fn preview(r:&Run,item:&Item,x:f64,y:f64)->Vec<(usize,usize)> {
     let p=aim_preview(r,item,x,y);p.delivery.into_iter().chain(p.area).collect()
 }
+fn ice_area(out:&mut AimPreview,o:&crate::vision::TerrainObservation,center:(usize,usize)) {
+    let (x,y)=(center.0 as i32,center.1 as i32);let w=o.width;
+    let open=|xx:i32,yy:i32|xx>=0&&yy>=0&&(xx as usize)<w&&(yy as usize)<o.height
+        &&o.cells.get(yy as usize*w+xx as usize).is_some_and(|c|c.current&&c.tile.is_some()
+            &&!matches!(c.tile.as_deref(),Some("wall"|"tree"))&&c.door_open!=Some(false));
+    for yy in y-1..=y+1 {for xx in x-1..=x+1 {
+        if open(xx,yy)&&(xx==x||yy==y||open(xx,y)||open(x,yy)) {out.area.push((xx as usize,yy as usize));}
+    }}
+}
 /// Knowledge-filtered geometry, using the same portal ray planner/traversal and
 /// physical terrain policy as launch. O(observation + floor clone + ray-plan +
 /// V*A*P), O(F+V+A+P) scratch. Unknown cells terminate the route, even if remembered.
@@ -359,7 +465,7 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
     let Some(kind)=effect(item) else {
         out.area=crate::revision50_control_amulets::preview(r,item,x,y);
         if crate::revision50_control_amulets::effect(item)==Some(crate::revision50_control_amulets::ControlEffect::Beckoning) {
-            out.delivery=crate::revision50_control_amulets::beckoning_preview(r,x,y);
+            out.delivery=crate::revision50_control_amulets::beckoning_preview_with_range(r,x,y,crate::revision52_amulet_tiers::profile(r,item).and_then(|p|p.range).unwrap_or(8.));
         }
         return out;
     };
@@ -367,8 +473,8 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
     let Some(o)=crate::vision::observe_terrain(r) else {return out};
     let known=|at:usize|o.cells.get(at).is_some_and(|c|c.current&&c.tile.is_some());
     let f=crate::dreamwalking::floor_for(r,&r.player).unwrap();let w=f.width();
-    if kind==Effect::Iceblast {
-        if target_blocker_ui(r,item,x,y).is_some(){return out;}
+    if kind==Effect::Iceblast && r.simulation_revision.value_or(29.)<52. {
+        if target_blocker_ui_base(r,item,x,y).is_some(){return out;}
         let opaque:Vec<_>=o.cells.iter().map(|c|!c.current || matches!(c.tile.as_deref(),Some("wall"|"tree")) || c.door_open==Some(false)).collect();
         for yy in y as i32-1..=y as i32+1 {for xx in x as i32-1..=x as i32+1 {
             let Some(at)=crate::portals::cell(f,xx as f64,yy as f64) else {continue};
@@ -378,11 +484,14 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
         }}
         out.impact=Some((x as usize,y as usize));return out;
     }
-    if kind==Effect::Blinking && target_blocker_ui(r,item,x,y).is_some(){return out;}
+    if matches!(kind,Effect::Iceblast|Effect::Blinking) && target_blocker_ui_base(r,item,x,y).is_some(){return out;}
     if kind==Effect::Blinking && r.simulation_revision.value_or(29.)<51. {
         out.area.push((x as usize,y as usize));return out;
     }
-    if r.player.x==x&&r.player.y==y {return out;}
+    if r.player.x==x&&r.player.y==y {
+        if kind==Effect::Iceblast {out.impact=Some((x as usize,y as usize));ice_area(&mut out,&o,(x as usize,y as usize));}
+        return out;
+    }
     // A remembered aim is legal, but only its continuously observed prefix is shown.
     if !o.cells[at].current&&!o.cells[at].remembered {return out;}
     let mut floor=f.clone();
@@ -391,8 +500,12 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
     }
     floor.doors=crate::Field::Missing;
     floor.environment=crate::Field::Missing;
-    if let Some(pairs)=floor.portals.as_mut() {pairs.retain(|p|known(p.a)&&known(p.b));}
     let mut unknown_entries=std::collections::HashSet::new();
+    if let Some(pairs)=floor.portals.as_mut() {pairs.retain(|p| {
+        let all=known(p.a)&&known(p.b);
+        if !all&&r.simulation_revision.value_or(29.)>=52. {unknown_entries.extend([p.a,p.b].into_iter().filter(|&at|known(at)));}
+        all
+    });}
     for pockets in [&mut floor.non_euclidean,&mut floor.speed_up] {
         if let Some(pockets)=pockets.as_mut() {for pocket in pockets.iter_mut() {
             pocket.groups.retain(|g| {
@@ -404,24 +517,49 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
             pocket.cells.sort_unstable();pocket.cells.dedup();
         }pockets.retain(|p|!p.groups.is_empty());}
     }
+    let current_firebolt=kind==Effect::Firebolt&&crate::firebolt_travel::current(r);
+    // A detached, knowledge-only burned view. No live ignition, hidden fuel,
+    // hidden freezing aura or gameplay RNG may affect the targeting preview.
+    let visible_freezers:Vec<_>=if current_firebolt {std::iter::once(&r.player).chain(r.actors_at(r.depth))
+        .filter(|a|!a.dead.value_or(false)&&crate::dreamwalking::same_plane(r,&r.player,a)
+            && (a.id==r.player.id||crate::vision::visible_actor(r,a))
+            && a.active.iter().any(|id|id=="dawel-reverse-entropy")).collect()} else {vec![]};
+    let burnable:Vec<_>=o.cells.iter().map(|c|current_firebolt&&known(c.index)&&!c.snow
+        && !c.hazards.as_ref().is_some_and(|h|crate::environment::fire_active(h.fire.as_ref().map(String::as_str)))
+        && !visible_freezers.iter().any(|a|(a.x-(c.index%w)as f64).hypot(a.y-(c.index/w)as f64)<=10.)).collect();
+    let burned=if current_firebolt {let mut view=floor.clone();
+        for (at,tile) in view.tiles.iter_mut().enumerate(){if burnable[at]&&tile=="tree"{*tile="floor".into();}}
+        Some(view)}else{None};
     let pass=|p:Point|crate::portals::cell(&floor,p.x as f64,p.y as f64).is_some_and(|at|known(at)
         && !unknown_entries.contains(&at)&&o.cells[at].door_open!=Some(false)
         &&crate::projectiles::terrain_pass(r.simulation_revision.value_or(29.),&floor,p));
+    let entered_pass=|p:Point|pass(p)||burned.as_ref().is_some_and(|view|
+        crate::portals::cell(view,p.x as f64,p.y as f64).is_some_and(|at|known(at)
+            && !unknown_entries.contains(&at)&&burnable[at]
+            &&crate::projectiles::terrain_pass(r.simulation_revision.value_or(29.),view,p)));
     let from=Point{x:r.player.x as i32,y:r.player.y as i32};let target=Point{x:x as i32,y:y as i32};
     let plan=crate::portals::ray_plan(&floor,from,target,pass);
     if plan.origin_fork.len()>1 {
         out.possible_exits=plan.origin_fork.into_iter().filter(|&at|known(at)).map(|at|(at%w,at/w)).collect();return out;
     }
-    let scale=if kind==Effect::Blinking{1}else{(floor.tiles.len()*2) as i32};
+    let scale=if matches!(kind,Effect::Blinking|Effect::Iceblast){1}else{(floor.tiles.len()*2) as i32};
     let aim=Point{x:plan.origin.x+(plan.aim.x-plan.origin.x)*scale,y:plan.origin.y+(plan.aim.y-plan.origin.y)*scale};
     let visible:Vec<_>=r.actors_at(r.depth).iter().filter(|a|!a.dead.value_or(false)&&a.hp>0.
-        &&crate::dreamwalking::same_plane(r,&r.player,a)&&crate::vision::visible_actor(r,a)).collect();
+        &&crate::dreamwalking::same_plane(r,&r.player,a)&&crate::vision::visible_actor(r,a)
+        && (!current_firebolt||engine::condition(a,"underwater")<=0.)).collect();
     let occupied=|p:Point|visible.iter().any(|a|crate::portals::same_cell(&floor,a.x,a.y,p.x as f64,p.y as f64));
     let prior=std::cell::Cell::new(plan.origin);
     let impact=std::cell::Cell::new(None);
+    let unknown_stop=std::cell::Cell::new(false);
     let forks=std::cell::RefCell::new(vec![]);
     let ray=crate::portals::directed_ray_trace(&floor,plan.origin,aim,|p| {
-        let open=pass(p);
+        let alternative=crate::portals::cell(&floor,prior.get().x as f64,prior.get().y as f64)
+            .zip(crate::portals::cell(&floor,p.x as f64,p.y as f64))
+            .is_some_and(|(a,b)|a!=b&&crate::portals::exits(&floor,a).contains(&b));
+        let open=if alternative{pass(p)}else{entered_pass(p)};
+        if !open && crate::portals::cell(&floor,p.x as f64,p.y as f64).is_some_and(|at|!known(at)||unknown_entries.contains(&at)) {
+            unknown_stop.set(true);
+        }
         if !open && (p.x-prior.get().x).abs().max((p.y-prior.get().y).abs())<=1
             && crate::portals::cell(&floor,p.x as f64,p.y as f64).is_some_and(|at|known(at)&&!unknown_entries.contains(&at)) {
             impact.set(Some((p.x as usize,p.y as usize)));
@@ -444,6 +582,25 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
         out.possible_exits=forks.into_inner().into_iter().filter(|&at|known(at)).map(|at|(at%w,at/w)).collect();
     }
     if kind==Effect::Blinking&&out.delivery.last()==Some(&(x as usize,y as usize))&&!occupied(target) {out.impact=Some((x as usize,y as usize));}
+    if r.simulation_revision.value_or(29.)>=52. && matches!(kind,Effect::Iceblast|Effect::Blinking) {
+        // An unknown prefix/fork is not a promised detonation or landing. Never
+        // draw an AoE around the end of incomplete knowledge.
+        let resolved=out.possible_exits.is_empty()&&!unknown_stop.get();
+        out.impact=None;
+        if resolved {
+            let endpoint=if kind==Effect::Blinking {
+                let phase=r.player.active.iter().any(|s|s=="etill-phase-through");
+                let at=out.delivery.iter().rposition(|&(xx,yy)|!occupied(Point{x:xx as i32,y:yy as i32})
+                    &&(xx as f64-r.player.x).hypot(yy as f64-r.player.y)<=crate::revision52_amulet_tiers::profile(r,item).and_then(|p|p.range).unwrap_or(10.)
+                    &&!crate::revision50_terrain::clay_blocks_run(r,&r.player,xx as f64,yy as f64)
+                    &&(phase||!o.cells[yy*w+xx].grate));
+                out.delivery.truncate(at.map_or(0,|i|i+1));
+                out.delivery.last().copied().unwrap_or((from.x as usize,from.y as usize))
+            } else {out.delivery.last().copied().unwrap_or((from.x as usize,from.y as usize))};
+            out.impact=Some(endpoint);
+            if kind==Effect::Iceblast {ice_area(&mut out,&o,endpoint);} else {out.area.push(endpoint);}
+        }
+    }
     out
 }
 
@@ -476,6 +633,20 @@ mod tests {
     fn cast(r:&mut Run,id:f64,x:f64,y:f64){assert_eq!(command(r,&Command::UseAt{id,x,y}).unwrap(),Some(true));}
     fn hp(r:&Run,id:f64)->f64{engine::actor(r,id).unwrap().hp}
     fn ring(id:f64,effect:&str)->Item{Item{id,kind:"ring".into(),effect:effect.to_string().into(),equipped:"ring1".to_string().into(),..Default::default()}}
+    #[test] fn r52_telepathy_admits_dark_ability_target_without_bypassing_effect_blockers(){
+        let mut r=room();r.simulation_revision=52.0.into();r.player.stats.perception=0.;
+        r.floor_mut().unwrap().lights.fill(-100.);enemy(&mut r,20.,18.,10.);
+        r.inventory.push(make_amulet_for_revision(Effect::Iceblast,1.,52.).unwrap());
+        assert!(!target_valid(&r,Effect::Iceblast,18.,10.));
+        r.player.conditions.insert("telepathic".into(),30.);
+        assert!(!crate::vision::directly_visible_actor(&r,engine::actor(&r,20.).unwrap()));
+        assert!(target_valid(&r,Effect::Iceblast,18.,10.));
+        let mut direct=r.clone();cast(&mut direct,1.,18.,10.);assert!(hp(&direct,20.)<500.);
+        let mut wall=r.clone();let w=wall.floor().unwrap().width();wall.floor_mut().unwrap().tiles[10*w+14]="wall".into();
+        cast(&mut wall,1.,18.,10.);assert_eq!(hp(&wall,20.),500.);
+        let mut blocker=r.clone();enemy(&mut blocker,21.,14.,10.);
+        cast(&mut blocker,1.,18.,10.);assert_eq!(hp(&blocker,20.),500.);assert!(hp(&blocker,21.)<500.);
+    }
     #[test] fn lightning_continues_beyond_aim_pierces_allies_and_stops_at_wall(){
         let mut r=room();add(&mut r,Effect::Lightning,1.);enemy(&mut r,20.,13.,10.);enemy(&mut r,21.,30.,10.);enemy(&mut r,22.,35.,10.);
         engine::actor_mut_trusted(&mut r,21.).unwrap().state="ally".into();
@@ -718,4 +889,146 @@ mod tests {
         assert!(!target_valid(&r,Effect::Blinking,30.,10.),"Blink keeps ten Euclidean endpoint range even across portals");
     }
 
+    fn r52_room()->Run {let mut r=aimed_room();r.simulation_revision=52.0.into();r}
+    #[test] fn r52_iceblast_uses_first_creature_and_actual_animation_area() {
+        let mut r=r52_room();add(&mut r,Effect::Iceblast,1.);enemy(&mut r,20.,14.,10.);enemy(&mut r,21.,18.,10.);
+        let before=r.clone();let p=aim_preview(&r,&r.inventory[0],18.,10.);
+        assert_eq!(p.delivery,vec![(11,10),(12,10),(13,10),(14,10)]);
+        assert_eq!(p.impact,Some((14,10)));assert_eq!(p.area.len(),9);assert!(!p.area.contains(&(18,10)));assert_eq!(r,before);
+        crate::events::begin();cast(&mut r,1.,18.,10.);let events=crate::events::finish();
+        assert_eq!((hp(&r,20.),hp(&r,21.)),(470.,500.));
+        let route=events.iter().filter_map(|e|e.animation.as_ref()).find(|a|a.proposal=="A04"&&a.stage==crate::events::Stage::Travel).unwrap();
+        assert_eq!(route.cells.last(),Some(&crate::events::EventPoint{x:14.,y:10.}));
+        let area=events.iter().filter_map(|e|e.animation.as_ref()).find(|a|a.proposal=="A04"&&a.style=="crystal").unwrap();
+        assert_eq!(area.cells.iter().map(|p|(p.x as usize,p.y as usize)).collect::<Vec<_>>(),p.area);
+        assert_eq!(r.inventory[0].amulet_state.as_ref().unwrap().energy,0.);
+        assert_eq!(r.player.energy,before.player.energy-20.);
+    }
+    #[test] fn r52_iceblast_and_blink_resolve_before_walls_doors_and_fixtures() {
+        for obstruction in ["wall","door","Borge","Epidite"] {for kind in [Effect::Iceblast,Effect::Blinking] {
+            let mut r=r52_room();add(&mut r,kind,1.);let w=r.floor().unwrap().width();
+            match obstruction {
+                "wall"=>r.floor_mut().unwrap().tiles[10*w+14]="wall".into(),
+                "door"=>{let mut d=indexmap::IndexMap::new();d.insert((10*w+14).to_string(),crate::FloorDoorsEntry{open:false,..Default::default()});r.floor_mut().unwrap().doors=d.into();},
+                kind=>r.floor_mut().unwrap().godbeast_event=crate::GodbeastEvent{kind:kind.into(),x:15.,y:10.,..Default::default()}.into(),
+            }
+            let p=aim_preview(&r,&r.inventory[0],18.,10.);let ray=trace(&r,kind,18.,10.);
+            let endpoint=if kind==Effect::Blinking {blink_landing(&r,&ray)} else {*ray.points.last().unwrap()};
+            assert!(endpoint.x<15,"{obstruction} {kind:?}");
+            assert_eq!(p.impact,Some((endpoint.x as usize,endpoint.y as usize)),"{obstruction} {kind:?}");
+            assert_eq!(p.delivery.last(),p.impact.as_ref());
+            assert!(admission(&r,&Command::UseAt{id:1.,x:18.,y:10.}).unwrap().is_ok());
+            cast(&mut r,1.,18.,10.);
+            if kind==Effect::Blinking {assert_eq!((r.player.x,r.player.y),(endpoint.x as f64,endpoint.y as f64));}
+        }}
+    }
+    #[test] fn r52_blink_backs_up_from_occupied_or_inaccessible_landing() {
+        for target in [14.,18.] {
+            let mut r=r52_room();add(&mut r,Effect::Blinking,1.);enemy(&mut r,20.,14.,10.);
+            let w=r.floor().unwrap().width();r.floor_mut().unwrap().grates=vec![(10*w+13)as f64].into();
+            let p=aim_preview(&r,&r.inventory[0],target,10.);
+            assert!(target_blocker_ui(&r,&r.inventory[0],target,10.).is_none());
+            assert_eq!(p.delivery.last(),Some(&(12,10)));assert_eq!(p.impact,Some((12,10)));
+            crate::events::begin();cast(&mut r,1.,target,10.);let events=crate::events::finish();
+            assert_eq!((r.player.x,r.player.y),(12.,10.));assert_eq!(hp(&r,20.),500.);
+            assert!(events.iter().filter_map(|e|e.animation.as_ref()).any(|a|a.proposal=="A06"&&a.style=="unfold"&&a.cells.last()==Some(&crate::events::EventPoint{x:12.,y:10.})));
+        }
+        let mut r=r52_room();add(&mut r,Effect::Blinking,1.);enemy(&mut r,20.,11.,10.);
+        let p=aim_preview(&r,&r.inventory[0],18.,10.);assert!(p.delivery.is_empty());assert_eq!(p.impact,Some((10,10)));
+        let before=r.clone();let c=Command::UseAt{id:1.,x:18.,y:10.};
+        assert!(target_blocker_ui(&r,&r.inventory[0],18.,10.).is_some());
+        assert!(admission(&r,&c).unwrap().is_err());assert!(command(&mut r,&c).is_err());assert_eq!(r,before);
+        assert!(!target_valid(&r,Effect::Blinking,21.,10.));
+    }
+    #[test] fn r52_hidden_adjacent_blink_blocker_does_not_become_a_free_probe() {
+        let mut r=r52_room();add(&mut r,Effect::Blinking,1.);
+        r.player.conditions.shift_remove("allSeeingReveal");r.player.conditions.shift_remove("allSeeingDepth");
+        let clear=aim_preview(&r,&r.inventory[0],18.,10.);let c=Command::UseAt{id:1.,x:18.,y:10.};
+        enemy(&mut r,20.,11.,10.);engine::actor_mut_trusted(&mut r,20.).unwrap().conditions.insert("invisible".into(),20.);
+        assert!(!crate::vision::visible_actor(&r,engine::actor(&r,20.).unwrap()));
+        assert_eq!(aim_preview(&r,&r.inventory[0],18.,10.),clear);
+        assert!(target_blocker_ui(&r,&r.inventory[0],18.,10.).is_none());assert!(admission(&r,&c).unwrap().is_ok());
+        let main_energy=r.player.energy;cast(&mut r,1.,18.,10.);
+        assert_eq!((r.player.x,r.player.y),(10.,10.));assert_eq!(r.inventory[0].amulet_state.as_ref().unwrap().energy,0.);
+        assert_eq!(r.player.energy,main_energy-10.);
+    }
+    #[test] fn r52_telepathic_aim_still_detonates_on_intervening_creature() {
+        let mut r=r52_room();add(&mut r,Effect::Iceblast,1.);
+        r.player.conditions.clear();r.player.conditions.insert("telepathic".into(),20.);
+        r.player.stats.perception=-1000.;
+        let f=r.floor_mut().unwrap();f.lights.fill(-100.);f.light_sources=Field::Missing;f.environment=Field::Missing;
+        enemy(&mut r,20.,14.,10.);enemy(&mut r,21.,18.,10.);
+        assert!(crate::ability_sight::actor(&r,engine::actor(&r,21.).unwrap()));
+        let command=Command::UseAt{id:1.,x:18.,y:10.};
+        assert!(admission(&r,&command).unwrap().is_ok());
+        assert_eq!(trace(&r,Effect::Iceblast,18.,10.).points.last(),Some(&Point{x:14,y:10}));
+        cast(&mut r,1.,18.,10.);
+        assert_eq!(hp(&r,20.),470.);assert_eq!(hp(&r,21.),500.);
+    }
+    #[test] fn r52_hidden_interceptor_never_changes_preview_or_admission() {
+        for kind in [Effect::Iceblast,Effect::Blinking,Effect::Firebolt,Effect::Poison,Effect::Acid] {
+            let mut r=r52_room();add(&mut r,kind,1.);
+            r.player.conditions.shift_remove("allSeeingReveal");r.player.conditions.shift_remove("allSeeingDepth");
+            let p=aim_preview(&r,&r.inventory[0],18.,10.);let c=Command::UseAt{id:1.,x:18.,y:10.};
+            enemy(&mut r,20.,14.,10.);engine::actor_mut_trusted(&mut r,20.).unwrap().conditions.insert("invisible".into(),20.);
+            assert!(!crate::vision::visible_actor(&r,engine::actor(&r,20.).unwrap()));
+            assert_eq!(aim_preview(&r,&r.inventory[0],18.,10.),p,"{kind:?}");
+            assert!(admission(&r,&c).unwrap().is_ok());let ray=trace(&r,kind,18.,10.);assert_eq!(ray.points.last(),Some(&Point{x:14,y:10}));
+            cast(&mut r,1.,18.,10.);
+            if kind==Effect::Blinking {assert_eq!(r.player.x,13.);}else if kind==Effect::Iceblast {assert_eq!(hp(&r,20.),470.);}
+        }
+    }
+    #[test] fn r52_unknown_terrain_stops_ink_without_promising_an_endpoint() {
+        let mut r=r52_room();r.player.conditions.clear();r.player.stats.perception=-1000.;
+        let f=r.floor_mut().unwrap();f.lights.fill(-100.);f.light_sources=Field::Missing;f.environment=Field::Missing;let w=f.width();
+        for kind in [Effect::Iceblast,Effect::Blinking,Effect::Firebolt] {
+            let item=make_amulet(kind,1.).unwrap();let p=aim_preview(&r,&item,18.,10.);
+            let mut changed=r.clone();changed.floor_mut().unwrap().tiles[10*w+14]="wall".into();enemy(&mut changed,20.,13.,10.);
+            assert_eq!(aim_preview(&changed,&item,18.,10.),p);assert!(p.area.is_empty());assert!(p.impact.is_none());
+        }
+    }
+    #[test] fn r52_lightning_still_pierces_and_acid_keeps_range_eight() {
+        for kind in [Effect::Lightning,Effect::Firebolt,Effect::Poison,Effect::Acid] {
+            let mut r=r52_room();add(&mut r,kind,1.);enemy(&mut r,20.,14.,10.);enemy(&mut r,21.,20.,10.);
+            let p=aim_preview(&r,&r.inventory[0],18.,10.);let ray=trace(&r,kind,18.,10.);
+            assert_eq!(p.delivery,ray.points.iter().skip(1).map(|p|(p.x as usize,p.y as usize)).collect::<Vec<_>>());
+            if kind==Effect::Lightning {assert!(p.delivery.contains(&(20,10)));assert_eq!(ray.targets,vec![20.,21.]);}
+            else {assert_eq!(p.impact,Some((14,10)));assert_eq!(ray.targets,vec![20.]);}
+        }
+        let r=r52_room();let item=make_amulet(Effect::Acid,1.).unwrap();assert_eq!(aim_preview(&r,&item,20.,10.).delivery.last(),Some(&(18,10)));
+    }
+    #[test] fn r52_finite_portal_rays_and_save_restore_are_deterministic() {
+        for kind in [Effect::Iceblast,Effect::Blinking] {
+            let mut r=r52_room();add(&mut r,kind,1.);let w=r.floor().unwrap().width();
+            r.floor_mut().unwrap().portals=vec![crate::portals_generation::PortalPair{a:10*w+12,b:10*w+16,color_index:0}].into();
+            enemy(&mut r,20.,17.,10.);let p=aim_preview(&r,&r.inventory[0],18.,10.);let ray=trace(&r,kind,18.,10.);
+            let endpoint=if kind==Effect::Blinking{blink_landing(&r,&ray)}else{*ray.points.last().unwrap()};
+            assert_eq!(p.impact,Some((endpoint.x as usize,endpoint.y as usize)));
+            let mut saved:Run=serde_json::from_str(&serde_json::to_string(&r).unwrap()).unwrap();
+            cast(&mut r,1.,18.,10.);cast(&mut saved,1.,18.,10.);assert_eq!(r,saved);
+        }
+    }
+    #[test] fn r52_iceblast_hits_portal_alias_interceptor_once_and_hidden_aim_is_pure() {
+        for hidden in [false,true] {
+            let mut r=r52_room();add(&mut r,Effect::Iceblast,1.);let w=r.floor().unwrap().width();
+            r.floor_mut().unwrap().portals=vec![crate::portals_generation::PortalPair{a:10*w+12,b:10*w+30,color_index:0}].into();
+            if hidden {r.player.conditions.shift_remove("allSeeingReveal");r.player.conditions.shift_remove("allSeeingDepth");}
+            let clear=aim_preview(&r,&r.inventory[0],18.,10.);enemy(&mut r,20.,30.,10.);
+            if hidden {engine::actor_mut_trusted(&mut r,20.).unwrap().conditions.insert("invisible".into(),20.);}
+            let before=r.clone();let p=aim_preview(&r,&r.inventory[0],18.,10.);assert_eq!(r,before);
+            if hidden {assert_eq!(p,clear);}else {assert_eq!(p.impact,Some((12,10)));}
+            assert_eq!(trace(&r,Effect::Iceblast,18.,10.).points.last(),Some(&Point{x:12,y:10}));
+            cast(&mut r,1.,18.,10.);assert_eq!(hp(&r,20.),470.);assert_eq!(engine::condition(engine::actor(&r,20.).unwrap(),"slowed"),3.);
+        }
+    }
+
+}
+
+/// Shared player-facing admission copy; invalid-state diagnostics stay distinct.
+pub fn admission_message(error:crate::revision50_amulets::AdmissionError)->String {
+ if error==crate::revision50_amulets::AdmissionError::InsufficientPlayerEnergy {"Insufficient Energy".into()}else{format!("This amulet cannot activate: {error:?}.")}
+}
+#[cfg(test)]mod insufficient_energy_copy_tests {
+ use super::*;use crate::revision50_amulets::AdmissionError;
+ #[test]fn only_insufficient_energy_uses_short_message(){assert_eq!(admission_message(AdmissionError::InsufficientPlayerEnergy),"Insufficient Energy");assert_eq!(admission_message(AdmissionError::InvalidState),"This amulet cannot activate: InvalidState.");}
 }

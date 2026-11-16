@@ -1,5 +1,9 @@
 # R51 potion-darkness rendering correction
 
+> Retained R50/R51 behavior. New revision 52 runs immediately set affected
+> effective illumination to -100; see [the revised Darkness rule](revision52-darkness.md).
+> The decrement examples below remain historical compatibility evidence.
+
 > Historical first correction. The later designer-authored sRGB mapping in
 > [R51 illumination calibration](revision51-illumination-rendering.md) supersedes
 > the positive-light no-op behavior, glow exposure and screenshot interpretation

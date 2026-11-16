@@ -124,7 +124,7 @@ pub fn place_ground_item(
         x = nx;
         y = ny;
         metric(r, "itemPlacementFalls", 1.0);
-        depth += 1.0;
+        depth = crate::fast_mode::below(r, depth);
     }
     metric(r, "itemPlacementDiscarded", 1.0);
     Ok(PlacementResult::Discarded { depth })

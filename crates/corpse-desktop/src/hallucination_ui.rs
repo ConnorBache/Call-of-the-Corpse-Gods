@@ -6,6 +6,10 @@ pub const SAMPLE_MS:f64=800.;
 /// O(A) existing shared-origin lookup, once when rebuilding observed data.
 pub fn active(r:&Run)->bool {r.simulation_revision.value_or(29.)>=43. && corpse_core::half_here::origins(r).iter().any(|a|!a.dead.value_or(false)&&corpse_core::engine::condition(a,"hallucinating")>0.)}
 pub fn eligible(a:&Actor)->bool {!corpse_core::half_here::is_clone(a)&&!corpse_core::dreamwalking::is_nightmare(a)&&!corpse_core::dreamwalking::is_body(a)}
+/// Per-target R52 telepathy suppresses cosmetic hallucinations only for sensed actors.
+/// Uses existing sense query (origins/abilities/LOS); no simulation state changes.
+pub fn affects(r:&Run,a:&Actor)->bool {active(r)&&eligible(a)
+ && !corpse_core::actor_presentation::identity_known(r,a)}
 pub fn sample(now:f64,reduced:bool)->usize {if reduced||!now.is_finite()||now<=0. {0}else{((now/SAMPLE_MS).floor()as u64%VARIANTS as u64)as usize}}
 /// O(seed bytes), only while preparing a fixed six-entry display palette.
 /// Cycling the fixed palette guarantees adjacent samples differ.
@@ -13,11 +17,12 @@ pub fn kind(r:&Run,a:&Actor,phase:usize)->&'static str {let mut h=2166136261u32;
 pub fn question(s:&mut String){if !s.is_empty()&&!s.ends_with('?'){s.push('?');}}
 /// Preserve the uncertainty suffix after a detached portal/pocket qualifier.
 pub fn append_alias(c:&mut crate::render::Cell,suffix:&str){let uncertain=c.hallucination.is_some();if uncertain&&c.label.ends_with('?'){c.label.pop();}c.label.push_str(suffix);if uncertain{question(&mut c.label);}}
-pub fn view_active(v:&crate::render::View)->bool {!v.hallucination_cells.is_empty()}
+pub fn view_active(v:&crate::render::View)->bool {!v.hallucination_cells.is_empty()||v.ground_entities.iter().any(|g|g.hallucination.is_some())}
 /// O(observed layers + six-entry payload selection). No world reads or raster work.
 pub fn apply_view(v:&mut crate::render::View,phase:usize){
  if v.hallucination_phase==phase{return;}v.hallucination_phase=phase;if !view_active(v){return;}
  for &index in &v.hallucination_cells {let Some(c)=v.cells.get_mut(index)else{continue;};if let Some(cache)=c.hallucination.clone(){let x=c.x;let y=c.y;let bg=c.bg;let alias=if c.label.contains(" (through portal)"){" (through portal)"}else if c.label.contains(" (linked space)"){" (linked space)"}else{""};*c=cache[phase].clone();c.x=x;c.y=y;c.bg=bg;if !alias.is_empty(){if c.label.ends_with('?'){c.label.pop();}c.label.push_str(alias);}question(&mut c.label);c.hallucination=Some(cache);}}
+ for g in &mut v.ground_entities {if let Some(cache)=&g.hallucination{g.name=cache[phase].0.clone();g.glyph=cache[phase].1.clone();g.color=cache[phase].2;}}
  for c in &mut v.creatures {if let Some(cache)=c.hallucination.clone(){*c=cache[phase].clone();c.hallucination=Some(cache);}}
 }
 /// Paint-only damage for opt-in tile mode; full-paint default has no planner work.
@@ -29,7 +34,7 @@ pub fn map_cell(c:&mut crate::render::Cell,mut f:impl FnMut(&mut crate::render::
 #[cfg(test)]
 mod tests {
  use super::*;
- fn room(revision:f64,count:usize)->Run {
+ pub(super) fn room(revision:f64,count:usize)->Run {
   let mut r=corpse_core::startup::new_run_shell_revision("0-5-11:appearance43","Unblessed",false,revision).unwrap();
   r.player.x=2.;r.player.y=2.;r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
   r.player.conditions.insert("hallucinating".into(),100.);r.player.conditions.insert("telepathic".into(),100.);
@@ -62,6 +67,39 @@ mod tests {
   apply_view(&mut view,sample(SAMPLE_MS,true));crate::inspection_ui::apply_hallucination(&mut report,0);assert_eq!(view.creatures[0].name,report.title);
  }
  #[test]
+ fn revision52_telepathy_keeps_true_map_list_inspection_identity_across_phases(){
+  let mut r=room(52.,2);r.player.stats.perception=300.;
+  r.player.conditions.remove("telepathic");
+  r.player.conditions.insert("cameTurns".into(),100.);r.player.conditions.insert("cameTarget".into(),100.);
+  let before=r.clone();let mut view=crate::observe::observe(&r);
+  let mut report=crate::inspection_ui::observe_tile(&r,5,5);
+  let terrain=corpse_core::vision::observe_terrain(&r).unwrap();
+  assert_eq!(crate::inspection_ui::observe_tile_with_terrain(&r,5,5,&terrain),report);
+  assert!(report.hallucination.is_none());assert_eq!(report.title,"Giant Rat");
+  let mut unknown=crate::inspection_ui::observe_tile(&r,6,5);assert!(unknown.hallucination.is_some());
+  let actual=&r.actors_at(1.)[0];
+  for phase in 0..VARIANTS {
+   apply_view(&mut view,phase);crate::inspection_ui::apply_hallucination(&mut report,phase);
+   crate::inspection_ui::apply_hallucination(&mut unknown,phase);
+   let cell=view.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap();
+   let row=view.creatures.iter().find(|c|c.id==100.).unwrap();
+   assert_eq!(cell.label,actual.name);assert_eq!(cell.glyph,actual.glyph);
+   assert!(cell.hallucination.is_none());assert!(row.hallucination.is_none());
+   assert_eq!(row.name,actual.name);assert_eq!(row.max_hp,actual.max_hp);
+   assert_eq!(report.title,actual.name);assert!(!report.creature.as_ref().unwrap().resources.ends_with('?'));
+   let other=view.cells.iter().find(|c|c.actor_id==Some(101.)).unwrap();
+   assert!(other.hallucination.is_some());assert_eq!(other.label,unknown.title);
+  }
+  assert_eq!(r,before);
+  r.player.conditions.remove("cameTurns");
+  assert!(crate::inspection_ui::observe_tile(&r,5,5).hallucination.is_some());
+  r.player.conditions.insert("telepathic".into(),100.);
+  for y in 1..28 {r.floor_mut().unwrap().tiles[y*79+4]="wall".into();}
+  assert!(!corpse_core::vision::directly_visible_actor(&r,&r.actors_at(1.)[0]));
+  let v=crate::observe::observe(&r);assert_eq!(v.creatures.iter().find(|c|c.id==100.).unwrap().name,"Giant Rat");
+  assert_eq!(crate::inspection_ui::observe_tile(&r,5,5).title,"Giant Rat");
+ }
+ #[test]
  fn revision43_keeps_self_and_owned_body_presentation(){
   let r=room(43.,1);assert!(crate::creature_presentation::project(&r,&r.player).is_none());
   let mut a=r.actors_at(1.)[0].clone();a.conditions.insert("halfHereClone".into(),1.);assert!(!eligible(&a));
@@ -84,6 +122,32 @@ mod tests {
    for phase in 1..6 {mark_view(&painter,&view,&mut plan);apply_view(&mut view,phase);mark_view(&painter,&view,&mut plan);plan.finish_damage(&mut painter);plan.paint_base(&mut painter,&view,"",0.);painter.tile_clip_enabled=false;full.game_at(&view,"",false,0.);assert_eq!(painter.pixels.len(),full.pixels.len());if let Some(i)=painter.pixels.iter().zip(&full.pixels).position(|(a,b)|a!=b){panic!("phase {phase}, scale {scale}, differing pixel byte {i}: {} vs {}",painter.pixels[i],full.pixels[i]);}plan.clear_frame();}
   }
  }
+ #[test]
+ fn revision52_roots_keep_their_material_and_glyph_through_all_hallucination_phases(){
+  let mut r=room(52.,1);r.player.stats.perception=300.;r.player.conditions.remove("hallucinating");r.player.conditions.remove("telepathic");
+  let mut source=corpse_core::population::create_actor_revision("bastidion",200.,4.,4.,false,52.).unwrap();
+  source.state="wandering".into();
+  let mut corpse=corpse_core::population::create_actor_revision("rat",201.,8.,4.,false,52.).unwrap();
+  corpse.dead=true.into();corpse.hp=0.;corpse.heartless=true.into();
+  r.actors_at_mut(1.).extend([source,corpse]);r.next_id=202.;
+  let path:Vec<_>=(4..=8).map(|x|(4*79+x)as f64).collect();
+  let f=r.floor_mut().unwrap();f.roots=vec![0.;f.tiles.len()].into();
+  for &at in &path{f.roots.as_mut().unwrap()[at as usize]=1.;}
+  f.fungal_roots=vec![corpse_core::FungalRoot{fungus_id:200.,corpse_id:201.,path,active:true,
+   color:corpse_core::fungi::ROOT_COLOR.into(),..Default::default()}].into();
+  corpse_core::environment::initialize(f).unwrap();
+  corpse_core::environment::add_gas(f,4*79+6,"hallucinogenic",100.,200.).unwrap();
+  let sober=crate::observe::observe(&r);
+  let roots=|v:&crate::render::View|v.cells.iter().filter(|c|c.y==4&&(5..=7).contains(&c.x))
+   .map(|c|(c.x,c.glyph.clone(),c.fg,c.bg,c.hallucination.is_some())).collect::<Vec<_>>();
+  let expected=roots(&sober);assert_eq!(expected.len(),3);assert!(expected.iter().all(|c|c.1=="─"&&!c.4));
+  r.player.conditions.insert("hallucinating".into(),100.);let before=r.clone();let mut v=crate::observe::observe(&r);
+  let mut identities=std::collections::HashSet::new();
+  for phase in 0..VARIANTS {apply_view(&mut v,phase);assert_eq!(roots(&v),expected);
+   identities.insert(v.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap().label.clone());}
+  assert!(identities.len()>1,"ordinary actors still hallucinate");assert_eq!(r,before);
+ }
+
  /// Lead-run only. Initial report formatting and steady selection are separate;
  /// no paint/upload cost is claimed. Each row contains all raw independent samples.
  #[test]
@@ -105,5 +169,33 @@ mod tests {
    }
    println!("HALLUCINATION_CACHE {}",serde_json::json!({"revision":revision,"actors":count,"n":20,"rows":rows}));
   }}
+ }
+}
+
+#[cfg(test)]
+mod telepathy_regression {
+ use super::*;
+ #[test]
+ fn r52_telepathy_overrides_hallucination_map_list_inspect_and_log() {
+  let mut r=super::tests::room(52.,1);
+  let a=&r.actors_at(1.)[0];let name=a.name.clone();
+  assert!(corpse_core::vision::telepathic(&r,a));
+  assert_eq!(corpse_core::actor_presentation::name(&r,a),name);
+  let mut v=crate::observe::observe(&r);let mut report=crate::inspection_ui::observe_tile(&r,5,5);
+  for phase in 0..6 {
+   apply_view(&mut v,phase);crate::inspection_ui::apply_hallucination(&mut report,phase);
+   let c=v.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap();
+   assert_eq!(c.label,name);assert!(c.hallucination.is_none());
+   assert_eq!(v.creatures.iter().find(|c|c.id==100.).unwrap().name,name);
+   assert_eq!(report.title,name);assert!(report.hallucination.is_none());
+  }
+  r.player.conditions.shift_remove("telepathic");
+  let v=crate::observe::observe(&r);assert!(v.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap().hallucination.is_some());
+  // Target-specific sense protects only its target, not every perceived actor.
+  r.player.conditions.insert("cameTarget".into(),100.);r.player.conditions.insert("cameTurns".into(),5.);
+  let mut other=r.actors_at(1.)[0].clone();other.id=101.;other.x=6.;r.actors_at_mut(1.).push(other);
+  let v=crate::observe::observe(&r);
+  assert!(v.cells.iter().find(|c|c.actor_id==Some(100.)).unwrap().hallucination.is_none());
+  assert!(v.cells.iter().find(|c|c.actor_id==Some(101.)).unwrap().hallucination.is_some());
  }
 }

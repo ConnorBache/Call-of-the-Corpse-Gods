@@ -20,7 +20,7 @@ pub(super) fn primary_kind(seed: &str, depth: u32) -> Option<&'static str> {
 /// and returned memory for L=5..7 items and P payload bytes; no rejection loop.
 /// Each instance gets a fresh ID; equal subtype rolls remain valid ordinary loot.
 pub(super) fn generate(
-    primary: &str, rng: &mut GenerationRng, next_id: &mut f64,
+    primary: &str, rng: &mut GenerationRng, next_id: &mut f64, revision:f64,
 ) -> Result<Vec<Item>, String> {
     let counts = KINDS.map(|kind| if kind == primary { 3 } else { rng.integer(1, 2) });
     let mut items = Vec::with_capacity(counts.iter().sum::<i32>() as usize);
@@ -37,7 +37,7 @@ pub(super) fn generate(
                     ..Default::default()
                 }
             } else {
-                super::revision50::create(kind, rng, *next_id)?
+                super::revision50::create(kind, rng, *next_id, revision)?
             };
             *next_id += 1.;
             items.push(item);

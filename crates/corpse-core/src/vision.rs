@@ -135,9 +135,12 @@ pub(crate) fn ring_light_groups(r: &Run, dream: bool) -> Vec<RingLightGroup<'_>>
     }
     owners.into_values().collect()
 }
-/// O(A*I + H*(F+K²R)) scalar optical query, O(H+K) scratch. Each copy
-/// contributes +10, but shared-body endpoints do not duplicate the same ring.
+/// O(F+D+A*I + H*(F+K²R)) scalar optical query, O(H+K) scratch. D is the
+/// R52 potion mask. Each copy contributes +10 outside that mask; shared-body
+/// endpoints do not duplicate the same ring.
 fn ring_light_bonus(r: &Run, target: Point, dream: bool) -> f64 {
+    if crate::dreamwalking::floor_in_plane(r,dream).or_else(||r.floor()).is_some_and(|f|
+        bounds(f,target)&&crate::revision50_potions::absolute_darkness_at(r,f,target.y as usize*f.width()+target.x as usize)) {return 0.;}
     ring_light_groups(r,dream).into_iter().filter(|g|
         !g.origins.iter().any(|a| point(a)==target)
             && g.origins.iter().any(|a| optical_route(r,a,target).is_some())
@@ -213,15 +216,19 @@ fn viewpoints(r: &Run) -> Vec<&Actor> {
 fn illumination(r: &Run, target: Point, exclude: Option<f64>) -> f64 {
     illumination_in_plane(r,target,exclude,crate::dreamwalking::context_dream(r))
 }
-/// O(F + fire-window*R + L*R + A + A_near*B + emitting_near*R) time,
-/// O(1) scratch. A actors are still scanned, but distant sources skip ability,
-/// body and plane checks; darkness subtraction order is unchanged. No cache.
+/// O(F + D + fire-window*R + L*R + A + A_near*B + emitting_near*R), plus
+/// ring_light_bonus's optical-query cost. D is the R52 potion mask; covered
+/// cells return after O(F+D). Otherwise O(1) scratch apart from ring queries.
+/// Distant actors skip ability/body/plane checks; old subtraction order stays.
 pub(crate) fn illumination_in_plane(r:&Run,target:Point,exclude:Option<f64>,dream:bool)->f64 {
     let _timing_function = crate::timing::span("vision.lighting");
     let Some(f) = crate::dreamwalking::floor_in_plane(r,dream).or_else(||r.floor()) else { return -100.0 };
     if !bounds(f, target) {
         return -100.0;
     }
+    // R52 applies a final effective-light override, including later/mobile lights.
+    // Early return is equivalent without mutating or clamping any source values.
+    if crate::revision50_potions::absolute_darkness_at(r,f,target.y as usize*f.width()+target.x as usize) {return -100.;}
     let mut result = f
         .lights
         .get(target.y as usize * f.width() + target.x as usize)
@@ -325,7 +332,7 @@ fn actor_light_modifiers(r: &Run, a: &Actor, mut l: f64, ring_bonus: f64) -> f64
             l *= 2.0;
         }
     }
-    if l < 0.0 && crate::revision50_rings::has_effect(r,a,"stealth") { l *= 1.2; }
+    if l < 0.0 { l *= crate::revision50_rings::stack_multiplier(r,a,"stealth",1.2); }
     l.clamp(-100.0, 100.0)
 }
 pub fn light(r: &Run, a: &Actor) -> f64 {
@@ -499,6 +506,16 @@ pub fn visible(r: &Run, x: usize, y: usize) -> bool {
     }
     let l = tile_light(r, x, y);
     viewpoints(r).iter().any(|a| tile_chance(r, a, p, l) > 5.0)
+}
+/// Direct optical cell admission for detached action paths, excluding sensed-only
+/// area knowledge. O(P*(light/LOS)), preserving current visible() optical policy.
+pub fn directly_visible_tile(r:&Run,x:usize,y:usize)->bool {
+    let p=Point{x:x as i32,y:y as i32};
+    if !r.floor().is_some_and(|f|bounds(f,p)){return false}
+    if all_seeing(r){return true}
+    let light=tile_light(r,x,y);
+    viewpoints(r).iter().filter(|a|crate::dreamwalking::same_plane(r,&r.player,a))
+        .any(|a|tile_chance(r,a,p,light)>5.)
 }
 /// Actor-local targeting visibility. Player calls preserve the existing shared
 /// viewpoints. Independent copies use their own senses and plane, never the
@@ -1124,7 +1141,7 @@ pub fn observe_terrain(r: &Run) -> Option<TerrainObservation> {
         for (plane, &(floor, _)) in floors.iter().enumerate() {
             let mut source = ObservedLightSource {
                 origin_known: false, emission_group: 0, x: -1., y: -1.,
-                kind: "potion-darkness".into(), color_role: "darkness".into(),
+                kind: if crate::revision50_potions::absolute_darkness(r) {"potion-darkness-override"} else {"potion-darkness"}.into(), color_role: "darkness".into(),
                 power: 50., falloff: 0., actor_id: None,
                 cells: Vec::new(), strengths: Vec::new(),
             };
@@ -1217,9 +1234,11 @@ mod native_plane_tests {
 
     #[test]
     fn potion_darkness_projection_is_current_plane_only_and_read_only() {
-        for player_dream in [false, true] {
+        for revision in [51.,52.] {for player_dream in [false, true] {
             let mut r = split_room(player_dream);
-            r.simulation_revision = 51.0.into();
+            r.simulation_revision = revision.into();
+            r.player.stats.perception=100.;
+            let kind=if revision>=52.{"potion-darkness-override"}else{"potion-darkness"};
             let expiry = r.tick + 20.;
             crate::mutation_journal::make_mut(&mut r.floors[0]).revision50_darkness = vec![crate::revision50_potions::Darkness { cell: AT, amount: 25., expires_at: expiry }].into();
             crate::mutation_journal::make_mut(&mut r.dreamwalking.as_mut().unwrap().floors[0]).revision50_darkness = vec![crate::revision50_potions::Darkness { cell: AT, amount: 50., expires_at: expiry }].into();
@@ -1227,20 +1246,21 @@ mod native_plane_tests {
                 if own_plane { r.player.x = 6.; }
                 let frozen = serde_json::to_vec(&r).unwrap();
                 let o = observe_terrain(&r).unwrap();
-                let sources: Vec<_> = o.light_sources.iter().filter(|s| s.kind == "potion-darkness").collect();
+                let sources: Vec<_> = o.light_sources.iter().filter(|s| s.kind == kind).collect();
                 assert_eq!(sources.len(), 1);
                 assert_eq!(sources[0].cells, vec![AT]);
                 let dream = if own_plane { player_dream } else { !player_dream };
                 assert_eq!(sources[0].strengths, vec![if dream { 50. } else { 25. }]);
+                if revision>=52. {assert_eq!(o.cells[AT].illumination,Some(-100.));}
                 assert!(!sources[0].origin_known && sources[0].actor_id.is_none());
                 assert_eq!((sources[0].x, sources[0].y), (-1., -1.));
                 assert_eq!(serde_json::to_vec(&r).unwrap(), frozen);
             }
             r.player.x = 1.; r.player.active.clear();
-            assert!(!observe_terrain(&r).unwrap().light_sources.iter().any(|s| s.kind == "potion-darkness"), "hidden source mask must not reveal unseen cells");
+            assert!(!observe_terrain(&r).unwrap().light_sources.iter().any(|s| s.kind == kind), "hidden source mask must not reveal unseen cells");
             r.player.x = 6.; r.tick = expiry;
-            assert!(!observe_terrain(&r).unwrap().light_sources.iter().any(|s| s.kind == "potion-darkness"), "expired masks never reach rendering even before cleanup");
-        }
+            assert!(!observe_terrain(&r).unwrap().light_sources.iter().any(|s| s.kind == kind), "expired masks never reach rendering even before cleanup");
+        }}
     }
 
     fn assert_native_cell(o: &TerrainObservation, dream: bool) {

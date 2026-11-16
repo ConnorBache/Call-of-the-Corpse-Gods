@@ -136,7 +136,9 @@ pub fn turn(
         if let Some(v) = a.conditions.get("targetId") {
             m.conditions.insert("targetId".into(), *v);
         }
+        crate::animation_enemy::mark(r,&a,"E05","fold",crate::events::Stage::Special);
         r.actors_at_mut(r.depth).retain(|b| b.id != id);
+        crate::revision50::end_duels_with_target(r,id);
         r.floor_mut().unwrap().dirty = true;
         report(
             r,
@@ -387,6 +389,14 @@ fn breathe_fire_inner(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
             crate::environment::ignite(r, x as f64, y as f64, None, Some(id))?;
         }
     }
+    if crate::events::enabled(r) {
+        // Detached presentation order only: O(C*portal metric + C log C), O(C).
+        // The authoritative ignition loop/RNG order above remains unchanged.
+        let mut cells:Vec<_>=affected.iter().copied().map(|i|(i,crate::portals::point_distance(r,&source,(i%w)as f64,(i/w)as f64))).collect();
+        cells.sort_by(|(i,a),(j,b)|a.total_cmp(b).then(i.cmp(j)));
+        let cells:Vec<_>=cells.into_iter().map(|(i,_)|crate::events::EventPoint{x:(i%w) as f64,y:(i/w) as f64}).collect();
+        crate::events::cue(r,&source,"E03","fan-orange",crate::events::Stage::Travel,&cells);
+    }
     let victims: Vec<_> = std::iter::once(&r.player)
         .chain(r.actors_at(r.depth))
         .filter(|a| {
@@ -402,7 +412,7 @@ fn breathe_fire_inner(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         if actor(r,v).is_some_and(|target|crate::revision50_combat::oblivious_blocks(r,target,Some(&source))) {continue;}
         // This is the resolved breath footprint, not lingering fire exposure.
         if crate::revision50_nightmares::strike(r, v) { continue; }
-        engine::damage_direct_with_source_snapshot(r, v, 24.0, &source, "fire", true).map_err(|e| e.0)?;
+        engine::damage_direct_with_source_snapshot(r, v, crate::balance52::local_amount(r, &source, "monsterSpecialDamage", 24.), &source, "fire", true).map_err(|e| e.0)?;
         if actor(r, v).is_some_and(living) {
             let random = crate::rng::random(r);
             let player = if id == r.player.id { 1.0 } else { 0.0 };
@@ -429,14 +439,14 @@ fn breathe_fire_inner(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         "breathes a spreading cone of fire!",
         Some(&target),
     );
-    crate::events::actor_event(
+    if !crate::events::enabled(r) { crate::events::actor_event(
         r,
         &updated,
         "burst",
         "Fire breath",
         Some((&target).into()),
         None,
-    );
+    ); }
     Ok(true)
 }
 

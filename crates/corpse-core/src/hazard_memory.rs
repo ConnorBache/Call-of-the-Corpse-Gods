@@ -24,14 +24,15 @@ pub fn observation_context_revision(f: &Floor, revision: f64) -> ObservationCont
     let mut roots: HashMap<usize, RootObservation> = HashMap::new();
     for root in f.fungal_roots.as_ref().into_iter().flatten() {
         if revision >= 51.0 && !root.active { continue; }
-        for (n, &at) in root.path.iter().enumerate() {
+        let path = root.grown_path();
+        for (n, &at) in path.iter().enumerate() {
             let at = at as usize;
             if value(&f.roots, at) == 0. {
                 continue;
             }
-            let before = if revision >= 51.0 && n + 1 < root.path.len() { at }
-                else { root.path[n.saturating_sub(1)] as usize };
-            let after = root.path[(n + 1).min(root.path.len() - 1)] as usize;
+            let before = if revision >= 51.0 && n + 1 < path.len() { at }
+                else { path[n.saturating_sub(1)] as usize };
+            let after = path[(n + 1).min(path.len() - 1)] as usize;
             let dx = (after % width) as i64 - (before % width) as i64;
             let dy = (after / width) as i64 - (before / width) as i64;
             let glyph = if dx == 0 {

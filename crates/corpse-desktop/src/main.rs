@@ -1,3 +1,5 @@
+mod health_warning;
+mod death_pause;
 mod gpu_render;
 #[cfg(feature = "runtime-timing")]
 mod timing_test;
@@ -22,6 +24,8 @@ mod creature_abilities_ui;
 mod creature_presentation;
 mod hallucination_ui;
 mod effects;
+mod staged_firebolt;
+mod action_marks;
 mod embedded_assets;
 mod entity_profile;
 mod hazards_ui;
@@ -31,6 +35,12 @@ mod bestiary_progress;
 mod display_ui;
 mod dream_ui;
 mod menu_ui;
+mod help_ui;
+mod cursor_ui;
+#[cfg(test)] mod input_loop_tests;
+mod avatar_menu;
+mod menu_visit;
+#[cfg(test)] mod avatar_menu_tests;
 mod modal_ui;
 mod observe;
 mod perception_ui;
@@ -45,8 +55,10 @@ mod session_store;
 mod startup_ui;
 mod debug_floor_ui;
 mod statuses_ui;
+mod monster_status_ui;
 mod stat_presentation;
 mod targeting_ui;
+mod directional_zap_ui;
 #[cfg(test)] mod aiming_effect_tests;
 mod terminal_ui;
 mod travel_ui;
@@ -122,6 +134,41 @@ fn paint_manual_render_test(
     }
 }
 
+/// O(1): pass only the active originating view's revision to the Bestiary.
+/// Cached inactive games/replays must not change the menu's current-rule pages.
+fn manual_simulation_revision(
+    origin: Screen,
+    game: Option<&corpse_core::Run>,
+    replay: Option<&corpse_core::Run>,
+) -> Option<f64> {
+    match origin {
+        Screen::Game => game,
+        Screen::ReplayGame => replay,
+        _ => None,
+    }.map(|run| run.simulation_revision.value_or(29.))
+}
+
+#[cfg(test)]
+mod bestiary_revision_routing_tests {
+    use super::*;
+    #[test]
+    fn originating_game_or_replay_supplies_only_its_revision() {
+        let mut game: corpse_core::Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let mut replay = game.clone();
+        game.simulation_revision = 50.0.into();
+        replay.simulation_revision = 51.0.into();
+        assert_eq!(manual_simulation_revision(Screen::Game, Some(&game), Some(&replay)), Some(50.));
+        assert_eq!(manual_simulation_revision(Screen::ReplayGame, Some(&game), Some(&replay)), Some(51.));
+        game.simulation_revision = Field::Missing;
+        assert_eq!(manual_simulation_revision(Screen::Game, Some(&game), None), Some(29.));
+        for screen in [Screen::Menu, Screen::Manual, Screen::Replays, Screen::Scores, Screen::Settings, Screen::Summary, Screen::Start, Screen::ImportSave] {
+            assert_eq!(manual_simulation_revision(screen, Some(&game), Some(&replay)), None);
+        }
+        assert_eq!(manual_simulation_revision(Screen::Game, None, Some(&replay)), None);
+        assert_eq!(manual_simulation_revision(Screen::ReplayGame, Some(&game), None), None);
+    }
+}
+
 fn can_continue(
     run: &Option<temporal::Engine>,
     saved: &Option<(temporal::Engine, session_store::Kind)>,
@@ -167,8 +214,8 @@ fn load(path: &str) -> Result<temporal::Engine, String> {
     load_with_kind(path).map(|(run, _)| run)
 }
 
-fn main() -> Result<(), String> {
-    let args: Vec<String> = std::env::args().collect();
+fn main() -> Result<(), String> { run_app(std::env::args().collect()) }
+fn run_app(args: Vec<String>) -> Result<(), String> {
     #[cfg(feature = "runtime-timing")]
     if args.iter().any(|s| s == "--timing-test") {
         return timing_test::run(&args);
@@ -184,19 +231,28 @@ fn main() -> Result<(), String> {
         .and_then(|i| args.get(i + 1))
         .cloned()
         .unwrap_or_default();
-    let mut mode = args
+    let mode = args
         .iter()
         .position(|s| s == "--mode")
-        .and_then(|i| args.get(i + 1))
-        .cloned()
+        .map(|i| args.get(i + 1).cloned().ok_or("--mode requires Avatar"))
+        .transpose()?
         .unwrap_or_else(|| "Avatar".into());
+    // A mode flag cannot create a new non-Avatar run; historical fixture/replay
+    // loading still uses its recorded mode without rewriting the saved state.
+    if args.iter().any(|s|s=="--generated") || (!fixture_session && !args.iter().any(|s|s=="--replay")) {validate_new_mode(&mode)?;}
+    let mut avatar_selection = avatar_menu::Selection::default();
+    avatar_selection.sync_seed(&seed);
     let mut seed_focus = true;
     let mut floor_focus = false;
     let mut pending_start = startup_ui::Loader::<temporal::Engine>::default();
     let mut playtest_floor = args.iter().position(|s| s == "--playtest-floor" || s == "--debug-floor")
-        .map(|i| args.get(i + 1).cloned().ok_or("--playtest-floor requires a floor from 1 to 40"))
+        .map(|i| args.get(i + 1).cloned().ok_or("--playtest-floor requires a floor from 1 to 20"))
         .transpose()?;
-    if let Some(floor) = &playtest_floor { corpse_core::playtest::parse_floor(floor)?; }
+    if let Some(floor) = &playtest_floor {
+        corpse_core::playtest::parse_floor(floor)?;
+        seed=avatar_selection.prepared_seed(&seed,fresh_seed)?;
+        avatar_selection.sync_seed(&seed);
+    }
     let mut session_kind = if fixture_session {
         session_store::Kind::Fixture
     } else {
@@ -292,7 +348,10 @@ fn main() -> Result<(), String> {
     } else { 0. };
     if let Some(i) = args.iter().position(|s| s == "--render-test") {
         let path = args.get(i + 1).ok_or("--render-test requires PNG path")?;
-        if args
+        if args.iter().any(|s| s == "--render-help") {
+            painter.clear([12, 12, 18]);
+            let mut help = help_ui::Help::default(); help.open(&painter); help.paint(&mut painter);
+        } else if args
             .iter()
             .any(|s| s == "--manual" || s == "--manual-entry")
         {
@@ -305,7 +364,11 @@ fn main() -> Result<(), String> {
         } else if args.iter().any(|s| s == "--render-start") {
             painter.start(&seed, &mode, true, playtest_floor.as_deref().map(|s| (s, false)), "");
         } else {
-            {painter.menu(18, 0, false, &mode);painter.menu_seed(&seed,false,false);}
+            {painter.menu(18, 0, false, &mode);painter.menu_seed(&seed,false,false);painter.menu_fast_mode(false,false);avatar_selection.paint_slots(&mut painter,0);
+             if let Some(i)=args.iter().position(|s|s=="--render-god-picker") {
+                 let slot=args.get(i+1).and_then(|s|s.parse::<usize>().ok()).unwrap_or(1).clamp(1,3)-1;
+                 avatar_selection.open(slot);avatar_selection.paint_picker(&mut painter);
+             }}
         };
         let file = std::fs::File::create(path).map_err(|e| e.to_string())?;
         let mut encoder = png::Encoder::new(file, painter.width as u32, painter.height as u32);
@@ -341,7 +404,7 @@ fn main() -> Result<(), String> {
             .get(i + 1)
             .ok_or("--render-game requires output path")?;
         let r = if args.iter().any(|a| a == "--generated") {
-            new_selected_run(&seed, &mode, playtest_floor.as_deref())?
+            new_selected_run(&avatar_selection.prepared_seed(&seed,fresh_seed)?, &mode, playtest_floor.as_deref())?
         } else {
             load(&fixture)?
         };
@@ -410,20 +473,20 @@ fn main() -> Result<(), String> {
             .get(i + 1)
             .ok_or("--dump-observation requires output path")?;
         let r = if args.iter().any(|a| a == "--generated") {
-            new_selected_run(&seed, &mode, playtest_floor.as_deref())?
+            new_selected_run(&avatar_selection.prepared_seed(&seed,fresh_seed)?, &mode, playtest_floor.as_deref())?
         } else {
             load(&fixture)?
         };
         let v = observe::observe(&r.run);
         let cells:Vec<_>=v.cells.iter().map(|c|serde_json::json!({"x":c.x,"y":c.y,"glyph":c.glyph,"fg":c.fg,"bg":c.bg,"heartless":c.heartless,"superscript":c.superscript,"arrow":c.arrow})).collect();
-        let data = serde_json::json!({"width":v.width,"height":v.height,"cells":cells,"hp":v.hp,"maxHp":v.max_hp,"energy":v.energy,"maxEnergy":v.max_energy,"tick":v.turn,"depth":v.depth,"log":v.log,"inventory":v.inventory});
+        let data = serde_json::json!({"width":v.width,"height":v.height,"cells":cells,"hp":v.hp,"maxHp":v.max_hp,"energy":v.energy,"maxEnergy":v.max_energy,"tick":v.turn,"depth":v.display_depth,"log":v.log,"inventory":v.inventory});
         std::fs::write(path, serde_json::to_string_pretty(&data).unwrap())
             .map_err(|e| e.to_string())?;
         return Ok(());
     }
     if args.iter().any(|s| s == "--check-fixture") {
         let r = if args.iter().any(|a| a == "--generated") {
-            new_selected_run(&seed, &mode, playtest_floor.as_deref())?
+            new_selected_run(&avatar_selection.prepared_seed(&seed,fresh_seed)?, &mode, playtest_floor.as_deref())?
         } else {
             load(&fixture)?
         };
@@ -523,6 +586,7 @@ fn main() -> Result<(), String> {
     let mut last_frame = u32::MAX;
     let mut dirty = true;
     let mut cosmetic_dirty = false;
+    let mut help = help_ui::Help::default();
     let mut inventory = false;
     let mut pack_view: Option<pack::PackView> = None;
     let mut pending_item: Option<pack::PackTarget> = None;
@@ -532,6 +596,7 @@ fn main() -> Result<(), String> {
     let mut autoexplore = travel_ui::AutoExplore::default();
     let mut hover_tile: Option<(usize, usize)> = None;
     let mut keyboard_aim=false;
+    let mut keyboard_cursor=cursor_ui::Cursor::default();
     let mut pending_hover_position: Option<Option<(i32,i32)>> = None;
     let mut pending_hover_raw: Option<Option<(i32,i32)>> = None;
     let mut hover_path: Vec<(usize, usize)> = Vec::new();
@@ -545,6 +610,8 @@ fn main() -> Result<(), String> {
     let mut record_warning = String::new();
     let mut summary: Option<corpse_core::profile::RunSummary> = None;
     let mut summary_scroll = 0usize;
+    let mut death_pause=death_pause::DeathPause::default();
+    let mut health_warning=health_warning::Warning::default();
     let mut tile_report: Option<inspection_ui::Report> = None;
     let mut tile_report_scroll = 0usize;
     let mut inspecting = false;
@@ -553,7 +620,10 @@ fn main() -> Result<(), String> {
     let mut player_status_offset = 0usize;
     let mut chronicle_offset = 0usize;
     let mut menu_selected = 0usize;
+    let menu_fast_mode = true;
     let mut menu_seed_focus = false;
+    let mut observed_seed = seed.clone();
+    let mut menu_visits = menu_visit::Visits::default();
     let mut display_form: Option<display_ui::DisplaySettings> = None;
     let mut choice_selected = 0usize;
     let mut debug_loadout = debug_floor_ui::View::default();
@@ -563,6 +633,7 @@ fn main() -> Result<(), String> {
     let mut ability_offset = 0usize;
     let mut pending_ability: Option<String> = None;
     let mut implant_attacker: Option<f64> = None;
+    let mut riptide_target = targeting_ui::RiptideTarget::default();
     let mut cached_view: Option<render::View> = None;
     let mut hallucination_phase=0usize;
     // Separate opt-in prototype. Unset/0 remains the frozen full-paint policy.
@@ -609,7 +680,7 @@ fn main() -> Result<(), String> {
             }
             match resized{
                 Ok(true)=>{
-                    if screen==Screen::Game && !keyboard_aim {
+                    if screen==Screen::Game && !keyboard_aim && !keyboard_cursor.active() {
                         let mouse=events.mouse_state();
                         let raw=canvas.window().has_mouse_focus().then_some((mouse.x(),mouse.y()));
                         let position=resize_hover_position(&painter,raw,canvas.window().size(),resize_hover_blocked(run.as_ref().map(|r| &r.run),inventory||inspecting||history.is_some()||ability_detail.is_some()||hazard_prompt.is_some()),tile_report.is_some());
@@ -623,8 +694,22 @@ fn main() -> Result<(), String> {
         }
         if rejected_drawable.is_some_and(|size|size!=(drawable_w,drawable_h)){rejected_drawable=None;}
         // Use committed geometry even if this requested resize was rejected.
-        let tile_enabled=!gpu_available&&!gpu_failed&&tile_requested&&(painter.width as u64*HEIGHT as u64==painter.height as u64*WIDTH as u64);
+        let mut tile_enabled=!help.active()&&!gpu_available&&!gpu_failed&&tile_requested&&(painter.width as u64*HEIGHT as u64==painter.height as u64*WIDTH as u64);
+        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+        #[cfg(test)] input_loop_tests::inject(&sdl,&mut canvas,&painter)?;
         for mut event in events.poll_iter() {
+            if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+            let dead=screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead");
+            match death_pause.event(dead,&event) {
+                death_pause::Decision::Advance=>{summary=run.as_ref().map(|r|corpse_core::profile::summarize_run(&r.run));summary_scroll=0;screen=Screen::Summary;dirty=true;continue;},
+                death_pause::Decision::Block=>continue,
+                death_pause::Decision::Pass=>{},
+            }
+            match health_warning.event(&event){
+                health_warning::Decision::Dismiss=>{dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;continue;},
+                health_warning::Decision::Block=>continue,
+                health_warning::Decision::Pass=>{},
+            }
             // A held X is one press, not preview confirmation or cancellation.
             if matches!(event, Event::KeyDown { keycode: Some(Keycode::X), repeat: true, .. }) { continue; }
             let cancel_explore = cancels_autoexplore(&event);
@@ -634,6 +719,9 @@ fn main() -> Result<(), String> {
                 if autoexplore.cancel() { dirty = true; }
                 if travel.as_ref().is_some_and(|(walk, _)| walk.exploring()) { travel = None; dirty = true; }
             }
+            if observed_seed!=seed {avatar_selection.sync_seed(&seed);observed_seed=seed.clone();}
+            dirty |= menu_visits.observe(screen,pending_start.busy(),&mut avatar_selection,&mut seed,&mut notice);
+            if screen!=Screen::Menu {avatar_selection.close();}
             dirty|=cancel_aim_for_context(screen!=Screen::Game||inventory||inspecting||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
                 &mut pending_item,&mut pending_ability,&mut implant_attacker,&mut keyboard_aim);
             painter.set_responsive_canvas(matches!(screen,Screen::Game|Screen::ReplayGame));
@@ -661,25 +749,89 @@ fn main() -> Result<(), String> {
                 }
                 _ => {}
             }
+            // Help owns input before aiming, modal shortcuts or command dispatch.
+            // A close click/key is consumed, never forwarded to the underlying view.
+            let help_available = (screen == Screen::Menu && !pending_start.busy()
+                && !avatar_selection.active() && !menu_seed_focus)
+                || (screen == Screen::Game && !inventory && !inspecting && history.is_none()
+                    && ability_detail.is_none() && tile_report.is_none() && hazard_prompt.is_none()
+                    && run.as_ref().is_some_and(|r| r.run.offers.is_empty() && !debug_loadout.active(&r.run)));
+            let help_button = match &event {
+                Event::MouseButtonDown { x, y, .. } => match screen {
+                    Screen::Menu => help_ui::menu_button_at(*x, *y),
+                    Screen::Game => painter.toolbar_action(*x, *y) == Some(help_ui::ACTION),
+                    _ => false,
+                },
+                _ => false,
+            };
+            match help.event(&event, &painter, help_available, help_button) {
+                help_ui::Response::Opened | help_ui::Response::Closed => {
+                    resting = None; travel = None; autoexplore.cancel();
+                    pending_hover_position = None; pending_hover_raw = None;
+                    hover_path.clear(); hover_report = None;
+                    if let Some(view) = cached_view.as_mut() { view.path.clear(); }
+                    tile_plan.invalidate(); tile_overlays.invalidate(); tile_panels = None;
+                    tile_enabled = false; // Also repaint the opening/closing frame in full.
+                    force_texture_upload = true; cosmetic_dirty = true; continue;
+                },
+                help_ui::Response::Consumed => { cosmetic_dirty = true; continue; },
+                help_ui::Response::Ignored => {},
+            }
             if pending_item.is_none()&&pending_ability.is_none(){keyboard_aim=false;}
-            if matches!(event,Event::MouseMotion{..}|Event::MouseButtonDown{..}){keyboard_aim=false;}
+            let cursor_available = cursor_context_available(screen,
+                inventory||inspecting||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
+                run.as_ref().map(|r| &r.run),run.as_ref().is_some_and(|r|debug_loadout.active(&r.run)));
+            if !cursor_available || pending_item.is_some() || pending_ability.is_some() {
+                keyboard_cursor.clear();
+            }
+            if matches!(event,Event::MouseMotion{..}|Event::MouseButtonDown{..}
+                |Event::Window{win_event:sdl2::event::WindowEvent::FocusLost,..}) {
+                keyboard_aim=false;keyboard_cursor.clear();
+            }
+            if cursor_available && pending_item.is_none() && pending_ability.is_none() {
+                if let Event::KeyDown{keycode:Some(key),keymod,repeat,timestamp,window_id,..}=&event {
+                    if let Some(r)=run.as_ref() {
+                        if let Some(grid)=cursor_grid(&r.run) {
+                            match keyboard_cursor.key(*key,*keymod,*repeat,grid,hover_tile) {
+                                cursor_ui::Action::Inspect(tile) => {
+                                    resting=None;travel=None;autoexplore.cancel();hover_tile=Some(tile);
+                                    hover_path.clear();hover_report=None;pending_hover_position=None;pending_hover_raw=None;
+                                    dirty=true;continue;
+                                },
+                                cursor_ui::Action::Confirm(tile) => {
+                                    if let Some(click)=cursor_click(&painter,grid,tile,*timestamp,*window_id) {event=click;}
+                                    else {continue;}
+                                },
+                                cursor_ui::Action::Exit => {
+                                    resting=None;travel=None;hover_tile=None;hover_path.clear();hover_report=None;
+                                    pending_hover_position=None;pending_hover_raw=None;dirty=true;continue;
+                                },
+                                cursor_ui::Action::Consumed => continue,
+                                cursor_ui::Action::Pass => {},
+                            }
+                        }
+                    }
+                }
+            }
             if screen==Screen::Game&&!inventory&&!inspecting&&history.is_none()&&ability_detail.is_none()
                 &&tile_report.is_none()&&hazard_prompt.is_none()&&(pending_item.is_some()||pending_ability.is_some()) {
                 if let Event::KeyDown{keycode:Some(key),keymod,timestamp,window_id,..}=&event {
                     if !aim_modifiers_allowed(*keymod) { /* Preserve fullscreen/system shortcuts. */ }
                     else if let Some(r)=run.as_ref() {
-                        if let Some(next)=aim_keyboard_tile(&r.run,hover_tile,*key) {
+                        if *key==Keycode::Z {continue;}
+                        if matches!(*key,Keycode::Return|Keycode::KpEnter)
+                            && matches!(event,Event::KeyDown{repeat:true,..}) {continue;}
+                        if let Some(next)=directional_zap_ui::keyboard_tile(&r.run,pending_item.as_ref(),hover_tile,keyboard_aim,*key) {
                             keyboard_aim=true;resting=None;travel=None;hover_tile=Some(next);hover_path.clear();hover_report=None;
                             pending_hover_position=None;pending_hover_raw=None;dirty=true;continue;
                         }
                         if matches!(*key,Keycode::Return|Keycode::KpEnter) {
                             if let Some((tx,ty))=hover_tile {
-                                let f=r.run.floor().unwrap();let(cw,ch,ox,oy)=painter.map_layout(f.width(),f.height());
-                                // Reuse the exact click admission/dispatch branch. No duplicate
-                                // keyboard simulation, payment, target lookup, or RNG path.
-                                event=Event::MouseButtonDown{timestamp:*timestamp,window_id:*window_id,which:0,
-                                    mouse_btn:sdl2::mouse::MouseButton::Left,clicks:1,
-                                    x:ox+tx as i32*cw+cw/2,y:oy+ty as i32*ch+ch/2};
+                                // General cursor and targeting share the exact map-click
+                                // admission/dispatch branch and displayed-plane geometry.
+                                if let Some(click)=cursor_grid(&r.run).and_then(|grid|cursor_click(&painter,grid,(tx,ty),*timestamp,*window_id)) {
+                                    event=click;
+                                } else {continue;}
                             } else {continue;}
                         }
                     }
@@ -730,6 +882,7 @@ fn main() -> Result<(), String> {
                     repeat,
                     ..
                 } => {
+                    let key=if key==Keycode::KpEnter {Keycode::Return}else{key};
                     travel = None;
                     if screen==Screen::Game && history.is_some(){
                         match key{Keycode::Escape=>shutter.close(start.elapsed().as_millis()as f64,reduced),Keycode::Up=>shutter.scroll_for_height(1,history.as_ref().unwrap().len(),painter.logical_height()),Keycode::Down=>shutter.scroll_for_height(-1,history.as_ref().unwrap().len(),painter.logical_height()),Keycode::PageUp=>shutter.scroll_for_height(20,history.as_ref().unwrap().len(),painter.logical_height()),Keycode::PageDown=>shutter.scroll_for_height(-20,history.as_ref().unwrap().len(),painter.logical_height()),_=>{}}
@@ -753,14 +906,19 @@ fn main() -> Result<(), String> {
                         if key==Keycode::Escape{pending_start.cancel();notice="Play preparation cancelled.".into();}
                         continue;
                     }
+                    if screen == Screen::Menu && avatar_selection.active() && !(key==Keycode::Return && keymod.intersects(Mod::LALTMOD|Mod::RALTMOD)) {
+                        avatar_selection.key(key,keymod,&mut seed);
+                        continue;
+                    }
                     if screen == Screen::Menu && menu_seed_focus && !(key==Keycode::Return && keymod.intersects(Mod::LALTMOD|Mod::RALTMOD)) {
                         match key {
                             Keycode::Escape=>{menu_seed_focus=false;menu_selected=0;},
                             Keycode::Tab=>{menu_seed_focus=false;menu_selected=menu_ui::next_item(menu_ui::SEED_INDEX,!keymod.intersects(Mod::LSHIFTMOD|Mod::RSHIFTMOD),can_continue(&run,&saved_run));},
+                            Keycode::Down|Keycode::Up=>{menu_seed_focus=false;menu_selected=menu_ui::next_item(menu_ui::SEED_INDEX,key==Keycode::Down,can_continue(&run,&saved_run));},
                             Keycode::Backspace=>{seed.pop();},
                             Keycode::A if keymod.intersects(Mod::LCTRLMOD|Mod::RCTRLMOD)=>seed.clear(),
                             Keycode::V if keymod.intersects(Mod::LCTRLMOD|Mod::RCTRLMOD)=>match video.clipboard().clipboard_text(){Ok(text)=>{if !menu_ui::edit_seed(&mut seed,&text,true){notice="Seed is too long or contains control characters.".into();}},Err(e)=>notice=e},
-                            Keycode::Return|Keycode::KpEnter=>{playtest_floor=None;begin_menu_descent(&mut pending_start,&seed,&mode,&mut notice);},
+                            Keycode::Return|Keycode::KpEnter=>{playtest_floor=None;begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,None,menu_fast_mode,&mut notice);},
                             _=>{},
                         }
                         continue;
@@ -770,7 +928,7 @@ fn main() -> Result<(), String> {
                         painter.toolbar_focus = match key {
                             Keycode::I => Some(4),
                             Keycode::M => Some(7),
-                            Keycode::Slash if shift => Some(9),
+                            Keycode::Slash if shift => Some(help_ui::ACTION),
                             _ => None,
                         };
                     }
@@ -903,7 +1061,7 @@ fn main() -> Result<(), String> {
                             continue;
                         }
                         if pending_ability.take().is_some() {
-                            implant_attacker = None;
+                            implant_attacker = None; riptide_target.cancel();
                             notice = "Targeting cancelled.".into();
                             continue;
                         }
@@ -1020,17 +1178,14 @@ fn main() -> Result<(), String> {
                         match key {
                             Keycode::Tab => {
                                 if playtest_floor.is_some() {
-                                    if seed_focus { seed_focus = false; floor_focus = false; }
-                                    else if !floor_focus { floor_focus = true; }
-                                    else { floor_focus = false; seed_focus = true; }
+                                    seed_focus = !seed_focus; floor_focus = !seed_focus;
                                 } else { seed_focus = true; floor_focus = false; }
                             },
                             Keycode::Backspace if floor_focus => { if let Some(floor) = playtest_floor.as_mut() { floor.pop(); } },
                             Keycode::A if floor_focus && keymod.intersects(Mod::LCTRLMOD | Mod::RCTRLMOD) => { if let Some(floor) = playtest_floor.as_mut() { floor.clear(); } },
                             Keycode::Left | Keycode::Right if floor_focus => {
                                 if let Some(floor) = playtest_floor.as_mut() {
-                                    let n = corpse_core::playtest::parse_floor(floor).unwrap_or(1) as i32;
-                                    *floor = (n + if key == Keycode::Right { 1 } else { -1 }).clamp(1,40).to_string();
+                                    *floor = menu_ui::step_start_floor(floor,key==Keycode::Right,menu_fast_mode);
                                 }
                             },
                             Keycode::Backspace if seed_focus => {
@@ -1042,18 +1197,13 @@ fn main() -> Result<(), String> {
                             {
                                 seed.clear()
                             }
-                            Keycode::Left | Keycode::Right if playtest_floor.is_some() && !seed_focus => {
-                                mode = menu_ui::cycle_mode(&mode, key == Keycode::Right).into();
-                            }
                             Keycode::C if playtest_floor.is_some() && keymod.intersects(Mod::LCTRLMOD | Mod::RCTRLMOD) => { notice=video.clipboard().set_clipboard_text(&seed).map(|_|"Exact seed copied.".into()).unwrap_or_else(|e|e); },
-                            Keycode::V if playtest_floor.is_some() && keymod.intersects(Mod::LCTRLMOD | Mod::RCTRLMOD) => { match video.clipboard().clipboard_text() { Ok(text) if text.len() <= 180 && !text.chars().any(char::is_control) => seed=text, Ok(_) => notice="Seed must fit 160 suffix bytes and contain no control characters.".into(), Err(e) => notice=e } },
+                            Keycode::V if playtest_floor.is_some() && keymod.intersects(Mod::LCTRLMOD | Mod::RCTRLMOD) => { match video.clipboard().clipboard_text() { Ok(text) if text.len() <= 180 && !text.chars().any(char::is_control) => seed=text, Ok(_) => notice="Seed must fit 180 total bytes and contain no control characters.".into(), Err(e) => notice=e } },
                             Keycode::F3 | Keycode::F4 | Keycode::F8 if playtest_floor.is_some() => debug_floor_ui::cycle_god(&mut seed, if key == Keycode::F3 { 0 } else if key == Keycode::F4 { 1 } else { 2 }),
-                            Keycode::F2 => seed = fresh_seed(),
+                            Keycode::F2 => {if let Ok(next)=avatar_selection.prepared_seed("",fresh_seed){seed=next;}},
                             Keycode::Return => {
                                 if !pending_start.busy() {
-                                    let (seed, mode, floor) = (seed.clone(), mode.clone(), playtest_floor.clone());
-                                    pending_start.start(move || new_selected_run(&seed, &mode, floor.as_deref()));
-                                    notice = "Preparing seeded floors and loadout... Esc cancels.".into();
+                                    begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,playtest_floor.clone(),menu_fast_mode,&mut notice);
                                 }
                             },
                             _ => {}
@@ -1065,7 +1215,8 @@ fn main() -> Result<(), String> {
                             Keycode::R => terminal_record_key = None,
                             Keycode::Return => {
                                 seed.clear();playtest_floor=None;screen=Screen::Menu;
-                                begin_menu_descent(&mut pending_start,&seed,&mode,&mut notice);
+                                menu_visits.observe(screen,false,&mut avatar_selection,&mut seed,&mut notice);
+                                begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,None,menu_fast_mode,&mut notice);
                             }
                             Keycode::Down => summary_scroll += 1,
                             Keycode::Up => summary_scroll = summary_scroll.saturating_sub(1),
@@ -1089,25 +1240,25 @@ fn main() -> Result<(), String> {
                     }
                     if screen == Screen::Menu {
                         match key {
-                            Keycode::Space if menu_selected==0 && !fixture_session=>{playtest_floor=None;begin_menu_descent(&mut pending_start,&seed,&mode,&mut notice);continue;},
+                            Keycode::Space if menu_selected==0 && !fixture_session=>{playtest_floor=None;begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,None,menu_fast_mode,&mut notice);continue;},
                             Keycode::Down | Keycode::Up | Keycode::Tab => {
                                 let forward = key != Keycode::Up && !(key == Keycode::Tab && keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD));
                                 menu_selected = menu_ui::next_item(menu_selected, forward, can_continue(&run, &saved_run));
                                 menu_seed_focus=menu_selected==menu_ui::SEED_INDEX;
                                 continue;
                             }
-                            Keycode::Left | Keycode::Right if menu_selected == menu_ui::MODE_INDEX => {
-                                mode = menu_ui::cycle_mode(&mode, key == Keycode::Right).into();
+                            Keycode::Left | Keycode::Right if (avatar_menu::GOD_START..avatar_menu::GOD_START+3).contains(&menu_selected) => {
+                                let slot=menu_selected-avatar_menu::GOD_START;
+                                menu_selected=avatar_menu::GOD_START+(slot+if key==Keycode::Right{1}else{2})%3;
                                 continue;
                             }
-                            Keycode::Right if menu_selected == 0 => {
-                                menu_selected = menu_ui::MODE_INDEX;
-                                continue;
+                            Keycode::Right if menu_selected == 0 => {menu_selected=avatar_menu::GOD_START;continue;}
+                            Keycode::Return | Keycode::Space if menu_selected == menu_ui::FAST_INDEX => {
+                                notice.clear(); continue;
                             }
-                            Keycode::Return | Keycode::Space if menu_selected == menu_ui::SEED_INDEX => { menu_seed_focus=true; continue; }
-                            Keycode::Return | Keycode::Space if menu_selected == menu_ui::MODE_INDEX => {
-                                mode = menu_ui::cycle_mode(&mode, true).into();
-                                continue;
+                            Keycode::Return | Keycode::Space if menu_selected == menu_ui::SEED_INDEX => {menu_seed_focus=true;continue;}
+                            Keycode::Return | Keycode::Space if (avatar_menu::GOD_START..avatar_menu::GOD_START+3).contains(&menu_selected) => {
+                                avatar_selection.sync_seed(&seed);avatar_selection.open(menu_selected-avatar_menu::GOD_START);continue;
                             }
                             Keycode::I => {
                                 screen = Screen::ImportSave;
@@ -1117,7 +1268,7 @@ fn main() -> Result<(), String> {
                             Keycode::C | Keycode::F9 => menu_selected = 1,
                             _ => {}
                         }
-                        if (key == Keycode::Return && menu_selected == 1)
+                        if (matches!(key,Keycode::Return|Keycode::Space) && menu_selected == 1)
                             || matches!(key, Keycode::C | Keycode::F9)
                         {
                             if continue_run(&mut run, &mut saved_run, &mut session_kind) {
@@ -1134,7 +1285,7 @@ fn main() -> Result<(), String> {
                             }
                             continue;
                         }
-                        if key == Keycode::Return && menu_selected > 1 {
+                        if matches!(key,Keycode::Return|Keycode::Space) && menu_selected > 1 {
                             screen = match menu_selected {
                                 2 => Screen::Replays,
                                 3 => Screen::Scores,
@@ -1143,7 +1294,7 @@ fn main() -> Result<(), String> {
                                     Screen::Manual
                                 }
                                 5 => Screen::Settings,
-                                6 => { playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; Screen::Start },
+                                6 => { if let Ok(next)=avatar_selection.prepared_seed(&seed,fresh_seed){seed=next;} playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; Screen::Start },
                                 _ => Screen::Menu
                             };
                             continue;
@@ -1179,8 +1330,9 @@ fn main() -> Result<(), String> {
                     {
                         if !fixture_session {
                             playtest_floor = None;
-                            begin_menu_descent(&mut pending_start,&seed,&mode,&mut notice);
                             screen=Screen::Menu;
+                            menu_visits.observe(screen,pending_start.busy(),&mut avatar_selection,&mut seed,&mut notice);
+                            begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,None,menu_fast_mode,&mut notice);
                             continue;
                         }
                         match load(&fixture) {
@@ -1206,8 +1358,7 @@ fn main() -> Result<(), String> {
                         continue;
                     };
                     if key == Keycode::Slash && keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD) {
-                        screen = Screen::Menu;
-                        continue;
+                        continue; // Help is admitted before gameplay input above.
                     }
                     if key == Keycode::PageDown {
                         ability_offset = (ability_offset + ability_ui::capacity(&painter.profile))
@@ -1231,20 +1382,13 @@ fn main() -> Result<(), String> {
                         if corpse_core::debug_floor::state(&r.run).is_some() { notice="DEBUG seed-only replay export is unavailable; use F7 for an explicit debug state export.".into(); continue; }
                         notice = if session_kind == session_store::Kind::Genuine {
                             (|| -> Result<String, String> {
-                                std::fs::create_dir_all(&replay_dir).map_err(|e| e.to_string())?;
-                                let record = corpse_core::replay::ReplayRecord::try_from_run(&r.run).map_err(|e|e.to_string())?;
-                                let id = std::time::SystemTime::now()
-                                    .duration_since(std::time::UNIX_EPOCH)
-                                    .map_err(|e| e.to_string())?
-                                    .as_millis();
-                                let path = std::path::Path::new(&replay_dir)
-                                    .join(format!("descent-{id}.json"));
-                                std::fs::write(
-                                    &path,
-                                    serde_json::to_vec_pretty(&record)
-                                        .map_err(|e| e.to_string())?,
-                                )
-                                .map_err(|e| e.to_string())?;
+                                let mut record = corpse_core::replay::ReplayRecord::try_from_run(&r.run).map_err(|e|e.to_string())?;
+                                let date = session_store::utc_now();
+                                record.saved_at = date.clone().into();
+                                let path = session_store::replay_archive::write(
+                                    std::path::Path::new(&replay_dir), &r.run, &date,
+                                    &serde_json::to_vec_pretty(&record).map_err(|e| e.to_string())?,
+                                )?;
                                 replays = replays::Replays::new(std::path::Path::new(&replay_dir));
                                 Ok(format!("Replay exported: {}", path.display()))
                             })()
@@ -1329,8 +1473,7 @@ fn main() -> Result<(), String> {
                         notice.clear();
                         continue;
                     }
-                    if key == Keycode::Z
-                        && keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD)
+                    if cursor_ui::rest_key(key,keymod,pending_item.is_some()||pending_ability.is_some()) == cursor_ui::RestKey::UntilChange
                         && !inventory
                         && r.run.status == "playing"
                         && r.run.offers.is_empty()
@@ -1341,7 +1484,9 @@ fn main() -> Result<(), String> {
                         });
                         continue;
                     }
-                    let mut command = if key == Keycode::R && !corpse_core::temporal::retains_revert_history(&r.run) { None } else { key_command(key) };
+                    let mut command = if (key == Keycode::R && !corpse_core::temporal::retains_revert_history(&r.run))
+                        || (key == Keycode::Z && cursor_ui::rest_key(key,keymod,pending_item.is_some()||pending_ability.is_some()) != cursor_ui::RestKey::Once)
+                        { None } else { key_command(key) };
                     if inventory {
                         let view = pack_view.get_or_insert_with(|| pack::PackView::observe(&r.run));
                         view.refresh(&r.run);
@@ -1424,7 +1569,7 @@ fn main() -> Result<(), String> {
                         if observe::ability_needs_target_for_run(&r.run, id)
                             && !ability_ui::deactivates_without_target(&r.run, id)
                         {
-                            implant_attacker = None;pending_item=None;
+                            implant_attacker = None; riptide_target.cancel();pending_item=None;
                             pending_ability = Some(id.clone());
                             notice = if r.run.simulation_revision.value_or(29.) >= 50. { targeting_ui::ability_prompt(id) } else { "Select a target. Escape cancels." }.into();
                             if id=="kative-cogworks" { notice=targeting_ui::cogworks_prompt(&r.run); }
@@ -1469,8 +1614,13 @@ fn main() -> Result<(), String> {
                     if let Some(view) = cached_view.as_ref() {
                         let (_,_,ox,_) = painter.map_layout(view.width,view.height);
                         let layout=render::enemy_list::Layout::resolve_frame(&painter.profile,ox,painter.frame());
-                        if let Some(index)=layout.rows.contains(x,y).then(||layout.content(&painter,&view.creatures).hit(x,y,painter.enemy_list_offset)).flatten() {
-                            inspected_actor=Some(view.creatures[index].id);
+                        if let Some(index)=layout.rows.contains(x,y).then(||layout.content_view(&painter,view).hit(x,y,painter.enemy_list_offset)).flatten() {
+                            if let Some((tx,ty))=render::enemy_list::Content::ground(view,index) {
+                                if let Some(r)=run.as_ref(){tile_report=Some(inspection_ui::observe_tile(&r.run,tx,ty));tile_report_scroll=0;}
+                                painter.enemy_hover=None;painter.ground_hover=None;cosmetic_dirty=true;continue;
+                            }
+                            let Some(index)=render::enemy_list::Content::creature_index(view,index) else{continue;};
+                            inspected_actor=view.creatures.get(index).map(|a|a.id);
                             creature_offset=index;
                             inspecting=true;
                             painter.enemy_hover=None;
@@ -1563,7 +1713,8 @@ fn main() -> Result<(), String> {
                         if (690..740).contains(&y) {
                             if (180..610).contains(&x) {
                                 seed.clear();playtest_floor=None;screen=Screen::Menu;
-                                begin_menu_descent(&mut pending_start,&seed,&mode,&mut notice);
+                                menu_visits.observe(screen,false,&mut avatar_selection,&mut seed,&mut notice);
+                                begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,None,menu_fast_mode,&mut notice);
                             } else if (710..1100).contains(&x) {
                                 screen = Screen::Menu;
                             }
@@ -1572,13 +1723,15 @@ fn main() -> Result<(), String> {
                     }
                     if screen == Screen::Menu {
                         if pending_start.busy(){continue;}
+                        if avatar_selection.active(){avatar_selection.click(x,y,&mut seed);continue;}
                         let Some(i) = menu_item_at(x, y) else {
                             continue;
                         };
                         menu_selected = i;
                         menu_seed_focus=i==menu_ui::SEED_INDEX;
                         match i {
-                            0 if !fixture_session => { playtest_floor=None;begin_menu_descent(&mut pending_start,&seed,&mode,&mut notice); },
+                            menu_ui::FAST_INDEX => { notice.clear(); },
+                            0 if !fixture_session => { playtest_floor=None;begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,None,menu_fast_mode,&mut notice); },
                             0 => match load(&fixture) {
                                 Ok(r) => {
                                     effects.clear();
@@ -1614,8 +1767,8 @@ fn main() -> Result<(), String> {
                                 screen = Screen::Manual
                             }
                             5 => screen = Screen::Settings,
-                            menu_ui::MODE_INDEX => mode = menu_ui::cycle_mode(&mode, true).into(),
-                            6 => { playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; screen = Screen::Start; },
+                            i if (avatar_menu::GOD_START..avatar_menu::GOD_START+3).contains(&i) => {avatar_selection.sync_seed(&seed);avatar_selection.open(i-avatar_menu::GOD_START);},
+                            6 => { if let Ok(next)=avatar_selection.prepared_seed(&seed,fresh_seed){seed=next;} playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; screen = Screen::Start; },
                             _ => {}
                         }
                     } else if screen == Screen::Start {
@@ -1627,19 +1780,15 @@ fn main() -> Result<(), String> {
                             seed_focus = true; floor_focus = false;
                         } else if playtest_floor.is_some() && (450..994).contains(&x) && (475..517).contains(&y) {
                             seed_focus = false; floor_focus = true;
-                        } else if playtest_floor.is_some() && (450..994).contains(&x) && (412..464).contains(&y) {
-                            seed_focus = false; floor_focus = false;
-                            mode = menu_ui::cycle_mode(&mode, true).into();
+
                         } else if (284..994).contains(&x) && (if playtest_floor.is_some() { 548..603 } else { 505..560 }).contains(&y) {
                             {
                                 if !pending_start.busy() {
-                                    let (seed, mode, floor) = (seed.clone(), mode.clone(), playtest_floor.clone());
-                                    pending_start.start(move || new_selected_run(&seed, &mode, floor.as_deref()));
-                                    notice = "Preparing seeded floors and loadout... Esc cancels.".into();
+                                    begin_selected_descent_with_fast(&mut pending_start,&seed,&avatar_selection,playtest_floor.clone(),menu_fast_mode,&mut notice);
                                 }
                             }
                         } else if (892..994).contains(&x) && (303..338).contains(&y) {
-                            seed = fresh_seed();
+                            if let Ok(next)=avatar_selection.prepared_seed("",fresh_seed){seed=next;}
                         } else if (284..410).contains(&x) && (610..650).contains(&y) {
                             screen = Screen::Menu;
                         }
@@ -1721,7 +1870,7 @@ fn main() -> Result<(), String> {
                             {
                                 if let Some(cached) = cached_view.as_ref() {
                                     inspected_actor =
-                                        render::creature_at(cached,creature_offset,sheet_pointer.unwrap().0,sheet_pointer.unwrap().1)
+                                        render::creature_at(&painter,cached,creature_offset,sheet_pointer.unwrap().0,sheet_pointer.unwrap().1)
                                             .or(inspected_actor);
                                 }
                                 continue;
@@ -1796,11 +1945,12 @@ fn main() -> Result<(), String> {
                                         previous = Screen::Game;
                                         screen = Screen::Manual
                                     }
+                                    help_ui::ACTION => {}, // Help is routed before command dispatch.
                                     _ => screen = Screen::Menu,
                                 }
                             } else if x >= painter.hud_left() + 10
-                                && y >= 204
-                                && y < 252
+                                && y >= painter.frame().map.1+painter.frame().map.3-22
+                                && y < painter.frame().map.1+painter.frame().map.3
                             {
                                 inspected_actor = view.creatures.first().map(|a| a.id);
                                 inspecting = true;
@@ -1820,6 +1970,11 @@ fn main() -> Result<(), String> {
                                     .map(|a| a.id.clone())
                                 {
                                     if !ability_ui::command_binding_allowed(&r.run, &id) { continue; }
+                                    if id=="kative-cogworks" {
+                                        if let Some(mode)=cogworks_ui::bubble_hit(x,y,painter.hud_left(),ability_ui::top(&painter.profile)+i as i32*ability_ui::row(&painter.profile)) {
+                                            notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&Command::Ability{id:id.clone(),target:Field::Value(mode as f64),x:Field::Missing,y:Field::Missing}){Ok(_)=>targeting_ui::cogworks_prompt(&r.run),Err(e)=>e.to_string()};
+                                        }
+                                    }
                                     if id == "kative-tinker" {
                                         let pv = pack_view
                                             .get_or_insert_with(|| pack::PackView::observe(&r.run));
@@ -1840,7 +1995,7 @@ fn main() -> Result<(), String> {
                                     if observe::ability_needs_target_for_run(&r.run, &id)
                                         && !ability_ui::deactivates_without_target(&r.run, &id)
                                     {
-                                        implant_attacker = None;pending_item=None;
+                                        implant_attacker = None; riptide_target.cancel();pending_item=None;
                                         notice = if r.run.simulation_revision.value_or(29.) >= 50. { targeting_ui::ability_prompt(&id) } else { "Select a target. Escape cancels." }.into();
                                         if id=="kative-cogworks" { notice=targeting_ui::cogworks_prompt(&r.run); }
                                         pending_ability = Some(id);
@@ -1874,16 +2029,13 @@ fn main() -> Result<(), String> {
                                     let (tx, ty) =
                                         (((x - ox) / cw) as usize, ((y - oy) / ch) as usize);
                                     if let Some(target) = pending_item.take() {
-                                        if let Some(message) = target.target_blocker(&r.run,tx as f64,ty as f64) {
-                                            notice=message.into(); inventory=r.run.status=="playing";
-                                        } else if view.cells.iter().any(|c| c.x == tx && c.y == ty) {
-                                            let outcome=dispatch(r,&mut effects,start.elapsed().as_millis() as f64,
-                                                &target.command(tx as f64,ty as f64));
-                                            notice=finish_pack_dispatch(&mut inventory,&r.run.status,outcome);
-                                            if let Some(pack)=pack_view.as_mut(){pack.refresh(&r.run);}
-                                        } else {
-                                            inventory=r.run.status=="playing";
-                                            notice = "Select a known map location.".into();
+                                        match directional_zap_ui::command(&r.run,&view,&target,(tx,ty)) {
+                                            Ok(command) => {
+                                                let outcome=dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&command);
+                                                notice=finish_pack_dispatch(&mut inventory,&r.run.status,outcome);
+                                                if let Some(pack)=pack_view.as_mut(){pack.refresh(&r.run);}
+                                            },
+                                            Err(message) => {notice=message.into();inventory=r.run.status=="playing";},
                                         }
                                     } else if let Some(id) = pending_ability.take() {
                                         let target = view
@@ -1896,12 +2048,19 @@ fn main() -> Result<(), String> {
                                                 .is_some_and(|a| corpse_core::dreamwalking::same_plane(&r.run, &r.run.player, a)))
                                             .map(Field::Value)
                                             .unwrap_or(Field::Missing);
+                                        let target = if id == "etill-riptide" {
+                                            match riptide_target.select(&r.run, target.as_ref().copied(), tx, ty) {
+                                                Ok(Some(actor)) => Field::Value(actor),
+                                                Ok(None) => { pending_ability=Some(id); notice="Select the rally point. Escape cancels.".into(); continue; },
+                                                Err(reason) => { pending_ability=Some(id); notice=reason.into(); continue; },
+                                            }
+                                        } else { target };
                                         let target = if r.run.simulation_revision.value_or(29.) >= 50. && id == "numo-implant-thought" {
                                             if let Some(attacker) = implant_attacker {
                                                 if let Some(reason) = targeting_ui::implant_victim_blocker(&r.run, attacker, tx, ty) {
                                                     pending_ability = Some(id); notice = reason.into(); continue;
                                                 }
-                                                implant_attacker = None;
+                                                implant_attacker = None; riptide_target.cancel();
                                                 Field::Value(attacker)
                                             } else {
                                                 let attacker = target.as_ref().copied();
@@ -2002,6 +2161,9 @@ fn main() -> Result<(), String> {
                         }
                     }
                 }
+                Event::MouseMotion { x, y, .. } if screen == Screen::Menu && avatar_selection.active() => {
+                    dirty |= avatar_selection.hover(x,y);
+                }
                 Event::MouseMotion { x, y, .. } if screen == Screen::Menu && !menu_seed_focus && !pending_start.busy() => {
                     if let Some(i) = menu_item_at(x, y) {
                         if i != menu_selected {
@@ -2082,7 +2244,7 @@ fn main() -> Result<(), String> {
                             let path=travel.as_ref().map(|(t,_)|t.path()).or_else(||autoexplore.path())
                                 .map(|path|path.iter().map(|s|(s.x,s.y)).collect()).unwrap_or_else(||hover_path.clone());
                             sync_pointer_view(view,&r.run,hover_tile,path,pending_item.as_ref());
-                            sync_ability_preview(view,&r.run,pending_ability.as_deref(),implant_attacker,pending_item.is_some());
+                            sync_ability_preview(view,&r.run,pending_ability.as_deref(),if pending_ability.as_deref()==Some("etill-riptide"){riptide_target.enemy()}else{implant_attacker},pending_item.is_some());
                             if tile_enabled{tile_overlay::mark_presentation(&painter,view,&mut tile_plan);}
                         }
                         cosmetic_dirty = true;
@@ -2124,15 +2286,17 @@ fn main() -> Result<(), String> {
                             let (_,_,ox,_)=painter.map_layout(v.width,v.height);
                             let layout=render::enemy_list::Layout::resolve_frame(&painter.profile,ox,painter.frame());
                             if layout.bounds.contains(mouse_x,mouse_y) {
-                                let content=layout.content(&painter,&v.creatures);
+                                let content=layout.content_view(&painter,v);
                                 painter.enemy_list_offset=content.scroll(painter.enemy_list_offset,y);
-                                painter.enemy_hover=content.hit(mouse_x,mouse_y,painter.enemy_list_offset).map(|i|v.creatures[i].id.to_bits());
+                                let index=content.hit(mouse_x,mouse_y,painter.enemy_list_offset);
+                                painter.enemy_hover=index.and_then(|i|render::enemy_list::Content::actor(v,i));
+                                painter.ground_hover=index.and_then(|i|render::enemy_list::Content::ground(v,i));
                                 cosmetic_dirty=true;continue;
                             }
                         }
                     }
                     if mouse_x >= painter.hud_left() + 10
-                        && (220..246).contains(&mouse_y)
+                        && (painter.frame().map.1+painter.frame().map.3-22..painter.frame().map.1+painter.frame().map.3).contains(&mouse_y)
                     {
                         if y < 0 {
                             player_status_offset += 2;
@@ -2141,6 +2305,7 @@ fn main() -> Result<(), String> {
                         }
                     } else if mouse_x >= painter.hud_left() + 10
                         && mouse_y >= ability_ui::top(&painter.profile)
+                        && mouse_y < ability_ui::top(&painter.profile)+ability_ui::row(&painter.profile)*ability_ui::capacity(&painter.profile) as i32
                     {
                         if y < 0 {
                             ability_offset += 1;
@@ -2154,8 +2319,7 @@ fn main() -> Result<(), String> {
                                     .saturating_sub(1),
                             );
                         }
-                    } else if mouse_x < painter.hud_left()
-                        && mouse_y < render::chronicle_height(&painter.profile) + 5
+                    } else if painter.chronicle_hit_rect().contains(mouse_x,mouse_y)
                     {
                         if y > 0 {
                             chronicle_offset += y as usize;
@@ -2243,7 +2407,7 @@ fn main() -> Result<(), String> {
                     }
                     dirty = true;
                 }
-                Event::TextInput { text, .. } if screen==Screen::Menu && menu_seed_focus && !pending_start.busy()=>{
+                Event::TextInput { text, .. } if screen==Screen::Menu && menu_seed_focus && !avatar_selection.active() && !pending_start.busy()=>{
                     if menu_ui::edit_seed(&mut seed,&text,false){dirty=true;}
                 }
                 Event::TextInput { text, .. } if screen == Screen::Start && !pending_start.busy() && floor_focus => {
@@ -2252,10 +2416,7 @@ fn main() -> Result<(), String> {
                     }
                 }
                 Event::TextInput { text, .. } if screen == Screen::Start && !pending_start.busy() && seed_focus => {
-                    if seed.len() + text.len() <= 160 {
-                        seed.push_str(&text);
-                        dirty = true;
-                    }
+                    if menu_ui::edit_seed(&mut seed,&text,false) {dirty=true;}
                 }
                 Event::Window {
                     win_event: sdl2::event::WindowEvent::Leave,
@@ -2291,6 +2452,9 @@ fn main() -> Result<(), String> {
                 _ => {}
             }
         }
+        if observed_seed!=seed {avatar_selection.sync_seed(&seed);observed_seed=seed.clone();}
+        dirty |= menu_visits.observe(screen,pending_start.busy(),&mut avatar_selection,&mut seed,&mut notice);
+        if screen!=Screen::Menu {avatar_selection.close();}
         dirty|=cancel_aim_for_context(screen!=Screen::Game||inventory||inspecting||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
             &mut pending_item,&mut pending_ability,&mut implant_attacker,&mut keyboard_aim);
         if pending_gpu_failure.is_some(){continue 'running;}
@@ -2316,6 +2480,7 @@ fn main() -> Result<(), String> {
             }
             dirty = true;
         }
+        dirty |= menu_visits.observe(screen,pending_start.busy(),&mut avatar_selection,&mut seed,&mut notice);
         if was_preparing && !pending_start.busy() { dirty = true; }
         // DEBUG never supersedes the normal Continue slot, even in this process.
         if run.as_ref().is_some_and(|r| r.run.playtest.is_missing()) {
@@ -2363,7 +2528,7 @@ fn main() -> Result<(), String> {
         if screen == Screen::Settings && display_form.is_none() {
             let (desktop, modes) = display_choices(canvas.window(), &video);
             display_form = Some(display_ui::DisplaySettings::new(settings.display_mode,
-                settings.store.resolution, desktop, modes));
+                settings.store.resolution, desktop, modes).with_action_animation_mode(settings.store.action_animation_mode));
         } else if screen != Screen::Settings {
             display_form = None;
         }
@@ -2376,7 +2541,12 @@ fn main() -> Result<(), String> {
             if screen!=Screen::Game||shutter.closed(now,reduced){history=None;cosmetic_dirty=true;}
             else if shutter.animating(now,reduced){cosmetic_dirty=true;}
         }
-        if screen == Screen::Game && travel.as_ref().is_some_and(|(_, next)| now >= *next) {
+        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+        if screen==Screen::Game&&(health_warning.active()||run.as_ref().is_some_and(|r|r.run.status=="dead")) {
+            travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;
+            inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;
+        }
+        if !help.active() && screen == Screen::Game && travel.as_ref().is_some_and(|(_, next)| now >= *next) {
             if let (Some((mut walk, _)), Some(r)) = (travel.take(), run.as_mut()) {
                 let quiet = walk.exploring();
                 match walk.next_command(&r.run) {
@@ -2400,7 +2570,8 @@ fn main() -> Result<(), String> {
                 dirty = true;
             }
         }
-        if screen == Screen::Game && resting.as_ref().is_some_and(|rest| now >= rest.next) {
+        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+        if !help.active() && screen == Screen::Game && !health_warning.active() && resting.as_ref().is_some_and(|rest| now >= rest.next) {
             if let Some(r) = run.as_mut() {
                 let before = resting.take().unwrap();
                 if r.run.status == "playing" && r.run.offers.is_empty() {
@@ -2431,14 +2602,25 @@ fn main() -> Result<(), String> {
             }
         }
 
-        if screen == Screen::ReplayGame && replays.playing && now - replays.last_step >= 120. {
+        if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+        if health_warning.active(){travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;}
+        let action_reduced=reduced || settings.store.action_animation_mode!=appearance_store::ActionAnimationMode::Normal;
+        let action_instant=settings.store.action_animation_mode==appearance_store::ActionAnimationMode::Instant;
+        replays.configure_motion(action_reduced,action_instant);
+        if screen == Screen::ReplayGame && replays.playing && now - replays.last_step >= 120. && replays.ready_for_step(now) {
             replays.step(now);
             dirty = true;
         }
-        let old_cues = effects.cues.len();
-        effects.prune(now);
-        dirty |= effects.cues.len() != old_cues;
-        let transient = effects.animate(now);
+        // Resample after synchronous command/replay/autosave work, so the first
+        // presented frame starts at the queued action rather than skipping it.
+        let now = start.elapsed().as_millis() as f64;
+        if !minimized&&drawable_w>0&&drawable_h>0 {effects.begin_frame(now);}
+        effects.configure_motion(action_reduced,action_instant);
+        if effects.profile.as_ref()!=Some(&painter.profile){effects.profile=Some(painter.profile.clone());}
+        let old_cues = (effects.cues.len(),effects.plane_transition.is_some());
+        if !minimized&&drawable_w>0&&drawable_h>0 {effects.prune(now);}
+        dirty |= (effects.cues.len(),effects.plane_transition.is_some()) != old_cues;
+        let transient = effects.animate(now) || (screen==Screen::ReplayGame&&replays.animating(now));
         let frame = if reduced {
             18
         } else {
@@ -2460,17 +2642,21 @@ fn main() -> Result<(), String> {
             let gpu_frame=gpu_available && rejected_drawable.is_none() && matches!(screen,Screen::Game|Screen::ReplayGame);
             if gpu_frame{painter.gpu.get_or_insert_with(Default::default).begin();}else{painter.gpu=None;gpu_renderer.reset();}
 
-            if screen!=Screen::Game{tile_plan.invalidate();tile_overlays.invalidate();tile_panels=None;}
+            if screen!=Screen::Game{painter.firebolt_terrain=None;tile_plan.invalidate();tile_overlays.invalidate();tile_panels=None;}
             painter.bestiary_unread=manual.progress.has_unread();
             match screen {
                 Screen::Menu => {
                     painter.menu(frame, menu_selected, can_continue(&run, &saved_run), &mode);
                     painter.menu_seed(&seed,menu_seed_focus,pending_start.busy());
+                    painter.menu_fast_mode(menu_fast_mode,menu_selected==menu_ui::FAST_INDEX);
+                    avatar_selection.paint_slots(&mut painter,menu_selected);
                     if !notice.is_empty() {
                         painter.rect(103,415,559,24,[24,10,12]);
                         let label=painter.fit_text_role(typography_ui::Role::Secondary,&notice,545,12);
                         painter.text_role(typography_ui::Role::Secondary,&label,110,420,12,[240,170,145]);
                     }
+                    avatar_selection.paint_picker(&mut painter);
+                    help_ui::paint_menu_button(&mut painter);
                 }
                 Screen::Summary => {
                     if let Some(s) = &summary {
@@ -2487,8 +2673,18 @@ fn main() -> Result<(), String> {
                     }
                 }
                 Screen::ImportSave => painter.import_save(&notice),
-                Screen::Start => painter.start(&seed, &mode, seed_focus, playtest_floor.as_deref().map(|s| (s, floor_focus)), &notice),
-                Screen::Manual => {manual.paint_at(&mut painter, if reduced { 0. } else { now }); manual.mark_viewed(); manual.progress.report_error(&mut notice);},
+                Screen::Start => {
+                    painter.start(&seed, &mode, seed_focus, playtest_floor.as_deref().map(|s| (s, floor_focus)), &notice);
+                },
+                Screen::Manual => {
+                    let manual_run=if previous==Screen::ReplayGame {replays.session.as_ref().map(|s|&s.engine.run)} else {run.as_ref().map(|e|&e.run)};
+                    manual.set_compressed_depths(manual_run.map_or(true,|r|r.compressed_depths.value_or(false)));
+                    manual.set_simulation_revision(manual_simulation_revision(previous,
+                        run.as_ref().map(|engine| &engine.run),
+                        replays.session.as_ref().map(|session| &session.engine.run)));
+                    manual.paint_at(&mut painter, if reduced { 0. } else { now });
+                    manual.mark_viewed(); manual.progress.report_error(&mut notice);
+                },
                 Screen::Replays => replays.library(&mut painter),
                 Screen::ReplayGame => replays.paint(&mut painter, now, reduced),
                 Screen::Scores => profiles.paint(&mut painter),
@@ -2550,7 +2746,7 @@ fn main() -> Result<(), String> {
                                 view.possible_exits = hover_tile.map_or_else(Vec::new, |(x, y)|
                                     view.terrain_snapshot.as_deref().map_or_else(||non_euclidean_ui::possible_exit_marks(&r.run,x,y),|o|non_euclidean_ui::possible_exit_marks_with_terrain(&r.run,x,y,o)));
                                 sync_item_preview(&mut view,&r.run,pending_item.as_ref());
-                                sync_ability_preview(&mut view,&r.run,pending_ability.as_deref(),implant_attacker,pending_item.is_some());
+                                sync_ability_preview(&mut view,&r.run,pending_ability.as_deref(),if pending_ability.as_deref()==Some("etill-riptide"){riptide_target.enemy()}else{implant_attacker},pending_item.is_some());
                                 view.provenance = provenance.into();
                                 view.chronicle_offset = chronicle_offset;
                                 view.abilities =
@@ -2573,7 +2769,14 @@ fn main() -> Result<(), String> {
                             hallucination_phase=next_hallucination_phase;
                             let _paint_timing=corpse_core::timing::span("desktop.paint.composition");
                             let current_view=cached_view.as_ref().unwrap();
-                            let paint_notice=notice.as_str();
+                            if effects.firebolt_terrain.prepare(current_view,&effects.cues,now,action_reduced,&mut painter.firebolt_terrain) && tile_enabled {
+                                // Staged terrain can change layer footprints and custom light
+                                // reconstruction. Arrival frames conservatively redraw all.
+                                tile_plan.invalidate();
+                                tile_plan.replace_view(None,current_view,&painter);
+                            }
+                            let paint_notice=inspection_ui::footer_text(&notice, hover_report.as_ref());
+                            let ability_detail_view=ability_detail.as_ref().map(|id|ability_ui::observe(&r.run,id));
                             let mut planned_overlay=None;
                             let mut full_pack_state=None;
                             if tile_enabled{
@@ -2588,19 +2791,23 @@ fn main() -> Result<(), String> {
                                 }else{None};
                                 let shutter_state=history.as_ref().and_then(|_|chronicle_overlay::bounds_painter(&painter,&shutter,now,reduced).and_then(|(x,y,w,h)|painter.logical_damage_rect(x,y,w,h)).map(|bounds|tile_overlay::Shutter{bounds,offset:shutter.offset}));
                                 let mut panels=Vec::new();
+                                if effects.plane_transition.is_some(){let b=painter.frame().map;panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}
+                                if !effects::inventory_marks(&effects.cues,now).is_empty(){panels.extend(painter.logical_damage_rect(0,painter.toolbar_y(),painter.logical_width(),64));panels.extend(painter.logical_damage_rect(painter.hud_left(),40,painter.logical_width()-painter.hud_left(),662));if let Some(pack)=pack_view.as_ref(){let b=pack.bounds();panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}}
                                 if inspecting{panels.extend(painter.sheet_damage_rect(333,121,644,587));}
                                 if tile_report.is_some(){let(x,y,w,h)=inspection_ui::bounds(&painter.profile);panels.extend(painter.sheet_damage_rect(x,y,w,h));}
-                                // Unclipped hazard prose can extend below its box. Ability
-                                // headers honor custom font sizes; conservatively retain their
-                                // full horizontal band, not unrelated top-of-screen pixels.
+                                // Unclipped hazard prose retains its horizontal band. Ability
+                                // details share exact content-sized bounds with their painter.
                                 if hazard_prompt.is_some(){panels.extend(painter.sheet_damage_rect(0,282,render::WIDTH as i32,render::HEIGHT as i32-282));}
-                                if ability_detail.is_some(){panels.extend(painter.sheet_damage_rect(0,142,render::WIDTH as i32,render::HEIGHT as i32-142));}
+                                if let Some(ability)=&ability_detail_view{panels.extend(painter.ability_detail_damage(ability));}
                                 if debug_loadout.active(&r.run){panels.extend(painter.sheet_damage_rect(0,51,render::WIDTH as i32,718));}
-                                let next=tile_overlay::Frame{pack:pack_state,hover:hover_state,effects:tile_overlay::effects(&painter,current_view,&effects.cues,now,reduced),shutter:shutter_state,
-                                    full_modal:!current_view.offers.is_empty()&&r.run.status=="playing",panels,redraw_panels:dirty||hallucination_changed,choice:choice_selected,inspector:inspecting.then_some((inspected_actor.map(f64::to_bits),creature_offset)),save_error:autosave.error.clone()};
+                                let next=tile_overlay::Frame{pack:pack_state,hover:hover_state,effects:tile_overlay::effects(&painter,current_view,&effects.cues,now,action_reduced),shutter:shutter_state,
+                                    full_modal:!current_view.offers.is_empty()&&r.run.status=="playing",panels,redraw_panels:dirty||hallucination_changed||effects.redraw_panels(now),choice:choice_selected,inspector:inspecting.then_some((inspected_actor.map(f64::to_bits),creature_offset)),save_error:autosave.error.clone()};
                                 for rect in tile_overlays.changes(&painter,&next){tile_plan.mark_native_rect(rect);}
                                 let keys=tile_overlay::PanelKeys::read(&painter);keys.mark_changes(tile_panels,&painter,current_view,&mut tile_plan);tile_panels=Some(keys);
-                                if tile_notice!=paint_notice{let y=render::toolbar_y(&painter.profile).min(715-(painter.profile.number("ui.layout.buttonHeight").round()as i32-42)).min(786)-24;if let Some(rect)=painter.logical_damage_rect(0,y,render::WIDTH as i32,render::HEIGHT as i32-y){tile_plan.mark_native_rect(rect);}tile_notice=paint_notice.to_owned();}
+                                if tile_notice!=paint_notice{if let Some(rect)=painter.footer_damage(){tile_plan.mark_native_rect(rect);}tile_notice=paint_notice.to_owned();}
+                                if let Some(stage)=painter.firebolt_terrain.as_ref() {
+                                    for rect in stage.damage(&painter,current_view) {tile_plan.mark_native_rect(rect);}
+                                }
                                 tile_plan.mark_animation(current_view,&painter,now,reduced);
                                 tile_overlay::finish_dependencies(&mut painter,&mut tile_plan,&next);
                                 tile_plan.paint_base(&mut painter,current_view,paint_notice,if reduced{0.}else{now});
@@ -2612,11 +2819,12 @@ fn main() -> Result<(), String> {
                                 painter.game_at_behind_pack(current_view,paint_notice,if reduced{0.}else{now},pack.bounds());
                             }else{painter.game_at(current_view,paint_notice,false,if reduced{0.}else{now});}
                             if !tile_enabled||!painter.tile_mask.is_empty(){
+                            if let Some(transition)=effects.plane_transition.as_ref(){painter.scene_crossfade(&transition.before,now-transition.started,transition.ascend);}
                             painter.effects(
                                 cached_view.as_ref().unwrap(),
                                 &effects.cues,
                                 now,
-                                reduced,
+                                action_reduced,
                             );
                             if !inventory&&!inspecting&&ability_detail.is_none()&&history.is_none() {
                                 if let (Some(report), Some((x, y))) = (&hover_report, hover_tile) {
@@ -2640,7 +2848,9 @@ fn main() -> Result<(), String> {
                                 if let Some(state)=planned_overlay.as_ref().and_then(|s|s.pack.as_ref()).or(full_pack_state.as_ref()){
                                     pack.paint_prepared(&mut painter,state);
                                 }else{pack.paint(&mut painter);}
+                                pack.paint_action_marks(&mut painter,&effects.cues,now);
                             }
+                            effects::paint_inventory_hud(&mut painter,current_view,&effects.cues,now,inventory);
                             if inspecting {
                                 creature_offset = creature_offset.min(
                                     cached_view
@@ -2662,9 +2872,9 @@ fn main() -> Result<(), String> {
                             if let Some((_, message)) = &hazard_prompt {
                                 painter.hazard_prompt(message);
                             }
-                            if let Some(id) = &ability_detail {
+                            if let Some(ability) = &ability_detail_view {
                                 painter.ability_detail(
-                                    &ability_ui::observe(&r.run, id),
+                                    ability,
                                     ability_detail_scroll,
                                 );
                             }
@@ -2685,6 +2895,8 @@ fn main() -> Result<(), String> {
                     }
                 }
             }
+            help.paint(&mut painter);
+            if screen==Screen::Game{if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
             if let Some(frame)=painter.gpu.as_ref(){
                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
@@ -2693,7 +2905,7 @@ fn main() -> Result<(), String> {
                 }
                 canvas.present();
             }else{
-            let upload=tile_overlay::upload_plan(&painter,!tile_frame||force_texture_upload);
+            let upload=tile_overlay::upload_plan(&painter,!tile_frame||force_texture_upload||health_warning.active());
             let full_upload=upload.full;
             let upload_rects=&upload.rectangles;
             {let _upload_timing=corpse_core::timing::span("desktop.texture.upload");
@@ -2704,11 +2916,17 @@ fn main() -> Result<(), String> {
             }
             if full_upload||!upload_rects.is_empty()||force_present{let _present_timing=corpse_core::timing::span("desktop.texture.present");canvas.clear();canvas.copy(&texture,None,None)?;canvas.present();}
             }
+            health_warning.presented();
+            death_pause.presented(screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead"));
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
             dirty = false;
             cosmetic_dirty = false;
             last_frame = frame;
         }
+        #[cfg(test)] if input_loop_tests::observe(&mut canvas,&painter,input_loop_tests::State {
+            screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
+            help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),
+        })? {break 'running;}
         std::thread::sleep(Duration::from_millis(8));
     }
     Ok(())
@@ -2744,7 +2962,7 @@ fn key_command(key: Keycode) -> Option<Command> {
         return Some(Command::Move { dx, dy });
     }
     match key {
-        Keycode::Period | Keycode::Space | Keycode::Kp5 => Some(Command::Wait),
+        Keycode::Z | Keycode::Period | Keycode::Space | Keycode::Kp5 => Some(Command::Wait),
 
         Keycode::R => Some(Command::Ability {
             id: "numo-revert".into(),
@@ -2868,7 +3086,7 @@ mod tests {
     #[test]
     fn blessing_hover_uses_click_bounds_without_auto_choosing(){let mut selected=0;assert!(update_blessing_hover(&mut selected,3,389,350));assert_eq!(selected,1);assert!(!update_blessing_hover(&mut selected,3,389,350));assert!(!update_blessing_hover(&mut selected,3,389,338));assert_eq!(selected,1);assert!(!update_blessing_hover(&mut selected,1,389,520));assert_eq!(selected,1);selected=2;assert!(!update_blessing_hover(&mut selected,3,0,0));assert_eq!(selected,2);}
     #[test]
-    fn menu_pointer_matches_eight_buttons_and_excludes_gaps() {
+    fn menu_pointer_matches_primary_buttons_and_excludes_gaps() {
         for (i, item) in menu_ui::ITEMS.iter().enumerate() {
             assert_eq!(menu_item_at(item.x, item.y), Some(i));
             assert_eq!(menu_item_at(item.x + item.w - 1, item.y + item.h - 1), Some(i));
@@ -2920,7 +3138,10 @@ mod tests {
     }
 }
 
-/// Core command cost + O(command receipt bytes) + presentation event processing.
+/// Core command + receipt/event processing, plus O(I) dagger lookup for I items.
+/// Every R52 command while Dreamwalking, or one capable of entering/changing a
+/// plane/floor, captures a full outgoing observation: existing observation cost
+/// plus O(View bytes) retained memory, even if that command does not transition.
 /// Keep the wrapper type here: coercing to mutable core would force every command to checkpoint.
 fn dispatch(
     engine: &mut temporal::Engine,
@@ -2928,6 +3149,13 @@ fn dispatch(
     now: f64,
     command: &Command,
 ) -> Result<corpse_core::engine::DispatchOutcome, corpse_core::engine::EngineError> {
+    if engine.run.status=="dead" {return Err(corpse_core::engine::EngineError("Run has ended.".into()));}
+    let before_plane=corpse_core::dreamwalking::active(&engine.run);
+    let before_depth=engine.run.depth;
+    let can_change_plane=before_plane||matches!(command,Command::Ability{id,..}if id=="anavani-ascend")||matches!(command,Command::Use{id}if engine.run.inventory.iter().any(|i|i.id==*id&&corpse_core::phantasmii_generation::is_dagger(i)))||matches!(command,Command::Ability{id,..}if id==corpse_core::dreamwalking::DREAMWALK_ID||id==corpse_core::dreamwalking::WAKE_UP_ID);
+    let before_view=(engine.run.simulation_revision.value_or(29.)>=52.&&can_change_plane).then(||observe::observe_with_profile(&engine.run,effects.profile.as_ref().unwrap_or_else(||appearance_profile::Profile::defaults())));
+    let before_travel=staged_firebolt::needs_snapshot(&engine.run,command).then(||
+        observe::observe_with_profile(&engine.run,effects.profile.as_ref().unwrap_or_else(||appearance_profile::Profile::defaults())));
     let mut out = engine.dispatch(command)?;
     session_store::changed();
     let rewind = matches!(command,Command::Ability{id,..} if id=="numo-revert" || id=="morae-see-the-future");
@@ -2938,31 +3166,49 @@ fn dispatch(
         now,
         rewind,
     );
+    if let Some(before)=before_travel {effects.firebolt_terrain.capture(before,&effects.cues);}
+    effects.defer_until_frame(now);
+    if before_plane!=corpse_core::dreamwalking::active(&engine.run)||before_depth!=engine.run.depth{if let Some(before)=before_view{effects.plane_changed(before,now);if let Some(t)=effects.plane_transition.as_mut(){t.ascend=matches!(command,Command::Ability{id,..}if id=="anavani-ascend");}}}
     Ok(out)
 }
 
-/// O(seed + mode bytes) enqueue; asynchronous existing generation cost unchanged.
-/// Loader rejects repeat starts while busy; the menu remains responsive without a seed modal.
-fn begin_menu_descent(loader:&mut startup_ui::Loader<temporal::Engine>,seed:&str,mode:&str,notice:&mut String)->bool{
+/// O(S) validation/seed preparation before one bounded worker is enqueued.
+fn begin_menu_descent(loader:&mut startup_ui::Loader<temporal::Engine>,seed:&str,selection:&avatar_menu::Selection,notice:&mut String)->bool {
+    begin_selected_descent(loader,seed,selection,None,notice)
+}
+fn begin_selected_descent(loader:&mut startup_ui::Loader<temporal::Engine>,seed:&str,selection:&avatar_menu::Selection,floor:Option<String>,notice:&mut String)->bool {
+    begin_selected_descent_with_fast(loader,seed,selection,floor,false,notice)
+}
+fn begin_selected_descent_with_fast(loader:&mut startup_ui::Loader<temporal::Engine>,seed:&str,selection:&avatar_menu::Selection,floor:Option<String>,fast:bool,notice:&mut String)->bool {
     if loader.busy(){return false;}
-    let(seed,mode)=(seed.to_owned(),mode.to_owned());
-    let started=loader.start(move||new_selected_run(&seed,&mode,None));
+    if fast {
+        if let Some(input)=floor.as_deref() {
+            if let Err(error)=menu_ui::parse_start_floor(input,true) { *notice=error; return false; }
+        }
+    }
+    let seed=match selection.prepared_seed(seed,fresh_seed) {Ok(seed)=>seed,Err(error)=>{*notice=error;return false;}};
+    let started=loader.start(move||new_selected_run_with_fast(&seed,avatar_menu::MODE,floor.as_deref(),fast));
     if started{*notice="Preparing descent... Esc cancels.".into();}started
 }
+fn validate_new_mode(mode:&str)->Result<(),String> {
+    if mode!=avatar_menu::MODE {Err("New games are Avatar-only. Existing saves and replays retain their recorded modes.".into())} else {Ok(())}
+}
 fn new_selected_run(seed: &str, mode: &str, floor: Option<&str>) -> Result<temporal::Engine, String> {
-    if let Some(floor) = floor {
-        let floor = corpse_core::playtest::parse_floor(floor)?;
-        let seed = menu_ui::selected_seed(seed,fresh_seed);
-        let run = corpse_core::debug_floor::create_run_revision(&seed, mode, floor, 51.0)?;
-        session_store::changed();
-        temporal::Engine::new(run).map_err(|e| e.to_string())
-    } else { new_run(seed, mode) }
+    new_selected_run_with_fast(seed,mode,floor,false)
+}
+fn new_selected_run_with_fast(seed: &str, mode: &str, floor: Option<&str>, _fast: bool) -> Result<temporal::Engine, String> {
+    validate_new_mode(mode)?;
+    let seed = menu_ui::selected_seed(seed,fresh_seed);
+    let run = if let Some(floor) = floor {
+        let floor = menu_ui::parse_start_floor(floor,true)?;
+        corpse_core::debug_floor::create_avatar_run(&seed, floor)?
+    } else { corpse_core::startup::create_avatar_run(&seed)? };
+    let engine=temporal::Engine::new(run).map_err(|e| e.to_string())?;
+    session_store::changed();
+    Ok(engine)
 }
 fn new_run(seed: &str, mode: &str) -> Result<temporal::Engine, String> {
-    session_store::changed();
-    let seed = menu_ui::selected_seed(seed,fresh_seed);
-    corpse_core::startup::create_run_revision(&seed, mode, false, 51.0)
-        .and_then(|run| temporal::Engine::new(run).map_err(|e| e.to_string()))
+    new_selected_run_with_fast(seed,mode,None,true)
 }
 fn fresh_seed() -> String {
     let mut bytes = [0u8; 24];
@@ -3029,11 +3275,7 @@ fn apply_pack_action(
         pack::PackAction::Order(ids) => { if let Err(error)=set_pack_order(r, ids.into()){*notice=error;} },
         pack::PackAction::Notice(message) => *notice = message,
         pack::PackAction::Target(t) => {
-            *notice = if t.is_amulet(&r.run) {
-                "Select an amulet target. Escape cancels without spending energy or an action."
-            } else if matches!(t, pack::PackTarget::UseAt(_)) {
-                "Select a visible adjacent living creature. Escape cancels."
-            } else { "Select a visible target. Escape cancels." }.into();
+            *notice = directional_zap_ui::prompt(&r.run,&t).into();
             *target = Some(t);
             *open = false;
         }
@@ -3106,13 +3348,13 @@ fn apply_basic_display(action: display_ui::Action, form: &mut display_ui::Displa
     settings: &mut appearance_ui::SettingsView, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>,
     video: &sdl2::VideoSubsystem) -> bool {
     use display_ui::Action;
-    let Action::Apply { mode, resolution } = action else { return matches!(action, Action::Back); };
+    let Action::Apply { mode, resolution, action_animation_mode } = action else { return matches!(action, Action::Back); };
     let old_mode = canvas.window().fullscreen_state();
     let old_size = canvas.window().size();
     let old_display = canvas.window().display_mode().ok();
     let result = change_window_display(canvas.window_mut(), video, mode, resolution)
-        .and_then(|_| settings.store.set_display_preferences(mode,
-            if mode == appearance_store::DisplayMode::Borderless { None } else { resolution }));
+        .and_then(|_| settings.store.set_presentation_preferences(mode,
+            if mode == appearance_store::DisplayMode::Borderless { None } else { resolution }, action_animation_mode));
     match result {
         Ok(()) => form.notice = "Applied.".into(),
         Err(error) => {
@@ -3232,30 +3474,69 @@ mod append_play_sequence_tests;
 #[cfg(test)]
 mod menu_seed_creation_tests {
     use super::*;
+    #[test]
+    fn fast_debug_rejection_does_not_enqueue_or_change_gods() {
+        let selection=avatar_menu::Selection::default();
+        let before=selection.clone();
+        let mut loader=startup_ui::Loader::default();
+        let mut notice=String::new();
+        for floor in ["0","21","38"] {
+            assert!(!begin_selected_descent_with_fast(&mut loader,"",&selection,Some(floor.into()),true,&mut notice));
+            assert_eq!(notice,menu_ui::FAST_DEBUG_NOTICE);
+            assert!(!loader.busy());
+            assert_eq!(selection,before);
+        }
+        // A bad floor must win over even invalid seed syntax: no preparation has run.
+        assert!(!begin_selected_descent_with_fast(&mut loader,"bad\nseed",&selection,Some("21".into()),true,&mut notice));
+        assert_eq!(notice,menu_ui::FAST_DEBUG_NOTICE);
+        assert!(!loader.busy());
+        assert_eq!(selection,before);
+    }
+    #[test]
+    fn menu_fast_start_is_explicit_and_continue_preserves_the_recorded_flag() {
+        let seed="00-09-10:menu-fast-review";
+        let normal=new_selected_run_with_fast(seed,"Avatar",None,false).unwrap();
+        let fast=new_selected_run_with_fast(seed,"Avatar",None,true).unwrap();
+        assert!(normal.run.fast_mode.value_or(false));
+        assert!(normal.run.compressed_depths.value_or(false));
+        assert!(fast.run.fast_mode.value_or(false));
+        assert_eq!(fast.run.seed,seed);
+        let encoded=fast.save().unwrap();
+        let mut current=None;
+        let mut saved=Some((temporal::Engine::load(&encoded).unwrap(),session_store::Kind::Genuine));
+        let mut kind=session_store::Kind::Genuine;
+        assert!(continue_run(&mut current,&mut saved,&mut kind));
+        assert_eq!(current.unwrap().save().unwrap(),encoded);
+        assert!(new_selected_run_with_fast(seed,"Avatar",Some("21"),true).is_err());
+        let debug=new_selected_run_with_fast(seed,"Avatar",Some("1"),true).unwrap();
+        assert!(debug.run.fast_mode.value_or(false));
+        assert_eq!(debug.run.playtest.as_ref().unwrap().start_floor,1);
+        assert_eq!(debug.run.seed,seed);
+    }
     /// Four actual floor constructions plus O(serialized Run bytes) equality; no file IO.
     #[test]
-    fn menu_new_run_uses_exact_fixed_seed_revision50_and_blank_os_random_seeds() {
+    fn menu_new_run_uses_exact_fixed_seed_revision52_and_blank_os_random_seeds() {
         let seed="00-09-10:menu-seed-review";
         let a=new_selected_run(seed,"Avatar",None).unwrap();
         let b=new_selected_run(seed,"Avatar",None).unwrap();
         assert_eq!(a.run.seed,seed);assert_eq!(b.run.seed,seed);
-        assert_eq!(a.run.simulation_revision.value_or(0.),51.);
-        assert_eq!(b.run.simulation_revision.value_or(0.),51.);
+        assert_eq!(a.run.simulation_revision.value_or(0.),52.);
+        assert_eq!(b.run.simulation_revision.value_or(0.),52.);
         assert_eq!(serde_json::to_vec(&a.run).unwrap(),serde_json::to_vec(&b.run).unwrap());
         let blank=new_selected_run("","Avatar",None).unwrap();
         let spaces=new_selected_run("   ","Avatar",None).unwrap();
         assert!(!blank.run.seed.is_empty());assert!(!spaces.run.seed.is_empty());
         // This is a real OS-random integration check, not a mathematical uniqueness claim.
         assert_ne!(blank.run.seed,spaces.run.seed);
-        assert_eq!(blank.run.simulation_revision.value_or(0.),51.);
-        assert_eq!(spaces.run.simulation_revision.value_or(0.),51.);
+        assert_eq!(blank.run.simulation_revision.value_or(0.),52.);
+        assert_eq!(spaces.run.simulation_revision.value_or(0.),52.);
     }
     #[test]
-    fn menu_debug_start_uses_revision51_without_changing_the_selected_seed() {
+    fn menu_debug_start_uses_revision52_without_changing_the_selected_seed() {
         let seed = "0-5-11:menu-debug-r50";
-        let debug = new_selected_run(seed, "Unblessed", Some("1")).unwrap();
+        let debug = new_selected_run(seed, "Avatar", Some("1")).unwrap();
         assert_eq!(debug.run.seed, seed);
-        assert_eq!(debug.run.simulation_revision.value_or(0.), 51.);
+        assert_eq!(debug.run.simulation_revision.value_or(0.), 52.);
         assert_eq!(debug.run.playtest.as_ref().unwrap().start_floor, 1);
         let saved = debug.save().unwrap();
         assert_eq!(temporal::Engine::load(&saved).unwrap().save().unwrap(), saved);
@@ -3335,6 +3616,7 @@ fn sync_enemy_inspection_view(view:&mut render::View,actor:Option<f64>,hover_pat
 /// Synchronize only pointer presentation. Existing targeting/portal queries remain;
 /// this deliberately does not call observe_with_profile or regenerate world cells.
 fn sync_ability_preview(view:&mut render::View,run:&corpse_core::Run,ability:Option<&str>,attacker:Option<f64>,item_target:bool) {
+    view.selected_ability=if item_target{None}else{ability.map(str::to_owned)};
     if item_target {return;}
     view.target_color=None;view.target_area.clear();view.target_impact=None;
     if run.simulation_revision.value_or(29.) < 50. { return; }
@@ -3356,14 +3638,36 @@ fn cancel_aim_for_context(blocked:bool,item:&mut Option<pack::PackTarget>,abilit
 fn aim_modifiers_allowed(modifiers:Mod)->bool {
     !modifiers.intersects(Mod::LCTRLMOD|Mod::RCTRLMOD|Mod::LALTMOD|Mod::RALTMOD|Mod::LGUIMOD|Mod::RGUIMOD)
 }
+/// O(1) mode admission beyond the existing bounded debug-state lookup.
+fn cursor_context_available(screen:Screen,modal:bool,run:Option<&corpse_core::Run>,debug_open:bool)->bool {
+    screen==Screen::Game&&!modal&&!debug_open&&run.is_some_and(|run|run.status=="playing"&&run.offers.is_empty()
+        && !corpse_core::debug_floor::preparing(run))
+}
+/// Match the existing pointer's displayed plane, without reading any cell or
+/// actor. O(F) existing floor lookup; no knowledge or simulation is changed.
+fn cursor_grid(run:&corpse_core::Run)->Option<cursor_ui::Grid> {
+    let floor=if corpse_core::dreamwalking::active(run) {
+        corpse_core::dreamwalking::floor_in_plane(run,true).or_else(||run.floor())
+    } else {run.floor()}?;
+    Some(cursor_ui::Grid{width:floor.width(),height:floor.height(),player:(run.player.x as usize,run.player.y as usize)})
+}
+/// O(1) synthetic map click, bounded to displayed coordinates. The normal
+/// click handler owns knowledge, hazards, targeting, turn and resource checks.
+fn cursor_click(painter:&Painter,grid:cursor_ui::Grid,tile:(usize,usize),timestamp:u32,window_id:u32)->Option<Event> {
+    if !grid.contains(tile) {return None;}
+    let(cw,ch,ox,oy)=painter.map_layout(grid.width,grid.height);
+    if cw<=0||ch<=0 {return None;}
+    Some(Event::MouseButtonDown{timestamp,window_id,which:0,mouse_btn:sdl2::mouse::MouseButton::Left,clicks:1,
+        x:ox+tile.0 as i32*cw+cw/2,y:oy+tile.1 as i32*ch+ch/2})
+}
 /// Keyboard movement while targeting moves only the detached aim coordinate.
 /// O(1), bounded by the current floor; world/equipment/turn state is untouched.
 fn aim_keyboard_tile(run:&corpse_core::Run,hover:Option<(usize,usize)>,key:Keycode)->Option<(usize,usize)> {
     let Command::Move{dx,dy}=key_command(key)? else{return None};
-    let f=run.floor()?;if f.width()==0||f.height()==0{return None;}
-    let(x,y)=hover.unwrap_or((run.player.x as usize,run.player.y as usize));
-    Some(((x as i64+dx as i64).clamp(0,f.width() as i64-1)as usize,
-          (y as i64+dy as i64).clamp(0,f.height() as i64-1)as usize))
+    let grid=cursor_grid(run)?;if grid.width==0||grid.height==0{return None;}
+    let(x,y)=hover.unwrap_or(grid.player);
+    Some((x.saturating_add_signed(dx as isize).min(grid.width-1),
+          y.saturating_add_signed(dy as isize).min(grid.height-1)))
 }
 /// One detached result for full observations, cached pointer updates and
 /// keyboard aim changes. Clearing is unconditional, including cancel/reopen.
@@ -3565,21 +3869,27 @@ mod native_drawable_contract_tests {
 /// O(C+A+T²) for observed-only hit resolution and existing card text layout.
 /// Reused after mouse input, world replacement and resizing, without world reads.
 fn refresh_panel_hover(p:&mut Painter,v:&render::View,point:Option<(i32,i32)>,allowed:bool)->bool{
-    let old=(p.enemy_hover,p.ability_hover,p.enemy_list_offset);
-    let (enemy,ability)=point.filter(|_|allowed).map_or((None,None),|(x,y)|{
-        let(_,_,ox,_)=p.map_layout(v.width,v.height);
+    let old=(p.enemy_hover,p.ground_hover,p.ability_hover,p.enemy_list_offset);
+    let (enemy,ground,ability)=point.filter(|_|allowed).map_or((None,None,None),|(x,y)|{
+        let(cw,ch,ox,oy)=p.map_layout(v.width,v.height);
         let layout=render::enemy_list::Layout::resolve_frame(&p.profile,ox,p.frame());
+        let content=layout.content_view(p,v);
         let from_map=p.enemy_at_map_point(v,x,y);
-        let enemy=if layout.rows.contains(x,y){layout.content(p,&v.creatures).hit(x,y,p.enemy_list_offset).map(|i|v.creatures[i].id.to_bits())}else{from_map};
-        if let Some(id)=from_map {
-            if let Some(index)=v.creatures.iter().position(|a|a.id.to_bits()==id){
-                p.enemy_list_offset=layout.content(p,&v.creatures).reveal(index,p.enemy_list_offset);
-            }
-        }
-        (enemy,p.ability_inspect_at(v.abilities.len(),x,y))
+        let map_ground=if from_map.is_none()&&x>=ox&&y>=oy&&x<ox+cw*v.width as i32&&y<oy+ch*v.height as i32 {
+            let at=(((x-ox)/cw)as usize,((y-oy)/ch)as usize);
+            v.ground_entities.iter().position(|g|(g.x,g.y)==at)
+        }else{None};
+        let (enemy,ground)=if layout.rows.contains(x,y){
+            let index=content.hit(x,y,p.enemy_list_offset);
+            (index.and_then(|i|render::enemy_list::Content::actor(v,i)),index.and_then(|i|render::enemy_list::Content::ground(v,i)))
+        }else{(from_map,map_ground.map(|i|{let g=&v.ground_entities[i];(g.x,g.y)}))};
+        let reveal=from_map.and_then(|id|v.creatures.iter().position(|a|a.id.to_bits()==id).map(|i|i+render::enemy_list::Content::stair_count(v)))
+            .or_else(||map_ground.map(|i|render::enemy_list::Content::row_for_ground(v,i)));
+        if let Some(index)=reveal{p.enemy_list_offset=content.reveal(index,p.enemy_list_offset);}
+        (enemy,ground,p.ability_inspect_at(v.abilities.len(),x,y))
     });
-    p.enemy_hover=enemy;p.ability_hover=ability;
-    old!=(p.enemy_hover,p.ability_hover,p.enemy_list_offset)
+    p.enemy_hover=enemy;p.ground_hover=ground;p.ability_hover=ability;
+    old!=(p.enemy_hover,p.ground_hover,p.ability_hover,p.enemy_list_offset)
 }
 #[cfg(test)]
 mod refreshed_hover_tests {
@@ -3605,3 +3915,19 @@ mod darkness_render_tests;
 
 #[cfg(test)]
 mod water_render_tests;
+
+#[cfg(test)] mod action_animation_tests;
+
+#[cfg(test)]
+mod revision52_floods_ui_tests;
+
+#[cfg(test)] mod death_dispatch_tests {
+ use super::*;
+ #[test] fn dead_run_commands_cannot_advance_or_modify_archive_input(){
+  let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+  let mut engine=temporal::Engine::new(run).unwrap();engine.run.status="dead".into();engine.run.player.hp=0.;
+  let before=engine.run.clone();let mut effects=effects::Effects::default();
+  for command in [Command::Wait,Command::Move{dx:1.,dy:0.}] {assert!(dispatch(&mut engine,&mut effects,0.,&command).is_err());assert!(engine.run==before);}
+  assert_eq!(serde_json::to_value(corpse_core::profile::summarize_run(&engine.run)).unwrap(),serde_json::to_value(corpse_core::profile::summarize_run(&before)).unwrap());
+ }
+}

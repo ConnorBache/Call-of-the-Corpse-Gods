@@ -7,7 +7,7 @@ pub fn project(r:&Run,a:&Actor)->Option<Actor> {
     if r.simulation_revision.value_or(29.)>=43. && a.id==r.player.id{return None;}
     if corpse_core::dreamwalking::is_nightmare(a) || corpse_core::dreamwalking::is_body(a) { return None; }
     let original=corpse_core::actor_presentation::apparent_kind(r,a)?;
-    let kind=if crate::hallucination_ui::active(r)&&crate::hallucination_ui::eligible(a) {
+    let kind=if crate::hallucination_ui::affects(r,a) {
         crate::hallucination_ui::kind(r,a,0)
     }else{original};
     project_kind(r,a,kind)

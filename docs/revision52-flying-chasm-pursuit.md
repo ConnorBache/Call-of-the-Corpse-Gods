@@ -1,0 +1,124 @@
+# Revision 52 flying chasm pursuit
+
+## Authored behavior and implementation
+
+The designer requested: “Flying enemies need to be able to sweep down to chase
+you when you fall down a chasm.” This is a simulation-only R52 follow-up.
+
+A living, currently flying enemy already hunting the actual player can register
+that player's chasm departure if it can perceive the player at the exit. The
+existing detection/known-position rule is used, including the normal line of
+sight, invisibility, plane and perception checks. A missing target ID is not the
+player's ID, even when the player's numeric ID is zero. Sleeping, wandering,
+neutral, dead, zero-health, nonflying and other-target actors are not enrolled by
+this new path. Existing nonflying and pre-R52 travel behavior is retained.
+
+Both direct player travel and forced/expired-flight fall cohorts record the
+actual reserved player landing, not the lower floor's stairs or an assumed
+same-coordinate destination. No pursuer moves at registration. It approaches
+the precise source chasm through normal pursuit, including occupancy, corners,
+terrain, movement holds, Fast and Haste. A blocked route does not teleport it.
+The inactive-floor transfer checks that the source remains a chasm and the
+actor is still flying. Closed/restored terrain and expired flight do not grant
+an arbitrary floor change. Ordinary finite-flight loss still uses ordinary
+fall rules.
+
+A committed sweep uses existing transfer placement: the recorded landing or
+its eight adjacent candidates, passability/habitat checks, stair exclusion,
+portal-equivalent occupancy, diagonal corner rules and existing hazard ordering.
+The player's occupied landing is reserved. If no candidate is available or the
+destination is absent, the hunter stays on its source floor with its chase
+intact and can retry. No far-away fallback, telefrag, extra generation, payment
+or damage is introduced. Successful deliberate airborne sweeps take no fall
+impact. Existing environmental arrival effects still run.
+
+Already-airborne Dragons yield to ordinary pursuit while such a chase is
+pending, rather than their shortcut planner folding their wings on ground
+beside the chasm. This does not activate flight, extend its six-tick timer,
+change its cost or alter ordinary shortcut/landing planning. New player
+arrivals retain R52's one-floor-ahead generation horizon; follower transfers
+use only the already recorded destination.
+
+## Persistence and admission
+
+The existing numeric condition map carries one additional flag, `chaseChasm: 1`,
+alongside `chaseDepth`, `chaseExitX/Y` and `chaseLandingX/Y`. The flag is not a
+timer. The R52 condition support registry accepts only the exact value 1; all
+other values are invalid at its save/command validation boundary. The R52
+registry also admits the five existing chase depth/coordinate keys when the
+player returns to their source floor before the hunter arrives; their existing
+value semantics are unchanged. Transfer still checks finite, integral,
+in-bounds destination coordinates. Normal chase
+cleanup, target reacquisition, rest and death clear the flag with the existing
+chase fields. No top-level save-format revision or migration is added.
+
+Save/load, ordinary Snapshot rewind and See the Future's native-state anchor
+preserve a pending sweep and its chosen landing. Older saves without the flag
+keep their old pending-transfer behavior, including old fall damage; old chase
+records are not guessed or retroactively promoted. The new rule applies to
+new R52 departures in loaded runs. R52 replay outcomes may therefore differ
+from recordings made before this follow-up. Pre-R52 departures are unchanged.
+
+## Complexity
+
+Let A be actors on the source floor, F be loaded floors (at most 40), V be floor
+cells (at most 3600), K be per-actor condition/ability/equipment data, P be
+portal-equivalent endpoints, d the stable actor-index depth (bounded by 16),
+G all persisted actor/pilot/reserved identities, and D the authoritative
+detection-query cost.
+
+- Registration runs once per successful player chasm departure, not per frame.
+  It scans source actors and stores at most A IDs. Stable actor lookup is
+  O(d), and marking the source floor dirty scans up to F floors, giving
+  O(A*(K + D + d + F)) time and O(A) additional candidate memory. A cold actor
+  index reconciliation adds O(G*d + F + V) time and existing index storage. The first actor/floor write may detach shared
+  COW data of O(A*K + V + floor metadata); these blocks are not copied for each
+  follower. Detection includes the existing plane/equipment lookups and cold
+  light/optical field construction, not a constant-time scalar. Its own cached
+  and cold bounds remain documented by the vision/lighting subsystems.
+- The transfer predicate adds O(F + K) time and O(1) scratch to the existing
+  floor/chase lookup. It runs only for a pending transfer or an active Dragon
+  decision. No pathfield or random destination is generated by the predicate.
+- Existing pursuit still owns distance fields, authoritative traversal and
+  movement hooks. No new per-turn pathfinding pass is added. The Dragon early
+  return replaces its optional flight route planning with that normal pursuit.
+- Existing arrival builds an O(A_destination) occupancy set, considers nine
+  cells, and includes portal alias scans, habitat/terrain/bulwark lookups and
+  normal movement hooks. Transfers still clone the proxy's non-COW header and
+  can detach affected actor/floor COW blocks. No new full-floor landing scan is
+  added. Player fall landing selection, generation and catch-up costs remain
+  the additive costs documented in `travel-coverage.md`.
+- One extra condition per pending actor is O(A) persisted memory and joins the
+  existing O(total conditions) validation/serialization/temporal snapshots.
+  No renderer, native rasterization, framebuffer or UI cache work is added.
+
+These are conservative analytical bounds, not measured timing claims. Use
+long source-floor chases, crowded destinations, cold visibility caches and
+many pending flyers to profile; test commands below exercise deterministic
+behavior, not performance.
+
+## Verification
+
+The focused native tests live in `revision52_flying_chasm_tests.rs`, included
+under `offscreen::revision52_flying_chasm_tests`. They exercise registration,
+false/missing targets, awareness, direct and cohort falls, actual destination,
+normal/Fast/Haste composition, complete player normal/haste dispatch, collision
+and portal aliases, stair/corner blocks, deferred arrival, missing/closed
+exits, lost flight, blocked routes, save/Snapshot/Future copies, legacy behavior,
+finite Dragon flight and one-floor-ahead generation. Focused execution receipts are under `verification/revision52-flying-chasm/`.
+The final focused sweep filter has 16 passing tests. Additional passing suites:
+15 Dragon-flight, 9 enemy-follow-up, 19 stair, 5 speed, 4 legacy travel-fixture
+wrappers and 1 complete legacy travel-trace wrapper, for 69 passing Rust tests
+across these commands. The fixture wrappers each contain multiple deterministic
+cases. The initial 13/15 run is retained separately: it exposed the corrected
+source-return condition admission and an isolated-stair test-fixture assumption.
+No failing run is relabeled as a pass.
+
+Commands use `CARGO_TARGET_DIR=../corpse-center-target tools/cargo.sh test -p
+corpse-core --lib FILTER -- --nocapture`, with filters `revision52_flying_chasm`,
+`revision52_dragon_flight`, `revision52_enemy_followups`, `revision51_stair` and
+`revision52_speed`. Legacy fixture validation uses `tools/cargo.sh test -p
+corpse-core --test travel --test travel_traces -- --nocapture` with the same
+target directory. These are focused native results, not a complete workspace,
+Windows build, launch or interactive verification claim. Final combined gates
+remain the release owner's responsibility.

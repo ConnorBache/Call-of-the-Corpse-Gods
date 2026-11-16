@@ -93,6 +93,10 @@ fn integrated_role(path: &str) -> bool {
     .iter()
     .any(|key| path.starts_with(&format!("typography.{key}.")))
 }
+const FIXED_PLAYER_GLYPH: &str = "Player glyph is fixed to @";
+fn fixed_player_glyph(path: &str) -> bool {
+    path == "entities.objects.player.glyph"
+}
 fn retained_only(path: &str) -> bool {
     if (path.starts_with("ui.layout.") && !integrated_layout(path))
         || (path.starts_with("typography.")
@@ -151,7 +155,7 @@ fn partially_applied(path: &str) -> bool {
 }
 fn changed_notice(path: &str) -> &'static str {
     if partially_applied(path) {
-        "Appearance updated in supported views. Some native source consumers are not yet integrated."
+        "Appearance updated in supported views."
     } else if retained_only(path) {
         "Saved in working appearance and export. This setting is not yet applied by the native renderer."
     } else {
@@ -316,6 +320,11 @@ impl SettingsView {
         self.focus = None;
     }
     fn focus(&mut self, focus: Focus) {
+        if matches!(&focus, Focus::Value(i) if fixed_player_glyph(&controls()[*i].path)) {
+            self.focus = None;
+            self.notice = FIXED_PLAYER_GLYPH.into();
+            return;
+        }
         self.input = match &focus {
             Focus::Search => self.query.clone(),
             Focus::Value(i) => display(self.store.working().value(&controls()[*i].path)),
@@ -339,6 +348,11 @@ impl SettingsView {
         let Some(c) = self.selected_control().cloned() else {
             return Action::None;
         };
+        if fixed_player_glyph(&c.path) {
+            self.focus = None;
+            self.notice = FIXED_PLAYER_GLYPH.into();
+            return Action::None;
+        }
         let value = match c.kind.as_str() {
             "number" => {
                 let n = (self.store.working().number(&c.path)
@@ -368,6 +382,11 @@ impl SettingsView {
         match focus {
             Focus::Value(i) => {
                 let c = &controls()[i];
+                if fixed_player_glyph(&c.path) {
+                    self.focus = None;
+                    self.notice = FIXED_PLAYER_GLYPH.into();
+                    return Action::None;
+                }
                 let value = match c.kind.as_str() {
                     "number" => match self.input.parse::<f64>().ok().filter(|n| n.is_finite()) {
                         Some(n) => Value::from(n),
@@ -702,6 +721,11 @@ impl SettingsView {
             if let Some(i) = list.get(row) {
                 self.selected = row;
                 let c = &controls()[*i];
+                if fixed_player_glyph(&c.path) {
+                    self.focus = None;
+                    self.notice = FIXED_PLAYER_GLYPH.into();
+                    return Action::None;
+                }
                 if x >= 1110 {
                     let result = self.store.reset_property(&c.path);
                     return self.finish(result, "Setting reset to project default.");
@@ -962,6 +986,10 @@ impl SettingsView {
                 14,
                 INK,
             );
+            if fixed_player_glyph(&c.path) {
+                p.text(FIXED_PLAYER_GLYPH, 325, y + 27, 14, MUTED);
+                continue;
+            }
             let editing = self.focus == Some(Focus::Value(*i));
             let value = if editing {
                 self.input.clone()
@@ -1025,7 +1053,9 @@ impl SettingsView {
             MUTED,
         );
         if let Some(c) = self.selected_control() {
-            let hint = if partially_applied(&c.path) {
+            let hint = if fixed_player_glyph(&c.path) {
+                "Player glyph is fixed to @."
+            } else if partially_applied(&c.path) {
                 "Applied in supported views; remaining source consumers and modal reflow are incomplete."
             } else if retained_only(&c.path) {
                 "Stored/exportable: native rendering for this setting is not implemented yet."
@@ -1159,6 +1189,64 @@ mod tests {
         v.store = Store::memory();
         v.open();
         v
+    }
+    #[test]
+    fn player_glyph_setting_is_read_only_for_mouse_keyboard_and_stale_focus() {
+        let mut v = view();
+        v.store.set("entities.objects.player.glyph", Value::from("P")).unwrap();
+        v.change_category(10);
+        v.query = "entities.objects.player.glyph".into();
+        let list = v.filtered();
+        assert_eq!(list.len(), 1);
+        let before = v.store.export_json();
+        for _ in 0..2 {
+            for x in [500, 1020, 1070, 1140] {
+                assert_eq!(v.click(x, 340), Action::None);
+                assert!(v.focus.is_none());
+                assert_eq!(v.notice, FIXED_PLAYER_GLYPH);
+                v.text_input("X");
+            }
+            for key in [Keycode::Return, Keycode::Left, Keycode::Right] {
+                assert_eq!(v.key(key, Mod::NOMOD), Action::None);
+                assert!(v.focus.is_none());
+            }
+        }
+        v.focus = Some(Focus::Value(list[0]));
+        v.input = "X".into();
+        assert_eq!(v.commit_input(), Action::None);
+        assert!(v.focus.is_none());
+        assert_eq!(v.store.export_json(), before);
+        let imported = Profile::parse(&before).unwrap();
+        assert_eq!(imported.text("entities.objects.player.glyph"), "P");
+        if let Ok(directory) = std::env::var("CORPSE_PLAYER_GLYPH_REVIEW") {
+            let mut p = Painter::new();
+            v.paint(&mut p);
+            std::fs::create_dir_all(&directory).unwrap();
+            let file = std::fs::File::create(format!("{directory}/player-glyph-fixed-setting-1280x800.png")).unwrap();
+            let mut encoder = png::Encoder::new(file, p.width as u32, p.height as u32);
+            encoder.set_color(png::ColorType::Rgba);
+            encoder.set_depth(png::BitDepth::Eight);
+            encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+        }
+    }
+    #[test]
+    fn player_glyph_lock_preserves_other_player_style_and_map_font_controls() {
+        let mut v = view();
+        for (path, value) in [
+            ("entities.objects.player.color", "#123456"),
+            ("entities.objects.player.background", "#654321"),
+            ("entities.objects.player.emphasis", "1.5"),
+            ("typography.map.fontFamily", "monospace"),
+        ] {
+            v.change_category(10);
+            v.query = path.into();
+            assert_eq!(v.filtered().len(), 1, "{path}");
+            v.select_control(0);
+            assert!(matches!(v.focus, Some(Focus::Value(_))), "{path}");
+            v.input = value.into();
+            assert_eq!(v.commit_input(), Action::Changed, "{path}: {}", v.notice);
+            assert_eq!(display(v.store.working().value(path)), value);
+        }
     }
     #[test]
     fn exact_edit_cancel_undo_and_repeat_do_not_move_panel() {

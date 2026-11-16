@@ -1,5 +1,9 @@
 # Revision 50 potions and persistent ice
 
+> Darkness's decrement rule below is retained for R50/R51. Revision 52 instead
+> sets effective light to -100 immediately with the same footprint and duration;
+> see [the current Darkness amendment](revision52-darkness.md).
+
 Draft native support, behind the unchanged normal R50 release admission gate.
 
 ## Authored roster

@@ -2,7 +2,7 @@
 use crate::render::Rgb;
 
 pub const LEVELS: [f64; 9] = [-100., -75., -50., -25., 0., 25., 50., 75., 100.];
-pub const MULTIPLIERS: [f64; 9] = [0.05, 0.20, 0.40, 0.65, 1., 1.50, 2.05, 2.70, 3.40];
+pub const MULTIPLIERS: [f64; 9] = [0.05, 0.15, 0.30, 0.55, 1., 1.50, 2.05, 2.70, 3.40];
 pub const WARM: Rgb = [255, 180, 100];
 pub const TINT_STRENGTH: f64 = 0.35;
 
@@ -10,14 +10,31 @@ pub const TINT_STRENGTH: f64 = 0.35;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct DisplayLight {
     pub multiplier: f64,
+    pub illumination: f64,
     /// Unit-sRGB source hue, averaged separately from scalar brightness.
     pub tint: [f64; 3],
 }
 impl DisplayLight {
     pub fn neutral(illumination: f64) -> Self {
-        Self { multiplier: multiplier(illumination), tint: [1.; 3] }
+        Self { multiplier: multiplier(illumination), illumination, tint: [1.; 3] }
+    }
+    /// Separate negative-light ink exposure. Never changes visibility or adds light.
+    pub fn foreground(self, color: Rgb, creature: bool) -> Rgb {
+        if self.illumination >= 0. || self.illumination.is_nan() { return self.apply(color); }
+        let values=if creature {[0.40,0.55,0.70,0.85,1.]} else {[0.25,0.40,0.55,0.75,1.]};
+        let retention=negative_curve(self.illumination,[0.10,0.25,0.50,0.75,1.]);
+        let retention=if creature {retention+(1.-retention)*0.15} else {retention};
+        let graded=Self {multiplier:negative_curve(self.illumination,values),..self}.apply_exposure(color);
+        desaturate(graded,retention)
     }
     pub fn apply(self, color: Rgb) -> Rgb {
+        let graded=self.apply_exposure(color);
+        if self.illumination<0. {
+            // Apply after source tint so a warm source cannot recolor gray darkness.
+            desaturate(graded,negative_curve(self.illumination,[0.10,0.25,0.50,0.75,1.]))
+        }else{graded}
+    }
+    fn apply_exposure(self, color:Rgb)->Rgb {
         // One common gamut scale retains material hue instead of independently
         // clipping channels to white. Zero-light neutral grading is byte-exact.
         let peak = color.into_iter().max().unwrap_or(0) as f64;
@@ -62,18 +79,30 @@ fn encode(v: f64) -> f64 {
 }
 fn luma(c: [f64; 3]) -> f64 { c[0] * 0.2126 + c[1] * 0.7152 + c[2] * 0.0722 }
 
+/// Five fixed knots, monotone cubic Hermite interpolation; zero-slope dark tail.
+/// O(1) time/scratch. Beyond -100 retains readability rather than hiding admitted ink.
+fn negative_curve(level:f64, values:[f64;5])->f64 {
+    if level<=-100. {return values[0];}if level>=0. {return values[4];}
+    let i=((level+100.)/25.).floor()as usize;let t=(level+100.-i as f64*25.)/25.;
+    let slope=|j:usize|(values[j+1]-values[j])/25.;
+    let tangent=|j:usize|if j==0 {0.}else if j==4 {slope(3)}else{2.*slope(j-1)*slope(j)/(slope(j-1)+slope(j))};
+    (2.*t*t*t-3.*t*t+1.)*values[i]+(t*t*t-2.*t*t+t)*25.*tangent(i)
+        +(-2.*t*t*t+3.*t*t)*values[i+1]+(t*t*t-t*t)*25.*tangent(i+1)
+}
+
 /// O(1) time/scratch: eight fixed monotone Hermite intervals, no table allocation.
 /// C1 tails remain unclamped: exponential darkness and logarithmic brightening.
 pub fn multiplier(light: f64) -> f64 {
     if light.is_nan() { return 1.; }
-    if light < -100. { return 0.05 * ((light + 100.) / 10.).exp(); }
+    if light < -100. { return 0.05 * ((light + 100.) / 12.5).exp(); }
     if light > 100. { return 3.4 + 1.45 * ((light - 100.) / 50.).ln_1p(); }
     if light == 100. { return 3.4; }
     let i = ((light + 100.) / 25.).floor() as usize;
     let slope = |j: usize| (MULTIPLIERS[j + 1] - MULTIPLIERS[j]) / 25.;
     let tangent = |j: usize| {
-        if j == 0 { 0.005 }
+        if j == 0 { 0.004 }
         else if j == 8 { 0.029 }
+        else if j == 4 { 2. * 0.014 * 0.020 / (0.014 + 0.020) }
         else { 2. * slope(j - 1) * slope(j) / (slope(j - 1) + slope(j)) }
     };
     let t = (light - LEVELS[i]) / 25.;
@@ -90,7 +119,7 @@ mod tests {
     use super::*;
     #[test]
     fn calibration_knots_floor_pixels_smooth_monotone_tails() {
-        let pixels = [[2,1,2],[7,6,6],[14,11,13],[22,18,21],[34,28,32],
+        let pixels = [[1,1,1],[4,4,4],[9,8,9],[18,15,18],[34,28,32],
             [51,42,48],[70,57,66],[92,76,86],[116,95,109]];
         for ((light, expected), pixel) in LEVELS.into_iter().zip(MULTIPLIERS).zip(pixels) {
             assert!((multiplier(light) - expected).abs() < 1e-12);
@@ -101,7 +130,7 @@ mod tests {
             assert!((left - right).abs() < 0.000001, "C1 at {light}");
         }
         for i in -2000..4000 { assert!(multiplier(i as f64 / 10.) < multiplier((i + 1) as f64 / 10.)); }
-        assert!((multiplier(-150.) - 0.00033689734995427336).abs() < 1e-15);
+        assert!((multiplier(-150.) - 0.000915781944436709).abs() < 1e-15);
         assert!((multiplier(150.) - 4.405063411811921).abs() < 1e-12);
         assert!((multiplier(200.) - 4.992987818568759).abs() < 1e-12);
         assert!(multiplier(250.) - multiplier(200.) < multiplier(200.) - multiplier(150.));
@@ -125,4 +154,44 @@ mod tests {
         assert_ne!(DisplayLight::neutral(75.).apply([140,117,86]),DisplayLight::neutral(100.).apply([140,117,86]), "bright custom materials retain highlight headroom");
         assert_eq!(DisplayLight::neutral(0.).apply([240,230,220]),[240,230,220]);
     }
+}
+
+#[cfg(test)]
+mod negative_role_tests {
+    use super::*;
+    #[test]
+    fn exact_negative_knots_roles_and_desaturation() {
+        for (i,level) in [-100.,-75.,-50.,-25.,0.].into_iter().enumerate() {
+            let display=DisplayLight::neutral(level);
+            let expected_bg=[0.05,0.15,0.30,0.55,1.][i];
+            assert!((display.multiplier-expected_bg).abs()<1e-12);
+            let terrain=display.foreground([100;3],false);let creature=display.foreground([100;3],true);
+            assert_eq!(terrain,[[25;3],[40;3],[55;3],[75;3],[100;3]][i]);
+            assert_eq!(creature,[[40;3],[55;3],[70;3],[85;3],[100;3]][i]);
+        }
+        let c=DisplayLight::neutral(-100.).foreground([180,80,40],false);
+        assert!(c[0]-c[2]<8,"near-black terrain has muted hue: {c:?}");
+        for level in [0.,1.,12.5,25.,50.,75.,100.,200.] {
+            let d=DisplayLight::neutral(level);assert_eq!(d.apply([90,40,20]),d.foreground([90,40,20],false));
+            assert_eq!(d.apply([90,40,20]),d.foreground([90,40,20],true));
+        }
+    }
+}
+
+/// O(12) bounded channel-gain search, O(1) scratch. Preserve the already-muted
+/// hue while lifting foreground contrast; whiten only if its gamut cannot reach it.
+pub fn foreground_contrast(ink:Rgb,bg:Rgb,target:f64)->Rgb {
+    if crate::color::contrast(ink,bg)>=target {return ink;}
+    let peak=ink.into_iter().max().unwrap_or(0);
+    if peak==0 {return crate::color::distinguish(ink,bg,target);}
+    let scale=|gain:f64|ink.map(|v|(v as f64*gain).round().min(255.)as u8);
+    let(mut lo,mut hi)=(1.,255./peak as f64);
+    if crate::color::contrast(scale(hi),bg)<target {return crate::color::distinguish(ink,bg,target);}
+    for _ in 0..12 {let mid=(lo+hi)/2.;if crate::color::contrast(scale(mid),bg)<target {lo=mid;}else{hi=mid;}}
+    scale(hi)
+}
+
+fn desaturate(color:Rgb,retention:f64)->Rgb {
+    let gray=color[0]as f64*0.2126+color[1]as f64*0.7152+color[2]as f64*0.0722;
+    rounded(color.map(|v|gray+(v as f64-gray)*retention))
 }

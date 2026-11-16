@@ -144,7 +144,7 @@ fn r51_all_amulet_descriptions_keep_effects_costs_and_targeting() {
         ("poison",15,"Fires a projectile that poisons its target for 6 damage per turn for 20 turns.","Unlimited range."),
         ("iceblast",30,"Deals 30 cold damage and slows creatures for 3 turns in a 3×3 area, leaving ice.","Targets a visible area."),
         ("acid",20,"Fires a projectile that deals 40 damage and reduces the target’s DR by 10 for 6 turns.","Range: 8 tiles."),
-        ("blinking",20,"Teleports you to a visible, accessible square within 10 tiles.",""),
+        ("blinking",20,"Blink along a 10 tile line.",""),
         ("beckoning",15,"Pulls a targeted creature next to you.","Targets a visible creature within 8 tiles with a clear path to you."),
         ("discord",30,"Makes a creature and all other creatures hostile to each other for 6 turns.","Targets a visible creature within 8 tiles."),
         ("obstruction",25,"Creates a three-tile wall perpendicular to your aim for 8 turns.","Targets visible open ground along a cardinal or diagonal aim."),
@@ -164,4 +164,63 @@ fn r51_all_amulet_descriptions_keep_effects_costs_and_targeting() {
         assert_eq!(view.tooltip().as_deref(),Some(expected.as_str()),"{effect} hover");
         assert_eq!(serde_json::to_vec(&r).unwrap(),before);
     }
+}
+
+#[test]
+fn audit_batch_three_blink_all_tiers_and_dagger_copy() {
+ let mut r=run();r.simulation_revision=52.0.into();let p=Painter::new();
+ for tier in 1..=corpse_core::revision52_amulet_tiers::MAX_TIER {
+  let mut item=Item{id:900.,kind:"amulet".into(),effect:"blinking".to_string().into(),amulet_tier:(tier as f64).into(),..Default::default()};
+  corpse_core::revision50_amulets::initialize_item(&mut item).unwrap();
+  let expected=format!("Blink along a {} tile line.",9+tier);
+  assert_eq!(corpse_core::revision52_amulet_tiers::description(&r,&item).as_deref(),Some(expected.as_str()));
+  assert!(corpse_core::revision52_amulet_tiers::details(&r,&item).is_none());
+  r.inventory=vec![item.clone()];let before=r.clone();
+  assert!(describe_item(&r,&item).contains(&expected));
+  let mut view=PackView::observe(&r);view.configure(&p,p.frame().map.tuple());hover_first(&mut view);assert!(view.tooltip().unwrap().contains(&expected));
+  assert!(r==before);
+  r.ground.insert(r.depth.to_string(),vec![corpse_core::GroundItem{x:r.player.x,y:r.player.y,item:item.clone(),..Default::default()}].into());
+  let report=crate::inspection_ui::observe_tile(&r,r.player.x as usize,r.player.y as usize);
+  assert!(serde_json::to_string(&report).unwrap().contains(&expected),"ground tier {tier}");
+ }
+ let mut dagger=corpse_core::phantasmii_generation::dagger(12.);
+ dagger.effect="With a drop of blood on the Altar of the Phantasmii, you can access amazing power.".to_string().into();
+ assert_eq!(describe_item(&r,&dagger),"Dagger of the Phantasmii\nApply while standing on the Altar of the Phantasmii to enter Dreamwalking.");
+}
+
+#[test]
+fn item_grant_copy_lives_in_abilities_not_item_surfaces() {
+ let mut r=run();r.simulation_revision=52.0.into();r.offers.clear();r.player.ability_reserves=Field::Missing;
+ r.player.equipment_abilities=Field::Missing;r.player.ability_order=Field::Missing;r.ground.clear();
+ let mut ring=Item{id:910.,name:"Ring of Protection".into(),kind:"ring".into(),effect:"protection".to_string().into(),granted_ability:"shrail-execute".to_string().into(),additional_granted_abilities:vec!["numo-distract".into()],..Default::default()};
+ ring.tinkered=true.into();
+ let mut amulet=corpse_core::revision50_amulet_effects::make_amulet(corpse_core::revision50_amulet_effects::Effect::Blinking,911.).unwrap();
+ amulet.granted_ability="morae-see-the-future".to_string().into();
+ let p=Painter::new();
+ let (x,y)=(r.player.x,r.player.y);
+ for item in [ring.clone(),amulet.clone()] {
+  r.ground_at_mut(r.depth).push(corpse_core::GroundItem{x,y,item:item.clone(),..Default::default()});
+ }
+ assert_eq!(corpse_core::inventory::collect_underfoot(&mut r,20.).unwrap(),2);
+ let rows=crate::ability_ui::visible_abilities(&r);
+ for id in ["shrail-execute","numo-distract","morae-see-the-future"] {
+  let row=rows.iter().find(|a|a.id==id).expect("carried grant visible in ability section");
+  assert_eq!(row.description,crate::ability_ui::observe(&r,id).description);
+  assert!(!row.description.is_empty());
+ }
+ for item in [&ring,&amulet] {
+  let copy=describe_item(&r,item);
+  for id in item.granted_ability.as_ref().into_iter().chain(item.additional_granted_abilities.iter()) {
+   let row=rows.iter().find(|a|a.id==*id).unwrap();assert!(copy.contains(&format!("Grants {}.",row.name)));assert!(!copy.contains(&row.description));
+  }
+  assert!(copy.contains(if item.kind=="ring"{"DR"}else{"Blink along a 10 tile line."}));
+  r.ground.insert(r.depth.to_string(),vec![corpse_core::GroundItem{x:r.player.x,y:r.player.y,item:item.clone(),..Default::default()}].into());
+  let report=crate::inspection_ui::observe_tile(&r,r.player.x as usize,r.player.y as usize);
+  let ground=serde_json::to_string(&report).unwrap();
+  for row in &rows {if !row.description.is_empty(){assert!(!ground.contains(row.description.lines().next().unwrap()));}}
+ }
+ let mut view=PackView::observe(&r);view.configure(&p,p.frame().map.tuple());hover_first(&mut view);
+ let tooltip=view.tooltip().unwrap();assert!(tooltip.contains("Grants"));assert!(!tooltip.contains(crate::ability_ui::EXECUTE_DESCRIPTION));
+ assert_eq!(corpse_core::inventory::command(&mut r,&corpse_core::Command::Drop{id:910.}).unwrap(),Some(true));
+ let rows=crate::ability_ui::visible_abilities(&r);assert!(!rows.iter().any(|a|a.id=="shrail-execute"||a.id=="numo-distract"));assert!(rows.iter().any(|a|a.id=="morae-see-the-future"));
 }

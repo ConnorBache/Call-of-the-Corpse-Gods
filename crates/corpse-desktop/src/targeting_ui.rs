@@ -311,7 +311,7 @@ mod tests {
 pub fn visible_enemy(run: &Run, id: f64) -> bool {
     corpse_core::engine::actor(run, id).is_some_and(|a| a.id != run.player.id
         && !matches!(a.state.as_str(), "ally" | "neutral") && a.hp > 0.
-        && !a.dead.value_or(false) && vision::visible_actor(run, a)
+        && !a.dead.value_or(false) && corpse_core::ability_sight::actor(run, a)
         && corpse_core::dreamwalking::same_plane(run, &run.player, a))
 }
 pub fn adjacent_enemy(run: &Run, id: f64) -> bool {
@@ -321,6 +321,7 @@ pub fn adjacent_enemy(run: &Run, id: f64) -> bool {
 /// A target-kind hint is presentation only; core admission still owns payment.
 pub fn ability_prompt(id: &str) -> &'static str {
     match id {
+        "etill-riptide" => "Select a visible enemy, then its rally point. Escape cancels.",
         "numo-implant-thought" => "Select a visible enemy, then an adjacent creature. Escape cancels.",
         "pelian-fated-duel" => "Select a visible adjacent enemy. Escape cancels.",
         "pelian-relentless-pursuit" => "Select a visible enemy to pursue. Escape cancels.",
@@ -356,6 +357,7 @@ pub fn ability_preview(run: &Run, id: &str, attacker: Option<f64>, hover: Option
     let enemy = || run.actors_at(run.depth).iter().find(|a|
         visible_enemy(run,a.id) && corpse_core::portals::same_position(run,a,x as f64,y as f64));
     let valid=match id {
+        "etill-riptide" => attacker.map_or_else(||enemy().is_some(), |_|run.floor().is_some_and(|f|x<f.width()&&y<f.height())),
         "ursa-waking-nightmares" => nightmare_blocker(run,x,y).is_none(),
         "pelian-relentless-pursuit" => enemy().is_some(),
         "pelian-fated-duel" => enemy().is_some_and(|a| adjacent_enemy(run,a.id)),
@@ -398,7 +400,7 @@ pub fn implant_victim_blocker(run: &Run, attacker: f64, x: usize, y: usize) -> O
     };
     let valid = std::iter::once(&run.player).chain(run.actors_at(run.depth)).any(|a|
         a.id != attacker && a.hp > 0. && !a.dead.value_or(false)
-        && (a.id == run.player.id || vision::visible_actor(run, a))
+        && (a.id == run.player.id || corpse_core::ability_sight::actor(run, a))
         && corpse_core::dreamwalking::same_plane(run, source, a)
         && corpse_core::portals::same_position(run, a, x as f64, y as f64)
         && corpse_core::portals::actor_chebyshev(run, source, a) <= 1.);
@@ -448,4 +450,114 @@ mod revision50_target_tests {
         assert!(ability_preview(&run,"kative-clay-army",None,Some((x,y))).is_empty());
         assert_eq!(run,before);
     }
+}
+
+#[cfg(test)]
+mod integrated_telepathy_target_tests {
+    #[test]
+    fn enemy_target_admission_matches_core_telepathy_and_physical_effect() {
+        let mut r:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.player.x=10.;r.player.y=10.;
+        r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
+        r.player.conditions.insert("telepathic".into(),100.);
+        let mut a=r.player.clone();a.id=901.;a.x=14.;a.state="wandering".into();
+        a.conditions.clear();a.conditions.insert("invisible".into(),100.);
+        *r.actors_at_mut(r.depth)=vec![a];
+        let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());
+        f.doors=corpse_core::Field::Missing;f.portals=corpse_core::Field::Missing;f.non_euclidean=corpse_core::Field::Missing;
+        assert!(super::visible_enemy(&r,901.));
+        let w=r.floor().unwrap().width();r.floor_mut().unwrap().tiles[10*w+12]="wall".into();
+        let before=serde_json::to_vec(&r).unwrap();
+        assert!(corpse_core::vision::telepathic(&r,&r.actors_at(r.depth)[0]));
+        assert!(!super::visible_enemy(&r,901.));
+        assert_eq!(serde_json::to_vec(&r).unwrap(),before);
+    }
+}
+
+/// Two UI selections, one simulation command. No Run mutation or payment until
+/// both selections succeed; the rally point is independent of Command::Rally.
+#[derive(Default)]
+pub struct RiptideTarget { enemy: Option<f64> }
+impl RiptideTarget {
+    pub fn cancel(&mut self) { self.enemy=None; }
+    pub fn enemy(&self) -> Option<f64> { self.enemy }
+    // O(actor lookup + visibility/LoE), O(1) retained state; called on click only.
+    pub fn select(&mut self, run: &Run, clicked: Option<f64>, x: usize, y: usize)
+        -> Result<Option<f64>, &'static str> {
+        if let Some(enemy)=self.enemy {
+            if !visible_enemy(run,enemy) {
+                self.cancel(); return Err("Select a visible enemy first.");
+            }
+            if !run.floor().is_some_and(|f|x<f.width() && y<f.height()) {
+                return Err("Select a rally point on this floor.");
+            }
+            self.cancel(); Ok(Some(enemy))
+        } else {
+            let enemy=clicked.filter(|id|visible_enemy(run,*id))
+                .ok_or("Select a visible enemy first.")?;
+            self.enemy=Some(enemy); Ok(None)
+        }
+    }
+}
+
+#[cfg(test)]
+mod riptide_tests {
+    use super::*;
+    fn scene() -> Run {
+        let mut r=crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision=52.0.into();
+        r.floor_mut().unwrap().non_euclidean=corpse_core::Field::Missing;
+        let mut a=corpse_core::population::create_actor_revision("bear",901.,12.,10.,false,52.).unwrap();a.state="hunting".into();
+        a.abilities.clear();a.active.clear();r.actors_at_mut(r.depth).push(a);r
+    }
+    #[test]
+    fn riptide_two_selections_and_cancel_never_spend_or_advance() {
+        let r=scene();let before=r.clone();let mut aim=RiptideTarget::default();
+        assert_eq!(aim.select(&r,Some(901.),12,10),Ok(None));
+        assert_eq!(aim.select(&r,None,15,10),Ok(Some(901.)));
+        assert_eq!(r,before);
+        assert_eq!(aim.select(&r,Some(901.),12,10),Ok(None));aim.cancel();
+        assert!(aim.select(&r,None,15,10).is_err());assert_eq!(r,before);
+    }
+    #[test]
+    fn riptide_destination_does_not_add_visibility_or_loe_restrictions() {
+        let mut r=scene();let mut aim=RiptideTarget::default();
+        assert_eq!(aim.select(&r,Some(901.),12,10),Ok(None));
+        let w=r.floor().unwrap().width();
+        for y in 0..r.floor().unwrap().height(){r.floor_mut().unwrap().tiles[y*w+14]="wall".into();}
+        assert!(aim.select(&r,None,usize::MAX,10).is_err());
+        assert_eq!(aim.select(&r,None,15,10),Ok(Some(901.)));
+    }
+    #[test]
+    fn riptide_pull_continues_and_blocks_voluntary_movement() {
+        let mut r=scene();r.player.active.push("etill-riptide".into());
+        for (key,value) in [("riptideTarget",901.),("riptideX",16.),("riptideY",10.)] {
+            r.player.conditions.insert(key.into(),value);
+        }
+        corpse_core::divine_environment::apply_riptide(&mut r).unwrap();
+        assert_eq!(corpse_core::engine::actor(&r,901.).unwrap().x,13.);
+        assert!(!corpse_core::engine::move_actor(&mut r,901.,0.,1.,true).unwrap());
+        corpse_core::divine_environment::apply_riptide(&mut r).unwrap();
+        assert_eq!(corpse_core::engine::actor(&r,901.).unwrap().x,14.);
+        let w=r.floor().unwrap().width();r.floor_mut().unwrap().tiles[10*w+15]="wall".into();
+        corpse_core::divine_environment::apply_riptide(&mut r).unwrap();
+        assert_eq!(corpse_core::engine::actor(&r,901.).unwrap().x,14.);
+    }
+    #[test]
+    fn riptide_second_stage_native_capture() {
+        let mut r=scene();r.player.abilities.push("etill-riptide".into());
+        let mut aim=RiptideTarget::default();assert_eq!(aim.select(&r,Some(901.),12,10),Ok(None));
+        let mut view=crate::observe::observe(&r);view.hover=Some((16,10));
+        crate::sync_ability_preview(&mut view,&r,Some("etill-riptide"),aim.enemy(),false);
+        assert_eq!(view.target_path,vec![(16,10)]);
+        let mut p=crate::render::Painter::new();p.resize(1280,800);
+        p.game_at(&view,"Select the rally point. Escape cancels.",false,0.);
+        if let Ok(path)=std::env::var("CORPSE_RIPTIDE_CAPTURE") {
+            let file=std::fs::File::create(path).unwrap();
+            let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);
+            encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);
+            encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+        }
+    }
+
 }

@@ -6,6 +6,8 @@ pub(super) struct AsciiMask {
     pub(super) runs: Vec<(i32, i32)>,
     /// Exclusive last covered row, computed once for bottom-aligned ground ink.
     pub(super) ink_bottom: usize,
+    pub(super) ink_bounds: Option<super::glyph_ink::Bounds>,
+    pub(super) italic_ink_bounds: Option<super::glyph_ink::Bounds>,
 }
 
 impl AsciiMask {
@@ -28,7 +30,19 @@ impl AsciiMask {
             row_offsets.push(u32::try_from(runs.len()).expect("ASCII run count exceeds u32"));
         }
         let ink_bottom = row_offsets.windows(2).rposition(|r| r[0] != r[1]).map_or(0, |y| y + 1);
-        Self { coverage, row_offsets, runs, ink_bottom }
+        let mut ink_bounds = None;
+        let mut italic_ink_bounds = None;
+        // Reuse exact covered runs. Bounds include pixel area, not advance width.
+        for y in 0..height {
+            let shear = ((height as i32 - 1 - 2 * y as i32) as f64 * width as f64
+                / (8. * height.max(1) as f64)).round() as i32;
+            for &(left, right) in &runs[row_offsets[y] as usize..row_offsets[y+1] as usize] {
+                let row = super::glyph_ink::Bounds { left, top:y as i32, right, bottom:y as i32+1 };
+                super::glyph_ink::Bounds::extend(&mut ink_bounds, row);
+                super::glyph_ink::Bounds::extend(&mut italic_ink_bounds, row.translated(shear, 0));
+            }
+        }
+        Self { coverage, row_offsets, runs, ink_bottom, ink_bounds, italic_ink_bounds }
     }
 
     /// O(log R_row + intersecting runs), preserving left-to-right order without

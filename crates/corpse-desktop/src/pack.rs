@@ -148,6 +148,7 @@ struct Stamp {
     abilities: Vec<String>,
     energy: f64,
     ability_reserves: Vec<(String,f64,f64)>,
+    resource_history: Vec<(String, corpse_core::ResourceMeterHistory)>,
     status: String,
     offers: Vec<String>,
     blocked: bool,
@@ -175,6 +176,7 @@ impl Stamp {
                 run.player.ability_reserves.as_ref().into_iter().flat_map(|m|m.iter())
                     .map(|(id,s)|(id.clone(),s.energy,s.capacity)).collect()
             } else {Vec::new()},
+            resource_history: run.resource_history.as_ref().and_then(|h|h.actors.get(&run.player.id.to_string())).into_iter().flat_map(|m|m.iter()).map(|(key,value)|(key.clone(),value.clone())).collect(),
             status: run.status.clone(),
             dreamwalking: corpse_core::dreamwalking::active(run),
             teleport_cooldown: corpse_core::ahvamitt::cooldown(run),
@@ -752,7 +754,11 @@ impl PackView {
         let mut lines = vec![];
         lines.extend(self.wrap_detail(&g.name).into_iter().map(|s| (s, INK)));
         lines.push((String::new(), MUTED));
-        for s in g.description.split('\n') {
+        for (index,s) in g.description.split('\n').enumerate() {
+            // The selected pane already paints the canonical jewelry title.
+            // Keep it in the complete description for detached tooltips/ground.
+            if matches!(g.item.kind.as_str(),"ring"|"amulet")
+                && index == 0 && s == g.name { continue; }
             lines.extend(self.wrap_detail(s).into_iter().map(|s| (s, MUTED)));
         }
         if g.count > 1. {
@@ -817,8 +823,15 @@ impl PackView {
         );
         (content - self.layout.detail.3).max(0)
     }
+    fn row_label(&self, g: &Group) -> String {
+        format!("{}{}{}", g.name,
+            if g.count>1. {format!(" ×{}",g.count)} else {String::new()},
+            if self.stamp.revision<50. && crafting::is_equipped(&g.item) {
+                format!(" [{}]",g.item.equipped.as_ref().unwrap())
+            } else {String::new()})
+    }
     fn capacity_heading(&self) -> String {
-        if self.stamp.revision >= 50. { "Separate category limits".into() }
+        if self.stamp.revision >= 50. { String::new() }
         else { format!("{} / {} slots", self.slots, self.capacity) }
     }
     fn hint(&self) -> String {
@@ -910,6 +923,17 @@ impl PackView {
         for (_,y) in self.section_positions(){if let Some(r)=intersect_rect(Rect(self.layout.list.0,y-self.list_scroll,self.layout.list.2,24),self.layout.list){rows.push(r);}}
         let header=Rect(self.layout.bounds.0,self.layout.bounds.1,self.layout.bounds.2,(self.layout.list.1-self.layout.bounds.1).max(0));
         PackPaintState{rows,detail:self.layout.detail,header,bounds:self.layout.bounds,epoch:self.paint_epoch,selected:self.selected.map(f64::to_bits),request:self.request.clone(),list_scroll:self.list_scroll,detail_scroll:self.detail_scroll,read_only:self.read_only,pending:self.pending,focus_action:self.focus_action,hover,tooltip}
+    }
+    /// Inventory action feedback uses the actual visible matching item row. A
+    /// consumed or scrolled-away item falls back to the Pack heading, not a map cue.
+    pub fn paint_action_marks(&self,p:&mut Painter,cues:&[crate::effects::Cue],now:f64){
+        for (id,mark,color,alpha) in crate::effects::inventory_marks(cues,now){
+            if id.is_none()&&mark.style!="pack-capacity" {continue}
+            let row=id.and_then(|id|self.row_positions().into_iter().find(|(i,_)|self.groups[*i].item.id==id))
+                .map(|(_,y)|y-self.list_scroll).filter(|y|*y>=self.layout.list.1&&*y+self.layout.row<=self.layout.list.1+self.layout.list.3);
+            let (x,y,w,h)=row.map_or((self.layout.bounds.0+85,self.layout.bounds.1+12,22,22),|y|(self.layout.list.0+2,y,22,self.layout.row));
+            crate::action_marks::paint(p,&mark,x,y,w,h,color,alpha);
+        }
     }
     pub fn paint(&self,p:&mut Painter){let state=self.paint_state(p);self.paint_prepared(p,&state);}
     /// Paints the same full logical composition through the independent native damage scissor.
@@ -1018,22 +1042,7 @@ impl PackView {
             }
             let valid =
                 self.request.is_some() && self.target_blocker(self.target_member(g)).is_none();
-            let label = format!(
-                "{}{}{}",
-                g.name,
-                if g.count > 1. {
-                    format!(" ×{}", g.count)
-                } else {
-                    String::new()
-                },
-                if self.stamp.revision >= 50. && matches!(g.item.kind.as_str(), "ring" | "amulet") {
-                    " [active]".into()
-                } else if self.stamp.revision < 50. && crafting::is_equipped(&g.item) {
-                    format!(" [{}]", g.item.equipped.as_ref().unwrap())
-                } else {
-                    String::new()
-                }
-            );
+            let label = self.row_label(g);
             p.clip = Some((
                 self.layout.list.0,
                 y.max(self.layout.list.1),
@@ -1046,6 +1055,9 @@ impl PackView {
             } else {
                 51
             };
+            let reserve=crate::render::resource_ui::amulet_reserve(&g.item,self.stamp.revision);
+            let right_pad=if self.read_only||self.request.is_some(){6}else{58};
+            let meter_width=if reserve.is_some(){((self.layout.list.2-right_pad)/3).clamp(60,100)}else{0};
             p.text_role(
                 Role::Inventory,
                 &self.text_metrics.as_ref().map_or_else(
@@ -1053,12 +1065,7 @@ impl PackView {
                     |m| {
                         m.ellipsize(
                             &label,
-                            self.layout.list.2
-                                - if self.read_only || self.request.is_some() {
-                                    6
-                                } else {
-                                    58
-                                },
+                            self.layout.list.2-right_pad-if reserve.is_some(){meter_width+8}else{0},
                         )
                     },
                 ),
@@ -1071,6 +1078,11 @@ impl PackView {
                     p.profile.rgb("ui.colors.primary")
                 },
             );
+            if let Some((energy,capacity))=reserve {
+                crate::render::resource_ui::paint_bar(p,"",&format!("{energy:.0}/{capacity:.0}"),
+                    self.layout.list.0+self.layout.list.2-right_pad-meter_width,y+4,meter_width,19,
+                    p.profile.rgb("ui.colors.energy"),energy/capacity.max(1.),11);
+            }
             if !self.read_only && self.request.is_none() {
                 let up = self.reorder_neighbor(*index, -1).is_some();
                 let down = self.reorder_neighbor(*index, 1).is_some();
@@ -1272,7 +1284,13 @@ fn ellipsize(text: &str, columns: usize) -> String {
 
 fn identity(run: &Run, i: &Item) -> Item {
     let mut key = i.clone();
-    key.id = 0.;
+    // R52 amulets are physical, separately charged instances, including old
+    // missing-state items. Preserve the ID even when their effect/tier match.
+    // Typed Item equality also retains the stored tier and complete reserve.
+    if !(run.simulation_revision.value_or(29.) == 52.
+        && corpse_core::revision52_amulet_tiers::profile(run, i).is_some()) {
+        key.id = 0.;
+    }
     key.quantity = Field::Missing;
     if run.simulation_revision.value_or(29.) >= 50. && matches!(i.kind.as_str(), "ring" | "amulet") {
         key.equipped = Field::Missing;
@@ -1368,8 +1386,8 @@ fn item_actions(run: &Run, item: &Item) -> Vec<Button> {
     }
     if run.simulation_revision.value_or(29.)>=50. && corpse_core::revision50_amulet_effects::is_amulet(item) {
         let blocker=corpse_core::revision50_amulets::plan_item_activation(run,item.id,
-            corpse_core::revision50_amulet_effects::item_spec(item).as_ref()).err()
-            .map(|e|format!("This amulet cannot activate: {e:?}."));
+            corpse_core::revision50_amulet_effects::item_spec_for_revision(item,run.simulation_revision.value_or(29.)).as_ref()).err()
+            .map(corpse_core::revision50_amulet_effects::admission_message);
         push("Apply",ButtonAction::Target(PackTarget::UseAt(item.id)),blocker,
             "Choose a target for this amulet.".into());
     }
@@ -1642,11 +1660,14 @@ pub(crate) fn describe_item(run: &Run, i: &Item) -> String {
     describe_item_with_offense(run, i, offense)
 }
 fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
+    if run.simulation_revision.value_or(29.) >= 52. && projectiles::is_bow(i) {
+        return format!("Apply to fire an arrow at a visible target. {} arrows available.", arrow_count(run));
+    }
     if corpse_core::ahvamitt::is_mask(i) {
         return format!("{}\nGrants Teleport while in your inventory.", corpse_core::revision50_item_knowledge::display_name(run, i));
     }
     if corpse_core::phantasmii_generation::is_dagger(i) {
-        return format!("{}\n{}\nApply while standing on the Altar of the Phantasmii to enter Dreamwalking.",
+        return format!("{}\n{}",
             i.name, corpse_core::phantasmii_generation::DAGGER_DESCRIPTION);
     }
     if corpse_core::phantasmii_generation::is_shard(i) {
@@ -1676,6 +1697,10 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
     }
     let stats = bonuses(i.bonus.as_ref(), i.base_bonus.as_ref());
     if i.kind == "heart" {
+        let rewards = inventory::effective_heart_rewards(run, i);
+        let stats = if corpse_core::fast_mode::enabled(run) {
+            bonuses(rewards.bonus.as_ref(), None)
+        } else { stats };
         let mut text = format!(
             "{}{} <heart>\n{}\n{} blessings · {} energy",
             i.name,
@@ -1689,7 +1714,7 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
             } else {
                 &stats
             },
-            i.exp.value_or(0.),
+            rewards.blessings,
             i.energy.value_or(0.)
         );
         if marked_heart(i) {
@@ -1719,14 +1744,7 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
         return text;
     }
     if inventory::is_arrow(i) {
-        return format!(
-            "{} ×{}\n{}\nA shot consumes one arrow on a hit. Misses and empty shots leave it recoverable. Drop and Throw use one arrow.",
-            i.name,
-            i.quantity.value_or(1.),
-            if run.simulation_revision.value_or(29.) >= 50. {
-                "Bow ammunition; one trinket stack with unlimited capacity."
-            } else { "Bow ammunition; unlimited arrows share one bag slot." }
-        );
+        return format!("{} ×{}", i.name, i.quantity.value_or(1.));
     }
     let mut lines = vec![
         displayed_name(run, i),
@@ -1796,13 +1814,8 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
             } else {
                 "Inactive equipment grant:"
             },
-            progression::definition_for_revision(run.simulation_revision.value_or(29.), id).map_or(id.as_str(), |a| a.name.as_str())
+            crate::ability_ui::display_text(progression::definition_for_revision(run.simulation_revision.value_or(29.), id).map_or(id.as_str(), |a| a.name.as_str()))
         ));
-        if let Some(a) = progression::definition_for_revision(run.simulation_revision.value_or(29.), id) {
-            lines.push(if run.simulation_revision.value_or(29.)>=50. {
-                crate::ability_ui::observe(run,id).description
-            } else {crate::ability_ui::display_description(run, &a.id, &a.description).into()});
-        }
     }
     if i.tinkered.value_or(false) {
         lines.push("You've already tinkered with this item.".into());
@@ -1853,13 +1866,18 @@ fn append_named_jewelry(run: &Run, i: &Item, lines: &mut Vec<String>) -> bool {
         lines.push(description.into());
         return true;
     }
-    if let Some(description) = corpse_core::revision50_amulet_effects::description(i) {
-        lines.push(description.into());
-        let energy=i.amulet_state.as_ref().map_or(50.,|s|s.energy);
-        let base=corpse_core::revision50_amulet_effects::item_spec(i).unwrap().activation_cost;
+    if let Some(description) = corpse_core::revision52_amulet_tiers::description(run, i) {
+        lines.push(description);
+        let spec=corpse_core::revision50_amulet_effects::item_spec_for_revision(i,run.simulation_revision.value_or(29.)).unwrap();
+        let energy=i.amulet_state.as_ref().map_or(spec.capacity,|s|s.energy.min(spec.capacity));
+        let base=spec.activation_cost;
         let cost=(base-if run.player.abilities.iter().any(|a|a=="kative-appropriate"){10.}else{0.}).max(0.);
-        lines.push(format!("Amulet energy: {energy}/50 · Activation: {cost} energy."));
-        if let Some(details) = corpse_core::revision50_amulet_effects::details(i) { lines.push(details.into()); }
+        let change = if run.inventory.iter().any(|owned| owned.id==i.id) {
+            crate::render::resource_ui::change_suffix(run,
+                &corpse_core::resources::amulet_key(i.id),energy,spec.capacity)
+        } else { String::new() };
+        lines.push(format!("Amulet energy: {energy}/{}{change} · Activation: {cost} energy.",spec.capacity));
+        if let Some(details) = corpse_core::revision52_amulet_tiers::details(run,i) { lines.push(details); }
         return true;
     }
     false
@@ -1887,8 +1905,8 @@ fn describe_potion(run: &Run, i: &Item) -> String {
     }
     let detail=match effect {
         "detect magic"=>format!("Senses potions and magical equipment for {} turns. Remembers their good, bad, or bizarre magic and last positions afterward. Mixed magic is bizarre. Ordinary gear, hearts, and tools are not detected.",(20f64*strength).ceil()),
-        "healing"=>format!("Restores {} health, up to maximum health.",50.*strength),
-        "energy"=>format!("Restores {} energy, up to your energy limit.",50.*strength),
+        "healing"=>format!("Restores {} health.",50.*strength),
+        "energy"=>format!("Restores {} energy.",50.*strength),
         "incineration"=>format!("Ignites the impact tile; a creature there burns for a random {}–{} turns, taking 4 HP per normal turn. Fire exposure renews the 6–10-turn burn.",(6f64*strength).ceil(),(10f64*strength).ceil()),
         "caustic gas"=>"Releases caustic gas.".into(),
         "paralysis"=>format!("Releases paralysis gas; a directly affected creature is paralyzed for {} turns.",(5f64*strength).ceil()),
@@ -1934,6 +1952,22 @@ mod tests {
 
     fn run() -> Run {
         serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap()
+    }
+    #[test]
+    fn fast_heart_description_matches_awarded_rewards_without_mutating_item() {
+        let mut r = run(); r.simulation_revision = 52.0.into(); r.fast_mode = true.into();
+        let i = Item { id: 9999., name: "Rat heart".into(), kind: "heart".into(), exp: 0.25.into(),
+            energy: 3.5.into(), bonus: PartialStats { offense: 0.125.into(), defense: 0.25.into(),
+                accuracy: 0.375.into(), dodge: 0.625.into(), dr: 0.75.into(), perception: 1.125.into(),
+                max_energy: 1.25.into(), max_hp: 1.375.into() }.into(), ..Default::default() };
+        let before = i.clone(); let text = describe_item(&r, &i);
+        for value in ["+0 Damage", "+0 HP", "+0 accuracy", "+2 dodge", "+2 dr",
+            "+2 perception", "+2 maxEnergy", "+2 maxHp", "0.5 blessings · 3.5 energy"] {
+            assert!(text.contains(value), "missing {value}: {text}");
+        }
+        assert_eq!(i, before);
+        r.fast_mode = Field::Missing;
+        assert!(describe_item(&r, &i).contains("0.25 blessings · 3.5 energy"));
     }
     fn gear(id: f64, name: &str) -> Item {
         equipment::make_equipment(name, id).unwrap()
@@ -2204,6 +2238,9 @@ mod tests {
             text = text.replace(&format!("Shots: {base} base damage + ×0.5 Offense, before variance, defenses, and whole-number rounding."),
                 &format!("Shot damage{suffix}: {range} before defenses and ability bonuses."));
         }
+        text = text.replace("\nWhen you use a potion, mark it diluted. You can use it again at half efficacy. Then it's actually gone.", "");
+        text = text.replace(", up to maximum health.", ".");
+        text = text.replace(", up to your energy limit.", ".");
         text = text.replace("Already tinkered; cannot be tinkered again.", "You've already tinkered with this item.");
         text = text.replace("Releases gas that deals 1/15 of maximum HP per normal turn. Gas vulnerability applies before rounding up; damage prevention applies afterward. Dilution reduces the gas volume, not its damage.", "Releases caustic gas.");
         // Literal old/new bonus-unit oracle, independent of presentation helpers.
@@ -2435,16 +2472,14 @@ mod tests {
             v.paint(&mut painter);
             assert_eq!(v.key(Keycode::Escape, Mod::NOMOD), PackAction::Close);
             v.refresh(&r);
-            for (x, y) in [
-                (BOUNDS.0 - 1, BOUNDS.1),
-                (BOUNDS.0, BOUNDS.1 - 1),
-                (BOUNDS.0 + BOUNDS.2, BOUNDS.1),
-                (BOUNDS.0, BOUNDS.1 + BOUNDS.3),
-                (1100, 350),
-            ] {
-                let at = (y as usize * crate::render::WIDTH + x as usize) * 4;
-                assert_eq!(&painter.pixels[at..at + 3], &[93, 31, 113]);
-            }
+            // The resolved responsive modal, not the obsolete fixed BOUNDS,
+            // defines the paint scissor. Check the entire exterior, not samples.
+            let Rect(bx,by,bw,bh)=v.layout.bounds;
+            for y in 0..painter.height { for x in 0..painter.width {
+                if (bx..bx+bw).contains(&(x as i32))&&(by..by+bh).contains(&(y as i32)){continue;}
+                let at=(y as usize*painter.width as usize+x as usize)*4;
+                assert_eq!(&painter.pixels[at..at+3],&[93,31,113],"outside modal at {x},{y}");
+            }}
             assert_eq!(painter.clip, None);
         }
         assert_eq!(r, before);
@@ -2887,6 +2922,10 @@ fn category_summary(run: &Run) -> String {
 mod revision50_item_knowledge_tests;
 
 #[cfg(test)]
+#[path="revision52_amulet_ui_tests.rs"]
+mod revision52_amulet_ui_tests;
+
+#[cfg(test)]
 #[path="revision50_jewelry_capture_tests.rs"]
 mod revision50_jewelry_capture_tests;
 
@@ -2915,13 +2954,23 @@ mod revision50_pack_tests {
         assert!(item_actions(&r,&ring).iter().any(|b|b.label=="Equip"));
         assert!(describe_item(&r,&ring).contains("Unequipped"));
     }
+    #[test] fn carried_jewelry_rows_omit_redundant_activity_and_capacity_explanation() {
+        let mut r=run();r.inventory.clear();r.player.abilities.clear();
+        r.inventory.push(Item{id:900.,kind:"ring".into(),name:"Ring of Light".into(),effect:"light".to_string().into(),..Default::default()});
+        r.inventory.push(corpse_core::revision50_amulet_effects::make_amulet(corpse_core::revision50_amulet_effects::Effect::Firebolt,901.).unwrap());
+        let view=PackView::observe(&r);
+        assert!(view.capacity_heading().is_empty());
+        for g in &view.groups {assert_eq!(view.row_label(g),g.name);assert!(!view.row_label(g).contains("active"));}
+        assert!(view.stamp.category_summary.contains("Rings 1/5"));
+        assert!(view.stamp.category_summary.contains("Amulets 1/5"));
+    }
     #[test] fn five_empty_category_sections_keep_independent_limits() {
         let mut r=run();r.inventory.clear();r.player.abilities.clear();
         let view=PackView::observe(&r);
         assert_eq!(view.stamp.category_headers,vec!["Trinkets 0 · unlimited","Amulets 0/5","Rings 0/5","Potions 0/5","Hearts 0/5"]);
         assert_eq!(view.section_positions(),(0..5).map(|i|(i,view.layout.list.1+i as i32*24)).collect::<Vec<_>>());
         assert!(view.row_positions().is_empty());assert_eq!(view.list_max_scroll(),0);
-        assert_eq!(view.capacity_heading(),"Separate category limits");
+        assert!(view.capacity_heading().is_empty());
         assert!(!view.stamp.category_summary.contains("shared"));
     }
     #[test] fn category_counts_include_all_carried_jewelry_and_stack_units() {
@@ -2944,7 +2993,7 @@ mod revision50_pack_tests {
         r.player.abilities=vec!["isheilah-tools-of-the-trade".into(),"kative-bottomless-pack".into(),"kative-appropriate".into()];
         view.refresh(&r);
         assert_eq!(view.stamp.category_headers,vec!["Trinkets 2 · unlimited","Amulets 5/10","Rings 5/13","Potions 5/15","Hearts 5/5"]);
-        assert_eq!(view.capacity_heading(),"Separate category limits");
+        assert!(view.capacity_heading().is_empty());
     }
     #[test] fn category_order_and_reordering_never_cross_sections() {
         let mut r=run();r.inventory.clear();r.player.abilities.clear();
@@ -3010,7 +3059,7 @@ mod revision50_pack_tests {
     }
     #[test] fn all_item_grants_have_revision50_names_and_copy() {
         let r=run(); let i=Item { kind:"ring".into(),granted_ability:"shrail-execute".to_string().into(), additional_granted_abilities:vec!["kative-appropriate".into()],..Default::default() };
-        let text=describe_item(&r,&i);assert!(text.contains("Execute"));assert!(text.contains("Appropriate"));assert!(text.contains("energy costs from amulets by 10"));
+        let text=describe_item(&r,&i);assert!(text.contains("Execute"));assert!(text.contains("Appropriate"));assert!(!text.contains("energy costs from amulets by 10"));
     }
     #[test] fn carried_jewelry_grant_and_bonus_copy_preserves_legacy() {
         let mut r=run();
@@ -3038,15 +3087,16 @@ mod revision50_pack_tests {
             }
         }
     }
-    #[test] fn reserve_changes_invalidate_pack_and_reach_item_tooltips() {
+    #[test] fn reserve_changes_invalidate_pack_but_do_not_duplicate_ability_details() {
         let mut r=run();r.player.energy=0.;
         let id="numo-implant-thought";
         let item=Item{kind:"ring".into(),granted_ability:id.to_string().into(),..Default::default()};
-        assert!(describe_item(&r,&item).contains("Reserve not configured"));
+        let item_text=describe_item(&r,&item);assert!(item_text.contains("Grants Implant Thought."));assert!(!item_text.contains("Reserve"));
         let before=Stamp::observe(&r);
         corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,31.,16.).unwrap();
         assert!(before!=Stamp::observe(&r));
-        assert!(describe_item(&r,&item).contains("Reserve 16/31"));
+        assert_eq!(describe_item(&r,&item),item_text);
+        assert!(crate::ability_ui::observe(&r,id).cost.contains("Reserve 16/31"));
     }
     #[test] fn authored_ring_effect_tooltips_are_versioned_and_keep_item_grants() {
         let mut r=run();
@@ -3167,5 +3217,92 @@ mod quiet_pack_copy_tests {
         r.inventory.push(item.clone());
         let buttons=item_actions(&r,&item);
         assert_eq!(buttons.iter().find(|b|b.label=="Apply").unwrap().tip,"Choose a target for this amulet.");
+    }
+}
+
+#[cfg(test)]
+mod released_floods_pack_tests {
+    use super::*;
+    #[test]
+    fn released_floods_apply_keeps_targeting_at_every_revision() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.player.energy=100.;r.player.abilities.clear();r.player.active.clear();r.inventory.clear();
+        let mut item=Item{id:901.,kind:"amulet".into(),effect:"floods".to_string().into(),..Default::default()};
+        corpse_core::revision50_amulets::initialize_item_for_revision(&mut item,52.).unwrap();r.inventory.push(item.clone());
+        for revision in [50.,51.,52.] {
+            r.simulation_revision=revision.into();let buttons=item_actions(&r,&item);let apply=buttons.iter().find(|b|b.label=="Apply").unwrap();assert!(apply.blocker.is_none());
+            assert!(matches!(apply.action,ButtonAction::Target(PackTarget::UseAt(901.))));
+            assert_eq!(apply.tip,"Choose a target for this amulet.");
+            for (width,height) in [(1280,800),(960,1200)] {
+                let mut painter=Painter::new();painter.resize(width,height);painter.set_responsive_canvas(true);
+                let mut view=PackView::observe(&r);view.configure(&painter,painter.frame().map.tuple());view.selected=Some(901.);
+                let expected=PackAction::Target(PackTarget::UseAt(901.));
+                for _ in 0..view.keyboard_tabs_for_action_label("Apply").unwrap(){view.key(Keycode::Tab,Mod::NOMOD);}
+                assert_eq!(view.key(Keycode::Return,Mod::NOMOD),expected);
+                // A completed/canceled action refreshes the real pending-action guard.
+                view.refresh(&r);view.configure(&painter,painter.frame().map.tuple());view.focus_action=None;
+                let index=view.selected_group().unwrap().actions.iter().position(|a|a.label=="Apply").unwrap();
+                let rect=view.button_rects().into_iter().find(|(i,_)|*i==index).unwrap().1;
+                if rect.1+rect.3>view.layout.detail.1+view.layout.detail.3 {view.detail_scroll+=rect.1+rect.3-view.layout.detail.1-view.layout.detail.3;}
+                let rect=view.button_rects().into_iter().find(|(i,_)|*i==index).unwrap().1;
+                assert_eq!(view.click(rect.0+3,rect.1+3),expected);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod revision52_composite_accuracy_tests {
+    use super::*;
+    #[test]
+    fn current_bow_description_is_only_requested_text() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.inventory.clear();
+        for count in [0.,1.,17.] {
+            r.inventory.clear();
+            if count>0. {r.inventory.push(Item{id:951.,kind:"ammo".into(),effect:"arrows".to_string().into(),quantity:count.into(),..Default::default()});}
+            for name in ["Bow","Composite bow"] {
+                let mut item=corpse_core::equipment::make_equipment(name,950.).unwrap();
+                item.tinkered=true.into(); item.granted_ability="shrail-execute".to_string().into();
+                r.simulation_revision=52.0.into();
+                assert_eq!(describe_item(&r,&item),format!("Apply to fire an arrow at a visible target. {count} arrows available."));
+                r.simulation_revision=51.0.into();
+                assert!(describe_item(&r,&item).contains("Half the miss chance of a thrown weapon"));
+            }
+        }
+    }
+}
+
+#[cfg(test)]mod tinkered_name_ui_tests {
+ use super::*;
+ #[test]fn pack_name_and_inspect_title_use_same_grant_suffix(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  for (kind,effect,name)in[("ring","light","Ring of Light"),("amulet","lightning","Amulet of Lightning")] {
+   let i=Item{id:900.,kind:kind.into(),effect:effect.to_string().into(),name:name.into(),tinkered:true.into(),granted_ability:"shrail-execute".to_string().into(),..Default::default()};
+   let shown=displayed_name(&r,&i);assert!(shown.ends_with(" and Execute"));assert!(describe_item(&r,&i).starts_with(&shown));assert_eq!(shown.matches(" and Execute").count(),1);
+  }
+ }
+}
+
+#[cfg(test)]mod insufficient_energy_pack_tests {
+ use super::*;
+ #[test]fn amulet_apply_blocker_is_exact_short_copy(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.energy=0.;r.player.abilities.clear();r.player.active.clear();
+  let item=Item{id:991.,kind:"amulet".into(),name:"Amulet of Lightning".into(),effect:"lightning".to_string().into(),amulet_state:corpse_core::revision50_amulets::AmuletState{instance_id:991,energy:0.,ready_at_half_tick:0}.into(),..Default::default()};r.inventory=vec![item.clone()];
+  let buttons=item_actions(&r,&item);let apply=buttons.iter().find(|b|b.label=="Apply").unwrap();assert_eq!(apply.blocker.as_deref(),Some("Insufficient Energy"));
+ }
+}
+
+#[cfg(test)] mod arrow_copy_cuts_tests {
+    use super::*;
+    #[test] fn arrow_description_keeps_only_name_and_quantity() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        for revision in [49.,50.,51.,52.] {
+            r.simulation_revision=revision.into();
+            for count in [1.,17.,500.] {
+                let item=equipment::make_arrows(900.,count);
+                assert_eq!(describe_item(&r,&item),format!("{} ×{}",item.name,count));
+            }
+        }
     }
 }

@@ -89,7 +89,7 @@ fn raster_proof(p: &Painter) -> Value {
         json!({"character":ch.to_string(),"native_mask_width":w,"native_mask_height":h,
             "mask_payload_bytes":b.coverage.len()})).collect::<Vec<_>>();
     ascii.sort_by_key(|v|(v["character"].as_str().unwrap().to_owned(),v["native_mask_width"].as_i64(),v["native_mask_height"].as_i64()));
-    let mut compound = p.identity_masks.iter().map(|((s,w,h,source_scale,_,_,_),(_,_,mw,mh,b))|
+    let mut compound = p.identity_masks.iter().map(|((s,w,h,source_scale,_,_,_),(_,_,mw,mh,b,_))|
         json!({"glyph":s,"native_cell_width":w,"native_cell_height":h,
             "outline_source_scale":f32::from_bits(*source_scale),"mask_width":mw,
             "mask_height":mh,"mask_payload_bytes":b.len()})).collect::<Vec<_>>();

@@ -76,6 +76,7 @@ pub fn apply_dagger(r:&mut Run,id:f64)->Result<bool,EngineError> {
     if active(r) {return Ok(false)}
     let at=r.floor().and_then(|f|f.godbeast_event.as_ref()).is_some_and(|e|e.kind=="Phantasmii" && e.altar.as_ref().is_some_and(|a|a.x==r.player.x && a.y==r.player.y));
     if !at {engine::log(r,"Stand on the Altar of the Phantasmii to apply this dagger.","player");return Ok(false)}
+    // The shared P73 transition is emitted once by the command observer.
     begin(r)
 }
 pub fn wake(r:&mut Run)->bool {
@@ -84,6 +85,8 @@ pub fn wake(r:&mut Run)->bool {
     r.player.x=s.anchor_x; r.player.y=s.anchor_y;
     r.actors_at_mut(r.depth).retain(|a|Some(a.id)!=s.body_id);
     let s=r.dreamwalking.as_mut().unwrap();s.active=false;s.body_id=None;
+    crate::revision50::duel_actor_changed(r,r.player.id);
+    crate::revision50::settle_duel_targets(r);
     engine::log(r,"You wake up.","player"); true
 }
 pub fn ability(r:&mut Run,id:&str)->Result<Option<bool>,EngineError> {
@@ -96,7 +99,7 @@ pub fn ability(r:&mut Run,id:&str)->Result<Option<bool>,EngineError> {
 pub fn shards_collected(r:&mut Run) {
     if !active(r) || unlocked(r) {return}
     let count:f64=r.inventory.iter().filter(|i|crate::phantasmii_generation::is_shard(i)).map(crate::inventory::quantity).sum();
-    if count>=3. {r.dreamwalking.as_mut().unwrap().unlocked=true;engine::log(r,"The ritual is complete. You can now Dreamwalk whenever you wish.","player");}
+    if count>=3. {r.dreamwalking.as_mut().unwrap().unlocked=true;crate::events::inventory(r,"E83","unlock-diamond",None);engine::log(r,"The ritual is complete. You can now Dreamwalk whenever you wish.","player");}
 }
 /// O(A+P) at resource synchronization boundaries. Conditions remain body-local.
 pub fn sync(r:&mut Run) {

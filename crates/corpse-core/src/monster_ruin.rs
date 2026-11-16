@@ -24,9 +24,19 @@ pub fn ruin_damage(a: &Actor) -> f64 {
 }
 /// Revision42 early Zillennia pulse trial. O(1) fixed quality dispatch; no RNG,
 /// geometry, cooldown or energy changes. Raw packet is halved here ONCE; existing
-/// attack-channel tuning still applies afterward, yielding7/9 rather than14/18.
+/// attack-channel tuning still applies afterward through R51, yielding7/9.
+/// Current R52 authors7/9 directly and applies no final attack multiplier.
 pub fn ruin_damage_revision(a: &Actor, revision: f64) -> f64 {
-    if matches!(revision, 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0) {
+    if crate::combat::raw_attack_damage_enabled(revision) {
+        return match a.zillennia_quality.as_ref().map(String::as_str) {
+            Some("infant") => 7.0,
+            Some("child") => 9.0,
+            _ => a.zillennia_quality.as_ref().and_then(|q| ["infant", "child", "lesser", "unqualified", "mature", "greater", "hulking", "ancient", "timeless", "transcendent"].iter().position(|x| *x == q))
+                .map(|i| 14.0 + 4.0 * i as f64)
+                .unwrap_or_else(|| 10.0 + a.conditions.get("godbeastDepth").copied().unwrap_or(1.0)),
+        };
+    }
+    if matches!(revision, 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0) {
         match a.zillennia_quality.as_ref().map(String::as_str) {
             Some("infant") => return 14.0,
             Some("child") => return 18.0,
@@ -44,6 +54,18 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         || !crate::monster_horn::spell_spend(r, id, 20.0)
     {
         return Ok(false);
+    }
+    // Presentation reuses the exact point-distance and LOS admission rules.
+    // O(N*(portal distance+LOS)) on a successful cast, no RNG or geometry writes.
+    if crate::events::enabled(r) {
+        let f=r.floor().unwrap();let w=f.width();let mut cells=Vec::new();
+        let mut point=a.clone();
+        for i in 0..f.tiles.len() {
+            point.x=(i%w)as f64;point.y=(i/w)as f64;
+            if crate::portals::point_distance(r,&a,point.x,point.y)<=3.
+                && crate::vision::line_of_sight(r,&a,&point) {cells.push(crate::events::EventPoint::from(&point));}
+        }
+        crate::events::cue(r,&a,"E51","crossed-ring-violet",crate::events::Stage::Special,&cells);
     }
     // O(A * (A + LOS + damage)), stable source array snapshot, no target RNG.
     let ids: Vec<f64> = std::iter::once(&r.player)
@@ -65,6 +87,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
                 // player source may earn Reaping, an allied caster may not.
                 if crate::dreamwalking::same_plane(r, &a, &v)
                     && crate::revision50_nightmares::strike(r, victim) { continue; }
+                let packets=crate::events::damage_count(victim);
                 engine::damage_direct_with_source_snapshot(
                     r,
                     victim,
@@ -74,6 +97,9 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
                     false,
                 )
                 .map_err(|e| e.0)?;
+                if crate::events::damage_count(victim)>packets {
+                    crate::animation_enemy::mark(r,&v,"E51","puncture-violet",crate::events::Stage::Health);
+                }
             }
         }
     }
@@ -81,7 +107,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         a.conditions.insert("beastCooldown".into(), 3.0);
     }
     let a = actor(r, id).unwrap_or(&a).clone();
-    crate::events::actor_event(r, &a, "burst", "Ruin pulse", None, None);
+    if !crate::events::enabled(r) {crate::events::actor_event(r, &a, "burst", "Ruin pulse", None, None);}
     let b = actor(r, target).unwrap_or(&b);
     let b = b.clone();
     crate::monster_horn::report(r, &a, &b, "unleashes a pulse of ruin.");

@@ -7,7 +7,7 @@ use std::collections::HashSet;
 fn metric(r: &mut Run, k: &str, n: f64) {
     *r.metrics.entry(k.into()).or_default() += n
 }
-fn sever(r: &mut Run, id: f64) {
+pub(crate) fn sever(r: &mut Run, id: f64) {
     let direct_roots = r.simulation_revision.value_or(29.) >= 51.;
     for f in &mut r.floors {
         if f.fungal_roots
@@ -113,7 +113,7 @@ pub fn place_corpse(
         x = nx;
         y = ny;
         metric(r, "corpsePlacementFalls", 1.0);
-        depth += 1.0;
+        depth = crate::fast_mode::below(r, depth);
     }
     r.actors_at_mut(from).retain(|a| a.id != corpse.id);
     sever(r, corpse.id);

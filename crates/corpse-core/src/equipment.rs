@@ -47,6 +47,7 @@ pub fn validate(i: &Item) -> Result<(), EngineError> {
 /// maximum ID length L. It does not initialize powers or mutate item state.
 pub fn validate_for_revision(i: &Item, revision: f64) -> Result<(), EngineError> {
     validate(i)?;
+    if !crate::revision52_amulet_tiers::valid_item(i,revision) {return Err(EngineError("Invalid Revision 52 amulet tier".into()));}
     if revision >= 50.0 && crate::tinker::grants(i)
         .any(|id| crate::progression::definition_for_revision(revision, id).is_none()) {
         return Err(EngineError("Equipment contains an unknown or retired Revision 50 blessing grant".into()));
@@ -449,9 +450,9 @@ pub fn removal_blocker(r: &Run, id: f64, whole_stack: bool) -> Option<String> {
     } else { items.remove(index); }
     let abilities = crate::equipment_abilities::equipment_ability_state(r, &items).abilities;
     let before = crate::revision50_inventory::capacity(r);
-    let after = crate::revision50_inventory::capacity_for_abilities(&abilities);
+    let after = crate::revision50_inventory::capacity_for_abilities_revision(&abilities, r.simulation_revision.value_or(29.));
     if (after.rings < before.rings || after.amulets < before.amulets || after.potions < before.potions || after.hearts < before.hearts)
-        && !crate::revision50_inventory::finite_categories_fit(&items, &abilities) {
+        && !crate::revision50_inventory::finite_categories_fit_revision(&items, &abilities, r.simulation_revision.value_or(29.)) {
         Some("This jewelry grants carrying capacity. Free space in the affected category before removing it.".into())
     } else { None }
 }

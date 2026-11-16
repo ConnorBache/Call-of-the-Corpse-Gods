@@ -45,9 +45,10 @@ pub fn summon(r:&mut Run,id:f64,target:f64)->Result<bool,String> {
     child.stats.offense=200.;child.stats.defense=24.;child.stats.accuracy=140.;child.stats.dodge=30.;
     child.hp=244.;child.max_hp=244.;
     crate::accuracy_dodge::apply_witch_newborn(&mut child, kind, 33.);
-    if matches!(r.simulation_revision.value_or(29.), 42. | 43. | 44. | 45. | 46. | 50. | 51.) {
+    if matches!(r.simulation_revision.value_or(29.), 42. | 43. | 44. | 45. | 46. | 50. | 51. | 52.) {
         crate::balance42::apply_new_actor_kind(&mut child, &format!("witch:{kind}"), 42.);
     }
+    crate::balance52::apply_new_actor_kind(&mut child, &format!("witch:{kind}"), r.depth, r.simulation_revision.value_or(29.));
     let child_id = child.id;
     r.actors_at_mut(r.depth).push(child);
     let ready=r.tick+10.;
@@ -55,7 +56,9 @@ pub fn summon(r:&mut Run,id:f64,target:f64)->Result<bool,String> {
     r.floor_mut().unwrap().dirty=true;
     // Preserve visibility/disguise admission: a witnessed summon is named by
     // its current appearance, never by a hidden true Skin Walker identity.
-    crate::events::actor_event(r,&a,"summon","Summon",Some(crate::events::EventPoint{x,y}),None);
+    if crate::events::enabled(r) {
+        if let Some(child)=actor(r,child_id) {crate::animation_enemy::mark(r,child,"E08","summon-violet",crate::events::Stage::Special);}
+    } else {crate::events::actor_event(r,&a,"summon","Summon",Some(crate::events::EventPoint{x,y}),None);}
     if crate::vision::visible_actor(r,&a) {
         let message = if r.simulation_revision.value_or(29.) >= 43. {
             let caster = definite_name(crate::actor_presentation::name(r,&a));

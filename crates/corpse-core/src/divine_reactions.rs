@@ -37,7 +37,15 @@ pub fn surrender_bonus(r: &Run, b: &Actor, defense: f64, apply: bool) -> f64 {
 }
 /// Call after rolling a landed strike, using damage without the Surrender bonus.
 pub fn pay_surrender(r: &mut Run, b: &Actor, ordinary_damage: f64) {
+    pay_surrender_from(r,b,ordinary_damage,None);
+}
+/// Direction is presentation-only and admitted only for an observed attacker.
+pub fn pay_surrender_from(r:&mut Run,b:&Actor,ordinary_damage:f64,attacker:Option<&Actor>) {
     if ordinary_damage <= 0.0
+        // R52 waits for a source whose damage is reduced by DR. Piercing hits
+        // bypass the bonus, so they cannot spend energy or consume the proc.
+        || (r.simulation_revision.value_or(29.) >= 52.
+            && attacker.is_some_and(|a| a.abilities.iter().any(|id| id == "enemy:beast:armor-piercing")))
         || !active(r, b, SURRENDER)
         || owner(r, b).conditions.get("surrenderTick") == Some(&r.tick)
     {
@@ -58,6 +66,8 @@ pub fn pay_surrender(r: &mut Run, b: &Actor, ordinary_damage: f64) {
             .unwrap()
             .conditions
             .insert("surrenderTick".into(), tick);
+        if let Some(attacker)=attacker {crate::events::facing(r,b,attacker,"P10","shield-wedge",crate::events::Stage::Impact);}
+        else {crate::animation_player::local(r,b,"P10","shield",crate::events::Stage::Impact);}
     } else {
         engine::actor_mut_trusted(r, id)
             .unwrap()
@@ -76,7 +86,7 @@ pub fn quick_hand_after_hit(r: &mut Run, b: &Actor) {
     }
     let id = half_here::owner_id(r, b);
     let resolving = r.resolving_tick.value_or(false);
-    if let Some(o) = engine::actor_mut_trusted(r, id) {
+    let spent=if let Some(o) = engine::actor_mut_trusted(r, id) {
         o.reactions = (o.reactions.value_or(0.0) - 1.0).into();
         let h = engine::condition(o, "hasted").max(1.0);
         o.conditions.insert("hasted".into(), h);
@@ -85,7 +95,11 @@ pub fn quick_hand_after_hit(r: &mut Run, b: &Actor) {
         } else {
             o.conditions.insert("hastedFresh".into(), 1.0);
         }
-    }
+        true
+    } else {false};
+    if !spent {return;}
+    crate::animation_player::local(r,b,"P16","speed",crate::events::Stage::Special);
+    if id==r.player.id {crate::events::inventory(r,"P16","reaction-spent",None);}
 }
 /// Counter may still fire after a terminal strike. Use source's post-impact body
 /// position and pre-strike defender Offense; the engine supplies current attacker's DR.
@@ -133,6 +147,9 @@ pub fn select_deflection_target(r: &mut Run, b: &Actor, secondary: bool) -> Opti
         o.reactions = (o.reactions.value_or(0.0) - 1.0).into();
     }
     let index = (rng::random(r) * candidates.len() as f64).floor() as usize;
+    if let Some(target)=engine::actor(r,candidates[index]) {
+        crate::events::link(r,b,target,"P17","arc-redirect",crate::events::Stage::Special);
+    }
     Some(candidates[index])
 }
 pub fn nightmare_absorbs(r: &Run, a: &Actor, source: Option<&Actor>) -> bool {
@@ -180,6 +197,7 @@ pub fn apply_bleeding(r: &mut Run, a: &Actor, target_id: f64, dealt: f64, offens
         let duration = engine::condition(b, "bleeding").max(offense.max(0.0));
         b.conditions.insert("bleeding".into(), duration);
         b.conditions.insert("bleedSourceId".into(), a.id);
+        if duration>0. {let b=b.clone();crate::animation_player::local(r,&b,"P38","droplet-two",crate::events::Stage::Special);}
     }
 }
 
@@ -217,4 +235,27 @@ mod dream_plane_tests {
         assert_eq!(select_deflection_target(&mut r, &player, false), Some(enemy.id));
         assert_eq!(r.player.reactions.value_or(0.), 2.);
     }
+}
+
+#[cfg(test)] mod redirect_animation_fidelity_tests {
+ use super::*;
+ #[test] fn consumed_redirect_has_selected_endpoints_and_empty_reaction_has_none(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  r.player.x=2.;r.player.y=2.;r.player.abilities=vec![DEFLECT.into()];r.player.active=r.player.abilities.clone();r.player.conditions.clear();r.player.reactions=1.0.into();
+  let mut enemy=r.player.clone();enemy.id=900.;enemy.x=3.;enemy.state="hunting".into();enemy.abilities.clear();enemy.active.clear();
+  r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(enemy.clone());let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=crate::Field::Missing;f.non_euclidean=crate::Field::Missing;
+  let defender=r.player.clone();crate::events::begin();assert_eq!(select_deflection_target(&mut r,&defender,false),Some(enemy.id));
+  let events=crate::events::finish();let link=events.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.style=="arc-redirect")).unwrap();assert_eq!(link.from,Some((&defender).into()));assert_eq!(link.to,(&enemy).into());
+  let defender=r.player.clone();crate::events::begin();assert_eq!(select_deflection_target(&mut r,&defender,false),None);assert!(crate::events::finish().is_empty());
+ }
+}
+
+#[cfg(test)] mod animation_reaction_receipt_tests {
+ use super::*;
+ #[test] fn quick_hand_has_one_map_cue_and_one_owned_hud_receipt_only_on_spend(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.conditions.clear();r.player.abilities=vec![QUICK_HAND.into()];r.player.active=r.player.abilities.clone();r.player.reactions=1.0.into();let a=r.player.clone();
+  crate::events::begin();quick_hand_after_hit(&mut r,&a);let e=crate::events::finish();let cues:Vec<_>=e.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P16").collect();assert_eq!(cues.len(),2);assert_eq!(cues.iter().filter(|a|a.surface.is_none()&&a.style=="speed").count(),1);assert_eq!(cues.iter().filter(|a|a.surface.as_deref()==Some("inventory")&&a.style=="reaction-spent").count(),1);
+  let a=r.player.clone();crate::events::begin();quick_hand_after_hit(&mut r,&a);assert!(crate::events::finish().is_empty());
+  let mut ally=r.player.clone();ally.id=900.;ally.x+=1.;ally.state="ally".into();ally.reactions=1.0.into();r.actors_at_mut(r.depth).push(ally.clone());crate::events::begin();quick_hand_after_hit(&mut r,&ally);assert!(!crate::events::finish().iter().filter_map(|e|e.animation.as_ref()).any(|a|a.surface.as_deref()==Some("inventory")));
+ }
 }

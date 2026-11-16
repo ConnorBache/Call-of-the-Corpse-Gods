@@ -406,6 +406,8 @@ pub fn mercurialize_on_revival(r: &mut Run, id: f64, depth: f64) {
         return;
     };
     mercurialize_actor(a);
+    let a=a.clone();
+    if depth == r.depth { crate::animation_enemy::mark(r, &a, "E80", "rise-gold", crate::events::Stage::Special); }
 }
 pub fn mercurialize_actor(a: &mut Actor) {
     if !a.name.starts_with("Mercuria's ") && !a.name.starts_with("Mercuria’s ") {
@@ -513,6 +515,7 @@ pub fn siphon_hit(r: &mut Run, attacker: f64, defender: f64) {
     }
     let hp = (a.hp + (a.max_hp * 0.02).ceil().max(1.)).min(a.max_hp);
     crate::engine::actor_mut_trusted(r, attacker).unwrap().hp = hp;
+    if hp > a.hp { crate::animation_enemy::mark(r, &a, "E22", "droplet-ichor", crate::events::Stage::Health); }
     if r.player.x >= 0. && (attacker == r.player.id || crate::vision::visible_actor(r, &a)) {
         let who = if attacker == r.player.id {
             "You".to_string()

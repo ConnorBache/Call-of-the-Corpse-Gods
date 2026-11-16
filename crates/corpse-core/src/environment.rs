@@ -787,7 +787,7 @@ pub fn burn_roots(f: &mut Floor, cell: usize) {
     }
     if let Some(connections) = f.fungal_roots.as_mut() {
         for root in connections {
-            if root.active && root.path.contains(&(cell as f64)) {
+            if root.active && root.grown_path().contains(&(cell as f64)) {
                 root.active = false;
             }
         }
@@ -802,6 +802,7 @@ pub fn corpse_rooted(f: &Floor, actors: &[crate::Actor], corpse: &crate::Actor) 
     f.fungal_roots.as_ref().is_some_and(|roots| {
         roots.iter().any(|root| {
             root.active
+                && root.reaches_corpse()
                 && root.corpse_id == corpse.id
                 && actors.iter().any(|a| {
                     a.id == root.fungus_id
@@ -1043,7 +1044,7 @@ fn resolve_bursts_inner(
         let f = r.floor().unwrap();
         let x = burst.at % f.width();
         let y = burst.at / f.width();
-        explosion_event(r, x as f64, y as f64);
+        explosion_event(r, x as f64, y as f64, burst.radius as f64, "shared", None);
         let origin = terrain_origin(r, x as f64, y as f64);
         let victims: Vec<_> = std::iter::once(&r.player)
             .chain(r.actors_at(r.depth))
@@ -1157,6 +1158,7 @@ pub fn tick_environment_options_with_falls(
     crate::revision50_control_amulets::expire_terrain(r);
     let _timing_environment_stage = crate::timing::span("environment.setup");
     validate_supported_with_falls(r, pending_falls)?;
+    crate::corpse_currents::settle_falls(r)?;
     let native_hooks = crate::water_blood::enabled(r);
     let depth = r.depth;
     let ids: Vec<_> = std::iter::once(&r.player)
@@ -1206,6 +1208,10 @@ pub fn tick_environment_options_with_falls(
             let e = f.environment.as_mut().unwrap();
             e.fire[i as usize] = e.fire[i as usize].max(2.);
         }
+    }
+    if crate::events::enabled(r) {
+        let cells:Vec<_>=r.floor().and_then(|f|f.godbeast_event.as_ref().filter(|e|e.kind=="Mercuria").and_then(|e|e.flood_frontier.as_ref()).map(|v|(f.width(),v))).map(|(w,v)|v.iter().map(|i|crate::events::EventPoint{x:(*i as usize%w)as f64,y:(*i as usize/w)as f64}).collect()).unwrap_or_default();
+        crate::events::at(r,"E78","wave-ichor",crate::events::Stage::Special,&cells);
     }
     if !crate::dreamwalking::context_dream(r) {crate::ichor::tick_fish(r)?;}
     let leaf_sources = refresh_razorleaves(r, &ids);
@@ -1260,7 +1266,10 @@ pub fn tick_environment_options_with_falls(
             let owner = source_id(adapter.run, Some(id));
             let volume = a.conditions.get("monsterGasPassiveVolume").copied().unwrap_or(35.);
             let gas = breather_gas(adapter.run, &a);
+            let before=adapter.run.floor().unwrap().environment.as_ref().and_then(|e|e.gas_volume.as_ref()).map_or(0.,|v|v[at]);
             add_gas(adapter.run.floor_mut().unwrap(), at, gas, volume, owner)?;
+            let after=adapter.run.floor().unwrap().environment.as_ref().and_then(|e|e.gas_volume.as_ref()).map_or(0.,|v|v[at]);
+            if after>before {crate::animation_enemy::mark(adapter.run,&a,"E56",if gas=="hallucinogenic" {"puff-violet"}else{"puff-green"},crate::events::Stage::Special);}
         }
         if !crate::dreamwalking::is_body(&a) && a.abilities.iter().any(|id| id == "anavani-star-power") {
             if a.active.iter().any(|id| id == "anavani-star-power") {
@@ -1429,6 +1438,8 @@ pub fn tick_environment_options_with_falls(
                 Some("confusion") => crate::monster_statuses::willpower_duration(r, &a, 8.),
                 _ => 0.,
             };
+            let before=crate::engine::actor(r,id).unwrap();
+            let prior=[cond(before,"paralyzed"),cond(before,"hallucinating"),cond(before,"confused")];
             let a = crate::engine::actor_mut_trusted(r, id).unwrap();
             if gas.as_deref() == Some("paralysis") {
                 let v = cond(a, "paralyzed").max(2.);
@@ -1443,6 +1454,10 @@ pub fn tick_environment_options_with_falls(
                 let v = cond(a, "confused").max(mental_duration);
                 a.conditions.insert("confused".into(), v);
                 a.conditions.shift_remove("confusedFresh");
+            }
+            let after=crate::engine::actor(r,id).unwrap();
+            for (key,before) in ["paralyzed","hallucinating","confused"].into_iter().zip(prior) {
+                if before<=0. && cond(after,key)>0. {crate::animation_enemy::mark(r,after,"E72",if key=="paralyzed"{"bracket-violet"}else{"crossed-ring-violet"},crate::events::Stage::Special);}
             }
         }
         {
@@ -1509,8 +1524,16 @@ pub fn tick_environment_options_with_falls(
     }
     let black_pit = black_pit_active
         .unwrap_or_else(|| r.player.active.iter().any(|id| id == "grisha-black-pit"));
+    let restoring:Vec<usize>=if crate::events::enabled(r) && !black_pit {
+        let f=r.floor().unwrap();f.altered_chasms.as_ref().into_iter().flat_map(|m|m.iter()).filter_map(|(key,record)|key.parse::<usize>().ok().filter(|&i|record.age>=2. && f.tiles.get(i).is_some_and(|t|t=="chasm"))).collect()
+    }else{vec![]};
     restore_altered_chasms_revision(r.floor_mut().unwrap(), black_pit, revision);
+    if !restoring.is_empty() {
+        let f=r.floor().unwrap();let w=f.width();let cells:Vec<_>=restoring.into_iter().filter(|&i|f.tiles[i]!="chasm").map(|i|crate::events::EventPoint{x:(i%w)as f64,y:(i/w)as f64}).collect();
+        crate::events::at(r,"P53","unfold",crate::events::Stage::Special,&cells);
+    }
     if !crate::dreamwalking::active(r) && !crate::dreamwalking::context_dream(r) {crate::inventory::float_carried_item(r)?;}
+    crate::corpse_currents::drift(r);
     drift_ground_items(r)?;
     let f = r.floor_mut().unwrap();
     let e = f.environment.as_ref().unwrap();
@@ -1889,7 +1912,10 @@ fn explode_retained(
     if options.audible {
         crate::engine::log(r, "You hear an explosion!", "environment");
     }
-    explosion_event(r, x, y);
+    let animation_source=source.or_else(||options.source.and_then(|id|crate::engine::actor(r,id)));
+    let animation_key=if options.direct_impact&&animation_source.is_some_and(|a|crate::abilities::endpoint_active(r,a,"anavani-nova")){"P57"}
+        else if options.ignite_first&&animation_source.is_some_and(|a|a.abilities.iter().any(|s|s=="enemy:beast:detonate")){"E37"}else{"shared"};
+    explosion_event(r,x,y,options.radius,animation_key,animation_source);
     let shared = options.gas_blast || hit_pools.is_some();
     let mut local = std::collections::HashSet::new();
     let pools = hit_pools.unwrap_or(&mut local);
@@ -1976,7 +2002,22 @@ fn explode_retained(
     Ok(())
 }
 
-fn explosion_event(r: &Run, x: f64, y: f64) {
+/// O(R² * LOS) for a real blast radius R; detached visible footprint only.
+/// Uses the very same radius and LOS predicate as damage admission, before
+/// ignition/deaths alter geometry. No legacy held '+' or invented neighbors.
+fn explosion_event(r: &Run, x: f64, y: f64, radius:f64,key:&str,source:Option<&crate::Actor>) {
+    if crate::events::enabled(r) {
+        let Some(f)=r.floor()else{return};let origin=terrain_origin(r,x,y);let mut cells=Vec::new();
+        for yy in (y-radius.ceil()).max(0.)as usize..=(y+radius.ceil()).min(f.height()as f64-1.)as usize {
+            for xx in (x-radius.ceil()).max(0.)as usize..=(x+radius.ceil()).min(f.width()as f64-1.)as usize {
+                let mut target=origin.clone();target.x=xx as f64;target.y=yy as f64;
+                if (x-target.x).hypot(y-target.y)<=radius&&crate::vision::line_of_sight(r,&origin,&target){cells.push(crate::events::EventPoint{x:target.x,y:target.y});}
+            }
+        }
+        if let Some(a)=source.filter(|a|crate::events::actor_observed(r,a)) {crate::events::cue(r,a,key,"burst-ember",crate::events::Stage::Special,&cells);}
+        else {crate::events::at(r,"shared","burst-ember",crate::events::Stage::Special,&cells);}
+        return;
+    }
     crate::events::emit(
         r,
         crate::events::PresentationEvent {
@@ -1987,7 +2028,7 @@ fn explosion_event(r: &Run, x: f64, y: f64) {
             color: Some("#fff23a".into()),
             label: Some("Explosion".into()),
             depth: r.depth,
-        },
+         animation: None, },
     );
 }
 
@@ -2199,7 +2240,7 @@ mod presentation_parity {
     }
 }
 
-/// Pilot selected-state reader, O(1 + gas-name bytes), no parent/grid serialization.
+/// Pilot selected-state reader: Normal O(1), Fast O(F), plus gas-name bytes; no grid serialization.
 /// Four primary columns only: legacy channel views, provenance, vents, fire and
 /// RNG are deliberately outside this measurement pilot's coverage. Numeric bits
 /// preserve signed zero/NaN; field presence is distinct from a null gas cell.
@@ -2209,9 +2250,12 @@ pub(crate) fn capture_pilot_gas_cell(r: &Run, depth_bits: u64, index: usize) -> 
     if !depth.is_finite() || depth < 1. || depth.fract() != 0. || depth > usize::MAX as f64 {
         return Err("unsupported gas floor depth".into());
     }
-    let slot = (depth as usize).checked_sub(1).ok_or("invalid gas floor depth")?;
-    let f = r.floors.get(slot).filter(|f| f.depth.to_bits() == depth_bits)
-        .ok_or("physical gas floor address mismatch")?;
+    let f = if crate::fast_mode::enabled(r) {
+        r.floors.iter().find(|f| f.depth.to_bits() == depth_bits)
+    } else {
+        let slot = (depth as usize).checked_sub(1).ok_or("invalid gas floor depth")?;
+        r.floors.get(slot).filter(|f| f.depth.to_bits() == depth_bits)
+    }.ok_or("physical gas floor address mismatch")?;
     if index >= f.tiles.len() { return Err("gas cell outside floor".into()); }
     let e = match &f.environment {
         Field::Missing => return Ok(json!({"environment":"missing"})),
@@ -2274,13 +2318,17 @@ impl PilotGas<'_>{
 fn pilot_number_compact(v:&PilotCell<u64>)->serde_json::Value{use serde_json::json;match v{PilotCell::Missing=>json!([0]),PilotCell::Null=>json!([1]),PilotCell::Value(bits)=>json!([2,bits])}}
 /// O(1) lookup and borrow, no JSON/string allocation on valid reads.
 fn pilot_number_borrow(v:&Field<Vec<f64>>,index:usize)->Result<PilotCell<u64>,String>{Ok(match v{Field::Missing=>PilotCell::Missing,Field::Null=>PilotCell::Null,Field::Value(v)=>PilotCell::Value(v.get(index).ok_or("gas numeric shape mismatch")?.to_bits())})}
-/// O(1) address/column reads, O(gas-name bytes) only when caller compares strings.
+/// Normal O(1), Fast O(F) floor lookup, then O(1) columns; string comparison O(name bytes).
 /// Intentionally independent of the frozen verbose oracle's implementation.
 pub(crate) fn capture_pilot_gas_borrowed(r:&Run,depth_bits:u64,index:usize)->Result<PilotGas<'_>,String>{
     let depth=f64::from_bits(depth_bits);
     if !depth.is_finite()||depth<1.||depth.fract()!=0.||depth>usize::MAX as f64{return Err("unsupported gas floor depth".into());}
-    let slot=(depth as usize).checked_sub(1).ok_or("invalid gas floor depth")?;
-    let f=r.floors.get(slot).filter(|f|f.depth.to_bits()==depth_bits).ok_or("physical gas floor address mismatch")?;
+    let f=if crate::fast_mode::enabled(r){
+        r.floors.iter().find(|f|f.depth.to_bits()==depth_bits)
+    }else{
+        let slot=(depth as usize).checked_sub(1).ok_or("invalid gas floor depth")?;
+        r.floors.get(slot).filter(|f|f.depth.to_bits()==depth_bits)
+    }.ok_or("physical gas floor address mismatch")?;
     if index>=f.tiles.len(){return Err("gas cell outside floor".into());}
     let e=match &f.environment{Field::Missing=>return Ok(PilotGas::Missing),Field::Null=>return Ok(PilotGas::Null),Field::Value(e)=>e};
     let kind=match &e.gas_type{Field::Missing=>PilotCell::Missing,Field::Null=>PilotCell::Null,Field::Value(v)=>PilotCell::Value(v.get(index).ok_or("gas type shape mismatch")?.as_deref())};

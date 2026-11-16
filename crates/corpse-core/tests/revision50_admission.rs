@@ -135,8 +135,8 @@ fn revision50_default_admission_never_upgrades_a_revision46_saved_run() {
 
 #[test]
 fn revision50_admission_rejects_skipped_future_fractional_and_nonfinite_revisions() {
-    // R51 is now implemented explicitly; the next revision must still fail.
-    for revision in [47., 48., 49., 52., 49.5, 50.5, 51.5, f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+    // R52 is now implemented explicitly; the next revision must still fail.
+    for revision in [47., 48., 49., 53., 52.5, 49.5, 50.5, 51.5, f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
         assert!(startup::new_run_shell_revision("unsupported", "Unblessed", false, revision).is_err());
         assert!(corpse_core::debug_floor::create_run_revision("unsupported", "Unblessed", 1, revision).is_err());
         assert!(corpse_core::playtest::create_run_revision("unsupported", "Unblessed", false, 1,
@@ -148,6 +148,7 @@ fn revision50_admission_rejects_skipped_future_fractional_and_nonfinite_revision
         assert!(ReplaySession::from_initial(initial, record).is_err());
     }
     assert_eq!(startup::new_run_shell_revision("supported51", "Unblessed", false, 51.).unwrap().simulation_revision, Field::Value(51.));
+    assert_eq!(startup::new_run_shell_revision("supported52", "Unblessed", false, 52.).unwrap().simulation_revision, Field::Value(52.));
     let mut initial = fixture(50.);
     let record = ReplayRecord::from_run(&initial);
     initial.simulation_revision = 46.0.into();

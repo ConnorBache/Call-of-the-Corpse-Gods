@@ -27,7 +27,7 @@ pub fn profiles() -> &'static [BirthProfile] {
 /// Explicit child context keys (e.g. witch:night-crawler) are final overrides,
 /// not multipliers stacked on the natural profile.
 pub fn apply_new_actor_kind(actor: &mut Actor, kind: &str, revision: f64) {
-    if !matches!(revision, 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0) { return; }
+    if !matches!(revision, 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0) { return; }
     if let Some(row) = profiles().iter().find(|row| row.kind == kind) {
         actor.stats.offense = row.offense;
         actor.stats.dodge = row.dodge;

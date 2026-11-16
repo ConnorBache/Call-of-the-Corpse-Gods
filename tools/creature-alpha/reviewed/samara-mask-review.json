@@ -1,0 +1,462 @@
+{
+  "method": "spatially reviewed negative-space components with two-pixel low-matte boundary refinement",
+  "reviewed_regions": [
+    {
+      "seed": [
+        754,
+        115
+      ],
+      "bbox": [
+        739,
+        71,
+        796,
+        171
+      ],
+      "core_pixels": 2930,
+      "removed_pixels": 3241
+    },
+    {
+      "seed": [
+        318,
+        98
+      ],
+      "bbox": [
+        313,
+        84,
+        368,
+        115
+      ],
+      "core_pixels": 930,
+      "removed_pixels": 1079
+    },
+    {
+      "seed": [
+        480,
+        135
+      ],
+      "bbox": [
+        462,
+        91,
+        552,
+        213
+      ],
+      "core_pixels": 4672,
+      "removed_pixels": 5237
+    },
+    {
+      "seed": [
+        744,
+        119
+      ],
+      "bbox": [
+        663,
+        103,
+        746,
+        141
+      ],
+      "core_pixels": 1544,
+      "removed_pixels": 1806
+    },
+    {
+      "seed": [
+        903,
+        155
+      ],
+      "bbox": [
+        774,
+        103,
+        925,
+        212
+      ],
+      "core_pixels": 6215,
+      "removed_pixels": 7015
+    },
+    {
+      "seed": [
+        312,
+        125
+      ],
+      "bbox": [
+        304,
+        115,
+        328,
+        136
+      ],
+      "core_pixels": 299,
+      "removed_pixels": 396
+    },
+    {
+      "seed": [
+        353,
+        156
+      ],
+      "bbox": [
+        341,
+        115,
+        419,
+        199
+      ],
+      "core_pixels": 3301,
+      "removed_pixels": 3544
+    },
+    {
+      "seed": [
+        670,
+        144
+      ],
+      "bbox": [
+        665,
+        133,
+        695,
+        159
+      ],
+      "core_pixels": 294,
+      "removed_pixels": 404
+    },
+    {
+      "seed": [
+        336,
+        162
+      ],
+      "bbox": [
+        328,
+        142,
+        354,
+        177
+      ],
+      "core_pixels": 303,
+      "removed_pixels": 403
+    },
+    {
+      "seed": [
+        662,
+        157
+      ],
+      "bbox": [
+        639,
+        147,
+        671,
+        170
+      ],
+      "core_pixels": 322,
+      "removed_pixels": 394
+    },
+    {
+      "seed": [
+        736,
+        192
+      ],
+      "bbox": [
+        703,
+        149,
+        745,
+        226
+      ],
+      "core_pixels": 1400,
+      "removed_pixels": 1698
+    },
+    {
+      "seed": [
+        352,
+        188
+      ],
+      "bbox": [
+        329,
+        170,
+        354,
+        202
+      ],
+      "core_pixels": 323,
+      "removed_pixels": 438
+    },
+    {
+      "seed": [
+        711,
+        227
+      ],
+      "bbox": [
+        593,
+        179,
+        727,
+        288
+      ],
+      "core_pixels": 4344,
+      "removed_pixels": 5220
+    },
+    {
+      "seed": [
+        370,
+        241
+      ],
+      "bbox": [
+        336,
+        210,
+        381,
+        289
+      ],
+      "core_pixels": 1657,
+      "removed_pixels": 1894
+    },
+    {
+      "seed": [
+        407,
+        228
+      ],
+      "bbox": [
+        403,
+        216,
+        440,
+        244
+      ],
+      "core_pixels": 540,
+      "removed_pixels": 635
+    },
+    {
+      "seed": [
+        454,
+        255
+      ],
+      "bbox": [
+        432,
+        232,
+        474,
+        279
+      ],
+      "core_pixels": 949,
+      "removed_pixels": 1075
+    },
+    {
+      "seed": [
+        892,
+        287
+      ],
+      "bbox": [
+        804,
+        232,
+        934,
+        369
+      ],
+      "core_pixels": 8611,
+      "removed_pixels": 9454
+    },
+    {
+      "seed": [
+        226,
+        274
+      ],
+      "bbox": [
+        142,
+        233,
+        254,
+        313
+      ],
+      "core_pixels": 4529,
+      "removed_pixels": 4971
+    },
+    {
+      "seed": [
+        306,
+        268
+      ],
+      "bbox": [
+        283,
+        234,
+        340,
+        291
+      ],
+      "core_pixels": 1535,
+      "removed_pixels": 1745
+    },
+    {
+      "seed": [
+        510,
+        276
+      ],
+      "bbox": [
+        468,
+        245,
+        516,
+        318
+      ],
+      "core_pixels": 1937,
+      "removed_pixels": 2174
+    },
+    {
+      "seed": [
+        384,
+        283
+      ],
+      "bbox": [
+        376,
+        257,
+        426,
+        305
+      ],
+      "core_pixels": 1131,
+      "removed_pixels": 1294
+    },
+    {
+      "seed": [
+        635,
+        286
+      ],
+      "bbox": [
+        612,
+        263,
+        655,
+        307
+      ],
+      "core_pixels": 732,
+      "removed_pixels": 937
+    },
+    {
+      "seed": [
+        464,
+        317
+      ],
+      "bbox": [
+        421,
+        282,
+        489,
+        355
+      ],
+      "core_pixels": 2035,
+      "removed_pixels": 2404
+    },
+    {
+      "seed": [
+        521,
+        305
+      ],
+      "bbox": [
+        510,
+        287,
+        528,
+        321
+      ],
+      "core_pixels": 344,
+      "removed_pixels": 452
+    },
+    {
+      "seed": [
+        953,
+        300
+      ],
+      "bbox": [
+        937,
+        287,
+        966,
+        315
+      ],
+      "core_pixels": 429,
+      "removed_pixels": 553
+    },
+    {
+      "seed": [
+        654,
+        316
+      ],
+      "bbox": [
+        634,
+        288,
+        681,
+        353
+      ],
+      "core_pixels": 1656,
+      "removed_pixels": 1836
+    },
+    {
+      "seed": [
+        782,
+        355
+      ],
+      "bbox": [
+        746,
+        289,
+        830,
+        416
+      ],
+      "core_pixels": 4774,
+      "removed_pixels": 5279
+    },
+    {
+      "seed": [
+        168,
+        360
+      ],
+      "bbox": [
+        135,
+        328,
+        226,
+        422
+      ],
+      "core_pixels": 2693,
+      "removed_pixels": 2970
+    },
+    {
+      "seed": [
+        555,
+        355
+      ],
+      "bbox": [
+        543,
+        340,
+        568,
+        377
+      ],
+      "core_pixels": 371,
+      "removed_pixels": 471
+    },
+    {
+      "seed": [
+        536,
+        361
+      ],
+      "bbox": [
+        512,
+        349,
+        539,
+        377
+      ],
+      "core_pixels": 445,
+      "removed_pixels": 581
+    },
+    {
+      "seed": [
+        969,
+        363
+      ],
+      "bbox": [
+        952,
+        350,
+        991,
+        378
+      ],
+      "core_pixels": 371,
+      "removed_pixels": 488
+    },
+    {
+      "seed": [
+        504,
+        446
+      ],
+      "bbox": [
+        319,
+        367,
+        517,
+        504
+      ],
+      "core_pixels": 9600,
+      "removed_pixels": 10871
+    }
+  ],
+  "source_rgb_preserved": true,
+  "remaining": "No blanket darkness deletion. Samara trunk hollows and lower root ambiguities preserved.",
+  "source_sha256": "0cde43db8c95b460fa3db78ed1af94140cf4f0a16fbd3b50f6fce8f10575729e",
+  "legacy_sha256": "53d2cf44d254f06d5c15731ce0c8c2590c53a75be918a85b9f1e75985288b26f",
+  "candidate_sha256": "9185f3f5cd41bc7bd614a1964178927daab8010236a938aaf4ce3bec87584348",
+  "alpha_sha256": "0a9f633923f0c0336795ce2c888f64286d5d69ad3203ed1033f25f2f139ac46d",
+  "removed": 80912,
+  "restored": 0,
+  "partial": 0
+}

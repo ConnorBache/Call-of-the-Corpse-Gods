@@ -43,15 +43,19 @@ pub fn summon(r: &mut Run, id: f64, target: f64) -> Result<bool, String> {
     child.heartless=a.heartless.clone();
     child.state=if a.state=="ally" {"ally"} else {"wandering"}.into();
     child.conditions.insert("queenSummoned".into(),1.0);
-    if matches!(r.simulation_revision.value_or(29.), 42. | 43. | 44. | 45. | 46. | 50. | 51.) {
+    if matches!(r.simulation_revision.value_or(29.), 42. | 43. | 44. | 45. | 46. | 50. | 51. | 52.) {
         crate::balance42::apply_new_actor_kind(&mut child, kind, 42.);
         crate::balance42::apply_new_actor_kind(&mut child, &format!("queen:{kind}"), 42.);
     }
+    crate::balance52::apply_new_actor_kind(&mut child, &format!("queen:{kind}"), r.depth, r.simulation_revision.value_or(29.));
+    let child_id=child.id;
     r.actors_at_mut(r.depth).push(child);
     let ready=r.tick+COOLDOWN;
     actor_mut_trusted(r,id).unwrap().conditions.insert("monsterSummonReadyAt".into(),ready);
     r.floor_mut().unwrap().dirty=true;
-    crate::events::actor_event(r,&a,"summon","Summon Saidribee",Some(crate::events::EventPoint{x,y}),None);
+    if crate::events::enabled(r) {
+        if let Some(child)=actor(r,child_id) {crate::animation_enemy::mark(r,child,"E66","summon-honey",crate::events::Stage::Special);}
+    } else {crate::events::actor_event(r,&a,"summon","Summon Saidribee",Some(crate::events::EventPoint{x,y}),None);}
     if crate::vision::visible_actor(r,&a) {
         crate::engine::log(r,format!("{} summons a Saidribee.",a.name),"enemy");
     }

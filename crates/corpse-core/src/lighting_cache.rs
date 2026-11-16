@@ -20,6 +20,8 @@ struct Dependencies {
     positive: Vec<PositiveSource>,
     dark: Vec<DarkSource>,
     potion_darkness: Vec<(usize,u64)>,
+    /// Semantic version is a dependency even when same-tick mask data is identical.
+    absolute_darkness: bool,
     /// Per-emitter optical LOS, excluding its own tile. Empty before R50.
     ring_light: Vec<(usize, Vec<bool>)>,
 }
@@ -92,7 +94,7 @@ impl Dependencies {
             ambient: (0..n).map(|i| f.lights.get(i).copied().unwrap_or(0.).to_bits()).collect(),
             opaque: (0..n).map(|i| matches!(f.tiles[i].as_str(), "wall" | "tree")
                 || crate::environment::blocks_sight(f, i)).collect(),
-            positive, dark, ring_light,
+            positive, dark, ring_light, absolute_darkness: crate::revision50_potions::absolute_darkness(r),
             potion_darkness: if crate::revision50::enabled(r) {f.revision50_darkness.as_ref().into_iter().flatten().filter(|d|d.expires_at>r.tick).map(|d|(d.cell,d.amount.to_bits())).collect()} else {Vec::new()} })
     }
 
@@ -164,6 +166,15 @@ impl Dependencies {
             if !excluding.is_empty() { excluding[i] += bonus; }
         }
         for v in values.iter_mut().chain(excluding.iter_mut()) { *v = v.clamp(-100., 100.); }
+        // O(D): final R52 override wins over every emitter, including additive
+        // rings and active-own-Shine exclusion. Original source buffers survive.
+        if self.absolute_darkness {
+            for &(cell,_) in &self.potion_darkness {
+                values[cell]=-100.;
+                if !excluding.is_empty() {excluding[cell]=-100.;}
+                if !ring_bonus.is_empty() {ring_bonus[cell]=0.;}
+            }
+        }
         LightField { width: self.width, height: self.height, values, excluding, owners, ring_bonus }
     }
 }
@@ -248,6 +259,7 @@ impl<'a> LightingProjection<'a> {
         self.fields[usize::from(dream)].as_ref().map_or(-100., |f| f.at(p))
     }
     /// O(1) additive ring light, also applied to Darkness Aura's absolute base.
+    /// R52 potion-covered cells report zero so the aura cannot bypass the mask.
     pub fn ring_bonus_in_plane(&self,p:Point,dream:bool)->f64 {
         self.fields[usize::from(dream)].as_ref().map_or(0.,|f|f.ring_bonus_at(p))
     }
@@ -296,7 +308,7 @@ mod exclusion_tests {
         for case in 0..48 {
             let mut d=Dependencies{width:11,height:11,
                 ambient:(0..121).map(|i|(-100.+((i*7+case)%211) as f64/1.25).to_bits()).collect(),
-                opaque:(0..121).map(|i|(i*13+case)%19==0).collect(),positive:vec![],dark:vec![],ring_light:vec![],potion_darkness:vec![]};
+                opaque:(0..121).map(|i|(i*13+case)%19==0).collect(),positive:vec![],dark:vec![],ring_light:vec![],potion_darkness:vec![],absolute_darkness:false};
             for j in 0..17 {
                 d.positive.push(PositiveSource{x:((j*3+case)%13) as i32-1,y:((j*7+case)%13) as i32-1,
                     power:(40.+((j*11+case)%101) as f64/1.5).to_bits(),fire:j%5==0,

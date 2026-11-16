@@ -29,7 +29,7 @@ pub fn willpower_duration(r: &Run, target: &Actor, duration: f64) -> f64 {
     if duration.is_finite() && duration > 0.
         && crate::revision50_rings::has_effect(r, target, crate::revision50_rings::WILLPOWER)
     {
-        (duration / 2.).ceil()
+        (duration * crate::revision50_rings::stack_multiplier(r, target, crate::revision50_rings::WILLPOWER, 0.5)).ceil()
     } else {
         duration
     }
@@ -80,6 +80,11 @@ pub fn apply_status(
         };
         if !reachable { return false; }
     }
+    let prior=actor(r,target).map_or(0.,|a|condition(a,key));
+    let curse_key=source.and_then(|id|crate::engine::actor_any(r,id)).and_then(|a| {
+        if a.abilities.iter().any(|s|s=="enemy:beast:bloodmancy") {Some("E04")}
+        else if a.abilities.iter().any(|s|s=="enemy:beast:witch") {Some("E08")} else {None}
+    });
     let Some(a) = actor_mut_trusted(r, target) else {
         return false;
     };
@@ -97,6 +102,8 @@ pub fn apply_status(
     } else {
         a.conditions.shift_remove(source_key);
     }
+    let a=a.clone();
+    if prior<=0. {if let Some(proposal)=curse_key {crate::animation_enemy::mark(r,&a,proposal,match key {"hemophilia"=>"split-ring-red","slowed"=>"bracket-blue",_=>"droplet-green"},crate::events::Stage::Special);}}
     r.floor_mut().expect("current floor").dirty = true;
     true
 }

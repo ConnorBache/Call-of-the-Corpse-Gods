@@ -96,7 +96,7 @@ fn revision50_preserves_latest_physical_profiles_without_new_retuning() {
 
 #[test]
 fn balance_admission_does_not_open_unimplemented_intermediate_revisions() {
-    for revision in [47.0, 48.0, 49.0, 52.0, 50.5, 51.5] {
+    for revision in [47.0, 48.0, 49.0, 53.0, 50.5, 51.5, 52.5] {
         let mut a = Actor { creature_kind: "rat".to_string().into(), ..Default::default() };
         a.stats.offense = 123.0; a.stats.dodge = 456.0;
         let before = a.clone();

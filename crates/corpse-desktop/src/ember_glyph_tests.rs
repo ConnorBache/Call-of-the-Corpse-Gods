@@ -28,7 +28,7 @@ fn ember_middle_dot_keeps_font_geometry_at_native_fractional_and_hidpi_sizes() {
                 let nw=p.native_x((100+w) as f64)-p.native_x(100.);
                 let nh=p.native_y((100+h) as f64)-p.native_y(100.);
                 let (_,actual)=p.identity_masks.iter().find(|(key,_)|key.0=="·"&&key.1==nw&&key.2==nh).unwrap();
-                let (dx,dy,mw,mh,mask)=actual;
+                let (dx,dy,mw,mh,mask,_)=actual;
                 let font=if ibm {&p.font} else {&p.fallback[0]};
                 let (metrics,expected)=font.rasterize('·',(17.*(nw as f64/15.).min(nh as f64/24.)) as f32);
                 assert_eq!((*mw,*mh),(metrics.width,metrics.height));
@@ -60,7 +60,7 @@ fn ember_dot_cache_clip_and_gpu_use_the_same_native_mask() {
     p.clip=None;p.gpu=Some(crate::gpu_render::Frame::default());
     p.map_identity_alpha("·",100,100,30,48,[255,255,255],1.);
     let frame=p.gpu.as_ref().unwrap();assert_eq!(frame.masks.len(),1);assert_eq!(frame.quads.len(),1);
-    let (_,(_,_,w,h,mask))=cache.iter().next().unwrap();
+    let (_,(_,_,w,h,mask,_))=cache.iter().next().unwrap();
     assert_eq!((frame.masks[0].width,frame.masks[0].height),(*w,*h));
     assert_eq!(&frame.masks[0].coverage,mask);
 }

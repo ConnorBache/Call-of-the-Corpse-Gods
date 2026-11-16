@@ -62,14 +62,25 @@ pub fn world_turn(r: &mut Run) -> Result<(), EngineError> {
         .filter(|a|!a.dead.value_or(false) && a.hp > 0. && crate::dreamwalking::physical(r,a)
             && sees(r,&source,a.x,a.y)).map(|a|a.id).collect();
     for g in r.ground_at_mut(r.depth) { if exposed.contains(&g.item.id.to_bits()) { bless(&mut g.item); } }
+    let blessed:Vec<_>=r.ground.get(&r.depth.to_string()).into_iter().flat_map(|g|g.iter()).filter(|g|exposed.contains(&g.item.id.to_bits())).map(|g|crate::events::EventPoint{x:g.x,y:g.y}).collect();
     if r.player.x >= 0. && crate::vision::visible(r,e.x as usize,e.y as usize) {
         engine::log(r,"The Epidite flashes with bright, cleansing light.","environment");
     }
-    crate::events::emit(r, crate::events::PresentationEvent {
+    if crate::events::enabled(r) {
+        // Exact physical LOS footprint, independent from which bodies survived
+        // the packet; central terrain admission clips to observed cells.
+        let f=r.floor().unwrap();let w=f.width();
+        let cells:Vec<_>=(0..f.tiles.len()).filter_map(|i| {
+            let (x,y)=((i%w)as f64,(i/w)as f64);
+            sees(r,&source,x,y).then_some(crate::events::EventPoint{x,y})
+        }).collect();
+        crate::events::at(r,"E77","wave-gold",crate::events::Stage::Special,&cells);
+    } else { crate::events::emit(r, crate::events::PresentationEvent {
         kind:"burst".into(), from:Some(crate::events::EventPoint{x:e.x,y:e.y}),
         to:crate::events::EventPoint{x:e.x,y:e.y}, glyph:Some("✧".into()),
         color:Some(PULSE_COLOR.into()), label:Some(PULSE_LABEL.into()), depth:r.depth,
-    });
+     animation: None, }); }
+    crate::events::at(r,"E77","diamond-gold",crate::events::Stage::Special,&blessed);
     for id in targets {
         if engine::actor(r,id).is_some_and(|a|!a.dead.value_or(false) && a.hp > 0.) {
             engine::damage_environment(r,id,DAMAGE,None,"epidite",true)?;

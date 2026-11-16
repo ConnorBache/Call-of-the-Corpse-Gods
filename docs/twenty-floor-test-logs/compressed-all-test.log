@@ -1,0 +1,38 @@
+    Blocking waiting for file lock on build directory
+warning: unnecessary parentheses around closure body
+   --> crates/corpse-core/src/revision50_control_amulets.rs:341:85
+    |
+341 | ...=engine::actor(r,id).filter(|a|(engine::condition(a,ROOTS)>0.||a.conditions.contains_key(ROOT_X))){crate::events::cue(r,a,"A10",...
+    |                                   ^                                                                ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+341 - pub fn break_roots(r:&mut Run,id:f64) {if let Some(a)=engine::actor(r,id).filter(|a|(engine::condition(a,ROOTS)>0.||a.conditions.contains_key(ROOT_X))){crate::events::cue(r,a,"A10","dissolve-root",crate::events::Stage::Special,&[a.into()]);}if let Some(a)=engine::actor_mut_trusted(r,id) {for k in [ROOTS,ROOT_X,ROOT_Y,ROOT_DEPTH,ROOT_SOURCE,tiers::ROOTS_DAMAGE] {a.conditions.shift_remove(k);}}}
+341 + pub fn break_roots(r:&mut Run,id:f64) {if let Some(a)=engine::actor(r,id).filter(|a|engine::condition(a,ROOTS)>0.||a.conditions.contains_key(ROOT_X)){crate::events::cue(r,a,"A10","dissolve-root",crate::events::Stage::Special,&[a.into()]);}if let Some(a)=engine::actor_mut_trusted(r,id) {for k in [ROOTS,ROOT_X,ROOT_Y,ROOT_DEPTH,ROOT_SOURCE,tiers::ROOTS_DAMAGE] {a.conditions.shift_remove(k);}}}
+    |
+
+warning: constant `COUNT_NAMES` is never used
+  --> crates/corpse-core/src/timing.rs:11:7
+   |
+11 | const COUNT_NAMES: [&str; 19] = ["profile_value", "profile_rgb", "profile_material", "hex_parse", "known_cells", "output_cells", "ac...
+   |       ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `corpse-core` (lib test) generated 2 warnings (run `cargo fix --lib -p corpse-core --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 03s
+     Running unittests src/lib.rs (target/debug/deps/corpse_core-e0a2afdaf33bbc0f)
+
+running 8 tests
+test fast_mode_tests::compressed_finale_travel_uses_twentieth_floor_without_extra_floor ... ok
+test inventory::heart_items::fast_reward_tests::compressed_sap_uses_actual_first_threshold_without_double_halving ... ok
+test inventory::heart_items::fast_reward_tests::compressed_rewards_halve_fast_blessings_but_keep_stat_multiplier ... ok
+test inventory::heart_items::fast_reward_tests::compressed_first_level_costs_one_and_following_thresholds_are_unchanged ... ok
+test profile::compressed_summary_tests::compressed_summary_uses_player_facing_depth_without_fast_badge ... ok
+test fast_mode_tests::compressed_route_has_twenty_floors_and_all_eight_milestones ... ok
+test fast_mode_tests::compressed_new_game_replays_seed_with_same_route_and_rewards ... ok
+test fast_mode_tests::compressed_generation_reaches_all_bosses_and_depth40_finale ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 826 filtered out; finished in 36.79s
+

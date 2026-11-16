@@ -126,6 +126,10 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
     if has(&a, "bloodmancy") {
         if phase % 2.0 == 0.0 {
             let pulled = pull_one(r, &a, &b)?;
+            if let Some(after)=actor(r,target) {
+                if after.x!=b.x || after.y!=b.y {crate::events::cue(r,after,"E04","root-crimson",crate::events::Stage::Special,&[(&b).into(),after.into()]);}
+                else if !pulled {crate::animation_enemy::mark(r,after,"E04","rejected-crimson",crate::events::Stage::Special);}
+            }
             let b = actor(r, target).unwrap_or(&b).clone();
             report(
                 r,
@@ -141,6 +145,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         } else {
             crate::monster_statuses::apply_curse(r, target, "hemophilia", 20.0, id);
             report(r, &a, &b, "curses its prey with hemophilia.");
+            if crate::events::enabled(r) {crate::events::actor_event(r,&a,"projectile","Hemophilia",Some((&b).into()),None);}
         }
         actor_mut_trusted(r, id)
             .unwrap()
@@ -220,8 +225,11 @@ pub fn heal_others(r: &mut Run, id: f64) -> Result<bool, String> {
         return Ok(false);
     }
     let owner = crate::half_here::owner_id(r, &b);
+    let heal_amount = crate::balance52::local_amount(r, &a, "monsterHealAmount", 25.);
     let recipient = actor_mut_trusted(r, owner).unwrap();
-    recipient.hp = (recipient.hp + 25.0).min(recipient.max_hp);
+    let before_hp=recipient.hp;
+    recipient.hp = (recipient.hp + heal_amount).min(recipient.max_hp);
+    let healed=recipient.hp>before_hp;
     crate::half_here::sync(r);
     let tick = r.tick;
     actor_mut_trusted(r, id)
@@ -230,7 +238,12 @@ pub fn heal_others(r: &mut Run, id: f64) -> Result<bool, String> {
         .insert("monsterHealReadyAt".into(), tick + 2.0);
     let b = actor(r, b.id).unwrap_or(&b).clone();
     report(r, &a, &b, "restores an injured companion.");
-    crate::events::actor_event(r, &a, "heal", "Healing", Some((&b).into()), None);
+    if crate::events::enabled(r) {
+        if healed {
+            crate::events::link(r,&a,&b,"E17","leaf-green",crate::events::Stage::Special);
+            crate::animation_enemy::mark(r,&b,"E17","stitch-green",crate::events::Stage::Health);
+        }
+    } else {crate::events::actor_event(r, &a, "heal", "Healing", Some((&b).into()), None);}
     Ok(true)
 }
 #[cfg(test)]

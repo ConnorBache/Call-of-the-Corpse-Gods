@@ -189,8 +189,8 @@ fn successful_escape_breaks_binding_root_only_failed_or_blocked_attempt_does_not
     for j in [i,i-1,other,other-1] {roots[j]=1.;}
     r.floor_mut().unwrap().roots=roots.into();
     r.floor_mut().unwrap().fungal_roots=vec![
-        FungalRoot{fungus_id:100.,corpse_id:101.,path:vec![(i-1)as f64,i as f64],active:true,color:"#00ff00".into()},
-        FungalRoot{fungus_id:200.,corpse_id:201.,path:vec![(other-1)as f64,other as f64],active:true,color:"#00ff00".into()},
+        FungalRoot{fungus_id:100.,corpse_id:101.,path:vec![(i-1)as f64,i as f64],active:true,color:"#00ff00".into(),growth:Field::Missing},
+        FungalRoot{fungus_id:200.,corpse_id:201.,path:vec![(other-1)as f64,other as f64],active:true,color:"#00ff00".into(),growth:Field::Missing},
     ].into();
     engine::move_actor(&mut r,p,1.,0.,false).unwrap();
     assert_eq!(r.player.x,20.);assert_eq!(r.floor().unwrap().roots.as_ref().unwrap()[i],1.);

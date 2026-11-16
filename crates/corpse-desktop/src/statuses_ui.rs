@@ -78,9 +78,12 @@ impl ConditionMeters {
         result
     }
 }
-pub fn hover_description(status: &Status) -> String {
+pub fn hover_description(revision: f64, status: &Status) -> String {
+    if revision >= 52. && status.name == "Fast" { return "Fast: can move two tiles per action, or move once then attack. Slowed suppresses the extra movement.".into(); }
+    if revision >= 52. && status.name == "Haste" { return format!("Haste: takes two complete actions per world turn. Slowed suppresses Haste.{}",
+        status.duration.map_or_else(String::new,|n|format!(" {n} turns remaining."))); }
     format!(
-        "{} · {}.",
+        "{} {}.",
         status.name,
         status.duration.map_or_else(
             || "ongoing".into(),
@@ -123,6 +126,15 @@ pub fn display_name(name:&str)->&str {
     }
 }
 
+/// One readable condition run; callers wrap the text to their available width.
+/// O(T) output for T displayed characters. Duration values stay visible.
+pub fn summary(statuses: &[Status]) -> String {
+    statuses.iter().map(|s| {
+        let name = display_name(&s.name);
+        s.duration.map_or_else(|| name.to_string(), |n| format!("{name} {n}"))
+    }).collect::<Vec<_>>().join(", ")
+}
+
 fn named(actor: &Actor, name: &str, active: bool) -> bool {
     let ids = if active {
         &actor.active
@@ -150,8 +162,13 @@ fn dream_craft(run: &Run) -> bool {
 /// deterministic detection, not pursuit state alone. O(N*D+A), N observers and
 /// D core detection-query cost (light/stat/LOS); no random draws or mutations.
 pub fn has_ongoing_haste(run: &Run, actor: &Actor) -> bool {
-    has(actor, "enemy:beast:fast")
-        || (has(actor, "enemy:beast:vampire") && condition(actor, "monsterVampireBat") > 0.)
+    corpse_core::revision52_swimming::grants_haste(run, actor)
+        || has_non_water_haste(run, actor)
+}
+/// Fixed Haste sources for knowledge-filtered route projections. Swimming is
+/// evaluated separately on the projected departure tile, not hidden live water.
+pub(crate) fn has_non_water_haste(run: &Run, actor: &Actor) -> bool {
+    (run.simulation_revision.value_or(29.) < 52. && corpse_core::ai::is_fast(actor))
         || named(actor, "Rushing Torrent", true)
         || (named(actor, "Sleep Walk", false) && actor.energy == 0.)
         || (named(actor, "Step Through Shadows", false)
@@ -312,7 +329,9 @@ pub fn observe(run: &Run, actor: &Actor) -> Vec<Status> {
         ("beastCooldown", "Special-action cooldown"),
     ];
     for (key, name) in TIMED {
-        let value = condition(actor, key);
+        let value = if key == "bleeding" && corpse_core::revision52_enemy_followups::enabled(run) {
+            condition(actor,key).max(condition(actor,corpse_core::revision52_enemy_followups::BLEED))
+        } else { condition(actor, key) };
         if value > 0. && !(key == "cameTurns" && player) {
             push(name, Some(value));
         }
@@ -354,6 +373,9 @@ pub fn observe(run: &Run, actor: &Actor) -> Vec<Status> {
             },
         );
     }
+    if run.simulation_revision.value_or(29.) >= 52. && corpse_core::ai::is_fast(actor) {
+        push("Fast", None);
+    }
     if is_hasted(run, actor) {
         push(
             "Haste",
@@ -383,14 +405,16 @@ pub fn observe(run: &Run, actor: &Actor) -> Vec<Status> {
         }
     }
     if condition(actor, "envenomed") > 0. {
-        let potency = actor
-            .conditions
-            .iter()
-            .filter(|(key, _)| key.starts_with("venom:"))
-            .map(|(_, value)| combat::damage_packet(run, actor, *value, "venom", false))
-            .fold(0., |sum, n| sum + n);
         if let Some(status) = out.iter_mut().find(|s| s.name == "Envenomed") {
-            status.name = format!("Envenomed: {potency} damage/turn");
+            if run.simulation_revision.value_or(29.0) >= 52.0 {
+                let severity: f64 = actor.conditions.iter().filter(|(key, _)| key.starts_with("venom:"))
+                    .map(|(_, value)| value.max(0.0)).sum();
+                status.name = format!("Envenomed {severity}");
+            } else {
+                let potency = actor.conditions.iter().filter(|(key, _)| key.starts_with("venom:"))
+                    .map(|(_, value)| combat::damage_packet(run, actor, *value, "venom", false)).fold(0.0, |sum, n| sum + n);
+                status.name = format!("Envenomed: {potency} damage/turn");
+            }
         }
     }
     if has(actor, "enemy:beast:rooted") {
@@ -457,6 +481,38 @@ mod tests {
     use corpse_core::Field;
     fn fixture() -> Run {
         serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap()
+    }
+    #[test]
+    fn revision52_swimming_haste_is_ongoing_read_only_and_matches_scheduler() {
+        let mut r=fixture();r.simulation_revision=52.0.into();
+        r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
+        r.inventory=vec![corpse_core::revision52_swimming::make_ring(900.)];
+        let at=r.player.y as usize*r.floor().unwrap().width()+r.player.x as usize;
+        for tile in ["floor","shallow-water","water"] {
+            r.floor_mut().unwrap().tiles[at]=tile.into();r.floor_mut().unwrap().ichor=Field::Missing;
+            for state in ["ordinary","slowed","flying"] {
+                r.player.conditions.clear();
+                if state!="ordinary" {r.player.conditions.insert(state.into(),3.);}
+                let before=serde_json::to_value(&r).unwrap();
+                let actual=observe(&r,&r.player);let hasted=tile!="floor"&&state=="ordinary";
+                assert_eq!(is_hasted(&r,&r.player),hasted);
+                assert_eq!(is_hasted(&r,&r.player),corpse_core::ai::is_hasted_in(&r,&r.player));
+                assert_eq!(actual.iter().find(|s|s.name=="Haste"),hasted.then_some(&Status{name:"Haste".into(),duration:None}));
+                assert_eq!(serde_json::to_value(&r).unwrap(),before);
+            }
+        }
+    }
+    #[test]
+    fn revision52_bleeding_meter_merges_wounds_without_exposing_keys() {
+        let mut r=fixture();r.simulation_revision=52.0.into();
+        for player in [false,true] {
+            let mut a=r.player.clone();a.id=if player {r.player.id}else{800.};a.conditions.clear();a.abilities.clear();a.active.clear();
+            a.conditions.insert("bleeding".into(),2.);a.conditions.insert("killspawnBleeding".into(),3.);
+            a.conditions.insert("killspawnBleed:3:801".into(),10.);
+            let statuses=observe(&r,&a);let bleeding:Vec<_>=statuses.iter().filter(|s|s.name=="Bleeding").collect();
+            assert_eq!(bleeding.len(),1);assert_eq!(bleeding[0].duration,Some(3.));
+            assert!(statuses.iter().all(|s|!s.name.contains("killspawn")&&!s.name.contains("801")));
+        }
     }
     #[test]
     fn source_185_observed_status_and_scheduler_cases() {
@@ -532,10 +588,12 @@ mod tests {
                 "{} ongoing",
                 case["name"]
             );
-            let hovers: Vec<_> = actual.iter().map(hover_description).collect();
+            let hovers: Vec<_> = actual.iter().map(|s| hover_description(run.simulation_revision.value_or(29.), s)).collect();
             assert_eq!(
                 serde_json::to_value(hovers).unwrap(),
-                case["hover"],
+                serde_json::to_value(case["hover"].as_array().unwrap().iter().map(|v|{
+                    let s=v.as_str().unwrap();s.rsplit_once(" · ").map_or_else(||s.to_owned(),|(a,b)|format!("{a} {b}"))
+                }).collect::<Vec<_>>()).unwrap(),
                 "{} hover",
                 case["name"]
             );
@@ -623,7 +681,7 @@ mod tests {
             r.player.conditions.insert("r50FireImmunity".into(),turns);
             let before=serde_json::to_vec(&r).unwrap();let statuses=observe(&r,&r.player);
             assert_eq!(statuses,vec![Status{name:"Fire Immunity".into(),duration:Some(turns)}]);
-            assert_eq!(hover_description(&statuses[0]),format!("Fire Immunity · {turns} turns remaining."));
+            assert_eq!(hover_description(r.simulation_revision.value_or(29.), &statuses[0]),format!("Fire Immunity {turns} turns remaining."));
             assert_eq!(serde_json::to_vec(&r).unwrap(),before);
         }
         r.player.conditions.insert("r50FireImmunity".into(),0.);assert!(observe(&r,&r.player).is_empty());
@@ -633,7 +691,7 @@ mod tests {
     #[test] fn compact_discord_retains_full_description_data() {
         let status=Status{name:"Discord: hostile to all".into(),duration:Some(6.)};
         assert_eq!(compact_meter_name(&status.name),Some("Discord"));
-        assert_eq!(hover_description(&status),"Discord: hostile to all · 6 turns remaining.");
+        assert_eq!(hover_description(50., &status),"Discord: hostile to all 6 turns remaining.");
         assert_eq!(compact_meter_name("Paralyzed"),None);
     }
     #[test] fn named_amulet_statuses_expose_only_names_and_remaining_turns() {
@@ -684,7 +742,7 @@ mod revision51_display_unit_tests {
         let before=run.clone();
         let player=observe(&run,&run.player);
         let hp=player.iter().find(|s|s.name=="HP +18").unwrap();
-        assert_eq!(hover_description(hp),"HP +18 · 7 turns remaining.");
+        assert_eq!(hover_description(run.simulation_revision.value_or(29.), hp),"HP +18 7 turns remaining.");
         assert!(player.iter().any(|s|s.name=="Damage +5"));
         let mut enemy=run.player.clone();enemy.id=98765.;
         enemy.conditions.insert("buff:defense".into(),-2.);
@@ -713,5 +771,63 @@ mod revision51_venom_tests {
         r.inventory.push(corpse_core::Item{id:800.,name:"Ring of Poison Resistance".into(),kind:"ring".into(),effect:corpse_core::revision50_rings::POISON_RESISTANCE.to_string().into(),..Default::default()});
         r.player.conditions.insert("envenomed".into(),2.);r.player.conditions.insert("venom:1".into(),2.9);r.player.conditions.insert("venom:2".into(),2.9);
         let before=r.clone();assert!(observe(&r,&r.player).iter().any(|s|s.name=="Envenomed: 2 damage/turn"));assert_eq!(r,before);
+    }
+}
+
+#[cfg(test)]
+mod revision52_speed_tests {
+    use super::*;
+    #[test]
+    fn speed_hover_copy_is_revision_gated() {
+        for revision in [29., 48., 51.] {
+            for (duration, expected) in [
+                (None, "Haste ongoing."),
+                (Some(1.), "Haste 1 turn remaining."),
+                (Some(5.), "Haste 5 turns remaining."),
+            ] {
+                assert_eq!(hover_description(revision, &Status { name: "Haste".into(), duration }), expected);
+            }
+            assert_eq!(hover_description(revision, &Status { name: "Fast".into(), duration: None }), "Fast ongoing.");
+        }
+        assert_eq!(hover_description(52., &Status { name: "Haste".into(), duration: None }),
+            "Haste: takes two complete actions per world turn. Slowed suppresses Haste.");
+        assert_eq!(hover_description(52., &Status { name: "Haste".into(), duration: Some(5.) }),
+            "Haste: takes two complete actions per world turn. Slowed suppresses Haste. 5 turns remaining.");
+        assert_eq!(hover_description(52., &Status { name: "Fast".into(), duration: None }),
+            "Fast: can move two tiles per action, or move once then attack. Slowed suppresses the extra movement.");
+    }
+    #[test]
+    fn fast_is_distinct_from_haste_without_mutating_observed_actor() {
+        for revision in [51.,52.] {let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=revision.into();let mut a=corpse_core::population::create_actor_revision("cave-bat",800.,10.,10.,false,revision).unwrap();
+            for hasted in [false,true] {a.conditions.insert("hasted".into(),if hasted{5.}else{0.});let before=r.clone();let old=a.clone();let statuses=observe(&r,&a);assert_eq!(statuses.iter().any(|s|s.name=="Fast"),revision>=52.);assert_eq!(statuses.iter().any(|s|s.name=="Haste"),revision<52.||hasted);assert_eq!(r,before);assert_eq!(a,old);}
+        }
+        assert!(hover_description(52., &Status{name:"Fast".into(),duration:None}).contains("then attack"));
+        assert!(hover_description(52., &Status{name:"Haste".into(),duration:Some(5.)}).contains("two complete actions"));
+    }
+}
+
+#[cfg(test)] mod compact_duration_format_tests {
+    use super::*;
+    #[test] fn plain_numbers_preserve_status_duration_and_severity(){
+        let statuses=vec![Status{name:"Burning".into(),duration:Some(1.)},Status{name:"Envenomed 2".into(),duration:Some(7.)},Status{name:"Flying".into(),duration:None}];
+        assert_eq!(summary(&statuses),"Burning 1, Envenomed 2 7, Flying");
+        assert_eq!(hover_description(52.,&statuses[0]),"Burning 1 turn remaining.");
+    }
+}
+
+#[cfg(test)]
+mod revision52_venom_tests {
+    use super::*;
+    #[test]
+    fn severity_label_preserves_shared_duration_and_does_not_apply_resistance() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.player.conditions.clear();r.player.conditions.insert("envenomed".into(),5.);
+        r.player.conditions.insert("venom:20:7".into(),2.);
+        r.inventory.push(corpse_core::Item{id:800.,name:"Ring of Poison Resistance".into(),kind:"ring".into(),effect:corpse_core::revision50_rings::POISON_RESISTANCE.to_string().into(),..Default::default()});
+        let before=r.clone();
+        assert!(observe(&r,&r.player).iter().any(|s|s.name=="Envenomed 2" && s.duration==Some(5.)));
+        assert_eq!(r,before);
+        r.player.conditions.insert("venom:20:7".into(),1.);
+        assert!(observe(&r,&r.player).iter().any(|s|s.name=="Envenomed 1"));
     }
 }

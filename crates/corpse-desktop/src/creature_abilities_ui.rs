@@ -580,7 +580,7 @@ fn detailed_enemy(r: &Run, a: &Actor, e: &Enemy) -> String {
         format!("; {}", limits.join("; "))
     };
     if half_here::is_clone(a) && needs_ai {
-        format!("A creature acting independently could {}{limit}. This body cannot use that power independently.",uninflect(&effect))
+        format!("A creature acting independently could {}{limit}.",uninflect(&effect))
     } else {
         format!("It {}.", trim(&(effect + &limit)))
     }
@@ -959,21 +959,28 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
             .filter(|_|r.simulation_revision.value_or(29.)>=50.) {
             let toggle=d.flags.iter().any(|flag|flag=="toggle");
             let state=if toggle {if source.active.contains(id) {" (active)"} else {" (inactive)"}} else {""};
-            let reserve=crate::ability_ui::actor_reserve_summary(source,id)
-                .map(|s|format!(" {s}." )).unwrap_or_default();
-            parts.push(if compact {format!("{}{state}.{reserve}",d.name)} else {format!("{}{state}: {}{reserve}",d.name,d.description)});
+            let reserve=if d.name == "Hanged" { String::new() } else { crate::ability_ui::actor_reserve_summary_for_revision(source,id,r.simulation_revision.value_or(29.))
+                .map(|s|format!(" {s}." )).unwrap_or_default() };
+            let description = if r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender" {
+                crate::ability_ui::display_description(r, id, &d.description)
+            } else { d.description.as_str() };
+            parts.push(if compact {format!("{}{state}.{reserve}",d.name)} else {format!("{}{state}: {description}{reserve}",d.name)});
             divine_actions |= d.flags.iter().any(|flag|matches!(flag.as_str(),"toggle"|"activate"|"target"|"action"));
         } else if let Some(e) = meta(id) {
             if !applies(source, id, &idset) {
                 continue;
             }
             actions |= !e.passive;
-            parts.push(if corpse_core::fungi::hallucination_emitter(r, source) && id == "enemy:beast:fungal-gas" {
+            parts.push(if id == "enemy:beast:fast" && r.simulation_revision.value_or(29.)>=52. {
+                "Fast: can move two tiles per action, or move once then attack. This is not Haste.".into()
+            } else if id == "enemy:beast:fungal-gas" && r.simulation_revision.value_or(29.) >= 52. {
+                format!("Continually emits {} gas. Roots grow along a direct route toward visible corpses within 10 tiles, one tile every 3 normal turns. Once roots reach a corpse, they feed on it, preventing its revival and increasing gas output.", corpse_core::fungi::emission(r, source).0)
+            } else if corpse_core::fungi::hallucination_emitter(r, source) && id == "enemy:beast:fungal-gas" {
                 "Continually emits hallucinogenic gas. Roots feed on visible corpses within 10 tiles, preventing their revival. Each connected corpse increases its gas output.".into()
             } else if r.simulation_revision.value_or(29.) >= 33. && source.name.starts_with("Greater ") && matches!(id.as_str(),"enemy:pale:breath"|"enemy:pale:breath-boost") {
                 if id=="enemy:pale:breath" {"Continually emits hallucinogenic gas.".into()} else {"Exhales an additional hallucinogenic cloud for 10 Energy.".into()}
             } else if r.simulation_revision.value_or(29.) >= 33. && id == "enemy:pale:scream" {
-                format!("Disorients foes within 10 tiles for 5 turns: -{} Accuracy. Allies retain the existing Damage and Perception boosts. Costs 15 Energy.", if source.name.starts_with("Greater ") {10} else {5})
+                format!("Disorients foes within 10 tiles for 5 turns: -{} Accuracy. Costs 15 Energy.", if source.name.starts_with("Greater ") {10} else {5})
             } else if compact {
                 compact_enemy(source, e)
             } else {
@@ -1005,7 +1012,7 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
             parts.push("Disguises itself as a much shallower creature beyond two grid squares of an observing player body. Nearer bodies reveal its true form; combat statistics remain unchanged.".into());
         }
         if source.name.starts_with("Greater ") && source.abilities.iter().any(|s|s=="enemy:pale:breath") {
-            parts.push("It emits hallucinogenic gas instead of caustic gas. Exposure refreshes Hallucinating to 2 turns while exposed, changing only perceived creature identities.".into());
+            parts.push("Exposure refreshes Hallucinating to 2 turns while exposed, changing only perceived creature identities.".into());
         }
     }
     if parts.is_empty() {
@@ -1113,11 +1120,53 @@ pub fn describe(r: &Run, a: &Actor) -> (String, String) {
     let current = |value:String| if r.simulation_revision.value_or(29.)>=50. {
         value.replace("Bastidion","Corpse Fungus").replace("Breather","Gasser").replace("Biter","Chomper")
     } else {value};
-    (current(text(r, a, true)), current(text(r, a, false)))
+    let mut compact = current(text(r, a, true));
+    let mut details = current(text(r, a, false));
+
+    if corpse_core::revision52_enemy_followups::enabled(r) {
+        let species = |kind| corpse_core::revision52_enemy_followups::species(a,kind);
+        let extra = if species("dragon") { Some((
+            "Takes flight for a faster safe route (8 NRG).",
+            "Takes flight for up to 6 turns when it offers a faster route to safe ground (8 NRG).")) }
+            else if species("blorb") { Some(("Melee hits add 1 caustic damage.","Damaging melee hits add 1 caustic damage before protection.")) }
+            else if species("killspawn") { Some(("Melee hits cause deep bleeding.","Damaging melee hits add half their damage as bleeding over 3 turns. Wounds add together.")) }
+            else {None};
+        if let Some((short,long)) = extra {
+            if !compact.is_empty() {compact.push(' ');} compact.push_str(short);
+            if !details.is_empty() {details.push(' ');} details.push_str(long);
+        }
+    }
+    (crate::ability_ui::display_text(&compact).into_owned(), crate::ability_ui::display_text(&details).into_owned())
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn scream_copy_omits_approved_ally_recap_without_mutation() {
+        for revision in [33., 52.] {
+            let r = corpse_core::startup::new_run_shell_revision("0-5-11:scream-copy", "Unblessed", false, revision).unwrap();
+            for (name, accuracy) in [("Screamer", 5), ("Greater Screamer", 10)] {
+                let a = Actor { id: 999., name: name.into(), abilities: vec!["enemy:pale:scream".into()], ..Default::default() };
+                let before_run = r.clone(); let before_actor = a.clone();
+                let (compact, details) = describe(&r, &a);
+                let expected = format!("Disorients foes within 10 tiles for 5 turns: -{accuracy} Accuracy. Costs 15 Energy.");
+                for text in [compact, details] {
+                    assert!(text.contains(&expected), "{text}");
+                    assert!(!text.contains("Allies retain the existing"), "{text}");
+                }
+                assert_eq!(r, before_run); assert_eq!(a, before_actor);
+            }
+        }
+    }
+    #[test]
+    fn revision52_followup_copy_is_revision_scoped() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        for (kind,needle) in [("dragon","8 NRG"),("blorb","1 caustic"),("killspawn","3 turns")] {
+            let a=corpse_core::population::create_actor_revision(kind,800.,1.,1.,false,51.).unwrap();
+            r.simulation_revision=51.0.into();assert!(!describe(&r,&a).1.contains(needle));
+            r.simulation_revision=52.0.into();assert!(describe(&r,&a).1.contains(needle));
+        }
+    }
     #[test]
     fn shine_suppression_status_preserves_legacy_wording_without_mutation() {
         for revision in [45., 46.] { for enabled in [false, true] {
@@ -1220,6 +1269,18 @@ mod tests {
         }
     }
     #[test]
+    fn revision52_fungal_copy_states_slow_contact_dependent_roots() {
+        let mut r: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        let a=corpse_core::population::create_actor_revision("bastidion",1000.,1.,1.,false,52.).unwrap();
+        for copy in [describe(&r,&a).0,describe(&r,&a).1] {
+            assert!(copy.contains("one tile every 3 normal turns"));assert!(copy.contains("Once roots reach a corpse"));
+            assert!(copy.contains("hallucinogenic gas"));
+        }
+        r.simulation_revision=51.0.into();assert!(!describe(&r,&a).1.contains("3 normal turns"));
+    }
+
+    #[test]
     fn revision50_bastidion_copy_names_fixed_gas_without_removing_enemy_cooldowns() {
         let mut r: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         r.simulation_revision=50.0.into();
@@ -1271,5 +1332,16 @@ mod revision51_ichor_fire_tests {
             assert!(entry.mechanics.iter().any(|m| m.name == "Fire Immunity"
                 && m.text == "Immune to fire and burning."));
         }
+    }
+}
+
+#[cfg(test)]
+mod revision52_fast_copy_tests {
+    use super::*;
+    #[test]
+    fn observed_fast_trait_explains_move_then_attack_and_preserves_legacy_copy() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let a=corpse_core::population::create_actor_revision("cave-bat",800.,10.,10.,false,52.).unwrap();
+        for revision in [51.,52.] {r.simulation_revision=revision.into();let before=r.clone();let (short,long)=describe(&r,&a);for text in [short,long] {assert_eq!(text.contains("move once then attack"),revision>=52.);}assert_eq!(r,before);}
     }
 }

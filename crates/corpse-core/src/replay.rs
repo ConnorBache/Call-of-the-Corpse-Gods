@@ -11,8 +11,14 @@ pub struct ReplayRecord {
     pub revert_policy: Field<String>,
     #[serde(default, skip_serializing_if = "Field::is_missing")]
     pub snapshot_from: Field<usize>,
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub firebolt_travel_from: Field<usize>,
     pub seed: String,
     pub mode: String,
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub fast_mode: Field<bool>,
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub compressed_depths: Field<bool>,
     #[serde(default)]
     pub dev: bool,
     pub commands: Vec<Command>,
@@ -37,8 +43,11 @@ impl ReplayRecord {
             version: 2.0,
             revert_policy: Field::Value(match run.replay_snapshot_from {Field::Missing=>"legacy",Field::Value(0)=>"snapshot",Field::Value(_)=>"legacy",Field::Null=>"unknown"}.into()),
             snapshot_from: match run.replay_snapshot_from {Field::Value(n) if n>0=>Field::Value(n),_=>Field::Missing},
+            firebolt_travel_from: match run.firebolt_travel_from { Field::Value(n) => n.into(), _ => Field::Missing },
             seed: run.seed.clone(),
             mode: run.mode.clone(),
+            fast_mode: run.fast_mode.clone(),
+            compressed_depths: run.compressed_depths.clone(),
             dev: run.dev,
             commands: run.replay.clone(),
             simulation_revision: run.simulation_revision.clone(),
@@ -55,6 +64,12 @@ impl ReplayRecord {
     }
     /// O(1) policy/schema checks. Boundary is a command INDEX, not game tick.
     fn validate_policy(&self)->Result<(),StorageError> {
+        if matches!(self.compressed_depths, Field::Null) || self.compressed_depths.value_or(false) && !self.fast_mode.value_or(false) { return Err(StorageError("Invalid dungeon route".into())); }
+        if matches!(self.fast_mode, Field::Null) || self.fast_mode.value_or(false) && (self.simulation_revision.as_ref() != Some(&52.) || self.mode != "Avatar" || self.dev || !self.playtest.is_missing()) { return Err(StorageError("Unsupported Fast mode replay configuration".into())); }
+        if !self.firebolt_travel_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.firebolt_travel_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Invalid Firebolt travel replay boundary".into()));
+        }
         let valid=if self.version==1.0 {self.revert_policy.is_missing()&&self.snapshot_from.is_missing()}
         else if self.version==2.0 {match self.revert_policy.as_ref().map(String::as_str) {
             Some("snapshot")=>self.snapshot_from.is_missing(),
@@ -65,6 +80,7 @@ impl ReplayRecord {
     }
     /// O(1), configure only at start or the single legacy-to-snapshot boundary.
     fn apply_policy(&self,engine:&mut Engine,cursor:usize) {
+        crate::firebolt_travel::apply_replay_policy(&mut engine.run, &self.firebolt_travel_from, cursor);
         if cursor==0 {engine.set_legacy_revert(self.version==1.0||self.revert_policy.as_ref().map(String::as_str)==Some("legacy"));}
         if self.version==2.0&&self.snapshot_from.as_ref()==Some(&cursor) {engine.set_legacy_revert(false);}
     }
@@ -80,7 +96,7 @@ impl ReplaySession {
     /// O(initial world generation/import), plus O(1) policy admission.
     pub fn create(record: ReplayRecord, require_revision: bool) -> Result<Self, StorageError> {
         if (require_revision || !record.simulation_revision.is_missing())
-            && !matches!(record.simulation_revision.as_ref(), Some(29.0 | 30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0))
+            && !matches!(record.simulation_revision.as_ref(), Some(29.0 | 30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0))
         {
             return Err(StorageError("This replay requires its original game build: simulation revision is missing or incompatible".into()));
         }
@@ -89,8 +105,9 @@ impl ReplaySession {
         {
             return Err(StorageError("Unsupported replay".into()));
         }
-        let initial = create_initial(&record)
+        let mut initial = create_initial(&record)
         .map_err(StorageError)?;
+        crate::firebolt_travel::apply_replay_policy(&mut initial, &record.firebolt_travel_from, 0);
         let mut engine=Engine::new(initial.clone())?;
         record.apply_policy(&mut engine,0);
         Ok(Self {
@@ -103,19 +120,22 @@ impl ReplaySession {
     }
 
     /// O(initial world clone/validation/history import), O(1) policy admission.
-    pub fn from_initial(initial: Run, record: ReplayRecord) -> Result<Self, StorageError> {
+    pub fn from_initial(mut initial: Run, record: ReplayRecord) -> Result<Self, StorageError> {
         record.validate_policy()?;
         if record.simulation_revision != initial.simulation_revision
-            || !matches!(record.simulation_revision.as_ref(), Some(29.0 | 30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0))
+            || !matches!(record.simulation_revision.as_ref(), Some(29.0 | 30.0 | 31.0 | 32.0 | 33.0 | 34.0 | 35.0 | 36.0 | 37.0 | 38.0 | 39.0 | 40.0 | 41.0 | 42.0 | 43.0 | 44.0 | 45.0 | 46.0 | 50.0 | 51.0 | 52.0))
             || record.seed != initial.seed
             || record.mode != initial.mode
+            || record.fast_mode.value_or(false) != crate::fast_mode::enabled(&initial)
+            || record.compressed_depths.value_or(false) != crate::fast_mode::compressed(&initial)
             || record.dev != initial.dev
             || record.playtest != initial.playtest
         {
             return Err(StorageError(
-                "Replay requires matching initial fixture and simulation revision 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 50 or 51".into(),
+                "Replay requires matching initial fixture and simulation revision 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 50, 51 or 52".into(),
             ));
         }
+        crate::firebolt_travel::apply_replay_policy(&mut initial, &record.firebolt_travel_from, 0);
         let mut engine=Engine::new(initial.clone())?;
         record.apply_policy(&mut engine,0);
         Ok(Self {
@@ -141,7 +161,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.snapshot_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor);}
+        if self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor);}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -154,7 +174,9 @@ impl ReplaySession {
             .map_err(StorageError)?;
         }
         self.record.validate_policy()?;
-        self.engine = Engine::new(self.initial.clone())?;
+        let mut initial = self.initial.clone();
+        crate::firebolt_travel::apply_replay_policy(&mut initial, &self.record.firebolt_travel_from, 0);
+        self.engine = Engine::new(initial)?;
         self.record.apply_policy(&mut self.engine,0);
         self.cursor = 0;
         Ok(())
@@ -162,6 +184,8 @@ impl ReplaySession {
 }
 
 fn create_initial(record: &ReplayRecord) -> Result<Run, String> {
+    if record.compressed_depths.value_or(false) { return crate::startup::create_avatar_run(&record.seed); }
+    if record.fast_mode.value_or(false) { return crate::startup::create_avatar_run_fast(&record.seed); }
     if let Some(p) = record.playtest.as_ref() {
         if p.version == 2 {return Err("DEBUG loadout edits are not command-ledger replayable; use the saved session instead.".into());}
         let run = crate::playtest::create_run_revision(&record.seed, &record.mode, record.dev, p.start_floor, &p.profile, record.simulation_revision.value_or(29.))?;

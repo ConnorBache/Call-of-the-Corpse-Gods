@@ -125,7 +125,7 @@
     "id": "pelian-relentless-pursuit",
     "godId": 1,
     "name": "Relentless Pursuit",
-    "description": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.\n\nImplementation: The path follows the moving target, routes around obstacles when possible, and may pass through another enemy only when the target would otherwise be inaccessible.",
+    "description": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.",
     "effectSummary": "Activate for 10 energy to draw a path from you to the targeted enemy. If you follow that path, you can move again every turn.",
     "flags": [
       "target"
@@ -159,8 +159,8 @@
     "id": "isheilah-make-slippery",
     "godId": 2,
     "name": "Make Slippery",
-    "description": "Select an enemy, when they try to move, they don't and you spend 8 energy.",
-    "effectSummary": "Select an enemy, when they try to move, they don't and you spend 8 energy.",
+    "description": "Select an enemy; when they try to move, they don't and you spend 8 energy.",
+    "effectSummary": "Select an enemy; when they try to move, they don't and you spend 8 energy.",
     "flags": [
       "toggle",
       "target"
@@ -171,8 +171,8 @@
     "id": "isheilah-quick-hand",
     "godId": 2,
     "name": "Quick Hand",
-    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
-    "effectSummary": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
+    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn.",
+    "effectSummary": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn.",
     "flags": [
       "passive",
       "toggle"
@@ -451,8 +451,8 @@
     "id": "lichor-blood-weapon",
     "godId": 6,
     "name": "Blood Weapon",
-    "description": "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
-    "effectSummary": "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
+    "description": "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
+    "effectSummary": "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
     "flags": [
       "activate"
     ],
@@ -632,8 +632,8 @@
     "id": "anavani-nova",
     "godId": 9,
     "name": "Nova",
-    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
-    "effectSummary": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
+    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
+    "effectSummary": "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
     "flags": [
       "passive",
       "toggle"
@@ -679,7 +679,7 @@
     "id": "kative-cogworks",
     "godId": 10,
     "name": "Cogworks",
-    "description": "This ability can be toggled to mode one, two or three, or activated.\n\nMode 1: When activated, create a 3x3 pit in an area not occupied by any creatures. Costs 20 energy.\n\nMode 2: When activated, create a 5x1 wall with 200 HP, oriented perpendicular to the direction thrown. Costs 20 energy.\n\nMode 3: Select a terrain modification you have made and remove it. Removing a terrain modification is free.\n\nImplementation: Preview the placement in the sight display; color both the pit and wall in Kative's colors. When an enemy tries to move through a wall, it attacks the wall instead.",
+    "description": "This ability can be toggled to mode one, two or three, or activated.\n\nMode 1: When activated, create a 3x3 pit in an area not occupied by any creatures. Costs 20 energy.\n\nMode 2: When activated, create a 5x1 wall with 200 HP, oriented perpendicular to the direction thrown. Costs 20 energy.\n\nMode 3: Select a terrain modification you have made and remove it. Removing a terrain modification is free.\n\nWhen an enemy tries to move through a wall, it attacks the wall instead.",
     "effectSummary": "This ability can be toggled to mode one, two or three, or activated.",
     "flags": [
       "target"
@@ -701,7 +701,7 @@
     "id": "kative-clay-army",
     "godId": 10,
     "name": "Clay Army",
-    "description": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.\n\nImplementation: Clay Soldiers are treated as unbreakable walls for pathfinding and collision.",
+    "description": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.",
     "effectSummary": "When activated, spend 20 energy and move one tile. Where you were standing becomes a Clay Soldier which will attack anyone who is adjacent to it at the end of a turn. A Clay Soldier copies your current attacks without abilities.",
     "flags": [
       "target"
@@ -712,8 +712,8 @@
     "id": "kative-appropriate",
     "godId": 10,
     "name": "Appropriate",
-    "description": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10, to a minimum of zero.",
-    "effectSummary": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10, to a minimum of zero.",
+    "description": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10.",
+    "effectSummary": "Increase the number of rings you can carry by 3 and the number of amulets you can carry by 3. Reduce energy costs from amulets by 10.",
     "flags": [
       "passive"
     ],
@@ -723,8 +723,8 @@
     "id": "kative-tinker",
     "godId": 10,
     "name": "Tinker",
-    "description": "Spend 100 energy to bless a ring or amulet with a random ability from a random god you do not embody. The ring or amulet retains its existing abilities as well as the new ability. The granted ability works while the item is carried; all carried rings and amulets are automatically active. Each item can be tinkered once; granted abilities never duplicate another generated item grant.",
-    "effectSummary": "Spend 100 energy to bless a ring or amulet with a random ability from a random god you do not embody. The ring or amulet retains its existing abilities as well as the new ability. The granted ability works while the item is carried; all carried rings and amulets are automatically active. Each item can be tinkered once; granted abilities never duplicate another generated item grant.",
+    "description": "Spend 100 energy to bless a ring or amulet with a random ability from a random god you do not embody. The ring or amulet retains its existing abilities as well as the new ability. Each item can be tinkered once; granted abilities never duplicate another generated item grant.",
+    "effectSummary": "Spend 100 energy to bless a ring or amulet with a random ability from a random god you do not embody. The ring or amulet retains its existing abilities as well as the new ability. Each item can be tinkered once; granted abilities never duplicate another generated item grant.",
     "flags": [
       "target"
     ],
@@ -801,8 +801,8 @@
     "id": "morae-all-seeing-eyes",
     "godId": 11,
     "name": "All-Seeing Eyes",
-    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
-    "effectSummary": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
+    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
+    "effectSummary": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
     "flags": [
       "activate"
     ],

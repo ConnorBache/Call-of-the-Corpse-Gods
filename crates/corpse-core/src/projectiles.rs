@@ -43,16 +43,22 @@ pub fn trace_committed(r:&mut Run,tx:f64,ty:f64)->Landing {let a=r.player.clone(
 /// Only launch sites call this after validation. Pure trace/hover/AI queries stop
 /// at random forks; a launched ray consumes RNG only for forks it actually enters.
 pub fn trace_committed_from_actor(r:&mut Run,a:&crate::Actor,tx:f64,ty:f64)->Landing {
- if r.simulation_revision.value_or(29.)<36.||!crate::dreamwalking::floor_for(r,a).is_some_and(|f|crate::non_euclidean_generation::has_links(f)){return trace_from_actor(r,a,tx,ty)}
- let mut state=crate::rng::to_u32(r.rng);
- let result=trace_plane_impl(r,a.x,a.y,tx,ty,Some(a),Some(&mut state));
- r.rng=state as f64;result
+ let mut points=Vec::new();
+ let result=if r.simulation_revision.value_or(29.)<36.||!crate::dreamwalking::floor_for(r,a).is_some_and(|f|crate::non_euclidean_generation::has_links(f)) {
+    trace_plane_impl(r,a.x,a.y,tx,ty,Some(a),None,Some(&mut points))
+ } else {
+    let mut state=crate::rng::to_u32(r.rng);
+    let result=trace_plane_impl(r,a.x,a.y,tx,ty,Some(a),Some(&mut state),Some(&mut points));
+    r.rng=state as f64;result
+ };
+ crate::events::committed_path(r,a,&points);result
 }
 fn trace_plane(r:&Run,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option<&crate::Actor>)->Landing {
- trace_plane_impl(r,source_x,source_y,tx,ty,origin,None)
+ trace_plane_impl(r,source_x,source_y,tx,ty,origin,None,None)
 }
-fn trace_plane_impl(r:&Run,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option<&crate::Actor>,mut random:Option<&mut u32>)->Landing {
+fn trace_plane_impl(r:&Run,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option<&crate::Actor>,mut random:Option<&mut u32>,mut capture:Option<&mut Vec<crate::movement::Point>>)->Landing {
     let (mut x, mut y) = (source_x, source_y);
+    if let Some(v)=capture.as_deref_mut(){v.push(crate::movement::Point{x:x as i32,y:y as i32});}
     let mut last = Landing {
         x,
         y,
@@ -64,7 +70,7 @@ fn trace_plane_impl(r:&Run,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option
     }
     let f = origin.and_then(|a|crate::dreamwalking::floor_for(r,a)).or_else(||r.floor()).unwrap();
     if crate::portals::enabled(r) {
-        return trace_spatial(r,f,source_x,source_y,tx,ty,origin,|options|random.as_deref_mut().map(|state|options[(crate::rng::next_u32(state) as f64/4294967296.*options.len() as f64).floor()as usize]));
+        return trace_spatial(r,f,source_x,source_y,tx,ty,origin,capture,|options|random.as_deref_mut().map(|state|options[(crate::rng::next_u32(state) as f64/4294967296.*options.len() as f64).floor()as usize]));
     }
     let (dx, dy) = ((tx - x).abs(), (ty - y).abs());
     let (sx, sy) = (
@@ -86,6 +92,7 @@ fn trace_plane_impl(r:&Run,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option
         {
             return last;
         }
+        if let Some(v)=capture.as_deref_mut(){v.push(crate::movement::Point{x:x as i32,y:y as i32});}
         last = Landing {
             x,
             y,
@@ -103,7 +110,7 @@ fn trace_plane_impl(r:&Run,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option
     last
 }
 
-fn trace_spatial(r:&Run,f:&crate::Floor,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option<&crate::Actor>,mut choose:impl FnMut(&[usize])->Option<usize>)->Landing {
+fn trace_spatial(r:&Run,f:&crate::Floor,source_x:f64,source_y:f64,tx:f64,ty:f64,origin:Option<&crate::Actor>,capture:Option<&mut Vec<crate::movement::Point>>,mut choose:impl FnMut(&[usize])->Option<usize>)->Landing {
  let mut last=Landing{x:source_x,y:source_y,actor_id:None,distance:Some(0.)};
 
         let from=crate::movement::Point{x:source_x as i32,y:source_y as i32};
@@ -120,6 +127,7 @@ fn trace_spatial(r:&Run,f:&crate::Floor,source_x:f64,source_y:f64,tx:f64,ty:f64,
             if options.len()==1{return Some(options[0])}
             choose(options)
         },|p|occupant(p).is_some());
+        if let Some(v)=capture{v.clear();v.extend(ray.points.iter().copied());}
         if let Some(p)=ray.points.last(){last=Landing{x:p.x as f64,y:p.y as f64,actor_id:if ray.points.len()>1||ray_from!=from{occupant(*p).map(|a|a.id)}else{None},distance:Some(ray.distance)};}
         return last;
 }
@@ -137,7 +145,7 @@ pub fn possible_shot_range(r:&Run,a:&crate::Actor,b:&crate::Actor,max_range:f64)
  let mut queue=std::collections::VecDeque::from([Vec::<usize>::new()]);
  for _ in 0..POSSIBLE_SHOT_BUDGET {
   let Some(prefix)=queue.pop_front()else{break};let mut at=0;let mut fork=None;
-  let p=trace_spatial(r,f,a.x,a.y,b.x,b.y,Some(a),|options|{
+  let p=trace_spatial(r,f,a.x,a.y,b.x,b.y,Some(a),None,|options|{
    if let Some(&choice)=prefix.get(at){at+=1;options.get(choice).copied()}else{fork=Some(options.len());None}
   });
   if p.actor_id==Some(b.id)&&p.distance.is_some_and(|d|d<=max_range){return p.distance}
@@ -150,6 +158,10 @@ pub fn is_bow(i: &Item) -> bool {
         && i.ranged_weapon
             .as_ref()
             .is_some_and(|s| matches!(s.as_str(), "bow" | "composite-bow"))
+}
+/// Live R52 accuracy policy for both bow types; older saves stay unchanged.
+pub fn normal_bow_accuracy(r: &Run, item: &Item) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && is_bow(item)
 }
 /// Pure shared throw preview/commit calculation. One effective-stat query and
 /// constant arithmetic; R51 reduces the fixed component, not bonuses or throw scaling.
@@ -166,10 +178,10 @@ pub fn player_throw_base_for_revision(item: &Item, offense: f64, revision: f64) 
     let one = item.kind == "weapon" && item.hands.value_or(0.0) == 1.0;
     let n = if one {
         crate::revision50_player_attack::fixed_damage_for_revision(revision, item.damage.value_or(0.0))
-            + item.enchantment.value_or(0.0)
-            + offense * item.offense_multiplier.value_or(1.0)
+            + item.enchantment.value_or(0.0) * if crate::combat::raw_attack_damage_enabled(revision) { 0.5 } else { 1.0 }
+            + offense * item.offense_multiplier.value_or(1.0) * if crate::combat::raw_attack_damage_enabled(revision) { 0.5 } else { 1.0 }
     } else {
-        offense
+        offense * if crate::combat::raw_attack_damage_enabled(revision) { 0.5 } else { 1.0 }
     };
     if !item.thrown.value_or(false) && one { n / 2.0 } else { n }
 }
@@ -301,14 +313,14 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
             }),
             Some(glyph(&arrow)),
         );
+        crate::events::projectile_item(r,arrow.id);
         let target = r
             .actors_at(depth)
             .iter()
             .find(|a| Some(a.id) == landing.actor_id && !a.dead.value_or(false) && a.hp > 0.0)
             .map(|a| a.id);
         let hit = if let Some(victim) = target {
-            let base = crate::engine::player_weapon_strike_base(r, &item);
-            crate::engine::attack_ranged_resolved(r, player, victim, base, range, 0.5, true)?
+            crate::engine::attack_bow_resolved(r, victim, &item, range)?
         } else {
             false
         };
@@ -358,6 +370,7 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
             .position(|i| i.id == id)
             .ok_or_else(|| EngineError("thrown item disappeared during attack".into()))?;
         let mut thrown = crate::inventory::take_one(r, index);
+        crate::events::projectile_item(r,thrown.id);
         thrown.equipped = Field::Missing;
         if shard && crate::dreamwalking::active(r) {thrown.dream_ground=true.into();}
         if let Some((_,x,y))=recovery {

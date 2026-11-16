@@ -44,7 +44,7 @@ fn revision50_jewelry_capture_five_carried_categories() {
     let before=serde_json::to_vec(&r).unwrap();let mut p=Painter::new();let pack=selected(&r,&mut p,903.);
     assert_eq!(pack.stamp.category_headers,vec!["Trinkets 1 · unlimited","Amulets 1/5","Rings 1/5","Potions 2/5","Hearts 1/5"]);
     assert_eq!(pack.display_order(),vec![901.,902.,903.,904.,905.]);
-    assert_eq!(pack.capacity_heading(),"Separate category limits");
+    assert!(pack.capacity_heading().is_empty());
     assert!(pack.section_positions().iter().all(|(_,y)|*y+24<=pack.layout.list.1+pack.layout.list.3));
     assert!(pack.groups.iter().filter(|g|matches!(g.item.kind.as_str(),"ring"|"amulet"))
         .all(|g|g.description.lines().nth(1)==Some(titlecase(&g.item.kind).as_str())
@@ -66,7 +66,10 @@ fn revision50_jewelry_capture_concise_ring_copy_and_long_grants() {
         assert!(pack.selected_group().unwrap().description.contains(fragment));
         paint_capture(&r,&mut p,&pack,name);
         if id==903. {
-            assert!(pack.detail_max_scroll()>0,"actual multi-grant description must scroll");
+            assert_eq!(pack.detail_max_scroll(),0,"grant names fit without duplicated ability prose");
+            let text=&pack.selected_group().unwrap().description;
+            for name in ["Execute","Appropriate","Implant Thought"] {assert!(text.contains(&format!("Grants {name}.")));}
+            assert!(!text.contains("energy costs from amulets by 10"));
             let Rect(x,y,_,_)=pack.layout.detail;pack.scroll(-1000,x+2,y+2);
             assert_eq!(pack.detail_scroll,pack.detail_max_scroll());
             paint_capture(&r,&mut p,&pack,"long-ring-bottom");

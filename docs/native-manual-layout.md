@@ -187,3 +187,11 @@ full authored description/history/form/ability/location reconstruction, every
 occupied art pixel's preservation, unchanged stat order, and pixels in protected
 header/navigation/footer regions. Full native/workspace and resized-render QA
 must be reported separately; successful compilation is not visual acceptance.
+
+## Continuous foreground colors — November 8, 2026
+
+The new [Bestiary continuous colors](bestiary-continuous-colors.md) entry supersedes
+the earlier threshold-based black/white and stepped-secondary contrast selection.
+It documents the requested smooth foreground/unread-marker gradients, fixed glyph
+keyline, continuous void field, exact complexity costs, and still-pending native
+verification. Original creature artwork and authored alpha remain unchanged.

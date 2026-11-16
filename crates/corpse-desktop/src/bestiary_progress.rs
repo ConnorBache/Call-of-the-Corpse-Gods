@@ -139,7 +139,7 @@ mod tests {
         view.creatures=vec![crate::render::Creature {
             perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,
             id:4.,name:"Admitted apparent actor".into(),glyph:"?".into(),color:[255;3],state:"wandering".into(),
-            distance:3.,hp:10.,max_hp:10.,energy:10.,max_energy:10.,statuses:vec![],meters:vec![],
+            distance:3.,hp:10.,max_hp:10.,energy:10.,max_energy:10.,uses_energy:false,statuses:vec![],meters:vec![],
         }];view
     }
     #[test]

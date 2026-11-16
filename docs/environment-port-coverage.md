@@ -69,3 +69,12 @@ Hidden-floor proxies commit the whole Arc-backed floor/actor/ground collections 
 Retained-source blasts expose `explode_with_source_snapshot`; they capture provenance before any victim callback, and never temporarily insert removed actors into occupancy. Default blasts also retain initial source identity. Damage/reaction callers must prefer live stable-ID relookup and use the retained source only when that endpoint no longer exists.
 
 Latest handoff dependencies: Dream Craft run-aware flight/contact conversion is owned by abilities/inventory, with engine/AI owned by combat. Body-only flight helper cannot prove equipped-Dream behavior until those callers and fixtures compose. New feature owners may expand explicit ownership gates after exact source tests; unsupported offscreen traits/actives and inactive shared-endpoint states continue to reject.
+
+## Revision 52 corpse-current follow-up
+
+Loose waking corpses now share normal-turn current physics through the separate
+corpse occupancy layer, with connected-root anchoring, exact inactive-floor
+catch-up and dead-body flight rejection. Ordinary item currents and immediate
+corpse/item placement falls are retained. See [implementation and scoped
+verification](revision52-corpse-currents.md); this supersedes the older stationary
+corpse assumption only for R52 corpses with current activity.

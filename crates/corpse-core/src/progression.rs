@@ -23,6 +23,22 @@ pub const WEAVE_DESCRIPTION: &str = "You can freely travel along your time weave
 /// Warm O(1); first revision41 use clones O(A + catalog text bytes), A=72.
 /// Old revisions return the original frozen catalog without altering its order.
 pub fn catalog_for_revision(revision: f64) -> &'static [Ability] {
+    if crate::hanged::enabled(revision) {
+        static R52: std::sync::OnceLock<Vec<Ability>> = std::sync::OnceLock::new();
+        return R52.get_or_init(|| {
+            let mut catalog = catalog_for_revision(50.).to_vec();
+            let a = catalog.iter_mut().find(|a| a.id == crate::hanged::ID).expect("Missed Me slot");
+            a.name = "Hanged".into();
+            a.description = crate::hanged::DESCRIPTION.into();
+            a.flags = vec!["passive".into()];
+            for a in &mut catalog {
+                if matches!(a.id.as_str(), "isheilah-quick-hand" | "isheilah-are-you-sure-about-that") {
+                    a.description = a.description.replace("Reactions refresh when you wait.", "Waiting restores 1 reaction, up to your maximum.");
+                }
+            }
+            catalog
+        });
+    }
     if revision >= 50.0 {
         static R50: std::sync::OnceLock<Vec<Ability>> = std::sync::OnceLock::new();
         return R50.get_or_init(|| serde_json::from_str(include_str!("../catalog/abilities-v50.json")).expect("revision 50 catalog"));
@@ -127,9 +143,14 @@ fn choose<'a>(pool: &[&'a Ability], owned: &[String], sample: f64) -> &'a Abilit
     }
     pool.last().unwrap()
 }
+/// O(1); the twenty-floor rules change only the first purchased level.
+pub fn level_up_cost(r: &Run) -> f64 {
+    if r.compressed_depths.value_or(false) && r.level == 1. { 1. }
+    else { 2.0f64.powf(r.level) }
+}
 /// O(A²) with fixed authored A=72; deterministic god/pool and RNG order.
 pub fn level_up(r: &mut Run) {
-    let cost = 2.0f64.powf(r.level);
+    let cost = level_up_cost(r);
     if r.exp < cost || !r.offers.is_empty() {
         return;
     }
@@ -142,7 +163,7 @@ pub fn level_up(r: &mut Run) {
     r.level += 1.0;
     if crate::revision50::enabled(r) {
         // Already validated above. Player energy is intentionally not refilled.
-        crate::revision50_ability_energy::refill_on_level_up(&mut r.player).unwrap();
+        crate::revision50_ability_energy::refill_on_level_up_for_revision(&mut r.player, r.simulation_revision.value_or(29.)).unwrap();
     }
     r.player.conditions.shift_remove("pelianUsed");
     r.player.conditions.insert("rageCost".into(), 0.0);
@@ -253,7 +274,7 @@ pub fn choose_offer(r: &mut Run, id: &str) -> Result<bool, crate::engine::Engine
             .find(|a| a.id == id)
             .ok_or_else(|| crate::engine::EngineError(format!("unknown ability {id}")))?;
         if crate::revision50::enabled(r) {
-            crate::revision50_ability_energy::acquire(&mut r.player, &[id.into()])
+            crate::revision50_ability_energy::acquire_for_revision(&mut r.player, &[id.into()], r.simulation_revision.value_or(29.))
                 .map_err(|e| crate::engine::EngineError(format!("Blessing acquisition: {e:?}")))?;
         }
         r.player
@@ -271,7 +292,7 @@ pub fn choose_offer(r: &mut Run, id: &str) -> Result<bool, crate::engine::Engine
         if !order.iter().any(|s| s == id) {
             order.push(id.into());
         }
-        initialize_ability_state(&mut r.player, id, r.tick).map_err(crate::engine::EngineError)?;
+        initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, id, r.tick).map_err(crate::engine::EngineError)?;
         crate::engine::log(r, format!("Learned {}.", a.name), "player");
     }
     r.offers.clear();
@@ -316,7 +337,10 @@ pub fn starter_abilities_for_revision(god_id: u32, revision: f64) -> Result<Vec<
 }
 /// Exact one-time acquisition metadata; catalog initialization is distinct from execution support.
 pub fn initialize_ability_state(actor: &mut Actor, id: &str, tick: f64) -> Result<(), String> {
-    let a = definition(id);
+    initialize_ability_state_for_revision(29., actor, id, tick)
+}
+pub fn initialize_ability_state_for_revision(revision: f64, actor: &mut Actor, id: &str, tick: f64) -> Result<(), String> {
+    let a = definition_for_revision(revision, id).or_else(|| definition(id));
     let owned = actor.abilities.clone();
     let order = actor.ability_order.get_or_insert_with(|| owned);
     if !order.iter().any(|s| s == id) {
@@ -338,18 +362,7 @@ pub fn initialize_ability_state(actor: &mut Actor, id: &str, tick: f64) -> Resul
                 .or_insert(tick + 100.0);
         }
         "Missed Me" | "Are You Sure About That?" | "Quick Hand" => {
-            let max = actor
-                .abilities
-                .iter()
-                .filter(|s| {
-                    matches!(
-                        s.as_str(),
-                        "isheilah-missed-me"
-                            | "isheilah-are-you-sure-about-that"
-                            | "isheilah-quick-hand"
-                    )
-                })
-                .count() as f64;
+            let max = crate::engine::max_reactions_for_revision(revision, actor);
             actor.reactions = (actor.reactions.value_or(0.0) + 1.0).min(max).into();
         }
         _ => {}

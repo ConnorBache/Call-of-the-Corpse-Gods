@@ -68,23 +68,30 @@ pub fn reference_depth(kind: &str) -> Option<f64> {
 }
 
 /// Apply once at a new-actor construction boundary, before damage, growth or buffs.
-/// O(T), T fixed tuning records; no RNG, reward, ability or spawn-policy mutation.
+/// O(T+R), fixed tuning and R52 profile scans; no RNG or spawn-policy mutation.
+/// R52 Jackals are explicitly born heartless.
 pub fn apply_new_actor(actor: &mut Actor, revision: f64) {
-    if ![31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0].contains(&revision) { return; }
+    if ![31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) { return; }
     let Some(kind) = actor.creature_kind.as_ref().cloned() else { return; };
     apply_new_actor_kind(actor, &kind, revision);
 }
 
 /// Explicit construction key supports legacy Pale templates without creatureKind.
-/// Identity, rewards, traits and saved actor representation remain unchanged.
+/// Existing identity and abilities remain unchanged; R52 Jackals are born heartless.
+/// R52 Dodge uses the exact type's first profile; saved actors are not visited.
 pub fn apply_new_actor_kind(actor: &mut Actor, kind: &str, revision: f64) {
     apply_legacy_new_actor_kind(actor, kind, revision);
     crate::accuracy_dodge::apply_new_actor_kind(actor, kind, revision);
     crate::balance42::apply_new_actor_kind(actor, kind, revision);
+    actor.stats.accuracy = crate::combat::creature_birth_accuracy(revision, actor.stats.accuracy);
+    actor.stats.dodge = crate::combat::creature_birth_dodge(revision,
+        crate::balance52::birth_dodge_offset(kind, revision, actor.stats.dodge));
+    if revision >= 52. && kind == "pale:Jackal" { actor.heartless = true.into(); }
+    crate::balance52::apply_new_actor_kind(actor, kind, 1., revision);
 }
 
 fn apply_legacy_new_actor_kind(actor: &mut Actor, kind: &str, revision: f64) {
-    if ![31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0].contains(&revision) { return; }
+    if ![31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) { return; }
     let Some(t) = tuning_revision(revision).iter().find(|t| t.kind == kind)
         .or_else(|| tuning().iter().find(|t| t.kind == kind)) else { return; };
     actor.stats.offense = t.offense;
@@ -104,9 +111,14 @@ fn apply_legacy_new_actor_kind(actor: &mut Actor, kind: &str, revision: f64) {
 }
 
 /// Fixed birth-only profiles, distinct from natural species. Existing identity,
-/// abilities, energy costs and rewards survive; actual actor stats are serialized.
-/// O(T) lookup once per child; no depth-dependent rescaling and no RNG.
+/// abilities and energy costs survive; R52 Jackals are explicitly heartless.
+/// O(T+R) fixed catalog scans per child; no RNG or existing-actor rescaling.
 pub fn apply_summoned_actor(actor: &mut Actor, parent_greater: bool, child_kind: &str, revision: f64) {
+    if revision == 52. {
+        // Summoning never creates a weaker/stronger numerical variant of a species.
+        apply_new_actor_kind(actor, child_kind, revision);
+        return;
+    }
     if revision < 32.0 { return; }
     static SUMMONED: OnceLock<Vec<PhysicalTuning>> = OnceLock::new();
     let rows = SUMMONED.get_or_init(|| serde_json::from_str(include_str!("catalog/summoned-balance-v32.json"))
@@ -128,4 +140,8 @@ pub fn apply_summoned_actor(actor: &mut Actor, parent_greater: bool, child_kind:
         if let Some(volume) = volume { actor.conditions.insert(key.into(), volume); }
     }
     crate::balance42::apply_new_actor_kind(actor, &key, revision);
+    actor.stats.accuracy = crate::combat::creature_birth_accuracy(revision, actor.stats.accuracy);
+    actor.stats.dodge = crate::combat::creature_birth_dodge(revision,
+        crate::balance52::birth_dodge_offset(&key, revision, actor.stats.dodge));
+    if revision >= 52. && child_kind == "pale:Jackal" { actor.heartless = true.into(); }
 }

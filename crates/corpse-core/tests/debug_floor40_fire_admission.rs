@@ -2,10 +2,9 @@
 //! All reconstruction choices are test policy, not changes to player loadouts.
 use corpse_core::{Command, debug_floor, storage, temporal::Engine};
 
-#[test]
-fn debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic() {
+fn verify_floor40_hellfire_entry(revision: f64) {
     for mode in ["Unblessed", "Avatar"] {
-        let run = debug_floor::create_run_revision("floor40-fire-review-2", mode, 40, 51.).unwrap();
+        let run = debug_floor::create_run_revision("floor40-fire-review-2", mode, 40, revision).unwrap();
         let mut original = Engine::new(run).unwrap();
         while let Some(id) = original.run.offers.first().cloned() {
             original.dispatch(&Command::Choose { id }).unwrap();
@@ -45,6 +44,16 @@ fn debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic() {
             resumed = Engine::load(&resumed.save().unwrap()).unwrap();
         }
     }
+}
+
+#[test]
+fn debug_floor40_hellfire_entry_turns_and_save_resume_remain_deterministic() {
+    verify_floor40_hellfire_entry(51.);
+}
+
+#[test]
+fn revision52_debug_floor40_hellfire_entry_and_tiered_loot_round_trip() {
+    verify_floor40_hellfire_entry(52.);
 }
 
 #[test]

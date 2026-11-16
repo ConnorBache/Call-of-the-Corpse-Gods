@@ -247,3 +247,39 @@ fn complete_physical_ascent_from_forty_reaches_the_door_before_wave() {
     assert!(e.run.collapse.as_ref().unwrap().waves.len()>1);
     Engine::load(&e.save().unwrap()).unwrap();
 }
+
+#[test]
+fn revision52_cardinal_first_then_diagonal_inclusive_is_solid_and_serialized() {
+    let mut r=world(); r.simulation_revision=52.0.into(); kill(&mut r);
+    let rng=r.rng;
+    pulse(&mut r,2.);
+    assert_eq!(count(&r,40),5);
+    assert!(finale::collapsed(&r,40.,4*79+5));
+    assert!(!finale::collapsed(&r,40.,5*79+5));
+    assert!(r.collapse.as_ref().unwrap().waves[0].diagonal_next);
+    let snapshot=Snapshot::capture(&r);
+    let mut restored=storage::deserialize(&storage::serialize(&r).unwrap()).unwrap();
+    pulse(&mut r,4.); pulse(&mut restored,4.);
+    assert_eq!(r.collapse,restored.collapse);
+    assert_eq!(count(&r,40),21);
+    for y in 3..=5 {for x in 3..=5 {assert!(finale::collapsed(&r,40.,y*79+x));}}
+    assert!(!finale::collapsed(&r,40.,6*79+6));
+    pulse(&mut r,6.); assert_eq!(count(&r,40),37);
+    assert_eq!(r.rng,rng);
+    snapshot.restore(&mut r).unwrap();
+    assert!(r.collapse.as_ref().unwrap().waves[0].diagonal_next);
+    pulse(&mut r,4.); assert_eq!(r.collapse,restored.collapse);
+}
+
+#[test]
+fn revision52_new_stair_seed_starts_cardinal_even_on_global_diagonal_pulse() {
+    let mut r=world(); r.simulation_revision=52.0.into();
+    Arc::make_mut(&mut r.floors[39]).tiles[80]="floor".into();
+    Arc::make_mut(&mut r.floors[39]).tiles[5*79+5]="up".into();
+    kill(&mut r); r.depth=20.;
+    pulse(&mut r,2.); assert_eq!(count(&r,39),0);
+    pulse(&mut r,4.); assert_eq!(count(&r,39),1);
+    assert!(!r.collapse.as_ref().unwrap().waves.iter().find(|w|w.depth==39).unwrap().diagonal_next);
+    pulse(&mut r,6.); assert_eq!(count(&r,39),5);
+    pulse(&mut r,8.); assert_eq!(count(&r,39),21);
+}

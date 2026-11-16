@@ -20,7 +20,7 @@ pub fn terrain(run: &Run, observation: &vision::TerrainObservation, cells: &mut 
         if run.simulation_revision.value_or(29.) >= 51. {
             cell.glyph = pockets::group_number(f, at).unwrap().to_string();
             cell.fg = crate::color::composite(cell.bg, INK, if o.current { 0.95 } else { 0.38 });
-            cell.bottom_aligned = false;
+            cell.bottom_aligned = !fast;
             if fast {
                 // This is the material itself, not an overlay of grass/water.
                 cell.background_overlay = None;
@@ -44,7 +44,7 @@ pub fn restore_marker(cell: &mut Cell, original: &Cell) {
     if original.glyph.parse::<usize>().is_ok() {
         cell.glyph = original.glyph.clone();
         cell.fg = original.fg;
-        cell.bottom_aligned = false;
+        cell.bottom_aligned = original.bottom_aligned;
     }
 }
 /// Stable assignment metadata is not knowledge of its current terrain. Only
@@ -436,7 +436,7 @@ pub(crate) mod tests {
 mod revision51_tests {
     use super::*;
     use corpse_core::non_euclidean_generation::{NonEuclideanGroup as Group, NonEuclideanPocket as Pocket};
-    fn scene() -> Run {
+    pub(super) fn scene() -> Run {
         let mut r=super::tests::scene();r.simulation_revision=51.0.into();
         let f=r.floor_mut().unwrap();let w=f.width();
         f.speed_up=vec![Pocket{cells:(11..=16).map(|x|12*w+x).collect(),groups:(11..=15).step_by(2)
@@ -497,5 +497,118 @@ mod revision51_tests {
             std::fs::write(format!("{dir}/speed-up-controlled-run.json"),serde_json::to_vec_pretty(&r).unwrap()).unwrap();
         }
         assert_eq!(r,before);
+    }
+}
+
+#[cfg(test)]
+mod revision52_tests {
+    use super::*;
+
+    fn scene() -> Run {
+        let mut r=super::revision51_tests::scene();r.simulation_revision=52.0.into();r
+    }
+
+    #[test]
+    fn revision52_speed_up_numbers_match_actual_destinations_not_whole_areas() {
+        let r=scene();let before=r.clone();let view=crate::observe::observe(&r);
+        let observation=view.terrain_snapshot.as_ref().unwrap();let f=r.floor().unwrap();
+        for pocket in f.non_euclidean.as_ref().into_iter().flatten()
+            .chain(f.speed_up.as_ref().into_iter().flatten()) {
+            for group in &pocket.groups {
+                let number=pockets::group_number(f,group.destination).unwrap().to_string();
+                for at in group.sources.iter().copied().chain(std::iter::once(group.destination)) {
+                    let cell=view.cells.iter().take(view.terrain_count)
+                        .find(|c|c.y*view.width+c.x==at).unwrap();
+                    assert_eq!(cell.glyph,number);
+                    let destinations=observed_exits(&r,observation,at);
+                    assert_eq!(destinations,pockets::exits(f,at));
+                    for exit in destinations {
+                        let destination=view.cells.iter().take(view.terrain_count)
+                            .find(|c|c.y*view.width+c.x==exit).unwrap();
+                        assert_eq!(destination.glyph,number);
+                    }
+                }
+            }
+        }
+        let speed:Vec<_>=view.cells.iter().take(view.terrain_count)
+            .filter(|c|c.y==12&&(11..=16).contains(&c.x)).map(|c|c.glyph.as_str()).collect();
+        assert_eq!(speed,vec!["4","4","5","5","6","6"]);
+        // A viewport subset must retain floor-wide destinations, not renumber
+        // visible cells or collapse the entire Speed-up area to one number.
+        let mut subset:Vec<_>=view.cells.iter().take(view.terrain_count)
+            .filter(|c|c.y==12&&(13..=16).contains(&c.x)).cloned().collect();
+        for cell in &mut subset {cell.glyph.clear();}
+        terrain(&r,observation,&mut subset);
+        assert_eq!(subset.iter().map(|c|c.glyph.as_str()).collect::<Vec<_>>(),vec!["5","5","6","6"]);
+        let at=12*view.width+11;let mut hidden=observation.as_ref().clone();
+        hidden.cells[at+1].current=false;hidden.cells[at+1].remembered=false;hidden.cells[at+1].tile=None;
+        assert!(observed_exits(&r,&hidden,at).is_empty());
+        assert_eq!(r,before);
+    }
+
+    #[test]
+    fn revision52_speed_up_click_preview_and_actual_arrival_agree_in_both_phases() {
+        for phase in ["normal","haste"] {
+            let mut r=scene();r.phase=phase.to_string().into();r.player.x=10.;r.player.y=12.;
+            for (target,arrival) in [(11,12),(13,14),(13,13),(12,11)] {
+                let before=r.clone();let path=crate::travel_ui::path_to(&r,target,12,true);
+                assert_eq!(path.len(),1);assert!(!path[0].uncertain);
+                assert_eq!((path[0].arrival_x,path[0].arrival_y),(arrival,12));
+                assert_eq!(r,before,"click preview cannot draw RNG or mutate the run");
+                let mut travel=crate::travel_ui::Travel::new(&r,target,12,path);
+                let Some(corpse_core::Command::Move{dx,dy})=travel.next_command(&r).unwrap()
+                    else {panic!("expected one movement command")};
+                let id=r.player.id;
+                assert!(corpse_core::engine::move_actor(&mut r,id,dx,dy,true).unwrap());
+                assert_eq!((r.player.x,r.player.y),(arrival as f64,12.));
+                assert!(!travel.after_step(&r,false).unwrap());assert!(travel.path().is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn revision52_speed_up_destination_digits_survive_native_resize_and_animation() {
+        let r=scene();let before=r.clone();let view=crate::observe::observe(&r);
+        let mut changed=crate::observe::observe(&r);let marker=changed.cells.iter_mut().take(changed.terrain_count)
+            .find(|c|c.x==11&&c.y==12).unwrap();
+        assert_eq!(marker.glyph,"4");marker.glyph="9".into();
+        let marker=marker.clone();let mut painter=crate::render::Painter::new();
+        for (width,height) in [(960,600),(1600,900)] {
+            painter.resize(width,height);
+            let bounds=painter.cell_damage_rect(&marker,view.width,view.height).unwrap();
+            for now in [0.,824.] {
+                painter.game_at(&view,"",false,now);let original=painter.pixels.clone();
+                painter.game_at(&changed,"",false,now);
+                let mut different=0;
+                for y in bounds.y..bounds.bottom() {for x in bounds.x..bounds.right() {
+                    let offset=4*(y*width+x);
+                    if original[offset..offset+4]!=painter.pixels[offset..offset+4] {different+=1;}
+                }}
+                assert!(different>0,"numeric destination ink lost at {width}x{height}, t={now}");
+            }
+        }
+        assert_eq!(r,before);
+    }
+}
+
+#[cfg(test)]
+mod movement_marker_regressions {
+    #[test]
+    fn linked_space_has_one_player_image_before_and_after_crossing() {
+        let mut run=super::tests::scene();run.simulation_revision=52.0.into();
+        for x in [11.,13.,12.,13.,10.] {
+            run.player.x=x;
+            let before=run.clone();let view=crate::observe::observe(&run);
+            let players:Vec<_>=view.cells.iter().filter(|c|c.entity_ink.is_some_and(|e|e.player)).collect();
+            assert_eq!(players.len(),1);assert_eq!(players[0].x,x as usize);
+            assert_eq!(run,before);
+        }
+    }
+    #[test]
+    fn restored_number_keeps_ground_alignment() {
+        let mut marker=crate::render::Cell{glyph:"12".into(),bottom_aligned:true,non_euclidean:true,..Default::default()};
+        let original=marker.clone();marker.glyph="~".into();marker.bottom_aligned=false;
+        super::restore_marker(&mut marker,&original);
+        assert_eq!(marker.glyph,"12");assert!(marker.bottom_aligned);
     }
 }

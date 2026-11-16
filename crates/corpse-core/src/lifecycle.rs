@@ -112,8 +112,9 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
             "enemy",
         );
         let a = actor(r, id).unwrap();
+        crate::events::audible_banshee(r,a);
         if crate::vision::line_of_sight(r, a, &r.player) {
-            crate::engine::damage_environment(r, r.player.id, 100., Some(id), "banshee", true)
+            crate::engine::damage_environment(r, r.player.id, crate::balance52::local_amount(r, a, "monsterSpecialDamage", 100.), Some(id), "banshee", true)
                 .map_err(|e| e.to_string())?;
         }
     }
@@ -124,6 +125,7 @@ pub fn ursa_death_cry(r: &mut Run, id: f64, origin: crate::movement::Point) {
     if !a.dead.value_or(false) || !has_ursa_death_cry(a) {
         return;
     }
+    crate::animation_enemy::mark(r, a, "E19", "sound-pale", crate::events::Stage::Special);
     let partner = a.conditions.get("monsterUrsaPartnerId").copied();
     let major = r
         .actors_at(r.depth)
@@ -145,6 +147,7 @@ pub fn ursa_death_cry(r: &mut Run, id: f64, origin: crate::movement::Point) {
         });
         a.conditions.shift_remove("targetId");
         crate::travel::clear_floor_chase(a);
+        let a=a.clone(); crate::animation_enemy::mark(r, &a, "E20", "eye", crate::events::Stage::Special);
     }
 }
 /// Ordinary enemy branch of combat.syncHealth; linked and copied player bodies
@@ -171,5 +174,24 @@ pub fn sync_enemy_health(r: &mut Run, id: f64) -> Result<(), String> {
         actor_mut_trusted(r, id).unwrap().hp = hp;
     }
     actor_mut_trusted(r, id).unwrap().max_hp = max;
+    if r.simulation_revision.value_or(29.) >= 52. && actor(r, id).unwrap().hp <= 0. {
+        crate::engine::death_if_nonpositive(r, id).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+/// R52 boundary repair for unresolved nonpositive health, before actions/regen.
+/// O(A) scan and O(Z) IDs, plus existing death/rescue/corpse hooks for Z candidates.
+/// Fractional positive HP is alive; never use displayed HP as the death threshold.
+pub(crate) fn settle_nonpositive_health(r: &mut Run) -> Result<(), crate::engine::EngineError> {
+    if r.simulation_revision.value_or(29.) < 52. { return Ok(()); }
+    let ids: Vec<_> = std::iter::once(&r.player).chain(r.actors_at(r.depth))
+        .filter(|a| !a.dead.value_or(false) && a.hp <= 0.)
+        .map(|a| a.id).collect();
+    for id in ids {
+        // Earlier death hooks can remove or rescue another endpoint.
+        if actor(r, id).is_some_and(|a| !a.dead.value_or(false) && a.hp <= 0.) {
+            crate::engine::death_if_nonpositive(r, id)?;
+        }
+    }
     Ok(())
 }

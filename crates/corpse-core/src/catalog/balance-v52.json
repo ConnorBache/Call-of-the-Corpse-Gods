@@ -1,0 +1,4969 @@
+[
+  {
+    "kind": "banshee",
+    "floor": 29,
+    "offense": 360,
+    "defense": 36,
+    "accuracy": 144,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 30,
+    "offense": 395,
+    "defense": 36,
+    "accuracy": 156,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 31,
+    "offense": 415,
+    "defense": 36,
+    "accuracy": 160,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 32,
+    "offense": 471,
+    "defense": 36,
+    "accuracy": 156,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 33,
+    "offense": 498,
+    "defense": 36,
+    "accuracy": 156,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 34,
+    "offense": 591,
+    "defense": 36,
+    "accuracy": 160,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 35,
+    "offense": 767,
+    "defense": 36,
+    "accuracy": 154,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 36,
+    "offense": 744,
+    "defense": 36,
+    "accuracy": 168,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "banshee",
+    "floor": 37,
+    "offense": 805,
+    "defense": 36,
+    "accuracy": 168,
+    "dodge": 54,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 6,
+    "offense": 68,
+    "defense": 10,
+    "accuracy": 6,
+    "dodge": -9,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 7,
+    "offense": 74,
+    "defense": 13,
+    "accuracy": 7,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 8,
+    "offense": 81,
+    "defense": 17,
+    "accuracy": 7,
+    "dodge": 8,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 9,
+    "offense": 116,
+    "defense": 19,
+    "accuracy": 10,
+    "dodge": 16,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 10,
+    "offense": 101,
+    "defense": 22,
+    "accuracy": 15,
+    "dodge": 19,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 11,
+    "offense": 151,
+    "defense": 28,
+    "accuracy": 21,
+    "dodge": 24,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 12,
+    "offense": 144,
+    "defense": 32,
+    "accuracy": 27,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 13,
+    "offense": 178,
+    "defense": 33,
+    "accuracy": 35,
+    "dodge": 32,
+    "dr": 0
+  },
+  {
+    "kind": "bear",
+    "floor": 14,
+    "offense": 182,
+    "defense": 36,
+    "accuracy": 45,
+    "dodge": 32,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 6,
+    "offense": 8,
+    "defense": -7,
+    "accuracy": 9,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 7,
+    "offense": 11,
+    "defense": -5,
+    "accuracy": 9,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 8,
+    "offense": 15,
+    "defense": -4,
+    "accuracy": 9,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 9,
+    "offense": 20,
+    "defense": -4,
+    "accuracy": 11,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 10,
+    "offense": 26,
+    "defense": -2,
+    "accuracy": 16,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 11,
+    "offense": 33,
+    "defense": 0,
+    "accuracy": 23,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 12,
+    "offense": 41,
+    "defense": 2,
+    "accuracy": 29,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 13,
+    "offense": 51,
+    "defense": 1,
+    "accuracy": 38,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 14,
+    "offense": 59,
+    "defense": 2,
+    "accuracy": 46,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 15,
+    "offense": 65,
+    "defense": 4,
+    "accuracy": 58,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 23,
+    "offense": 8,
+    "defense": -9,
+    "accuracy": 146,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 24,
+    "offense": 8,
+    "defense": -9,
+    "accuracy": 147,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 25,
+    "offense": 51,
+    "defense": -9,
+    "accuracy": 148,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 26,
+    "offense": 131,
+    "defense": -9,
+    "accuracy": 152,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 27,
+    "offense": 117,
+    "defense": -9,
+    "accuracy": 147,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 28,
+    "offense": 8,
+    "defense": -9,
+    "accuracy": 155,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 29,
+    "offense": 156,
+    "defense": -9,
+    "accuracy": 156,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 30,
+    "offense": 179,
+    "defense": -9,
+    "accuracy": 154,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 31,
+    "offense": 193,
+    "defense": -9,
+    "accuracy": 156,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "birther:pale:Jackal",
+    "floor": 32,
+    "offense": 194,
+    "defense": -9,
+    "accuracy": 157,
+    "dodge": 11,
+    "dr": 0
+  },
+  {
+    "kind": "blorb",
+    "floor": 1,
+    "offense": 2,
+    "defense": -15,
+    "accuracy": -3,
+    "dodge": -11,
+    "dr": 0
+  },
+  {
+    "kind": "blorb",
+    "floor": 2,
+    "offense": 2,
+    "defense": -15,
+    "accuracy": -3,
+    "dodge": -11,
+    "dr": 0
+  },
+  {
+    "kind": "blorb",
+    "floor": 3,
+    "offense": 2,
+    "defense": -15,
+    "accuracy": -3,
+    "dodge": -11,
+    "dr": 0
+  },
+  {
+    "kind": "cancer",
+    "floor": 35,
+    "offense": 456,
+    "defense": 175,
+    "accuracy": 166,
+    "dodge": 42,
+    "dr": 97
+  },
+  {
+    "kind": "cancer",
+    "floor": 36,
+    "offense": 492,
+    "defense": 185,
+    "accuracy": 173,
+    "dodge": 53,
+    "dr": 102
+  },
+  {
+    "kind": "cancer",
+    "floor": 37,
+    "offense": 479,
+    "defense": 193,
+    "accuracy": 175,
+    "dodge": 59,
+    "dr": 107
+  },
+  {
+    "kind": "cancer",
+    "floor": 38,
+    "offense": 513,
+    "defense": 205,
+    "accuracy": 179,
+    "dodge": 66,
+    "dr": 112
+  },
+  {
+    "kind": "cancer",
+    "floor": 39,
+    "offense": 573,
+    "defense": 217,
+    "accuracy": 184,
+    "dodge": 74,
+    "dr": 118
+  },
+  {
+    "kind": "cancer",
+    "floor": 40,
+    "offense": 518,
+    "defense": 236,
+    "accuracy": 184,
+    "dodge": 77,
+    "dr": 128
+  },
+  {
+    "kind": "cave-bat",
+    "floor": 1,
+    "offense": 13,
+    "defense": -14,
+    "accuracy": -2,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "cave-bat",
+    "floor": 2,
+    "offense": 18,
+    "defense": -9,
+    "accuracy": 1,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "cave-bat",
+    "floor": 3,
+    "offense": 28,
+    "defense": -7,
+    "accuracy": 3,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "cave-bat",
+    "floor": 4,
+    "offense": 37,
+    "defense": -6,
+    "accuracy": 4,
+    "dodge": 2,
+    "dr": 0
+  },
+  {
+    "kind": "cave-bat",
+    "floor": 5,
+    "offense": 45,
+    "defense": -4,
+    "accuracy": 6,
+    "dodge": 5,
+    "dr": 0
+  },
+  {
+    "kind": "cave-bat",
+    "floor": 6,
+    "offense": 38,
+    "defense": -1,
+    "accuracy": 8,
+    "dodge": 13,
+    "dr": 0
+  },
+  {
+    "kind": "chimera",
+    "floor": 35,
+    "offense": 809,
+    "defense": 144,
+    "accuracy": 167,
+    "dodge": 44,
+    "dr": 48
+  },
+  {
+    "kind": "chimera",
+    "floor": 36,
+    "offense": 809,
+    "defense": 156,
+    "accuracy": 167,
+    "dodge": 62,
+    "dr": 52
+  },
+  {
+    "kind": "chimera",
+    "floor": 37,
+    "offense": 809,
+    "defense": 164,
+    "accuracy": 169,
+    "dodge": 66,
+    "dr": 54
+  },
+  {
+    "kind": "chimera",
+    "floor": 38,
+    "offense": 829,
+    "defense": 170,
+    "accuracy": 167,
+    "dodge": 74,
+    "dr": 56
+  },
+  {
+    "kind": "chimera",
+    "floor": 39,
+    "offense": 905,
+    "defense": 181,
+    "accuracy": 180,
+    "dodge": 78,
+    "dr": 59
+  },
+  {
+    "kind": "chimera",
+    "floor": 40,
+    "offense": 980,
+    "defense": 198,
+    "accuracy": 178,
+    "dodge": 81,
+    "dr": 64
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 20,
+    "offense": 160,
+    "defense": 96,
+    "accuracy": 124,
+    "dodge": 9,
+    "dr": 15
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 21,
+    "offense": 159,
+    "defense": 102,
+    "accuracy": 128,
+    "dodge": 15,
+    "dr": 16
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 22,
+    "offense": 178,
+    "defense": 107,
+    "accuracy": 128,
+    "dodge": 18,
+    "dr": 17
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 23,
+    "offense": 201,
+    "defense": 109,
+    "accuracy": 129,
+    "dodge": 23,
+    "dr": 17
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 24,
+    "offense": 233,
+    "defense": 110,
+    "accuracy": 131,
+    "dodge": 26,
+    "dr": 17
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 25,
+    "offense": 250,
+    "defense": 111,
+    "accuracy": 134,
+    "dodge": 26,
+    "dr": 17
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 26,
+    "offense": 312,
+    "defense": 117,
+    "accuracy": 138,
+    "dodge": 29,
+    "dr": 18
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 27,
+    "offense": 309,
+    "defense": 128,
+    "accuracy": 138,
+    "dodge": 29,
+    "dr": 19
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 28,
+    "offense": 338,
+    "defense": 138,
+    "accuracy": 138,
+    "dodge": 30,
+    "dr": 21
+  },
+  {
+    "kind": "dire-bear",
+    "floor": 29,
+    "offense": 365,
+    "defense": 147,
+    "accuracy": 138,
+    "dodge": 31,
+    "dr": 22
+  },
+  {
+    "kind": "dragon",
+    "floor": 38,
+    "offense": 739,
+    "defense": 153,
+    "accuracy": 179,
+    "dodge": 62,
+    "dr": 83
+  },
+  {
+    "kind": "dragon",
+    "floor": 39,
+    "offense": 779,
+    "defense": 162,
+    "accuracy": 183,
+    "dodge": 74,
+    "dr": 87
+  },
+  {
+    "kind": "dragon",
+    "floor": 40,
+    "offense": 853,
+    "defense": 179,
+    "accuracy": 182,
+    "dodge": 74,
+    "dr": 96
+  },
+  {
+    "kind": "dryad",
+    "floor": 3,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 25
+  },
+  {
+    "kind": "dryad",
+    "floor": 4,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 27
+  },
+  {
+    "kind": "dryad",
+    "floor": 5,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 32
+  },
+  {
+    "kind": "dryad",
+    "floor": 6,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 35
+  },
+  {
+    "kind": "dryad",
+    "floor": 7,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 40
+  },
+  {
+    "kind": "dryad",
+    "floor": 8,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 45
+  },
+  {
+    "kind": "dryad",
+    "floor": 9,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 49
+  },
+  {
+    "kind": "dryad",
+    "floor": 10,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 53
+  },
+  {
+    "kind": "dryad",
+    "floor": 11,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 63
+  },
+  {
+    "kind": "dryad",
+    "floor": 12,
+    "offense": 0,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": -13,
+    "dr": 0,
+    "heal_amount": 69
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 8,
+    "offense": 63,
+    "defense": 19,
+    "accuracy": 8,
+    "dodge": 8,
+    "dr": 21
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 9,
+    "offense": 68,
+    "defense": 20,
+    "accuracy": 11,
+    "dodge": 16,
+    "dr": 22
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 10,
+    "offense": 77,
+    "defense": 23,
+    "accuracy": 16,
+    "dodge": 19,
+    "dr": 24
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 11,
+    "offense": 91,
+    "defense": 30,
+    "accuracy": 22,
+    "dodge": 24,
+    "dr": 28
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 12,
+    "offense": 111,
+    "defense": 34,
+    "accuracy": 28,
+    "dodge": 27,
+    "dr": 30
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 13,
+    "offense": 134,
+    "defense": 36,
+    "accuracy": 36,
+    "dodge": 32,
+    "dr": 31
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 14,
+    "offense": 133,
+    "defense": 38,
+    "accuracy": 46,
+    "dodge": 32,
+    "dr": 33
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 15,
+    "offense": 165,
+    "defense": 43,
+    "accuracy": 57,
+    "dodge": 34,
+    "dr": 35
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 16,
+    "offense": 165,
+    "defense": 46,
+    "accuracy": 71,
+    "dodge": 38,
+    "dr": 38
+  },
+  {
+    "kind": "giant-beetle",
+    "floor": 17,
+    "offense": 182,
+    "defense": 49,
+    "accuracy": 84,
+    "dodge": 39,
+    "dr": 40
+  },
+  {
+    "kind": "glim",
+    "floor": 7,
+    "offense": 79,
+    "defense": 4,
+    "accuracy": 11,
+    "dodge": 4,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 8,
+    "offense": 79,
+    "defense": 12,
+    "accuracy": 11,
+    "dodge": 9,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 9,
+    "offense": 79,
+    "defense": 17,
+    "accuracy": 14,
+    "dodge": 18,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 10,
+    "offense": 82,
+    "defense": 22,
+    "accuracy": 19,
+    "dodge": 24,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 11,
+    "offense": 101,
+    "defense": 28,
+    "accuracy": 25,
+    "dodge": 29,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 12,
+    "offense": 124,
+    "defense": 32,
+    "accuracy": 31,
+    "dodge": 32,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 13,
+    "offense": 130,
+    "defense": 33,
+    "accuracy": 39,
+    "dodge": 37,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 14,
+    "offense": 153,
+    "defense": 36,
+    "accuracy": 49,
+    "dodge": 37,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 15,
+    "offense": 172,
+    "defense": 40,
+    "accuracy": 60,
+    "dodge": 39,
+    "dr": 0
+  },
+  {
+    "kind": "glim",
+    "floor": 16,
+    "offense": 187,
+    "defense": 43,
+    "accuracy": 74,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin",
+    "floor": 1,
+    "offense": 11,
+    "defense": -7,
+    "accuracy": -1,
+    "dodge": -5,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin",
+    "floor": 2,
+    "offense": 22,
+    "defense": -1,
+    "accuracy": 2,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin",
+    "floor": 3,
+    "offense": 28,
+    "defense": 2,
+    "accuracy": 4,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin",
+    "floor": 4,
+    "offense": 33,
+    "defense": 4,
+    "accuracy": 5,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin",
+    "floor": 5,
+    "offense": 34,
+    "defense": 7,
+    "accuracy": 7,
+    "dodge": 9,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 5,
+    "offense": -1,
+    "defense": 3,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 6,
+    "offense": -1,
+    "defense": 6,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 7,
+    "offense": -1,
+    "defense": 9,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 8,
+    "offense": -1,
+    "defense": 13,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 9,
+    "offense": -1,
+    "defense": 15,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 10,
+    "offense": -1,
+    "defense": 20,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 11,
+    "offense": -1,
+    "defense": 23,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 12,
+    "offense": -1,
+    "defense": 28,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 13,
+    "offense": -1,
+    "defense": 31,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-bloodmancer",
+    "floor": 14,
+    "offense": -1,
+    "defense": 33,
+    "accuracy": 12,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 14,
+    "offense": 79,
+    "defense": 28,
+    "accuracy": 58,
+    "dodge": 28,
+    "dr": 33
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 15,
+    "offense": 111,
+    "defense": 32,
+    "accuracy": 66,
+    "dodge": 32,
+    "dr": 36
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 16,
+    "offense": 133,
+    "defense": 34,
+    "accuracy": 80,
+    "dodge": 38,
+    "dr": 38
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 17,
+    "offense": 148,
+    "defense": 36,
+    "accuracy": 96,
+    "dodge": 37,
+    "dr": 39
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 18,
+    "offense": 159,
+    "defense": 42,
+    "accuracy": 109,
+    "dodge": 37,
+    "dr": 44
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 19,
+    "offense": 185,
+    "defense": 46,
+    "accuracy": 114,
+    "dodge": 42,
+    "dr": 46
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 20,
+    "offense": 208,
+    "defense": 50,
+    "accuracy": 125,
+    "dodge": 49,
+    "dr": 50
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 21,
+    "offense": 267,
+    "defense": 54,
+    "accuracy": 130,
+    "dodge": 53,
+    "dr": 53
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 22,
+    "offense": 333,
+    "defense": 55,
+    "accuracy": 126,
+    "dodge": 53,
+    "dr": 53
+  },
+  {
+    "kind": "hemogoblin-mech",
+    "floor": 23,
+    "offense": 381,
+    "defense": 57,
+    "accuracy": 125,
+    "dodge": 57,
+    "dr": 54
+  },
+  {
+    "kind": "horn-1",
+    "floor": 12,
+    "offense": 31,
+    "defense": 10,
+    "accuracy": 41,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 13,
+    "offense": 38,
+    "defense": 12,
+    "accuracy": 48,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 14,
+    "offense": 42,
+    "defense": 15,
+    "accuracy": 59,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 15,
+    "offense": 53,
+    "defense": 19,
+    "accuracy": 69,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 16,
+    "offense": 56,
+    "defense": 21,
+    "accuracy": 82,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 17,
+    "offense": 60,
+    "defense": 25,
+    "accuracy": 96,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 18,
+    "offense": 71,
+    "defense": 29,
+    "accuracy": 104,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 19,
+    "offense": 69,
+    "defense": 34,
+    "accuracy": 118,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 20,
+    "offense": 81,
+    "defense": 38,
+    "accuracy": 126,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-1",
+    "floor": 21,
+    "offense": 87,
+    "defense": 39,
+    "accuracy": 130,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 12,
+    "offense": 107,
+    "defense": 14,
+    "accuracy": 31,
+    "dodge": 28,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 13,
+    "offense": 104,
+    "defense": 16,
+    "accuracy": 39,
+    "dodge": 33,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 14,
+    "offense": 116,
+    "defense": 17,
+    "accuracy": 49,
+    "dodge": 33,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 15,
+    "offense": 139,
+    "defense": 22,
+    "accuracy": 61,
+    "dodge": 36,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 16,
+    "offense": 133,
+    "defense": 26,
+    "accuracy": 75,
+    "dodge": 34,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 17,
+    "offense": 162,
+    "defense": 27,
+    "accuracy": 88,
+    "dodge": 36,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 18,
+    "offense": 180,
+    "defense": 29,
+    "accuracy": 95,
+    "dodge": 39,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 19,
+    "offense": 186,
+    "defense": 34,
+    "accuracy": 109,
+    "dodge": 41,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 20,
+    "offense": 197,
+    "defense": 36,
+    "accuracy": 118,
+    "dodge": 41,
+    "dr": 0
+  },
+  {
+    "kind": "horn-2",
+    "floor": 21,
+    "offense": 220,
+    "defense": 38,
+    "accuracy": 121,
+    "dodge": 46,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 22,
+    "offense": 126,
+    "defense": 28,
+    "accuracy": 136,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 23,
+    "offense": 163,
+    "defense": 29,
+    "accuracy": 138,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 24,
+    "offense": 195,
+    "defense": 30,
+    "accuracy": 142,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 25,
+    "offense": 227,
+    "defense": 28,
+    "accuracy": 143,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 26,
+    "offense": 251,
+    "defense": 37,
+    "accuracy": 150,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 27,
+    "offense": 253,
+    "defense": 42,
+    "accuracy": 147,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 28,
+    "offense": 268,
+    "defense": 48,
+    "accuracy": 148,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 29,
+    "offense": 300,
+    "defense": 53,
+    "accuracy": 147,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 30,
+    "offense": 323,
+    "defense": 61,
+    "accuracy": 147,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-3",
+    "floor": 31,
+    "offense": 352,
+    "defense": 70,
+    "accuracy": 150,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 24,
+    "offense": 385,
+    "defense": 34,
+    "accuracy": 129,
+    "dodge": 33,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 25,
+    "offense": 402,
+    "defense": 34,
+    "accuracy": 129,
+    "dodge": 33,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 26,
+    "offense": 507,
+    "defense": 38,
+    "accuracy": 129,
+    "dodge": 34,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 27,
+    "offense": 507,
+    "defense": 48,
+    "accuracy": 132,
+    "dodge": 35,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 28,
+    "offense": 490,
+    "defense": 53,
+    "accuracy": 129,
+    "dodge": 38,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 29,
+    "offense": 525,
+    "defense": 57,
+    "accuracy": 129,
+    "dodge": 41,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 30,
+    "offense": 630,
+    "defense": 70,
+    "accuracy": 129,
+    "dodge": 38,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 31,
+    "offense": 630,
+    "defense": 70,
+    "accuracy": 129,
+    "dodge": 39,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 32,
+    "offense": 700,
+    "defense": 80,
+    "accuracy": 130,
+    "dodge": 41,
+    "dr": 0
+  },
+  {
+    "kind": "horn-4",
+    "floor": 33,
+    "offense": 770,
+    "defense": 89,
+    "accuracy": 132,
+    "dodge": 43,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 29,
+    "offense": 175,
+    "defense": 62,
+    "accuracy": 147,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 30,
+    "offense": 262,
+    "defense": 66,
+    "accuracy": 147,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 31,
+    "offense": 284,
+    "defense": 73,
+    "accuracy": 147,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 32,
+    "offense": 404,
+    "defense": 79,
+    "accuracy": 147,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 33,
+    "offense": 382,
+    "defense": 90,
+    "accuracy": 147,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 34,
+    "offense": 350,
+    "defense": 104,
+    "accuracy": 150,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 35,
+    "offense": 481,
+    "defense": 113,
+    "accuracy": 151,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 36,
+    "offense": 580,
+    "defense": 116,
+    "accuracy": 157,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 37,
+    "offense": 639,
+    "defense": 126,
+    "accuracy": 157,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-5",
+    "floor": 38,
+    "offense": 650,
+    "defense": 130,
+    "accuracy": 163,
+    "dodge": 94,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 30,
+    "offense": 514,
+    "defense": 52,
+    "accuracy": 140,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 31,
+    "offense": 464,
+    "defense": 71,
+    "accuracy": 144,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 32,
+    "offense": 530,
+    "defense": 78,
+    "accuracy": 144,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 33,
+    "offense": 497,
+    "defense": 90,
+    "accuracy": 147,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 34,
+    "offense": 514,
+    "defense": 108,
+    "accuracy": 150,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 35,
+    "offense": 594,
+    "defense": 110,
+    "accuracy": 154,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 36,
+    "offense": 626,
+    "defense": 120,
+    "accuracy": 154,
+    "dodge": 49,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 37,
+    "offense": 674,
+    "defense": 119,
+    "accuracy": 156,
+    "dodge": 53,
+    "dr": 0
+  },
+  {
+    "kind": "horn-6",
+    "floor": 38,
+    "offense": 658,
+    "defense": 131,
+    "accuracy": 165,
+    "dodge": 59,
+    "dr": 0
+  },
+  {
+    "kind": "horn-7",
+    "floor": 36,
+    "offense": 421,
+    "defense": 114,
+    "accuracy": 165,
+    "dodge": 108,
+    "dr": 0
+  },
+  {
+    "kind": "horn-7",
+    "floor": 37,
+    "offense": 499,
+    "defense": 119,
+    "accuracy": 165,
+    "dodge": 108,
+    "dr": 0
+  },
+  {
+    "kind": "horn-7",
+    "floor": 38,
+    "offense": 556,
+    "defense": 139,
+    "accuracy": 165,
+    "dodge": 108,
+    "dr": 0
+  },
+  {
+    "kind": "horn-7",
+    "floor": 39,
+    "offense": 649,
+    "defense": 145,
+    "accuracy": 174,
+    "dodge": 108,
+    "dr": 0
+  },
+  {
+    "kind": "horn-7",
+    "floor": 40,
+    "offense": 722,
+    "defense": 150,
+    "accuracy": 168,
+    "dodge": 108,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 16,
+    "offense": 144,
+    "defense": 20,
+    "accuracy": 81,
+    "dodge": 29,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 17,
+    "offense": 152,
+    "defense": 22,
+    "accuracy": 94,
+    "dodge": 30,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 18,
+    "offense": 173,
+    "defense": 25,
+    "accuracy": 101,
+    "dodge": 34,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 19,
+    "offense": 176,
+    "defense": 28,
+    "accuracy": 116,
+    "dodge": 38,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 20,
+    "offense": 204,
+    "defense": 29,
+    "accuracy": 122,
+    "dodge": 36,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 21,
+    "offense": 231,
+    "defense": 29,
+    "accuracy": 128,
+    "dodge": 49,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 22,
+    "offense": 277,
+    "defense": 35,
+    "accuracy": 121,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 23,
+    "offense": 299,
+    "defense": 37,
+    "accuracy": 129,
+    "dodge": 52,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 24,
+    "offense": 326,
+    "defense": 37,
+    "accuracy": 132,
+    "dodge": 52,
+    "dr": 0
+  },
+  {
+    "kind": "kelpie",
+    "floor": 25,
+    "offense": 384,
+    "defense": 37,
+    "accuracy": 132,
+    "dodge": 56,
+    "dr": 0
+  },
+  {
+    "kind": "killspawn",
+    "floor": 25,
+    "offense": 385,
+    "defense": 69,
+    "accuracy": 140,
+    "dodge": 31,
+    "dr": 25
+  },
+  {
+    "kind": "killspawn",
+    "floor": 26,
+    "offense": 434,
+    "defense": 69,
+    "accuracy": 144,
+    "dodge": 34,
+    "dr": 26
+  },
+  {
+    "kind": "killspawn",
+    "floor": 27,
+    "offense": 507,
+    "defense": 73,
+    "accuracy": 144,
+    "dodge": 34,
+    "dr": 28
+  },
+  {
+    "kind": "killspawn",
+    "floor": 28,
+    "offense": 526,
+    "defense": 79,
+    "accuracy": 144,
+    "dodge": 35,
+    "dr": 30
+  },
+  {
+    "kind": "killspawn",
+    "floor": 29,
+    "offense": 566,
+    "defense": 85,
+    "accuracy": 144,
+    "dodge": 37,
+    "dr": 32
+  },
+  {
+    "kind": "killspawn",
+    "floor": 30,
+    "offense": 617,
+    "defense": 92,
+    "accuracy": 144,
+    "dodge": 38,
+    "dr": 35
+  },
+  {
+    "kind": "killspawn",
+    "floor": 31,
+    "offense": 698,
+    "defense": 99,
+    "accuracy": 146,
+    "dodge": 41,
+    "dr": 37
+  },
+  {
+    "kind": "killspawn",
+    "floor": 32,
+    "offense": 764,
+    "defense": 108,
+    "accuracy": 146,
+    "dodge": 41,
+    "dr": 40
+  },
+  {
+    "kind": "killspawn",
+    "floor": 33,
+    "offense": 791,
+    "defense": 118,
+    "accuracy": 147,
+    "dodge": 42,
+    "dr": 43
+  },
+  {
+    "kind": "killspawn",
+    "floor": 34,
+    "offense": 815,
+    "defense": 133,
+    "accuracy": 148,
+    "dodge": 43,
+    "dr": 48
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 13,
+    "offense": 125,
+    "defense": 29,
+    "accuracy": 45,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 14,
+    "offense": 125,
+    "defense": 33,
+    "accuracy": 54,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 15,
+    "offense": 127,
+    "defense": 40,
+    "accuracy": 66,
+    "dodge": 30,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 16,
+    "offense": 148,
+    "defense": 43,
+    "accuracy": 80,
+    "dodge": 34,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 17,
+    "offense": 165,
+    "defense": 46,
+    "accuracy": 93,
+    "dodge": 35,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 18,
+    "offense": 171,
+    "defense": 50,
+    "accuracy": 101,
+    "dodge": 38,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 19,
+    "offense": 204,
+    "defense": 55,
+    "accuracy": 113,
+    "dodge": 41,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 20,
+    "offense": 217,
+    "defense": 60,
+    "accuracy": 123,
+    "dodge": 44,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 21,
+    "offense": 231,
+    "defense": 64,
+    "accuracy": 127,
+    "dodge": 50,
+    "dr": 0
+  },
+  {
+    "kind": "long-saidri",
+    "floor": 22,
+    "offense": 246,
+    "defense": 67,
+    "accuracy": 127,
+    "dodge": 53,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 25,
+    "offense": 0,
+    "defense": 29,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 26,
+    "offense": 0,
+    "defense": 33,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 27,
+    "offense": 0,
+    "defense": 38,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 28,
+    "offense": 0,
+    "defense": 43,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 29,
+    "offense": 0,
+    "defense": 46,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 30,
+    "offense": 0,
+    "defense": 52,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 31,
+    "offense": 0,
+    "defense": 57,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 32,
+    "offense": 0,
+    "defense": 64,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 33,
+    "offense": 0,
+    "defense": 71,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "maulchild",
+    "floor": 34,
+    "offense": 0,
+    "defense": 82,
+    "accuracy": 134,
+    "dodge": 73,
+    "dr": 0
+  },
+  {
+    "kind": "minotaur",
+    "floor": 33,
+    "offense": 570,
+    "defense": 152,
+    "accuracy": 147,
+    "dodge": 29,
+    "dr": 56
+  },
+  {
+    "kind": "minotaur",
+    "floor": 34,
+    "offense": 602,
+    "defense": 170,
+    "accuracy": 148,
+    "dodge": 30,
+    "dr": 62
+  },
+  {
+    "kind": "minotaur",
+    "floor": 35,
+    "offense": 675,
+    "defense": 186,
+    "accuracy": 150,
+    "dodge": 32,
+    "dr": 67
+  },
+  {
+    "kind": "minotaur",
+    "floor": 36,
+    "offense": 631,
+    "defense": 197,
+    "accuracy": 157,
+    "dodge": 43,
+    "dr": 71
+  },
+  {
+    "kind": "minotaur",
+    "floor": 37,
+    "offense": 671,
+    "defense": 206,
+    "accuracy": 159,
+    "dodge": 49,
+    "dr": 74
+  },
+  {
+    "kind": "minotaur",
+    "floor": 38,
+    "offense": 654,
+    "defense": 217,
+    "accuracy": 163,
+    "dodge": 56,
+    "dr": 78
+  },
+  {
+    "kind": "minotaur",
+    "floor": 39,
+    "offense": 671,
+    "defense": 230,
+    "accuracy": 168,
+    "dodge": 64,
+    "dr": 82
+  },
+  {
+    "kind": "minotaur",
+    "floor": 40,
+    "offense": 786,
+    "defense": 250,
+    "accuracy": 168,
+    "dodge": 67,
+    "dr": 89
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 33,
+    "offense": 474,
+    "defense": 100,
+    "accuracy": 160,
+    "dodge": 46,
+    "dr": 0
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 34,
+    "offense": 553,
+    "defense": 100,
+    "accuracy": 164,
+    "dodge": 46,
+    "dr": 0
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 35,
+    "offense": 592,
+    "defense": 112,
+    "accuracy": 165,
+    "dodge": 48,
+    "dr": 0
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 36,
+    "offense": 592,
+    "defense": 118,
+    "accuracy": 173,
+    "dodge": 53,
+    "dr": 0
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 37,
+    "offense": 592,
+    "defense": 124,
+    "accuracy": 175,
+    "dodge": 58,
+    "dr": 0
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 38,
+    "offense": 651,
+    "defense": 133,
+    "accuracy": 178,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 39,
+    "offense": 632,
+    "defense": 141,
+    "accuracy": 185,
+    "dodge": 67,
+    "dr": 0
+  },
+  {
+    "kind": "moonspawn",
+    "floor": 40,
+    "offense": 691,
+    "defense": 155,
+    "accuracy": 183,
+    "dodge": 68,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 1,
+    "offense": 24,
+    "defense": -10,
+    "accuracy": -3,
+    "dodge": -5,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 2,
+    "offense": 34,
+    "defense": -5,
+    "accuracy": 0,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 3,
+    "offense": 46,
+    "defense": -3,
+    "accuracy": 2,
+    "dodge": -1,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 4,
+    "offense": 56,
+    "defense": -2,
+    "accuracy": 3,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 5,
+    "offense": 56,
+    "defense": 1,
+    "accuracy": 5,
+    "dodge": 9,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 6,
+    "offense": 55,
+    "defense": 2,
+    "accuracy": 7,
+    "dodge": 18,
+    "dr": 0
+  },
+  {
+    "kind": "needleling",
+    "floor": 7,
+    "offense": 68,
+    "defense": 5,
+    "accuracy": 8,
+    "dodge": 26,
+    "dr": 0
+  },
+  {
+    "kind": "nest:saidri-guardian",
+    "floor": 28,
+    "offense": 508,
+    "defense": 98,
+    "accuracy": 157,
+    "dodge": 39,
+    "dr": 36
+  },
+  {
+    "kind": "nest:saidri-guardian",
+    "floor": 29,
+    "offense": 519,
+    "defense": 115,
+    "accuracy": 164,
+    "dodge": 39,
+    "dr": 41
+  },
+  {
+    "kind": "nest:saidri-guardian",
+    "floor": 31,
+    "offense": 616,
+    "defense": 125,
+    "accuracy": 171,
+    "dodge": 39,
+    "dr": 44
+  },
+  {
+    "kind": "nest:saidri-guardian",
+    "floor": 32,
+    "offense": 677,
+    "defense": 135,
+    "accuracy": 163,
+    "dodge": 39,
+    "dr": 48
+  },
+  {
+    "kind": "nest:saidri-guardian",
+    "floor": 33,
+    "offense": 716,
+    "defense": 147,
+    "accuracy": 165,
+    "dodge": 39,
+    "dr": 51
+  },
+  {
+    "kind": "nest:saidri-guardian",
+    "floor": 34,
+    "offense": 682,
+    "defense": 169,
+    "accuracy": 168,
+    "dodge": 39,
+    "dr": 58
+  },
+  {
+    "kind": "nest:saidribee-queen",
+    "floor": 28,
+    "offense": 165,
+    "defense": 55,
+    "accuracy": 145,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "nest:saidribee-queen",
+    "floor": 29,
+    "offense": 169,
+    "defense": 65,
+    "accuracy": 152,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "nest:saidribee-queen",
+    "floor": 31,
+    "offense": 200,
+    "defense": 72,
+    "accuracy": 159,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "nest:saidribee-queen",
+    "floor": 32,
+    "offense": 221,
+    "defense": 78,
+    "accuracy": 151,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "nest:saidribee-queen",
+    "floor": 33,
+    "offense": 233,
+    "defense": 86,
+    "accuracy": 153,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "nest:saidribee-queen",
+    "floor": 34,
+    "offense": 221,
+    "defense": 99,
+    "accuracy": 156,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "nest:short-saidri",
+    "floor": 28,
+    "offense": 7,
+    "defense": -9,
+    "accuracy": 112,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "nest:short-saidri",
+    "floor": 29,
+    "offense": 6,
+    "defense": -8,
+    "accuracy": 119,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "nest:short-saidri",
+    "floor": 31,
+    "offense": 9,
+    "defense": -7,
+    "accuracy": 126,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "nest:short-saidri",
+    "floor": 32,
+    "offense": 10,
+    "defense": -7,
+    "accuracy": 118,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "nest:short-saidri",
+    "floor": 33,
+    "offense": 11,
+    "defense": -6,
+    "accuracy": 120,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "nest:short-saidri",
+    "floor": 34,
+    "offense": 9,
+    "defense": -4,
+    "accuracy": 122,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 24,
+    "offense": 163,
+    "defense": 32,
+    "accuracy": 144,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 25,
+    "offense": 164,
+    "defense": 34,
+    "accuracy": 172,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 26,
+    "offense": 197,
+    "defense": 37,
+    "accuracy": 165,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 27,
+    "offense": 210,
+    "defense": 39,
+    "accuracy": 170,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 28,
+    "offense": 230,
+    "defense": 43,
+    "accuracy": 168,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 29,
+    "offense": 226,
+    "defense": 48,
+    "accuracy": 163,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 30,
+    "offense": 278,
+    "defense": 52,
+    "accuracy": 162,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 31,
+    "offense": 294,
+    "defense": 56,
+    "accuracy": 169,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 32,
+    "offense": 316,
+    "defense": 60,
+    "accuracy": 169,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 33,
+    "offense": 318,
+    "defense": 68,
+    "accuracy": 171,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "night-crawler",
+    "floor": 34,
+    "offense": 332,
+    "defense": 75,
+    "accuracy": 171,
+    "dodge": 59.0,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 6,
+    "offense": 10,
+    "defense": 3,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 7,
+    "offense": 10,
+    "defense": 6,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 8,
+    "offense": 10,
+    "defense": 8,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 9,
+    "offense": 10,
+    "defense": 9,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 10,
+    "offense": 10,
+    "defense": 11,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 11,
+    "offense": 10,
+    "defense": 15,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 12,
+    "offense": 10,
+    "defense": 19,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 13,
+    "offense": 10,
+    "defense": 18,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 14,
+    "offense": 10,
+    "defense": 20,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Birther",
+    "floor": 15,
+    "offense": 10,
+    "defense": 24,
+    "accuracy": 7,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 3,
+    "offense": 17,
+    "defense": 2,
+    "accuracy": 3,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 4,
+    "offense": 22,
+    "defense": 4,
+    "accuracy": 4,
+    "dodge": -6,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 5,
+    "offense": 28,
+    "defense": 7,
+    "accuracy": 6,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 6,
+    "offense": 28,
+    "defense": 10,
+    "accuracy": 8,
+    "dodge": 9,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 7,
+    "offense": 31,
+    "defense": 13,
+    "accuracy": 9,
+    "dodge": 17,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 8,
+    "offense": 42,
+    "defense": 17,
+    "accuracy": 9,
+    "dodge": 26,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 9,
+    "offense": 47,
+    "defense": 19,
+    "accuracy": 12,
+    "dodge": 34,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 10,
+    "offense": 54,
+    "defense": 22,
+    "accuracy": 17,
+    "dodge": 37,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Biter",
+    "floor": 11,
+    "offense": 64,
+    "defense": 28,
+    "accuracy": 23,
+    "dodge": 42,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 23,
+    "offense": 20,
+    "defense": 28,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 24,
+    "offense": 20,
+    "defense": 28,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 25,
+    "offense": 20,
+    "defense": 31,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 26,
+    "offense": 20,
+    "defense": 35,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 27,
+    "offense": 20,
+    "defense": 38,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 28,
+    "offense": 20,
+    "defense": 40,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 29,
+    "offense": 20,
+    "defense": 46,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 30,
+    "offense": 20,
+    "defense": 47,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 31,
+    "offense": 20,
+    "defense": 54,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Birther",
+    "floor": 32,
+    "offense": 20,
+    "defense": 57,
+    "accuracy": 126,
+    "dodge": 75,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 18,
+    "offense": 100,
+    "defense": 70,
+    "accuracy": 108,
+    "dodge": 26,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 19,
+    "offense": 101,
+    "defense": 76,
+    "accuracy": 120,
+    "dodge": 30,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 20,
+    "offense": 110,
+    "defense": 81,
+    "accuracy": 130,
+    "dodge": 33,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 21,
+    "offense": 123,
+    "defense": 86,
+    "accuracy": 134,
+    "dodge": 38,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 22,
+    "offense": 137,
+    "defense": 91,
+    "accuracy": 134,
+    "dodge": 41,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 23,
+    "offense": 167,
+    "defense": 92,
+    "accuracy": 135,
+    "dodge": 46,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 24,
+    "offense": 165,
+    "defense": 93,
+    "accuracy": 137,
+    "dodge": 49,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 25,
+    "offense": 192,
+    "defense": 94,
+    "accuracy": 140,
+    "dodge": 49,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 26,
+    "offense": 190,
+    "defense": 99,
+    "accuracy": 144,
+    "dodge": 52,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Biter",
+    "floor": 27,
+    "offense": 223,
+    "defense": 109,
+    "accuracy": 144,
+    "dodge": 52,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 22,
+    "offense": 20,
+    "defense": 37,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 23,
+    "offense": 20,
+    "defense": 40,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 24,
+    "offense": 20,
+    "defense": 44,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 25,
+    "offense": 20,
+    "defense": 44,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 26,
+    "offense": 20,
+    "defense": 48,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 27,
+    "offense": 20,
+    "defense": 51,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 28,
+    "offense": 20,
+    "defense": 55,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 29,
+    "offense": 20,
+    "defense": 64,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 30,
+    "offense": 20,
+    "defense": 69,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Breather",
+    "floor": 31,
+    "offense": 20,
+    "defense": 75,
+    "accuracy": 127,
+    "dodge": 69,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 20,
+    "offense": 20,
+    "defense": 43,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 21,
+    "offense": 20,
+    "defense": 50,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 22,
+    "offense": 20,
+    "defense": 53,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 23,
+    "offense": 20,
+    "defense": 56,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 24,
+    "offense": 20,
+    "defense": 58,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 25,
+    "offense": 20,
+    "defense": 59,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 26,
+    "offense": 20,
+    "defense": 61,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 27,
+    "offense": 20,
+    "defense": 70,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 28,
+    "offense": 20,
+    "defense": 79,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Screamer",
+    "floor": 29,
+    "offense": 20,
+    "defense": 83,
+    "accuracy": 123,
+    "dodge": 63,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 19,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 20,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 21,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 22,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 23,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 24,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 25,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 26,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 27,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Greater Spitter",
+    "floor": 28,
+    "offense": 20,
+    "defense": 7,
+    "accuracy": 120,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 1,
+    "offense": 26,
+    "defense": -10,
+    "accuracy": -2,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 2,
+    "offense": 38,
+    "defense": -5,
+    "accuracy": 1,
+    "dodge": -3,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 3,
+    "offense": 47,
+    "defense": -3,
+    "accuracy": 3,
+    "dodge": 0,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 4,
+    "offense": 57,
+    "defense": -2,
+    "accuracy": 4,
+    "dodge": 4,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 5,
+    "offense": 58,
+    "defense": 1,
+    "accuracy": 6,
+    "dodge": 10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 6,
+    "offense": 57,
+    "defense": 2,
+    "accuracy": 8,
+    "dodge": 19,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Jackal",
+    "floor": 7,
+    "offense": 59,
+    "defense": 5,
+    "accuracy": 9,
+    "dodge": 27,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 4,
+    "offense": 10,
+    "defense": 4,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 5,
+    "offense": 10,
+    "defense": 8,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 6,
+    "offense": 10,
+    "defense": 11,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 7,
+    "offense": 10,
+    "defense": 16,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 8,
+    "offense": 10,
+    "defense": 19,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 9,
+    "offense": 10,
+    "defense": 21,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 10,
+    "offense": 10,
+    "defense": 25,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 11,
+    "offense": 10,
+    "defense": 32,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 12,
+    "offense": 10,
+    "defense": 37,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Screamer",
+    "floor": 13,
+    "offense": 10,
+    "defense": 40,
+    "accuracy": 4,
+    "dodge": -13,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 4,
+    "offense": -2,
+    "defense": -11,
+    "accuracy": 10,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 5,
+    "offense": -2,
+    "defense": -11,
+    "accuracy": 10,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 6,
+    "offense": -2,
+    "defense": -11,
+    "accuracy": 10,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 7,
+    "offense": -2,
+    "defense": -11,
+    "accuracy": 10,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 8,
+    "offense": 3,
+    "defense": -11,
+    "accuracy": 15,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 9,
+    "offense": 6,
+    "defense": -11,
+    "accuracy": 17,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 10,
+    "offense": 14,
+    "defense": -11,
+    "accuracy": 23,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 11,
+    "offense": 20,
+    "defense": -11,
+    "accuracy": 29,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "pale:Spitter",
+    "floor": 12,
+    "offense": 24,
+    "defense": -11,
+    "accuracy": 35,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 32,
+    "offense": 654,
+    "defense": 120,
+    "accuracy": 158,
+    "dodge": 56,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 33,
+    "offense": 658,
+    "defense": 131,
+    "accuracy": 159,
+    "dodge": 57,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 34,
+    "offense": 685,
+    "defense": 147,
+    "accuracy": 160,
+    "dodge": 58,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 35,
+    "offense": 739,
+    "defense": 160,
+    "accuracy": 162,
+    "dodge": 60,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 36,
+    "offense": 742,
+    "defense": 170,
+    "accuracy": 169,
+    "dodge": 71,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 37,
+    "offense": 776,
+    "defense": 178,
+    "accuracy": 171,
+    "dodge": 77,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 38,
+    "offense": 767,
+    "defense": 188,
+    "accuracy": 175,
+    "dodge": 84,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 39,
+    "offense": 764,
+    "defense": 200,
+    "accuracy": 180,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "phoenix",
+    "floor": 40,
+    "offense": 886,
+    "defense": 217,
+    "accuracy": 180,
+    "dodge": 95,
+    "dr": 0
+  },
+  {
+    "kind": "queen:saidri-guardian",
+    "floor": 28,
+    "offense": 246,
+    "defense": 98,
+    "accuracy": 157,
+    "dodge": 39,
+    "dr": 36
+  },
+  {
+    "kind": "queen:saidri-guardian",
+    "floor": 29,
+    "offense": 265,
+    "defense": 115,
+    "accuracy": 164,
+    "dodge": 39,
+    "dr": 41
+  },
+  {
+    "kind": "queen:saidri-guardian",
+    "floor": 31,
+    "offense": 384,
+    "defense": 125,
+    "accuracy": 171,
+    "dodge": 39,
+    "dr": 44
+  },
+  {
+    "kind": "queen:saidri-guardian",
+    "floor": 32,
+    "offense": 393,
+    "defense": 135,
+    "accuracy": 163,
+    "dodge": 39,
+    "dr": 48
+  },
+  {
+    "kind": "queen:saidri-guardian",
+    "floor": 33,
+    "offense": 348,
+    "defense": 147,
+    "accuracy": 165,
+    "dodge": 39,
+    "dr": 51
+  },
+  {
+    "kind": "queen:saidri-guardian",
+    "floor": 34,
+    "offense": 383,
+    "defense": 169,
+    "accuracy": 168,
+    "dodge": 39,
+    "dr": 58
+  },
+  {
+    "kind": "queen:short-saidri",
+    "floor": 28,
+    "offense": 4,
+    "defense": 21,
+    "accuracy": 112,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "queen:short-saidri",
+    "floor": 29,
+    "offense": 4,
+    "defense": 27,
+    "accuracy": 119,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "queen:short-saidri",
+    "floor": 31,
+    "offense": 8,
+    "defense": 30,
+    "accuracy": 126,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "queen:short-saidri",
+    "floor": 32,
+    "offense": 7,
+    "defense": 33,
+    "accuracy": 118,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "queen:short-saidri",
+    "floor": 33,
+    "offense": 4,
+    "defense": 37,
+    "accuracy": 120,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "queen:short-saidri",
+    "floor": 34,
+    "offense": 4,
+    "defense": 45,
+    "accuracy": 122,
+    "dodge": -4,
+    "dr": 0
+  },
+  {
+    "kind": "rat",
+    "floor": 1,
+    "offense": 17,
+    "defense": -10,
+    "accuracy": -1,
+    "dodge": -3,
+    "dr": 0
+  },
+  {
+    "kind": "rat",
+    "floor": 2,
+    "offense": 29,
+    "defense": -5,
+    "accuracy": 2,
+    "dodge": -2,
+    "dr": 0
+  },
+  {
+    "kind": "rat",
+    "floor": 3,
+    "offense": 38,
+    "defense": -3,
+    "accuracy": 4,
+    "dodge": 1,
+    "dr": 0
+  },
+  {
+    "kind": "river-drake",
+    "floor": 22,
+    "offense": 293,
+    "defense": 50,
+    "accuracy": 133,
+    "dodge": 30,
+    "dr": 20
+  },
+  {
+    "kind": "river-drake",
+    "floor": 23,
+    "offense": 314,
+    "defense": 52,
+    "accuracy": 137,
+    "dodge": 32,
+    "dr": 21
+  },
+  {
+    "kind": "river-drake",
+    "floor": 24,
+    "offense": 363,
+    "defense": 53,
+    "accuracy": 136,
+    "dodge": 33,
+    "dr": 21
+  },
+  {
+    "kind": "river-drake",
+    "floor": 25,
+    "offense": 423,
+    "defense": 53,
+    "accuracy": 141,
+    "dodge": 33,
+    "dr": 21
+  },
+  {
+    "kind": "river-drake",
+    "floor": 26,
+    "offense": 449,
+    "defense": 57,
+    "accuracy": 146,
+    "dodge": 35,
+    "dr": 22
+  },
+  {
+    "kind": "river-drake",
+    "floor": 27,
+    "offense": 479,
+    "defense": 64,
+    "accuracy": 145,
+    "dodge": 33,
+    "dr": 24
+  },
+  {
+    "kind": "river-drake",
+    "floor": 28,
+    "offense": 553,
+    "defense": 69,
+    "accuracy": 144,
+    "dodge": 35,
+    "dr": 26
+  },
+  {
+    "kind": "river-drake",
+    "floor": 29,
+    "offense": 599,
+    "defense": 74,
+    "accuracy": 144,
+    "dodge": 35,
+    "dr": 27
+  },
+  {
+    "kind": "river-drake",
+    "floor": 30,
+    "offense": 697,
+    "defense": 81,
+    "accuracy": 144,
+    "dodge": 36,
+    "dr": 29
+  },
+  {
+    "kind": "river-drake",
+    "floor": 31,
+    "offense": 731,
+    "defense": 89,
+    "accuracy": 149,
+    "dodge": 46,
+    "dr": 32
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 25,
+    "offense": 415,
+    "defense": 21,
+    "accuracy": 142,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 26,
+    "offense": 415,
+    "defense": 21,
+    "accuracy": 142,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 27,
+    "offense": 388,
+    "defense": 36,
+    "accuracy": 146,
+    "dodge": 80,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 28,
+    "offense": 415,
+    "defense": 38,
+    "accuracy": 147,
+    "dodge": 81,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 29,
+    "offense": 440,
+    "defense": 45,
+    "accuracy": 147,
+    "dodge": 84,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 30,
+    "offense": 330,
+    "defense": 56,
+    "accuracy": 144,
+    "dodge": 79,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 31,
+    "offense": 495,
+    "defense": 62,
+    "accuracy": 151,
+    "dodge": 82,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 32,
+    "offense": 467,
+    "defense": 67,
+    "accuracy": 148,
+    "dodge": 82,
+    "dr": 0
+  },
+  {
+    "kind": "sabretooth",
+    "floor": 33,
+    "offense": 466,
+    "defense": 78,
+    "accuracy": 150,
+    "dodge": 85,
+    "dr": 0
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 31,
+    "offense": 400,
+    "defense": 98,
+    "accuracy": 157,
+    "dodge": 39,
+    "dr": 36
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 32,
+    "offense": 416,
+    "defense": 103,
+    "accuracy": 166,
+    "dodge": 59,
+    "dr": 37
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 33,
+    "offense": 444,
+    "defense": 117,
+    "accuracy": 161,
+    "dodge": 61,
+    "dr": 42
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 34,
+    "offense": 477,
+    "defense": 124,
+    "accuracy": 163,
+    "dodge": 48,
+    "dr": 44
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 35,
+    "offense": 496,
+    "defense": 134,
+    "accuracy": 168,
+    "dodge": 55,
+    "dr": 47
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 36,
+    "offense": 549,
+    "defense": 148,
+    "accuracy": 172,
+    "dodge": 61,
+    "dr": 52
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 37,
+    "offense": 506,
+    "defense": 158,
+    "accuracy": 174,
+    "dodge": 69,
+    "dr": 55
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 38,
+    "offense": 556,
+    "defense": 169,
+    "accuracy": 176,
+    "dodge": 83,
+    "dr": 58
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 39,
+    "offense": 581,
+    "defense": 172,
+    "accuracy": 184,
+    "dodge": 84,
+    "dr": 59
+  },
+  {
+    "kind": "saidri-guardian",
+    "floor": 40,
+    "offense": 632,
+    "defense": 189,
+    "accuracy": 185,
+    "dodge": 91,
+    "dr": 64
+  },
+  {
+    "kind": "shellback-beetle",
+    "floor": 1,
+    "offense": 16,
+    "defense": -8,
+    "accuracy": -2,
+    "dodge": -14,
+    "dr": 14
+  },
+  {
+    "kind": "shellback-beetle",
+    "floor": 2,
+    "offense": 30,
+    "defense": -3,
+    "accuracy": 1,
+    "dodge": -13,
+    "dr": 24
+  },
+  {
+    "kind": "shellback-beetle",
+    "floor": 3,
+    "offense": 34,
+    "defense": 0,
+    "accuracy": 3,
+    "dodge": -10,
+    "dr": 28
+  },
+  {
+    "kind": "shellback-beetle",
+    "floor": 4,
+    "offense": 45,
+    "defense": 1,
+    "accuracy": 4,
+    "dodge": -6,
+    "dr": 31
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 1,
+    "offense": -1,
+    "defense": -9,
+    "accuracy": -2,
+    "dodge": -11,
+    "dr": 0
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 2,
+    "offense": 5,
+    "defense": -6,
+    "accuracy": 1,
+    "dodge": -10,
+    "dr": 0
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 3,
+    "offense": 10,
+    "defense": -4,
+    "accuracy": 3,
+    "dodge": -9,
+    "dr": 0
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 4,
+    "offense": 18,
+    "defense": -3,
+    "accuracy": 4,
+    "dodge": -6,
+    "dr": 0
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 5,
+    "offense": 24,
+    "defense": 0,
+    "accuracy": 5,
+    "dodge": -3,
+    "dr": 0
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 6,
+    "offense": 26,
+    "defense": 2,
+    "accuracy": 8,
+    "dodge": 3,
+    "dr": 0
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 7,
+    "offense": 40,
+    "defense": 4,
+    "accuracy": 9,
+    "dodge": 8,
+    "dr": 0
+  },
+  {
+    "kind": "short-saidri",
+    "floor": 8,
+    "offense": 44,
+    "defense": 6,
+    "accuracy": 10,
+    "dodge": 13,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 26,
+    "offense": 332,
+    "defense": 46,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 27,
+    "offense": 296,
+    "defense": 56,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 28,
+    "offense": 372,
+    "defense": 66,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 29,
+    "offense": 345,
+    "defense": 69,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 30,
+    "offense": 419,
+    "defense": 79,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 31,
+    "offense": 522,
+    "defense": 81,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 32,
+    "offense": 560,
+    "defense": 89,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 33,
+    "offense": 552,
+    "defense": 101,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 34,
+    "offense": 662,
+    "defense": 114,
+    "accuracy": 148,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 35,
+    "offense": 654,
+    "defense": 125,
+    "accuracy": 153,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "skin-walker",
+    "floor": 36,
+    "offense": 601,
+    "defense": 129,
+    "accuracy": 164,
+    "dodge": 74.0,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 10,
+    "offense": 59,
+    "defense": 1,
+    "accuracy": 25,
+    "dodge": 38,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 11,
+    "offense": 73,
+    "defense": 6,
+    "accuracy": 31,
+    "dodge": 39,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 12,
+    "offense": 80,
+    "defense": 10,
+    "accuracy": 37,
+    "dodge": 41,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 13,
+    "offense": 91,
+    "defense": 12,
+    "accuracy": 45,
+    "dodge": 45,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 14,
+    "offense": 103,
+    "defense": 14,
+    "accuracy": 56,
+    "dodge": 45,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 15,
+    "offense": 114,
+    "defense": 19,
+    "accuracy": 67,
+    "dodge": 45,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 16,
+    "offense": 139,
+    "defense": 20,
+    "accuracy": 79,
+    "dodge": 48,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 17,
+    "offense": 143,
+    "defense": 24,
+    "accuracy": 92,
+    "dodge": 49,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 18,
+    "offense": 147,
+    "defense": 27,
+    "accuracy": 101,
+    "dodge": 51,
+    "dr": 0
+  },
+  {
+    "kind": "tiger",
+    "floor": 19,
+    "offense": 147,
+    "defense": 32,
+    "accuracy": 113,
+    "dodge": 52,
+    "dr": 0
+  },
+  {
+    "kind": "troll",
+    "floor": 19,
+    "offense": 160,
+    "defense": 69,
+    "accuracy": 111,
+    "dodge": 16,
+    "dr": 18
+  },
+  {
+    "kind": "troll",
+    "floor": 20,
+    "offense": 183,
+    "defense": 74,
+    "accuracy": 122,
+    "dodge": 19,
+    "dr": 19
+  },
+  {
+    "kind": "troll",
+    "floor": 21,
+    "offense": 198,
+    "defense": 79,
+    "accuracy": 125,
+    "dodge": 25,
+    "dr": 20
+  },
+  {
+    "kind": "troll",
+    "floor": 22,
+    "offense": 218,
+    "defense": 83,
+    "accuracy": 126,
+    "dodge": 28,
+    "dr": 21
+  },
+  {
+    "kind": "troll",
+    "floor": 23,
+    "offense": 233,
+    "defense": 85,
+    "accuracy": 127,
+    "dodge": 33,
+    "dr": 21
+  },
+  {
+    "kind": "troll",
+    "floor": 24,
+    "offense": 281,
+    "defense": 85,
+    "accuracy": 129,
+    "dodge": 36,
+    "dr": 21
+  },
+  {
+    "kind": "troll",
+    "floor": 25,
+    "offense": 308,
+    "defense": 86,
+    "accuracy": 132,
+    "dodge": 36,
+    "dr": 22
+  },
+  {
+    "kind": "troll",
+    "floor": 26,
+    "offense": 344,
+    "defense": 91,
+    "accuracy": 135,
+    "dodge": 39,
+    "dr": 23
+  },
+  {
+    "kind": "troll",
+    "floor": 27,
+    "offense": 369,
+    "defense": 100,
+    "accuracy": 135,
+    "dodge": 39,
+    "dr": 25
+  },
+  {
+    "kind": "troll",
+    "floor": 28,
+    "offense": 406,
+    "defense": 108,
+    "accuracy": 135,
+    "dodge": 40,
+    "dr": 26
+  },
+  {
+    "kind": "ursa-major",
+    "floor": 36,
+    "offense": 378,
+    "defense": 197,
+    "accuracy": 170,
+    "dodge": 47,
+    "dr": 72
+  },
+  {
+    "kind": "ursa-major",
+    "floor": 37,
+    "offense": 378,
+    "defense": 238,
+    "accuracy": 172,
+    "dodge": 52,
+    "dr": 75
+  },
+  {
+    "kind": "ursa-major",
+    "floor": 38,
+    "offense": 378,
+    "defense": 259,
+    "accuracy": 176,
+    "dodge": 59,
+    "dr": 78
+  },
+  {
+    "kind": "ursa-major",
+    "floor": 39,
+    "offense": 378,
+    "defense": 276,
+    "accuracy": 180,
+    "dodge": 67,
+    "dr": 82
+  },
+  {
+    "kind": "ursa-major",
+    "floor": 40,
+    "offense": 407,
+    "defense": 309,
+    "accuracy": 181,
+    "dodge": 71,
+    "dr": 90
+  },
+  {
+    "kind": "ursa-minor",
+    "floor": 36,
+    "offense": 324,
+    "defense": 144,
+    "accuracy": 160,
+    "dodge": 53,
+    "dr": 50
+  },
+  {
+    "kind": "ursa-minor",
+    "floor": 37,
+    "offense": 324,
+    "defense": 158,
+    "accuracy": 162,
+    "dodge": 58,
+    "dr": 52
+  },
+  {
+    "kind": "ursa-minor",
+    "floor": 38,
+    "offense": 324,
+    "defense": 169,
+    "accuracy": 166,
+    "dodge": 65,
+    "dr": 55
+  },
+  {
+    "kind": "ursa-minor",
+    "floor": 39,
+    "offense": 324,
+    "defense": 180,
+    "accuracy": 170,
+    "dodge": 73,
+    "dr": 58
+  },
+  {
+    "kind": "ursa-minor",
+    "floor": 40,
+    "offense": 349,
+    "defense": 199,
+    "accuracy": 171,
+    "dodge": 77,
+    "dr": 63
+  },
+  {
+    "kind": "valta",
+    "floor": 34,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 157,
+    "dodge": 87,
+    "dr": 0,
+    "special_damage": 615
+  },
+  {
+    "kind": "valta",
+    "floor": 35,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 157,
+    "dodge": 87,
+    "dr": 0,
+    "special_damage": 683
+  },
+  {
+    "kind": "valta",
+    "floor": 36,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 163,
+    "dodge": 87,
+    "dr": 0,
+    "special_damage": 820
+  },
+  {
+    "kind": "valta",
+    "floor": 37,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 163,
+    "dodge": 87,
+    "dr": 0,
+    "special_damage": 785
+  },
+  {
+    "kind": "valta",
+    "floor": 38,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 167,
+    "dodge": 87,
+    "dr": 0,
+    "special_damage": 839
+  },
+  {
+    "kind": "valta",
+    "floor": 39,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 174,
+    "dodge": 87,
+    "dr": 0,
+    "special_damage": 770
+  },
+  {
+    "kind": "valta",
+    "floor": 40,
+    "offense": 140,
+    "defense": 84,
+    "accuracy": 174,
+    "dodge": 87,
+    "dr": 0,
+    "special_damage": 885
+  },
+  {
+    "kind": "vampire",
+    "floor": 30,
+    "offense": 297,
+    "defense": 52,
+    "accuracy": 158,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 31,
+    "offense": 394,
+    "defense": 58,
+    "accuracy": 165,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 32,
+    "offense": 354,
+    "defense": 66,
+    "accuracy": 158,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 33,
+    "offense": 408,
+    "defense": 78,
+    "accuracy": 163,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 34,
+    "offense": 482,
+    "defense": 82,
+    "accuracy": 163,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 35,
+    "offense": 668,
+    "defense": 87,
+    "accuracy": 158,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 36,
+    "offense": 612,
+    "defense": 94,
+    "accuracy": 172,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 37,
+    "offense": 730,
+    "defense": 101,
+    "accuracy": 169,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "vampire",
+    "floor": 38,
+    "offense": 728,
+    "defense": 104,
+    "accuracy": 174,
+    "dodge": 92,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 17,
+    "offense": 210,
+    "defense": 11,
+    "accuracy": 100,
+    "dodge": 50,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 18,
+    "offense": 200,
+    "defense": 15,
+    "accuracy": 110,
+    "dodge": 53,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 19,
+    "offense": 212,
+    "defense": 19,
+    "accuracy": 113,
+    "dodge": 55,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 20,
+    "offense": 220,
+    "defense": 22,
+    "accuracy": 133,
+    "dodge": 57,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 21,
+    "offense": 260,
+    "defense": 27,
+    "accuracy": 132,
+    "dodge": 60,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 22,
+    "offense": 320,
+    "defense": 27,
+    "accuracy": 129,
+    "dodge": 62,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 23,
+    "offense": 310,
+    "defense": 29,
+    "accuracy": 133,
+    "dodge": 61,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 24,
+    "offense": 420,
+    "defense": 31,
+    "accuracy": 128,
+    "dodge": 66,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 25,
+    "offense": 460,
+    "defense": 35,
+    "accuracy": 131,
+    "dodge": 67,
+    "dr": 0
+  },
+  {
+    "kind": "wendigo",
+    "floor": 26,
+    "offense": 460,
+    "defense": 36,
+    "accuracy": 142,
+    "dodge": 67,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 27,
+    "offense": 15,
+    "defense": 33,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 28,
+    "offense": 15,
+    "defense": 33,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 29,
+    "offense": 15,
+    "defense": 38,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 30,
+    "offense": 15,
+    "defense": 40,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 31,
+    "offense": 15,
+    "defense": 48,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 32,
+    "offense": 15,
+    "defense": 50,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 33,
+    "offense": 15,
+    "defense": 55,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 34,
+    "offense": 15,
+    "defense": 62,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 35,
+    "offense": 15,
+    "defense": 68,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch",
+    "floor": 36,
+    "offense": 15,
+    "defense": 72,
+    "accuracy": 145,
+    "dodge": 90,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 27,
+    "offense": 190,
+    "defense": 24,
+    "accuracy": 140,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 28,
+    "offense": 193,
+    "defense": 24,
+    "accuracy": 155,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 29,
+    "offense": 214,
+    "defense": 28,
+    "accuracy": 145,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 30,
+    "offense": 250,
+    "defense": 30,
+    "accuracy": 140,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 31,
+    "offense": 279,
+    "defense": 36,
+    "accuracy": 141,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 32,
+    "offense": 293,
+    "defense": 38,
+    "accuracy": 142,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 33,
+    "offense": 322,
+    "defense": 42,
+    "accuracy": 146,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 34,
+    "offense": 303,
+    "defense": 48,
+    "accuracy": 147,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 35,
+    "offense": 332,
+    "defense": 53,
+    "accuracy": 149,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:night-crawler",
+    "floor": 36,
+    "offense": 360,
+    "defense": 56,
+    "accuracy": 156,
+    "dodge": 64,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 27,
+    "offense": 190,
+    "defense": 24,
+    "accuracy": 144,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 28,
+    "offense": 193,
+    "defense": 24,
+    "accuracy": 159,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 29,
+    "offense": 214,
+    "defense": 28,
+    "accuracy": 149,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 30,
+    "offense": 250,
+    "defense": 30,
+    "accuracy": 144,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 31,
+    "offense": 279,
+    "defense": 36,
+    "accuracy": 145,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 32,
+    "offense": 293,
+    "defense": 38,
+    "accuracy": 146,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 33,
+    "offense": 322,
+    "defense": 42,
+    "accuracy": 150,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 34,
+    "offense": 303,
+    "defense": 48,
+    "accuracy": 151,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 35,
+    "offense": 332,
+    "defense": 53,
+    "accuracy": 153,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "witch:skin-walker",
+    "floor": 36,
+    "offense": 360,
+    "defense": 56,
+    "accuracy": 160,
+    "dodge": 78,
+    "dr": 0
+  },
+  {
+    "kind": "yeti",
+    "floor": 27,
+    "offense": 199,
+    "defense": 46,
+    "accuracy": 147,
+    "dodge": 35,
+    "dr": 29
+  },
+  {
+    "kind": "yeti",
+    "floor": 28,
+    "offense": 209,
+    "defense": 51,
+    "accuracy": 147,
+    "dodge": 37,
+    "dr": 31
+  },
+  {
+    "kind": "yeti",
+    "floor": 29,
+    "offense": 223,
+    "defense": 55,
+    "accuracy": 147,
+    "dodge": 36,
+    "dr": 33
+  },
+  {
+    "kind": "yeti",
+    "floor": 30,
+    "offense": 242,
+    "defense": 62,
+    "accuracy": 147,
+    "dodge": 38,
+    "dr": 36
+  },
+  {
+    "kind": "yeti",
+    "floor": 31,
+    "offense": 276,
+    "defense": 65,
+    "accuracy": 149,
+    "dodge": 43,
+    "dr": 38
+  },
+  {
+    "kind": "yeti",
+    "floor": 32,
+    "offense": 275,
+    "defense": 72,
+    "accuracy": 149,
+    "dodge": 44,
+    "dr": 41
+  },
+  {
+    "kind": "yeti",
+    "floor": 33,
+    "offense": 302,
+    "defense": 78,
+    "accuracy": 150,
+    "dodge": 44,
+    "dr": 44
+  },
+  {
+    "kind": "yeti",
+    "floor": 34,
+    "offense": 320,
+    "defense": 93,
+    "accuracy": 151,
+    "dodge": 48,
+    "dr": 51
+  },
+  {
+    "kind": "yeti",
+    "floor": 35,
+    "offense": 324,
+    "defense": 97,
+    "accuracy": 156,
+    "dodge": 48,
+    "dr": 53
+  },
+  {
+    "kind": "yeti",
+    "floor": 36,
+    "offense": 341,
+    "defense": 106,
+    "accuracy": 160,
+    "dodge": 57,
+    "dr": 57
+  }
+]

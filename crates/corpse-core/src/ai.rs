@@ -24,7 +24,10 @@ pub fn is_hasted_in(r: &crate::Run, a: &Actor) -> bool {
     if a.conditions.get("slowed").copied().unwrap_or(0.0) > 0.0 {
         return false;
     }
-    is_hasted(a)
+    (if r.simulation_revision.value_or(29.) >= 52. {
+        condition(a, "hasted") > 0. || a.active.iter().any(|id| id == "etill-rushing-torrent")
+    } else { is_hasted(a) })
+        || crate::revision52_swimming::grants_haste(r, a)
         || (a.abilities.iter().any(|id| id == "ursa-sleep-walk") && a.energy == 0.0)
         || (a
             .abilities
@@ -38,6 +41,16 @@ pub fn is_hasted_in(r: &crate::Run, a: &Actor) -> bool {
                     && b.conditions.get("seesPlayer") == Some(&1.0)
                     && crate::vision::detection_chance(r, b, a) > 0.0
             }))
+}
+/// Innate movement speed is not a second complete action. Vampire Bat form
+/// retains its existing movement benefit without being reported as Haste.
+pub fn is_fast(a: &Actor) -> bool {
+    a.abilities.iter().any(|id| id == "enemy:beast:fast") || crate::monster_vampire::flying(a)
+}
+pub fn fast_movement_enabled(r: &crate::Run, a: &Actor) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && is_fast(a)
+        && condition(a, "slowed") <= 0.
+        && !a.abilities.iter().any(|id| id == "enemy:beast:slow" || id == "enemy:pale:slow")
 }
 use crate::{Field, Run, combat, engine::condition, vision};
 pub fn sleeping(a: &Actor) -> bool {
@@ -103,6 +116,7 @@ pub fn advance_rest(r: &Run, a: &mut Actor, detected: bool) -> bool {
             "chaseExitY",
             "chaseLandingX",
             "chaseLandingY",
+            "chaseChasm",
             "stalkGoalX",
             "stalkGoalY",
             "stalkObservedX",
@@ -267,7 +281,11 @@ pub fn enemy_action_options(
     if a.abilities.iter().any(|id| id == "enemy:pale:breath-boost") && enemy_spend(r, id, 10.0) {
         let i = a.y as usize * r.floor().unwrap().width() + a.x as usize;
         let gas = crate::environment::breather_gas(r, &a);
-        crate::environment::add_gas(
+        // The paid cast deposits in one cell; propagation is a later world step.
+        // Observe that committed delta, never invent a radius around the caster.
+        let before=crate::animation_enemy::gas_cell(r, i);
+        let before=(before.0==Some(gas),before.1);
+        let deposited=crate::environment::add_gas(
             r.floor_mut().unwrap(),
             i,
             gas,
@@ -283,7 +301,11 @@ pub fn enemy_action_options(
                 "enemy",
             );
         }
-        crate::events::actor_event(r, &a, "burst", if gas == "hallucinogenic" { "Hallucinogenic gas" } else { "Caustic gas" }, None, None);
+        if crate::events::enabled(r) {
+            if deposited {crate::animation_enemy::gas_deposited(r,&a,i,before,gas,"E57");}
+        } else {
+            crate::events::actor_event(r, &a, "burst", if gas == "hallucinogenic" { "Hallucinogenic gas" } else { "Caustic gas" }, None, None);
+        }
         return Ok(true);
     }
     if a.abilities.iter().any(|id| id == "enemy:pale:scream") && enemy_spend(r, id, 15.0) {
@@ -326,11 +348,13 @@ pub fn enemy_action_options(
                     }
                 }
             }
+            let show=nearby;
             if same && other != player && b.state != "ally" {
                 wake(b, true);
                 b.state = "hunting".into();
                 b.last_seen = Field::Value(crate::ActorLastSeen { x: a.x, y: a.y });
             }
+            let b=b.clone(); if show { crate::animation_enemy::mark(r,&b,"E65",if same {"diamond-warm"}else{"crossed-ring-violet"},crate::events::Stage::Special); }
         }
         crate::events::actor_event(r, &a, "pulse", "Scream", None, None);
         if vision::visible_actor(r, &a) {
@@ -362,9 +386,12 @@ pub fn enemy_action_options(
         } else {
             1.0
         };
-        let base = (10.0 + combat::effective_stats(r, &a).offense) * multiplier;
+        let (fixed, coefficient) = if combat::raw_attack_damage_enabled(r.simulation_revision.value_or(29.)) { (5., 0.5) } else { (10., 1.) };
+        let base = (fixed + coefficient * combat::effective_stats(r, &a).offense) * multiplier;
         let landing=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
+    crate::events::tag_path(&a,"E61","glob");
         let range=crate::projectiles::traveled_distance(r,&a,b.x,b.y,&landing);
+        if landing.actor_id.is_none() && crate::events::enabled(r) {crate::events::actor_event(r,&a,"projectile","Distant spit",Some(crate::events::EventPoint{x:landing.x,y:landing.y}),None);}
         if let Some(actual)=landing.actor_id.filter(|_|range<=12.){crate::engine::attack_ranged_resolved(r,id,actual,base,range,1.,false)?;}
         actor_mut_trusted(r, id)
             .unwrap()
@@ -381,6 +408,8 @@ pub fn enemy_action_options(
                 id,
             )
             .map_err(crate::engine::EngineError)?;
+            let w=r.floor().unwrap().width();
+            crate::events::cue(r,&a,"E62","puff-green",crate::events::Stage::Special,&[crate::events::EventPoint{x:(i%w) as f64,y:(i/w) as f64}]);
         }
         return Ok(true);
     }
@@ -477,19 +506,24 @@ pub fn enemy_action_options(
             crate::physical_balance::apply_summoned_actor(
                 &mut child, greater, &format!("pale:{role}"), r.simulation_revision.value_or(29.0),
             );
+            let context = if greater { "greater-birther" } else { "birther" };
+            crate::balance52::apply_new_actor_kind(&mut child, &format!("{context}:pale:{role}"), r.depth, r.simulation_revision.value_or(29.));
             let label = format!(
                 "Birth {}",
                 child.name.strip_prefix("Pale ").unwrap_or(&child.name)
             );
+            if crate::events::enabled(r) {
+                crate::animation_enemy::mark(r,&child,if twins {"E64"}else{"E63"},"membrane-ivory",crate::events::Stage::Special);
+            }
             r.actors_at_mut(r.depth).push(child);
-            crate::events::actor_event(
+            if !crate::events::enabled(r) { crate::events::actor_event(
                 r,
                 &a,
                 "summon",
                 &label,
                 Some(crate::events::EventPoint { x, y }),
                 None,
-            );
+            ); }
         }
         if r.simulation_revision.value_or(29.0) >= 32.0 {
             let ready_at = r.tick + 10.0;
@@ -556,8 +590,18 @@ pub fn enemy_hit_effects(r: &mut Run, id: f64, target: f64) {
     };
     if strength > 0.0 {
         let key = format!("venom:{}:{}", r.tick + 5.0, id);
+        let stacked = r.simulation_revision.value_or(29.0) >= 52.0;
+        let now = r.tick;
         let b = actor_mut_trusted(r, target).unwrap();
-        *b.conditions.entry(key).or_insert(0.0) += strength;
+        if stacked {
+            // O(C) time and O(1) scratch: one additive severity, one refreshed clock.
+            let severity = b.conditions.iter().filter(|(k, _)| venom_expiry(k).is_some_and(|expiry| expiry >= now))
+                .map(|(_, value)| value.max(0.0)).sum::<f64>();
+            b.conditions.retain(|k, _| !k.starts_with("venom:"));
+            b.conditions.insert(key, severity + strength);
+        } else {
+            *b.conditions.entry(key).or_insert(0.0) += strength;
+        }
         b.conditions.insert("envenomed".into(), 5.0);
         let b = b.clone();
         if id == r.player.id
@@ -588,7 +632,34 @@ pub fn enemy_hit_effects(r: &mut Run, id: f64, target: f64) {
         crate::events::actor_event(r, &a, "status", "Envenomed", Some((&b).into()), None);
     }
 }
+fn venom_expiry(key: &str) -> Option<f64> {
+    key.strip_prefix("venom:")?.split(':').next()?.parse::<f64>().ok().filter(|n| n.is_finite())
+}
+
+/// R52 saves retain the existing key format. Older multi-bucket R52 states migrate
+/// lazily to one severity and the latest expiry, without resetting their clock.
+/// O(C) time, O(1) scratch besides the replacement key.
+fn consolidate_venom(r: &mut Run, id: f64) {
+    let now = r.tick;
+    let a = crate::engine::actor_mut_trusted(r, id).unwrap();
+    let mut severity = 0.0;
+    let mut latest: Option<(f64, String)> = None;
+    for (key, value) in &a.conditions {
+        if let Some(expiry) = venom_expiry(key).filter(|expiry| *expiry >= now) {
+            severity += value.max(0.0);
+            if latest.as_ref().is_none_or(|(old, _)| expiry > *old) {
+                latest = Some((expiry, key.clone()));
+            }
+        }
+    }
+    a.conditions.retain(|key, _| !key.starts_with("venom:"));
+    if let Some((_, key)) = latest.filter(|_| severity > 0.0) {
+        a.conditions.insert(key, severity);
+    }
+}
+
 pub fn enemy_turn_effects(r: &mut Run, id: f64) -> Result<(), crate::engine::EngineError> {
+    if r.simulation_revision.value_or(29.0) >= 52.0 { consolidate_venom(r, id); }
     let keys: Vec<_> = crate::engine::actor(r, id)
         .unwrap()
         .conditions

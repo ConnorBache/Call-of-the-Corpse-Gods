@@ -23,7 +23,7 @@ fn compact_dialog_input_damage_and_canvas_restore_share_one_transform() {
 fn compact_dialogs_render_repeatably_and_restore_background_after_dismissal() {
     let engine=corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let view=crate::observe::observe(&engine.run);let before=engine.save().unwrap();
     let mut p=Painter::new();p.set_responsive_canvas(true);p.game_at(&view,"",false,0.);let base=p.pixels.clone();
-    let ability=crate::ability_ui::AbilityView{id:"test".into(),name:"A long observed ability name".into(),description:"Full ability details remain available by scrolling. ".repeat(45),color:GOLD,cost:"6 Energy".into(),state:"Ready".into(),active:false,mode:"Active".into(),supported:true};
+    let ability=crate::ability_ui::AbilityView{reserve:None,indicator:None,fortunes:None,pending_reserve_loss:0.,id:"test".into(),name:"A long observed ability name".into(),description:"Full ability details remain available by scrolling. ".repeat(45),color:GOLD,cost:"6 Energy".into(),state:"Ready".into(),active:false,mode:"Active".into(),supported:true};
     for name in ["creatures","ability","hazard","inspection","pack","blessing"] {
         p.pixels.copy_from_slice(&base);
         match name {

@@ -1,5 +1,8 @@
 //! Display units only. Save fields and simulation arithmetic remain unchanged.
 use corpse_core::Actor;
+/// Current HP labels use whole units without depicting a living fraction as zero.
+/// O(1), display only: exact HP, bar proportions and death thresholds are untouched.
+pub fn current_health(hp: f64) -> f64 { hp.ceil().max(0.) }
 /// O(1). Input is already rounded by its mechanic; never round before conversion.
 /// Damage is the player's nominal melee bonus, not final damage or a ranged bonus.
 pub fn bonus(key: &str, value: f64) -> (&str, f64) {
@@ -14,11 +17,22 @@ pub fn damage_bonus(run: &corpse_core::Run, value: f64) -> f64 {
     if corpse_core::combat::nearest_damage_enabled(run) { corpse_core::combat::integer_stat(value) }
     else { value }
 }
-/// Ordinary enemy strike, before variance, DR and abilities, displayed to the nearest whole point.
-/// Actor-specific weapon coefficients matter; do not use the player bonus scale.
+/// Current-revision ordinary enemy strike, before variance, DR and abilities.
+/// Actor-specific weapon coefficients matter; never use the player bonus scale.
 pub fn enemy_damage(actor: &Actor) -> f64 {
-    corpse_core::combat::nearest_damage((actor.conditions.get("weaponDamage").copied().unwrap_or(10.)
-        + actor.stats.offense * actor.conditions.get("weaponOffenseMultiplier").copied().unwrap_or(1.)) * 0.5)
+    enemy_damage_revision(actor, 52.)
+}
+/// O(1) display conversion, using the originating run's rounding policy.
+/// R51+ rounds to nearest; legacy profiles retain ceiling. No Actor/Run mutation.
+pub fn enemy_damage_revision(actor: &Actor, revision: f64) -> f64 {
+    let amount = corpse_core::combat::creature_attack_base(revision, actor, actor.stats.offense);
+    if corpse_core::combat::raw_attack_damage_enabled(revision) {
+        corpse_core::combat::nearest_damage(amount)
+    } else if revision >= 51. {
+        corpse_core::combat::nearest_damage(amount * 0.5)
+    } else {
+        corpse_core::combat::tuned_damage(amount, Some("attack"))
+    }
 }
 #[cfg(test)] mod tests {
     use super::*;
@@ -33,7 +47,7 @@ pub fn enemy_damage(actor: &Actor) -> f64 {
         assert_eq!(enemy_damage(&a),7.);
         a.conditions.insert("weaponDamage".into(),45.);
         a.conditions.insert("weaponOffenseMultiplier".into(),2.);
-        assert_eq!(enemy_damage(&a),27.);
+        assert_eq!(enemy_damage(&a),53.);
     }
 }
 
@@ -48,5 +62,44 @@ mod revision51_hud_tests {
         let before=r.clone();assert_eq!(corpse_core::combat::effective_stats(&r,&r.player).offense,-1.5);
         assert_eq!(crate::observe::observe(&r).player_stats[0],-2.);assert_eq!(r,before);
         r.simulation_revision=50.0.into();assert_eq!(crate::observe::observe(&r).player_stats[0],-1.5);
+    }
+}
+
+#[cfg(test)]
+mod revision52_bestiary_damage_tests {
+    use super::*;
+    #[test]
+    fn enemy_damage_revision_keeps_legacy_rounding_and_current_coefficients() {
+        let mut actor = Actor::default();
+        actor.stats.offense = 2.2;
+        let before = actor.clone();
+        for revision in [29., 33., 42., 50.] {
+            assert_eq!(enemy_damage_revision(&actor, revision), 7.);
+        }
+        for revision in [51., 52.] {
+            assert_eq!(enemy_damage_revision(&actor, revision), 6.);
+        }
+        assert_eq!(actor, before);
+        actor.conditions.insert("weaponDamage".into(), 45.);
+        actor.conditions.insert("weaponOffenseMultiplier".into(), 2.);
+        actor.stats.offense = 4.;
+        assert_eq!(enemy_damage_revision(&actor, 50.), 27.);
+        assert_eq!(enemy_damage_revision(&actor, 52.), 53.);
+        actor.stats.offense = -100.;
+        for revision in [29., 50., 51., 52.] {
+            assert_eq!(enemy_damage_revision(&actor, revision), 0.);
+        }
+    }
+}
+
+#[cfg(test)]
+mod zero_health_display_tests {
+    #[test]
+    fn whole_health_never_rounds_a_living_fraction_to_zero() {
+        for hp in [f64::MIN_POSITIVE, 0.01, 0.25, 0.4, 0.5, 1.] {
+            assert_eq!(super::current_health(hp), 1.);
+        }
+        for hp in [-10., -0.25, -0., 0.] { assert_eq!(super::current_health(hp), 0.); }
+        assert_eq!(super::current_health(1.25), 2.);
     }
 }

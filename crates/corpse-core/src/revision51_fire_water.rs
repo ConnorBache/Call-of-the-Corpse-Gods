@@ -34,8 +34,9 @@ pub fn extinguish_cell(f: &mut Floor, i: usize, revision: f64) -> bool {
     extinguish(f, i);
     true
 }
-/// Sparkle itself is quenched by water even where independent Ichor can burn.
+/// R51 quenched Sparkle even on Ichor. R52 shares ordinary fire's fuel exception.
 pub fn extinguish_sparkle(f: &mut Floor, i: usize, revision: f64) -> bool {
+    if revision >= 52. { return extinguish_cell(f, i, revision); }
     if revision < 51. || !matches!(f.tiles.get(i).map(String::as_str), Some("water" | "shallow-water"))
         || crate::terrain_runtime::hellfire_at(f, i) { return false; }
     extinguish(f, i);

@@ -122,19 +122,19 @@ impl RasterStats {
 use super::{Cell as PaintCell, Painter, View, Rgb};
 use std::collections::{BTreeMap,BTreeSet};
 #[derive(Clone,PartialEq)]
-struct AbilityInk {name:String,cost:String,state:String,mode:String,color:Rgb,active:bool,supported:bool}
+struct AbilityInk {indicator:Option<crate::ability_ui::CustomIndicator>,fortunes:Option<(u8,u8)>,reserve:Option<(u64,u64)>,pending:u64,name:String,cost:String,state:String,mode:String,color:Rgb,active:bool,supported:bool}
 #[derive(Clone,PartialEq)]
-struct HudKey {domain:String,mode:String,gods:Vec<(String,Rgb)>,numbers:[u64;8],stats:[u64;5],creatures:usize,meters:Vec<crate::statuses_ui::Meter>,status_offset:usize,abilities:Vec<AbilityInk>,total:usize}
-impl HudKey {fn from(v:&View)->Self{Self{domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
+struct HudKey {cogworks_mode:u8,selected_ability:Option<String>,pending_energy_loss:u64,resource_changes:[String;3],domain:String,mode:String,gods:Vec<(String,Rgb)>,numbers:[u64;10],stats:[u64;5],creatures:usize,meters:Vec<crate::statuses_ui::Meter>,status_offset:usize,abilities:Vec<AbilityInk>,total:usize}
+impl HudKey {fn from(v:&View)->Self{Self{cogworks_mode:v.cogworks_mode,selected_ability:v.selected_ability.clone(),pending_energy_loss:v.pending_energy_loss.to_bits(),resource_changes:v.resource_changes.clone(),domain:v.domain.clone(),mode:v.mode.clone(),gods:v.god_labels.clone(),numbers:[v.depth.to_bits(),v.display_depth.to_bits(),v.max_depth as u64,v.level.to_bits(),v.hp.to_bits(),v.max_hp.to_bits(),v.energy.to_bits(),v.max_energy.to_bits(),v.blessings.to_bits(),v.blessing_goal.to_bits()],stats:v.player_stats.map(f64::to_bits),creatures:v.creatures.len(),meters:v.player_meters.clone(),status_offset:v.player_status_offset,abilities:v.abilities.iter().map(|a|AbilityInk{indicator:a.indicator,fortunes:a.fortunes,reserve:a.reserve.map(|(n,m)|(n.to_bits(),m.to_bits())),pending:a.pending_reserve_loss.to_bits(),name:a.name.clone(),cost:a.cost.clone(),state:a.state.clone(),mode:a.mode.clone(),color:a.color,active:a.active,supported:a.supported}).collect(),total:v.total_abilities}}}
 #[derive(Clone,PartialEq)]
-struct EnemyInk {perception_range:Option<String>,identity_outline:Option<Rgb>,id:u64,name:String,glyph:String,state:String,color:Rgb,distance:u64,resources:[u64;4],shared:bool,invulnerable:bool,statuses:Vec<crate::statuses_ui::Status>,meters:Vec<crate::statuses_ui::Meter>}
+struct EnemyInk {perception_range:Option<String>,identity_outline:Option<Rgb>,id:u64,name:String,glyph:String,state:String,color:Rgb,distance:u64,resources:[u64;4],shared:bool,uses_energy:bool,invulnerable:bool,statuses:Vec<crate::statuses_ui::Status>,meters:Vec<crate::statuses_ui::Meter>}
 #[derive(Clone,PartialEq)]
-struct Selection {toolbar:Option<usize>,bestiary:bool,enemy:Option<u64>,ability:Option<usize>,chronicle:bool,enemy_offset:usize}
-impl Selection {fn from(p:&Painter)->Self{Self{toolbar:p.toolbar_focus,bestiary:p.bestiary_unread,enemy:p.enemy_hover,ability:p.ability_hover,chronicle:p.chronicle_hover,enemy_offset:p.enemy_list_offset}}}
+struct Selection {toolbar:Option<usize>,bestiary:bool,enemy:Option<u64>,ground:Option<(usize,usize)>,ability:Option<usize>,chronicle:bool,enemy_offset:usize}
+impl Selection {fn from(p:&Painter)->Self{Self{toolbar:p.toolbar_focus,bestiary:p.bestiary_unread,enemy:p.enemy_hover,ground:p.ground_hover,ability:p.ability_hover,chronicle:p.chronicle_hover,enemy_offset:p.enemy_list_offset}}}
 struct Scene {
     order:Vec<(usize,usize)>, stacks:BTreeMap<(usize,usize),Vec<PaintCell>>, bounds:BTreeMap<(usize,usize),Rect>,
     buckets:BTreeMap<(usize,usize),Vec<usize>>, animated:Vec<Rect>,
-    chronicle:Vec<crate::chronicle::Group>,chronicle_offset:usize,hud:HudKey,enemies:Vec<EnemyInk>,
+    chronicle:Vec<crate::chronicle::Group>,chronicle_offset:usize,hud:HudKey,enemies:Vec<EnemyInk>,ground:Vec<super::enemy_list::GroundEntity>,
     paths:Vec<(usize,usize)>,targets:Vec<(usize,usize)>,target_area:Vec<(usize,usize)>,target_impact:Option<(usize,usize)>,target_color:Option<[u8;3]>,exits:Vec<(usize,usize)>,hover:Option<(usize,usize)>,
     perception_boundaries:Vec<crate::perception_ui::Boundary>,
     deep_water:bool,immersion_color:Option<Rgb>,dream:bool,seeds:(u32,u32),provenance:String,
@@ -162,7 +162,7 @@ impl Scene {
                 if !c.animations.is_empty()||c.pulse_speed!=0. {animated.push(b);}
             }
         }
-        Self{order:v.cells.iter().map(|c|(c.x,c.y)).collect(),stacks,bounds,buckets,animated,chronicle:v.log_groups.clone(),chronicle_offset:v.chronicle_offset,hud:HudKey::from(v),enemies:v.creatures.iter().map(|a|EnemyInk{perception_range:a.perception_range.clone(),identity_outline:a.identity_outline,id:a.id.to_bits(),name:a.name.clone(),glyph:a.glyph.clone(),state:a.state.clone(),color:a.color,distance:a.distance.to_bits(),resources:[a.hp.to_bits(),a.max_hp.to_bits(),a.energy.to_bits(),a.max_energy.to_bits()],shared:a.shared_resources,invulnerable:a.invulnerable,statuses:a.statuses.clone(),meters:a.meters.clone()}).collect(),paths:v.path.clone(),targets:v.target_path.clone(),target_area:v.target_area.clone(),target_impact:v.target_impact,target_color:v.target_color,exits:v.possible_exits.clone(),hover:v.hover,perception_boundaries:v.perception_boundaries.clone(),deep_water:v.deep_water,immersion_color:crate::illumination_ui::immersion_color(v),dream:v.dreamwalking,seeds:(v.cosmetic_seed,v.fire_seed),provenance:v.provenance.clone()}
+        Self{order:v.cells.iter().map(|c|(c.x,c.y)).collect(),stacks,bounds,buckets,animated,chronicle:v.log_groups.clone(),chronicle_offset:v.chronicle_offset,hud:HudKey::from(v),ground:v.ground_entities.clone(),enemies:v.creatures.iter().map(|a|EnemyInk{perception_range:a.perception_range.clone(),identity_outline:a.identity_outline,id:a.id.to_bits(),name:a.name.clone(),glyph:a.glyph.clone(),state:a.state.clone(),color:a.color,distance:a.distance.to_bits(),resources:[a.hp.to_bits(),a.max_hp.to_bits(),a.energy.to_bits(),a.max_energy.to_bits()],shared:a.shared_resources,uses_energy:a.uses_energy,invulnerable:a.invulnerable,statuses:a.statuses.clone(),meters:a.meters.clone()}).collect(),paths:v.path.clone(),targets:v.target_path.clone(),target_area:v.target_area.clone(),target_impact:v.target_impact,target_color:v.target_color,exits:v.possible_exits.clone(),hover:v.hover,perception_boundaries:v.perception_boundaries.clone(),deep_water:v.deep_water,immersion_color:crate::illumination_ui::immersion_color(v),dream:v.dreamwalking,seeds:(v.cosmetic_seed,v.fire_seed),provenance:v.provenance.clone()}
     }
     /// O(covered32px buckets + K log K), K intersecting cell stack indices.
     /// Sorted indices preserve global terrain/item/actor z-order exactly.
@@ -170,7 +170,7 @@ impl Scene {
     fn add_interactions(&self,p:&Painter,v:&View,d:&mut Damage){
         let(cw,ch,ox,oy)=p.map_layout(v.width,v.height);
         for &(x,y) in self.paths.iter().chain(&self.targets).chain(&self.target_area).chain(self.target_impact.iter()).chain(&self.exits).chain(self.hover.iter()){
-            if let Some(r)=p.logical_damage_rect(ox+x as i32*cw-2,oy+y as i32*ch-2,cw+4,ch+4){d.add(r);}
+            if let Some(r)=p.interaction_damage_rect(ox+x as i32*cw,oy+y as i32*ch,cw,ch){d.add(r);}
         }
     }
 }
@@ -190,7 +190,7 @@ impl RetainedGame {
         let full=force_full||!self.base.ready(size.0,size.1)||self.scene.is_none()||self.size!=size||self.layout!=layout;
         let mut damage=if full{Damage::full(size.0,size.1)}else{Damage::empty(size.0,size.1)};
         let next=(full||view_changed).then(||Scene::capture(p,v));
-        let left=p.hud_left();let top=super::chronicle_height(&p.profile)+20;
+        let left=p.hud_left();let top=super::chronicle_height(&p.profile)+20;let entities=p.frame().map.2;
         let add=|d:&mut Damage,x,y,w,h|{if let Some(r)=p.logical_damage_rect(x,y,w,h){d.add(r);}};
         if !full {
             let previous=self.scene.as_ref().unwrap();
@@ -206,7 +206,7 @@ impl RetainedGame {
                 for(at,_)in &next.stacks{if !previous.stacks.contains_key(at){if let Some(r)=next.bounds.get(at){damage.add(*r);}}}
                 if previous.chronicle!=next.chronicle||previous.chronicle_offset!=next.chronicle_offset{add(&mut damage,0,0,left,top);}
                 if previous.hud!=next.hud{add(&mut damage,left,0,p.logical_width()-left,p.logical_height());}
-                if previous.enemies!=next.enemies{add(&mut damage,0,top,layout.2,p.logical_height()-top);}
+                if previous.enemies!=next.enemies||previous.ground!=next.ground{add(&mut damage,entities,0,left-entities,p.logical_height());}
                 if previous.provenance!=next.provenance{add(&mut damage,0,775,super::WIDTH as i32,25);}
                 if previous.paths!=next.paths||previous.targets!=next.targets||previous.target_area!=next.target_area||previous.target_impact!=next.target_impact||previous.target_color!=next.target_color||previous.exits!=next.exits||previous.hover!=next.hover{previous.add_interactions(p,v,&mut damage);next.add_interactions(p,v,&mut damage);}
                 if previous.perception_boundaries!=next.perception_boundaries {
@@ -217,7 +217,7 @@ impl RetainedGame {
             let selection=Selection::from(p);
             if let Some(old)=&self.selection{
                 if old.toolbar!=selection.toolbar||old.bestiary!=selection.bestiary{add(&mut damage,0,p.toolbar_y()-24,p.logical_width(),p.logical_height()-p.toolbar_y()+24);}
-                if old.enemy!=selection.enemy||old.enemy_offset!=selection.enemy_offset{add(&mut damage,0,top,layout.2,p.logical_height()-top);}
+                if old.ground!=selection.ground||old.enemy!=selection.enemy||old.enemy_offset!=selection.enemy_offset{add(&mut damage,entities,0,left-entities,p.logical_height());}
                 if old.enemy!=selection.enemy {
                     for id in [old.enemy,selection.enemy] {
                         for b in previous.perception_boundaries.iter().filter(|b|Some(b.actor)==id){for r in crate::perception_ui::bounds(p,v,b){damage.add(r);}}
@@ -228,10 +228,15 @@ impl RetainedGame {
                         if let Some(rect)=p.cell_damage_rect(cell,v.width,v.height){damage.add(rect);}
                     }}
                 }
+                if old.ground!=selection.ground {
+                    for (x,y) in [old.ground,selection.ground].into_iter().flatten() {
+                        if let Some(r)=p.interaction_damage_rect(layout.2+x as i32*layout.0,layout.3+y as i32*layout.1,layout.0,layout.1){damage.add(r);}
+                    }
+                }
                 if old.ability!=selection.ability{add(&mut damage,left,crate::ability_ui::top(&p.profile)-4,p.logical_width()-left,p.logical_height()-crate::ability_ui::top(&p.profile)+4);}
                 if old.chronicle!=selection.chronicle{add(&mut damage,0,0,left,top);}
             }
-            if self.notice!=notice{add(&mut damage,0,p.toolbar_y()-24,p.logical_width(),p.logical_height()-p.toolbar_y()+24);}
+            if self.notice!=notice{if let Some(rect)=p.footer_damage(){damage.add(rect);}}
             if self.now!=Some(now.to_bits()) || (view_changed && (crate::appearance_light::animated(&p.profile)||crate::appearance_material::animated(&p.profile))) {
                 let scene=next.as_ref().unwrap_or(previous);
                 if v.dreamwalking||crate::appearance_light::animated(&p.profile)||crate::appearance_material::animated(&p.profile){

@@ -1,11 +1,11 @@
 //! Read-only source ability-presentation / ui-ability-list projection.
 use crate::render::Rgb;
 use corpse_core::{model::Run, progression};
-pub const TOP: i32 = 278;
-pub const ROW: i32 = 34;
-pub const CAPACITY: usize = 12;
+pub const TOP: i32 = 182;
+pub const ROW: i32 = 35;
+pub const CAPACITY: usize = 9;
 pub fn top(p: &crate::appearance_profile::Profile) -> i32 {
-    p.number("ui.layout.resourceRegionHeight").round() as i32 + 40
+    p.number("ui.layout.resourceRegionHeight").round() as i32 - 56
 }
 pub fn row(p: &crate::appearance_profile::Profile) -> i32 {
     let action = if p.number("typography.ability.fontSize") == 16. {
@@ -13,20 +13,16 @@ pub fn row(p: &crate::appearance_profile::Profile) -> i32 {
     } else {
         p.number("typography.ability.fontSize")
     };
-    p.number("ui.layout.abilityRowHeight")
-        .max(
-            (action * p.number("typography.ability.lineHeight"))
-                .max(
-                    p.number("typography.secondary.fontSize")
-                        * p.number("typography.secondary.lineHeight"),
-                )
-                .ceil()
-                + 6.,
-        )
-        .round() as i32
+    let minimum = (action * p.number("typography.ability.lineHeight"))
+        .max(p.number("typography.secondary.fontSize") * p.number("typography.secondary.lineHeight"))
+        .ceil() + 6.;
+    let previous = p.number("ui.layout.abilityRowHeight").max(50.).max(minimum);
+    // A compact reserve meter is 19 logical pixels; halve only the spare gap.
+    // Keep the typography minimum so larger authored fonts are never crushed.
+    (19. + (previous - 19.) / 2.).max(minimum).round() as i32
 }
 pub fn capacity(p: &crate::appearance_profile::Profile) -> usize {
-    ((702 - top(p)).max(0) / row(p).max(1)).max(1) as usize
+    ((634 - top(p)).max(0) / row(p).max(1)).max(1) as usize
 }
 pub fn god_color(id: usize) -> Rgb {
     const C: [Rgb; 12] = [
@@ -45,6 +41,13 @@ pub fn god_color(id: usize) -> Rgb {
     ];
     C.get(id).copied().unwrap_or([255, 248, 232])
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CustomIndicator {
+    Nightmares { count: u64, until: u64 },
+    Reactions(u64),
+    Rescue(bool),
+    Blood { count: u64, progress: u64 },
+}
 #[derive(Clone)]
 #[cfg_attr(test, derive(Debug))]
 pub struct AbilityView {
@@ -57,22 +60,45 @@ pub struct AbilityView {
     pub active: bool,
     pub mode: String,
     pub supported: bool,
+    pub reserve: Option<(f64,f64)>,
+    pub pending_reserve_loss: f64,
+    pub fortunes: Option<(u8,u8)>,
+    pub indicator: Option<CustomIndicator>,
+}
+/// Presentation-only alias: canonical names remain stable for proc matching,
+/// catalog identity, replays and saved state. O(text bytes), borrowed if absent.
+pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
+    let mut result = std::borrow::Cow::Borrowed(text);
+    for (old,new) in [("Rage at the Dying of the Light","Ragelight"),("You Shall Never Be Rid of Me","Never Be Rid of Me")] {
+        if result.contains(old) { result = std::borrow::Cow::Owned(result.replace(old,new)); }
+    }
+    result
 }
 /// O(1) presentation-only override: never changes catalog text used by offer tags.
+pub const EXECUTE_DESCRIPTION:&str="When active, you kill enemies in one hit if they have less than 25% of their HP remaining. Every time you do so, spend 10 energy.";
+pub const RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+    if id=="shrail-execute"&&run.simulation_revision.value_or(29.)>=52. {return EXECUTE_DESCRIPTION;}
+    if id=="shrail-rage-at-the-dying-of-the-light" {return RAGELIGHT_DESCRIPTION;}
+    if run.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender" {
+        return "Increase your DR for the first source of damage every turn.";
+    }
+    if run.simulation_revision.value_or(29.)>=52. && id=="anavani-illuminate" {
+        return "Spend 20 energy and select any visible square. Place a fire and light source that lasts until extinguished. Ordinary water puts it out immediately; Ichor-covered water does not.";
+    }
     if run.simulation_revision.value_or(29.) >= 51. {
         match id {
             "pelian-i-came-for-you" => return "Spend 10 energy and select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward. There is no turn limit.",
             "anavani-illuminate" => return "Spend 20 energy and select any visible square. Place a permanent fire and light source there. The fire and its light go out immediately on contact with water.",
-            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next time-consuming action finishes. Bonus free moves do not end the reveal.",
+            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
             "anavani-shine" => return "You emit light 100 which decreases by 10 every square away from you. You gain additional accuracy equal to the illumination of enemies. When active, you stop emitting this light.",
             _ => {},
         }
     }
     if corpse_core::combat::nearest_damage_enabled(run) {
         match id {
-            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP, rounded to the nearest whole number. Your next attack is guaranteed to hit and deals double damage.",
-            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded to the nearest whole number, unless it is immune.",
+            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
+            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
             _ => {},
         }
     }
@@ -90,7 +116,7 @@ pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a st
             "anavani-star-power" => return "You are immune to fire and always burning. You can activate this ability to stop burning.",
             "kative-adaptive-armor" => return "Eating a creature's heart grants 3 DR against that creature type. The next two hearts of that type grant 2 and 1 DR, for a maximum of +6 DR.",
             "kative-artifice-craft" => return "You can use hearts to Artifice Craft. Multiply the heart's permanent stat bonuses by 5 on the enhanced item while equipped.",
-            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes.",
+            "morae-all-seeing-eyes" => return "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
             _ => {}
         }
     }
@@ -99,9 +125,9 @@ pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a st
     }
     if run.simulation_revision.value_or(29.) >= 45. {
         match id {
-            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage.",
+            "lichor-blood-weapon" => return "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage.",
             "grisha-entropy" => return "You are immune to the effects of caustic gas, and have a cloud of caustic gas originating from you. When this is active, caustic gas does not originate from you.",
-            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
+            "anavani-nova" => return "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP.",
             _ => {}
         }
     }
@@ -113,14 +139,14 @@ pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a st
             "lichor-the-number-of-blood" => return "Every 5 turns, automatically hit and do double damage.",
             "grisha-boundless-hunger" => return "You have no max energy.",
             "dawel-reverse-entropy" => return "While active, enemies do not heal, regain energy, or revive, plants do not grow and neither gas nor fire spreads within 10.",
-            "morae-bonded-by-unseen-threads" => return "On activation, select an enemy, when you take damage, they take half.",
+            "morae-bonded-by-unseen-threads" => return "On activation, select an enemy; when you take damage, they take half.",
             "morae-see-the-future" => return "Spend all your energy to save your current state. Deactivating will return you there, undoing all that has been done.",
             "numo-mind-read" => return "While active, you have telepathy within 20. While inactive, you have telepathy within 5.",
             "etill-float-away" => return "When active, if an enemy damages you, fly until your next turn and move 1 tile away.",
             "ursa-dream-see" => return "You have telepathy with sleeping creatures. When active, you have telepathy with all creatures that are not obstructed.",
             "kative-dilute-potion" => return "When you use a potion, you can use it again at half efficacy.",
             "pelian-i-came-for-you" => return "Select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward.",
-            "isheilah-make-slippery" => return "Select an enemy, when they try to move, they don't and you spend 8 energy.",
+            "isheilah-make-slippery" => return "Select an enemy; when they try to move, they don't and you spend 8 energy.",
             "lichor-bleed-them" => return "Your attacks inflict bleed proportional to your Damage bonus.",
             "morae-fortune-teller" => return "You can have up to 3 fortunes. Spend a fortune to give yourself lucky, ensuring you hit with your next attack, or an enemy creature unlucky, ensuring they miss.",
             "etill-half-here" => return "Activate to put down a half clone within line of sight that shares your health pool, doesn't move, but provides you sight from that location. Deactivate to remove it.",
@@ -135,11 +161,12 @@ pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a st
 /// Canonical displayed/command order, matching main.ts + crafting.ts. Recomputed
 /// per refresh: See docs/ability-command-projection.md for catalog scans, aura/LOS and text costs.
 pub fn visible_abilities(r: &Run) -> Vec<AbilityView> {
+    let forecast=corpse_core::abilities::projected_upkeep(r);
     let mut rows: Vec<_> = dream_row(r).into_iter().collect();
     rows.extend(teleport_row(r));
     rows.extend(r.player.abilities.iter()
         .filter(|id| !matches!(id.as_str(), corpse_core::dreamwalking::WAKE_UP_ID | corpse_core::dreamwalking::DREAMWALK_ID | corpse_core::ahvamitt::TELEPORT_ID))
-        .map(|id| observe(r, id)));
+        .map(|id| observe_with_forecast(r, id, &forecast)));
     rows.extend(craft_rows(r));
     rows
 }
@@ -152,10 +179,11 @@ fn dream_row(r: &Run) -> Option<AbilityView> {
     let unavailable = r.status != "playing" || !r.offers.is_empty()
         || r.player.conditions.get("deathResolutionBlocked").is_some_and(|v| *v > 0.);
     Some(AbilityView {
+        reserve: None, indicator:None, fortunes:None,pending_reserve_loss: 0.,
         id: if permanent { corpse_core::dreamwalking::DREAMWALK_ID } else { corpse_core::dreamwalking::WAKE_UP_ID }.into(),
         name: if permanent { "Dreamwalk" } else { "Wake Up" }.into(),
         description: if permanent {
-            "Toggle Dreamwalking. Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake."
+            "Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake."
         } else {
             "Awake from the realm of dreams."
         }.into(),
@@ -176,6 +204,7 @@ fn teleport_row(r: &Run) -> Option<AbilityView> {
         || ["paralyzed", "deathResolutionBlocked"].iter()
             .any(|key| r.player.conditions.get(*key).is_some_and(|v| *v > 0.));
     Some(AbilityView {
+        reserve: None, indicator:None, fortunes:None,pending_reserve_loss: 0.,
         id: corpse_core::ahvamitt::TELEPORT_ID.into(), name: "Teleport".into(),
         description: "Teleport to a random location on the floor.".into(),
         color: [216, 191, 117], cost: if cooldown > 0 { format!("{cooldown}t cooldown") } else { "100t cooldown · Free".into() },
@@ -226,6 +255,7 @@ fn craft_rows(r: &Run) -> Vec<AbilityView> {
                 description.push_str(&format!(" Unavailable: {reason}{}", if reason.ends_with('.') { "" } else { "." }));
             }
             rows.push(AbilityView {
+        reserve: None, indicator:None, fortunes:None,pending_reserve_loss: 0.,
                 id: format!("craft:{}:{slot}", item.id),
                 name: format!("{kind} · {}", item.name),
                 description,
@@ -275,6 +305,51 @@ pub fn deactivates_without_target(r: &Run, id: &str) -> bool {
 }
 
 pub fn observe(r: &Run, id: &str) -> AbilityView {
+    observe_with_forecast(r,id,&corpse_core::abilities::projected_upkeep(r))
+}
+fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::UpkeepProjection)->AbilityView {
+    let mut row=observe_inner(r,id);
+    if id=="morae-fortune-teller" {
+        let count=r.player.conditions.get("fortunes").copied().unwrap_or(3.).clamp(0.,3.) as u8;
+        let until=if r.simulation_revision.value_or(29.)>=52. {corpse_core::fortune_schedule::turns_until(&r.player,r.tick)} else {(20.-r.tick.rem_euclid(20.)).ceil() as u8};
+        row.fortunes=Some((count,until));
+    }
+    if id=="shrail-execute"&&r.simulation_revision.value_or(29.)>=52. {row.description=EXECUTE_DESCRIPTION.into();}
+    if id=="shrail-rage-at-the-dying-of-the-light" {row.description=RAGELIGHT_DESCRIPTION.into();}
+    if id=="morae-all-seeing-eyes" {row.description="Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.".into();}
+    // Serialized ability order is acquisition order; only the first reaction
+    // power owns the shared pool display. Never confuse modern Hanged with it.
+    let first_reaction = r.player.abilities.iter().find(|a| {
+        matches!(a.as_str(), "isheilah-quick-hand" | "isheilah-are-you-sure-about-that")
+            || (a.as_str()=="isheilah-missed-me" && !corpse_core::hanged::enabled(r.simulation_revision.value_or(29.)))
+    });
+    row.indicator = match id {
+        "ursa-waking-nightmares" => Some(CustomIndicator::Nightmares {
+            count:r.player.nightmares.value_or(0.).max(0.) as u64,
+            until:(r.player.conditions.get("nightmareAt").copied().unwrap_or(r.tick+100.)-r.tick).max(0.).ceil() as u64,
+        }),
+        "pelian-you-shall-never-be-rid-of-me" => Some(CustomIndicator::Rescue(
+            r.player.conditions.get("pelianUsed").copied().unwrap_or(0.)==0.)),
+        "lichor-overflowing" => Some(CustomIndicator::Blood {
+            count:r.player.blood.value_or(0.).max(0.) as u64,
+            progress:r.player.damage_bank.value_or(0.).max(0.).round() as u64,
+        }),
+        _ if first_reaction.is_some_and(|first| first==id) => Some(CustomIndicator::Reactions(r.player.reactions.value_or(0.).max(0.) as u64)),
+        _ => None,
+    };
+    row.name=display_text(&row.name).into_owned();
+    row.description=display_text(&row.description).into_owned();
+    if r50(r) && r50_uses_energy(id) {
+        row.reserve=r.player.ability_reserves.as_ref().and_then(|m|m.get(id))
+            .filter(|s|corpse_core::revision50_ability_energy::valid_reserve(s))
+            .map(|s|{let s=corpse_core::revision52_reserves::project_reserve(*s,r.simulation_revision.value_or(29.));(s.energy,s.capacity)});
+        if row.reserve.is_some() {
+            row.pending_reserve_loss=forecast.reserve_energy.get(id).copied().unwrap_or(0.);
+        }
+    }
+    row
+}
+fn observe_inner(r: &Run, id: &str) -> AbilityView {
     let _timing = corpse_core::timing::span("desktop.ability");
     if matches!(id, corpse_core::dreamwalking::WAKE_UP_ID | corpse_core::dreamwalking::DREAMWALK_ID) {
         if let Some(row) = dream_row(r).filter(|row| row.id == id) { return row; }
@@ -289,6 +364,7 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
     }
     let Some(a) = progression::definition_for_revision(r.simulation_revision.value_or(29.), id) else {
         return AbilityView {
+        reserve: None, indicator:None, fortunes:None,pending_reserve_loss: 0.,
             id: id.into(),
             name: id.into(),
             description: "Unknown ability".into(),
@@ -311,7 +387,7 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
         || flag("target")
         || flag("action")
         || matches!(n, "Revert" | "Blood Letting");
-    let active = if n == "See The Future" {
+    let active = if n == "Hanged" { false } else if n == "See The Future" {
         r.future.as_ref().is_some()
     } else {
         p.active.iter().any(|i| i == id)
@@ -347,7 +423,7 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
     };
     let suppression = matches!(n, "Entropy" | "Shine" | "Star Power");
     let mut cost = match n {
-        "Execute" => "20 NRG/execute".into(),
+        "Execute" => format!("{} NRG/execute",corpse_core::revision50_combat::execute_cost(r.simulation_revision.value_or(29.))),
         "Commandment" => "20 NRG/attack".into(),
         "Waking Nightmares" => "1 nightmare".into(),
         "Cogworks" => match corpse_core::revision50_terrain::mode(r) {
@@ -355,7 +431,9 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
         },
         "Unyielding Assault" => "10 NRG/attack".into(),
         "Never Without a Fight" => "10 NRG/counter".into(),
+        "Never Surrender" if r.simulation_revision.value_or(29.) >= 52. => "8 NRG/first source".into(),
         "Never Surrender" => "8 NRG/first hit".into(),
+        "Hanged" => "4 main NRG/HP".into(),
         "Missed Me" if r50(r) => "1 reaction/retreat".into(),
         "Missed Me" => "1 reaction/first attack".into(),
         "Make Slippery" => "8 NRG/move".into(),
@@ -408,7 +486,7 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
     }
     let passive = !callable && !craft;
     if passive {
-        cost = "Passive".into();
+        cost = if n == "Hanged" { "Passive · 4 main NRG/HP" } else { "Passive" }.into();
     }
     // All counters are player-owned; none consult a hidden linked target.
     let counter = match n {
@@ -480,13 +558,7 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
         "Missed Me" | "Are You Sure About That?" | "Quick Hand" => Some(format!(
             "{}/{} reactions",
             p.reactions.value_or(0.),
-            progression::catalog()
-                .iter()
-                .filter(|a| matches!(
-                    a.name.as_str(),
-                    "Missed Me" | "Are You Sure About That?" | "Quick Hand"
-                ) && p.abilities.contains(&a.id))
-                .count()
+            corpse_core::engine::max_reactions_for_revision(r.simulation_revision.value_or(29.), p)
         )),
         "Rage at the Dying of the Light" => Some(format!("{} NRG/rescue", c("rageCost"))),
         "You Shall Never Be Rid of Me" => Some(format!(
@@ -555,6 +627,7 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
         }
     );
     let mut row = AbilityView {
+        reserve: None, indicator:None, fortunes:None,pending_reserve_loss: 0.,
         id: id.into(),
         name: a.name.clone(),
         description: if n == "Adaptive Armor" {
@@ -605,14 +678,14 @@ pub fn observe(r: &Run, id: &str) -> AbilityView {
         .into(),
         supported,
     };
-    if r50(r) && id=="kative-clay-army" {
-        row.description.push_str("\nEach Clay Soldier uses your current attack without abilities, and attacks anyone adjacent at the end of a turn. It is an unbreakable wall.");
+    if r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender" {
+        row.description.push_str("\nDamage that ignores DR spends no energy and leaves this activation available.");
     }
-    if let Some(summary)=reserve {
-        row.description.push_str(&format!("\n{summary}. Ability energy is spent first; player energy pays any remainder. Ability energy refills to 50 on level-up; player energy does not."));
-        if id == corpse_core::revision50_ability_energy::FUTURE_ID {
-            row.description.push_str(" See The Future spends all its own reserve and all current player energy, leaving other reserves untouched. The saved state is after payment.");
-        }
+    if r50(r) && id=="kative-clay-army" {
+        row.description.push_str("\nIt is an unbreakable wall.");
+    }
+    if id == corpse_core::revision50_ability_energy::FUTURE_ID {
+        row.description.push_str("\nSpends all your energy.");
     }
     if let Some(reason)=activation_blocker.filter(|_|r50(r) && !active) {
         row.description.push_str(&format!("\nUnavailable: {reason}."));
@@ -637,25 +710,37 @@ pub fn r50_uses_energy(id:&str)->bool {
 /// Expected O(ID bytes), O(text bytes) output; no resource mutation or defaults.
 pub fn reserve_summary(r: &Run, id: &str) -> Option<String> {
     if !r50(r) {return None;}
-    actor_reserve_summary(&r.player,id)
+    let mut summary = actor_reserve_summary_for_revision(&r.player,id,r.simulation_revision.value_or(29.))?;
+    if let Some(reserve) = r.player.ability_reserves.as_ref().and_then(|m|m.get(id)) {
+        if corpse_core::revision50_ability_energy::valid_reserve(reserve) {
+            let reserve = corpse_core::revision52_reserves::project_reserve(*reserve,r.simulation_revision.value_or(29.));
+            summary.push_str(&crate::render::resource_ui::change_suffix(r,
+                &corpse_core::resources::ability_key(id),reserve.energy,reserve.capacity));
+        }
+    }
+    Some(summary)
 }
 pub fn actor_reserve_summary(actor: &corpse_core::Actor, id: &str) -> Option<String> {
+    actor_reserve_summary_for_revision(actor,id,50.)
+}
+pub fn actor_reserve_summary_for_revision(actor: &corpse_core::Actor, id: &str, revision:f64) -> Option<String> {
     if !r50_uses_energy(id) {return None;}
     let reserve=actor.ability_reserves.as_ref()?.get(id)?;
     Some(if corpse_core::revision50_ability_energy::valid_reserve(reserve) {
+        let reserve=corpse_core::revision52_reserves::project_reserve(*reserve,revision);
         format!("Reserve {}/{}",reserve.energy,reserve.capacity)
     } else {"Reserve invalid".into()})
 }
 /// Mirrors atomic core split payment and Future's own-reserve/player drain.
 pub fn payment_blocker(r: &Run, id: &str, cost: f64) -> Option<String> {
     if !r50(r) {return (r.player.energy<cost).then(||format!("Needs {cost} energy"));}
-    use corpse_core::revision50_ability_energy::{plan_payment, plan_future_payment, EnergyError, FUTURE_ID};
+    use corpse_core::revision50_ability_energy::{plan_payment_for_revision, plan_future_payment_for_revision, EnergyError, FUTURE_ID};
     let plan = if id == FUTURE_ID {
         if r.future.is_some() { return None; }
-        plan_future_payment(&r.player)
+        plan_future_payment_for_revision(&r.player,r.simulation_revision.value_or(29.))
     } else {
         if cost == 0. { return None; }
-        plan_payment(r.player.ability_reserves.as_ref(),id,r.player.energy,cost)
+        plan_payment_for_revision(r.player.ability_reserves.as_ref(),id,r.player.energy,cost,r.simulation_revision.value_or(29.))
     };
     if id == FUTURE_ID && plan.as_ref().is_ok_and(|p| p.actor_energy_spent() > 0. || p.reserve_energy_spent() > 0.)
         && corpse_core::abilities::energy_activation_silenced(r, &r.player) {
@@ -854,7 +939,7 @@ mod authored_copy_r38_tests;
 pub fn command_binding_allowed(r: &Run, id: &str) -> bool {
     if r50(r) {
         if !runtime_supported(r, id) { return false; }
-        if progression::definition_for_revision(50., id).is_some_and(|a| a.flags.iter().all(|flag| flag == "passive") && a.name != "Blood Letting") { return false; }
+        if progression::definition_for_revision(r.simulation_revision.value_or(29.), id).is_some_and(|a| a.flags.iter().all(|flag| flag == "passive") && a.name != "Blood Letting") { return false; }
     }
     !(r.simulation_revision.value_or(29.0) >= 41.0 && id == progression::WEAVE_ID)
 }
@@ -895,7 +980,7 @@ mod revision43_description_tests {
             assert_eq!(observe(&run,id).description,if revision>=43.{requested}else{original.as_str()});
             let item=corpse_core::Item{id:6001.,name:"Blessed ring".into(),kind:"ring".into(),granted_ability:id.to_string().into(),..Default::default()};
             let detail=crate::pack::describe_item(&run,&item);
-            assert!(detail.contains(if revision>=43.{requested}else{original.as_str()}));
+            assert!(!detail.contains(if revision>=43.{requested}else{original.as_str()}));
             assert_eq!(serde_json::to_vec(&run).unwrap(),before);
         }
         assert_eq!(progression::definition(id).unwrap().description,original);
@@ -913,14 +998,14 @@ mod revision44_description_tests {
         ("lichor-the-number-of-blood", "Every 5 turns, automatically hit and do double damage."),
         ("grisha-boundless-hunger", "You have no max energy."),
         ("dawel-reverse-entropy", "While active, enemies do not heal, regain energy, or revive, plants do not grow and neither gas nor fire spreads within 10."),
-        ("morae-bonded-by-unseen-threads", "On activation, select an enemy, when you take damage, they take half."),
+        ("morae-bonded-by-unseen-threads", "On activation, select an enemy; when you take damage, they take half."),
         ("morae-see-the-future", "Spend all your energy to save your current state. Deactivating will return you there, undoing all that has been done."),
         ("numo-mind-read", "While active, you have telepathy within 20. While inactive, you have telepathy within 5."),
         ("etill-float-away", "When active, if an enemy damages you, fly until your next turn and move 1 tile away."),
         ("ursa-dream-see", "You have telepathy with sleeping creatures. When active, you have telepathy with all creatures that are not obstructed."),
         ("kative-dilute-potion", "When you use a potion, you can use it again at half efficacy."),
         ("pelian-i-came-for-you", "Select an enemy. You gain telepathy on that enemy and if a move would bring you closer to the enemy, you can take 1 free turn afterward."),
-        ("isheilah-make-slippery", "Select an enemy, when they try to move, they don't and you spend 8 energy."),
+        ("isheilah-make-slippery", "Select an enemy; when they try to move, they don't and you spend 8 energy."),
         ("lichor-bleed-them", "Your attacks inflict bleed proportional to your Damage bonus."),
         ("morae-fortune-teller", "You can have up to 3 fortunes. Spend a fortune to give yourself lucky, ensuring you hit with your next attack, or an enemy creature unlucky, ensuring they miss."),
         ("etill-half-here", "Activate to put down a half clone within line of sight that shares your health pool, doesn't move, but provides you sight from that location. Deactivate to remove it."),
@@ -942,7 +1027,7 @@ mod revision44_description_tests {
                 assert_eq!(observe(&run, id).description, expected, "ability detail: {id}");
                 assert_eq!(offer.description, expected, "blessing choice: {id}");
                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
+                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
                 assert_eq!(progression::definition(id).unwrap().description, original);
             }
             assert_eq!(view.offers.len(), REQUESTED.len());
@@ -957,7 +1042,7 @@ mod revision44_description_tests {
     fn approved_unchanged_copy_and_prior_fury_override_are_preserved() {
         let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         run.simulation_revision = 44.0.into();
-        for id in ["dawel-shadow-in-the-dark", "kative-mini-me", "shrail-rage-at-the-dying-of-the-light", "numo-implant-thought", "grisha-uncast"] {
+        for id in ["dawel-shadow-in-the-dark", "kative-mini-me", "numo-implant-thought", "grisha-uncast"] {
             let original = &progression::definition(id).unwrap().description;
             assert_eq!(observe(&run, id).description, *original);
         }
@@ -971,9 +1056,9 @@ mod revision44_description_tests {
 mod revision45_description_tests {
     use super::*;
     const REQUESTED: &[(&str, &str)] = &[
-        ("lichor-blood-weapon", "Activate by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage."),
+        ("lichor-blood-weapon", "Activate by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage."),
         ("grisha-entropy", "You are immune to the effects of caustic gas, and have a cloud of caustic gas originating from you. When this is active, caustic gas does not originate from you."),
-        ("anavani-nova", "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune."),
+        ("anavani-nova", "You are immune to explosions. When active, when you attack, create an explosion and spend 40 energy. Every explosion deals 50% of each affected creature's maximum HP."),
     ];
     #[test]
     fn exact_authored_copy_reaches_rows_grants_and_offers_without_catalog_mutation() {
@@ -994,7 +1079,7 @@ mod revision45_description_tests {
                 }
                 assert_eq!(offer.description, expected, "blessing choice: {id}");
                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
+                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
                 assert_eq!(progression::definition(id).unwrap().description, original);
             }
             assert_eq!(view.offers.len(), REQUESTED.len());
@@ -1029,7 +1114,7 @@ mod revision46_description_tests {
                 assert_eq!(observe(&run, id).description, expected, "ability detail: {id}");
                 assert_eq!(offer.description, expected, "blessing choice: {id}");
                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
+                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
                 assert_eq!(progression::definition(id).unwrap().description, original);
             }
             assert_eq!(view.offers.len(), REQUESTED.len());
@@ -1050,7 +1135,7 @@ mod revision46_wording_refresh_tests {
         ("anavani-star-power", "You are immune to fire and always burning. You can activate this ability to stop burning."),
         ("kative-adaptive-armor", "Eating a creature's heart grants 3 DR against that creature type. The next two hearts of that type grant 2 and 1 DR, for a maximum of +6 DR."),
         ("kative-artifice-craft", "You can use hearts to Artifice Craft. Multiply the heart's permanent stat bonuses by 5 on the enhanced item while equipped."),
-        ("morae-all-seeing-eyes", "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next action finishes."),
+        ("morae-all-seeing-eyes", "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn."),
     ];
     #[test]
     fn exact_authored_copy_reaches_rows_grants_and_offers_without_catalog_mutation() {
@@ -1074,7 +1159,7 @@ mod revision46_wording_refresh_tests {
                 }
                 assert_eq!(offer.description, detail, "blessing choice: {id}");
                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
-                assert!(crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant: {id}");
+                assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
                 assert_eq!(progression::definition(id).unwrap().description, original);
             }
             assert_eq!(view.offers.len(), REQUESTED.len());
@@ -1142,6 +1227,7 @@ mod revision50_ui_tests {
         corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,31.,16.).unwrap();
         let before=r.clone();let row=observe(&r,id);
         assert_eq!(row.cost,"Reserve 16/31 · 15 NRG + action");
+        assert!(!row.description.contains("Reserve 16/31"));
         assert!(!row.state.contains("Unavailable"));
         assert!(row.description.contains("player energy does not"));assert_eq!(r,before);
         r.player.ability_reserves.as_mut().unwrap().get_mut(id).unwrap().energy=0.;r.player.energy=15.;
@@ -1172,5 +1258,298 @@ mod revision50_future_ui_tests {
         r.player.ability_reserves.as_mut().unwrap()[id].energy=0.;assert!(!observe(&r,id).state.contains("Unavailable"));
         r.future=Some("not decoded by UI".to_string().into());r.player.energy=20.;
         let row=observe(&r,id);assert!(row.cost.contains("Free return"));assert!(!row.state.contains("Unavailable"));
+    }
+}
+
+#[cfg(test)]
+mod revision52_hanged_ui_tests {
+    use super::*;
+    #[test]
+    fn passive_hanged_has_no_toggle_binding_reaction_counter_or_reserve_cost() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.offers.clear();r.player.abilities=vec![corpse_core::hanged::ID.into(),"isheilah-quick-hand".into()];
+        r.player.active=vec![corpse_core::hanged::ID.into()];r.player.reactions=1.0.into();
+        for revision in [51.,52.] {
+            r.simulation_revision=revision.into();let row=observe(&r,corpse_core::hanged::ID);
+            assert_eq!(row.name,if revision==52.{"Hanged"}else{"Missed Me"});
+            assert_eq!(command_binding_allowed(&r,corpse_core::hanged::ID),revision<52.);
+            if revision==52. {
+                assert!(!row.active);assert!(row.cost.contains("4 main NRG/HP"));
+                assert!(!row.cost.to_lowercase().contains("reaction"));assert!(!row.cost.contains("Reserve"));
+                assert!(!row.state.contains("ON") && !row.state.contains("OFF"));
+                let quick=observe(&r,"isheilah-quick-hand");assert!(quick.cost.contains("1/1 reactions"));
+                assert!(quick.description.contains("Waiting restores 1 reaction"));
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod never_surrender_description_tests {
+    use super::*;
+    #[test]
+    fn exact_requested_r52_description_preserves_cost_and_legacy_copy() {
+        let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.simulation_revision = 52.0.into();
+        assert_eq!(display_description(&run, "pelian-never-surrender", "legacy"),
+            "Increase your DR for the first source of damage every turn.");
+        let row = observe(&run, "pelian-never-surrender");
+        assert!(row.description.starts_with("Increase your DR for the first source of damage every turn."));
+        assert!(row.cost.contains("8 NRG"), "{}", row.cost);
+        run.player.abilities = vec!["pelian-never-surrender".into()];
+        run.offers = vec!["pelian-never-surrender".into()];
+        let requested = "Increase your DR for the first source of damage every turn.";
+        assert!(crate::observe::observe(&run).offers[0].description.starts_with(requested));
+        let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(),
+            granted_ability: "pelian-never-surrender".to_string().into(), ..Default::default() };
+        assert!(!crate::pack::describe_item(&run, &item).contains(requested));
+        assert!(crate::creature_abilities_ui::describe(&run, &run.player).1.contains(requested));
+        run.simulation_revision = 51.0.into();
+        assert_eq!(display_description(&run, "pelian-never-surrender", "legacy"),
+            "Spend 8 energy and add one sixth of your HP bonus to your DR the first time you take damage every turn.");
+    }
+}
+
+#[cfg(test)]
+mod never_surrender_detail_followup_tests {
+    use super::*;
+    const ID: &str = "pelian-never-surrender";
+    const OPENING: &str = "Increase your DR for the first source of damage every turn.";
+    const EXCEPTION: &str = "Damage that ignores DR spends no energy and leaves this activation available.";
+
+    fn room(revision: f64) -> Run {
+        let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.simulation_revision = revision.into();
+        run.player.abilities = vec![ID.into()]; run.player.active = vec![ID.into()];
+        run.player.conditions.clear(); run.offers = vec![ID.into()];
+        run
+    }
+
+    fn review_actual_detail_dialog() {
+        let mut run = room(52.); run.offers.clear();
+        run.player.ability_reserves = corpse_core::Field::Missing;
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut run).unwrap();
+        corpse_core::resources::begin_resource_turn(&mut run);
+        let player_id = run.player.id;
+        assert!(corpse_core::revision50_ability_energy::spend(&mut run, player_id, ID, 8.));
+        let before = serde_json::to_vec(&run).unwrap();
+        let row = observe(&run, ID);
+        assert!(row.cost.contains("Reserve 2/10 - -80%"), "{}", row.cost);
+        assert!(!row.description.contains("Ability energy refills to"));
+        let view = crate::observe::observe(&run);
+        for (width, height) in [(1280, 800), (960, 1200)] {
+            let mut painter = crate::render::Painter::new();
+            painter.try_resize(width, height).unwrap(); painter.set_responsive_canvas(true);
+            painter.game_at(&view, "", false, 0.);
+            let background = painter.pixels.clone();
+            let bounds = painter.ability_detail_damage(&row).unwrap();
+            let rail = painter.logical_damage_rect(painter.hud_left(), 0, 2, 2).unwrap().x;
+            let top = painter.logical_damage_rect(0, (super::top(&painter.profile) - 28).max(8), 2, 2).unwrap().y;
+            let footer = painter.logical_damage_rect(0, painter.inspection_notice_y(), 2, 2).unwrap().y;
+            assert_eq!(bounds.right(), rail, "dialog right edge must touch the ability rail");
+            assert_eq!(bounds.y, top);
+            assert!(bounds.x > 0 && bounds.bottom() < footer);
+            let mut short = row.clone(); short.description = OPENING.into();
+            assert!(bounds.h > painter.ability_detail_damage(&short).unwrap().h,
+                "dialog height must reflect the complete detail body");
+            let prior_clip = painter.clip;
+            painter.ability_detail(&row, 0);
+            assert_eq!(painter.clip, prior_clip);
+            for (i, pixel) in painter.pixels.chunks_exact(4).enumerate() {
+                if !bounds.contains(i % painter.width, i / painter.width) {
+                    assert_eq!(pixel, &background[i*4..i*4+4], "paint escaped exact dialog bounds");
+                }
+            }
+            let first_page = painter.pixels.clone();
+            painter.game_at(&view, "", false, 0.); painter.ability_detail(&row, usize::MAX);
+            assert_eq!(painter.pixels, first_page, "complete detail must fit without clipped or scroll-hidden text");
+            let geometry = serde_json::json!({"width": width, "height": height,
+                "dialog": {"x":bounds.x,"y":bounds.y,"width":bounds.w,"height":bounds.h},
+                "rail_x":rail,"footer_y":footer,"all_text_fits":true,"outside_bounds_unchanged":true,
+                "opening":OPENING,"exception":EXCEPTION,"reserve":"Reserve 2/10 - -80%","refill":10});
+            println!("Never Surrender detail: {geometry}");
+            if let Ok(directory) = std::env::var("CORPSE_NEVER_SURRENDER_DETAIL_OUTPUT") {
+                assert!(std::path::Path::new(&directory).is_absolute(), "capture destination must be absolute");
+                std::fs::create_dir_all(&directory).unwrap();
+                let stem = format!("{directory}/never-surrender-detail-{width}x{height}");
+                let mut encoder = png::Encoder::new(std::fs::File::create(format!("{stem}.png")).unwrap(), width as u32, height as u32);
+                encoder.set_color(png::ColorType::Rgba); encoder.set_depth(png::BitDepth::Eight);
+                encoder.write_header().unwrap().write_image_data(&painter.pixels).unwrap();
+                std::fs::write(format!("{stem}.json"), serde_json::to_vec_pretty(&geometry).unwrap()).unwrap();
+            }
+        }
+        assert_eq!(serde_json::to_vec(&run).unwrap(), before);
+    }
+
+    #[test]
+    fn full_detail_explains_bypass_after_the_exact_unmodified_short_description() {
+        let mut run = room(52.);
+        let before = serde_json::to_vec(&run).unwrap();
+        assert_eq!(display_description(&run, ID, "legacy"), OPENING);
+        let row = observe(&run, ID);
+        let mut lines = row.description.lines();
+        assert_eq!(lines.next(), Some(OPENING));
+        assert_eq!(lines.next(), Some(EXCEPTION));
+        assert!(row.cost.contains("8 NRG/first source"));
+        assert!(crate::observe::observe(&run).offers[0].description.contains(EXCEPTION));
+        let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(),
+            granted_ability: ID.to_string().into(), ..Default::default() };
+        assert!(!crate::pack::describe_item(&run, &item).contains(EXCEPTION));
+        assert!(!observe(&run, "numo-distract").description.contains(EXCEPTION));
+        assert_eq!(serde_json::to_vec(&run).unwrap(), before);
+        run.simulation_revision = 51.0.into();
+        assert!(!observe(&run, ID).description.contains(EXCEPTION));
+        review_actual_detail_dialog();
+    }
+
+    #[test]
+    fn reserve_refill_detail_uses_revision_capacity_for_all_paid_ability_kinds() {
+        for revision in [50., 51., 52.] {
+            let run = room(revision);
+            let before = serde_json::to_vec(&run).unwrap();
+            for id in [ID, "numo-distract", corpse_core::revision50_ability_energy::FUTURE_ID] {
+                let description = observe(&run, id).description;
+                assert!(!description.contains("Ability energy refills to"),
+                    "revision={revision}, id={id}: {description}");
+                if revision >= 52. { assert!(!description.contains("refills to 50")); }
+            }
+            assert_eq!(serde_json::to_vec(&run).unwrap(), before);
+        }
+        let run = room(49.);
+        assert!(!observe(&run, ID).description.contains("Ability energy refills to"));
+    }
+}
+
+#[cfg(test)] mod reserve_bar_projection_tests {
+    use super::*;
+    #[test] fn reserve_bar_forecast_uses_canonical_debit_and_leaves_run_unchanged(){
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.offers.clear();r.player.active.clear();r.player.ability_reserves=corpse_core::Field::Missing;
+        let id="morae-turning-the-wheel";r.player.abilities.push(id.into());r.player.active.push(id.into());r.player.energy=50.;
+        corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,7.).unwrap();
+        let before=r.clone();let row=observe(&r,id);
+        assert_eq!(row.reserve,Some((7.,10.)));assert_eq!(row.pending_reserve_loss,7.);
+        assert_eq!(corpse_core::abilities::projected_player_upkeep(&r),13.);assert_eq!(r,before);
+        r.player.active.clear();assert_eq!(observe(&r,id).pending_reserve_loss,0.);
+        r.player.ability_reserves.as_mut().unwrap()[id].energy=11.;assert_eq!(observe(&r,id).reserve,None);
+        assert_eq!(observe(&r,"shrail-masochism").reserve,None);
+    }
+}
+
+#[cfg(test)] mod ragelight_presentation_tests {
+    use super::*;
+    #[test] fn rename_is_display_only_and_preserves_proc_cost_and_save(){
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();let id="shrail-rage-at-the-dying-of-the-light";
+        r.player.abilities.push(id.into());r.player.conditions.insert("rageCost".into(),17.);
+        let before=serde_json::to_string(&r).unwrap();let row=observe(&r,id);
+        assert_eq!(row.name,"Ragelight");assert_eq!(row.id,id);assert!(row.cost.contains("17 NRG/rescue"));
+        assert_eq!(corpse_core::progression::definition_for_revision(52.,id).unwrap().name,"Rage at the Dying of the Light");
+        assert_eq!(crate::chronicle::present("Rage at the Dying of the Light activates."),"Ragelight activates.");
+        let (short,details)=crate::creature_abilities_ui::describe(&r,&r.player);
+        assert!(!short.contains("Rage at the Dying of the Light"));assert!(!details.contains("Rage at the Dying of the Light"));
+        assert!(details.contains("Ragelight"));
+        let item=corpse_core::Item{kind:"ring".into(),granted_ability:id.to_string().into(),..Default::default()};
+        assert!(crate::pack::describe_item(&r,&item).contains("Grants Ragelight."));
+        assert_eq!(serde_json::to_string(&r).unwrap(),before);
+        assert!(matches!(display_text("@"),std::borrow::Cow::Borrowed(_)));
+    }
+}
+
+#[cfg(test)] mod compact_spacing_tests {
+    use super::*;
+    #[test] fn halve_spare_ability_margin_and_keep_hit_testing_aligned() {
+        let profile=crate::appearance_profile::Profile::defaults();
+        assert_eq!(row(&profile),35);
+        for(w,h)in[(1280,800),(1920,1080),(960,1200)] {
+            let mut p=crate::render::Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
+            let count=capacity(&p.profile);
+            for i in 0..count {
+                let y=top(&p.profile)+i as i32*row(&p.profile);
+                assert_eq!(p.ability_inspect_at(count,p.hud_left()+20,y+10),Some(i));
+            }
+        }
+    }
+}
+
+#[cfg(test)] mod ragelight_final_copy_tests {
+    use super::*;
+    #[test] fn exact_copy_has_no_appended_reserve_explanation_or_mechanics_mutation(){
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let id="shrail-rage-at-the-dying-of-the-light";r.simulation_revision=52.0.into();r.player.abilities=vec![id.into()];
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
+        for energy in [0.,100.] {r.player.energy=energy;let before=r.clone();assert_eq!(observe(&r,id).description,RAGELIGHT_DESCRIPTION);assert!(r==before);}
+    }
+}
+
+#[cfg(test)] mod execute_final_copy_tests {
+    use super::*;
+    #[test] fn current_execute_cost_and_exact_description_match_payment(){
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+        let id="shrail-execute";r.player.abilities=vec![id.into()];corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
+        let row=observe(&r,id);assert_eq!(row.description,EXECUTE_DESCRIPTION);assert!(row.cost.contains("10 NRG/execute"));assert!(!row.cost.contains("20 NRG/execute"));
+    }
+}
+
+#[cfg(test)]mod audit_batch_two_tests {
+ use super::*;
+ #[test]fn requested_short_copy_has_no_stale_overrides(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  for id in ["isheilah-quick-hand","lichor-blood-weapon","anavani-nova","morae-all-seeing-eyes"] {r.player.abilities.push(id.into());}
+  r.player.ability_reserves=corpse_core::Field::Missing;corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,"morae-all-seeing-eyes",10.,10.).unwrap();
+  assert!(!observe(&r,"isheilah-quick-hand").description.contains("No energy cost."));
+  assert!(observe(&r,"lichor-blood-weapon").description.starts_with("Activate by paying 10% of your maximum HP. Your next attack"));
+  let nova=observe(&r,"anavani-nova").description;assert!(nova.contains("Every explosion deals 50% of each affected creature's maximum HP."));assert!(!nova.contains("unless it is immune"));
+  assert_eq!(observe(&r,"morae-all-seeing-eyes").description,"Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.");
+  for diluted in [false,true]{let n=if diluted{25}else{50};assert_eq!(corpse_core::revision50_item_knowledge::potion_effect_description("healing",diluted).unwrap(),format!("Restores {n} HP."));assert_eq!(corpse_core::revision50_item_knowledge::potion_effect_description("energy",diluted).unwrap(),format!("Restores {n} energy."));}
+  assert_eq!(corpse_core::revision50_item_knowledge::potion_effect_description("cleansing",false).unwrap(),"Removes harmful temporary effects from the affected creature.");
+ }
+}
+
+#[cfg(test)] mod audit_batch_three_tests {
+ use super::*;
+ #[test] fn future_unique_paragraph_and_appropriate_copy(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  let id="morae-see-the-future";r.player.abilities=vec![id.into(),"kative-appropriate".into()];
+  r.player.ability_reserves=corpse_core::Field::Missing;
+  corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,10.).unwrap();
+  for energy in [0.,100.] {r.player.energy=energy;let before=r.clone();let d=observe(&r,id).description;
+   assert!(d.starts_with("Spend all your energy to save your current state."));
+   assert_eq!(d.lines().filter(|s|s.contains("Spends all")).collect::<Vec<_>>(),vec!["Spends all your energy."]);
+   for stale in ["other reserves","after payment","Ability energy is spent first"] {assert!(!d.contains(stale));}
+   assert!(!observe(&r,"kative-appropriate").description.contains("minimum of zero"));assert!(r==before);
+  }
+ }
+}
+
+#[cfg(test)] mod approved_copy_cuts_tests {
+    use super::*;
+    #[test] fn clay_and_tinker_keep_rules_without_repeated_tutorial() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        r.player.abilities=vec!["kative-clay-army".into(),"kative-tinker".into()];
+        let clay=observe(&r,"kative-clay-army").description;
+        assert!(clay.ends_with("\nIt is an unbreakable wall."));
+        assert!(!clay.contains("Each Clay Soldier uses"));
+        assert!(clay.contains("spend 20 energy"));
+        let tinker=observe(&r,"kative-tinker").description;
+        assert!(!tinker.contains("automatically active"));
+        assert!(tinker.contains("Spend 100 energy"));
+        assert!(tinker.contains("Each item can be tinkered once"));
+    }
+}
+
+
+#[cfg(test)]
+mod never_be_rid_name_tests {
+    #[test]
+    fn rename_keeps_internal_identity() {
+        let mut r: corpse_core::Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into();
+        let id = "pelian-you-shall-never-be-rid-of-me";
+        let before = serde_json::to_string(&r).unwrap();
+        assert_eq!(super::observe(&r,id).name,"Never Be Rid of Me");
+        assert_eq!(super::display_text("You Shall Never Be Rid of Me activates."),"Never Be Rid of Me activates.");
+        assert_eq!(serde_json::to_string(&r).unwrap(),before);
     }
 }

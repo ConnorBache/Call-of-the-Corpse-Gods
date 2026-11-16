@@ -42,7 +42,7 @@ fn exhaustive_paint_evidence() {
         for c in &mut view.cells {c.animations.clear();}
         let cue=crate::effects::Cue{event:corpse_core::events::PresentationEvent{
             kind:"burst".into(),from:None,to:corpse_core::events::EventPoint{x:engine.run.player.x,y:engine.run.player.y},
-            glyph:Some("人".into()),color:None,label:None,depth:view.depth},started:0.,held:true};
+            glyph:Some("人".into()),color:None,label:None,depth:view.depth, animation: None, },started:0.,held:true,static_marks:false};
         p.effects(&view,&[cue],83.,false);record(&p,"explosion-overlay");
         // All alpha values on arbitrary destination RGBA, clipped/downscaled strokes,
         // font fallback, compound/italic map glyphs, picture scaling and zero dimensions.

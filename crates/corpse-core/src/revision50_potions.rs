@@ -19,6 +19,12 @@ fn square(f:&Floor,x:f64,y:f64,radius:i32)->Vec<usize> {
 pub fn darkness_at(f:&Floor,at:usize,tick:f64)->f64 {
     f.revision50_darkness.as_ref().and_then(|v|v.iter().find(|d|d.cell==at&&d.expires_at>tick)).map_or(0.,|d|d.amount)
 }
+/// R52 changes effective illumination and dose geometry, not source powers or clocks.
+pub fn absolute_darkness(r:&Run)->bool {r.simulation_revision.value_or(29.)>=52.}
+/// O(D) time, O(1) scratch; D is the bounded, unique-per-cell potion mask.
+pub fn absolute_darkness_at(r:&Run,f:&Floor,at:usize)->bool {
+    absolute_darkness(r)&&darkness_at(f,at,r.tick)>0.
+}
 pub fn expire(r:&mut Run) {
     if !crate::revision50::enabled(r){return}
     let tick=r.tick;
@@ -74,14 +80,25 @@ fn cleanse(r:&mut Run,id:f64) {
     }
     for key in ["poisonSourceId","slowSourceId","hemophiliaSourceId","bleedSourceId","disorientedPenalty","screamPenalty","gasVulnerable","grabbedBy","venomSourceId",crate::revision50_amulet_effects::POISON_DAMAGE,crate::revision50_amulet_effects::ACID_PENALTY] {a.conditions.shift_remove(key);}
     a.conditions.retain(|key,_|!key.starts_with("venom:"));
+    crate::revision52_enemy_followups::clear_bleed(a);
     if !a.abilities.iter().any(|id|id=="enemy:beast:everburn") {
         for key in ["burning","burningOwner","burningPlayer"] {a.conditions.shift_remove(key);}
     }
 }
-/// Non-overlapping cells are bounded by floor area. Reapplication refreshes the
-/// greater magnitude/duration, like ordinary statuses; it never stacks darkness.
+/// R52 uses cell-center Euclidean radius 3: scan 49 positions, keep at most 29.
+/// R50/R51 retain the exact square/order. Both ignore walls and portal topology;
+/// the projectile dispatcher has already selected the real impact coordinate.
+fn darkness_footprint(r:&Run,x:f64,y:f64)->Vec<usize> {
+    let f=r.floor().unwrap();
+    if !absolute_darkness(r) {return square(f,x,y,2)}
+    (-3i32..=3).flat_map(|dy|(-3i32..=3).filter_map(move |dx| {
+        if dx*dx+dy*dy>9 {None} else {crate::portals::cell(f,x+dx as f64,y+dy as f64)}
+    })).collect()
+}
+/// O(49 + 29D), O(29) scratch for R52; D <= floor cells. Reapplication
+/// refreshes the greater magnitude/duration and never stacks darkness.
 fn darkness(r:&mut Run,x:f64,y:f64,strength:f64) {
-    let cells=square(r.floor().unwrap(),x,y,2);let expiry=r.tick+(20.*strength).ceil();
+    let cells=darkness_footprint(r,x,y);let expiry=r.tick+(20.*strength).ceil();
     let f=r.floor_mut().unwrap();f.dirty=true;
     let entries=f.revision50_darkness.get_or_insert_with(Vec::new);
     for cell in cells {
@@ -219,3 +236,6 @@ pub fn apply(r:&mut Run,effect:&str,target:Option<f64>,x:f64,y:f64,strength:f64,
 #[cfg(test)]
 #[path="revision50_potions_tests.rs"]
 mod tests;
+#[cfg(test)]
+#[path="revision52_darkness_tests.rs"]
+mod revision52_darkness_tests;

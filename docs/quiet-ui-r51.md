@@ -23,3 +23,15 @@ Let C be detached observed cells, A observed creatures, T metadata/condition tex
 ## Verification
 
 Run full locked workspace tests on the final source, plus quiet_ui, player_background, display_ui and native_drawable_contract_tests. Capture CORPSE_R51_VISUAL_OUTPUT for software render comparison at standard, wide, portrait and fractional sizes. Verify the Windows binary and bundled DLL imports separately. Successful Linux tests and cross-compilation are not Windows execution or real monitor-switch/DPI verification.
+
+## R52 residual Pack text cleanup
+
+Native animation review exposed two remaining redundant labels: the explanatory
+“Separate category limits” heading and “[active]” on carried rings/amulets. These
+are removed. Item names, quantities and actual category counts remain. Historical
+pre-R50 equipped-slot labels remain because those saves still distinguish wearing
+from carrying. The row-label helper retains O(label bytes) formatting per visible
+row and adds no simulation, storage or map work. Focused tests and recapture are
+pending the next desktop build.
+
+The R52 Dreamwalk review also removed the normal creature-card explanation “Shares your Health and Energy.” Sleeping-body/clone names and condition labels remain; the duplicate resource bars remain suppressed. Inspection-specific mechanics text is unchanged. The shared-card regression verifies that no explanatory line or duplicate bars are introduced.

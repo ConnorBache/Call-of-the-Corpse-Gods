@@ -16,6 +16,10 @@ fn has_clay(r:&Run,depth:f64)->bool {
 fn dynamic(r: &Run, f: &Floor) -> bool {
     let _timing_function = crate::timing::span("offscreen.dynamic_guard");
     if has_clay(r,f.depth) {return true;}
+    if crate::corpse_currents::has_activity(r, f) {return true;}
+    // Unresolved zero HP must enter the real death lifecycle, never bulk regen.
+    if r.simulation_revision.value_or(29.) >= 52. && r.actors_at(f.depth).iter()
+        .any(|a| !a.dead.value_or(false) && a.hp <= 0.) { return true; }
     if crate::revision50_control_amulets::has_temporary_terrain(r,f.depth) {return true;}
     if crate::terrain_runtime::enabled(r) && f.hellfire.as_ref().is_some_and(|v|v.iter().any(|v|*v)) {return true;}
     if r.simulation_revision.value_or(29.)>=34. && f.godbeast_event.as_ref().is_some_and(|e|e.kind=="Epidite") {return true;}
@@ -112,6 +116,7 @@ fn dynamic(r: &Run, f: &Floor) -> bool {
                     v > 0.
                         && ([
                             "bleeding",
+                            "killspawnBleeding",
                             "burning",
                             "paralyzed",
                             "telepathic",
@@ -350,6 +355,7 @@ fn rest(a: &mut Actor, elapsed: f64, cap: f64, suppressed: bool, revision: f64) 
             "chaseExitY",
             "chaseLandingX",
             "chaseLandingY",
+            "chaseChasm",
             "stalkGoalX",
             "stalkGoalY",
             "stalkObservedX",
@@ -580,6 +586,7 @@ fn catch_up(
         r.floors = head.floors;
         r.ground = head.ground;
         r.generated_ability_grants = head.generated_ability_grants;
+        crate::revision50::settle_duel_targets(r);
         let surviving_ids: HashSet<u64> = r
             .actors
             .values()
@@ -679,9 +686,12 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
     let depth = head.depth;
     let tick = head.tick;
     let width = head.floor().unwrap().width();
+    crate::lifecycle::settle_nonpositive_health(head).map_err(|e| e.to_string())?;
+    crate::corpse_currents::settle_falls(head)?;
     crate::creature_feeding::begin_turn(head);
-    let ids = crate::ai::phase_order(head.actors_at(depth), false);
     crate::monster_chill::apply_adjacency(head);
+    crate::engine::offscreen_haste_actions(head).map_err(|e|e.to_string())?;
+    let ids = crate::ai::phase_order(head.actors_at(depth), false);
     let mut occupied: HashSet<_> = head
         .actors_at(depth)
         .iter()
@@ -699,7 +709,7 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
         }
     }
     crate::monster_chill::apply_adjacency(head);
-    'actors: for &id in &ids {
+    for &id in &ids {
         let Some(a) = actor(head, id).cloned() else {
             continue;
         };
@@ -750,6 +760,7 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
             continue;
         }
         crate::ai::enemy_turn_effects(head, id).map_err(|e| e.to_string())?;
+        crate::revision52_enemy_followups::tick_bleed(head, id).map_err(|e| e.to_string())?;
         let Some(a) = actor(head, id).cloned() else {
             continue;
         };
@@ -834,6 +845,7 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
         for key in [
             "paralyzed",
             "flying",
+            "dragonFlight",
             "hasted",
             "temporaryAlly",
             "magicSensitive",
@@ -849,6 +861,7 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
         }
         a.conditions.shift_remove("silenced");
         a.conditions.shift_remove("riptide");
+        crate::revision50::settle_duel_owner(head,id);
         let active = actor(head, id).unwrap().active.clone();
         for ability in active {
             let cost = if crate::revision50::enabled(head) {
@@ -878,21 +891,31 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
         if actor(head, id).is_none_or(|a| a.dead.value_or(false)) {
             continue;
         }
+        let before_action=actor(head,id).unwrap().clone();
+        let (result,receipt)=crate::revision52_speed::measure(id,false,|| -> Result<(),String> {
         if !was_paralyzed && crate::revision50_control_amulets::discord_turn(head,id,false).map_err(|e|e.to_string())? {
             occupied=head.actors_at(depth).iter().filter(|a|!a.dead.value_or(false)).map(|a|a.y as usize*width+a.x as usize).collect();
-            continue;
+            return Ok(());
         }
         let mut a = actor(head, id).unwrap().clone();
+        if a.state != "hunting" && !was_paralyzed
+            && !(c(&a,"slowed")>0. && tick%2.==0.)
+            && crate::revision52_dragon_flight::landing_turn(head,id).map_err(|e|e.to_string())? {
+            occupied=head.actors_at(depth).iter().filter(|a|!a.dead.value_or(false)).map(|a|a.y as usize*width+a.x as usize).collect();
+            return Ok(());
+        }
+        // The landing hook may have ended flight in place before ordinary rest.
+        a = actor(head,id).unwrap().clone();
         prepare_ally_rest(head, &mut a);
         let cap = crate::combat::effective_stats(head, &a).max_energy;
         let suppressed = frozen(head.actors_at(depth), &a);
         let resting = rest(&mut a, 1., cap, suppressed, head.simulation_revision.value_or(29.));
         *actor_mut_trusted(head, id).unwrap() = a;
         if resting {
-            continue;
+            return Ok(());
         }
         if crate::ichor::squirm_if_stranded(head, id) {
-            continue;
+            return Ok(());
         }
         let a = actor(head, id).unwrap().clone();
         let may_move = !was_paralyzed && !((c(&a, "slowed") > 0.
@@ -901,7 +924,7 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
             let a = actor(head, id).unwrap();
             occupied.remove(&at);
             occupied.insert(a.y as usize * width + a.x as usize);
-            continue;
+            return Ok(());
         }
         if (a.state != "hunting" && c(&a, "monsterInventorFleeing") <= 0.)
             || was_paralyzed
@@ -911,14 +934,14 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
                     .any(|id| id == "enemy:pale:slow" || id == "enemy:beast:slow"))
                 && tick % 2. == 0.)
         {
-            continue;
+            return Ok(());
         }
         if c(&a, "rangedRecovery") > 0. {
             actor_mut_trusted(head, id)
                 .unwrap()
                 .conditions
                 .shift_remove("rangedRecovery");
-            continue;
+            return Ok(());
         }
         if crate::engine::monster_ai_turn(head, id, false).map_err(|e| e.to_string())? {
             occupied = head
@@ -927,10 +950,10 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
                 .filter(|a| !a.dead.value_or(false))
                 .map(|a| a.y as usize * width + a.x as usize)
                 .collect();
-            continue;
+            return Ok(());
         }
         let Some(a) = crate::engine::actor(head, id).cloned() else {
-            continue;
+            return Ok(());
         };
         let chasing = a
             .conditions
@@ -946,10 +969,10 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
             a.last_seen.as_ref()
         };
         let Some(destination) = destination else {
-            continue;
+            return Ok(());
         };
         if destination.x.fract() != 0. || destination.y.fract() != 0. {
-            continue;
+            return Ok(());
         }
         let target = crate::movement::Point {
             x: destination.x as i32,
@@ -1066,7 +1089,7 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
                     {
                         if !crate::engine::movement_held(head, id) {
                             if crate::monster_statuses::try_hemophilia_episode(head, id)? {
-                                continue 'actors;
+                                return Ok(());
                             }
                             occupied.remove(&at);
                             crate::environment::open_door(head.floor_mut().unwrap(), to);
@@ -1106,6 +1129,21 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
                 a.state = "wandering".into();
                 a.last_seen = Field::Missing;
                 crate::travel::clear_floor_chase(a);
+            }
+        }
+        Ok(())
+        });
+        result?;
+        if receipt.moved && !receipt.attacked && !pending.iter().any(|p|p.id==id) {
+            let mut fast_cache=crate::engine::PathCache::new();
+            crate::engine::fast_followup(head,id,&before_action,&mut fast_cache).map_err(|e|e.to_string())?;
+            occupied=head.actors_at(depth).iter().filter(|a|!a.dead.value_or(false)).map(|a|a.y as usize*width+a.x as usize).collect();
+            if let Some(a)=actor(head,id).filter(|a|!a.dead.value_or(false) && a.hp>0.) {
+                if a.conditions.get("chaseDepth").is_some_and(|&d|d.is_finite()&&d.fract()==0.&&d!=depth)
+                    && crate::revision51_stairs::at_chase_exit(head,a,c(a,"chaseExitX"),c(a,"chaseExitY"))
+                    && !crate::revision51_stairs::blocked(head,a,c(a,"chaseExitX"),c(a,"chaseExitY")) {
+                    pending.push(Transfer{id,from:depth,to:c(a,"chaseDepth"),tick,fall:head.floor().unwrap().tiles[a.y as usize*width+a.x as usize]=="chasm"});
+                }
             }
         }
     }
@@ -1166,6 +1204,12 @@ fn apply_transfer(r: &mut Run, t: Transfer) -> Result<(), String> {
         return Ok(());
     };
     let source = proxy(r, t.from, t.tick);
+    let sweep = crate::travel::flying_chasm_chase(&source,&a);
+    // Restoring the source terrain or losing flight cannot turn an old sweep
+    // into an arbitrary floor transfer. Ordinary finite-flight falls own that
+    // case. Leave the chase queued when its landing or route is unavailable.
+    if r.simulation_revision.value_or(29.) >= 52. && c(&a,"chaseChasm") == 1.
+        && (!sweep || t.to != crate::fast_mode::below(r, t.from)) { return Ok(()); }
     if a.dead.value_or(false)
         || a.state != "hunting"
         || !crate::revision51_stairs::at_chase_exit(&source,&a,c(&a,"chaseExitX"),c(&a,"chaseExitY"))
@@ -1280,7 +1324,7 @@ fn apply_transfer(r: &mut Run, t: Transfer) -> Result<(), String> {
             crate::mutation_journal::make_mut(f).dirty = true;
         }
     }
-    if t.fall && head.floor().unwrap().tiles[i] != "water" {
+    if t.fall && !sweep && head.floor().unwrap().tiles[i] != "water" {
         let hp = crate::engine::actor(&head, t.id).unwrap().max_hp;
         crate::engine::damage_environment(&mut head, t.id, hp * 0.25, None, "fall", false)
             .map_err(|e| e.to_string())?;
@@ -1293,6 +1337,7 @@ fn apply_transfer(r: &mut Run, t: Transfer) -> Result<(), String> {
     r.floors = head.floors;
     r.actors.replace_from(head.actors);
     r.ground = head.ground;
+    crate::revision50::settle_duel_targets(r);
     for message in head.log {
         if message == "You hear an explosion!" {
             crate::engine::log(r, message, "environment");
@@ -1312,7 +1357,8 @@ fn frozen(actors: &[Actor], a: &Actor) -> bool {
 fn regen(r: &Run, f: &Floor, a: &mut Actor, ticks: f64, suppressed: bool) {
     // Shared endpoints must not gain a second natural-regeneration tick.
     // Preserve historical offscreen arithmetic for legacy revisions.
-    if suppressed || (crate::revision50::enabled(r) && crate::half_here::is_clone(a)) {
+    if suppressed || (crate::revision50::enabled(r) && crate::half_here::is_clone(a))
+        || (r.simulation_revision.value_or(29.) >= 52. && (a.dead.value_or(false) || a.hp <= 0.)) {
         return;
     }
     let drowned = a.abilities.iter().any(|id| id == "etill-drown")
@@ -1482,3 +1528,32 @@ mod portal_traversal_tests {
 #[cfg(test)]
 #[path = "revision51_stair_arrival_tests.rs"]
 mod revision51_stair_arrival_tests;
+
+#[cfg(test)]
+#[path = "revision52_flying_chasm_tests.rs"]
+mod revision52_flying_chasm_tests;
+
+#[cfg(test)]
+mod revision52_speed_tests {
+    use super::*;
+    fn room()->Run {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.tick=11.;r.player.x=-999.;r.player.y=-999.;r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();r.inventory.clear();r.actors=Default::default();
+        let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.environment=Field::Missing;f.doors=Field::Missing;f.currents=Field::Missing;f.slime=Field::Missing;f.roots=Field::Missing;f.fungal_roots=Field::Missing;f.mud=Field::Missing;f.vents=Field::Missing;f.ichor=Field::Missing;f.portals=Field::Missing;r
+    }
+    fn add(r:&mut Run,kind:&str,id:f64,x:f64)->f64 {let mut a=crate::population::create_actor_revision(kind,id,x,10.,false,52.).unwrap();a.state="hunting".into();a.last_seen=crate::ActorLastSeen{x:30.,y:10.}.into();r.actors_at_mut(r.depth).push(a);id}
+    #[test]
+    fn offscreen_fast_haste_compose_without_duplicate_world_clocks() {
+        for haste in [false,true] {let mut r=room();let id=add(&mut r,"cave-bat",800.,5.);if haste {crate::engine::actor_mut_trusted(&mut r,id).unwrap().conditions.insert("hasted".into(),5.);}
+            precise_actor_phase(&mut r,&mut vec![]).unwrap();let a=crate::engine::actor(&r,id).unwrap();assert_eq!(a.x,if haste{9.}else{7.});assert_eq!(c(a,crate::creature_feeding::AGE),1.);if haste{assert_eq!(c(a,"hasted"),4.);}}
+    }
+    #[test]
+    fn offscreen_hasted_inventor_mount_can_remove_its_old_actor_id() {
+        let mut r=room();let id=add(&mut r,"hemogoblin-inventor",800.,10.);let mech=add(&mut r,"hemogoblin-mech",801.,11.);let a=crate::engine::actor_mut_trusted(&mut r,id).unwrap();a.conditions.insert("monsterInventorFleeing".into(),1.);a.conditions.insert("monsterLinkedMechId".into(),mech);a.conditions.insert("hasted".into(),5.);
+        precise_actor_phase(&mut r,&mut vec![]).unwrap();assert!(crate::engine::actor(&r,id).is_none());assert!(crate::engine::actor(&r,mech).unwrap().monster_state.as_ref().unwrap().pilot.as_ref().is_some());
+    }
+    #[test]
+    fn offscreen_haste_at_stair_edge_keeps_transfer_not_wandering() {
+        let mut r=room();let id=add(&mut r,"cave-bat",800.,10.);let w=r.floor().unwrap().width();r.floor_mut().unwrap().tiles[10*w+11]="down".into();let a=crate::engine::actor_mut_trusted(&mut r,id).unwrap();a.last_seen=crate::ActorLastSeen{x:11.,y:10.}.into();for (k,v) in [("hasted",5.),("chaseDepth",2.),("chaseExitX",11.),("chaseExitY",10.),("chaseLandingX",10.),("chaseLandingY",10.)] {a.conditions.insert(k.into(),v);}
+        let mut transfers=vec![];precise_actor_phase(&mut r,&mut transfers).unwrap();assert_eq!(transfers.len(),1);assert_eq!(transfers[0].id,id);assert_eq!(crate::engine::actor(&r,id).unwrap().state,"hunting");
+    }
+}

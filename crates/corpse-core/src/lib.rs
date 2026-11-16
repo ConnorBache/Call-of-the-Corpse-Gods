@@ -1,8 +1,11 @@
+pub mod hanged;
 pub mod revision51_perception;
 pub mod revision50_creature_identity;
 pub mod revision50_item_knowledge;
 pub mod revision50_rings;
+pub mod revision52_swimming;
 pub mod revision50_player_attack;
+pub mod revision52_reserves;
 pub mod revision50_ability_energy;
 pub mod revision50_amulets;
 pub mod revision50_amulet_effects;
@@ -62,6 +65,7 @@ pub mod hazard_memory;
 pub mod fungi;
 
 pub mod currents;
+pub mod square_currents;
 
 pub mod validation;
 
@@ -84,12 +88,14 @@ pub mod events;
 pub mod sphinx_generation;
 
 pub mod startup;
+pub mod fast_mode;
 
 pub mod projectiles;
 
 pub mod travel;
 
 pub mod corpse_placement;
+pub(crate) mod corpse_currents;
 
 pub mod lifecycle;
 pub mod monster_statuses;
@@ -205,3 +211,35 @@ pub mod revision51_stairs;
 
 /// Revision51 water extinguishes ordinary and Sparkle fire sources.
 pub mod revision51_fire_water;
+
+/// Detached revision52 enemy animation outcome cues.
+pub mod animation_enemy;
+
+pub mod animation_amulets;
+/// Firebolt-only travel amendment and command-ledger compatibility policy.
+pub mod firebolt_travel;
+pub mod animation_player;
+#[cfg(test)] mod animation_contract_tests;
+
+pub mod animation_observation;
+#[cfg(test)] mod animation_inventory_tests;
+
+/// Explicit revision52 floor-aware natural Fighter birth tuning.
+pub mod balance52;
+/// R52 paid Dragon flight and precise contact follow-ups.
+pub mod revision52_enemy_followups;
+/// Immutable item-birth tiers and captured amulet effect profiles.
+pub mod revision52_amulet_tiers;
+pub mod revision52_dragon_flight;
+
+pub(crate) mod revision52_speed;
+
+#[cfg(test)]
+mod fast_mode_tests;
+
+#[cfg(test)]
+mod fast_mode_boss_tests;
+
+pub mod fortune_schedule;
+
+pub mod ability_sight;

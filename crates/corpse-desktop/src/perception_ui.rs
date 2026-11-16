@@ -1,5 +1,5 @@
-//! R51 perception preview. All geometry/light comes from the detached current
-//! observation. Unknown rays produce no boundary, never an invented safe zone.
+//! R51+ perception preview. Enclose the complete confidently known sight area
+//! from detached current/remembered observation, never hidden world geometry.
 use corpse_core::{Actor, Floor, Run, movement::Point, revision51_perception as rules, vision};
 use crate::render::{Creature, Painter, View};
 
@@ -23,6 +23,19 @@ pub fn tile_label(run:&Run,cell:&vision::ObservedCell)->Option<String> {
     (n<0.).then(||format!("−{} perception range",number(-n)))
 }
 
+/// Remembered terrain is usable knowledge; telepathic-only current projections
+/// retain the existing optical-preview exclusion. Unknown cells have no tile.
+fn known(cell:&vision::ObservedCell)->bool {
+    cell.tile.is_some() && ((cell.current&&cell.direct)||(!cell.current&&cell.remembered))
+}
+/// Current light is exact. Remembered light is not serialized, so only sight
+/// that agrees across its full possible interval can extend into remembered cells.
+fn light_bounds(run:&Run,cell:&vision::ObservedCell)->Option<(f64,f64)> {
+    if !known(cell) {return None;}
+    let (low,high)=if cell.current {let l=cell.illumination?;(l,l)} else {(-100.,100.)};
+    Some((vision::perception_actor_light(run,&run.player,low,0.),
+        vision::perception_actor_light(run,&run.player,high,0.)))
+}
 /// Two detached opacity bounds. A result is certain only if the known-blocked
 /// and unknown-transparent route agree. O(V) setup and storage; no live rays.
 struct Geometry { floor:Floor, blocked:Vec<bool>, optimistic:Vec<bool> }
@@ -41,9 +54,10 @@ impl Geometry {
             }
             floor.portals=pairs.into();
         }
-        let optimistic=o.cells.iter().map(|c|current(c.index)&&
+        let optimistic=o.cells.iter().map(|c|known(c)&&
             (matches!(c.tile.as_deref(),Some("wall"|"tree"))||c.door_open==Some(false))).collect::<Vec<_>>();
-        let blocked=o.cells.iter().map(|c|!current(c.index)||optimistic[c.index]).collect();
+        let blocked=o.cells.iter().map(|c|!known(c)||optimistic[c.index]
+            ||(c.tile.as_deref()==Some("door")&&c.door_open.is_none())).collect();
         Some(Self{floor,blocked,optimistic})
     }
     fn distance(&self,from:Point,to:Point,opaque:&[bool])->f64 {
@@ -57,9 +71,44 @@ impl Geometry {
             .map_or(f64::INFINITY,|r|r.distance)
     }
 }
-/// O(A*V*(K²R+B)+V+K), O(V+K+A*E) extra memory. A admitted creatures,
-/// V cells, K known portal endpoints (<=14), R max ray length, B target actor
-/// modifiers, E contour edges (<=2V). Runs only on world observation, not paint.
+/// Non-optical rules that depend only on the observed actor and the player's
+/// own state, never on hidden terrain/light. Their union is safe over known
+/// same-plane cells even when an optical preview is unavailable.
+#[derive(Default)]
+struct Senses { all_known:bool, mind_radius:Option<f64>, dream_los:bool }
+impl Senses {
+    fn observe(run:&Run,actor:&Actor)->Self {
+        let condition=corpse_core::engine::condition;
+        let player=&run.player;
+        let all_seeing=condition(actor,"allSeeingReveal")==1.
+            &&condition(actor,"allSeeingDepth")==run.depth;
+        let alive=!player.dead.value_or(false);
+        // Match vision::telepathic_for_owner's target sleep predicate, including
+        // resting allies/recovering neutrals. The player's state is not hidden.
+        let sleeping=player.state=="sleeping"
+            ||(player.state=="ally"&&condition(player,"monsterAllyRest")==1.)
+            ||(player.state=="neutral"&&condition(player,"monsterRecoverySleep")==1.);
+        let dream=alive&&actor.abilities.iter().any(|a|a=="ursa-dream-see");
+        Self {
+            all_known:all_seeing||corpse_core::revision50_combat::witch_senses(run,actor,player)
+                ||(alive&&(condition(actor,"telepathic")>0.
+                    ||(condition(actor,"cameTurns")>0.&&condition(actor,"cameTarget")==player.id)))
+                ||(dream&&sleeping),
+            mind_radius:(alive&&actor.abilities.iter().any(|a|a=="numo-mind-read"))
+                .then(||if actor.active.iter().any(|a|a=="numo-mind-read"){20.}else{5.}),
+            dream_los:dream&&actor.active.iter().any(|a|a=="ursa-dream-see"),
+        }
+    }
+    fn any(&self)->bool {self.all_known||self.mind_radius.is_some()||self.dream_los}
+    fn sees(&self,from:Point,to:Point,g:Option<&Geometry>)->bool {
+        self.all_known||self.mind_radius.is_some_and(|r|vision::distance(from,to)<=r)
+            ||(self.dream_los&&g.is_some_and(|g|g.distance(from,to,&g.blocked).is_finite()))
+    }
+}
+/// World-observation-only projection. The additional known-mask/perimeter work
+/// is O(V) per creature with E<=4V output edges; detached rays retain their
+/// existing O(V*R) / O(V*K²R) cost. Full actor/modifier and memory bounds are in
+/// docs/revision52-enemy-perception-overlay.md. Painting never queries the run.
 pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>,creatures:&[Creature])->Vec<Boundary> {
     if !rules::enabled(run) {return Vec::new();}
     let Some(o)=o else{return Vec::new();};
@@ -68,31 +117,25 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>,creatures:&[Creatu
     if corpse_core::dreamwalking::active(run)
         ||creatures.iter().any(|c|run.actors_at(run.depth).iter().find(|a|a.id==c.id)
             .is_some_and(|a|a.perfect.value_or(false)
-                &&!corpse_core::dreamwalking::same_plane(run,&run.player,a)))
-        ||run.player.abilities.iter().any(|a|a=="enemy:beast:darkness-aura")
+                &&!corpse_core::dreamwalking::same_plane(run,&run.player,a))) {return Vec::new();}
+    // Moving player light cannot be reconstructed from the detached field. It
+    // does not invalidate a known special sense which ignores illumination.
+    let optical_supported=!(run.player.abilities.iter().any(|a|a=="enemy:beast:darkness-aura")
         ||(run.player.abilities.iter().any(|a|a=="anavani-shine")
             &&!run.player.active.iter().any(|a|a=="anavani-shine"))
-        ||corpse_core::revision50_rings::has_effect(run,&run.player,"light") {return Vec::new();}
-    let Some(g)=Geometry::new(run,o) else{return Vec::new();};
-    let light=o.cells.iter().map(|c|c.illumination.map(|l|
-        vision::perception_actor_light(run,&run.player,l,0.))).collect::<Vec<_>>();
+        ||corpse_core::revision50_rings::has_effect(run,&run.player,"light"));
+    let geometry=Geometry::new(run,o);
+    let light=o.cells.iter().map(|c|light_bounds(run,c)).collect::<Vec<_>>();
     let stealth=corpse_core::engine::condition(&run.player,"stealth");
     let submerged=corpse_core::engine::condition(&run.player,"submergedStealth");
     let invisible=corpse_core::engine::condition(&run.player,"invisible")>0.;
     creatures.iter().filter_map(|row| {
         let actor=run.actors_at(run.depth).iter().find(|a|a.id==row.id)?;
         // A disguise/hallucination must never disclose its underlying senses.
-        if row.shared_resources||actor.state=="ally"||row.hallucination.is_some()
+        if row.shared_resources||actor.state=="ally"||row.state=="sensed"||row.hallucination.is_some()
             ||crate::creature_presentation::project(run,actor).is_some(){return None;}
-        // Optical range is not a safe boundary for alternate senses. Do not
-        // imply safety beyond it while these observer-specific overrides apply.
-        if (corpse_core::engine::condition(actor,"allSeeingReveal")==1.
-                &&corpse_core::engine::condition(actor,"allSeeingDepth")==run.depth)
-            ||corpse_core::engine::condition(actor,"telepathic")>0.
-            ||(corpse_core::engine::condition(actor,"cameTurns")>0.
-                &&corpse_core::engine::condition(actor,"cameTarget")==run.player.id)
-            ||actor.abilities.iter().any(|a|matches!(a.as_str(),"numo-mind-read"|"ursa-dream-see"))
-            ||corpse_core::revision50_combat::witch_senses(run,actor,&run.player) {return None;}
+        let senses=Senses::observe(run,actor);
+        if (!optical_supported||geometry.is_none())&&!senses.any() {return None;}
         let from=Point{x:actor.x as i32,y:actor.y as i32};
         let at=actor.y as usize*o.width+actor.x as usize;
         if !o.cells.get(at).is_some_and(|c|c.current&&c.direct)
@@ -100,30 +143,37 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>,creatures:&[Creatu
             ||corpse_core::dreamwalking::is_nightmare(actor) {return None;}
         let perception=corpse_core::combat::effective_stats(run,actor).perception;
         let states=o.cells.iter().map(|c| {
-            if !c.current||!c.direct||c.tile.is_none(){return None;}
-            let illumination=light[c.index]?;
-            if invisible {return Some(false);}
+            if !known(c) {return None;}
             let to=Point{x:(c.index%o.width)as i32,y:(c.index/o.width)as i32};
+            if senses.sees(from,to,geometry.as_ref()) {return Some(true);}
+            if !optical_supported {return None;}
+            let g=geometry.as_ref()?;
+            let (darkest,brightest)=light[c.index]?;
+            if invisible {return Some(false);}
             // Without portals, range alone can prove an excluded tile. Avoid
             // ray walks outside the finite creature radius. Positive light still
             // requires LOS, and known portal shortcuts must use route distance.
             if g.floor.portals.as_ref().is_none_or(|p|p.is_empty())
-                &&!rules::creature_in_range(perception,vision::distance(from,to),stealth,submerged,illumination){return Some(false);}
-            let definite=rules::creature_in_range(perception,g.distance(from,to,&g.blocked),stealth,submerged,illumination);
-            let possible=rules::creature_in_range(perception,g.distance(from,to,&g.optimistic),stealth,submerged,illumination);
+                &&!rules::creature_in_range(perception,vision::distance(from,to),stealth,submerged,brightest){return Some(false);}
+            let definite=rules::creature_in_range(perception,g.distance(from,to,&g.blocked),stealth,submerged,darkest);
+            let possible=rules::creature_in_range(perception,g.distance(from,to,&g.optimistic),stealth,submerged,brightest);
             (definite==possible).then_some(definite)
         }).collect::<Vec<_>>();
         Some(Boundary{actor:row.id.to_bits(),edges:edges(o.width,o.height,&states)})
     }).collect()
 }
-/// Emit each known true/false interface once. Never close a contour against
-/// fog, remembered cells, map limits or a path whose hidden segment matters.
+/// Perimeter of the confirmed-visible union, including holes and map limits.
+/// Unknown/ambiguous cells are outside this knowledge area, not promised safe.
+/// O(V) time, O(E) output (E<=4V); each exposed cell side is emitted once.
 fn edges(w:usize,h:usize,states:&[Option<bool>])->Vec<Edge> {
     let mut out=Vec::new();
+    let inside=|x:usize,y:usize|states[y*w+x]==Some(true);
     for y in 0..h {for x in 0..w {
-        let Some(a)=states[y*w+x] else{continue;};
-        if x+1<w && states[y*w+x+1].is_some_and(|b|a!=b) {out.push(Edge{x:x+1,y,vertical:true});}
-        if y+1<h && states[(y+1)*w+x].is_some_and(|b|a!=b) {out.push(Edge{x,y:y+1,vertical:false});}
+        if !inside(x,y) {continue;}
+        if x==0||!inside(x-1,y) {out.push(Edge{x,y,vertical:true});}
+        if x+1==w||!inside(x+1,y) {out.push(Edge{x:x+1,y,vertical:true});}
+        if y==0||!inside(x,y-1) {out.push(Edge{x,y,vertical:false});}
+        if y+1==h||!inside(x,y+1) {out.push(Edge{x,y:y+1,vertical:false});}
     }}out
 }
 pub fn selected(view:&View,id:Option<u64>)->Option<&Boundary> {
@@ -131,7 +181,11 @@ pub fn selected(view:&View,id:Option<u64>)->Option<&Boundary> {
 }
 fn logical(p:&Painter,v:&View,e:Edge)->(i32,i32,i32,i32) {
     let(cw,ch,ox,oy)=p.map_layout(v.width,v.height);
-    (ox+e.x as i32*cw,oy+e.y as i32*ch,if e.vertical{1}else{cw},if e.vertical{ch}else{1})
+    // Keep right/bottom map-limit strokes inside the clip. Include both grid
+    // endpoints so concave and convex corners meet without a missing pixel.
+    let x=ox+e.x as i32*cw-i32::from(e.x==v.width);
+    let y=oy+e.y as i32*ch-i32::from(e.y==v.height);
+    (x,y,if e.vertical{1}else{cw+1},if e.vertical{ch+1}else{1})
 }
 pub fn bounds(p:&Painter,v:&View,b:&Boundary)->Vec<crate::render::damage::Rect> {
     b.edges.iter().filter_map(|&e|{let(x,y,w,h)=logical(p,v,e);p.logical_damage_rect(x-1,y-1,w+2,h+2)}).collect()

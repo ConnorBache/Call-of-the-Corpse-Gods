@@ -166,7 +166,7 @@ pub fn present(message: &str) -> String {
         "bite", "bites", "slash", "slashes", "skewer", "skewers", "pierce", "pierces",
         "sting", "stings", "gore", "gores", "crush", "crushes", "claw", "claws",
         "kill", "kills", "attack", "attacks"];
-    let mut output = message.to_owned();
+    let mut output = crate::ability_ui::display_text(message).into_owned();
     if names.iter().any(|name| message.strip_prefix(name).is_some_and(|tail|
         VERBS.iter().any(|verb| tail.strip_prefix(" tries to ").or_else(|| tail.strip_prefix(' '))
             .and_then(|s|s.strip_prefix(verb)).is_some_and(|s|s.starts_with(' '))))) {

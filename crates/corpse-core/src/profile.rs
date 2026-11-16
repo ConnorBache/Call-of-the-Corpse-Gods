@@ -14,6 +14,8 @@ pub struct HeartTotal {
 pub struct RunSummary {
     pub seed: String,
     pub mode: String,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub fast_mode: bool,
     pub status: String,
     pub score: Option<f64>,
     pub observed_blessings: f64,
@@ -24,6 +26,12 @@ pub struct RunSummary {
     pub death_reason: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ending: Option<String>,
+}
+fn is_false(value: &bool) -> bool { !*value }
+impl RunSummary {
+    pub fn mode_label(&self) -> &str {
+        if self.fast_mode { "Fast mode" } else { &self.mode }
+    }
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -77,6 +85,7 @@ pub fn summarize_run(run: &Run) -> RunSummary {
     RunSummary {
         seed: run.seed.clone(),
         mode: run.mode.clone(),
+        fast_mode: run.fast_mode.value_or(false) && !run.compressed_depths.value_or(false),
         status: run.status.clone(),
         score: stats
             .filter(|s| s.blessings_complete && run.playtest.is_missing())
@@ -84,7 +93,7 @@ pub fn summarize_run(run: &Run) -> RunSummary {
         observed_blessings: stats.map_or(0.0, |s| s.blessings_received),
         hearts,
         hearts_complete: stats.is_some_and(|s| s.hearts_complete),
-        depth: death.map_or(run.depth, |d| d.depth),
+        depth: crate::fast_mode::display_depth(run,death.map_or(run.depth, |d| d.depth)),
         tick: death.map_or(run.tick, |d| d.tick),
         death_reason: if run.status == "dead" {
             Some(
@@ -248,4 +257,40 @@ pub fn archive_run_record(
     out.run_archives.push(record);
     out.high_scores = ranked_run_records(&out.run_archives);
     Ok((out, true))
+}
+
+#[cfg(test)]
+mod fast_summary_tests {
+    use super::*;
+    #[test]
+    fn fast_summary_is_optional_for_legacy_and_retained_for_new_records() {
+        let mut run: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let normal=summarize_run(&run);
+        let json=serde_json::to_value(&normal).unwrap();
+        assert!(json.get("fastMode").is_none());
+        let old:RunSummary=serde_json::from_value(json.clone()).unwrap();
+        assert!(!old.fast_mode);
+        assert_eq!(old.mode_label(),run.mode);
+        run.fast_mode=Field::Value(true);
+        let fast=summarize_run(&run);
+        assert_eq!(fast.mode_label(),"Fast mode");
+        let value=serde_json::to_value(&fast).unwrap();
+        assert_eq!(value["fastMode"],true);
+        assert_eq!(serde_json::from_value::<RunSummary>(value).unwrap(),fast);
+        assert_eq!(fast.score,normal.score);
+        assert_eq!(fast.observed_blessings,normal.observed_blessings);
+    }
+}
+
+#[cfg(test)]
+mod compressed_summary_tests {
+    #[test]
+    fn compressed_summary_uses_player_facing_depth_without_fast_badge() {
+        let mut run:crate::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.fast_mode=true.into();run.compressed_depths=true.into();run.depth=40.;
+        let summary=super::summarize_run(&run);
+        assert_eq!(summary.depth,20.);assert!(!summary.fast_mode);assert_eq!(summary.mode_label(),"Avatar");
+        run.compressed_depths=false.into();let summary=super::summarize_run(&run);
+        assert_eq!(summary.depth,40.);assert!(summary.fast_mode);
+    }
 }

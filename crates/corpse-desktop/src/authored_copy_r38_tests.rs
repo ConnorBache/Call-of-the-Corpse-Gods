@@ -9,7 +9,7 @@ fn scene() -> Run {
 fn authored_copy_r38_dream_descriptions_are_exact() {
     let mut r = scene();
     r.dreamwalking = corpse_core::dreamwalking::State { unlocked: true, ..Default::default() }.into();
-    assert_eq!(dream_row(&r).unwrap().description, "Toggle Dreamwalking. Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake.");
+    assert_eq!(dream_row(&r).unwrap().description, "Leave your sleeping body behind to enter the Realm of Dreams. Toggle again to awake.");
     r.dreamwalking = corpse_core::dreamwalking::State { active: true, depth: r.depth, ..Default::default() }.into();
     assert_eq!(dream_row(&r).unwrap().description, "Awake from the realm of dreams.");
 }

@@ -186,7 +186,7 @@
     "id": "isheilah-quick-hand",
     "godId": 2,
     "name": "Quick Hand",
-    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn. No energy cost.",
+    "description": "Gain 1 maximum reaction. Reactions refresh when you wait. While active, being hit spends 1 reaction to grant haste for 1 turn.",
     "effectSummary": "gains a reaction and can spend one to gain Haste when hit",
     "flags": [
       "passive",
@@ -504,7 +504,7 @@
     "id": "lichor-blood-weapon",
     "godId": 6,
     "name": "Blood Weapon",
-    "description": "Activate freely by paying 10% of your maximum HP, rounded up. Your next attack is guaranteed to hit and deals double damage, subject to the usual defensive effects. Only one attack can be prepared at a time.",
+    "description": "Activate freely by paying 10% of your maximum HP. Your next attack is guaranteed to hit and deals double damage, subject to the usual defensive effects. Only one attack can be prepared at a time.",
     "effectSummary": "can spend health to prepare one guaranteed, empowered strike",
     "flags": [
       "activate"
@@ -711,7 +711,7 @@
     "id": "anavani-nova",
     "godId": 9,
     "name": "Nova",
-    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 30 energy. Every explosion deals 50% of each affected creature's maximum HP, rounded up, unless it is immune.",
+    "description": "You are immune to explosions. When active, when you attack, create an explosion and spend 30 energy. Every explosion deals 50% of each affected creature's maximum HP.",
     "effectSummary": "is immune to explosions and can create an explosion when it attacks",
     "flags": [
       "passive",
@@ -902,8 +902,8 @@
     "id": "morae-all-seeing-eyes",
     "godId": 11,
     "name": "All-Seeing Eyes",
-    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next time-consuming action finishes. The terrain stays remembered afterward.",
-    "effectSummary": "can briefly reveal the current floor and its creatures and contents",
+    "description": "Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.",
+    "effectSummary": "can briefly reveal the current floor and its creatures and contentsuntil your next turn.",
     "flags": [
       "activate"
     ],

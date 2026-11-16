@@ -44,6 +44,46 @@ fn frames(r:&Run)->Vec<render::View> {
      (Some(pack::PackTarget::UseAt(903.)),Some((14,13))),(None,None)]
      .into_iter().map(|(target,hover)|{let mut v=observe::observe(r);sync_pointer_view(&mut v,r,hover,vec![],target.as_ref());v}).collect()
 }
+#[test]fn r52_aim_mouse_keyboard_first_impact_matches_committed_command(){
+    for (id,endpoint) in [(902.,(16,10)),(903.,(15,10)),(901.,(16,10))] {
+        let mut r=room();r.simulation_revision=52.0.into();let before=r.clone();
+        let target=pack::PackTarget::UseAt(id);let mut mouse=observe::observe(&r);
+        sync_pointer_view(&mut mouse,&r,Some((20,10)),vec![],Some(&target));
+        let next=aim_keyboard_tile(&r,Some((20,11)),Keycode::Up).unwrap();let mut keyboard=observe::observe(&r);
+        sync_pointer_view(&mut keyboard,&r,Some(next),vec![],Some(&target));
+        assert_eq!(mouse.target_path,keyboard.target_path);assert_eq!(mouse.target_impact,keyboard.target_impact);
+        assert_eq!(mouse.target_area,keyboard.target_area);assert_eq!(mouse.target_impact,Some(endpoint));
+        assert_eq!(mouse.target_path.last(),Some(&endpoint));assert_eq!(r,before);
+        assert!(target.target_blocker(&r,20.,10.).is_none());
+        let out=corpse_core::engine::dispatch(&mut r,&target.command(20.,10.)).unwrap();
+        let key=if id==902.{"A04"}else if id==903.{"A06"}else{"A02"};
+        assert!(out.events.iter().filter_map(|e|e.animation.as_ref()).any(|a|a.proposal==key&&a.stage==corpse_core::events::Stage::Travel
+            &&a.cells.last().is_some_and(|p|(p.x as usize,p.y as usize)==endpoint)));
+        if id==903. {assert_eq!((r.player.x,r.player.y),(15.,10.));}
+        sync_pointer_view(&mut mouse,&r,None,vec![],None);assert!(mouse.target_path.is_empty()&&mouse.target_area.is_empty()&&mouse.target_impact.is_none());
+    }
+}
+#[test]fn r52_aim_shifted_blast_and_blink_full_retained_and_tile_match(){
+    let mut r=room();r.simulation_revision=52.0.into();let mut views=Vec::new();
+    for (id,hover) in [(902.,Some((20,10))),(903.,Some((20,10))),(902.,Some((14,13))),(903.,Some((16,10))),(902.,None)] {
+        let mut v=observe::observe(&r);sync_pointer_view(&mut v,&r,hover,vec![],Some(&pack::PackTarget::UseAt(id)));views.push(v);
+    }
+    let mut retained=render::RetainedGame::default();let mut p=Painter::new();let mut full=Painter::new();
+    for (w,h) in [(1280,800),(960,1200)] {p.resize(w,h);full.resize(w,h);p.set_responsive_canvas(true);full.set_responsive_canvas(true);
+        for (i,v) in views.iter().enumerate() {retained.update(&mut p,v,"",0.,true,false).unwrap();full.game_at(v,"",false,0.);assert!(p.pixels==full.pixels);
+            if let Ok(dir)=std::env::var("CORPSE_AIM_REVIEW") {
+                std::fs::create_dir_all(&dir).unwrap();let name=["intercepted-iceblast","shortened-blink","clear-iceblast","occupied-blink","cancel"][i];
+                let file=std::fs::File::create(format!("{dir}/r52-{name}-{w}x{h}.png")).unwrap();
+                let mut enc=png::Encoder::new(file,p.width as u32,p.height as u32);enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);
+                enc.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+            }
+        }
+    }
+    let mut tile=Painter::new();let mut full=Painter::new();let mut plan=render::tile_damage::TilePlanner::default();let mut old=None;
+    for v in &views {plan.replace_view(old,v,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,v,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();
+        full.game_at(v,"",false,0.);assert!(tile.pixels==full.pixels);old=Some(v);}
+    assert!(ability_ui::display_description(&r,"anavani-illuminate","").contains("Ichor-covered water does not"));
+}
 #[test]fn r51_aim_full_retained_tile_cancel_animation_and_resize_match(){
     let r=room();let views=frames(&r);let mut retained=render::RetainedGame::default();let mut p=Painter::new();let mut full=Painter::new();
     for (w,h) in [(1280,800),(1920,1080),(960,1200),(1537,911)] {

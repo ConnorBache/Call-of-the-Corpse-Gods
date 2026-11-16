@@ -71,6 +71,7 @@ pub fn create_for(r: &mut Run, owner_id: f64, x: f64, y: f64) -> Result<f64, Str
     let charges=p.nightmares.value_or(0.0);
     crate::engine::actor_mut_trusted(r,owner_id).unwrap().nightmares=(charges-1.0).into();
     r.next_id += 1.;
+    crate::animation_player::local(r,&decoy,"P31","summon",crate::events::Stage::Special);
     r.actors_at_mut(r.depth).push(decoy);
     if let Some(f) = r.floor_mut() { f.dirty = true; }
     Ok(id)
@@ -96,6 +97,7 @@ pub fn tick_actor(r: &mut Run, actor_id: f64) {
     if now>=at {
         a.nightmares=(a.nightmares.value_or(0.0)+1.0).into();
         a.conditions.insert("nightmareAt".into(),now+100.0);
+        if actor_id==r.player.id {crate::events::inventory(r,"P31","charge-spark",None);}
     }
 }
 
@@ -104,7 +106,9 @@ pub fn tick_actor(r: &mut Run, actor_id: f64) {
 /// O(A) stable removal; no corpse, resurrection, experience, or item drops.
 pub fn strike(r: &mut Run, id: f64) -> bool {
     if !enabled(r) || !crate::engine::actor(r, id).is_some_and(is_decoy) { return false; }
+    crate::animation_player::local(r,crate::engine::actor(r,id).unwrap(),"P31","dissolve",crate::events::Stage::Special);
     r.actors_at_mut(r.depth).retain(|a| a.id != id);
+    crate::revision50::end_duels_with_target(r,id);
     if let Some(f) = r.floor_mut() { f.dirty = true; }
     true
 }

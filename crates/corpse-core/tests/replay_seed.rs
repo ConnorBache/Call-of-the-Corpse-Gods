@@ -6,9 +6,12 @@ use corpse_core::{
 fn record(seed: &str, mode: &str) -> ReplayRecord {
     ReplayRecord {
         playtest: Field::Missing,
+        fast_mode: Field::Missing,
+        compressed_depths: Field::Missing,
         version: 1.0,
         revert_policy: Field::Missing,
         snapshot_from: Field::Missing,
+        firebolt_travel_from: Field::Missing,
         seed: seed.into(),
         mode: mode.into(),
         dev: false,

@@ -1,6 +1,12 @@
 //! Observation-only painter. Optional GPU recording emits native quads, while
 //! the unchanged software path remains the reference and headless exporter.
 use std::collections::HashMap;
+#[path = "resource_ui.rs"]
+pub mod resource_ui;
+#[path="ability_indicator_ui.rs"]
+mod ability_indicator_ui;
+#[path="ability_dialog.rs"]
+mod ability_dialog;
 #[path="pack_occlusion.rs"]
 mod pack_occlusion;
 #[path="chronicle_fade_cache.rs"]
@@ -9,6 +15,10 @@ mod chronicle_fade_cache;
 mod render_background;
 #[path = "ascii_mask.rs"]
 mod ascii_mask;
+#[path = "glyph_mask.rs"]
+mod glyph_mask;
+#[path = "glyph_ink.rs"]
+mod glyph_ink;
 #[path = "menu_heartbeat.rs"]
 mod menu_heartbeat;
 #[path = "menu_anatomy.rs"]
@@ -31,6 +41,7 @@ pub type Rgb = [u8; 3];
 pub const GOLD: Rgb = [248, 209, 0];
 pub const INK: Rgb = [233, 229, 239];
 pub const MUTED: Rgb = [119, 115, 132];
+const CORPSE_CROSS: Rgb = [245, 54, 64];
 #[derive(Clone)]
 pub struct Picture {
     pub w: usize,
@@ -93,6 +104,8 @@ pub struct Cell {
     pub hallucination: Option<std::sync::Arc<[Cell;6]>>,
     /// Cached visible Timeweave direction; paint never reads the Run or trail index.
     pub timeweave: Option<(i8, i8)>,
+    /// Exact known original duel perimeter; persistent state, no animation loop.
+    pub duel_edges:[bool;4],
     /// Italic treatment of the ASCII portal glyph, not a different character.
     pub italic: bool,
     /// Ground-cover ink alignment only; backgrounds and overlays keep tile bounds.
@@ -119,6 +132,8 @@ pub struct Cell {
     pub current: bool,
     pub direct: bool,
     pub actor_id: Option<f64>,
+    /// Detached ground-item identity, used only to stage a recovered projectile.
+    pub ground_item_id: Option<u64>,
     pub controllable_ally: bool,
     pub heartless: bool,
     /// Detached death marker; living sleeping bodies remain unmarked.
@@ -148,6 +163,7 @@ pub struct Creature {
     pub max_hp: f64,
     pub energy: f64,
     pub max_energy: f64,
+    pub uses_energy: bool,
     pub statuses: Vec<crate::statuses_ui::Status>,
     pub meters: Vec<crate::statuses_ui::Meter>,
 }
@@ -171,6 +187,8 @@ pub struct View {
     pub target_area: Vec<(usize, usize)>,
     pub target_impact: Option<(usize, usize)>,
     pub target_color: Option<Rgb>,
+    pub selected_ability: Option<String>,
+    pub cogworks_mode: u8,
     /// Possible exits, not a selected or promised movement/projectile outcome.
     pub possible_exits: Vec<(usize, usize)>,
     pub hover: Option<(usize, usize)>,
@@ -185,16 +203,22 @@ pub struct View {
     pub cells: Vec<Cell>,
     pub hp: f64,
     pub max_hp: f64,
+    /// Detached per-turn Health, Energy and Blessings change labels.
+    pub resource_changes: [String; 3],
+    pub pending_energy_loss: f64,
     /// Effective display contributions: nominal melee Damage, HP, DR, Accuracy, Dodge.
     pub player_stats: [f64;5],
     pub energy: f64,
     pub max_energy: f64,
     pub turn: f64,
     pub depth: f64,
+    pub display_depth: f64,
+    pub max_depth: u32,
     pub log: Vec<String>,
     pub chronicle_offset: usize,
     pub log_groups: Vec<crate::chronicle::Group>,
     pub creatures: Vec<Creature>,
+    pub ground_entities: Vec<enemy_list::GroundEntity>,
     pub inventory: Vec<String>,
     pub dead: bool,
     pub state: String,
@@ -281,6 +305,8 @@ fn blend_scaled_mask(pixels: &mut [u8], pitch: usize, bounds: (i32,i32,i32,i32),
 pub struct ResizePlan { width:usize, height:usize, pixels:Vec<u8> }
 pub const MAX_FRAMEBUFFER_PIXELS:usize=33_554_432;
 pub struct Painter {
+    /// Painter-only Firebolt staging; canonical View and inspection stay current.
+    pub firebolt_terrain: Option<crate::staged_firebolt::PaintStage>,
     pub gpu: Option<crate::gpu_render::Frame>,
     responsive_canvas:bool,
     pub tile_mask: tile_damage::RowSpans,
@@ -295,6 +321,7 @@ pub struct Painter {
     pub bestiary_unread: bool,
     pub enemy_list_offset: usize,
     pub enemy_hover: Option<u64>,
+    pub ground_hover: Option<(usize,usize)>,
     pub ability_hover: Option<usize>,
     pub chronicle_hover: bool,
     pub prose_contrast_outline: bool,
@@ -321,7 +348,7 @@ pub struct Painter {
     fallback: Vec<fontdue::Font>,
     glyphs: HashMap<(char, u16), (fontdue::Metrics, Vec<u8>)>,
     styled_glyphs: HashMap<(char, u16, usize, u16), (fontdue::Metrics, Vec<u8>)>,
-    identity_masks: HashMap<(String, i32, i32, u32, bool, u64, u64), (i32, i32, usize, usize, Vec<u8>)>,
+    identity_masks: HashMap<(String, i32, i32, u32, bool, u64, u64), (i32, i32, usize, usize, Vec<u8>, Option<glyph_ink::Bounds>)>,
     prose_glyphs: HashMap<(char, u32, bool), (fontdue::Metrics, std::sync::Arc<[u8]>)>,
     map_masks: HashMap<(char, i32, i32, u16), ascii_mask::AsciiMask>,
     /// Same-binary algorithm control; never a production setting.
@@ -338,6 +365,7 @@ impl Painter {
         let logo = crate::embedded_assets::compact_picture(include_bytes!("../assets/ui-runtime/menu-logo.webp"));
         let menu_layers = std::sync::Arc::new(menu_anatomy::layers(&logo));
         Self {
+            firebolt_terrain: None,
             gpu: None,
             responsive_canvas:false,
             tile_mask:tile_damage::RowSpans::default(),tile_clip_enabled:false,tile_cell_bounds:Vec::new(),
@@ -348,6 +376,7 @@ impl Painter {
             bestiary_unread: false,
             enemy_list_offset: 0,
             enemy_hover: None,
+            ground_hover: None,
             ability_hover: None,
             chronicle_hover: false,
             prose_contrast_outline: false,
@@ -498,7 +527,7 @@ impl Painter {
         v.creatures.iter().any(|a|a.id==id).then_some(id.to_bits())
     }
     pub fn ability_inspect_at(&self,count:usize,x:i32,y:i32)->Option<usize>{ability_inspect_at(&self.profile,count,x-(self.logical_width()-WIDTH as i32),y)}
-    pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{crate::modal_ui::Rect(12,6,(self.hud_left()-25).max(0),chronicle_height(&self.profile).max(0))}
+    pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{crate::modal_ui::Rect(12,12,(self.frame().map.2-24).max(0),chronicle_height(&self.profile).max(0))}
     fn native_x(&self, x: f64) -> i32 {
         self.origin.0 + (x * self.scale).round() as i32
     }
@@ -523,6 +552,16 @@ impl Painter {
         let r=self.native_x(x.saturating_add(w) as f64).max(0).min(self.width as i32);
         let b=self.native_y(y.saturating_add(h) as f64).max(0).min(self.height as i32);
         (r>l&&b>t).then(||damage::Rect::new(l as usize,t as usize,(r-l)as usize,(b-t)as usize))
+    }
+    /// O(1) interaction footprint. Rounded corner marks can extend a logical
+    /// pixel, and rect() guarantees a native pixel even below scale one.
+    /// Both retained paths must restore these strokes when targeting ends.
+    pub fn interaction_damage_rect(&self,x:i32,y:i32,w:i32,h:i32)->Option<damage::Rect>{
+        let r=self.logical_damage_rect(x-2,y-2,w+4,h+4)?;
+        let l=r.x.saturating_sub(1);let t=r.y.saturating_sub(1);
+        let right=r.right().saturating_add(1).min(self.width);
+        let bottom=r.bottom().saturating_add(1).min(self.height);
+        Some(damage::Rect::new(l,t,right-l,bottom-t))
     }
     /// O(text bytes) conservative full glyph/outline footprint. Long text is not
     /// clipped to its tile: include the entire contrast-dependent line footprint.
@@ -627,45 +666,46 @@ impl Painter {
             }
         }
     }
-    /// O(cw+ch) logical samples for three short strokes, with existing native pixel
-    /// scaling cost. Cached direction only; no geometry, world or RNG queries.
+    /// O(native tile area) time and O(1) scratch for three straight strokes.
+    /// Equal screen-space axes keep diagonals at 45 degrees, irrespective of tile aspect.
     fn timeweave_arrow(&mut self, x:i32, y:i32, cw:i32, ch:i32, direction:(i8,i8)) {
         self.timeweave_arrow_ink(x,y,cw,ch,direction,[54,211,193]);
     }
     fn timeweave_arrow_ink(&mut self, x:i32, y:i32, cw:i32, ch:i32, (dx,dy):(i8,i8), color:Rgb) {
         if cw<3 || ch<3 || !(-1..=1).contains(&dx) || !(-1..=1).contains(&dy) || (dx==0 && dy==0) {return;}
-        let cx=x+cw/2;let cy=y+ch/2;
-        let vx=dx as i32*((cw-3)/2).max(1);let vy=dy as i32*((ch-3)/2).max(1);
-        let tip=(cx+vx,cy+vy);let tail=(cx-vx,cy-vy);
-        let side=((cw/5).max(1),(ch/5).max(1));
-        let back=(tip.0-dx as i32*side.0,tip.1-dy as i32*side.1);
-        let wing=(-dy as i32*side.0,dx as i32*side.1);
-        for (a,b) in [(tail,tip),(tip,(back.0+wing.0,back.1+wing.1)),(tip,(back.0-wing.0,back.1-wing.1))] {
-            let steps=(b.0-a.0).abs().max((b.1-a.1).abs()).max(1);
-            for step in 0..=steps {
-                let px=a.0+(b.0-a.0)*step/steps;let py=a.1+(b.1-a.1)*step/steps;
-                if px>=x && px<x+cw && py>=y && py<y+ch {self.pixel(px,py,color,220);}
+        let norm=((dx as f64).powi(2)+(dy as f64).powi(2)).sqrt();
+        let (ux,uy)=(dx as f64/norm,dy as f64/norm);
+        let length=cw.min(ch) as f64*0.36;
+        let (cx,cy)=(x as f64+cw as f64/2.,y as f64+ch as f64/2.);
+        let tip=(cx+ux*length,cy+uy*length);
+        let tail=(cx-ux*length,cy-uy*length);
+        let head=length*0.65;
+        let back=(tip.0-ux*head,tip.1-uy*head);
+        let strokes=[(tail,tip),(tip,(back.0-uy*head*0.65,back.1+ux*head*0.65)),
+            (tip,(back.0+uy*head*0.65,back.1-ux*head*0.65))];
+        for py in self.native_y(y as f64)..self.native_y((y+ch) as f64) {
+            for px in self.native_x(x as f64)..self.native_x((x+cw) as f64) {
+                let mut coverage=0f64;
+                for (a,b) in strokes {
+                    let a=(self.native_x(a.0) as f64,self.native_y(a.1) as f64);
+                    let b=(self.native_x(b.0) as f64,self.native_y(b.1) as f64);
+                    let (vx,vy)=(b.0-a.0,b.1-a.1);
+                    let t=(((px as f64+0.5-a.0)*vx+(py as f64+0.5-a.1)*vy)/(vx*vx+vy*vy).max(0.001)).clamp(0.,1.);
+                    let distance=((px as f64+0.5-a.0-t*vx).powi(2)+(py as f64+0.5-a.1-t*vy).powi(2)).sqrt();
+                    coverage=coverage.max((self.scale*0.5+0.5-distance).clamp(0.,1.));
+                }
+                if coverage>0. {self.native_pixel(px,py,color,(220.*coverage).round() as u8);}
             }
         }
     }
-    /// Smooth tilde-shaped water ripple. O(native width * stroke height), O(1)
-    /// scratch. Cosmetic phase only; curve stays inside the existing tile bounds.
+    /// Move the canonical water glyph gently inside its tile, never redraw it as
+    /// a deforming curve. O(glyph raster coverage), cached mask; O(1) scratch.
     fn water_wave(&mut self,x:i32,y:i32,w:i32,h:i32,ink:Rgb,phase:f64) {
-        if w<=0||h<=0{return;}
-        let left=self.native_x(x as f64+w as f64*0.16);
-        let right=self.native_x(x as f64+w as f64*0.84);
-        let top=self.native_y(y as f64);let bottom=self.native_y((y+h)as f64);
-        let radius=(h as f64*self.scale*0.035).max(0.6);
-        for nx in left..right {
-            let u=(nx-left)as f64/(right-left).max(1)as f64;
-            let wave=(u*std::f64::consts::TAU-phase).sin();
-            let swell=(u*std::f64::consts::PI+phase*0.53).sin();
-            let cy=self.native_y(y as f64)as f64+h as f64*self.scale*(0.50+0.085*wave+0.025*swell);
-            for ny in ((cy-radius-1.).floor()as i32).max(top)..=((cy+radius+1.).ceil()as i32).min(bottom-1) {
-                let coverage=(radius+0.5-(ny as f64+0.5-cy).abs()).clamp(0.,1.);
-                if coverage>0.{self.native_pixel(nx,ny,ink,(255.*coverage).round()as u8);}
-            }
-        }
+        if w<=0 || h<=0 { return; }
+        let padx=(w/8).max(1);let pady=(h/10).max(1);
+        let dx=(phase.sin()*padx as f64).round() as i32;
+        let dy=((phase*0.53).sin()*pady as f64).round() as i32;
+        self.map_identity("~",x+padx+dx,y+pady+dy,(w-2*padx).max(1),(h-2*pady).max(1),ink);
     }
     /// O(native pixel footprint) time, O(1) extra space. No minimum-width expansion.
     pub fn pixel(&mut self, x: i32, y: i32, c: Rgb, a: u8) {
@@ -712,6 +752,7 @@ impl Painter {
         } else { x + cw * 2 / 3 }
     }
     pub fn text(&mut self, s: &str, x: i32, y: i32, size: u16, c: Rgb) {
+        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
         #[cfg(test)]
         let mut _paint_profile = paint_profile_bench::span(paint_profile_bench::Kind::Text);
         let mut cursor = x;
@@ -759,6 +800,7 @@ impl Painter {
         s: &str,
         baseline_size: u16,
     ) -> f64 {
+        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
         #[cfg(test)]
         let _paint_profile = paint_profile_bench::span(paint_profile_bench::Kind::TextMetrics);
         use crate::typography_ui::{Face, RoleStyle};
@@ -811,6 +853,7 @@ impl Painter {
         width: i32,
         size: u16,
     ) -> String {
+        let displayed=crate::ability_ui::display_text(text);let text=displayed.as_ref();
         if self.measure_text_role(role, text, size) <= width as f64 {
             return text.to_string();
         }
@@ -837,6 +880,7 @@ impl Painter {
         width: i32,
         baseline_size: u16,
     ) -> Vec<String> {
+        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
         let mut output = Vec::new();
         for paragraph in s.split('\n') {
             let mut line = String::new();
@@ -880,6 +924,7 @@ impl Painter {
         size: u16,
         color: Rgb,
     ) {
+        let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
         #[cfg(test)]
         let mut _paint_profile = paint_profile_bench::span(paint_profile_bench::Kind::TextRole);
         use crate::typography_ui::{Face, RoleStyle};
@@ -1150,16 +1195,16 @@ impl Painter {
         self.map_glyph_placed(ch, x, y, w, h, c, alpha, italic, None);
     }
     /// Bottom is a native-pixel ink baseline, not a moved tile or a new mask.
-    fn map_glyph_placed(&mut self, ch: char, x: i32, y: i32, w: i32, h: i32, c: Rgb, alpha: f64, italic: bool, ink_bottom: Option<i32>) {
+    fn map_glyph_placed(&mut self, ch: char, x: i32, y: i32, w: i32, h: i32, c: Rgb, alpha: f64, italic: bool, ink_bottom: Option<i32>) -> Option<glyph_ink::Bounds> {
         #[cfg(test)]
         let mut _paint_profile = paint_profile_bench::span(if alpha == 1. { paint_profile_bench::Kind::AsciiUnit } else { paint_profile_bench::Kind::AsciiScaled });
         let code = ch as usize;
         if !(32..=126).contains(&code) {
             self.text(&ch.to_string(), x, y, h as u16, c);
-            return;
+            return None;
         }
         if ch == ' ' {
-            return;
+            return None;
         }
         let (nx, ny) = (self.native_x(x as f64), self.native_y(y as f64));
         let (w, h) = (
@@ -1168,7 +1213,7 @@ impl Painter {
         );
         let (x, y) = (nx, ny);
         if w <= 0 || h <= 0 {
-            return;
+            return None;
         }
         let weight = self
             .profile
@@ -1216,7 +1261,9 @@ impl Painter {
         let cached = &self.map_masks[&key];
         let y = ink_bottom.map_or(y, |bottom| bottom - cached.ink_bottom as i32);
         let mask = &cached.coverage;
-        if let Some(gpu)=self.gpu.as_mut(){gpu.mask(crate::gpu_render::MaskKey::Ascii(ch,w,h,weight as u16,italic),(left,top,right,bottom),x,y,w as usize,h as usize,mask,c,alpha,italic);return;}
+        let ink_bounds = if italic { cached.italic_ink_bounds } else { cached.ink_bounds }
+            .map(|bounds| bounds.translated(x, y));
+        if let Some(gpu)=self.gpu.as_mut(){gpu.mask(crate::gpu_render::MaskKey::Ascii(ch,w,h,weight as u16,italic),(left,top,right,bottom),x,y,w as usize,h as usize,mask,c,alpha,italic);return ink_bounds;}
         #[cfg(test)]
         let sparse = alpha == 1. && self.ascii_sparse_enabled;
         #[cfg(not(test))]
@@ -1272,6 +1319,7 @@ impl Painter {
                 }
             }
         }
+        ink_bounds
     }
 
     /// Four fixed one-logical-pixel offsets, O(glyph raster coverage), no tile fill.
@@ -1281,7 +1329,11 @@ impl Painter {
     pub fn map_identity(&mut self, glyph: &str, x: i32, y: i32, w: i32, h: i32, c: Rgb) {
         self.map_identity_aligned(glyph, x, y, w, h, c, false);
     }
-    fn map_identity_aligned(&mut self, glyph: &str, x: i32, y: i32, w: i32, h: i32, c: Rgb, bottom_aligned: bool) {
+    fn ground_number(&mut self,glyph:&str,x:i32,y:i32,cw:i32,ch:i32,gw:i32,gh:i32,ink:Rgb) -> Option<glyph_ink::Bounds> {
+        let (nw,nh)=((gw*2/3).max(1),(gh*2/3).max(1));
+        self.map_identity_aligned(glyph,x+(cw-nw)/2,y+ch-nh,nw,nh,ink,true)
+    }
+    fn map_identity_aligned(&mut self, glyph: &str, x: i32, y: i32, w: i32, h: i32, c: Rgb, bottom_aligned: bool) -> Option<glyph_ink::Bounds> {
         let scale = self.profile.number("typography.map.glyphScale")
             * self.profile.number("typography.map.fontSize")
             / 17.;
@@ -1317,7 +1369,7 @@ impl Painter {
             c,
             1.,
             bottom,
-        );
+        )
     }
     /// Warm expected O(key bytes + clipped mask area); cold adds glyph raster + source mask work.
     fn map_identity_alpha(
@@ -1332,7 +1384,7 @@ impl Painter {
     ) {
         self.map_identity_alpha_placed(glyph, x, y, w, h, c, alpha, None);
     }
-    fn map_identity_alpha_placed(&mut self, glyph: &str, x: i32, y: i32, w: i32, h: i32, c: Rgb, alpha: f64, ink_bottom: Option<i32>) {
+    fn map_identity_alpha_placed(&mut self, glyph: &str, x: i32, y: i32, w: i32, h: i32, c: Rgb, alpha: f64, ink_bottom: Option<i32>) -> Option<glyph_ink::Bounds> {
         #[cfg(test)]
         let mut _paint_profile = paint_profile_bench::span(paint_profile_bench::Kind::Compound);
         if glyph.chars().count() == 1
@@ -1351,13 +1403,15 @@ impl Painter {
                 .max(1.) as i32;
             let gx = (x as f64 + w as f64 / 2. - gw as f64 / 2.).round() as i32;
             let gy = (y as f64 + h as f64 * 8. / 15. - gh as f64 / 2.).round() as i32;
-            self.map_glyph_placed(glyph.chars().next().unwrap(), gx, gy, gw, gh, c, alpha, false, ink_bottom);
-            return;
+            return self.map_glyph_placed(glyph.chars().next().unwrap(), gx, gy, gw, gh, c, alpha, false, ink_bottom);
         }
         // Fit the complete compound glyph using actual font metrics; preserve every character.
-        // Build the temporary outline mask at device-cell resolution, never a 26px
-        // intermediate enlarged after rasterization. O(mask area + output cell area).
-        let source_scale = (self.scale * (w.max(h) as f64 / 15.).max(1.)).max(1.) as f32;
+        // Rasterize a 4x device-cell outline, then integrate alpha coverage at the
+        // final size. Never nearest-enlarge a small punctuation mask or discard
+        // thin diagonals by point sampling. Cold O(outlines + source + output
+        // pixels); only the final native mask remains in the bounded cache.
+        let source_scale = (self.scale * (w.max(h) as f64 / 15.).max(1.)).max(1.) as f32
+            * glyph_mask::OVERSAMPLE;
         let (nx, ny) = (self.native_x(x as f64), self.native_y(y as f64));
         let (w, h) = (
             self.native_x((x + w) as f64) - nx,
@@ -1365,7 +1419,7 @@ impl Painter {
         );
         let (x, y) = (nx, ny);
         if w <= 0 || h <= 0 {
-            return;
+            return None;
         }
         let primary_ibm = self.profile.text("typography.map.fontFamily").split(',')
             .next().unwrap_or("").contains("IBM Plex Mono");
@@ -1455,25 +1509,21 @@ impl Painter {
         let dh = ((bottom - top) as f32 * scale).round().max(1.) as i32;
         let dx = (w - dw) / 2;
         let dy = (h - dh) / 2 - if glyph.chars().count() > 1 { h / 8 } else { 0 };
-        let mut output=Vec::with_capacity((dw*dh) as usize);
-        for yy in 0..dh {
-            let sy = top + yy as usize * (bottom - top) / dh as usize;
-            for xx in 0..dw {
-                let sx = left + xx as usize * (right - left) / dw as usize;
-                output.push(mask[sy * sw + sx]);
-            }
-        }
+        let output = glyph_mask::coverage_resize(&mask, sw, left, top,
+            right - left, bottom - top, dw as usize, dh as usize);
         (dx,dy,dw as usize,dh as usize,output)
         };
         if self.identity_masks.len()>=512 {self.identity_masks.clear();}
-        self.identity_masks.insert(key.clone(),(dx,dy,dw,dh,output));
+        let ink_bounds = glyph_ink::Bounds::from_mask(&output, dw);
+        self.identity_masks.insert(key.clone(),(dx,dy,dw,dh,output,ink_bounds));
         }
         let bounds=self.native_bounds();
-        let (dx,dy,dw,dh,mask)=&self.identity_masks[&key];
+        let (dx,dy,dw,dh,mask,ink_bounds)=&self.identity_masks[&key];
         let y=ink_bottom.map_or(y,|bottom|bottom-*dh as i32-*dy);
-        if let Some(gpu)=self.gpu.as_mut(){gpu.mask(crate::gpu_render::MaskKey::Identity(key.0.clone(),key.1,key.2,key.3,key.4,key.5,key.6),bounds,x+dx,y+dy,*dw,*dh,mask,c,alpha,false);return;}
+        let ink_bounds = ink_bounds.map(|bounds| bounds.translated(x+dx, y+dy));
+        if let Some(gpu)=self.gpu.as_mut(){gpu.mask(crate::gpu_render::MaskKey::Identity(key.0.clone(),key.1,key.2,key.3,key.4,key.5,key.6),bounds,x+dx,y+dy,*dw,*dh,mask,c,alpha,false);return ink_bounds;}
         blend_scaled_mask(&mut self.pixels,self.width,bounds,x+dx,y+dy,*dw,*dh,mask,c,alpha, &mut self.raster_stats, self.tile_clip_enabled.then_some(&self.tile_mask));
-
+        ink_bounds
     }
     /// O(P) native bounding pixels with fixed16 coverage samples; O(1) scratch.
     /// Same authored marker geometry/colors; no actor/world/visibility queries.
@@ -1527,13 +1577,17 @@ impl Painter {
     /// O(tile native pixels * 16 fixed coverage samples), O(1) scratch.
     /// The X overlays the retained creature glyph, like the heartless ring.
     /// Both renderers consume the same clipped native-pixel commands.
-    fn corpse_marker(&mut self, x:i32, y:i32, w:i32, h:i32, ink:Option<(Rgb,Rgb)>) {
-        let (cross,outline)=ink.unwrap_or(([240,223,190],[24,23,21]));
-        let cx=self.origin.0 as f64+(x as f64+w as f64/2.)*self.scale;
-        let cy=self.origin.1 as f64+(y as f64+h as f64/2.)*self.scale;
-        let half=w as f64/15.*1.4*self.scale;
+    fn corpse_marker(&mut self, glyph_bounds:Option<glyph_ink::Bounds>, x:i32, y:i32, w:i32, h:i32, ink:Option<(Rgb,Rgb)>) {
+        let (cross,outline)=ink.unwrap_or((CORPSE_CROSS,[24,23,21]));
+        // Actual ink, after typography and device-pixel rounding. Do not re-center
+        // a clipped fragment or include outlines, badges, shadows or terrain.
+        let (cx,cy)=glyph_bounds.map_or_else(|| (
+            self.origin.0 as f64+(x as f64+w as f64/2.)*self.scale,
+            self.origin.1 as f64+(y as f64+h as f64/2.)*self.scale,
+        ), glyph_ink::Bounds::center); // Preserve death indication for blank saved glyphs.
+        let half=w.min(h) as f64*0.30*self.scale;
         let (left,right,top,bottom)=(cx-half,cx+half,cy-half,cy+half);
-        let inner=(w as f64/15.*0.32*self.scale).max(0.2);
+        let inner=(w as f64/15.*0.48*self.scale).max(0.2);
         let outer=inner+(0.28*self.scale).max(0.2);
         let bounds=(self.native_x(x as f64),self.native_y(y as f64),self.native_x((x+w)as f64),self.native_y((y+h)as f64));
         let distance=|px:f64,py:f64,ax:f64,ay:f64,bx:f64,by:f64| {
@@ -1627,7 +1681,7 @@ impl Painter {
             }
         }
     }
-    pub fn menu(&mut self, frame: u32, selected: usize, can_continue: bool, mode: &str) {
+    pub fn menu(&mut self, frame: u32, selected: usize, can_continue: bool, _mode: &str) {
         // Heart runs smoothly at 30 Hz; preserve the existing fire/ember tempo.
         let ambient_frame = 18 + ((frame.saturating_sub(18) as u64 * 33) / 83) as u32;
         let fire = hellfire(ambient_frame);
@@ -1640,9 +1694,9 @@ impl Painter {
         self.menu_embers(ambient_frame);
         let bone = [238, 229, 207];
         let blood = [197, 37, 54];
-        let art_w = 500;
+        let art_w = 276;
         let art_h = (art_w as f64 * self.logo.h as f64 / self.logo.w as f64).round() as i32;
-        self.beating_emblem(676, 58, art_w, art_h, frame);
+        self.beating_emblem(803, 49, art_w, art_h, frame);
         crate::menu_ui::lettering(self, "CALL OF THE", 113, 61, 337, 35, bone, false);
         crate::menu_ui::lettering(self, "CORPSE", 103, 116, 559, 129, bone, true);
         crate::menu_ui::lettering(self, "GODS", 177, 266, 463, 145, blood, true);
@@ -1660,8 +1714,7 @@ impl Painter {
             }
             let color = if disabled { [139, 133, 132] }
                 else if active && i != 0 { [8, 6, 9] } else { bone };
-            let mode_label = format!("{mode} >");
-            let label = if i == crate::menu_ui::MODE_INDEX { mode_label.as_str() } else { item.label };
+            let label = item.label;
             let text_x = item.x + 15;
             let text_y = item.y + (item.h - item.size as i32) / 2 - 2;
             if !active {
@@ -1674,6 +1727,8 @@ impl Painter {
             self.text(label, text_x, text_y, item.size, color);
         }
     }
+    /// Fixed text and bounds; O(covered drawable pixels + glyph raster work).
+    pub fn menu_fast_mode(&mut self, _enabled: bool, _selected: bool) {}
     /// O(seed glyphs), measured UTF-8 tail fitting the raw menu font, no character splitting.
     pub(crate) fn menu_seed_tail(&self,seed:&str)->String{
         let mut width=0;let mut tail=Vec::new();
@@ -1696,17 +1751,10 @@ impl Painter {
     pub fn import_save(&mut self, notice: &str) {
         self.clear([5, 4, 12]);
         self.text("Import save", 284, 195, 35, GOLD);
-        self.text(
-            "Drop a complete save JSON file into this window.",
-            284,
-            280,
-            18,
-            INK,
-        );
         self.text("[Esc] Main menu", 284, 340, 16, MUTED);
         self.text(&truncate(notice, 76), 284, 410, 15, [240, 130, 110]);
     }
-    pub fn start(&mut self, seed: &str, mode: &str, focus: bool, playtest: Option<(&str, bool)>, notice: &str) {
+    pub fn start(&mut self, seed: &str, _mode: &str, focus: bool, playtest: Option<(&str, bool)>, notice: &str) {
         self.clear([8, 8, 8]);
         self.prose(if playtest.is_some() { "DEBUG floor testing" } else { "Descend?" }, 284, 175, if playtest.is_some() { 38 } else { 48 }, INK, true);
         if playtest.is_some() {
@@ -1720,14 +1768,13 @@ impl Painter {
         self.border(284, 340, 710, 52, if focus { INK } else { [75, 75, 75] });
         self.text(&truncate(seed, 62), 298, 355, 17, INK);
         self.text("Vessel", 284, 420, 18, INK);
-        if playtest.is_some() { self.border(450, 412, 544, 52, if focus || playtest.is_some_and(|p| p.1) { [75, 75, 75] } else { INK }); }
-        self.text(mode, 470, 427, 20, INK);
-        if playtest.is_some() { self.text("< >", 930, 427, 20, INK); }
+        self.text("Avatar", 470, 427, 20, INK);
+        self.text("Gods selected on the main menu", 620, 431, 14, MUTED);
         if let Some((floor, focus)) = playtest {
             self.text("Starting floor", 284, 485, 18, INK);
             self.rect(450, 475, 544, 42, [16, 16, 16]);
             self.border(450, 475, 544, 42, if focus { INK } else { [75, 75, 75] });
-            self.text(&format!("{floor}  / 40"), 470, 485, 19, INK);
+            self.text(&format!("{floor}  / 20"), 470, 485, 19, INK);
         }
         let button_y = if playtest.is_some() { 548 } else { 505 };
         self.rect(284, button_y, 710, 55, INK);
@@ -1749,6 +1796,19 @@ impl Painter {
                 crate::chronicle::color(line),
             );
         }
+    }
+    /// Transition feedback is one lit player tile, not a whole-map crossfade.
+    /// O(C) detached-player lookup plus O(tile pixels), O(1) scratch. The old
+    /// observed snapshot never redraws terrain, entities, outlines, or UI.
+    pub fn plane_crossfade(&mut self,before:&View,age:f64){self.scene_crossfade(before,age,false);}
+    pub fn scene_crossfade(&mut self,before:&View,age:f64,ascend:bool){
+        if !(0.0..250.0).contains(&age) { return; }
+        let Some(c)=before.cells.iter().find(|c|c.actor_id==Some(before.player_id)) else {return};
+        // Observation stores knowledge on terrain layers, not actor overlays.
+        if !before.cells.iter().any(|t|t.x==c.x&&t.y==c.y&&t.current) { return; }
+        let (cw,ch,ox,oy)=self.map_layout(before.width,before.height);
+        let color=if ascend {[255,225,144]}else{[188,179,242]};
+        self.blend_rect(ox+c.x as i32*cw,oy+c.y as i32*ch,cw,ch,color,((1.-age/250.)*54.).round()as u8);
     }
     /// Existing O(map cells + effect tiles log effect tiles) projection; raster O(painted pixels).
     pub fn effects(&mut self, v: &View, cues: &[crate::effects::Cue], now: f64, reduced: bool) {
@@ -1782,7 +1842,7 @@ impl Painter {
                     continue;
                 }
                 let i = tile.y as usize * v.width + tile.x as usize;
-                if !known[i] {
+                if !known[i] && !cue.event.animation.as_ref().is_some_and(|a|a.surface.as_deref()==Some("audible")) {
                     continue;
                 }
                 if tiles
@@ -1800,20 +1860,20 @@ impl Painter {
             let index = tile.y as usize * v.width + tile.x as usize;
             let direct = direct_cells[index];
             let display = display_lights[index];
-            let field = tile.color.map(|c| (c as f64 * 0.32).round() as u8);
+            let field = tile.color.map(|c| (c as f64 * tile.field_strength).round() as u8);
             let field = if direct {
-                crate::illumination_ui::paint_color(field, display)
+                display.map_or(field,|light|light.apply(field))
             } else {
                 crate::color::telepathic(field, true)
             };
-            self.blend_rect(x,y,cw,ch,field,(tile.light*255.).round() as u8);
+            if tile.glyph.is_none() { self.blend_rect(x,y,cw,ch,field,(tile.light*255.).round() as u8); }
             let actor = actors[index];
             if let Some(c) = actor {
-                self.map_identity(&c.glyph, x, y, cw, ch, c.fg);
+                let glyph_bounds=self.map_identity_aligned(&c.glyph, x, y, cw, ch, c.fg, false);
                 let marker = if v.dreamwalking && !c.dream_entity { Some((c.fg,c.bg)) }
-                    else { display.map(|light| (light.apply([240,223,190]),light.apply([24,23,21]))) };
+                    else { display.map(|light| (light.foreground(if c.corpse {CORPSE_CROSS} else {[240,223,190]},true),light.apply([24,23,21]))) };
                 if c.corpse {
-                    self.corpse_marker(x,y,cw,ch,marker);
+                    self.corpse_marker(glyph_bounds,x,y,cw,ch,marker);
                 } else if c.heartless {
                     self.heartless_marker(&c.glyph, x, y, cw, ch,marker);
                 }
@@ -1824,12 +1884,12 @@ impl Painter {
                     (ch / 2).max(7) as u16,
                     crate::illumination_ui::paint_color([255, 224, 160], display),
                 );
-            } else if let Some(g) = &tile.glyph {
-                let color = if direct {
-                    crate::illumination_ui::paint_color(tile.color, display)
-                } else {
-                    crate::color::telepathic(tile.color, false)
-                };
+            }
+            // A traveling glyph is the only foreground animation primitive.
+            // Local feedback preserves the entity's canonical identity above light.
+            if let Some(g) = &tile.glyph {
+                let color = if direct { crate::illumination_ui::paint_color(tile.color, display) }
+                    else { crate::color::telepathic(tile.color, false) };
                 self.map_identity_alpha(g, x, y, cw, ch, color, tile.light);
             }
         }
@@ -1841,8 +1901,6 @@ impl Painter {
         self.native_fill(0,0,self.width as i32,self.height as i32,[5,4,12],232);
         self.rect(345, 70, 590, 660, [11, 13, 21]);
         self.border(345, 70, 590, 660, [53, 55, 68]);
-        self.text("A BLESSING EARNED", 373, 98, 14, GOLD);
-        self.text("Choose what answers.", 373, 128, 28, GOLD);
         for (i, a) in offers.iter().take(3).enumerate() {
             let y = 180 + i as i32 * 170;
             self.rect(
@@ -1901,72 +1959,30 @@ impl Painter {
         }
         self.text("[Y] Yes    [N] No", 334, 468, 18, GOLD);
     }
-    pub fn ability_detail(&mut self, a: &crate::ability_ui::AbilityView, offset: usize) {self.centered_sheet(|p|p.ability_detail_sheet(a,offset));}
-    fn ability_detail_sheet(&mut self, a: &crate::ability_ui::AbilityView, offset: usize) {
-        self.rect(458, 150, 515, 500, [11, 13, 21]);
-        self.border(458, 150, 515, 500, [53, 55, 68]);
-        self.text_role(
-            crate::typography_ui::Role::Tooltips,
-            &truncate(&a.name, 38),
-            476,
-            172,
-            21,
-            a.color,
-        );
-        self.text_role(
-            crate::typography_ui::Role::Tooltips,
-            &format!("{} · {}", a.mode, a.state),
-            476,
-            208,
-            14,
-            MUTED,
-        );
-        self.text_role(
-            crate::typography_ui::Role::Tooltips,
-            &truncate(&a.cost, 54),
-            476,
-            234,
-            14,
-            [36, 223, 255],
-        );
-        let lines = self.wrap_text_role(
-            crate::typography_ui::Role::Tooltips,
-            &a.description,
-            480,
-            16,
-        );
-        let style = crate::typography_ui::resolve(
-            &self.profile,
-            crate::typography_ui::Role::Tooltips,
-            crate::typography_ui::RoleStyle::baseline(16.),
-        );
-        let line_height = (style.font_size * style.line_height).round().max(1.) as i32;
-        let capacity = (292 / line_height).max(1) as usize;
-        let first = offset.min(lines.len().saturating_sub(capacity));
-        self.clip = Some((476, 270, 480, 292));
-        for (i, line) in lines.iter().skip(first).take(capacity).enumerate() {
-            self.text_role(
-                crate::typography_ui::Role::Tooltips,
-                line,
-                476,
-                270 + i as i32 * line_height,
-                16,
-                INK,
-            );
-        }
-        self.clip = None;
-        if !a.supported {
-            self.text_role(
-                crate::typography_ui::Role::Tooltips,
-                "Native execution coverage pending",
-                476,
-                584,
-                13,
-                MUTED,
-            );
-        }
+    pub fn ability_detail(&mut self, a: &crate::ability_ui::AbilityView, offset: usize) {
+        ability_dialog::paint(self, a, offset);
+    }
+    pub fn ability_detail_damage(&self, a: &crate::ability_ui::AbilityView) -> Option<damage::Rect> {
+        ability_dialog::bounds(self, a)
+    }
+    pub fn inspection_notice_y(&self) -> i32 {
+        self.frame().map.1+self.frame().map.3+5
+    }
+    pub fn footer_damage(&self) -> Option<damage::Rect> {
+        let top = self.frame().map.1+self.frame().map.3;
+        self.logical_damage_rect(0,top,self.logical_width(),self.logical_height()-top)
     }
     /// O(T log T) worst-case fitting, O(T) temporary strings; no truncation if both fit.
+    /// Read-only anchor at the already displayed Quick Hand reaction cost.
+    pub fn reaction_action_anchor(&self,v:&View,style:&str)->(i32,i32,i32,i32){
+        if let Some((i,a))=v.abilities.iter().take(crate::ability_ui::capacity(&self.profile)).enumerate().find(|(_,a)|a.id==if style=="reaction-spent-missed-me"{"isheilah-missed-me"}else{"isheilah-quick-hand"}) {
+            let left=self.hud_left();let rail=self.logical_width()-left-26;
+            let state=if a.active{"ACTIVE"}else if !a.supported{"UNAVAILABLE"}else if a.mode.eq_ignore_ascii_case("passive"){"PASSIVE"}else{&a.state};
+            let (_,_,x)=self.ability_metadata(state,&ability_cost_text(&a.cost,state),left+19,left+12+rail-3);
+            return (x,crate::ability_ui::top(&self.profile)+i as i32*crate::ability_ui::row(&self.profile)+16,14,16)
+        }
+        (self.hud_left()+12,crate::ability_ui::top(&self.profile)-26,20,20)
+    }
     fn ability_metadata(&self,state:&str,cost:&str,left:i32,right:i32)->(String,String,i32){
         let role=crate::typography_ui::Role::Secondary;
         let gap=if state.is_empty()||cost.is_empty(){0}else{8};
@@ -2028,22 +2044,15 @@ impl Painter {
         );
         let bar_y = y + if compact { 22 } else { 32 };
         if a.shared_resources {
-            self.text_role(
-                crate::typography_ui::Role::Secondary,
-                "Shares your Health and Energy",
-                x,
-                bar_y,
-                12,
-                MUTED,
-            );
             return;
         }
-        let half = (w - 10) / 2;
+        let half = if a.uses_energy { (w - 10) / 2 } else { w };
         for (i, (name, value, max, color)) in [
             ("Health", a.hp, a.max_hp, [255, 48, 85]),
             ("Energy", a.energy, a.max_energy, [36, 223, 255]),
         ]
         .into_iter()
+        .take(if a.uses_energy { 2 } else { 1 })
         .enumerate()
         {
             let xx = x + i as i32 * (half + 10);
@@ -2060,7 +2069,7 @@ impl Painter {
             }
             self.text_role(
                 crate::typography_ui::Role::Secondary,
-                &format!("{name} {value:.0}/{}", resource_max_label(max)),
+                &format!("{name} {:.0}/{}", if name == "Health" {crate::stat_presentation::current_health(value)} else {value}, resource_max_label(max)),
                 xx,
                 bar_y,
                 12,
@@ -2078,6 +2087,17 @@ impl Painter {
             );
         }
     }
+    /// Shared measured wrapping keeps dialog painting and selection aligned.
+    fn creature_condition_layout(&self, a: &Creature) -> (Vec<String>, i32, i32) {
+        let role = crate::typography_ui::Role::Secondary;
+        let text = crate::statuses_ui::summary(&a.statuses);
+        let lines = if text.is_empty() { Vec::new() } else { self.wrap_text_role(role, &text, 588, 13) };
+        let style = crate::typography_ui::resolve(&self.profile, role,
+            crate::typography_ui::RoleStyle::baseline(13.));
+        let step = (style.font_size * style.line_height).ceil().max(15.) as i32;
+        let height = 76 + lines.len() as i32 * step;
+        (lines, step, height)
+    }
     pub fn creatures(&mut self, view: &View, selected: Option<f64>, offset: usize) {self.centered_sheet(|p|p.creatures_sheet(view,selected,offset));}
     fn creatures_sheet(&mut self, view: &View, selected: Option<f64>, offset: usize) {
         self.rect(337, 125, 636, 579, [11, 13, 21]);
@@ -2086,18 +2106,14 @@ impl Painter {
         self.clip = Some((349, 190, 612, 466));
         let mut y = 196;
         for a in view.creatures.iter().skip(offset) {
-            let h = 76 + ((a.meters.len() + 1) / 2) as i32 * 26;
+            let (lines, step, h) = self.creature_condition_layout(a);
             if selected == Some(a.id) {
                 self.rect(349, y - 4, 612, h - 6, [28, 32, 46]);
             }
             self.creature_summary(a, 361, y, 588, false);
-            for (i, m) in a.meters.iter().enumerate() {
-                self.condition_meter(
-                    m,
-                    361 + (i % 2) as i32 * 299,
-                    y + 58 + (i / 2) as i32 * 26,
-                    289,
-                );
+            for (i, line) in lines.iter().enumerate() {
+                self.text_role(crate::typography_ui::Role::Secondary, line,
+                    361, y + 58 + i as i32 * step, 13, [193, 138, 255]);
             }
             y += h;
             if y >= 656 {
@@ -2183,9 +2199,9 @@ impl Painter {
         self.clear_with_rect(
             game_color(&self.profile, "ui.colors.background"),
             (0, map_top,
-                self.hud_left() - self.profile.number("ui.layout.mapSpacing").round() as i32,
+                self.frame().map.2,
                 (self.frame().map.1 + self.frame().map.3 - map_top).max(0)),
-            game_color(&self.profile, "fog.unexplored"),
+            crate::illumination_ui::unexplored(&self.profile),
         );
         #[cfg(test)]
         drop(_paint_background);
@@ -2194,14 +2210,17 @@ impl Painter {
         let hovered_enemy=self.enemy_hover.and_then(|id|v.cells.iter()
             .find(|c|c.actor_id.is_some_and(|actor|actor.to_bits()==id)).map(|c|(c.x,c.y)));
         let left = self.hud_left();
-        let rail_width = self.logical_width() - left - 26;
+        let rail_width = self.logical_width() - left - 24;
+        let map_right=self.frame().map.2;
+        let panel_bottom=self.frame().map.1+self.frame().map.3;
+        let stats_top=panel_bottom-88;
         // Measured wrapping is O(L²) worst-case metric work for bounded recent log text.
         // Raster fade is O(A) over the native chronicle rectangle, with no copied frame.
-        if self.intersects_damage(0,0,left,chronicle_height(&self.profile)+20) {
+        if self.intersects_damage(0,0,map_right,chronicle_height(&self.profile)+20) {
         #[cfg(test)]
         let _paint_chronicle = paint_profile_bench::span(paint_profile_bench::Kind::Chronicle);
         let mut lines = Vec::new();
-        let size = self.profile.number("typography.chronicle.fontSize").round() as u16;
+        let size = crate::modal_ui::changed_number(&self.profile,"typography.chronicle.fontSize",14.).round() as u16;
         let line_height = (size as f64 * self.profile.number("typography.chronicle.lineHeight"))
             .round().max(1.) as i32;
         for group in &v.log_groups {
@@ -2209,27 +2228,27 @@ impl Painter {
                 format!("{}  ×{}", group.message, group.count)
             } else { group.message.clone() };
             for line in self.wrap_text_role(crate::typography_ui::Role::Chronicle,
-                &message, left - 36, size) {
+                &message, map_right - 32, size) {
                 lines.push((line, crate::chronicle::color(&group.message)));
             }
         }
         let end = lines.len().saturating_sub(v.chronicle_offset.min(lines.len().saturating_sub(4)));
         let height = chronicle_height(&self.profile);
         let start = end.saturating_sub(((height + line_height - 1) / line_height) as usize);
-        let bottom = 6 + height;
-        self.clip = Some((12, 6, left - 25, height));
+        let bottom = 12 + height;
+        self.clip = Some((16, 12, map_right - 32, height));
         for (i, (line, color)) in lines[start..end].iter().enumerate() {
-            self.text_role(crate::typography_ui::Role::Chronicle, line, 12,
+            self.text_role(crate::typography_ui::Role::Chronicle, line, 16,
                 bottom - (end - start - i) as i32 * line_height, size,
                 if *color == INK { game_color(&self.profile, "ui.colors.chronicle") } else { *color });
         }
         self.clip = None;
         let background = game_color(&self.profile, "ui.colors.background");
-        let (left_px, right_px) = (self.native_x(12.).max(0), self.native_x((left - 13) as f64).min(self.width as i32));
-        let (top_px, bottom_px) = (self.native_y(6.).max(0), self.native_y(bottom as f64).min(self.height as i32));
+        let (left_px, right_px) = (self.native_x(16.).max(0), self.native_x((map_right - 16) as f64).min(self.width as i32));
+        let (top_px, bottom_px) = (self.native_y(12.).max(0), self.native_y(bottom as f64).min(self.height as i32));
         self.paint_chronicle_fade(background,(left_px,top_px,right_px,bottom_px));
         if self.chronicle_hover {
-            let r=chronicle_hit_rect(&self.profile);
+            let r=self.chronicle_hit_rect();
             self.border(r.0,r.1,r.2,r.3,[174,158,107]);
         }
         } // Chronicle damage section
@@ -2237,20 +2256,27 @@ impl Painter {
         let map_damage=self.paint_cell_indices.as_ref().is_some_and(|v|!v.is_empty()) || self.intersects_damage(ox-4,oy-4,cw*v.width as i32+8,ch*v.height as i32+ch+8);
         #[cfg(test)]
         let _paint_terrain = paint_profile_bench::span(paint_profile_bench::Kind::TerrainPreparation);
+        // The staged cache changes only at head arrivals or a new observation.
+        // Arc clones keep per-frame preparation O(1); actor layers stay current.
+        let staged_cells=self.firebolt_terrain.as_ref().map(|stage|stage.cells.clone());
+        let source_cells=staged_cells.as_deref().unwrap_or(&v.cells);
+        let terrain_snapshot=self.firebolt_terrain.as_ref().map(|stage|stage.snapshot.clone())
+            .or_else(||v.terrain_snapshot.clone());
         let animated_cells = if map_damage && (crate::appearance_light::animated(&self.profile)
             || crate::appearance_material::animated(&self.profile))
         {
-            v.terrain_snapshot.as_ref().map(|observation| {
+            terrain_snapshot.as_ref().map(|observation| {
                 let (mut cells, backgrounds, lights) =
                     crate::observe::terrain_frame_baseline(observation, &self.profile, v.cosmetic_seed, now);
                 // Countdown is observed once per accepted turn, never recomputed
                 // from render time or from hidden live world state.
-                for (cell, original) in cells.iter_mut().zip(v.cells.iter().take(v.terrain_count)) {
+                for (cell, original) in cells.iter_mut().zip(source_cells.iter().take(v.terrain_count)) {
                     let mut original = original.clone();
                     crate::illumination_ui::restore_source_ink(&mut original);
                     let original = &original;
                     cell.subscript = original.subscript.clone();
                     cell.timeweave = original.timeweave;
+                    cell.duel_edges = original.duel_edges;
                     if original.non_euclidean {
                         crate::non_euclidean_ui::restore_marker(cell, original);
                     }
@@ -2268,7 +2294,7 @@ impl Painter {
                         material[c.y * v.width + c.x] = bg;
                     }
                 }
-                for original in v.cells.iter().skip(v.terrain_count) {
+                for original in source_cells.iter().skip(v.terrain_count) {
                     let mut cell = original.clone();
                     crate::hallucination_ui::map_cell(&mut cell, crate::illumination_ui::restore_source_ink);
                     let i = cell.y * v.width + cell.x;
@@ -2309,7 +2335,7 @@ impl Painter {
         };
         #[cfg(test)]
         drop(_paint_terrain);
-        let painted_cells = animated_cells.as_ref().unwrap_or(&v.cells);
+        let painted_cells = animated_cells.as_ref().unwrap_or(source_cells);
         #[cfg(test)]
         let _paint_dream = paint_profile_bench::span(paint_profile_bench::Kind::DreamPreparation);
         // O(C + G) transform/copy of detached cells, including G glyph/label bytes;
@@ -2358,8 +2384,8 @@ impl Painter {
                 );
             }
             let point = (cell.x, cell.y);
-            if path.contains(&point) || target_path.contains(&point) || target_area.contains(&point) || v.target_impact==Some(point) || v.hover == Some(point) || hovered_enemy == Some(point) {
-                let selected = v.hover == Some(point) || hovered_enemy == Some(point)
+            if path.contains(&point) || target_path.contains(&point) || target_area.contains(&point) || v.target_impact==Some(point) || v.hover == Some(point) || (hovered_enemy == Some(point) || self.ground_hover == Some(point)) {
+                let selected = v.hover == Some(point) || (hovered_enemy == Some(point) || self.ground_hover == Some(point))
                     || (v.target_path.is_empty() && v.path.last() == Some(&point));
                 if target_area.contains(&point) || v.target_impact==Some(point) {
                     self.native_fill(self.native_x(x as f64),self.native_y(y as f64),
@@ -2379,6 +2405,10 @@ impl Painter {
                     }
                 }
             }
+            for (direction,edge) in cell.duel_edges.iter().enumerate(){if *edge{
+                let ink=crate::illumination_ui::paint_color([235,196,72],cell.display_light);
+                match direction {0=>self.rect(x+cw-1,y,1,ch,ink),1=>self.rect(x,y+ch-1,cw,1,ink),2=>self.rect(x,y,1,ch,ink),_=>self.rect(x,y,cw,1,ink)}
+            }}
             for (glyph, color, opacity) in &cell.underlays {
                 self.map_identity(
                     glyph,
@@ -2429,27 +2459,29 @@ impl Painter {
                 }
             }
             let water_phase=cell.animations.iter().find_map(|a|if let Animation::Water{phase,speed}=a {Some((*phase,*speed))}else{None});
-            if cell.glyph=="~" && now>0. && water_phase.is_some() {
+            let glyph_bounds = if cell.glyph=="~" && now>0. && water_phase.is_some() {
                 let(phase,speed)=water_phase.unwrap();
                 self.water_wave(x+(cw-gw)/2,y+(ch-gh)/2,gw,gh,ink,now*speed/900.+phase);
+                None
             } else if cell.italic && cell.glyph == "0" {
-                self.map_glyph_styled('0', x + (cw - gw) / 2 + gw / 8,
-                    y + (ch - gh) / 2, (gw * 3 / 4).max(1), gh, ink, 1., true);
+                self.map_glyph_placed('0', x + (cw - gw) / 2 + gw / 8,
+                    y + (ch - gh) / 2, (gw * 3 / 4).max(1), gh, ink, 1., true, None)
+            } else if cell.non_euclidean && cell.bottom_aligned && cell.glyph.parse::<usize>().is_ok() {
+                // A small ground marker, not an actor-sized identity. Keep its baseline
+                // at the same lower tile padding as grass, including multi-digit links.
+                self.ground_number(&cell.glyph,x,y,cw,ch,gw,gh,ink)
             } else {
                 self.map_identity_aligned(&cell.glyph, x + (cw - gw) / 2,
                     y + (ch - gh) / 2, gw, gh, ink,
-                    cell.bottom_aligned && cell.glyph == "\"");
-            }
+                    cell.bottom_aligned && cell.glyph == "\"")
+            };
             if now > 0. {
                 for animation in &cell.animations {
                     match *animation {
                         Animation::Water { .. } => {}
                         Animation::Gas { phase, color } => {
                             let pulse = 0.5 + 0.5 * (now / 1900. + phase).sin();
-                            let top=y+(ch as f64*(0.2+pulse/3.)) as i32;
-                            let bottom=y+(ch as f64*(0.4+pulse/3.)) as i32;
-                            self.blend_rect(x+cw/8,top,cw*7/8-cw/8,bottom-top,color,
-                                ((0.025+pulse*0.035)*255.) as u8);
+                            self.blend_rect(x,y,cw,ch,color,((0.012+pulse*0.018)*255.) as u8);
                         }
                         Animation::Reflection { phase, color } => {
                             let pulse = 0.5
@@ -2470,9 +2502,9 @@ impl Painter {
                 }
             }
             let marker_ink = if v.dreamwalking && !cell.dream_entity { Some((cell.fg,cell.bg)) }
-                else { cell.display_light.map(|light| (light.apply([240,223,190]),light.apply([24,23,21]))) };
+                else { cell.display_light.map(|light| (light.foreground(if cell.corpse {CORPSE_CROSS} else {[240,223,190]},true),light.apply([24,23,21]))) };
             if cell.corpse {
-                self.corpse_marker(x,y,cw,ch,marker_ink);
+                self.corpse_marker(glyph_bounds,x,y,cw,ch,marker_ink);
             } else if cell.heartless {
                 self.heartless_marker(&cell.glyph, x, y, cw, ch,marker_ink);
             }
@@ -2509,27 +2541,12 @@ impl Painter {
         if self.intersects_damage(left,0,self.logical_width()-left,self.logical_height()) {
         #[cfg(test)]
         let _paint_hud = paint_profile_bench::span(paint_profile_bench::Kind::HudResources);
-        // Fixed heading and mode columns: longer domains never run into the mode.
-        let heading_width = (self.logical_width() - 80 - (left + 12) - 10).max(1);
-        let heading = self.fit_text_role(crate::typography_ui::Role::Headings,
-            &format!("{} · {:.0}/40", v.domain, v.depth), heading_width, 13);
-        self.clip = Some((left + 12, 6, heading_width, 24));
-        self.text_role(crate::typography_ui::Role::Headings, &heading, left + 12, 12, 13,
-            game_color(&self.profile, "ui.colors.headings"));
-        self.clip = Some((self.logical_width() - 80, 6, 66, 24));
-        self.text_role(crate::typography_ui::Role::Secondary, &v.mode, self.logical_width() - 80, 12, 13,
-            game_color(&self.profile, "ui.colors.primary"));
-        self.clip = None;
-        for (i, (name, color)) in v.god_labels.iter().take(3).enumerate() {
-            self.text(name, left + 12 + i as i32 * 67, 34, 11, *color);
+        self.text(&format!("Depth {:.0}/{}",v.display_depth,v.max_depth),left+12,12,13,game_color(&self.profile,"ui.colors.headings"));
+        self.text(&format!("Lvl {:.0}",v.level),self.logical_width()-80,12,13,INK);
+        for (i,(name,color)) in v.god_labels.iter().take(3).enumerate() {
+            let width=rail_width/3;
+            self.text(name,left+12+i as i32*width,34,11,*color);
         }
-        self.text(
-            &format!("Level {:.0}", v.level),
-            self.logical_width() - 80,
-            34,
-            11,
-            game_color(&self.profile, "ui.colors.primary"),
-        );
         for (i, (label, value, max, color)) in [
             (
                 "Health",
@@ -2554,31 +2571,16 @@ impl Painter {
         .enumerate()
         {
             let y = 76 + i as i32 * 26;
-            self.text(label, left + 12, y, 14, color);
-            self.text(
-                &format!("{value:.0} / {}", resource_max_label(max)),
-                self.logical_width() - 138,
-                y,
-                13,
-                game_color(&self.profile, "ui.colors.primary"),
-            );
-            let h = if i == 0 { 10 } else { 8 };
-            self.rect(left + 12, y + 16, rail_width, h, [36, 41, 53]);
-            self.rect(
-                left + 12,
-                y + 16,
-                (rail_width as f64
-                    * (value / if max.is_infinite() { 100. } else { max.max(1.) }).clamp(0., 1.))
-                    as i32,
-                h,
-                color,
-            );
+            let text = resource_ui::value_text(label, value, max, &v.resource_changes[i]);
+            let (fill,pending)=resource_ui::bar_fractions(value,max,if i==1{v.pending_energy_loss}else{0.});
+            resource_ui::paint_bar_pending(self,label,&text,left+12,y,rail_width,24,color,
+                fill,13,pending);
         }
         for(i,(label,value))in ["Damage","HP","DR","Accuracy","Dodge"].into_iter().zip(v.player_stats).enumerate(){
             let text=if i<2 {format!("{label} {value:+}")} else {format!("{label} {value}")};
             let col=rail_width/2;
             self.text_role(crate::typography_ui::Role::Secondary,&text,left+12+(i%2)as i32*col,
-                158+(i/2)as i32*19,12,game_color(&self.profile,"ui.colors.primary"));
+                stats_top+12+(i/2)as i32*19,13,game_color(&self.profile,"ui.colors.primary"));
         }
         for (i, m) in v
             .player_meters
@@ -2589,14 +2591,14 @@ impl Painter {
         {
             self.condition_meter(
                 m,
-                left + 12 + (i % 2) as i32 * 133,
-                222 + (i / 2) as i32 * 22,
-                124,
+                left + 12 + (i % 2) as i32 * (rail_width/2),
+                stats_top+66 + (i / 2) as i32 * 22,
+                rail_width/2-8,
             );
         }
         self.rect(left + 12, crate::ability_ui::top(&self.profile) - 28, rail_width, 1, [36, 30, 46]);
         } // upper HUD
-        if self.intersects_damage(0,chronicle_height(&self.profile),ox,self.logical_height()-chronicle_height(&self.profile)) {
+        if self.intersects_damage(map_right,0,left-map_right,self.logical_height()) {
             #[cfg(test)]
             let _paint_enemies = paint_profile_bench::span(paint_profile_bench::Kind::Enemies);
             let enemy_layout=enemy_list::Layout::resolve_frame(&self.profile, ox,self.frame());
@@ -2605,21 +2607,6 @@ impl Painter {
         if self.intersects_damage(left,0,self.logical_width()-left,self.logical_height()) {
         #[cfg(test)]
         let _paint_abilities = paint_profile_bench::span(paint_profile_bench::Kind::HudAbilities);
-        self.text_role(
-            crate::typography_ui::Role::Headings,
-            "Divine abilities",
-            left + 12,
-            crate::ability_ui::top(&self.profile) - 24,
-            14,
-            game_color(&self.profile, "ui.colors.headings"),
-        );
-        self.text(
-            &format!("{}", v.total_abilities),
-            self.logical_width() - 36,
-            crate::ability_ui::top(&self.profile) - 24,
-            14,
-            game_color(&self.profile, "ui.colors.secondary"),
-        );
         for (i, a) in v
             .abilities
             .iter()
@@ -2632,30 +2619,47 @@ impl Painter {
                 self.rect(left + 12, y, rail_width, crate::ability_ui::row(&self.profile), [39,44,61]);
                 self.border(left + 12, y, rail_width, crate::ability_ui::row(&self.profile), [174,158,107]);
             }
-            self.rect(
-                left + 12,
-                y,
-                2,
-                crate::ability_ui::row(&self.profile),
-                a.color,
-            );
-            // Fixed two-line track: primary names never compete with variable metadata.
-            let name_width = rail_width - 12;
-            let name = self.fit_text_role(crate::typography_ui::Role::Ability, &a.name, name_width, 15);
-            let unavailable = !a.supported || a.state.to_ascii_lowercase().contains("unavailable");
-            let name_color = if unavailable { game_color(&self.profile, "ui.colors.muted") }
-                else if a.active { [125, 255, 119] } else { a.color };
-            self.clip = Some((left + 18, y, rail_width - 6, crate::ability_ui::row(&self.profile)));
-            self.text_role(crate::typography_ui::Role::Ability, &name, left + 19, y + 1, 15, name_color);
-            let state = if a.active { "ACTIVE" } else if !a.supported { "UNAVAILABLE" }
-                else if a.mode.eq_ignore_ascii_case("passive") { "PASSIVE" } else { &a.state };
-            let cost = ability_cost_text(&a.cost, state);
-            let (state,cost,cost_x)=self.ability_metadata(state,&cost,left+19,left+12+rail_width-3);
-            self.text_role(crate::typography_ui::Role::Secondary, &state, left + 19, y + 20, 10,
-                if a.active { [125, 255, 119] } else { game_color(&self.profile, "ui.colors.secondary") });
-            self.text_role(crate::typography_ui::Role::Secondary, &cost, cost_x, y + 20, 10,
-                if unavailable { game_color(&self.profile, "ui.colors.muted") } else { game_color(&self.profile, "ui.colors.energy") });
-            self.clip = None;
+            let selecting=v.selected_ability.as_deref()==Some(a.id.as_str());
+            let passive=a.mode.eq_ignore_ascii_case("passive")&&!selecting;
+            let reserve=if passive {None}else{a.reserve};
+            let cogworks=a.id=="kative-cogworks";
+            let orb_width=if passive{0}else if cogworks{50}else{18};
+            let name_x=left+18+orb_width;
+            let bar_width=rail_width/3;
+            let bar_x=left+12+rail_width-bar_width;
+            let name_width=if reserve.is_some()||a.fortunes.is_some()||a.indicator.is_some(){bar_x-name_x-8}else{rail_width-12-orb_width};
+            let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);
+            self.clip=Some((left+12,y,rail_width,crate::ability_ui::row(&self.profile)));
+            for(line,name)in names.iter().enumerate(){
+                self.text(name,name_x,y+3+line as i32*15,13,a.color);
+            }
+            if let Some(indicator)=a.indicator {
+                ability_indicator_ui::paint(self,indicator,bar_x,y,bar_width);
+            } else if let Some((count,until))=a.fortunes {
+                let box_w=((bar_width-6)/3).max(18);
+                for i in 0..3 {
+                    let bx=bar_x+i* (box_w+3);
+                    if i<count as i32 {self.rect(bx,y,box_w,19,[184,119,255]);}
+                    self.border(bx,y,box_w,19,[184,119,255]);
+                    if count<3&&i==count as i32 {
+                        let text=until.to_string();let tw=resource_ui::text_width(self,&text,12);
+                        self.text(&text,bx+(box_w-tw)/2,y+2,12,[232,220,255]);
+                    }
+                }
+            } else if let Some((current,maximum))=reserve {
+                let value=format!("{current:.0}/{maximum:.0} NRG");
+                resource_ui::paint_bar_pending(self,"",&value,bar_x,y,bar_width,19,
+                    game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),11,a.pending_reserve_loss/maximum.max(1.));
+            }
+            if !passive {
+                for orb in 0..if cogworks{3}else{1} {
+                    let chosen=if cogworks{orb+1==v.cogworks_mode as i32}else{a.active};
+                    let targeting=selecting&&(!cogworks||chosen);
+                    let cx=left+23+orb*16;let cy=y+11;
+                    for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(targeting||chosen||d>=15){self.rect(cx+dx,cy+dy,1,1,if targeting{[255,155,56]}else if chosen{[100,255,114]}else{[110,110,125]});}}}
+                }
+            }
+            self.clip=None;
         }
         } // HUD damage section
         if map_damage && (!v.path.is_empty()||!v.target_path.is_empty()||!v.target_area.is_empty()||v.target_impact.is_some()||!v.possible_exits.is_empty()||v.hover.is_some()) {
@@ -2724,19 +2728,25 @@ impl Painter {
         }
         } // interaction marks
         if map_damage { crate::perception_ui::paint(self,v); }
-        let footer_top=self.toolbar_y().min(self.logical_height()-85-(self.profile.number("ui.layout.buttonHeight").round() as i32-42)).min(self.logical_height()-14)-24;
+        let footer_top=self.frame().map.1+self.frame().map.3;
         if self.intersects_damage(0,footer_top,self.logical_width(),self.logical_height()-footer_top) {
         #[cfg(test)]
         let _paint_footer = paint_profile_bench::span(paint_profile_bench::Kind::Footer);
+        let strip_height=self.toolbar_y()-footer_top;
+        self.rect(8,footer_top,self.logical_width()-16,strip_height,[8,7,13]);
+        self.border(8,footer_top,self.logical_width()-16,strip_height,[88,81,98]);
+        let previous_clip=self.clip;
+        self.clip=Some((12,footer_top+1,self.logical_width()-24,strip_height-2));
         self.text_role(
             crate::typography_ui::Role::Primary,
-            &truncate(notice, 136),
+            &self.fit_text_role(crate::typography_ui::Role::Primary, notice, self.logical_width()-40, 15),
             20,
-            self.logical_height()-85 - (self.profile.number("ui.layout.buttonHeight").round() as i32 - 42),
+            self.inspection_notice_y(),
             15,
             game_color(&self.profile, "ui.colors.secondary"),
         );
 
+        self.clip=previous_clip;
         for (i, label) in TOOLBAR_ACTIONS.iter().enumerate() {
             let (x, w) = toolbar_rect_for_width(i,self.logical_width());
             let y = self.toolbar_y();
@@ -2753,6 +2763,13 @@ impl Painter {
             }
         }
         } // footer damage section
+        // Flush shared panel boundaries. O(1) primitives, no simulation work.
+        let edge=[88,81,98];
+        self.border(8,8,map_right-8,chronicle_height(&self.profile)+4,edge);
+        self.border(8,chronicle_height(&self.profile)+11,map_right-8,panel_bottom-chronicle_height(&self.profile)-10,edge);
+        self.border(map_right-1,8,left-map_right+2,panel_bottom-7,edge);
+        self.border(left,8,self.logical_width()-left-8,panel_bottom-7,edge);
+        self.border(left,stats_top,self.logical_width()-left-8,panel_bottom-stats_top+1,edge);
         if let Some(veil) = crate::illumination_ui::immersion_color(v) {
             // Rebuilt base pixels only: clipped/tile paths tint their disjoint
             // repainted regions once, never previously tinted retained pixels.
@@ -2804,7 +2821,7 @@ pub fn map_layout_profile(
 }
 pub fn map_layout_frame(w:usize,h:usize,p:&crate::appearance_profile::Profile,frame:crate::modal_ui::Frame)->(i32,i32,i32,i32){
     let aspect = p.number("typography.map.tileHeight") / p.number("typography.map.tileWidth");
-    let area_w = (frame.map.2 - 21 - enemy_list::RESERVED_WIDTH).max(1);
+    let area_w = (frame.map.2 - 24).max(1);
     let top = chronicle_height(p) + 20;
     let area_h = (frame.map.1 + frame.map.3 - 20 - top).max(1);
     let mut cw = ((area_w as f64 / w.max(1) as f64).min(area_h as f64 / (h.max(1) as f64 * aspect)))
@@ -2819,7 +2836,7 @@ pub fn map_layout_frame(w:usize,h:usize,p:&crate::appearance_profile::Profile,fr
     (
         cw,
         ch,
-        frame.sidebar - p.number("ui.layout.mapSpacing").round() as i32 - cw * w as i32,
+        frame.map.2 - 12 - cw * w as i32,
         top + (area_h - ch * h as i32) / 2,
     )
 }
@@ -3225,14 +3242,15 @@ mod tests {
 }
 
 // Stable command IDs are independent of their visible toolbar slots.
-pub const TOOLBAR_VISIBLE_ACTIONS: [usize; 3] = [4, 7, 9];
-pub const TOOLBAR_ACTIONS: [&str; 3] = ["Pack", "Bestiary", "Menu"];
-pub const TOOLBAR_LABELS: [&str; 3] = TOOLBAR_ACTIONS;
-/// Equal thirds follow the active canvas, not the original 1280px sheet.
+pub const TOOLBAR_VISIBLE_ACTIONS: [usize; 4] = [4, 7, crate::help_ui::ACTION, 9];
+pub const TOOLBAR_ACTIONS: [&str; 4] = ["Pack", "Bestiary", "?", "Menu"];
+pub const TOOLBAR_LABELS: [&str; 4] = TOOLBAR_ACTIONS;
+/// Equal slots follow the active canvas, not the original 1280px sheet.
 pub fn toolbar_rect_for_width(i:usize,width:i32)->(i32,i32){
     let usable=(width-24).max(0);
-    let left=12+usable*i as i32/3;
-    let right=12+usable*(i as i32+1)/3;
+    let count=TOOLBAR_VISIBLE_ACTIONS.len() as i32;
+    let left=12+usable*i as i32/count;
+    let right=12+usable*(i as i32+1)/count;
     (left,right-left)
 }
 pub fn toolbar_rect(i: usize) -> (i32, i32) {toolbar_rect_for_width(i,WIDTH as i32)}
@@ -3262,13 +3280,13 @@ pub fn toolbar_action(x: i32, y: i32) -> Option<usize> {
     })
 }
 
-pub fn creature_at(view: &View, offset: usize, x: i32, y: i32) -> Option<f64> {
+pub fn creature_at(p: &Painter, view: &View, offset: usize, x: i32, y: i32) -> Option<f64> {
     if !(337..973).contains(&x) || !(190..656).contains(&y) {
         return None;
     }
     let mut top = 196;
     for a in view.creatures.iter().skip(offset) {
-        let h = 76 + ((a.meters.len() + 1) / 2) as i32 * 26;
+        let (_, _, h) = p.creature_condition_layout(a);
         if y >= top - 4 && y < top + h - 4 {
             return Some(a.id);
         }
@@ -3317,7 +3335,9 @@ pub(crate) fn readable_cell_colors(cell: &Cell) -> (Rgb, Rgb) {
         } else { cell.fg };
         return (fg, cell.bg);
     }
-    if cell.fire || cell.label.is_empty() { return (cell.fg, cell.bg); }
+    // Known chasm terrain keeps its authored dark ink and black background in
+    // memory too. Entity ink was handled above; never lift a void to memory gray.
+    if cell.fire || cell.label.is_empty() || cell.label == "chasm" { return (cell.fg, cell.bg); }
     if cell.current {
         let contrast = if cell.label == "wall" { 2.5 } else if cell.label == "floor" { 1.7 } else { 2.1 };
         (crate::color::distinguish(cell.fg, cell.bg, contrast), cell.bg)
@@ -3327,9 +3347,9 @@ pub(crate) fn readable_cell_colors(cell: &Cell) -> (Rgb, Rgb) {
             c.map(|v| (luma + (v as f64 - luma) * saturation).round().clamp(0., 255.) as u8)
         };
         let wall = cell.label == "wall";
-        let bg = gray(cell.bg, 0.5).map(|v| v.max(if wall { 13 } else { 7 }));
-        let fg = gray(cell.fg, 0.6);
-        let floor: u8 = if wall { 106 } else if cell.label == "floor" { 73 } else { 91 };
+        let bg = gray(cell.bg, 0.).map(|v| v.max(if wall { 13 } else { 7 }));
+        let fg = gray(cell.fg, 0.);
+        let floor: u8 = if wall { 70 } else if cell.label == "floor" { 54 } else { 64 };
         let peak = *fg.iter().max().unwrap_or(&0);
         let lift = floor.saturating_sub(peak);
         (fg.map(|v| v.saturating_add(lift)), bg)
@@ -3378,10 +3398,10 @@ mod gameplay_hierarchy_tests {
         let (wall_fg, wall_bg) = readable_cell_colors(&wall);
         let (floor_fg, _) = readable_cell_colors(&floor);
         let (water_fg, _) = readable_cell_colors(&water);
-        assert!(wall_fg[0] >= 100 && floor_fg[0] >= 70);
+        assert!(wall_fg[0] >= 70 && floor_fg[0] >= 54);
         assert!(wall_fg[0] > floor_fg[0]);
-        assert!(water_fg[2] > water_fg[0]);
-        assert!(crate::color::contrast(wall_fg, wall_bg) > 3.);
+        assert_eq!(water_fg[2],water_fg[0]);
+        assert!(crate::color::contrast(wall_fg, wall_bg) > 2.);
         assert_eq!(readable_cell_colors(&Cell::default()), ([0; 3], [0; 3]));
         // No clock/neighbor/current world state enters the remembered transform.
         let mut altered = wall.clone();
@@ -3399,7 +3419,7 @@ mod gameplay_hierarchy_tests {
         view.hp = 2.;
         view.max_hp = 99999.;
         view.total_abilities = 90;
-        view.abilities = vec![crate::ability_ui::AbilityView {
+        view.abilities = vec![crate::ability_ui::AbilityView { reserve:None,indicator:None,fortunes:None,pending_reserve_loss:0.,
             id: "test".into(), name: "Unyielding Assault".into(), description: "Details".repeat(100),
             color: [255, 70, 150], cost: "3/5 charges · 6 NRG".into(), state: "Unavailable".into(),
             active: false, mode: "Passive".into(), supported: true,
@@ -3407,13 +3427,12 @@ mod gameplay_hierarchy_tests {
         view.creatures.clear();
         painter.game_at(&view, "", false, 0.);
         assert_eq!(painter.map_layout(view.width, view.height), layout);
-        let hud_boundary = painter.hud_left() as usize;
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
                 // The Chronicle ends at the HUD boundary. The HUD's top rows
                 // legitimately change here (creature count and Health).
-                if (x >= layout.2 as usize && x < hud_boundary)
-                    || (x < hud_boundary && y < chronicle_height(&painter.profile) as usize)
+                if (x >= layout.2 as usize && x < painter.frame().map.2 as usize)
+                    || (x < painter.frame().map.2 as usize && y < chronicle_height(&painter.profile) as usize)
                     || y >= 748
                 {
                     let i = (y * WIDTH + x) * 4;
@@ -3467,7 +3486,7 @@ mod gameplay_hierarchy_tests {
             "You strike the Screamling.".into(), "You kill the Screamling.".into(),
             "A blessing stirs. The ancient passages remain visible beyond the reach of your light.".into(),
         ], &[]);
-        view.abilities = vec![crate::ability_ui::AbilityView {
+        view.abilities = vec![crate::ability_ui::AbilityView { reserve:None,indicator:None,fortunes:None,pending_reserve_loss:0.,
             id: "test".into(), name: "Unyielding Assault".into(), description: String::new(),
             color: [255, 70, 150], cost: "1/1 reactions · 1 reaction/first attack".into(), state: String::new(),
             active: false, mode: "Passive".into(), supported: true,
@@ -3546,7 +3565,7 @@ pub fn ability_inspect_at(p:&crate::appearance_profile::Profile,count:usize,x:i3
 
 /// O(1) Chronicle click and hover use the same painted logical region.
 pub fn chronicle_hit_rect(p:&crate::appearance_profile::Profile)->crate::modal_ui::Rect {
-    crate::modal_ui::Rect(12,6,(hud_left(p)-25).max(0),chronicle_height(p).max(0))
+    crate::modal_ui::Rect(12,12,(crate::modal_ui::Frame::from_profile(p).map.2-24).max(0),chronicle_height(p).max(0))
 }
 
 #[cfg(test)]
@@ -3701,3 +3720,228 @@ mod ember_glyph_tests;
 #[cfg(test)]
 #[path="grass_amulet_render_tests.rs"]
 mod grass_amulet_render_tests;
+
+#[cfg(test)]
+mod ground_number_paint_tests {
+    use super::*;
+    fn bounds(p:&Painter)->(usize,usize,usize,usize) {
+        let points:Vec<_>=p.pixels.chunks_exact(4).enumerate().filter(|(_,c)|c[..3]!=[0,0,0]).map(|(i,_)|(i%p.width,i/p.width)).collect();
+        (points.iter().map(|p|p.0).min().unwrap(),points.iter().map(|p|p.1).min().unwrap(),
+         points.iter().map(|p|p.0).max().unwrap(),points.iter().map(|p|p.1).max().unwrap())
+    }
+    #[test]
+    fn numbers_are_smaller_and_lower_at_native_scales() {
+        for scale in [1.,1.5,2.] {
+            let mut p=Painter::new();p.resize((WIDTH as f64*scale)as usize,(HEIGHT as f64*scale)as usize);
+            for glyph in ["1","12","128"] {
+                p.clear([0,0,0]);p.map_identity(glyph,100,100,15,24,[255,255,255]);let large=bounds(&p);
+                p.clear([0,0,0]);p.ground_number(glyph,100,100,15,24,15,24,[255,255,255]);let small=bounds(&p);
+                assert!(small.3-small.1<large.3-large.1,"{glyph} scale {scale}");
+                assert!(small.1>large.1);assert!(small.3>=large.3);
+                assert!(small.0>=p.native_x(100.)as usize && small.2<p.native_x(115.)as usize);
+                assert!(small.3<p.native_y(124.)as usize);
+            }
+            if let Ok(dir)=std::env::var("CORPSE_TIMEWEAVE_UI_REVIEW") {
+                p.clear([24,21,28]);
+                for (i,glyph) in ["1","2","12","128"].into_iter().enumerate() {
+                    let x=100+i as i32*22;p.map_identity(glyph,x,70,15,24,[95,211,211]);
+                    p.ground_number(glyph,x,100,15,24,15,24,[95,211,211]);
+                }
+                p.map_identity_aligned("\"",195,100,15,24,[120,199,107],true);
+                let file=std::fs::File::create(format!("{dir}/ground-numbers-{scale}.png")).unwrap();
+                let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);
+                encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod linked_space_repaint_tests {
+    use super::*;
+    #[test]
+    fn moving_player_and_ground_numbers_match_full_and_tile_repaints() {
+        let mut run=crate::non_euclidean_ui::tests::scene();run.simulation_revision=52.0.into();
+        run.player.x=11.;let mut old=crate::observe::observe(&run);
+        let (mut retained_p,mut tile,mut full)=(Painter::new(),Painter::new(),Painter::new());
+        let mut retained=RetainedGame::default();let mut plan=tile_damage::TilePlanner::default();
+        retained.update(&mut retained_p,&old,"",0.,true,true).unwrap();
+        plan.replace_view(None,&old,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,&old,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();
+        for x in [13.,12.,13.,10.] {
+            run.player.x=x;let view=crate::observe::observe(&run);
+            full.game_at(&view,"",false,0.);retained.update(&mut retained_p,&view,"",0.,true,false).unwrap();
+            assert!(retained_p.pixels==full.pixels,"retained at {x}");
+            plan.replace_view(Some(&old),&view,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,&view,"",0.);tile.tile_clip_enabled=false;
+            assert!(tile.pixels==full.pixels,"tile at {x}");plan.clear_frame();old=view;
+        }
+        if let Ok(dir)=std::env::var("CORPSE_TIMEWEAVE_UI_REVIEW") {
+            let file=std::fs::File::create(format!("{dir}/linked-space-full-frame.png")).unwrap();
+            let mut encoder=png::Encoder::new(file,full.width as u32,full.height as u32);encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);
+            encoder.write_header().unwrap().write_image_data(&full.pixels).unwrap();
+        }
+    }
+}
+
+#[cfg(test)]
+#[path="glyph_mask_tests.rs"]
+mod glyph_mask_tests;
+
+#[cfg(test)]
+mod zero_health_render_tests {
+    use super::*;
+    fn number_pixels(hp: f64) -> Vec<u8> {
+        let r: corpse_core::Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let mut v = crate::observe::observe(&r);v.hp=hp;v.max_hp=100.;
+        let mut p=Painter::new();p.game_at(&v,"",false,0.);
+        let left=(p.logical_width()-138) as usize;
+        (76..91).flat_map(|y|p.pixels[(y*p.width+left)*4..(y*p.width+left+120)*4].to_vec()).collect()
+    }
+    #[test]
+    fn zero_health_player_hud_distinguishes_a_quarter_hp_from_death() {
+        assert_eq!(number_pixels(0.25),number_pixels(1.));
+        assert_ne!(number_pixels(0.25),number_pixels(0.));
+    }
+}
+
+#[cfg(test)]
+mod fast_menu_layout_tests {
+    use super::*;
+    /// Opt-in native Painter evidence only. O(F * P + glyph rasterization) time,
+    /// O(P) comparison memory for F=9 exported frames at three fixed sizes.
+    /// No SDL window, game state, gameplay RNG, or product CLI behavior is added.
+    #[test]
+    fn fast_menu_native_scaled_captures() {
+        use crate::avatar_menu::{Selection, GODS, MODE};
+        use sdl2::keyboard::{Keycode, Mod};
+        let Ok(directory) = std::env::var("COTCG_FAST_MENU_EXPORT_DIR") else { return; };
+        let directory = std::path::Path::new(&directory);
+        std::fs::create_dir_all(directory).unwrap();
+        let mut painter = Painter::new();
+        let mut selection = Selection::default();
+        let mut seed = "03-09-11:fast-menu-review".to_string();
+        selection.sync_seed(&seed);
+        let original_seed = seed.clone();
+        let original_gods = selection.gods;
+        assert_eq!(original_gods, [3, 9, 11]);
+        let mut frames = Vec::new();
+        let paint_menu = |painter: &mut Painter, selection: &Selection, seed: &str, fast| {
+            painter.menu(18, crate::menu_ui::FAST_INDEX, false, MODE);
+            painter.menu_seed(seed, false, false);
+            painter.menu_fast_mode(fast, true);
+            selection.paint_slots(painter, crate::menu_ui::FAST_INDEX);
+        };
+        let write_frame = |painter: &Painter, name: &str| {
+            // Exclusive evidence creation prevents a later invocation silently
+            // replacing frames whose source/binary identity was already bound.
+            let file = std::fs::OpenOptions::new().write(true).create_new(true)
+                .open(directory.join(name)).unwrap();
+            let mut encoder = png::Encoder::new(file, painter.width as u32, painter.height as u32);
+            encoder.set_color(png::ColorType::Rgba);
+            encoder.set_depth(png::BitDepth::Eight);
+            encoder.write_header().unwrap().write_image_data(&painter.pixels).unwrap();
+        };
+        for (width, height) in [(1280, 800), (1920, 1200), (960, 1200)] {
+            painter.resize(width, height);
+            let controls = [crate::menu_ui::FAST_RECT, crate::menu_ui::SEED_RECT,
+                crate::avatar_menu::CANCEL].into_iter()
+                .chain((0..3).map(crate::avatar_menu::slot_rect))
+                .chain((0..12).map(crate::avatar_menu::card_rect))
+                .chain(crate::menu_ui::ITEMS.iter().map(|item| (item.x,item.y,item.w,item.h)));
+            for (x,y,w,h) in controls {
+                assert!(painter.native_x(x as f64) >= 0 && painter.native_y(y as f64) >= 0);
+                assert!(painter.native_x((x+w) as f64) <= width as i32);
+                assert!(painter.native_y((y+h) as f64) <= height as i32);
+            }
+            let (fx,fy,fw,fh) = crate::menu_ui::FAST_RECT;
+            let fast_bounds = (painter.native_x(fx as f64),painter.native_y(fy as f64),
+                painter.native_x((fx+fw) as f64),painter.native_y((fy+fh) as f64));
+            for dpi in [1,2] {
+                let native = (painter.native_x((fx+fw/2) as f64)/dpi,
+                    painter.native_y((fy+fh/2) as f64)/dpi);
+                let logical = painter.logical_point_for_canvas(native.0,native.1,
+                    ((width/dpi as usize) as u32,(height/dpi as usize) as u32),false);
+                assert!(crate::menu_ui::fast_at(logical.0,logical.1));
+            }
+            let mut off_frame = Vec::new();
+            let mut on_frame = Vec::new();
+            for fast in [false, true] {
+                paint_menu(&mut painter, &selection, &seed, fast);
+                assert_eq!((painter.width, painter.height), (width, height));
+                assert_eq!(selection.gods, original_gods);
+                assert_eq!(seed, original_seed);
+                let state = if fast { "on" } else { "off" };
+                let name = format!("avatar-fast-{state}-{width}x{height}.png");
+                write_frame(&painter, &name);
+                frames.push(serde_json::json!({"file":name,"width":width,"height":height,
+                    "screen":"Avatar menu","fast":fast,"selectedControl":"Fast mode",
+                    "fastNativeBounds":fast_bounds}));
+                if fast { on_frame = painter.pixels.clone(); }
+                else { off_frame = painter.pixels.clone(); }
+            }
+            assert_eq!(off_frame, on_frame, "Removed mode flag must not change the menu");
+            for (index,(off,on)) in off_frame.chunks_exact(4).zip(on_frame.chunks_exact(4)).enumerate() {
+                if off != on {
+                    let (x,y) = ((index%width) as i32,(index/width) as i32);
+                    assert!(x>=fast_bounds.0 && x<fast_bounds.2 && y>=fast_bounds.1 && y<fast_bounds.3,
+                        "Fast toggle changed pixels outside its actual native bounds");
+                }
+            }
+            selection.open(0);
+            selection.paint_picker(&mut painter);
+            for id in 0..GODS.len() {
+                let (x,y,w,h) = crate::avatar_menu::card_rect(id);
+                let px = painter.native_x((x+w-3) as f64) as usize;
+                let py = painter.native_y((y+h-3) as f64) as usize;
+                let offset = (py*width+px)*4;
+                assert_eq!(&painter.pixels[offset..offset+3],&crate::ability_ui::god_color(id));
+            }
+            let picker_frame = painter.pixels.clone();
+            let name = format!("avatar-god-picker-{width}x{height}.png");
+            write_frame(&painter, &name);
+            frames.push(serde_json::json!({"file":name,"width":width,"height":height,
+                "screen":"God picker","fast":true,"pickerSlot":0}));
+            selection.key(Keycode::Escape, Mod::NOMOD, &mut seed);
+            assert!(!selection.active());
+            assert_eq!(selection.gods, original_gods);
+            assert_eq!(seed, original_seed);
+            paint_menu(&mut painter, &selection, &seed, true);
+            assert_eq!(painter.pixels, on_frame, "Cancel restores the same selected Fast menu");
+            selection.open(0);
+            selection.paint_picker(&mut painter);
+            assert_eq!(painter.pixels, picker_frame, "Reopening retains picker selection and layout");
+            selection.close();
+        }
+        let gods: Vec<_> = GODS.iter().enumerate().map(|(id, god)| serde_json::json!({
+            "id":id,"name":god.name,"alias":god.alias,"domain":god.domain,
+            "color":crate::ability_ui::god_color(id)
+        })).collect();
+        let evidence = serde_json::json!({
+            "verification":"production native Painter PNGs, not live SDL input or Windows runtime",
+            "seed":seed,"selectedGods":original_gods,"gods":gods,"frames":frames,
+            "cancelReopen":"production Selection Escape path and exact full framebuffer restoration",
+            "fastSemantics":"presentation OFF/ON only; gameplay verified by separate source-bound core tests"
+        });
+        let file = std::fs::OpenOptions::new().write(true).create_new(true)
+            .open(directory.join("fast-menu-evidence.json")).unwrap();
+        serde_json::to_writer_pretty(file, &evidence).unwrap();
+        println!("FAST_MENU_CAPTURE frames=9 sizes=1280x800,1920x1200,960x1200 live_sdl=false");
+    }
+    #[test]
+    fn fast_menu_labels_fit_their_fixed_columns_at_supported_scales() {
+        let mut p=Painter::new();
+        for (width,height) in [(640,480),(960,540),(1280,800),(1920,1080),(2560,1600)] {
+            p.resize(width,height);
+            for (text,size,available) in [
+                ("Fast mode: OFF",18,170),
+                ("Fast mode: ON",18,170),
+                ("Floors 1, 3, ... 39, 40; hearts grant",12,359),
+                ("double blessings and stats. New descents only.",12,359),
+            ] {
+                // Same baseline advances as Painter::text; drawable scaling preserves fit.
+                let advance:i32=text.chars().map(|c|p.font.metrics(c,size as f32).advance_width.round() as i32).sum();
+                assert!(advance<=available,"{text} requires {advance}, available {available}");
+                assert!(advance as f64*p.scale<=available as f64*p.scale);
+            }
+        }
+    }
+}

@@ -1,5 +1,7 @@
 //! Authored encyclopedia with player-level discovery, separate from the Run.
 use crate::render::{Painter, Picture};
+#[path = "manual_ranges.rs"]
+mod effect_ranges;
 use serde::Deserialize;
 use std::collections::BTreeMap;
 #[derive(Deserialize, Clone)]
@@ -76,6 +78,8 @@ pub fn page_id_for_actor(actor: &corpse_core::Actor) -> Option<&'static str> {
 pub struct Manual {
     pub progress: crate::bestiary_progress::Progress,
     preview: bool,
+    simulation_revision: f64,
+    compressed_depths: bool,
     pub catalog: Catalog,
     pub depth: usize,
     ordered_ids: Vec<String>,
@@ -86,8 +90,17 @@ pub struct Manual {
 }
 impl Manual {
     pub fn new() -> Self {
-        let catalog: Catalog = serde_json::from_str(include_str!("../assets/manual.json"))
+        let mut catalog: Catalog = serde_json::from_str(include_str!("../assets/manual.json"))
             .expect("immutable bestiary catalog");
+        for (id,name,text,cost) in [
+            ("dragon","Flight","Takes a faster route to safe ground; lasts up to 6 turns.",8),
+            ("blorb","Caustic touch","Damaging melee hits add 1 caustic damage before protection.",0),
+            ("killspawn","Deep bleeding","Damaging melee hits add half their damage as bleeding over 3 turns. Wounds add together.",0),
+        ] {
+            if let Some(entry)=catalog.entries.iter_mut().find(|e|e.id==id) {
+                entry.mechanics.push(Mechanic {name:name.into(),text:text.into(),cost:cost.into()});
+            }
+        }
         // O(N log N) once, stable and independent of discovery/run state.
         let mut entries: Vec<_> = catalog.entries.iter().collect();
         entries.sort_by_key(|e| (first_depth(e).unwrap_or(usize::MAX), e.name.to_lowercase(), e.id.clone()));
@@ -95,6 +108,8 @@ impl Manual {
         Self {
             progress: Default::default(),
             preview: false,
+            simulation_revision: 52.,
+            compressed_depths: true,
             catalog,
             depth: 0,
             ordered_ids,
@@ -104,6 +119,12 @@ impl Manual {
             void_field: None,
         }
     }
+    /// Only the originating run's scalar revision crosses the UI boundary.
+    /// Menu/inactive runs use current rules; discovery is independent of this choice.
+    pub fn set_simulation_revision(&mut self, revision: Option<f64>) {
+        self.simulation_revision = revision.unwrap_or(52.);
+    }
+    pub fn set_compressed_depths(&mut self, compressed: bool) { self.compressed_depths = compressed; }
     pub fn preview_all(&mut self) { self.preview = true; }
     pub fn mark_viewed(&mut self) { if let Some(id)=self.ids().get(self.selected).cloned() {self.progress.view(&id);} }
     fn unlocked(&self,id:&str)->bool {self.preview || self.progress.seen(id)}
@@ -148,8 +169,8 @@ impl Manual {
         }
         self.scroll = 0;
     }
-    fn paint_storage_error(&self,p:&mut Painter) {
-        if let Some(error)=&self.progress.error {p.prose(&crate::render::truncate(error,120),248,707,12,[230,110,100],false);}
+    fn paint_storage_error(&self,p:&mut Painter,keyline:[u8;3]) {
+        if let Some(error)=&self.progress.error {p.bestiary_prose(&crate::render::truncate(error,120),248,707,12,[230,110,100],false,keyline);}
     }
     // Decode once per selection. Artwork and authored alpha remain untouched.
     fn prepare_art(&mut self) {
@@ -159,26 +180,25 @@ impl Manual {
                 entry.asset.clone(), trim_transparent_margin(crate::embedded_assets::creature_picture(bytes))));
         }
     }
-    // Layout is deterministic and uses only immutable catalog data; no run/discovery state.
+    // Layout and stats use immutable public catalogs, never actors from a live Run.
     pub fn paint(&mut self, p: &mut Painter) {
         self.paint_at(p, 0.);
     }
     pub fn paint_at(&mut self, p: &mut Painter, _time_ms: f64) {
-        // Visual depth follows first-appearance navigation, never combat calibration.
-        // This keeps page colors monotone while numeric stats use the current overlay.
-        self.paint_page(p, self.depth, self.depth as f64);
+        // First-appearance navigation controls only the solid page color.
+        // There is no selected dungeon floor: stats span the species' birth profiles.
+        self.paint_page(p, self.depth as f64);
     }
     // Render-test depth override preserves the immutable roster and selected entry.
     pub fn paint_at_depth(&mut self, p: &mut Painter, _time_ms: f64, depth: usize) {
-        self.paint_page(p, depth, depth as f64);
+        self.paint_page(p, depth.min(39) as f64);
     }
-    // Fractional render-only preview: stats use the lower whole floor, color interpolates.
+    // Fractional render-only preview changes color, never the stat range.
     pub fn paint_at_visual_depth(&mut self, p: &mut Painter, _time_ms: f64, depth: f64) {
         let depth = if depth.is_finite() { depth.clamp(0., 39.) } else { 0. };
-        self.paint_page(p, depth.floor() as usize, depth);
+        self.paint_page(p, depth);
     }
-    fn paint_page(&mut self, p: &mut Painter, depth: usize, color_depth: f64) {
-        let depth = depth.min(39);
+    fn paint_page(&mut self, p: &mut Painter, color_depth: f64) {
         self.scroll = 0;
         let theme = Theme::at_depth(color_depth);
         let ink = theme.ink;
@@ -190,34 +210,17 @@ impl Manual {
         // One uniform full-screen field; no scenery, noise, texture or animated backdrop.
         p.rect(16, 28, 4, 44, theme.accent);
         
-        p.prose("BESTIARY", 28, 38, 25, ink, true);
-        p.prose("ALL CREATURES", 24, 86, 14, ink, false);
+        p.bestiary_prose("BESTIARY", 28, 38, 25, ink, true,theme.keyline);
         p.rect(224, 26, 1, 704, theme.rule);
         p.border(158, 80, 24, 28, ink);
         p.border(184, 80, 24, 28, ink);
-        p.prose("‹", 164, 83, 18, ink, false);
-        p.prose("›", 190, 83, 18, ink, false);
+        p.bestiary_prose("‹", 164, 83, 18, ink, false,theme.keyline);
+        p.bestiary_prose("›", 190, 83, 18, ink, false,theme.keyline);
         p.rect(16, 139, 194, 1, ink);
         p.border(16, 708, 93, 26, ink);
         p.border(115, 708, 95, 26, ink);
-        p.prose("‹ PREV", 28, 713, 13, ink, false);
-        p.prose("NEXT ›", 128, 713, 13, ink, false);
-        p.prose(
-            "FIRST APPEARANCE",
-            24,
-            120,
-            10,
-            ink, false);
-        p.prose(
-            &format!(
-                "{:02} / {:02}",
-                self.selected + usize::from(!self.ids().is_empty()),
-                self.ids().len()
-            ),
-            130,
-            120,
-            13,
-            ink, false);
+        p.bestiary_prose("‹", 28, 713, 13, ink, false,theme.keyline);
+        p.bestiary_prose("›", 128, 713, 13, ink, false,theme.keyline);
         let first = self.selected.saturating_sub(10);
         for (i, id) in self.ids().iter().enumerate().skip(first).take(23) {
             if let Some(e) = self.catalog.entries.iter().find(|e| &e.id == id) {
@@ -225,49 +228,54 @@ impl Manual {
                 if i == self.selected {
                     p.rect(16, y - 3, 194, 24, ink);
                 }
-                p.prose(
-                    &crate::render::truncate(if self.unlocked(id) {&e.name} else {"?"}, 20),
+                p.bestiary_prose(
+                    &crate::render::truncate(if self.unlocked(id) {&e.name} else {""}, 20),
                     24,
                     y,
                     14,
-                    if i == self.selected { paper } else { theme.secondary }, false);
-                if self.progress.unread(id) {p.prose("!",195,y,16,[255,215,65],true);}
+                    if i == self.selected { theme.selected_ink } else { theme.secondary }, false,if i==self.selected {[0,0,0]}else{theme.keyline});
             }
         }
-        let Some(entry) = self.entry().cloned() else {
-            p.prose(
+        let Some(mut entry) = self.entry().cloned() else {
+            p.bestiary_prose(
                 "No creature selected.",
                 250,
                 230,
                 19,
-                ink, false);
+                ink, false,theme.keyline);
             paint_footer(p, ink);
             p.prose_contrast_outline = false;
             return;
         };
         if !self.unlocked(&entry.id) {
-            p.prose("?", 710, 310, 100, ink, true);
             paint_footer(p,ink);
-            self.paint_storage_error(p);
+            self.paint_storage_error(p,theme.keyline);
             p.prose_contrast_outline=false;
             return;
         }
-        self.paint_storage_error(p);
-        let page=resolve_page(p,&entry,self.art.as_ref().map(|(_,a)|a));
+        self.paint_storage_error(p,theme.keyline);
+        if entry.id == "bastidion" { entry.conditional_depths = birth_depths(&entry, self.simulation_revision); }
+        // Detached presentation copy: never change source spawn ranges or stat lookup depths.
+        let mut displayed_entry=entry.clone();
+        if self.compressed_depths {
+            displayed_entry.ordinary_depths=compressed_ranges(&entry.ordinary_depths);
+            displayed_entry.conditional_depths=compressed_ranges(&entry.conditional_depths);
+        }
+        let page=resolve_page(p,&displayed_entry,self.art.as_ref().map(|(_,a)|a));
         let layout=&page.content;
         let mut title_size = 50;
         while p.prose_width(&entry.name.to_uppercase(), title_size, true) > 990 { title_size -= 1; }
-        p.prose(&format!("{} / {}", entry.family.to_uppercase(), first_depth(&entry)
+        p.bestiary_prose(&format!("{} / {}", entry.family.to_uppercase(), first_depth(&displayed_entry)
             .map(|d| format!("FIRST APPEARS AT DEPTH {d:02}"))
-            .unwrap_or_else(|| "COMPANION".into())),248,28,13,theme.secondary,false);
-        p.prose(&entry.name.to_uppercase(),248,48,title_size,ink,true);
+            .unwrap_or_else(|| "COMPANION".into())),248,28,13,theme.secondary,false,theme.keyline);
+        p.bestiary_prose(&entry.name.to_uppercase(),248,48,title_size,ink,true,theme.keyline);
         p.rect(248,106,64,4,theme.accent);
         if let Some((_,art))=&self.art {
             let (x,y,aw,ah)=page.art;
-            let separate_void=entry.family=="void" && relative_luminance(paper)<0.08;
-            let inset=if separate_void {12}else{0};
+            let separate_void=entry.family=="void";
+            let inset=if separate_void {theme.void_inset}else{0};
             if separate_void {
-                let field=[paper[0].max(150),paper[1].max(64),paper[2].max(70)];
+                let field=theme.void_paper;
                 if self.void_field.as_ref().map(|(color,_)|*color)!=Some(field) {
                     let mut backing=crate::embedded_assets::compact_picture(include_bytes!("../assets/ui-runtime/bestiary-ink-splash-broad.webp"));
                     for pixel in backing.rgba.chunks_exact_mut(4) {pixel[..3].copy_from_slice(&field);}
@@ -280,30 +288,30 @@ impl Manual {
         }
         let (ax,sy,aw,row)=page.stats;
         p.rect(ax,sy,aw,2,ink);
-        p.prose(if entry.id == "bastidion" { "STATS / CURRENT DEPTH" } else if entry.stats.is_none() { "STATS / CHARACTER-DEPENDENT" } else { "BASE STATS" },ax,sy+12,12,theme.secondary,false);
+        p.bestiary_prose("BASE STATS",ax,sy+12,12,theme.secondary,false,theme.keyline);
         p.rect(ax+aw-32,sy+9,30,28,[16,14,18]);
         if entry.id == "dire-bear" { p.map_identity_outline(&entry.glyph,ax+aw-30,sy+10,26,26,[190,190,190]); }
         p.map_identity(&entry.glyph,ax+aw-30,sy+10,26,26,crate::color::hex(&entry.color));
-        for (i,(label,value)) in stat_rows(&entry,depth).iter().enumerate() {
+        for (i,(label,value)) in stat_rows(&entry,self.simulation_revision).iter().enumerate() {
             let cell=aw/if row {8}else{4};
             let x=ax+(if row {i}else{i%4}) as i32*cell;
             let y=sy+45+if row {0}else{(i/4) as i32*59};
-            p.prose(label,x,y,11,theme.secondary,false);
-            p.prose(value,x,y+17,24,ink,true);
+            p.bestiary_prose(label,x,y,11,theme.secondary,false,theme.keyline);
+            p.bestiary_prose(value,x,y+17,stat_value_size(p,value,cell-6),ink,true,theme.keyline);
         }
         for (i,line) in layout.lines.iter().enumerate() {
             let col=usize::from(page.text_x.len()>1 && i>=layout.split);
             let y=page.text_y+layout.offsets[i]-if col==1 {layout.offsets[layout.split]} else {0};
             if line.heading {
-                p.prose(&line.text,page.text_x[col],y,layout.size,ink,true);
+                p.bestiary_prose(&line.text,page.text_x[col],y,layout.size,ink,true,theme.keyline);
             } else {
-                paint_content_line(p,line,page.text_x[col],y,layout.size,ink);
+                paint_content_line(p,line,page.text_x[col],y,layout.size,ink,theme.keyline);
             }
         }
         for (x,y,extra) in &page.extras {
             for (i,line) in extra.lines.iter().enumerate() {
                 let ly=y+extra.offsets[i];
-                if line.heading {p.prose(&line.text,*x,ly,extra.size,ink,true);} else {paint_content_line(p,line,*x,ly,extra.size,ink);}
+                if line.heading {p.bestiary_prose(&line.text,*x,ly,extra.size,ink,true,theme.keyline);} else {paint_content_line(p,line,*x,ly,extra.size,ink,theme.keyline);}
             }
         }
         // All UI is painted after the illustration and its ink ground.
@@ -316,40 +324,85 @@ fn paint_footer(p: &mut Painter, ink: [u8; 3]) {
     p.rect(16, 741, 1242, 3, ink);
 }
 
+// Explicit smoothly colored keyline, never a contrast-threshold color swap.
+// It starts as page color to preserve the original black text weight, and
+// reaches black before continuous fill luminance crosses the page. Selected
+// rows retain a constant black keyline against their separate background.
+// Four warm cached-glyph passes add a fixed factor to O(glyph coverage) painting.
+trait BestiaryText {
+    fn bestiary_prose(&mut self, text: &str, x: i32, y: i32, size: u16, color: [u8; 3], title: bool, keyline:[u8;3]);
+}
+impl BestiaryText for Painter {
+    fn bestiary_prose(&mut self, text: &str, x: i32, y: i32, size: u16, color: [u8; 3], title: bool, keyline:[u8;3]) {
+        for (dx,dy) in [(-1,0),(1,0),(0,-1),(0,1)] {
+            self.prose(text,x+dx,y+dy,size,keyline,title);
+        }
+        self.prose(text,x,y,size,color,title);
+    }
+}
+
+#[derive(Debug)]
 struct Theme {
     paper: [u8; 3],
     ink: [u8; 3],
     accent: [u8; 3],
     rule: [u8; 3],
     secondary: [u8; 3],
+    unread: [u8; 3],
+    keyline: [u8; 3],
+    selected_ink: [u8; 3],
+    selected_unread: [u8; 3],
+    void_paper: [u8; 3],
+    void_inset: i32,
+}
+fn mix_color(a: [u8;3], b: [u8;3], t: f64) -> [u8;3] {
+    let t=t.clamp(0.,1.);
+    std::array::from_fn(|i|(a[i] as f64+(b[i] as f64-a[i] as f64)*t).round() as u8)
 }
 impl Theme {
     fn at(depth: usize) -> Self { Self::at_depth(depth as f64) }
     fn at_depth(depth: f64) -> Self {
-        // O(1) continuous interpolation BETWEEN the established floor1/25/40 anchors.
-        // Each page is one solid color; fractional visual preview floors are not rounded.
-        let d = if depth.is_finite() { depth.clamp(0., 39.) } else { 0. };
-        let (a, b, t) = if d <= 24. {
-            ([239., 232., 204.], [143., 28., 32.], d / 24.)
-        } else { ([143., 28., 32.], [0., 0., 0.], (d - 24.) / 15.) };
-        let paper = std::array::from_fn(|i| (a[i] + (b[i] - a[i]) * t).round() as u8);
-        let dark = [0, 0, 0]; let light = [255, 255, 255];
-        let l = relative_luminance(paper);
-        let ink = if (l + 0.05) / (relative_luminance(dark) + 0.05)
-            >= (relative_luminance(light) + 0.05) / (l + 0.05) { dark } else { light };
-        let accent = [216, 234, 27];
-        let rule = std::array::from_fn(|i| ((paper[i] as u16 + ink[i] as u16) / 2) as u8);
-        let secondary=(12..=20).map(|step|std::array::from_fn(|i| {
-            ((paper[i] as u16*(20-step)+ink[i] as u16*step)/20) as u8
-        })).find(|&color| {
-            let a=relative_luminance(color);(a.max(l)+0.05)/(a.min(l)+0.05)>=4.5
-        }).unwrap_or(ink);
-        Self { paper, ink, accent, rule, secondary }
+        // O(1), piecewise-linear depth colors. Fractional previews are not rounded
+        // to whole floors. Only final 8-bit channel quantization remains.
+        let d=if depth.is_finite() {depth.clamp(0.,39.)} else {0.};
+        let paper=if d<=24. {mix_color([239,232,204],[143,28,32],d/24.)}
+            else {mix_color([143,28,32],[0,0,0],(d-24.)/15.)};
+        // The old polarity change was near floor 17. Approach its white endpoint
+        // evenly instead of replacing black with white in a single page step.
+        let ink=mix_color([0,0,0],[255,255,255],d/16.);
+        let keyline=mix_color([239,232,204],[0,0,0],d/4.);
+        let secondary=if d<=16. {ink}
+            else {mix_color([255,255,255],[222,222,222],(d-16.)/23.)};
+        let unread=if d<=16. {mix_color([205,137,20],[255,255,255],d/16.)}
+            else {mix_color([255,255,255],[255,215,65],(d-16.)/23.)};
+        // Selected rows have ink as their background. A white bridge keeps
+        // labels readable while that separate background passes through gray.
+        let selected_ink=if d<=6. {mix_color([239,232,204],[255,255,255],d/6.)}
+            else if d<=8. {[255,255,255]}
+            else if d<=16. {mix_color([255,255,255],[175,96,89],(d-8.)/8.)}
+            else {paper};
+        let selected_unread=if d<=6. {mix_color([255,215,65],[255,255,255],d/6.)}
+            else if d<=8. {[255,255,255]}
+            else {mix_color([255,255,255],[255,215,65],(d-8.)/31.)};
+        let accent=[216,234,27];
+        let rule=mix_color(paper,ink,0.5);
+        // The void backing starts as exactly the page color, then approaches
+        // the established burgundy field. No luminance-triggered appearance.
+        let void_progress=((d-18.)/10.).clamp(0.,1.);
+        let void_paper=if d<=18. {paper}
+            else {mix_color([167,79,75],[150,64,70],void_progress)};
+        let void_inset=(12.*void_progress).round() as i32;
+        Self {paper,ink,accent,rule,secondary,unread,keyline,selected_ink,selected_unread,void_paper,void_inset}
     }
 }
 fn relative_luminance(rgb: [u8;3]) -> f64 {
     let c = rgb.map(|v| { let s=v as f64/255.; if s<=0.04045 {s/12.92} else {((s+0.055)/1.055).powf(2.4)} });
     c[0]*0.2126+c[1]*0.7152+c[2]*0.0722
+}
+/// O(D), D <= 40 authored depths; lists remain sorted and duplicate-free.
+fn compressed_ranges(depths:&[usize])->Vec<usize> {
+    let mut mapped:Vec<_>=(1..=20).filter(|d| depths.contains(&(corpse_core::fast_mode::content_depth(*d) as usize))).map(|d|d as usize).collect();
+    mapped.sort_unstable();mapped.dedup();mapped
 }
 fn first_depth(entry: &Entry) -> Option<usize> {
     entry.ordinary_depths.iter().chain(&entry.conditional_depths).copied().min()
@@ -383,64 +436,140 @@ fn trim_transparent_margin(art:Picture)->Picture {
     for y in y0..y1 {rgba.extend_from_slice(&art.rgba[(y*art.w+x0)*4..(y*art.w+x1)*4]);}
     Picture {w:x1-x0,h:y1-y0,rgba}
 }
-fn stat_rows(entry: &Entry, depth_index: usize) -> Vec<(&'static str, String)> {
+const STAT_LABELS: [&str; 7] = ["HP", "Energy", "Accuracy", "Damage", "Dodge", "DR", "Perception"];
+
+/// The current catalog owns R52 natural/context floor rows, not the Bestiary's
+/// historical appearance metadata. Exact context keys never borrow other births.
+fn birth_depths(entry: &Entry, revision: f64) -> Vec<usize> {
+    if revision == 52. {
+        let key = if entry.id == "saidribee-queen" { "nest:saidribee-queen" } else { &entry.id };
+        let depths: Vec<_> = corpse_core::balance52::profiles().iter()
+            .filter(|r| r.kind == key).map(|r| r.floor as usize).collect();
+        if !depths.is_empty() { return depths; }
+    }
     if entry.id.starts_with("zillennia:") {
-        let depth=if entry.conditional_depths.contains(&(depth_index+1)) {depth_index+1}
-            else {*entry.conditional_depths.first().expect("Godbeast quality depth")};
-        if let Ok(actor)=corpse_core::population::zillennia_revision(depth as u32,33.0) {
-            let stats=&actor.stats;
-            return [
-                ("HP",actor.max_hp),("Energy",stats.max_energy),("Accuracy",stats.accuracy),
-                ("Damage",crate::stat_presentation::enemy_damage(&actor)),("Dodge",stats.dodge),
-                ("DR",stats.dr),("Perception",stats.perception),
-            ].into_iter().map(|(label,value)|(label,value.to_string())).collect();
-        }
+        return corpse_core::population::catalog().zillennia.iter().enumerate()
+            .filter(|(_, a)| a.zillennia_quality.as_ref().is_some_and(|q| entry.id == format!("zillennia:{q}")))
+            .map(|(i, _)| i + 1).collect();
     }
-    // Same immutable per-depth birth template as create_population_actor; never read a Run.
     if entry.id == "bastidion" {
-        let actor = &corpse_core::population::catalog().fungi[depth_index];
-        let stats = &actor.stats;
-        return [
-            ("HP", actor.max_hp), ("Energy", stats.max_energy), ("Accuracy", stats.accuracy),
-            ("Damage", crate::stat_presentation::enemy_damage(&actor)), ("Dodge", stats.dodge),
-            ("DR", stats.dr), ("Perception", stats.perception),
-        ].into_iter().map(|(label, value)| (label, value.to_string())).collect();
-    }
-    // Current values come from the exact revision33 birth constructor, not a
-    // second handwritten stat table. Special/variable entries stay authored.
-    if corpse_core::population::catalog().actors.contains_key(&entry.id) || corpse_core::new_creatures::template(&entry.id).is_some() {
-        if let Ok(actor) = corpse_core::population::create_actor_revision(&entry.id, 0., 0., 0., false, 33.) {
-            let stats = &actor.stats;
-            return [
-                ("HP", actor.max_hp), ("Energy", stats.max_energy), ("Accuracy", stats.accuracy),
-                ("Damage", crate::stat_presentation::enemy_damage(&actor)), ("Dodge", stats.dodge),
-                ("DR", stats.dr), ("Perception", stats.perception),
-            ].into_iter().map(|(label, value)| (label, value.to_string())).collect();
+        if revision >= 51. {
+            // Cold-only immutable admission cache. Pool construction/scan costs
+            // are documented separately; no geometry or hidden Run is inspected.
+            static R51: std::sync::OnceLock<Vec<usize>> = std::sync::OnceLock::new();
+            static R52: std::sync::OnceLock<Vec<usize>> = std::sync::OnceLock::new();
+            return (if revision == 52. { &R52 } else { &R51 }).get_or_init(|| {
+                fungus_setup_depths(revision).into_iter().filter(|&depth|
+                    corpse_core::fungus_feasts::victim_pools(depth as u32, revision)
+                        .is_ok_and(|pools| pools.iter().all(|pool| !pool.is_empty()))).collect()
+            }).clone();
         }
+        return fungus_setup_depths(revision);
     }
-    let stat = |key: &str| {
-        entry
-            .stats
-            .as_ref()
-            .and_then(|s| s.get(key))
-            .map(|v| v.to_string())
-            .unwrap_or_else(|| "Varies".into())
+    let population = corpse_core::population::catalog();
+    if corpse_core::ordinary_roster::species_revision(revision).iter().any(|s| s.id == entry.id)
+        || population.pairs.values().any(|id| id == &entry.id) {
+        return (1..=40).filter(|&depth| corpse_core::ordinary_roster::candidates_revision(depth, true, revision)
+            .is_ok_and(|recipes| recipes.iter().any(|r| r.kinds.contains(&entry.id))))
+            .map(|d| d as usize).collect();
+    }
+    if entry.id.contains("ichor-") {
+        return (1..=40).filter(|&depth| corpse_core::ichor::eligible_fish_kinds(depth, revision).contains(&entry.id.as_str()))
+            .map(|d| d as usize).collect();
+    }
+    // Remaining fixed special births have their authored source floors; no
+    // depth-dependent profile is inferred when an authoritative birth is absent.
+    let mut depths: Vec<_> = entry.ordinary_depths.iter().chain(&entry.conditional_depths)
+        .copied().filter(|d| (1..=40).contains(d)).collect();
+    depths.sort_unstable(); depths.dedup(); depths
+}
+fn fungus_setup_depths(revision: f64) -> Vec<usize> {
+    (1..=40).filter(|&depth| corpse_core::generation::setup_definitions().iter().any(|setup|
+        // Setup24 stamps its fungus directly; frozen metadata has no kinds.
+        (setup.id == 24 || setup.kinds.iter().any(|kind| corpse_core::fungus_feasts::is_fungus(kind)))
+            && corpse_core::generation::setup_eligible_at_depth_revision(setup, depth, revision).unwrap_or(false)))
+        .map(|d| d as usize).collect()
+}
+
+/// Reconstruct only a public, unwounded birth template. The explicit special
+/// cases mirror startup/pocket births; context offspring are not natural actors.
+fn birth_actor(entry: &Entry, depth: usize, revision: f64) -> Option<corpse_core::Actor> {
+    if entry.id.starts_with("zillennia:") {
+        return corpse_core::population::zillennia_revision(depth as u32, revision).ok()
+            .filter(|a| a.zillennia_quality.as_ref().is_some_and(|q| entry.id == format!("zillennia:{q}")));
+    }
+    if entry.id == "bastidion" {
+        let mut actor=corpse_core::population::catalog().fungi.get(depth.checked_sub(1)?).cloned()?;
+        actor.stats.accuracy=corpse_core::combat::creature_birth_accuracy(revision,actor.stats.accuracy);
+        actor.stats.dodge=corpse_core::combat::creature_birth_dodge(revision,actor.stats.dodge);
+        return Some(actor);
+    }
+    let (birth_revision, profile_key) = match entry.id.as_str() {
+        // Keep the Sphinx chamber body; add only the R52 Accuracy/Dodge baselines below.
+        "sphinx" => (29., entry.id.as_str()),
+        // The Queen has one public birth source: a Nest, introduced in revision33.
+        "saidribee-queen" if revision >= 33. => (33., "nest:saidribee-queen"),
+        "saidribee-queen" => return None,
+        _ => (revision, entry.id.as_str()),
     };
-    vec![
-        (
-            "HP",
-            entry
-                .health
-                .map(|v| v.to_string())
-                .unwrap_or_else(|| "Varies".into()),
-        ),
-        ("Energy", stat("maxEnergy")),
-        ("Accuracy", stat("accuracy")),
-        ("Damage", entry.stats.as_ref().and_then(|s|s.get("offense")).map(|v|corpse_core::combat::nearest_damage((10.+v)*0.5).to_string()).unwrap_or_else(||"Varies".into())),
-        ("Dodge", stat("dodge")),
-        ("DR", stat("dr")),
-        ("Perception", stat("perception")),
-    ]
+    let mut actor = corpse_core::population::create_actor_revision(&entry.id, 0., 0., 0., false, birth_revision).ok()?;
+    if entry.id == "sphinx" {
+        actor.stats.accuracy=corpse_core::combat::creature_birth_accuracy(revision,actor.stats.accuracy);
+        actor.stats.dodge=corpse_core::combat::creature_birth_dodge(revision,actor.stats.dodge);
+    }
+    corpse_core::balance52::apply_new_actor_kind(&mut actor, profile_key, depth as f64, revision);
+    Some(actor)
+}
+fn actor_stat_values(actor: &corpse_core::Actor, revision: f64) -> [f64; 7] {
+    let stats = &actor.stats;
+    [actor.max_hp, stats.max_energy, stats.accuracy,
+        crate::stat_presentation::enemy_damage_revision(actor, revision), stats.dodge, stats.dr, stats.perception]
+}
+/// After floor admission, O(D * (A + T + R)): D <= 40 floors, A cloned actor
+/// fields, T legacy tuning and R current birth rows. O(A + D + S) scratch, S = 7.
+/// Floor/recipe and cold-cache helper costs: docs/revision52-bestiary-stats.md.
+/// No live actors, RNG, discovery changes or combat calibration from page colors.
+fn stat_rows(entry: &Entry, revision: f64) -> Vec<(&'static str, String)> {
+    let depths = birth_depths(entry, revision);
+    let mut bounds: Option<([f64; 7], [f64; 7])> = None;
+    let mut uses_energy = false;
+    // No public birth is not proof of incapability: character-dependent pages
+    // retain Varies. A supported no-depth template may still omit unused Energy.
+    let unknown_energy = depths.is_empty() && birth_actor(entry, 1, revision).is_none();
+    if depths.is_empty() {
+        uses_energy = birth_actor(entry, 1, revision).is_some_and(|a|
+            crate::monster_status_ui::energy_capable(revision, &a));
+    }
+    for depth in depths {
+        let Some(actor) = birth_actor(entry, depth, revision) else {
+            // Unsupported/character-dependent entries must not borrow stale JSON stats.
+            return STAT_LABELS.into_iter().map(|label| (label, "Varies".into())).collect();
+        };
+        uses_energy |= crate::monster_status_ui::energy_capable(revision, &actor);
+        let values = actor_stat_values(&actor, revision);
+        if let Some((low, high)) = bounds.as_mut() {
+            for i in 0..7 { low[i] = low[i].min(values[i]); high[i] = high[i].max(values[i]); }
+        } else { bounds = Some((values, values)); }
+    }
+    STAT_LABELS.into_iter().enumerate().filter(|(_, label)|
+        *label != "Energy" || uses_energy || unknown_energy).map(|(i, label)| {
+        let value = match bounds {
+            Some((low, high)) if low[i] == high[i] => display_stat_number(low[i]),
+            Some((low, high)) => format!("{}–{}", display_stat_number(low[i]), display_stat_number(high[i])),
+            None => "Varies".into(),
+        };
+        (label, value)
+    }).collect()
+}
+// Legacy templates can retain fractional stats. Round only the rendered text,
+// never actor values or gameplay, and do not print repeating binary fractions.
+fn display_stat_number(value: f64) -> String {
+    let value = format!("{value:.2}");
+    let compact = value.trim_end_matches('0').trim_end_matches('.');
+    if compact == "-0" { "0".into() } else { compact.into() }
+}
+fn stat_value_size(p: &Painter, value: &str, width: i32) -> u16 {
+    (12..=24).rev().find(|size| p.prose_width(value, *size, true) <= width).unwrap_or(12)
 }
 // Remove only complete, byte-identical leading sentences already shown in APPEARANCE.
 // A suffix can be reconstructed losslessly with its shared authored prefix.
@@ -516,19 +645,19 @@ fn body_lines(p: &Painter, body: &str, width: i32, size: u16) -> Vec<ContentLine
         ContentLine { text, heading: false, emphasis }
     }).collect()
 }
-fn paint_content_line(p: &mut Painter, line: &ContentLine, x: i32, y: i32, size: u16, ink: [u8; 3]) {
+fn paint_content_line(p: &mut Painter, line: &ContentLine, x: i32, y: i32, size: u16, ink: [u8; 3], keyline:[u8;3]) {
     let mut start = 0;
     let mut cursor = x;
     for range in &line.emphasis {
         let normal = &line.text[start..range.start];
-        p.prose(normal, cursor, y, size, ink, false);
+        p.bestiary_prose(normal, cursor, y, size, ink, false,keyline);
         cursor += p.prose_width(normal, size, false);
         let bold = &line.text[range.clone()];
-        p.prose(bold, cursor, y, size, ink, true);
+        p.bestiary_prose(bold, cursor, y, size, ink, true,keyline);
         cursor += p.prose_width(bold, size, true);
         start = range.end;
     }
-    p.prose(&line.text[start..], cursor, y, size, ink, false);
+    p.bestiary_prose(&line.text[start..], cursor, y, size, ink, false,keyline);
 }
 struct PageLayout {
     art:(i32,i32,i32,i32),
@@ -597,7 +726,7 @@ fn fit_content_part(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i3
             };
             section(
                 &format!("{}{}", mechanic_heading(mechanic), cost),
-                mechanic.text.clone(),
+                effect_ranges::page_text(entry, mechanic).to_owned(),
             );
         }
         let mut sources = Vec::new();
@@ -855,23 +984,14 @@ mod tests {
                 assert_eq!(format!("{prefix}{suffix}"), form.description);
             }
             for mechanic in &e.mechanics {
-                assert!(body.contains(&mechanic.text), "{}", e.id);
+                assert!(body.contains(effect_ranges::page_text(e, mechanic)), "{}", e.id);
             }
             for source in &e.sources {
                 assert!(redundant_source(source) || body.contains(&source.text), "{}", e.id);
             }
-            assert_eq!(
-                stat_rows(e, 0).iter().map(|r| r.0).collect::<Vec<_>>(),
-                [
-                    "HP",
-                    "Energy",
-                    "Accuracy",
-                    "Damage",
-                    "Dodge",
-                    "DR",
-                    "Perception"
-                ]
-            );
+            let labels = stat_rows(e, 52.).iter().map(|r| r.0).collect::<Vec<_>>();
+            assert_eq!(labels.iter().copied().filter(|s| *s != "Energy").collect::<Vec<_>>(),
+                ["HP", "Accuracy", "Damage", "Dodge", "DR", "Perception"]);
         }
     }
     #[test]
@@ -903,61 +1023,261 @@ mod tests {
             assert_eq!(actual.rgba,expected.rgba,"alpha and RGB must not be re-keyed: {id}");
         }
     }
+    fn display_values(actor: &corpse_core::Actor, revision: f64) -> [f64; 7] {
+        let base = actor.conditions.get("weaponDamage").copied().unwrap_or(10.)
+            + actor.stats.offense * actor.conditions.get("weaponOffenseMultiplier").copied().unwrap_or(1.);
+        let damage = if revision >= 51. { (base * 0.5).max(0.).round() }
+            else { (base * 0.5).ceil().max(0.) };
+        [actor.max_hp, actor.stats.max_energy, actor.stats.accuracy, damage,
+            actor.stats.dodge, actor.stats.dr, actor.stats.perception]
+    }
+    fn test_floor(depth: usize) -> corpse_core::Floor {
+        corpse_core::Floor { depth: depth as f64, width: 5.0.into(), height: 5.0.into(),
+            domain: "Dungeon".into(), tiles: vec!["floor".into(); 25], ..Default::default() }
+    }
+    fn assert_ranges(entry: &Entry, actors: &[corpse_core::Actor], revision: f64) {
+        assert!(!actors.is_empty());
+        let values: Vec<_> = actors.iter().map(|a| display_values(a, revision)).collect();
+        let rows = stat_rows(entry, revision);
+        let energy = actors.iter().any(|a| crate::monster_status_ui::energy_capable(revision, a));
+        assert_eq!(rows.iter().map(|r| r.0).collect::<Vec<_>>(),
+            STAT_LABELS.into_iter().filter(|s| *s != "Energy" || energy).collect::<Vec<_>>());
+        for (label, actual) in rows {
+            let i = STAT_LABELS.iter().position(|s| *s == label).unwrap();
+            let low = values.iter().map(|v| v[i]).fold(f64::INFINITY, f64::min);
+            let high = values.iter().map(|v| v[i]).fold(f64::NEG_INFINITY, f64::max);
+            let expected = if low == high { display_stat_number(low) }
+                else { format!("{}–{}", display_stat_number(low), display_stat_number(high)) };
+            assert_eq!(actual, expected, "{} revision{revision} {label}", entry.id);
+        }
+    }
     #[test]
-    fn bastidion_uses_actual_birth_template_at_every_depth() {
+    fn monster_energy_rows_use_public_revisioned_capabilities() {
+        let manual=Manual::new();
+        for (id, expected) in [("rat",false),("cave-bat",false),("vampire",false),
+            ("chimera",false),("hemogoblin-mech",false),("horn-2",false),("bastidion",false),
+            ("witch",true),("dryad",true),("bombardier",true),("horn-1",true),("dragon",true)] {
+            let entry=manual.catalog.entries.iter().find(|e|e.id==id).unwrap();
+            assert_eq!(stat_rows(entry,52.).iter().any(|r|r.0=="Energy"),expected,"{id}");
+        }
+        let dragon=manual.catalog.entries.iter().find(|e|e.id=="dragon").unwrap();
+        assert!(!stat_rows(dragon,51.).iter().any(|r|r.0=="Energy"));
+        assert!(stat_rows(dragon,52.).iter().any(|r|r.0=="Energy"));
+    }
+    #[test]
+    fn r52_bestiary_natural_and_legacy_stats_match_population_births() {
         let manual = Manual::new();
-        let entry = manual.catalog.entries.iter().find(|e| e.id == "bastidion").unwrap();
-        let catalog = corpse_core::population::catalog();
-        for depth in 0..40 {
-            let actor = &catalog.fungi[depth];
-            let expected = [actor.max_hp, actor.stats.max_energy, actor.stats.accuracy,
-                ((actor.conditions.get("weaponDamage").copied().unwrap_or(10.) + actor.stats.offense * actor.conditions.get("weaponOffenseMultiplier").copied().unwrap_or(1.))*0.5).round(), actor.stats.dodge, actor.stats.dr, actor.stats.perception];
-            let rows = stat_rows(entry, depth);
-            for (row, expected) in rows.iter().zip(expected) { assert_eq!(row.1, expected.to_string()); }
-        }
-        assert_eq!(stat_rows(entry, 0)[0].1, "154");
-        assert_eq!(stat_rows(entry, 0).len(), 7);
-        assert_eq!(stat_rows(entry, 39)[0].1, "622");
-        assert_eq!(stat_rows(entry, 39).len(), 7);
-    }
-    #[test]
-    fn balanced_entries_show_current_birth_stats_without_editing_authored_assets() {
-        let manual=Manual::new();
-        assert!(!manual.catalog.entries.iter().any(|e|e.id=="ichor-fish"));
-        let mut count=0;
-        for entry in &manual.catalog.entries {
-            if !(corpse_core::population::catalog().actors.contains_key(&entry.id) || corpse_core::new_creatures::template(&entry.id).is_some()) || entry.id=="bastidion" { continue; }
-            let actor=corpse_core::population::create_actor_revision(&entry.id,0.,0.,0.,false,33.).unwrap();
-            let expected=[actor.max_hp,actor.stats.max_energy,actor.stats.accuracy,
-                ((actor.conditions.get("weaponDamage").copied().unwrap_or(10.) + actor.stats.offense * actor.conditions.get("weaponOffenseMultiplier").copied().unwrap_or(1.))*0.5).round(),actor.stats.dodge,actor.stats.dr,actor.stats.perception];
-            for (row,expected) in stat_rows(entry,0).iter().zip(expected) {
-                assert_eq!(row.1,expected.to_string(),"{} {}",entry.id,row.0);
+        for revision in [29., 33., 42., 50., 51., 52.] {
+            for entry in manual.catalog.entries.iter().filter(|e| !e.id.starts_with("zillennia:")
+                && !["sphinx", "saidribee-queen"].contains(&e.id.as_str())) {
+                let mut actors = Vec::new();
+                for depth in birth_depths(entry, revision) {
+                    let mut floor = test_floor(depth); let mut next_id = 1.;
+                    let mut rng = corpse_core::rng::GenerationRng::new(1);
+                    let expected = corpse_core::population::create_population_actor_revision(
+                        &mut next_id, &mut floor, &entry.id, 12, false, &mut rng, revision).ok();
+                    let actual = birth_actor(entry, depth, revision);
+                    assert_eq!(actual.is_some(), expected.is_some(), "{} r{revision}", entry.id);
+                    if let (Some(actual), Some(expected)) = (actual, expected) {
+                        assert_eq!(actor_stat_values(&actual, revision), display_values(&expected, revision),
+                            "{} floor{depth} r{revision}", entry.id);
+                        actors.push(expected);
+                    }
+                }
+                if actors.is_empty() { assert!(stat_rows(entry, revision).iter().all(|r| r.1 == "Varies")); }
+                else { assert_ranges(entry, &actors, revision); }
             }
-            count+=1;
         }
-        assert_eq!(count,71); // 68 original fixed pages plus the three revision33 creatures.
+        let rat = manual.catalog.entries.iter().find(|e| e.id == "rat").unwrap();
+        assert_eq!(stat_rows(rat, 52.)[0].1, "40–82");
+        assert_eq!(stat_rows(rat, 52.).iter().find(|r| r.0 == "Damage").unwrap().1, "14–24");
+        assert_ne!(stat_rows(rat, 52.), stat_rows(rat, 51.));
+        assert_ne!(birth_actor(rat, 1, 52.).unwrap().max_hp, birth_actor(rat, 3, 52.).unwrap().max_hp);
     }
     #[test]
-    fn zillennia_pages_show_their_current_depth_quality_actor() {
-        let manual=Manual::new();
-        for entry in manual.catalog.entries.iter().filter(|e|e.id.starts_with("zillennia:")) {
-            for depth in &entry.conditional_depths {
-                let actor=corpse_core::population::zillennia_revision(*depth as u32,33.0).unwrap();
-                assert_eq!(entry.id,format!("zillennia:{}",actor.zillennia_quality.as_ref().unwrap()));
-                let expected=[actor.max_hp,actor.stats.max_energy,actor.stats.accuracy,
-                    ((actor.conditions.get("weaponDamage").copied().unwrap_or(10.) + actor.stats.offense * actor.conditions.get("weaponOffenseMultiplier").copied().unwrap_or(1.))*0.5).round(),actor.stats.dodge,actor.stats.dr,actor.stats.perception];
-                for (row,expected) in stat_rows(entry,depth-1).iter().zip(expected) {
-                    assert_eq!(row.1,expected.to_string(),"{} at{} {}",entry.id,depth,row.0);
+    fn r52_bestiary_fungus_and_zillennia_use_real_depth_templates() {
+        let manual = Manual::new();
+        for revision in [29., 33., 51., 52.] {
+            let fungus = manual.catalog.entries.iter().find(|e| e.id == "bastidion").unwrap();
+            let actors: Vec<_> = birth_depths(fungus, revision).iter()
+                .map(|&d| {
+                    let mut a=corpse_core::population::catalog().fungi[d-1].clone();
+                    if revision >= 52. { a.stats.accuracy += 15.; a.stats.dodge = (10. + a.stats.dodge).max(10.); }
+                    a
+                }).collect();
+            assert_ranges(fungus, &actors, revision);
+            assert_eq!(stat_rows(fungus, revision)[0].1, if revision >= 51. { "154–574" } else { "154–622" });
+            for entry in manual.catalog.entries.iter().filter(|e| e.id.starts_with("zillennia:")) {
+                let actors: Vec<_> = entry.conditional_depths.iter().map(|&depth| {
+                    let actor = corpse_core::population::zillennia_revision(depth as u32, revision).unwrap();
+                    assert_eq!(entry.id, format!("zillennia:{}", actor.zillennia_quality.as_ref().unwrap()));
+                    actor
+                }).collect();
+                assert_ranges(entry, &actors, revision);
+            }
+        }
+    }
+    #[test]
+    fn r52_bestiary_fractional_legacy_numbers_are_concise_display_only() {
+        assert_eq!(display_stat_number(-50. / 3.), "-16.67");
+        assert_eq!(display_stat_number(1000.), "1000");
+        assert_eq!(display_stat_number(1.25), "1.25");
+        assert_eq!(display_stat_number(-0.00001), "0");
+        assert_eq!(display_stat_number(3.5), "3.5");
+    }
+    #[test]
+    fn r52_bestiary_fungus_setup_metadata_matches_its_executable_stencil() {
+        let setup = corpse_core::generation::setup_definitions().iter().find(|s| s.id == 24).unwrap();
+        assert!(setup.kinds.is_empty());
+        let mut floor = corpse_core::Floor { depth: 1., width: 29.0.into(), height: 29.0.into(),
+            tiles: vec!["floor".into(); 29*29], ..Default::default() };
+        corpse_core::generation::stamp_setup(&mut floor, setup.id, 14, 14, &setup.kinds).unwrap();
+        assert!(floor.setup_spawns.as_ref().unwrap().iter().any(|s| corpse_core::fungus_feasts::is_fungus(&s.kind)));
+        assert_eq!(fungus_setup_depths(52.), (1..=40).collect::<Vec<_>>());
+    }
+    #[test]
+    fn r52_bestiary_ranges_ignore_stale_manual_floors_and_fungus_requires_both_feasts() {
+        let manual = Manual::new();
+        for id in ["rat", "bastidion", "zillennia:child", "saidribee-queen"] {
+            let mut entry = manual.catalog.entries.iter().find(|e| e.id == id).unwrap().clone();
+            let rows = stat_rows(&entry, 52.); let depths = birth_depths(&entry, 52.);
+            entry.ordinary_depths = vec![40]; entry.conditional_depths.clear();
+            assert_eq!(stat_rows(&entry, 52.), rows, "{id}"); assert_eq!(birth_depths(&entry, 52.), depths);
+        }
+        let fungus = manual.catalog.entries.iter().find(|e| e.id == "bastidion").unwrap();
+        for revision in [51., 52.] {
+            let depths = birth_depths(fungus, revision);
+            assert_eq!(depths, (1..=36).collect::<Vec<_>>());
+            for depth in 1..=40 {
+                let pools = corpse_core::fungus_feasts::victim_pools(depth, revision).unwrap();
+                assert_eq!(depths.contains(&(depth as usize)), pools.iter().all(|p| !p.is_empty()));
+                assert!(pools.iter().flatten().all(|k| !k.starts_with("zillennia") && k != "sphinx"));
+            }
+        }
+    }
+    #[test]
+    fn r52_bestiary_context_only_entries_match_their_actual_public_birth_path() {
+        let manual = Manual::new();
+        let queen = manual.catalog.entries.iter().find(|e| e.id == "saidribee-queen").unwrap();
+        for revision in [33., 42., 50., 51., 52.] {
+            let mut queens = Vec::new();
+            for &depth in &queen.conditional_depths {
+                let mut floor = test_floor(depth);
+                floor.pocket_biomes = vec![corpse_core::pocket_biomes::PocketBiome {
+                    theme: "saidribee-nest".into(), queen_cell: Some(12), honey_cell: Some(13), ..Default::default()
+                }].into();
+                let mut actors = Vec::new(); let mut ground = Vec::new(); let mut next_id = 1.;
+                corpse_core::pocket_biomes::populate_revision(&mut floor, &mut actors, &mut ground, &mut next_id, revision).unwrap();
+                assert_eq!(actors.len(), 1);
+                assert_eq!(actor_stat_values(&birth_actor(queen, depth, revision).unwrap(), revision), display_values(&actors[0], revision));
+                queens.push(actors.remove(0));
+            }
+            assert_ranges(queen, &queens, revision);
+        }
+        assert_eq!(stat_rows(queen, 52.)[0].1, "430–694");
+        assert!(stat_rows(queen, 29.).iter().all(|r| r.1 == "Varies"));
+        let sphinx = manual.catalog.entries.iter().find(|e| e.id == "sphinx").unwrap();
+        let guardian = corpse_core::population::create_actor("sphinx", 0., 0., 0., false).unwrap();
+        for revision in [29., 33., 42., 50., 51., 52.] {
+            let mut expected=guardian.clone();
+            if revision >= 52. { expected.stats.accuracy += 15.; expected.stats.dodge = (10. + expected.stats.dodge).max(10.); }
+            assert_ranges(sphinx, &[expected], revision);
+        }
+        // Do not invent a profile for a character-dependent or unsupported page.
+        let mut variable = queen.clone(); variable.id = "character-dependent".into();
+        variable.stats = None; variable.health = None;
+        assert!(stat_rows(&variable, 52.).iter().all(|r| r.1 == "Varies"));
+        variable.conditional_depths.clear();
+        assert!(stat_rows(&variable, 52.).iter().all(|r| r.1 == "Varies"));
+    }
+    #[test]
+    fn r52_bestiary_natural_ranges_do_not_mix_summon_or_nest_profiles() {
+        let manual = Manual::new();
+        for (kind, context) in [("short-saidri", "queen:short-saidri"),
+            ("saidri-guardian", "nest:saidri-guardian"), ("pale:Jackal", "birther:pale:Jackal"),
+            ("night-crawler", "witch:night-crawler")] {
+            let entry = manual.catalog.entries.iter().find(|e| e.id == kind).unwrap();
+            let profiles: Vec<_> = corpse_core::balance52::profiles().iter().filter(|r| r.kind == kind).collect();
+            let actors: Vec<_> = profiles.iter().map(|r| birth_actor(entry, r.floor as usize, 52.).unwrap()).collect();
+            assert_ranges(entry, &actors, 52.);
+            let contextual = corpse_core::balance52::profile(context, 30.).unwrap();
+            let natural = birth_actor(entry, 30, 52.).unwrap();
+            assert_ne!((natural.stats.offense, natural.max_hp, natural.stats.accuracy),
+                (contextual.offense, 100. + 6. * contextual.defense, contextual.accuracy + 15.));
+        }
+    }
+    #[test]
+    fn r52_bestiary_ichor_stats_match_event_births() {
+        let manual = Manual::new();
+        for revision in [29., 33., 42., 51., 52.] {
+            for depth in 4..=40 {
+                let kinds = corpse_core::ichor::eligible_fish_kinds(depth, revision);
+                for (i, kind) in kinds.iter().enumerate() {
+                    let entry = manual.catalog.entries.iter().find(|e| e.id == *kind).unwrap();
+                    let fish = corpse_core::ichor::make_fish_revision(0., 0., 0., depth as f64,
+                        (i as f64 + 0.5) / kinds.len() as f64, revision);
+                    assert_eq!(fish.creature_kind.as_ref().unwrap(), kind);
+                    assert_eq!(actor_stat_values(&birth_actor(entry, depth as usize, revision).unwrap(), revision),
+                        display_values(&fish, revision), "{kind} r{revision}");
                 }
             }
         }
     }
     #[test]
-    fn character_dependent_companions_never_invent_stats() {
-        let manual = Manual::new();
-        for entry in manual.catalog.entries.iter().filter(|e| e.stats.is_none()) {
-            assert!(stat_rows(entry, 0).iter().skip(1).all(|(_, value)| value == "Varies"));
-            if entry.health.is_none() { assert_eq!(stat_rows(entry, 0)[0].1, "Varies"); }
+    fn r52_bestiary_revision_changes_preserve_discovery_and_no_active_defaults_current() {
+        let mut manual = Manual::new(); manual.progress.discover(["rat"]);
+        assert!(manual.select_id("rat"));
+        let selected = manual.selected; let color_depth = manual.depth; let ids = manual.ids().to_vec();
+        assert_eq!(manual.simulation_revision, 52.);
+        let current = stat_rows(manual.entry().unwrap(), manual.simulation_revision);
+        manual.set_simulation_revision(Some(29.));
+        assert_ne!(stat_rows(manual.entry().unwrap(), manual.simulation_revision), current);
+        manual.set_simulation_revision(None);
+        assert_eq!(stat_rows(manual.entry().unwrap(), manual.simulation_revision), current);
+        assert!(manual.progress.seen("rat") && manual.progress.unread("rat"));
+        assert_eq!((manual.selected, manual.depth), (selected, color_depth)); assert_eq!(manual.ids(), ids);
+    }
+    #[test]
+    fn r52_bestiary_rebalanced_spell_copy_has_no_stale_fixed_coefficients() {
+        let manual = Manual::new(); let mut checked = 0;
+        for entry in &manual.catalog.entries {
+            if corpse_core::balance52::profiles().iter().any(|r| r.kind == entry.id
+                && (r.heal_amount.is_some() || r.special_damage.is_some())) {
+                for mechanic in &entry.mechanics {
+                    assert!(!mechanic.text.chars().any(|c| c.is_ascii_digit()), "{}: {}", entry.id, mechanic.text);
+                }
+                checked += 1;
+            }
+        }
+        assert_eq!(checked, 2); // Dryad healing and Valta moonbeam; costs remain authored.
+    }
+    #[test]
+    fn r52_bestiary_range_labels_fit_every_authored_page_and_capture_aspects() {
+        let mut manual = Manual::new(); manual.preview_all(); let mut p = Painter::new();
+        for id in manual.ids().to_vec() {
+            manual.select_id(&id); manual.prepare_art(); let entry = manual.entry().unwrap();
+            let page = resolve_page(&p, entry, manual.art.as_ref().map(|(_, a)| a));
+            let cell = page.stats.2 / if page.stats.3 {8} else {4};
+            for revision in [29., 33., 42., 50., 51., 52.] {
+                for (_, value) in stat_rows(entry, revision) {
+                    let size = stat_value_size(&p, &value, cell - 6);
+                    assert!(p.prose_width(&value, size, true) <= cell - 6, "{id}: {value}");
+                }
+            }
+        }
+        let directory = std::env::var("CORPSE_BESTIARY_REVIEW").ok();
+        if let Some(directory) = &directory { std::fs::create_dir_all(directory).unwrap(); }
+        for (aspect, width, height) in [("wide",1920,1080), ("portrait",900,1200)] {
+            p.try_resize(width,height).unwrap(); p.set_responsive_canvas(false);
+            for (id, revision) in [("rat",52.), ("dragon",52.), ("bastidion",52.), ("saidribee-queen",52.), ("rat",51.)] {
+                manual.select_id(id); manual.set_simulation_revision(Some(revision)); manual.paint(&mut p);
+                if let Some(directory) = &directory {
+                    let file = std::fs::File::create(format!("{directory}/bestiary-stats-{aspect}-{id}-r{revision}.png")).unwrap();
+                    let mut encoder = png::Encoder::new(file,p.width as u32,p.height as u32);
+                    encoder.set_color(png::ColorType::Rgba); encoder.set_depth(png::BitDepth::Eight);
+                    encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+                }
+            }
         }
     }
     #[test]
@@ -1030,9 +1350,9 @@ mod tests {
                 "ichor-fish-standard" | "lesser-ichor-fish" | "greater-ichor-fish" => "A piranha made of gruesome god-metal. It is a creature alive only to serve its godbeast master, and for no other reason.",
                 "zillennia:child" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one is smaller than average, but still of incredible eldritch power.",
                 "zillennia:infant" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one, dangerous as it is, is of diminutive size.",
-                "pale:Screamer" => "A creature of the pale species, most noticeable for its large mouth and piercing scream, which emboldens it's fellows.",
-                "pale:Spitter" => "An ancient low beast. It's phallic appendage can spew acid and gas to subdue it's enemies.",
-                "pale:Birther" => "A hideous low beast, which spawns other creatures from its vagina like head. It's large midsection deflates as it births its spawn.",
+                "pale:Screamer" => "A creature of the pale species, most noticeable for its large mouth and piercing scream, which emboldens its fellows.",
+                "pale:Spitter" => "An ancient low beast. Its phallic appendage can spew acid and gas to subdue its enemies.",
+                "pale:Birther" => "A hideous low beast, which spawns other creatures from its vagina like head. Its large midsection deflates as it births its spawn.",
                 "giant-beetle" => "A predatory beetle the size of a horse, with giant wings. It hunts humanoids which wander into the Flesh.",
                 "glim" => "A creature made of adhesive, flammable slime. It glides through the slime it places on the ground, unable to move otherwise.",
                 "bear" => "A mammalian beast which roams the Flesh, eating living creatures and carcasses alike.",
@@ -1043,10 +1363,10 @@ mod tests {
                 "horn-2" => "A two-horned creature from another reality which wishes to gore all living things.",
                 "horn-4" => "A four-horned creature from another reality which wishes to gore all living things.",
                 "horn-6" => "A six-horned creature from another reality which wishes to gore all living things.",
-                "lesser-ichor-shark" | "ichor-shark" | "greater-ichor-shark" => "A huge, terrifying fish with rows of sharp, dagger like teeth. It's body is made from the same toxic god-liquid in which it swims.",
+                "lesser-ichor-shark" | "ichor-shark" | "greater-ichor-shark" => "A huge, terrifying fish with rows of sharp, dagger like teeth. Its body is made from the same toxic god-liquid in which it swims.",
                 "sphinx" => "A keeper of secrets and riddles. Sphinxes stand as timeless sentinels over their treasure, and only through guile can they be plundered.",
                 "hemogoblin-mech" => "The result of true ingenuity attached to malevolent power and purpose.",
-                "hemogoblin-inventor" => "A goblin, rended of its flesh, but not it's inventive habits. It creates mechanisms of malice with which to end human life.",
+                "hemogoblin-inventor" => "A goblin, rended of its flesh, but not its inventive habits. It creates mechanisms of malice with which to end human life.",
                 "tiger" => "A feline-predator, which stalks its prey quietly.",
                 "long-saidri" => "A roaming guardian of Saidribee colonies. Its legs support a larger body, which allow for more venom and muscle.",
                 "bombardier" => "A beetle that explodes when startled. It is unclear whether this adaptation is biological, or corruptive in nature.",
@@ -1056,24 +1376,24 @@ mod tests {
                 "pale:Greater Biter" => "A grown pale. Large and hungry, it shares the maw of a crocodile, and an unmatched malice.",
                 "pale:Greater Spitter" => "A long, spindly pale, like an imitation of a human, but with a long phallic trunk used to spew terrible projectiles.",
                 "zillennia:mature" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This creature is large, larger than the space it takes up. You see it only through the inability to see around it, as it consumes everything that comes into contact, be it sound, light or flesh.",
-                "troll" => "A humanoid grown from the blood walls of the Flesh. Its hands are the size of small men, and it's mouth full of teeth with which to devour the uncorrupted.",
+                "troll" => "A humanoid grown from the blood walls of the Flesh. Its hands are the size of small men, and its mouth full of teeth with which to devour the uncorrupted.",
                 "pale:Greater Breather" => "A lowbeast biped which emits the smell of death. That is to say, those that smell the stench of the Greater Gasser have the death of their loved ones brought to the forefront of their mind until the hallucinations become too intense, and the soul evaporates.",
-                "pale:Greater Screamer" => "A colossal maw allows the scream of this creature to echo around, disorienting its pray. It's colossal vocal chords are as thick as steel cables.",
-                "pale:Greater Birther" => "A large biped which brings forth other lowbeasts. It deflates as it births its spawn, and when replenishes itself only with the blood of the Flesh.",
+                "pale:Greater Screamer" => "A colossal maw allows the scream of this creature to echo around, disorienting its pray. Its colossal vocal chords are as thick as steel cables.",
+                "pale:Greater Birther" => "A large biped which brings forth other lowbeasts. It deflates as it births its spawn, and replenishes itself only with the blood of the Flesh.",
                 "dire-bear" => "A huge bear, large enough to fit a human torso in its mouth with room to spare. It roams the Flesh, eating monsters and people alike.",
                 "zillennia:greater" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one is gargantuan, even larger than average, and consumes all it touches without discrimination.",
                 "river-drake" => "A reptilian which conquers the ecosystems of lakes and rivers.",
-                "horn-3" => "A beautiful, three-horned horse of magickal power from another dimension. It's playful nature often results in the death of its victims.",
+                "horn-3" => "A beautiful, three-horned horse of magickal power from another dimension. Its playful nature often results in the death of its victims.",
                 "killspawn" => "A demon made of metal, spawned fully formed from the God-Obelisks: The Borge. These creatures delight in death, and naught else.",
                 "zillennia:hulking" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one is of gargantuan, almost incomprehensible size. To kill it, almost unfathomable.",
                 "lesser-ichor-leviathan" => "An incredibly large, whale like predator created by Mercuria the Machine-Godbeast, all to patrol the endless depths of Ichor.",
-                "sabretooth" => "A pre-historic tiger, revived to defend the Flesh. It's bite is powerful, and it's fangs long.",
+                "sabretooth" => "A pre-historic tiger, revived to defend the Flesh. Its bite is powerful, and its fangs long.",
                 "banshee" => "Women under duress who flee to the Flesh for comfort and salvation have their body stripped from them, and replaced with a construct. Their screams of anguish can be fatal to those mortals who hear.",
-                "vampire" => "Human nobles whom perform terrible sacrifices can curry favor with the Flesh, earning themselves a terrible reward. Leech-vampirism changes their mind, just as well as their body, leaving them as one of the most dangerous monsters of the Flesh.",
-                "maulchild" => "A demon of innocent persuasion. It comes with others, and craves affection, holding it's victim still for it's fellows carving knives.",
-                "horn-5" => "A beautiful horse with five horns from another dimension. It's carries with it a malevolent aura, and a desire to inflict suffering.",
+                "vampire" => "Human nobles who perform terrible sacrifices can curry favor with the Flesh, earning themselves a terrible reward. Leech-vampirism changes their mind, just as well as their body, leaving them as one of the most dangerous monsters of the Flesh.",
+                "maulchild" => "A demon of innocent persuasion. It comes with others, and craves affection, holding its victim still for its fellows' carving knives.",
+                "horn-5" => "A beautiful horse with five horns from another dimension. It carries with it a malevolent aura, and a desire to inflict suffering.",
                 "zillennia:ancient" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. Born early in that millenium of godly intercourse, this creature is older than  humanity. It carries with it no desires, or fears. Just an almost unending sea of nothingness.",
-                "zillennia:timeless" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one does not change. It was created when those two gods locked eyes with each other, and their horrible romance began, before humanity had yet breathed. It cares not for the whims of time. It is likely it is unaware that it's parents lie long dead, and that it is a relic of a different era.",
+                "zillennia:timeless" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. This one does not change. It was created when those two gods locked eyes with each other, and their horrible romance began, before humanity had yet breathed. It cares not for the whims of time. It is likely it is unaware that its parents lie long dead, and that it is a relic of a different era.",
                 "zillennia:transcendent" => "Grisha and Dawel, in their final, death-like embrace, brought forth a creature known as a Zillennia, which is made of nothing and desires nothingness abound. Many spawned, large and small. It came into existence before its birth. This creature has never not existed, and yet it is composed of nothing, and so has never existed either. It shall eventually consume all it comes into contact with, as it wanders across the Flesh.",
                 "ichor-leviathan" => "An incredibly large, whale like predator created by Mercuria the Machine-Godbeast, all to patrol the endless depths of Ichor.",
                 "phoenix" => "A beautiful and noble creature, long-since corrupted by the Flesh and used as a terrible monster to protect its adminstrator.",
@@ -1127,8 +1447,8 @@ mod tests {
         let mut regular = Painter::new();
         let mut bold = Painter::new();
         let line = body_lines(&bold, "the Flesh", 288, 20).remove(0);
-        regular.prose(&line.text, 20, 20, 20, [255,255,255], false);
-        paint_content_line(&mut bold, &line, 20, 20, 20, [255,255,255]);
+        regular.bestiary_prose(&line.text, 20, 20, 20, [255,255,255], false,[0,0,0]);
+        paint_content_line(&mut bold, &line, 20, 20, 20, [255,255,255],[0,0,0]);
         assert_ne!(regular.pixels, bold.pixels);
     }
     #[test]
@@ -1139,10 +1459,10 @@ mod tests {
         let mut previous=1.;
         for d in 0..40 {
             let t=Theme::at(d);let l=relative_luminance(t.paper);assert!(l<previous);previous=l;
-            let secondary=relative_luminance(t.secondary);
-            assert!((secondary.max(l)+0.05)/(secondary.min(l)+0.05)>=4.5);
-            let i=relative_luminance(t.ink);
-            assert!((l.max(i)+0.05)/(l.min(i)+0.05)>=4.5,"depth {}",d+1);
+            for color in [t.secondary,t.ink] {
+                assert!(theme_contrast(color,t.paper).max(theme_contrast(t.keyline,t.paper))>=4.5,
+                    "depth {}: fill/keyline contrast",d+1);
+            }
         }
     }
     #[test]
@@ -1213,14 +1533,14 @@ mod tests {
         let Ok(directory)=std::env::var("CORPSE_FLESH_REVIEW") else {return;};
         std::fs::create_dir_all(&directory).unwrap();
         let mut p=Painter::new(); p.clear([20,17,22]);
-        p.prose("SOLID PAGE COLOR BY VISUAL FLOOR",20,14,26,[239,232,204],true);
-        p.prose("Colors blend between floor anchors; each bestiary page itself stays solid.",20,48,18,[239,232,204],false);
+        p.bestiary_prose("SOLID PAGE COLOR BY VISUAL FLOOR",20,14,26,[239,232,204],true,[0,0,0]);
+        p.bestiary_prose("Colors blend between floor anchors; each bestiary page itself stays solid.",20,48,18,[239,232,204],false,[0,0,0]);
         for floor in 1..=40 {
             let theme=Theme::at(floor-1);
             let x=20+((floor-1)%8) as i32*157;
             let y=94+((floor-1)/8) as i32*134;
             p.rect(x,y,145,120,theme.paper);
-            p.prose(&format!("FLOOR {floor:02}"),x+10,y+45,20,theme.ink,true);
+            p.bestiary_prose(&format!("FLOOR {floor:02}"),x+10,y+45,20,theme.ink,true,theme.keyline);
         }
         let file=std::fs::File::create(format!("{directory}/bestiary-palette-map.png")).unwrap();
         let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);
@@ -1244,10 +1564,43 @@ mod discovery_privacy_tests {
         manual.paint_at_depth(&mut painter,0.,0);assert_eq!(painter.pixels,original);assert!(manual.art.is_none());
     }
     #[test]
-    fn unread_marker_and_known_page_change_pixels_then_view_clears_unread() {
+    fn r52_bestiary_revision_and_stale_stat_changes_cannot_reveal_locked_pages() {
+        let mut manual = Manual::new(); let mut painter = Painter::new();
+        manual.select_id("rat"); manual.paint(&mut painter); let locked = painter.pixels.clone();
+        for revision in [29., 33., 51., 52.] {
+            manual.set_simulation_revision(Some(revision)); manual.paint(&mut painter);
+            assert_eq!(painter.pixels, locked); assert!(manual.art.is_none());
+        }
+        let rat = manual.catalog.entries.iter_mut().find(|e| e.id == "rat").unwrap();
+        rat.health = Some(999999.); rat.stats.as_mut().unwrap().insert("offense".into(),999999.);
+        manual.paint(&mut painter); assert_eq!(painter.pixels,locked);
+        assert!(!manual.progress.seen("rat") && !manual.progress.has_unread());
+    }
+    #[test]
+    fn r52_bestiary_revision_and_render_preserve_persisted_discovery_bytes() {
+        let path = std::env::temp_dir().join(format!("r52-bestiary-stat-record-{}.json", std::process::id()));
+        let mut manual = Manual::new();
+        manual.progress = crate::bestiary_progress::Progress::load(path.clone());
+        manual.progress.discover(["rat", "dragon"]); manual.select_id("rat");
+        let bytes = std::fs::read(&path).unwrap(); let mut painter = Painter::new();
+        for revision in [29., 51., 52.] {
+            manual.set_simulation_revision(Some(revision)); manual.paint(&mut painter);
+            assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        }
+        let reloaded = crate::bestiary_progress::Progress::load(path.clone());
+        assert!(reloaded.seen("rat") && reloaded.unread("rat") && reloaded.seen("dragon") && reloaded.unread("dragon"));
+        manual.mark_viewed();
+        let reloaded = crate::bestiary_progress::Progress::load(path.clone());
+        assert!(reloaded.seen("rat") && !reloaded.unread("rat") && reloaded.unread("dragon"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn known_page_changes_pixels_but_unread_marker_does_not() {
         let mut manual=Manual::new();let id=manual.ids()[0].clone();let mut painter=Painter::new();manual.paint(&mut painter);let locked=painter.pixels.clone();
         manual.progress.discover([id.as_str()]);manual.paint(&mut painter);assert_ne!(painter.pixels,locked);assert!(manual.progress.unread(&id));
+        let known=painter.pixels.clone();
         manual.mark_viewed();assert!(!manual.progress.unread(&id));assert!(manual.progress.seen(&id));
+        manual.paint(&mut painter);assert_eq!(painter.pixels,known);
     }
     #[test]
     fn discovery_transition_wide_and_portrait_capture() {
@@ -1261,7 +1614,10 @@ mod discovery_privacy_tests {
                 if state=="unread" {manual.progress.discover(["blorb"]);}
                 if state=="read" {manual.mark_viewed();}
                 manual.paint(&mut painter);
-                if let Some(prior)=previous {assert_ne!(painter.pixels,prior,"{label} {state} must change visible page/marker");}
+                if let Some(prior)=previous {
+                    if state=="read" {assert_eq!(painter.pixels,prior,"{label}: clearing unread must not change the page");}
+                    else {assert_ne!(painter.pixels,prior,"{label}: discovering a creature must reveal its page");}
+                }
                 previous=Some(painter.pixels.clone());
                 assert_eq!(manual.progress.unread("blorb"),state=="unread");
                 if state=="unknown" {assert!(manual.art.is_none());}
@@ -1275,4 +1631,23 @@ mod discovery_privacy_tests {
         }
     }
 
+}
+
+#[cfg(test)]
+fn theme_contrast(a:[u8;3],b:[u8;3])->f64 {
+    let (a,b)=(relative_luminance(a),relative_luminance(b));
+    (a.max(b)+0.05)/(a.min(b)+0.05)
+}
+#[cfg(test)]
+#[path="bestiary_theme_tests.rs"]
+mod bestiary_theme_tests;
+
+#[cfg(test)]
+mod compressed_depth_tests {
+    #[test]
+    fn bestiary_ranges_only_show_the_twenty_physical_floors() {
+        assert_eq!(super::compressed_ranges(&(1..=40).collect::<Vec<_>>()),(1..=20).collect::<Vec<_>>());
+        assert_eq!(super::compressed_ranges(&[5,10,15,20,25,30,35,40]),vec![3,5,8,10,13,15,18,20]);
+        assert!(super::compressed_ranges(&[2,4,9,19,39]).is_empty());
+    }
 }

@@ -23,7 +23,7 @@ fn result_reason(s: &RunSummary) -> &str {
 
 pub fn paint(p: &mut Painter, s: &RunSummary, offset: usize, notice: &str) {
     p.clear([5, 4, 12]);
-    p.text("THE DESCENT IS WRITTEN", 180, 105, 16, GOLD);
+    if s.fast_mode { p.text("Fast mode", 710, 105, 16, GOLD); }
     p.text(
         headline(s),
         180,
@@ -50,13 +50,11 @@ pub fn paint(p: &mut Painter, s: &RunSummary, offset: usize, notice: &str) {
         54,
         GOLD,
     );
-    let score_note = if s.score.is_some() {
-        "Every blessing received, including blessings already spent.".into()
-    } else {
-        format!("{:.0} blessings recorded since tracking began. The earlier total is unknown; this run is not ranked.", s.observed_blessings)
-    };
-    for (i, line) in crate::manual::wrap(&score_note, 40).iter().enumerate() {
-        p.text(line, 710, 425 + i as i32 * 23, 16, MUTED);
+    if s.score.is_none() {
+        let score_note = format!("{:.0} blessings recorded since tracking began. The earlier total is unknown; this run is not ranked.", s.observed_blessings);
+        for (i, line) in crate::manual::wrap(&score_note, 40).iter().enumerate() {
+            p.text(line, 710, 425 + i as i32 * 23, 16, MUTED);
+        }
     }
     if s.hearts.is_empty() {
         p.text(
@@ -110,6 +108,19 @@ pub fn paint(p: &mut Painter, s: &RunSummary, offset: usize, notice: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn fast_summary_adds_label_without_changing_normal_summary() {
+        let mut s=summary();
+        let mut p=Painter::new();
+        paint(&mut p,&s,0,"");
+        let normal=p.pixels.clone();
+        s.fast_mode=true;
+        paint(&mut p,&s,0,"");
+        assert_ne!(normal,p.pixels);
+        s.fast_mode=false;
+        paint(&mut p,&s,0,"");
+        assert_eq!(normal,p.pixels);
+    }
     fn summary() -> RunSummary {
         let run = corpse_core::storage::deserialize(include_str!(
             "../../../fixtures/avatar-room-v1.json"

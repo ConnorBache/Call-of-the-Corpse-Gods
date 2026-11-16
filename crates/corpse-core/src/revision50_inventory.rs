@@ -40,7 +40,16 @@ impl Capacity {
         self.rings + self.amulets + self.potions + self.hearts
     }
 }
-pub fn capacity(r: &Run) -> Capacity { capacity_for_abilities(&r.player.abilities) }
+pub fn capacity(r: &Run) -> Capacity {
+    capacity_for_abilities_revision(&r.player.abilities, r.simulation_revision.value_or(29.))
+}
+/// R52 adds five base heart slots; every existing ability capacity bonus is retained.
+/// O(B) existing ability scans, O(1) additional arithmetic and scratch.
+pub fn capacity_for_abilities_revision(abilities: &[String], revision: f64) -> Capacity {
+    let mut capacity = capacity_for_abilities(abilities);
+    if revision >= 52. { capacity.hearts += 5.; }
+    capacity
+}
 pub fn capacity_for_abilities(abilities: &[String]) -> Capacity {
     let has = |id: &str| abilities.iter().any(|a| a == id);
     let tools = has("isheilah-tools-of-the-trade");
@@ -88,6 +97,10 @@ impl Usage {
 /// O(I+B) time, O(1) scratch; special items never weaken finite-category limits.
 pub fn finite_categories_fit(items: &[Item], abilities: &[String]) -> bool {
     Usage::of(items).fits(capacity_for_abilities(abilities))
+}
+/// Revision-aware admission shares the same category limits as live pickup/UI.
+pub fn finite_categories_fit_revision(items: &[Item], abilities: &[String], revision: f64) -> bool {
+    Usage::of(items).fits(capacity_for_abilities_revision(abilities, revision))
 }
 /// O(I+B) time, O(1) scratch for I inventory entries and B owned blessings.
 /// Each finite category has its own budget, independent of every other category.

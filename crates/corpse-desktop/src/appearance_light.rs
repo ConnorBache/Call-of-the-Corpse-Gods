@@ -152,6 +152,7 @@ pub fn light_field(
     let mut maximum = vec![0f32; n];
     let mut darkness = vec![0f32; n];
     let mut potion_darkness = vec![0f32; n];
+    let mut absolute_darkness = vec![false; n];
     let mut cells = vec![None; n];
     // Scalar exposure and source hue are deliberately independent.
     let mut tint = vec![[0.; 3]; n];
@@ -186,6 +187,7 @@ pub fn light_field(
                     if source.kind == "potion-darkness" {
                         potion_darkness[i] = (potion_darkness[i] as f64 + strength) as f32;
                     }
+                    if source.kind == "potion-darkness-override" {absolute_darkness[i]=true;}
                 }
             }
             continue;
@@ -342,11 +344,11 @@ pub fn light_field(
         }
     }
     for i in 0..n {
-        let reduction = clamp(1. - darkness[i] as f64 / (maximum[i] as f64 + 100.));
+        let reduction = if absolute_darkness[i] {0.} else {clamp(1. - darkness[i] as f64 / (maximum[i] as f64 + 100.))};
         // Positive illumination historically affected glow/distance but not the
         // near material base. Apply the same bounded darkness response to that
         // base, only for the new potion mask; ordinary/aura lighting is unchanged.
-        out[i].ambient_attenuation = clamp(1. - potion_darkness[i] as f64 / (maximum[i] as f64 + 100.));
+        out[i].ambient_attenuation = if absolute_darkness[i] {0.} else {clamp(1. - potion_darkness[i] as f64 / (maximum[i] as f64 + 100.))};
         let cap = profile.number("lighting.maximumIllumination");
         for field in [&mut energy, &mut wall] {
             let peak = field[i].into_iter().fold(0f32, f32::max) as f64;
@@ -361,11 +363,16 @@ pub fn light_field(
                 field[i][channel] = (field[i][channel] as f64 * exposure) as f32;
             }
         }
-        let display_illumination = out[i].illumination + (profile.number("lighting.ambient") - 1.) * 100.
-            + (visual_max[i] - native_max[i]);
+        // The detached current-cell mask must also beat custom source glow and
+        // ambient controls. It never grades hidden or remembered cells.
+        let display_illumination = if absolute_darkness[i] {-100.} else {
+            out[i].illumination + (profile.number("lighting.ambient") - 1.) * 100.
+                + (visual_max[i] - native_max[i])};
         if let Some(display) = &mut out[i].display {
             display.multiplier = crate::color::light_ui::multiplier(display_illumination);
-            if tint_weight[i] > 0. { display.tint = tint[i].map(|v| v / tint_weight[i]); }
+            display.illumination = display_illumination;
+            if absolute_darkness[i] {display.tint=[1.;3];}
+            else if tint_weight[i] > 0. { display.tint = tint[i].map(|v| v / tint_weight[i]); }
         }
         out[i].energy = energy[i].map(|v| v as f64);
         out[i].wall_energy = wall[i].map(|v| v as f64);

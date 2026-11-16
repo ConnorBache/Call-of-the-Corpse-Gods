@@ -53,7 +53,7 @@ pub fn generate_floor_full_revision_from_attempt(
         || (first_attempt != 0 && revision < 38.0) {
         return Err("Unsupported generation recovery window".into());
     }
-    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0].contains(&revision) { return Err("Unsupported generation revision".into()); }
+    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0,52.0].contains(&revision) { return Err("Unsupported generation revision".into()); }
     if !(1..=40).contains(&depth) {
         return Err("Depth must be an integer from 1 to 40".into());
     }
@@ -68,7 +68,26 @@ pub fn generate_floor_full_revision_from_attempt(
         actual_up,
         revision,
         first_attempt,
+        None,
     )
+}
+/// Fast mode changes only the encounter schedule. Destination depth still owns
+/// the domain, terrain, population, loot and every depth-scaled creature stat.
+/// The normal generator never enters this path, preserving its exact seed stream.
+pub(crate) fn generate_fast_floor_from_attempt(
+    depth: u32, seed: u32, actual_up: Option<Point>, revision: f64,
+    first_attempt: u32, boss_depth: Option<u32>,
+) -> Result<Floor, String> {
+    if revision < 52. || !(1..=40).contains(&depth)
+        || first_attempt > 224 || first_attempt % GENERATION_CANDIDATE_LIMIT != 0
+        || boss_depth.is_some_and(|boss| boss == 0 || boss >= 40 || boss % 5 != 0
+            || boss > depth || depth - boss > 1) {
+        return Err("Unsupported Fast mode floor configuration".into());
+    }
+    let plan = domain_plan_revision(seed, revision);
+    let domain = &plan[(depth as usize - 1) / 5].domain;
+    generate_floor_revision_window(depth, seed, domain, boss_depth.is_some(), 79,
+        actual_up, revision, first_attempt, boss_depth)
 }
 pub fn generate_floor(
     depth: u32,
@@ -89,14 +108,14 @@ pub fn generate_floor_revision(
     actual_up: Option<Point>,
     revision: f64,
 ) -> Result<Floor, String> {
-    generate_floor_revision_window(depth, seed, domain, godbeast, size, actual_up, revision, 0)
+    generate_floor_revision_window(depth, seed, domain, godbeast, size, actual_up, revision, 0, None)
 }
 
 fn generate_floor_revision_window(
     depth: u32, seed: u32, domain: &str, godbeast: bool, size: usize,
-    actual_up: Option<Point>, revision: f64, first_attempt: u32,
+    actual_up: Option<Point>, revision: f64, first_attempt: u32, boss_depth: Option<u32>,
 ) -> Result<Floor, String> {
-    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0].contains(&revision) { return Err("Unsupported generation revision".into()); }
+    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0,52.0].contains(&revision) { return Err("Unsupported generation revision".into()); }
     if ![79, 50, 60].contains(&size) {
         return Err("Supported floor geometries are 79×29, 50×50 and 60×60".into());
     }
@@ -117,7 +136,7 @@ fn generate_floor_revision_window(
     }
     let mut last = "No candidate generated".to_string();
     for attempt in first_attempt..first_attempt + GENERATION_CANDIDATE_LIMIT {
-        match generate_floor_candidate_revision(depth, seed, domain, godbeast, size, actual_up, attempt, revision) {
+        match generate_floor_candidate_with_boss(depth, seed, domain, godbeast, size, actual_up, attempt, revision, boss_depth) {
             Ok((mut f, q, failed)) => {
                 let stage = f
                     .generation
@@ -170,6 +189,7 @@ fn generate_floor_revision_window(
                 ]
                 .iter()
                 .any(|s| e.contains(s))
+                    && !(revision >= 52.0 && e.starts_with("Isolated island"))
                     && !(revision >= 38.0 && [
                         "Automatic staircase has no repairable approach",
                         "Automatic staircase has no accessible approach",
@@ -212,7 +232,13 @@ pub fn generate_floor_candidate_revision(
     attempt: u32,
     revision: f64,
 ) -> Result<(Floor, TopologyAcceptance, usize), String> {
-    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0].contains(&revision) { return Err("Unsupported generation revision".into()); }
+    generate_floor_candidate_with_boss(depth, seed, domain, godbeast, size, actual_up, attempt, revision, None)
+}
+fn generate_floor_candidate_with_boss(
+    depth: u32, seed: u32, domain: &str, godbeast: bool, size: usize,
+    actual_up: Option<Point>, attempt: u32, revision: f64, boss_depth: Option<u32>,
+) -> Result<(Floor, TopologyAcceptance, usize), String> {
+    if ![29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,50.0,51.0,52.0].contains(&revision) { return Err("Unsupported generation revision".into()); }
     if ![79, 50, 60].contains(&size)
         || !(1..=40).contains(&depth)
         || ![
@@ -230,7 +256,7 @@ pub fn generate_floor_candidate_revision(
     if revision >= 38.0 && attempt >= 256 {
         return Err("Unsupported generation candidate attempt".into());
     }
-    let godbeast = godbeast && (revision < 33.0 || (depth < 40 && depth % 5 == 0));
+    let godbeast = godbeast && (boss_depth.is_some() || revision < 33.0 || (depth < 40 && depth % 5 == 0));
     let generation_seed = if attempt == 0 {
         seed
     } else {
@@ -274,6 +300,7 @@ pub fn generate_floor_candidate_revision(
     }
     let plan = domain_plan_revision(seed, revision);
     let d = (depth as usize - 1) / 5;
+    let boss_block = (boss_depth.unwrap_or(depth) as usize - 1) / 5;
     let mut rng = GenerationRng::new(mix(generation_seed, depth + 21000));
     let loops = add_room_loops(
         &mut layout,
@@ -384,14 +411,14 @@ pub fn generate_floor_candidate_revision(
         let mut rng = GenerationRng::new(mix(generation_seed, depth + 73000));
         f.godbeast_event = Field::Value(reserve_godbeast_room_revision(
             &mut f.tiles,
-            &plan[d].godbeast_kind,
+            &plan[boss_block].godbeast_kind,
             &mut || rng.random(),
             &[stairs.up, stairs.down],
             &layout.rooms.iter().map(|r| r.center).collect::<Vec<_>>(),
             &natural.terrain_spine.iter().copied().collect(),
             revision,
         )?);
-        if revision >= 33.0 && plan[d].godbeast_kind == "Veridian" {
+        if revision >= 33.0 && plan[boss_block].godbeast_kind == "Veridian" {
             f.godbeast_event.as_mut().unwrap().display_name = "Verdania".to_string().into();
         }
     }
@@ -451,7 +478,9 @@ pub fn generate_floor_candidate_revision(
     if vent.unresolved_basic_vents > 0 {
         return Err("Unsafe ordinary vent containment".into());
     }
-    if revision >= 40.0 {
+    if revision >= 52.0 {
+        crate::square_currents::generate_for_attempt(&mut f, seed, attempt);
+    } else if revision >= 40.0 {
         crate::shore_currents::repair(&mut f);
         apply_water_setup_currents_revision(&mut f, revision);
         crate::shore_currents::repair(&mut f);
@@ -531,6 +560,9 @@ pub fn generate_floor_candidate_revision(
     if revision >= 33.0 {
         crate::creature_feeding::decorate_floor(&mut f, generation_seed);
         crate::water_blood::register_river_sources(&mut f);
+    }
+    if revision >= 52.0 && q.acceptable {
+        crate::revision52_swimming::placement_cells(&f, &[], &[])?;
     }
     Ok((f, q, landmark.failed_majors))
 }

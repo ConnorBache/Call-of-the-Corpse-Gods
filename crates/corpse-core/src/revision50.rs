@@ -29,6 +29,7 @@ pub fn settle_actor_duel(a: &mut Actor, depth: f64) {
 /// O(A+B) scans across persisted owners; only blocks with an expired owner detach
 /// from COW snapshots. Each owner retains its own anchor, target and paid upkeep.
 pub fn settle_duel(r: &mut Run) {
+    if duel_target_rules(r) { settle_current_duels(r); return; }
     if !enabled(r) {return;}
     if r.player.active.iter().any(|s|s==DUEL) && !duel_area(&r.player,r.depth) {expire_duel(&mut r.player);}
     for (depth,block) in &mut r.actors {
@@ -40,6 +41,92 @@ pub fn settle_duel(r: &mut Run) {
         }
     }
 }
+/// R52 ends the selected-target tether; older replay revisions retain owner-only expiry.
+pub(crate) fn duel_target_rules(r: &Run) -> bool { r.simulation_revision.value_or(29.) >= 52. }
+fn duel_point(owner: &Actor, depth: f64, x: f64, y: f64) -> bool {
+    owner.conditions.get("r50DuelDepth") == Some(&depth)
+        && owner.conditions.get("r50DuelX").is_some_and(|anchor| (x-anchor).abs() <= 2.0)
+        && owner.conditions.get("r50DuelY").is_some_and(|anchor| (y-anchor).abs() <= 2.0)
+}
+/// O(d) clean global index lookup; includes the actor's actual persisted floor.
+/// Dirty reconciliation has the creature index's documented world/slot costs.
+fn duel_actor(r: &Run, id: f64) -> Option<(f64, &Actor)> {
+    if id == r.player.id { return Some((r.depth, &r.player)); }
+    let (floor, at) = r.actors.position(id, r.player.id, r.depth, false).ok()??;
+    let (depth, actors) = r.actors.get_index(floor)?;
+    Some((depth.parse().ok()?, actors.get(at)?))
+}
+fn duel_target_valid(r: &Run, owner: &Actor) -> bool {
+    owner.conditions.get("r50DuelTarget").and_then(|id| duel_actor(r, *id))
+        .is_some_and(|(depth, target)| target.hp > 0.0 && !target.dead.value_or(false)
+            && duel_point(owner, depth, target.x, target.y))
+}
+fn duel_invalid(r: &Run, owner: &Actor, depth: f64) -> bool {
+    !crate::half_here::is_clone(owner) && owner.active.iter().any(|id| id == DUEL)
+        && (!duel_area(owner, depth) || !duel_target_valid(r, owner))
+}
+/// Read-only counterpart to the maintenance settlement gate.
+pub fn duel_upkeep_valid(r:&Run,owner:&Actor)->bool {
+    !duel_target_rules(r) || !duel_invalid(r,owner,r.depth)
+}
+fn clear_duel_owner(r: &mut Run, id: f64) {
+    if let Some(owner) = engine::actor_any_mut(r, id) { expire_duel(owner); }
+    if id == r.player.id { crate::half_here::sync(r); }
+}
+/// O(d + K + C) before one owner's upkeep, no owner scan. Expiry changes only
+/// that owner (plus shared player endpoint projection), never another reserve.
+pub(crate) fn settle_duel_owner(r: &mut Run, id: f64) {
+    if !duel_target_rules(r) { return; }
+    if duel_actor(r, id).is_some_and(|(depth, owner)| duel_invalid(r, owner, depth)) {
+        clear_duel_owner(r, id);
+    }
+}
+/// O((D+1)*(d+K+C)) with a clean creature index, D independent Duel candidates;
+/// no world scan per move/attack. Structural reconciliation is shared with the
+/// existing identity index; COW detaches only blocks with an expiring owner.
+/// Call after each committed displacement, including every multi-step segment.
+/// No path/terrain work and no RNG. Expiry is irreversible even after reentry.
+pub(crate) fn duel_actor_changed(r: &mut Run, changed: f64) {
+    if !duel_target_rules(r) { return; }
+    let ids = r.actors.duel_owner_ids(r.player.id, r.depth).unwrap_or_default();
+    for id in std::iter::once(r.player.id).chain(ids.iter().copied()) {
+        let expired = duel_actor(r, id).is_some_and(|(depth, owner)|
+            !crate::half_here::is_clone(owner) && owner.active.iter().any(|s| s == DUEL)
+            && (owner.id == changed && !duel_area(owner, depth)
+                || owner.conditions.get("r50DuelTarget") == Some(&changed) && !duel_target_valid(r, owner)));
+        if expired { clear_duel_owner(r, id); }
+    }
+}
+/// Actual death/removal notification, after rescue but before any revival.
+/// Same candidate/index/COW bounds as duel_actor_changed; no world owner scan.
+pub(crate) fn end_duels_with_target(r: &mut Run, target: f64) {
+    if !duel_target_rules(r) { return; }
+    let ids = r.actors.duel_owner_ids(r.player.id, r.depth).unwrap_or_default();
+    for id in std::iter::once(r.player.id).chain(ids.iter().copied()) {
+        if duel_actor(r, id).is_some_and(|(_, owner)| !crate::half_here::is_clone(owner)
+            && owner.conditions.get("r50DuelTarget") == Some(&target)) { clear_duel_owner(r, id); }
+    }
+}
+/// Actual-world boundary normalization, O((D+1)*(d+K+C)) clean plus the shared
+/// index reconciliation/COW costs. Also normalizes loaded/rewound stale links.
+pub(crate) fn settle_current_duels(r: &mut Run) {
+    if !duel_target_rules(r) { return; }
+    let ids = r.actors.duel_owner_ids(r.player.id, r.depth).unwrap_or_default();
+    for id in std::iter::once(r.player.id).chain(ids.iter().copied()) { settle_duel_owner(r, id); }
+}
+/// Merge hidden-world target results without observing a temporarily staged
+/// player position during travel admission. Same bounds as full normalization.
+pub(crate) fn settle_duel_targets(r: &mut Run) {
+    if !duel_target_rules(r) { return; }
+    let ids = r.actors.duel_owner_ids(r.player.id, r.depth).unwrap_or_default();
+    for id in std::iter::once(r.player.id).chain(ids.iter().copied()) {
+        if duel_actor(r, id).is_some_and(|(_, owner)| !crate::half_here::is_clone(owner)
+            && owner.active.iter().any(|s| s == DUEL) && !duel_target_valid(r, owner)) {
+            clear_duel_owner(r, id);
+        }
+    }
+}
+
 pub fn duel_blocks(r: &Run, source: &Actor, target: &Actor) -> bool {
     if !enabled(r) {return false;}
     let owner_id=crate::half_here::owner_id(r,target);
@@ -47,6 +134,7 @@ pub fn duel_blocks(r: &Run, source: &Actor, target: &Actor) -> bool {
     let allied=|a:&Actor| a.id==r.player.id || a.state=="ally";
     source.id!=owner.id && (allied(source)!=allied(owner) || crate::revision50_control_amulets::discord_hostility(r,source,owner))
         && owner.active.iter().any(|s|s==DUEL) && duel_area(owner,r.depth)
+        && (!duel_target_rules(r) || duel_target_valid(r,owner))
         && owner.conditions.get("r50DuelTarget").is_some_and(|id|source.id!=*id)
 }
 /// O(A) actor selection plus existing visibility/attack cost. Every validation
@@ -64,6 +152,8 @@ fn implant_thought(r:&mut Run,target:&Field<f64>,x:&Field<f64>,y:&Field<f64>)->R
         && crate::portals::actor_chebyshev(r,&attacker,a)<=1.).cloned() else {return Ok(false)};
     if engine::attack_blocker(r,&attacker,&victim,0.,false).is_some() {return Ok(false)}
     if crate::abilities::energy_activation_silenced(r,&r.player) || !crate::revision50_ability_energy::spend(r,r.player.id,"numo-implant-thought",15.) {return Ok(false)}
+    crate::events::link(r,&r.player,&attacker,"P19","stitch-thought",crate::events::Stage::Special);
+    crate::events::link(r,&attacker,&victim,"P19","notch-target",crate::events::Stage::Special);
     engine::attack(r,tid,victim.id,1.)?;
     engine::log(r,"You use Implant Thought.","player");
     Ok(true)
@@ -201,3 +291,24 @@ mod tests {
         assert!(r.player.active.iter().any(|s|s==DUEL));
     }
 }
+
+#[cfg(test)] mod implant_animation_fidelity_tests {
+ use super::*;
+ #[test] fn admitted_control_has_thought_and_victim_direction_invalid_target_is_quiet(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  r.player.x=2.;r.player.y=2.;r.player.abilities=vec!["numo-implant-thought".into()];r.player.active.clear();r.player.conditions.clear();r.player.ability_reserves=Field::Missing;r.inventory.clear();
+  crate::revision50_ability_energy::initialize_reserve(&mut r.player,"numo-implant-thought",100.,100.).unwrap();
+  let mut enemy=r.player.clone();enemy.id=900.;enemy.x=3.;enemy.state="hunting".into();enemy.abilities.clear();enemy.ability_reserves=Field::Missing;
+  r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(enemy);let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=Field::Missing;f.non_euclidean=Field::Missing;
+  crate::events::begin();assert!(!implant_thought(&mut r,&999.0.into(),&2.0.into(),&2.0.into()).unwrap());assert!(crate::events::finish().is_empty());
+  crate::events::begin();assert!(implant_thought(&mut r,&900.0.into(),&2.0.into(),&2.0.into()).unwrap());let events=crate::events::finish();
+  for (style,from,to) in [("stitch-thought",(2.,2.),(3.,2.)),("notch-target",(3.,2.),(2.,2.))] {
+   let e=events.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P19"&&a.style==style)).unwrap();
+   assert_eq!(e.from,Some(crate::events::EventPoint{x:from.0,y:from.1}));assert_eq!(e.to,crate::events::EventPoint{x:to.0,y:to.1});
+  }
+ }
+}
+
+#[cfg(test)]
+#[path="revision52_duel_tests.rs"]
+mod revision52_duel_tests;

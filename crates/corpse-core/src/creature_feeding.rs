@@ -37,6 +37,7 @@ pub fn interrupt(a: &mut Actor) {
 }
 pub fn damage_interrupt(r: &mut Run, id: f64) {
     if !enabled(r) || actor(r,id).is_none_or(|a| !living_npc(r,a)) { return; }
+    if let Some(a)=actor(r,id).filter(|a|condition(a,COUNT)>0.0) { crate::animation_enemy::mark(r, a, "E84", "wake", crate::events::Stage::Special); }
     let in_turn = r.resolving_tick.value_or(false);
     let tick = r.tick + if in_turn { 0.0 } else { 1.0 };
     if let Some(a) = actor_mut_trusted(r, id) {
@@ -57,13 +58,16 @@ pub fn begin_turn(r: &mut Run) {
             && a.energy>=crate::combat::effective_stats(r,a).max_energy;
         Some((age,wake))
     }).collect();
+    let mut woken=Vec::new();
+    let animate=crate::events::enabled(r);
     for (a,update) in r.actors_slice_mut(r.depth).iter_mut().zip(updates) {
         let Some((age,wake))=update else {continue};
         a.conditions.insert(AGE.into(),age);
         a.conditions.insert(CLOCK.into(),tick);
-        if wake {crate::ai::wake(a,false);}
+        if wake {crate::ai::wake(a,false);if animate {woken.push(a.clone());}}
         if a.conditions.get(INTERRUPTED).is_some_and(|t| *t < tick) {a.conditions.shift_remove(INTERRUPTED);}
     }
+    for a in woken {crate::animation_enemy::mark(r,&a,"E84","wake",crate::events::Stage::Special);}
 }
 
 fn autonomous(r: &Run, a: &Actor) -> bool {
@@ -161,6 +165,9 @@ pub fn take_turn(r: &mut Run, id: f64, may_move: bool, haste: bool) -> Result<bo
         let tick=r.tick; let a=actor_mut_trusted(r,id).unwrap();
         if count>=FEEDING_TURNS {interrupt(a);a.conditions.insert(AGE.into(),0.0);}
         else {for (k,v) in [(LAST,tick),(COUNT,count),(SOURCE,source as f64),(KIND,kind),(X,a.x),(Y,a.y)] {a.conditions.insert(k.into(),v);}}
+        let a=a.clone();
+        if count==1.0 { crate::animation_enemy::mark(r, &a, "E84", "dip", crate::events::Stage::Special); }
+        else if count>=FEEDING_TURNS { crate::animation_enemy::mark(r, &a, "E84", "wake", crate::events::Stage::Special); }
         return Ok(true);
     }
     interrupt(actor_mut_trusted(r,id).unwrap());
@@ -182,7 +189,7 @@ pub fn end_turn(r: &mut Run) {
             && source_at(f,*v as usize)==a.conditions.get(KIND).copied());
         let invalid=!autonomous(r,a) || a.conditions.get(LAST)!=Some(&r.tick) || !source_valid || !safe_cell(r,a,at)
             || a.conditions.get(X)!=Some(&a.x) || a.conditions.get(Y)!=Some(&a.y);
-        if invalid {interrupt(actor_mut_trusted(r,id).unwrap());}
+        if invalid { let a=a.clone(); interrupt(actor_mut_trusted(r,id).unwrap()); crate::animation_enemy::mark(r,&a,"E84","wake",crate::events::Stage::Special); }
     }
 }
 pub fn description(r: &Run,a:&Actor)->Option<&'static str> {

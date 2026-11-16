@@ -1,5 +1,8 @@
 # Revision 51 perception presentation
 
+Historical initial behavior: the open-contour and special-sense omissions below
+are superseded by [the enclosed preview and known special senses](revision52-enemy-perception-overlay.md).
+
 R51 creature hover and the hovered left creature preview show `Perception range: N`,
 using the authored neutral-light **tile** range `20 + Perception / 5`. The red
 map contour instead follows plausible **creature** sight: twice the player's

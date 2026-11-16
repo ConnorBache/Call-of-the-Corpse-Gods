@@ -93,6 +93,7 @@ pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
         let next=r.floor_mut().unwrap().godbeast_event.as_mut().unwrap();
         next.activated=true.into();
         if let Some((id,name))=target { next.sacrifice_actor_id=id.into();next.sacrifice_name=name.into(); }
+        crate::events::at(r,"E73","fracture-amber",crate::events::Stage::Special,&[crate::events::EventPoint{x,y}]);
         engine::log(r,DEMAND,"environment");
         engine::log(r,if r.floor().unwrap().godbeast_event.as_ref().unwrap().sacrifice_actor_id.as_ref().is_some() {
             "The Borge marks its sacrifice. Bring that creature's heart to the altar."
@@ -100,7 +101,7 @@ pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
         return Ok(true);
     }
     if !e.activated.value_or(false) {
-        engine::log(r,"Strike the Borge to learn it's demand.","environment");return Ok(false);
+        engine::log(r,"Strike the Borge to learn its demand.","environment");return Ok(false);
     }
     if e.reward_created.value_or(false) {
         engine::log(r,"The Borge is satisfied.","environment");return Ok(false);
@@ -109,10 +110,11 @@ pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
         engine::log(r,"The altar accepts only the exact heart marked by the Borge.","environment");return Ok(false);
     };
     crate::inventory::take_one(r,index);
-    let reward=shard(r.next_id);r.next_id+=1.;r.inventory.push(reward);
+    let reward=shard(r.next_id);let reward_id=reward.id;r.next_id+=1.;r.inventory.push(reward);
     r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().reward_created=true.into();
     engine::log(r,"The offered heart transforms into a Shard of the Borge.","player");
     crate::events::actor_event(r,&r.player,"pulse","Shard of the Borge",Some(crate::events::EventPoint{x,y}),None);
+    crate::events::inventory(r,"E74","diamond",Some(reward_id));
     Ok(true)
 }
 /// Ordinary adjacent melee geometry, but no accuracy roll or creature immunity.
@@ -140,12 +142,14 @@ pub fn use_at(r:&mut Run,id:f64,x:f64,y:f64)->Result<bool,EngineError> {
     let before=crate::equipment::capture_before(r);
     crate::inventory::take_one(r,index);
     let victim=engine::actor(r,owner).unwrap().clone();
+    crate::animation_enemy::mark(r,&target,"E74","puncture",crate::events::Stage::Special);
     crate::resources::record_loss(r,&victim,"hp",victim.hp.max(0.));
     let a=engine::actor_mut_trusted(r,owner).unwrap();
     a.hp=0.;
     if !a.abilities.iter().any(|s|s=="enemy:beast:no-revival") {a.abilities.push("enemy:beast:no-revival".into());}
     engine::resolve_death(r,owner,Some(r.player.id),Some("borge-shard"),true)?;
     crate::equipment::settle_removed(r,before)?;
+    crate::animation_enemy::mark(r,&r.player,"E74","dissolve-shard",crate::events::Stage::Special);
     engine::log(r,"The Shard of the Borge disintegrates.","player");
     crate::events::actor_event(r,&r.player,"attack","Shard of the Borge",Some(crate::events::EventPoint{x,y}),None);
     Ok(true)
@@ -168,6 +172,7 @@ pub fn kill_on_hit(r:&mut Run,target:f64,source:f64)->Result<(),EngineError> {
     let owner=crate::half_here::owner_id(r,&target_actor);
     let Some(victim)=engine::actor(r,owner).cloned() else {return Ok(())};
     if victim.dead.value_or(false)||victim.hp<=0. {return Ok(())}
+    crate::animation_enemy::mark(r,&target_actor,"E74","puncture",crate::events::Stage::Special);
     crate::resources::record_loss(r,&victim,"hp",victim.hp.max(0.));
     let a=engine::actor_mut_trusted(r,owner).unwrap();a.hp=0.;
     if !a.abilities.iter().any(|s|s=="enemy:beast:no-revival") {a.abilities.push("enemy:beast:no-revival".into());}
@@ -180,6 +185,7 @@ pub fn consume_weapon(r:&mut Run,id:f64)->Result<(),EngineError> {
     let before=crate::equipment::capture_before(r);
     crate::inventory::take_one(r,index);
     crate::equipment::settle_removed(r,before)?;
+    crate::animation_enemy::mark(r,&r.player,"E74","dissolve-shard",crate::events::Stage::Special);
     engine::log(r,"The Shard of the Borge disintegrates.","player");
     Ok(())
 }

@@ -152,7 +152,7 @@ pub fn reconcile(r: &mut Run, settle_environment: bool) -> Result<bool, String> 
     crate::revision50_ability_energy::reconcile_acquired(r)
         .map_err(|e| format!("Blessing acquisition: {e:?}"))?;
     let previous = unique(r.player.equipment_abilities.value_or(Vec::new()));
-    let reactions_before = engine::max_reactions(&r.player);
+    let reactions_before = engine::max_reactions_for_revision(r.simulation_revision.value_or(29.), &r.player);
     let state = equipment_ability_state(r, &r.inventory);
     r.player.ability_order = state.order.into();
     r.player.abilities = state.abilities;
@@ -182,7 +182,7 @@ pub fn reconcile(r: &mut Run, settle_environment: bool) -> Result<bool, String> 
                 .conditions
                 .shift_remove(&format!("unequipped:{id}"));
         }
-        progression::initialize_ability_state(&mut r.player, id, r.tick)?;
+        progression::initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, id, r.tick)?;
     }
     r.player.equipment_abilities = state
         .grants
@@ -190,7 +190,7 @@ pub fn reconcile(r: &mut Run, settle_environment: bool) -> Result<bool, String> 
         .filter(|id| !state.base.contains(id))
         .collect::<Vec<_>>()
         .into();
-    let reactions_after = engine::max_reactions(&r.player);
+    let reactions_after = engine::max_reactions_for_revision(r.simulation_revision.value_or(29.), &r.player);
     r.player.reactions = (r.player.reactions.value_or(0.0)
         - (reactions_before - reactions_after).max(0.0))
     .min(reactions_after)
@@ -202,7 +202,7 @@ pub fn reconcile(r: &mut Run, settle_environment: bool) -> Result<bool, String> 
 /// reconciliation with its ordinary environment/health settlement boundary.
 pub fn promote_learned(r: &mut Run, id: &str) -> Result<bool, String> {
     if crate::revision50::enabled(r) {
-        crate::revision50_ability_energy::acquire(&mut r.player, &[id.into()])
+        crate::revision50_ability_energy::acquire_for_revision(&mut r.player, &[id.into()], r.simulation_revision.value_or(29.))
             .map_err(|e| format!("Blessing acquisition: {e:?}"))?;
     }
     let ids = r.player.equipment_abilities.get_or_insert_with(Vec::new);
@@ -213,6 +213,6 @@ pub fn promote_learned(r: &mut Run, id: &str) -> Result<bool, String> {
     if !r.player.abilities.iter().any(|s| s == id) {
         r.player.abilities.push(id.into());
     }
-    progression::initialize_ability_state(&mut r.player, id, r.tick)?;
+    progression::initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, id, r.tick)?;
     reconcile(r, true)
 }

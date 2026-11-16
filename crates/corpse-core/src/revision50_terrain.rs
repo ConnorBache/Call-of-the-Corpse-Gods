@@ -81,6 +81,7 @@ pub fn activate_clay(r:&mut crate::Run,x:f64,y:f64)->Result<bool,crate::engine::
     r.floor_mut().unwrap().revision50_terrain=modifications.into();
     if !crate::revision50_ability_energy::spend(r,r.player.id,CLAY_ARMY,COST) {*r=before;return Ok(false);}
     crate::engine::log(r,"A Clay Soldier rises where you stood.","player");
+    crate::events::at(r,"P63","rise",crate::events::Stage::Special,&plan.cells.iter().map(|c|crate::events::EventPoint{x:c.x as f64,y:c.y as f64}).collect::<Vec<_>>());
     presentation.commit();
     Ok(true)
 }
@@ -155,9 +156,13 @@ pub fn activate_cogworks(r:&mut crate::Run,x:f64,y:f64)->Result<bool,crate::engi
     if validate_modifications(f,&modifications).is_err() {return Ok(false);}
     if selected==3 {
         if !modifications.iter().any(|m|m.kind!=Kind::ClaySoldier && m.cells.contains(&center)) {return Ok(false);}
+        let removed=modifications.iter().find(|m|m.kind!=Kind::ClaySoldier && m.cells.contains(&center)).unwrap();
+        let removed_kind=removed.kind;
+        let removed_cells=removed.cells.clone();
         // remove performs all saved-data and selection checks before changing a tile.
         if remove(revision,r.floor_mut().unwrap(),&mut modifications,center).is_err() {return Ok(false);}
         r.floor_mut().unwrap().revision50_terrain=modifications.into();
+        crate::events::at(r,"P61",if removed_kind==Kind::Pit {"pit-rise"}else{"slab-sink"},crate::events::Stage::Special,&removed_cells.iter().map(|c|crate::events::EventPoint{x:c.x as f64,y:c.y as f64}).collect::<Vec<_>>());
         crate::engine::log(r,"You remove your Cogworks terrain without spending energy.","player");
         return Ok(true);
     }
@@ -180,6 +185,7 @@ pub fn activate_cogworks(r:&mut crate::Run,x:f64,y:f64)->Result<bool,crate::engi
     // by commit above, and no actor mutation occurs during that terrain operation.
     let paid=crate::revision50_ability_energy::spend(r,r.player.id,COGWORKS,COST);
     debug_assert!(paid);
+    crate::events::at(r,"P61",if selected==2 {"slab"} else {"pit-sink"},crate::events::Stage::Special,&plan.cells.iter().map(|c|crate::events::EventPoint{x:c.x as f64,y:c.y as f64}).collect::<Vec<_>>());
     crate::engine::log(r,if selected==2 {"You create a Cogworks wall with 200 shared HP."} else {"You create a Cogworks pit."},"player");
     Ok(true)
 }
@@ -466,7 +472,7 @@ fn wall_enemy(r:&crate::Run,a:&Actor)->bool {
 /// A normal hostile movement attempt becomes one terrain strike, never an
 /// arrival or creature attack. Caller excludes haste-only/forced movement.
 /// Automatic hit, no wall dodge/DR or creature-only effects; damage reuses the
-/// ordinary enemy base, serialized variance and attack tuning (half, revision-aware damage rounding).
+/// ordinary enemy base, serialized variance and revision-aware raw attack profiles and damage rounding.
 pub(crate) fn attack_wall(r:&mut crate::Run,a:&Actor,x:f64,y:f64)->Result<bool,crate::engine::EngineError> {
     if !wall_enemy(r,a) || crate::engine::condition(a,"forcedMove")!=0.
         || !breakable_at(r,a,x,y) || crate::engine::actor_passable(r,a,x,y) {return Ok(false);}
@@ -479,13 +485,17 @@ pub(crate) fn attack_wall(r:&mut crate::Run,a:&Actor,x:f64,y:f64)->Result<bool,c
         .map_err(|_|crate::engine::EngineError("Invalid Cogworks wall state".into()))?;
     if crate::monster_statuses::try_hemophilia_episode(r,a.id).map_err(crate::engine::EngineError)? {return Ok(true);}
     let stats=crate::combat::effective_stats(r,a);
-    let base=a.conditions.get("weaponDamage").copied().unwrap_or(10.)
-        + stats.offense*a.conditions.get("weaponOffenseMultiplier").copied().unwrap_or(1.);
+    let base=crate::combat::creature_attack_base(r.simulation_revision.value_or(29.), a, stats.offense);
     let variance=0.75+crate::rng::random(r)*0.5;
     let damage=crate::combat::ordinary_strike_damage_for_run(r,base,variance,0.,false,false);
     let revision = r.simulation_revision.value_or(29.);
-    damage_wall_revision(r.floor_mut().unwrap(),Cell{x:x as i32,y:y as i32},damage,revision)
+    let damaged_wall=damage_wall_revision(r.floor_mut().unwrap(),Cell{x:x as i32,y:y as i32},damage,revision)
         .map_err(|_|crate::engine::EngineError("Invalid Cogworks wall state".into()))?;
+    // A real positive hit chips only the observed struck material. No attacker
+    // identity, neighboring wall footprint, speculative damage or extra RNG.
+    if damaged_wall && damage>0. {
+        crate::events::at(r,"P61","fracture-chip",crate::events::Stage::Impact,&[crate::events::EventPoint{x,y}]);
+    }
     if crate::vision::visible_actor(r,a) {
         crate::engine::log(r,format!("{} strikes the Cogworks wall for {damage} damage.",crate::actor_presentation::name(r,a)),"enemy");
     }

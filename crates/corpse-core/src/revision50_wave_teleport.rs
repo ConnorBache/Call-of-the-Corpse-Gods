@@ -4,7 +4,7 @@ use crate::{Actor, Floor, Run, engine::{self, EngineError}, movement::Point};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum WaterStop { Lanes, WholeFront }
-// Each lane stops independently at existing water, per the designer decision.
+// Each lane stops independently. R52 includes and deepens terminal shallow water.
 const WATER_STOP: WaterStop = WaterStop::Lanes;
 
 fn target(r: &Run, x: f64, y: f64) -> Option<&Actor> {
@@ -15,16 +15,18 @@ fn target(r: &Run, x: f64, y: f64) -> Option<&Actor> {
         && crate::dreamwalking::same_plane(r,&r.player,a)
         && crate::portals::same_position(r,a,x,y) && crate::vision::visible_actor(r,a))
 }
-pub fn target_valid(r:&Run,teleport:bool,x:f64,y:f64)->bool {
+pub fn target_valid(r:&Run,teleport:bool,x:f64,y:f64)->bool {target_valid_with_range(r,teleport,x,y,8.)}
+pub fn target_valid_with_range(r:&Run,teleport:bool,x:f64,y:f64,range:f64)->bool {
     if !crate::revision50::enabled(r) || !x.is_finite() || !y.is_finite() || x.fract()!=0. || y.fract()!=0. {return false}
     if crate::dreamwalking::floor_for(r,&r.player).and_then(|f|crate::portals::cell(f,x,y)).is_none()
         || crate::portals::same_position(r,&r.player,x,y) {return false}
-    if teleport { target(r,x,y).is_some_and(|a|crate::portals::actor_chebyshev(r,&r.player,a)<=8.) }
+    if teleport { target(r,x,y).is_some_and(|a|crate::portals::actor_chebyshev(r,&r.player,a)<=range) }
     else {let dx=x-r.player.x;let dy=y-r.player.y;dx==0. || dy==0. || dx.abs()==dy.abs()}
 }
-pub fn target_blocker_ui(r:&Run,teleport:bool,x:f64,y:f64)->Option<&'static str> {
-    if target_valid(r,teleport,x,y) {None}
-    else if teleport {Some("Choose another visible creature within 8 tiles.")}
+pub fn target_blocker_ui(r:&Run,teleport:bool,x:f64,y:f64)->Option<&'static str> {target_blocker_ui_with_range(r,teleport,x,y,8.)}
+pub fn target_blocker_ui_with_range(r:&Run,teleport:bool,x:f64,y:f64,range:f64)->Option<&'static str> {
+    if target_valid_with_range(r,teleport,x,y,range) {None}
+    else if teleport {Some(if range==8.{"Choose another visible creature within 8 tiles."}else{"Choose another visible creature within this amulet’s range."})}
     else {Some("Choose a cardinal or diagonal direction for the wave.")}
 }
 fn direction(r:&Run,x:f64,y:f64)->(i32,i32) {
@@ -52,7 +54,14 @@ fn wave_cells(r:&Run,x:f64,y:f64,known_only:bool,policy:WaterStop)->Vec<usize> {
             let Some(at)=crate::portals::cell(f,px as f64,py as f64) else{blocked[(lane+1) as usize]=true;continue};
             if known_only && !crate::vision::visible(r,px as usize,py as usize) {blocked[(lane+1) as usize]=true;continue}
             if matches!(f.tiles[at].as_str(),"water"|"shallow-water"){water=true;}
-            if stops(f,at) {blocked[(lane+1) as usize]=true;continue}
+            if stops(f,at) {
+                blocked[(lane+1) as usize]=true;
+                if crate::revision52_amulet_tiers::enabled(r) && f.tiles[at]=="shallow-water"
+                    && !f.doors.as_ref().and_then(|d|d.get(&at.to_string())).is_some_and(|d|!d.open) {
+                    front.push(at);
+                }
+                continue
+            }
             front.push(at);
         }
         if water && policy==WaterStop::WholeFront {break}
@@ -60,8 +69,9 @@ fn wave_cells(r:&Run,x:f64,y:f64,known_only:bool,policy:WaterStop)->Vec<usize> {
     }
     cells
 }
-pub fn preview(r:&Run,teleport:bool,x:f64,y:f64)->Vec<(usize,usize)> {
-    if !target_valid(r,teleport,x,y){return vec![]}
+pub fn preview(r:&Run,teleport:bool,x:f64,y:f64)->Vec<(usize,usize)> {preview_with_range(r,teleport,x,y,8.)}
+pub fn preview_with_range(r:&Run,teleport:bool,x:f64,y:f64,range:f64)->Vec<(usize,usize)> {
+    if !target_valid_with_range(r,teleport,x,y,range){return vec![]}
     if teleport{return vec![(x as usize,y as usize)]}
     let w=crate::dreamwalking::floor_for(r,&r.player).unwrap().width();
     wave_cells(r,x,y,true,WATER_STOP).into_iter().map(|at|(at%w,at/w)).collect()
@@ -89,11 +99,13 @@ pub(crate) fn teleport(r:&mut Run,id:f64)->Result<(),EngineError> {
         let choices=destinations(r,&a);
         // A cramped floor fizzles without RNG. Do not reveal destination counts
         // through target admission, which would scout unexplored terrain.
-        if choices.is_empty(){return Ok(())}
+        if choices.is_empty(){crate::events::cue(r,&a,"A11","fold-reopen",crate::events::Stage::Special,&[(&a).into()]);return Ok(())}
         let at=choices[(crate::rng::random(r)*choices.len() as f64).floor() as usize];
+        crate::events::cue(r,&a,"A11","fold",crate::events::Stage::Travel,&[(&a).into()]);
         let w=r.floor().unwrap().width();let old=a.y as usize*w+a.x as usize;
         let a=engine::actor_mut_trusted(r,id).unwrap();a.x=(at%w) as f64;a.y=(at/w) as f64;
         engine::finish_actor_arrival(r,id,old,false,None)?;
+        if let Some(a)=engine::actor(r,id){crate::events::cue(r,a,"A11","unfold",crate::events::Stage::Special,&[a.into()]);}
         Ok(())
     })
 }
@@ -142,8 +154,14 @@ pub(crate) fn push_steps(r:&mut Run,id:f64,dx:i32,dy:i32,steps:usize)->Result<()
     }
     Ok(())
 }
-fn flood(r:&mut Run,x:f64,y:f64,policy:WaterStop)->Result<(),EngineError> {
+#[cfg(test)]
+fn flood(r:&mut Run,x:f64,y:f64,policy:WaterStop)->Result<(),EngineError> {flood_with_damage(r,x,y,policy,20.)}
+fn flood_with_damage(r:&mut Run,x:f64,y:f64,policy:WaterStop,damage:f64)->Result<(),EngineError> {
     let source=r.player.clone();let (dx,dy)=direction(r,x,y);let cells=wave_cells(r,x,y,false,policy);
+    // Capture membership before damage, forced arrivals, or this cast's writes.
+    // O(C) capture plus bounded O(C²) membership checks below, C<=15.
+    let shallow:Vec<_>=cells.iter().copied().filter(|&at|r.floor().unwrap().tiles[at]=="shallow-water").collect();
+    crate::events::cue(r,&source,"A12","wave",crate::events::Stage::Travel,&crate::animation_amulets::cell_points(r,&cells));
     let mut targets:Vec<_>=r.actors_at(r.depth).iter().filter(|a| a.hp>0. && !a.dead.value_or(false)
         && crate::dreamwalking::same_plane(r,&source,a)
         && crate::portals::cell(r.floor().unwrap(),a.x,a.y).is_some_and(|at|cells.contains(&at)))
@@ -153,18 +171,25 @@ fn flood(r:&mut Run,x:f64,y:f64,policy:WaterStop)->Result<(),EngineError> {
     targets.sort_by(|a,b|b.1.total_cmp(&a.1).then_with(||a.0.total_cmp(&b.0)));
     for (id,_) in targets {
         if engine::actor(r,id).is_none_or(|a|crate::revision50::duel_blocks(r,&source,a)) {continue}
-        engine::damage_direct_with_source_snapshot(r,id,20.,&source,"water",true)?;
+        engine::damage_direct_with_source_snapshot(r,id,damage,&source,"water",true)?;
+        let before=engine::actor(r,id).cloned();
         push(r,id,dx,dy)?;
+        if let Some((a,b))=before.as_ref().zip(engine::actor(r,id)).filter(|(a,b)|a.x!=b.x||a.y!=b.y){crate::events::cue(r,b,"A12","speed",crate::events::Stage::Special,&[a.into(),b.into()]);}
     }
-    for &at in &cells {quench(r.floor_mut().unwrap(),at);}
-    let replace:Vec<_>=cells.into_iter().filter(|&at|crate::revision50_control_amulets::can_replace_terrain(r,at)).collect();
+    let mut steam=Vec::new();
+    for &at in &cells {let burning=r.floor().unwrap().environment.as_ref().is_some_and(|e|e.fire.get(at).is_some_and(|v|*v>0.));quench(r.floor_mut().unwrap(),at);if burning&&r.floor().unwrap().environment.as_ref().is_some_and(|e|e.fire.get(at)==Some(&0.)){steam.push(at);}}
+    crate::events::at(r,"A12","steam",crate::events::Stage::Special,&crate::animation_amulets::cell_points(r,&steam));
+    let replace:Vec<_>=cells.into_iter().filter(|at|!shallow.contains(at))
+        .filter(|&at|crate::revision50_control_amulets::can_replace_terrain(r,at)).collect();
     crate::revision50_control_amulets::add_temporary_terrain(r,&replace,"shallow-water",12.);
+    crate::revision50_control_amulets::deepen_floods_terrain(r,&shallow);
     Ok(())
 }
-pub fn execute(r:&mut Run,teleportation:bool,x:f64,y:f64)->Result<(),EngineError> {
-    if !target_valid(r,teleportation,x,y){return Err(EngineError("Invalid amulet target.".into()))}
+pub fn execute(r:&mut Run,teleportation:bool,x:f64,y:f64)->Result<(),EngineError> {execute_with_profile(r,teleportation,x,y,8.,20.)}
+pub fn execute_with_profile(r:&mut Run,teleportation:bool,x:f64,y:f64,range:f64,damage:f64)->Result<(),EngineError> {
+    if !target_valid_with_range(r,teleportation,x,y,range){return Err(EngineError("Invalid amulet target.".into()))}
     if teleportation {let id=target(r,x,y).unwrap().id;teleport(r,id)}
-    else {let id=r.player.id;crate::dreamwalking::with_actor(r,id,|r|flood(r,x,y,WATER_STOP))}
+    else {let id=r.player.id;crate::dreamwalking::with_actor(r,id,|r|flood_with_damage(r,x,y,WATER_STOP,damage))}
 }
 
 #[cfg(test)]
@@ -309,3 +334,7 @@ mod tests {
     }
 
 }
+
+#[cfg(test)]
+#[path="revision52_floods_tests.rs"]
+mod revision52_floods_tests;

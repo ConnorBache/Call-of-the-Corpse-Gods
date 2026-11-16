@@ -50,7 +50,7 @@ impl Certificate {
 /// O(identifier bytes), fixed whitelist of metadata protocols eligible only AFTER
 /// full checkpoint admission/replay. Recognizing R50 here does not admit its engine.
 fn resumable_header(header: &log::Header) -> bool {
-    matches!(header.simulation_revision, 41 | 42 | 43 | 44 | 45 | 46 | 50 | 51)
+    matches!(header.simulation_revision, 41 | 42 | 43 | 44 | 45 | 46 | 50 | 51 | 52)
         && header.metadata_operations()
 }
 /// Exact decode owns both engine and evidence. Only admitted 41–46/50 metadata
@@ -59,12 +59,16 @@ fn resumable_header(header: &log::Header) -> bool {
 pub(super) fn load(path:&Path)->Result<(Engine,Kind),String>{
     let canonical=canonical_entry(path)?;
     let(raw,witness)=super::read_recording_bytes(path).map_err(|e|format!("Cannot load {}: {e}",path.display()))?;
-    let(core,kind)=super::decode_bytes(&raw)?;
+    let(core,kind,firebolt_migrated)=if log::is_journal(&raw) {
+        super::incremental_store::decode_with_migration(&raw)?
+    } else {let(core,kind)=super::decode_bytes(&raw)?;(core,kind,false)};
     let mut cursor=None;
     if log::is_journal(&raw){
         let header=log::inspect_header(&raw)?;
-        if resumable_header(&header){
-            // decode_bytes above already validated every operation and replayed it.
+        if resumable_header(&header)&&!firebolt_migrated{
+            // Decode above already validated every operation and replayed it.
+            // A migrated Firebolt boundary must enter a fresh checkpoint before
+            // current-policy commands can append behind this disk root.
             let metadata=log::parse(&raw,&header,|_|Ok(()))?.metadata;
             if !metadata.recovered_tail&&metadata.valid_len==raw.len(){cursor=Some(metadata);}
         }
@@ -76,3 +80,7 @@ pub(super) fn load(path:&Path)->Result<(Engine,Kind),String>{
 #[cfg(test)]
 #[path="recording_resume_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path="revision52_firebolt_journal_tests.rs"]
+mod firebolt_tests;

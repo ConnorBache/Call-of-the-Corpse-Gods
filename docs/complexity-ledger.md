@@ -1377,6 +1377,19 @@ two exits. Hidden endpoint identities do not reveal their location.
 
 Coverage and authoritative behavior are in `revision51-speed-up-tiles.md`.
 
+The R52 adjacent-pair clarification is a regression/documentation review of
+these existing paths, not a new runtime algorithm. Generation still enumerates
+at most eight fixed-length row/column candidates per eligible start, sorts the
+accepted candidates and tries at most 96 complete lines per pass, including
+the existing directed reachability proofs. Pair construction is O(K) plus
+O(K log K) sorting for a line of K<=10 cells. No matching search, per-frame
+pairing, new allocation or extra save validation was added. Number lookup,
+known-map filtering and native glyph reconstruction retain the bounds above.
+The new fixed-size native pixel regression performs eight full frames at two
+viewport sizes; each full-frame paint includes existing observation/material,
+glyph-cache and raster costs, plus O(W*H) comparison storage. It is test-only,
+not a measured runtime performance claim.
+
 ### Revision 51 stale root cleanup and olive material
 
 See [root lifecycle correction](revision51-root-cleanup.md#complexity-and-ownership).
@@ -1427,19 +1440,658 @@ O(C+U+A) final detached-cell grading, retained-cell storage, animation restorati
 and native/full/retained/tile/GPU verification costs. Simulation and visibility
 algorithms are unchanged; old v48 rendering remains an explicit frozen adapter.
 
+## Revision 52 exact Darkness illumination and radius-3 circle
 
-## Git import fixture restoration
+See [Darkness override](revision52-darkness.md) for bounded sparse masks,
+scalar/cache/observation costs, additional render scratch, revision identity,
+source-preserving expiry, and deterministic test boundaries. New application
+scans 49 offsets and retains at most 29 circle cells, with O(49 + 29D) time and
+O(29) scratch for D unique stored mask entries; legacy squares remain unchanged. This change adds
+no propagation, pathfinding, gameplay RNG or animation-owned simulation clock.
 
-Let n be the total fixture bytes (116,885,985), in two bounded tracked parts.
-The core build script runs initially and when Cargo detects a changed script,
-part, or restored output. Validation and restoration take O(n) I/O time, with
-two fixed 64KiB comparison buffers plus bounded standard-library copy buffering.
-Restoration uses O(n) temporary disk and leaves O(n) restored disk usage; existing
-matching output is only read. Atomic hard-link publication never overwrites a
-local edit. Filesystems without hard-link support fail safely. Cargo's own
-metadata checks and filesystem cache effects are outside the byte-loop estimate.
-The Python provenance verifier is O(total preserved bytes) time with 1MiB data
-buffers plus O(file count) manifest/path metadata. Tests: the helper runner
-exercises byte preservation, idempotence, local-edit refusal, truncated/missing
-parts, temporary-file cleanup, and automatic restoration on clean/repeated Cargo
-runs. No new full-game or Windows execution is implied by these checks.
+### Revision52 enemy outcome cues
+
+See [enemy animation matrix](revision52-enemy-animation-matrix.md). Presentation-only classification is O(T) per event for T authored traits. Direct scalar-transition hooks are O(1) plus existing visibility/plane admission; exact area cues cost O(C × V) time and O(C) detached output for C already-resolved cells and visibility-query cost V. Slime adds at most nine delta cells per actual move. Flood cues reuse the new frontier instead of rescanning a floor. Fungal roots and breath reuse their existing resolved paths/footprints. No added gameplay search, RNG, persistent state or wall-clock simulation is introduced. Native painting cost remains O(number of visible cue cells); bounded batches share the central presentation cap. Timings are not yet measured.
+
+## Revision 52 player outcome animation
+
+See [player animation bounds](revision52-player-animation-complexity.md): detached observed-actor command snapshots, direct outcome hooks, exact footprint costs, pursuit-route helper cost, and unmeasured visibility/cache assumptions. No simulation clocks or saved animation state.
+
+## Revision 52 admission and animation preferences
+
+See [admission and settings](revision52-admission-and-settings.md) for exact revision gates, unchanged inherited numeric profiles, bounded Settings choices, constant animation-mode draft controls and existing O(J) atomic preference persistence. Cosmetic timing is outside the saved simulation and RNG.
+
+## Revision 52 inventory-only outcome feedback
+
+See [inventory animation cues](revision52-inventory-animation-cues.md) for actual-use and payment admission, O(I+B) existing inventory scans, O(I) changed-reserve scratch, constant detached cue emission and strict separation from gameplay RNG/save state.
+
+## Revision52 action animation
+
+See [action animation contract](revision52-action-animation-contract.md) for detached event/route bounds, per-action timing, native raster cost, observation snapshots and verification limits.
+
+## Revision 52 natural Fighter birth profiles
+
+See [Fighter balance](revision52-fighter-balance.md) for the bounded150-row, exact-revision lookup at new natural birth only, one-time embedded JSON parsing, O(NR) additional floor-generation work, preserved RNG/rewards and strict separation from loaded, copied and summoned actors. Model validation is distinct from integrated-engine tests.
+
+
+## Revision52 reachable targeting and Sparkle
+
+See revision52-targeting-sparkle.md for bounded portal planning/traversal,
+O(V*(AP+M+G)) Blink landing filtering, observation/render costs and unchanged
+permanent-source/water cleanup costs. Bounds are source-derived; no new
+retained state or timers are added by these changes.
+
+
+## Revision52 enemy follow-ups
+
+See revision52-enemy-followups.md#complexity for the complete bounds and
+unmeasured profiling limits. Wound settlement is O(C + D*P), with at most three
+future buckets per recent source and normal-upkeep-only execution. Admission
+adds O(sum C) across persisted actors and carried pilots, plus the documented
+nested serialized-value scan at storage boundaries. Dragon minimax routing is
+O((V+E+K) log V + V*H + E*T + A*I), with E <= 8V, V <= 3600, and at most two
+route fields per action. No route cache hides invalidation or movement work.
+
+
+## Revision 52 amulet tier desktop presentation
+
+See [amulet tier presentation](revision52-amulet-tier-ui.md) for pure shared
+profile lookup, typed physical-instance grouping, existing O(I²) equality/rank
+work and O(G log G) display sorting, O(T) text construction, bounded DEBUG row
+painting and full/retained/tile verification. Shared interaction damage bounds
+add fixed two-logical-pixel plus one-native-pixel padding per side: O(K)
+footprint construction and queued rectangles for K old/new interaction cells.
+Existing span, raster and upload costs remain area/candidate-dependent. No
+pixel-diff invalidation or forced full repaint was added. There is no duplicated
+tier table, simulation mutation, RNG, new visibility query or per-frame tier
+cache. Native performance remains unmeasured.
+
+
+## Revision52 immutable amulet tier mechanics
+
+See [amulet tier complexity](revision52-amulet-tiers.md#complexity) for fixed nine-row profile lookup, one-time birth stamping, persisted-item and captured-rate validation, temporal boundaries, and bounded utility-range changes. No new RNG, path search, target count, item identity or recharge operation is introduced. Source-derived bounds are separate from measured runtime evidence.
+
+### R52 all-role contextual birth profiles
+
+The finalized all-role selection expands the fixed birth catalog from 150 to 550 rows. For R=550 rows, each new natural/Nest/summoned actor performs an O(R) exact-context nearest-floor lookup after legacy overlays, plus O(1) stat and optional saved-coefficient writes. There is no action-time depth scaling or RNG draw. Saved heal/special-damage reads are expected O(1); added condition validation is O(K) within each actor's existing condition traversal, and save-schema recursion remains O(J) serialized bytes. Catalog parsing/storage is O(catalog bytes) once; actor coefficient storage is O(1). Global gas/fire simulation, pathfinding and rendering costs are unchanged. See `revision52-all-role-balance.md` for scope, assumptions, limits and verification boundaries. These bounds are not timing measurements; profile full-world generation before introducing a lookup cache.
+
+## Revision52 Bestiary birth-stat ranges
+
+See [Bestiary stat presentation](revision52-bestiary-stats.md#complexity) for
+bounded public birth reconstruction, exact-profile/legacy-recipe floor lookup,
+revision-keyed cold fungus-feast admission caches, native font-fit/raster costs
+and unchanged discovery storage. The warm range reducer is
+O(R*J + D*(A + (T+R)*J + S)), with D <= 40, S = 7 and R = 550; recipe construction
+and cold feast/helper work are separately accounted for. No hidden Run actors,
+RNG, gameplay mutation, new selector or per-actor cache is added. These are
+source-derived bounds, not measured native or Windows performance.
+
+## Revision 52 Floods shallow-to-deep conversion
+
+See [Floods complexity](revision52-floods.md#complexity) for the bounded 15-cell
+geometry, original-shallow snapshot, O(C*(T+M+P+G+B)) guarded ledger merge,
+single-record storage, inherited floor copy-on-write and normal/offscreen expiry,
+visibility/cache costs, unchanged damage/push work and detached animation cells.
+No new per-frame simulation, RNG, terrain stack or native rendering path is
+introduced. Bounds are analytical; focused/native verification is distinct.
+The 2026-11-08 source reconstruction retains these bounds. Its explicit
+promotion helper rechecks the shared protection gates before merging each
+record and does not introduce a separate terrain stack. Reconstruction tests
+and provenance are recorded in `revision52-floods-reconstruction.md`.
+
+## R52 ground-marker presentation
+See [ground-marker presentation follow-up](r52-ground-markers.md) for native antialiased arrow cost, lowered small topology numbers, and removal of player linked aliases. No simulation complexity changes.
+
+## Revision 52 Minotaur ordering and collapse shape
+
+See [movement follow-up](revision52-charge-collapse.md) for the unchanged charge
+step budget, deferred haste selection costs, alternating cardinal/diagonal-inclusive
+collapse frontier and per-floor serialized phase. No per-frame simulation or RNG
+is introduced. Bounds are analytical, not measured performance.
+
+## R52 Weave of Time arrival consumption
+
+See [Weave arrival-consumption complexity](revision52-weave-consumption.md#complexity)
+for expected constant endpoint removal, linear middle removal, prefix-deletion
+cost, retained allocation, candidate clones and shared-trail detachment. No
+per-frame simulation or new RNG draw is introduced.
+
+## R52 negative illumination and Brogue chasm
+See [negative illumination and chasm presentation](r52-negative-illumination.md): fixed role curves/contrast and static cosmetic hashes, O(C+A+U) detached preparation, O(C) cached metadata, no new world queries.
+
+## R52 ratio accuracy and birth baselines
+
+See [ratio accuracy checkpoint](revision52-accuracy-formula.md#complexity).
+The shared revision-aware base chance uses O(1) time and extra memory for fixed
+numeric inputs, retaining the existing range exponentiation. It adds no RNG,
+allocation, cache or world query; effective-stat/illumination/attack/render work
+retains its existing bounds. New-body and player Accuracy/Dodge assignments
+add O(1) work at existing birth boundaries, with no saved marker or retroactive
+traversal. Historical balance/release receipts do not certify this change.
+
+## Visible ground sidebar and behavior labels
+
+See [visible-ground-list.md](visible-ground-list.md) for observation-time admission,
+G-entry category/distance sort, measured card wrapping, retained/tile repaint,
+and input-path bounds. Ground collection reuses existing visibility; presentation
+adds no simulation dispatch or animation-time world lookup. Restored monster
+state labels add O(label bytes) capitalization and measured wrapping per card.
+
+## R52 fixed Dodge, innate damage and carrying follow-up
+
+See [stat follow-up complexity](revision52-stat-followups.md#complexity).
+First-appearance Dodge adds an O(R*L) fixed-catalog scan only at birth (R=550,
+L=key bytes), with O(1) scratch after the shared catalog load. Innate arithmetic
+and Jackal heartless writes are constant. Revision-aware carrying checks retain
+O(I+B) category admission and existing jewelry-removal clone/ability work.
+
+Brogue-style gameplay animation: see [revision52-brogue-animation-style.md](revision52-brogue-animation-style.md) for two rendering primitives, quiet ordinary actions, exact route projection, local transition feedback, native raster cost and verification scope.
+
+
+
+### Chasm contrast correction (November 2026)
+See [r52-chasm-color-correction.md](r52-chasm-color-correction.md). For C detached terrain cells, finishing remains O(C + A + U), with existing animation anchors A and underlays U. A fixed set of default-profile checks is evaluated once per terrain rebuild; each existing boundary (at most four per cell) uses fixed RGB math. No extra cell scans, world/visibility reads, cache, RNG or retained storage are added. The historical bare-chasm skip of the bounded 12-step contrast search is superseded by the [ordinary illumination clarification](revision52-normal-chasm-illumination.md); visible chasms now share that same bounded search with other terrain. Extra memory is O(1); glyph rasterization/cache misses, pixel coverage and full/retained/tile costs are unchanged. These are analytic bounds, not benchmark claims.
+
+
+
+## R52 reserve ceiling and Wait recovery (2026-11-08)
+
+See [the reserve normalization and payment ledger](revision52-reserves-wait.md#complexity).
+Boundary normalization scans all actor/reserve/item projections in O(A+B+I+K),
+with O(D) recursive-pilot stack and full payload COW copies only for changed blocks.
+Acquisition retains O(B) reserve validation/clamping; payment/UI/Reaping/Wait add
+constant arithmetic to existing lookups/scans. No per-tick migration or new RNG.
+
+
+## Revision 52 Hanged damage redirection
+
+See [Hanged](revision52-hanged.md). Per incoming packet, O(1) scalar conversion
+follows existing mitigation. Ownership/ability inspection adds O(A+K); actual
+resource-history visibility/stat work and shared-body synchronization retain
+existing inclusive costs and COW detach behavior. No per-frame scan, RNG, saved
+state or additional energy pool. Load normalization scans persisted actor
+metadata (including initial player and nested pilots) once per normalized world;
+nested Future/history/pending states retain existing migration traversal costs.
+First-use versioned catalog construction clones fixed catalog/text once; warm
+access is O(1). Focused tests and source estimates are separate from full-candidate
+verification and measured profiling.
+
+
+## R52 native glyph coverage
+See [glyph mask coverage correction](revision52-glyph-mask-coverage.md) for fourfold source sampling, final alpha-area integration, bounded cached masks, cold raster cost, retained/GPU behavior and native verification scope.
+
+
+
+### R52 desktop source reconstruction (2026-11-08)
+The reconstructed Bestiary revision handoff and species damage conversion are
+O(1) time/O(1) extra memory per call. Existing birth/catalog/font costs are
+unchanged. The reconstructed Floods CPU oracle covers 58 frames and adds
+O(F*P) exact comparison time with O(P) buffers and O(F*C) detached views, plus
+production observation, Scene/tile planning, effect projection, glyph raster
+and PNG-encoding work. See [the reconstruction record](revision52-desktop-source-restoration.md)
+for variables, bounded fixtures, checks and source-provenance limits.
+
+## R52 source and delivery provenance update
+
+The Windows packager's snapshot and archive stages retain O(B + N log N) hashing
+and sorting for B source/artifact bytes and N files. Additional design reports
+are bounded file inputs. Complete source archives include fixtures and authoring
+assets rather than relying on missing intermediate deltas; compression work is
+linear in bytes for a fixed compressor setting, with bounded streaming buffers.
+These delivery operations are offline and never run per game frame or turn.
+
+## R52 Avatar selection and fixed player glyph
+
+See [new-game boundary](avatar-new-run-boundary-r52.md),
+[menu selection](revision52-avatar-menu.md), and
+[player glyph presentation](player-glyph-presentation.md). New Avatar wrappers
+add constant boundary work while preserving full generation costs. Seed editing
+and selection remain bounded by the existing seed-length limit; native menu
+painting includes glyph raster/cache and pixel costs. Player glyph projection
+adds constant work at the existing observation boundary and does not rewrite
+saved actors or appearance profiles.
+
+## R52 monster status and gas-entry presentation
+
+See [monster status presentation](monster-status-presentation.md) for actual
+capability lookup, condition formatting/wrapping, public-template projection,
+retained-cache and native painting costs. See [gas-entry warnings](gas-entry-warnings.md)
+for the additional constant-time current-cell gas-presence query and unchanged
+movement/hazard planning costs. Neither feature adds per-turn simulation work.
+
+## R52 incremental corpse roots
+
+See [root growth](revision52-root-growth.md) for per-link cadence, visible-prefix
+projection, corpse search/path costs, layer allocation, legacy-save compatibility,
+normal/offscreen scheduling and native rendering limits. Analytical bounds are
+separate from executed regressions and are not performance guarantees.
+
+## R52 complete source evidence
+
+Source snapshots now also include all documentation and third-party notices,
+with deduplicated paths. For N source paths and B bytes, the snapshot costs
+O(B + N log N) time and O(N) path/hash metadata, with streaming file reads.
+This catches missing or modified licensing/documentation before packaging without
+adding game-frame or simulation work.
+
+## R52 Fated Duel lifecycle
+
+See [Duel termination](revision52-fated-duel.md) for indexed attack/upkeep
+validation, conservative independent-owner candidates, event normalization,
+structural reconciliation, temporal restore and COW costs. Clean movement checks
+scale with candidate owners rather than all world actors; an adversarial world
+with many independent owners can still have quadratic event work. No serialized
+index, RNG, altered area or resource-cost rule is added.
+
+## R52 lake currents and island safeguards
+
+See [square currents and lookahead](revision52-square-currents.md) for bounded
+coverage, seeded edge/collision decisions, lake component scans and deferred
+floor-generation costs. See [Swimming island safeguards](revision52-swimming-islands.md)
+for water/flight ownership queries, land-component predicates, bounded two-label
+ordinary/assisted escape reachability, four-state ring-acquisition/entrance progress, deterministic item
+placement and bounded candidate retries.
+One-floor speculative lookahead reduces eager generation; explicit requests and
+real offscreen fall destinations can still generate deeper required floors.
+Generation work and static escape validation are not frame-time or universal
+gameplay-safety guarantees.
+
+
+## R52 enclosed enemy perception preview
+
+See [enemy perception overlay](revision52-enemy-perception-overlay.md) for detached
+knowledge bounds, remembered-light uncertainty, complete contour extraction,
+map-edge clipping, damage bounds and native raster costs. This is observation
+and presentation work; it does not change simulation perception, reveal unknown
+terrain or run gameplay randomness.
+The R52 follow-up adds O(B) known-special-sense classification per creature,
+O(1) all-known/radius checks per candidate and at most one additional detached
+route query for active Dream See; the existing ray/portal asymptotic bounds
+remain unchanged. Full known-cell and source-bound input/raster regressions are
+specified in that linked entry; their live-world oracle is test-only.
+
+
+## R52 dark chasm memory presentation
+
+See [dark chasm memory](revision52-dark-chasm-memory.md) for the narrow color
+projection rule, ordering with illumination/memory contrast, raster work and
+unchanged simulation/visibility costs.
+
+
+## R52 corpse colors and cross
+
+See [corpse colors and cross](revision52-corpse-colors-cross.md) for retained color
+projection, existing saved-color compatibility and independent marker raster
+costs. No serialized field or gameplay rule is changed by the visual presentation.
+
+
+## R52 shallow-water automatic pathing
+
+See [shallow-water pathing](revision52-shallow-water-pathing.md) for the shared
+known-terrain admission predicate, route-search and execution validation costs.
+Manual movement and static island escape searches retain their rules.
+
+
+## R52 wall and stale-flesh color distinction
+
+See [wall and stale-flesh colors](revision52-wall-flesh-colors.md) for material
+classification, palette projection and native rendering costs, including the
+player-knowledge boundary. No terrain or sight rule changes are implied.
+
+
+## R52 wall-feeding state presentation
+
+See [feeding state](revision52-feeding-state.md) for the actual feeding signal,
+projection frequency, display costs and knowledge boundaries.
+
+
+## R52 Fast and Haste action scheduling
+
+See [Fast versus Haste](revision52-fast-versus-haste.md) for bounded action passes,
+AI/visibility/pathfinding work per pass, movement-success guards, suppression and
+presentation costs. The extra decisions must include their existing AI costs,
+not be described as constant-time simply because the action count is bounded.
+
+## R52 corpse-cross glyph centering
+
+See [native ink centering](revision52-corpse-cross-centering.md). The marker now
+uses the actual base glyph's un-clipped native ink bounds, returned from the same
+paint call. Cold ASCII metadata adds O(H + R) work from existing row runs;
+compound/fallback metadata adds O(M) final-mask scanning, with O(1) bounds per
+bounded cache entry. Warm attachment adds O(1) work without a second raster,
+framebuffer scan or world query. Existing marker O(P × 16) raster/command costs,
+color/alpha, clipping, outlines, save format and privacy rules remain unchanged.
+
+## R52 exact-zero health and current-HP labels
+
+See [exact-zero health](revision52-zero-health.md). New R52 boundary settlement
+adds O(A) scan/O(Z) transient candidate IDs plus the existing death/rescue/visibility,
+loot and copy-on-write costs. Offscreen admission adds O(A) scan/O(1) memory before
+existing precise simulation when unresolved deaths exist. HP display conversion
+is O(1) per label; actual state, bars, RNG and historical revisions are preserved.
+
+
+## R52 ordinary chasm illumination clarification
+
+See [ordinary chasm illumination](revision52-normal-chasm-illumination.md).
+Removing the chasm-specific negative-light contrast skip leaves the detached
+finishing stage O(C + A + U) per rebuild, for C cells, A animation anchors and U
+underlays. Each visible chasm now pays the same fixed RGB arithmetic and bounded
+12-step contrast-gain search as ordinary terrain. Extra scratch is O(1); no new
+stored fields, cache, world reads, visibility work, allocations, glyph masks or
+raster passes are added. Native draw cost and cold glyph-cache work are unchanged.
+These are analytic bounds, not measured timing claims.
+
+## Revision 52 released Floods split
+
+The radial proposal is deferred. Native Apply and recorded UseAt commands retain
+the released wave algorithm and its at-most-15-cell footprint. The existing
+[wave complexity](revision52-floods.md#complexity) remains current; no radial
+49-cell pass, current-grid allocation or O(V) current restoration scan executes.
+Temporary-terrain Snapshot validation retains O(sum(T_f)) record traversal over
+stored floors with existing terrain validation. The removed module's historical
+bounds remain in the explicitly [deferred proposal](revision52-radial-floods.md#complexity).
+Test-only replay checks use existing whole-state storage/replay costs; they add
+no production per-command or rendering work.
+
+Revision 52 flying chasm pursuit: see [revision52-flying-chasm-pursuit.md](revision52-flying-chasm-pursuit.md) for departure detection/actor lookup bounds, unchanged normal pursuit and nine-cell transfer costs, explicit saved chase flag, finite-flight/Dragon behavior, COW/temporal costs and deterministic verification scope.
+
+## Revision 52 corpse current physics
+
+See [corpse currents and fallen flyers](revision52-corpse-currents.md#complexity)
+for stable-ID corpse occupancy snapshots, per-normal-turn sorting, exact
+inactive-floor activity, command/phase-boundary gravity scans, rooted-body predicates, root-sever/COW/index costs,
+constant-time dead-flight eligibility, and the unchanged placement/fall costs.
+No new rendering, save schema, RNG or pathfinding pass is introduced.
+
+
+## R52 minimum starting creature Dodge
+
+See [birth-only minimum complexity](revision52-birth-dodge-minimum.md#complexity).
+The minimum adds O(1) scalar comparison time and O(1) scratch at existing births.
+The O(R*L) first-appearance lookup, fixed tuning scans and shared catalog parse
+remain unchanged. No per-attack, per-frame, save/load or copy/revival traversal,
+allocation, cache or RNG work is added. Bounds are analytical.
+
+## Bestiary nearby-effect range prose
+
+See [effect range audit](revision52-bestiary-effect-ranges.md#complexity). The
+full-page-only borrowed text adapter adds O(M*L) fixed-dispatch comparisons for
+M mechanics and ID/name length L, plus the existing bounded O(C) text layout
+and rasterization for C selected-page characters. It does not query a Run, alter
+preview prose, or add any simulation/pathfinding work. Native art/font cold-cache
+and framebuffer costs remain in the existing Bestiary renderer, not hidden as
+constant-time simulation work.
+
+## Never Surrender DR eligibility and preview parity (2026-11-09)
+
+See [the DR-source, preview-admission and Hanged-payment audit](revision52-never-surrender-audit.md) for the new bounded source-ability check, reserve lookup costs and conditional two-endpoint stat queries. Hanged and ordered rescue implementation are unchanged.
+
+## Revision 52 empty-direction amulet input
+
+See [directional zap input](revision52-directional-zaps.md#complexity) for the
+first-key player-relative origin correction, unchanged mouse/Enter admission,
+O(I) carried-item classification and retained O(V) projected-cell confirmation.
+No new key bindings, simulation loops, state fields, visibility queries or RNG
+choices are introduced. Existing preview, launch and native rendering costs are
+unchanged; the focused helper/capture suite is not OS input-delivery evidence.
+
+## Revision 52 player resource turn changes
+
+See [player per-turn resource display](revision52-resource-changes.md) for the signed net/current-maximum convention, baseline storage and cache invalidation, legacy/save/temporal boundaries, and inclusive complexity.
+
+
+## Revision 52 menu-entry god randomization
+
+See [menu visit complexity](revision52-menu-god-randomization.md#complexity).
+The entry observer adds O(1) work and storage per queued-input/frame boundary;
+only an actual entry reads 12 OS-random bytes and runs the fixed 12-element,
+three-swap selection, O(K + S) time/O(K + S) scratch for K=12 gods and S seed
+bytes. It does not query a Run, parse/generate a floor, consume gameplay RNG,
+or touch a save/replay. A changed full prefix later uses the existing O(S + A)
+seed-sync parser once, including catalog initialization and starter construction.
+Native font/raster/cache/upload costs are unchanged. These are analytical bounds,
+not measured frame timings; OS entropy service latency is platform-dependent.
+
+## Revision 52 experimental Fast mode
+
+See [effective-depth routing, sparse identity and generation](revision52-fast-mode.md#complexity),
+[heart reward arithmetic](fast-mode-heart-rewards.md#complexity), and
+[menu, HUD and archive rendering](fast-mode-menu.md#complexity). Downward routing and
+mode checks are O(1); upward/sparse gas lookup is O(F), F<=40. Existing generation,
+travel, placement, visibility, COW and serialization costs remain explicit in the
+subsystem entry. There are no skipped-floor payloads or eager replay file scans.
+Only the heart's normally awarded stats and blessings receive compensation.
+Initial-floor/finale design and complete production/desktop validation are still
+open; these bounds are not measured speedup or release-readiness claims.
+
+
+## Revision 52 magic and physical projectile travel
+
+See [the travel amendment](revision52-magic-projectile-travel.md#complexity) for per-visible-cell timing, explicit delivery metadata, staged observed Firebolt terrain, new-command simulation compatibility, live portal traversal, and native raster/invalidation costs. No wall-clock animation state enters a Run.
+
+## Revision 52 staged Firebolt terrain
+
+See [Firebolt terrain presentation](revision52-firebolt-staging.md#complexity) for
+command-only outgoing observation costs, bounded detached terrain masking,
+arrival-driven native full damage, custom-light reconstruction, canonical actor
+and knowledge preservation, and replay autoplay presentation pacing. Simulation
+and saved/replayed command timing remain independent of animation.
+
+## Flush three-column HUD layout (November 13 UI mockup)
+
+Presentation only: Chronicle/map left, observed entities middle, player resources
+and abilities right, with boxed player stats at the bottom. Geometry resolution
+is O(1) per frame and input event, O(1) extra memory. Shared panel borders add a
+constant number of rectangle commands; software raster work is proportional to
+the clipped native edge pixels. Ability name wrapping uses existing measured
+word wrapping: O(T²) worst-case font metric work and O(T) temporary storage for
+T characters per admitted name, at most two painted lines per visible row.
+Entity content retains the existing bounded observation-only wrapping/sorting
+contract. Panel invalidation now targets the right-middle column in both
+retained and tiled renderers; no simulation or visibility calculation changes.
+Verify with enemy_list, quiet_ui, responsive_geometry, retained/tile damage and
+native generated_mid_depth_screenshot tests. Bounds are responsive logical
+coordinates transformed at the native drawable scale; costs are unmeasured
+asymptotic estimates, not new benchmark claims.
+
+### In-bar resource labels
+Player and observed-creature resource meters are 24 logical pixels thick, with
+labels and totals inside. Two text passes clipped at the fill boundary select
+contrasting ink for filled and empty regions. Per meter: O(G) metric/glyph work
+and O(W*H) software fill pixels, O(G) fitting storage; native GPU quads constant
+and glyph commands O(G). Caller clips and damage masks remain authoritative.
+No resource values or mechanics change. Validate zero/partial/full meters and
+retained/tiled resource updates with resource_ui and enemy_list tests.
+
+### Upcoming energy upkeep forecast
+Read-only projection follows canonical active order, atomic payments, own-reserve
+priority, next-normal-turn prepayment credits and remembered-grant expiry.
+Uses O(B*L) copied reserve metadata, expected O(B+A*L) lookup/planning for B
+reserves, A active abilities and L ID bytes. Unspeak additionally scans current
+floor actors and projects one cloned target's traits/catalog costs. No Run clone,
+RNG, turn advancement or live state mutation. It forecasts maintenance with
+current state, not uncertain combat procs, future commands or energy recovery.
+Resource hatch raster is O(segmentWidth*barHeight), O(1) extra memory; text
+contrast clips in three segments with O(G) glyph work. Display delta keys include
+the projected debit in both retained and tile renderers.
+Creature cards now place resources directly after the name, state/conditions
+below those bars, and spacing after the complete group. This is O(1) geometry
+per existing line; content collection, hit testing and scrolling remain shared.
+
+## Compact ability meters and linked creature hover (2026-11-14)
+- Ability reserve/upkeep presentation is read-only. One shared projection per observed ability list; canonical atomic payment plans split own reserve from player spill. No live simulation mutation or random draws.
+- Ability meter names wrap in their existing bounded row; state is underline/circle rather than added prose. Meter raster work remains bounded by the clipped HUD area; diagonal hatching is O(segment area).
+- Monster conditions retain numerical durations, use inter-card space first, and expand only with wrapped content. Shared layout computes painting and hit bounds, including staircase prefix rows.
+- Regression coverage exercises both hover directions for multiple actors and a wrapped long name across three window sizes, requiring identical highlighted frames for list and map pointer selection.
+
+## Text-fitted ability bar height (2026-11-14)
+- O(G) width measurement chooses one-line name/count when it fits; otherwise existing measured wrapping places the count under the full name. Height derives from rendered lines, font size, and padding rather than a fixed tall rectangle.
+- Four window sizes and representative longest ability names check enclosure, unchanged name text, row bounds, and no drawing beyond bar height. Existing resource and forecast repaint tests remain applicable.
+
+## Boundless Hunger display scale (2026-11-14)
+- Preserve uncapped gameplay energy and X/∞ display. Both fill and projected cost magnitude use a fixed100-point visual scale; fill and hatching saturate within the existing bar rectangle. Hatching denotes cost, not resulting bar shrinkage.
+- Readonly canonical upkeep still spends own reserves first. Tests cover250/110/90 energy,20 upkeep,5 reserve/15 player spill,150-cost saturation, and label enclosure at three window sizes. No overflow graphic or gameplay rule added.
+
+## Stroke-only upcoming-cost warning (2026-11-14)
+- Upcoming-cost warnings preserve the resource's original fill. Only the boundary and diagonal strokes are indigo; base fill and text contrast remain unchanged for player and divine reserve meters.
+- Raster complexity remains O(hatched area), with no additional overlay allocation. Tests sample player-blue and two god-colored reserve bars to prove pixels between strokes are unchanged.
+
+## Unified blue reserve fill (2026-11-14)
+- Divine reserve meters now use the same configured bright energy-blue fill as the player meter. Previously their god colors remained underneath stroke-only warning hatches; the magenta reserve fill could be mistaken for warning tint.
+- Indigo strokes use RGB110,90,235, distinct from dark text; there is still no warning background fill. Render order is base fill, warning strokes, then readable text.
+- Pixel comparison of actual native screenshots checks untouched blue between warning strokes against an adjacent ordinary blue region rather than relying solely on helper unit tests.
+
+## Adjacent one-third reserve bars and Ragelight presentation (2026-11-14)
+- Reserve meters occupy one third of the prior rail width, right-aligned beside the ability name; names wrap in the remaining space and active names remain underlined. Numeric NRG and indigo cost warnings remain inside the blue meter.
+- Ragelight is a presentation alias, leaving serialized ability IDs and canonical names used by simulation dispatch intact. Detached UI and final text measurement/rendering use the same alias so legacy log text is also shown correctly without changing saves.
+- O(T) alias lookup uses borrowed text when absent; wrapping/hit geometry retains the existing bounded rows. Four window sizes verify name/count enclosure and exact one-third sizing.
+
+### Ability enable indicators (2026-11-15)
+Each displayed non-passive ability uses a fixed 11×11 circle to show enabled state, including reserve-bearing rows; no underline. Per redraw O(A + G) indicator/text-layout work for A visible rows and G glyphs, with A bounded by viewport capacity, plus existing glyph rasterization costs. Indicator adds O(1) memory per row; no simulation changes.
+
+### Dedicated inspection strip (2026-11-15)
+The bottom inspection line owns a font-sized strip between the main panels and toolbar, with shared borders and inner clipping. Height depends only on the fixed typography profile, so hover changes do not reflow the map. O(G log G) worst-case text fitting, O(G) text paint and O(W×H) software strip fill for G text glyphs, W strip width and H bounded line height; constant panel geometry and O(G) temporary fitted string. Both retained and tile damage cover the full strip when notice changes.
+
+### Compact ability margins (2026-11-15)
+Ability row spacing halves the unused gap around a 19px reserve meter (50px to 35px at default typography), preserving the existing minimum for enlarged fonts. O(1) geometry; drawing/input share the same row and capacity functions. At most viewport-height/row visible entries; no new allocations or gameplay change.
+
+Fortune Teller presents three fixed boxes and the single next global 20-turn refresh countdown in the first empty box. Detached O(1) projection and constant paint primitives; countdown/charge changes are included in both retained damage keys. No simulation timing change.
+
+Amulet reserve bars read existing physical item energy/capacity during inventory/visible-ground observation. O(1) additional projection and fixed rectangle paint per amulet; sidebar names wrap in remaining width, pack names use existing measured fit. No extra hidden-item reads or simulation mutation.
+
+Execute revision52 per-proc debit is10 via the existing atomic reserve-first planner; revision51 and earlier retain20. O(1) cost selection, existing payment complexity unchanged. UI reads that same cost function and uses the exact authored description. Ragelight copy change is presentation-only.
+
+### Float Away direct-damage boundary
+R52 Float Away now uses the existing direct-packet flag: gas, lingering fire and periodic status damage cannot grant its flight or displacement. Melee, immediate ranged spells and other existing damage kinds retain the proc; other after-damage effects and pre-R52 replay behavior are unchanged. Regression tests cover nine indirect kinds and five direct kinds.
+
+### Telepathy hallucination override
+R52 sensed actors skip only hallucination identity/cache projection; ordinary disguises and pre-R52 presentation remain unchanged. Per admitted actor, the existing telepathy query scans body origins/abilities and can perform Dream See optical LOS (A actors, B abilities/origins, R ray/portal routing cost); worst-case additional work is the existing sense-query cost per presentation surface, with O(B) origin storage. Inspection uses its existing hallucination-cache result to avoid a second sense scan. No RNG, simulation, range, shared-viewpoint, or line-of-effect changes. Regression tests cover global and target-specific telepathy, six animation phases, map/list/inspect/log identity, and dark Iceblast targets with wall/creature blockers.
+
+### Target-selection ability orb
+The existing pending ability is projected to a detached selected-ability ID at the pointer synchronization boundary. Its orb is orange while selecting, with orange taking precedence over enabled green; non-targeted passives remain undecorated. Both retained HUD keys include this ID so cancellation restores normal ink without rebuilding world observation. Regression covers targeting entry/cancel and both retained painters at three window sizes.
+
+### R52 Half Here placement turn (2026-11-15)
+Successful placement enters the existing normal action scheduler; dismissal stays free and invalid placements report no action. The free-command gate and activation result each scan active ability IDs (A): O(A) time, O(1) extra memory per command, no RNG or new cache. Existing endpoint validation/creation and turn scheduling retain their prior costs; no new traversal is introduced. Verify successful placement, invalid/missing targets, dismissal, haste phase behavior, and pre-R52 fixture compatibility with focused Half Here tests.
+
+### R52 Composite bow accuracy
+
+Each shot/forecast checks the revision and bow kind once, O(1) time and memory.
+The resolver passes an explicit accuracy-only flag through deflection recursion;
+it adds no scans, RNG or persistent state. Effective-stat, collision/trajectory,
+rendering and existing recursive combat costs remain unchanged. Only hit-chance
+range becomes zero; physical range and ranged admission stay intact.
+
+### Death acknowledgement gate
+A constant-size desktop input gate blocks gameplay interaction until a dead-run frame has been presented and a fresh Space press arrives. Held or queued Space cannot skip the death view. Terminal auto-travel/rest/targeting are cleared, and dispatch refuses commands on dead runs without mutating save/replay input. Window/quit events remain live; archival and autosave paths are unchanged. Tests cover input gating, release/repress, new-run reset and terminal run immutability.
+
+### Surprise response timing
+R52 successful player hits on sleeping/wandering targets record an internal global-tick boundary before waking them. Their normal/bonus response and immediate counter-attack are blocked through that attack's AI phase, then normal behavior resumes. Direct spell damage uses the same pre-hit snapshot; misses and periodic status damage do not mark a target. Other creatures and historical revisions are unaffected. Dead actors are excluded so corpse lifecycle stays unchanged.
+
+### Fortune Teller relative refill schedule (R52)
+One keyed `turn_schedule::Schedule<()>` deadline per actor with depleted fortunes. Spending schedules now+20 only if no event exists; due events add one and reschedule by20 until cap3. The existing upkeep actor loop queries a constant-sized queue; no additional actor scan, periodic modulo polling, or decrementing countdown is introduced. UI computes remaining turns from the stored deadline. Save/clone preserves queue; older depleted R52 saves begin one fresh20 interval on first upkeep, while pre-R52 retains clock-aligned behavior. Due catch-up is bounded by three missing charges.
+
+### Cogworks modes and rally marker
+Cogworks projects its canonical mode to three compact clickable bubbles, with only the selected mode filled (orange during targeting, green otherwise). Existing numeric mode commands remain valid and both retained HUD keys include mode changes. Rally marks only an already knowledge-projected tile: standalone flag on terrain, superscript appended to the highest-priority entity without replacing its glyph/rank; animated terrain rebuilds retain standalone flags. Three-size native render tests compare retained paths and all mode transitions.
+
+### Tinkered jewelry display names
+The shared R50+ item-name projection appends the one Tinker grant to canonical ring/amulet names, retaining amulet tiers and using the current Ragelight alias. Existing base grants are not duplicated; Tinker's last added grant supplies the suffix. Stored item name, ID, grants and effects remain unchanged. Pack, ground/inspect, pickup/drop and Tinker log callers already share this projection. Tests cover tier preservation, old revision behavior, read-only state and duplicate prevention.
+
+## Transient actor status-death upkeep guard (2026-11-15)
+After status packets execute, normal upkeep revalidates its snapshotted actor ID before regeneration. Mini-Me may be physically removed by lethal venom/bleed; missing or dead actors skip the remaining upkeep. This adds one existing actor lookup per processed actor (same lookup/index assumptions as the adjacent upkeep operations), O(1) extra storage, no queue or scan beyond the existing lookup. Deterministic regressions cover wait/move, loaded pre-death state, lethal bleed and surviving venom. This prevents an Option unwrap panic; Windows runtime remains separately unverified.
+
+### Amulet insufficient-energy copy
+One shared admission-message formatter maps only InsufficientPlayerEnergy to the exact player-visible text "Insufficient Energy". Pack activation blockers and core target admission use it; other diagnostics and all resource mechanics remain unchanged. Core copy and actual Pack blocker regression tests cover the two paths.
+
+### Health threshold acknowledgement
+A constant-size desktop gate tracks resolved HP downward crossings at40% and25%. The lower crossed threshold wins if one action crosses both. It re-arms by observing healing above each threshold, does not warn on initial low-health loads or max-HP-only changes, and gives terminal death precedence. Only a fresh Escape after the warning is presented dismisses it. Automatic travel/rest and targeting are interrupted; simulation/save state is not altered. The warning forces safe overlay uploads and invalidates retained state on entry/exit; native screenshot and input/threshold tests cover the flow.
+
+### Text audit batch two
+Removed only the requested redundant clauses for Cleansing, Healing/Energy potions, Quick Hand, Dreamwalking, Blood Weapon and Nova; changed All-Seeing Eyes to end exactly "until your next turn." Canonical catalogs, desktop overrides and relevant legacy/diluted variants agree. All-Seeing Eyes' generic appended reserve explanation is suppressed to preserve that exact ending; mechanics (including free-move reveal persistence) are unchanged. Exact-copy tests cover current projections and authored Dreamwalking.
+
+## Text audit batch three
+Text-only removal of Dagger flavor, Appropriate floor clause, and See The Future reserve caveats; tiered Blinking uses the existing range profile. Description construction remains O(L) time/memory for output length L, once per observation/inspection; no simulation, scheduling, RNG, or save-format changes. Focused display tests cover all nine tiers.
+
+## Item grant copy ownership
+Item descriptions retain grant names but no longer duplicate ability descriptions. Shared Pack/ground/inspect path remains O(L+G*C) worst-case time and O(L) output memory for L displayed text, G grants and C catalog entries; removes ability forecast/description work for each grant. Existing pickup/drop reconciliation supplies carried jewelry grants to the abilities section; no simulation or save changes.
+Shared reserve tutorial paragraph also removed from ability details; specific costs, reserves, and unique rule paragraphs unchanged. No additional runtime work.
+
+### R52 regular Bow normal accuracy and minimal copy
+
+Extending the existing Composite accuracy flag to all bows is O(1) per shot or
+preview; it adds no RNG, traversal or state. The exact bow description counts
+arrows using the existing O(I) inventory scan and O(1) scratch, where I is carried
+item entries. It returns before generic equipment/ability description expansion.
+
+
+## Revision 53 Commands / Information Help menu and keyboard cursor
+
+See [Help layout, input and rendering](revision53-help-menu.md#complexity) for
+fixed authored-text limits, measured wrapping, profile-aware cache invalidation,
+scrolling and native/GPU composition costs. The detached Help module cannot
+read or mutate a Run. Opening/closing consumes input and invalidates presentation
+state; it introduces no simulation command. The detached keyboard cursor uses
+O(1) coordinate updates and O(1) state, then reuses existing observation, click
+travel, hazard and rendering paths with their existing costs. Plain Z reuses
+the existing Wait dispatch. See the linked keyboard-cursor bounds and
+verification records; this work is not a published release.
+
+
+### Integrated-v2 presentation recovery (November 15, 2026)
+Restored presentation-only magic field intensity and invisible player ink use constant
+arithmetic per emitted cue tile or player cell; existing route traversal and raster
+lighting costs remain unchanged. Identity-known inspection checks reuse the core
+telepathy query (including its origin and visibility lookup costs); they do not mutate
+simulation state or add a second world scan. Venom display scans C condition entries
+on each status observation, O(C) time and O(1) extra memory apart from output text.
+Replay naming writes B serialized bytes and probes D colliding names: O(B+D)
+filesystem operations/work, O(1) additional memory excluding the borrowed serialized
+payload. A sibling temporary file plus create-only hard link preserves existing names;
+there is no finite collision-count cap (the u64 counter is the representable bound).
+Filesystem sync latency and renderer timings are unmeasured. Validate with focused
+replay_archive, player_glyph_tests, action_animation_tests, hallucination and inspection
+tests, plus full workspace and native screenshot checks. No gameplay balance or
+visibility formula is changed by these presentation ports.
+
+### Integrated-v2 mechanics recovery (November 15, 2026)
+Current-tree selective port restores species-fixed birth selection and pre-DR attack
+coefficients atomically. Birth lookup remains O(R*L) over the fixed catalog and prefix
+length; applying a profile constructs one revision51 base actor to restore context-free
+stats/energy, then applies the selected profile, with no extra RNG. Saved actors are not
+retuned. Ordinary attacks, bow scaling and preview arithmetic add O(1) work and scratch;
+Composite scales the rounded post-armor packet once. Normal bow accuracy remains the
+latest revision52 distance-independent ratio. Numeric ring effects use the existing
+inventory/endpoint scan per query; stacking adds no new traversal. Venom consolidation
+scans C conditions once per affected actor upkeep, O(C) time/O(1) scratch plus replacement
+key; severity is one packet with the latest expiry. Ability-sight admission reuses existing
+terrain/portal route and telepathy queries; actual projectile collision remains separate.
+No cache, floor scan, wall-clock timer, RNG draw or simulation revision was introduced.
+Same-revision historical replay equivalence is not guaranteed because both source
+snapshots use revision52 for different rules. Focused feature and preservation tests
+are recorded outside source in the integration evidence; broad QA remains required.
+
+## Riptide two-stage desktop targeting (local integration follow-up)
+The desktop retains one optional enemy ID between the enemy click and rally-point
+click. No simulation command or payment occurs until the second selection; Escape,
+a different ability, or fatal/health-warning cancellation discards the selection.
+Each click validates the actor through existing observation/ability-sight helpers:
+O(A + V) time, where A is actor lookup and V is the existing visibility/physical
+line-of-effect query cost; no new cache or path search is introduced. The retained
+selection is O(1). Rally-point admission preserves the core in-bounds-only contract;
+ordinary movement blockers still stop each forced pull. Hover preview marks the
+candidate square, not a promised movement path. Native pixel capture uses the
+existing full renderer (O(screen pixels + observed cells), unchanged). Asymptotic
+estimates are not performance measurements.
+
+### Custom ability counters (native HUD)
+Each projected ability scans the player's B acquired abilities to identify the first shared-reaction owner: O(B) time, O(1) extra memory per row, O(B²) for all rows, consistent with existing per-row catalog projection. Values use serialized counters/deadlines; no simulation mutation or new timer. Each visible counter paints a fixed-size box/drop and bounded progress meter, O(P + D) native software pixel work (P = indicator pixel area, D = number-glyph raster work/cache misses), O(D) temporary formatting storage. HUD cache keys include indicator values, so counters repaint when only their value changes. Tests compare full/retained/tile rendering at 1280×800, 1920×1080 and 960×1200; timings not measured.
+
+## Twenty-floor blessing rewards (2026-11-16)
+The compressed-route flag selects heart blessing rewards and first-level threshold in O(1) time and O(1) extra memory per reward/threshold lookup. Heart stat scaling still touches eight fixed fields; no scan or extra persisted item copy is introduced. Sap computes the deficit against the same threshold in O(1). Existing level-up catalog offer selection retains its prior complexity. Native focused regressions cover reward ratios, fractional precision, unchanged stat bonuses, and the first/subsequent cost boundaries; no new performance claim is made.
+
+### Twenty-floor route (2026-11-16)
+Route coordinate conversions, adjacent-floor routing, reward multipliers and
+level thresholds are O(1) time and memory. Existing floor generation remains the
+same algorithm per physical floor, now at most 20 floors for new runs; one-floor
+lookahead retained. Save/replay/snapshot flag adds O(1) space. Display conversion
+does not affect simulation RNG. Legacy routes keep their existing algorithms.

@@ -3,11 +3,17 @@
 //! serialized RNG or simulation targeting is changed by this projection.
 use crate::{Actor, Run};
 
+/// Current runs use target-specific telepathy, not nearby sensed terrain.
+/// Older revisions retain their recorded presentation behavior.
+pub fn identity_known(r: &Run, a: &Actor) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && crate::vision::telepathic(r, a)
+}
+
 /// O(A + B*R + L), with B<=2 body origins, ray length R and seed bytes L.
 /// Uses the same fixed actor disguise and deterministic hallucination hash everywhere.
 pub fn apparent_kind(r: &Run, a: &Actor) -> Option<&'static str> {
     if r.simulation_revision.value_or(29.) < 33.
-        || a.id == r.player.id || crate::half_here::is_clone(a) { return None; }
+        || a.id == r.player.id || crate::half_here::is_clone(a) || identity_known(r, a) { return None; }
     let mut kind = crate::new_creatures::disguise_kind(r, a);
     if crate::half_here::origins(r).iter().any(|body|
         !body.dead.value_or(false) && crate::engine::condition(body, "hallucinating") > 0.) {

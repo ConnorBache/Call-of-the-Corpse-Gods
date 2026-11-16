@@ -1,5 +1,6 @@
 //! Revision 50's unequipped player melee baseline, authored as a Greatsword.
-//! Revision-aware entry points reduce only fixed player attack components in R51.
+//! R51 reduces fixed components; R52 retains the 20% innate increase while
+//! authoring attack bases and Offense coefficients in actual pre-DR HP units.
 //! Older revisions retain their arithmetic; no item is manufactured.
 use crate::{combat, Run};
 
@@ -7,16 +8,29 @@ pub const DAMAGE: f64 = 45.0;
 pub const OFFENSE_MULTIPLIER: f64 = 2.0;
 pub const REVISION51_BASE_PERCENT: f64 = 70.0;
 
-/// O(1), fixed player attack component only; bonuses and final rounding are separate.
+/// O(1), revision-aware fixed attack component; bonuses and rounding are separate.
 pub fn fixed_damage_for_revision(revision: f64, damage: f64) -> f64 {
-    // Percentage arithmetic preserves authored half boundaries (45 becomes exactly 31.5).
-    if revision >= 51.0 { damage * REVISION51_BASE_PERCENT / 100.0 } else { damage }
+    // Percentage arithmetic preserves exact authored halves (R51 31.5; R52 15.75).
+    if combat::raw_attack_damage_enabled(revision) { damage * 35.0 / 100.0 }
+    else if revision >= 51.0 { damage * REVISION51_BASE_PERCENT / 100.0 } else { damage }
 }
 
-/// Already-derived Offense retains its coefficient and is never scaled with the base.
+/// R52 keeps the innate 20% increase, authored at half raw strength:18.9.
+/// R52 bows share this innate component; thrown items remain item-defined.
+/// O(1), no RNG or saved-state mutation.
+pub fn innate_damage_for_revision(revision: f64) -> f64 {
+    let base = fixed_damage_for_revision(revision, DAMAGE);
+    if revision >= 52.0 { base * 120.0 / 100.0 } else { base }
+}
+
+/// Already-derived Offense stays unchanged; R52 authors its attack coefficient as1.
 pub fn with_offense_for_run(r: &Run, offense: f64) -> f64 {
-    fixed_damage_for_revision(r.simulation_revision.value_or(29.0), DAMAGE)
-        + OFFENSE_MULTIPLIER * offense
+    with_offense_for_revision(r.simulation_revision.value_or(29.0), offense)
+}
+
+/// Shared innate melee/bow formula, O(1), without item bonuses or early rounding.
+pub fn with_offense_for_revision(revision: f64, offense: f64) -> f64 {
+    innate_damage_for_revision(revision) + offense * if combat::raw_attack_damage_enabled(revision) { 1.0 } else { OFFENSE_MULTIPLIER }
 }
 
 /// Constant arithmetic on already-derived Offense. No rounding, RNG or procs.

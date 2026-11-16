@@ -18,6 +18,8 @@ pub const PROTECTION: &str = "protection";
 pub const SLAYING: &str = "slaying";
 pub const ICE_IMMUNITY: &str = "ice-immunity";
 pub const CORROSION_RESISTANCE: &str = "corrosion-resistance";
+/// R52 island safeguard. It is not added to the ordinary randomized ring pool.
+pub const SWIMMING: &str = "swimming";
 
 /// Canonical named-ring identity, independent of wearing or run revision.
 /// Only these explicit powers have been authored. Unknown/legacy effects are not
@@ -39,6 +41,7 @@ pub fn effect(item: &Item) -> Option<&'static str> {
         Some(SLAYING) => Some(SLAYING),
         Some(ICE_IMMUNITY) => Some(ICE_IMMUNITY),
         Some(CORROSION_RESISTANCE) => Some(CORROSION_RESISTANCE),
+        Some(SWIMMING) => Some(SWIMMING),
         _ => None,
     }
 }
@@ -60,6 +63,7 @@ pub fn display_name(item: &Item) -> Option<&'static str> {
         PROTECTION => "Ring of Protection",
         SLAYING => "Ring of Slaying",
         REAPING => "Ring of Reaping",
+        SWIMMING => "Ring of Swimming",
         _ => return None,
     })
 }
@@ -81,15 +85,15 @@ pub fn description(item: &Item) -> Option<&'static str> {
         SLAYING => Some("Grants +4 Damage."),
         ICE_IMMUNITY => Some("Prevents cold damage, cold-induced slowing, and slipping on ice."),
         CORROSION_RESISTANCE => Some("Halves acid, caustic gas, and ichor damage, and corrosion penalties to DR."),
+        SWIMMING => Some("Grants haste while in shallow or deep water, but not while flying above it."),
         _ => None,
     }
 }
 
 /// Is an authored named-ring power carried by this equipment owner?
 ///
-/// Non-Light powers use boolean presence, so duplicate copies do not multiply
-/// their fixed strengths. Light is the explicit additive-copy exception and
-/// uses count_effect. No tier order exists.
+/// Numeric powers stack per carried copy. Inherently binary powers (flight,
+/// ice immunity, swimming haste) use presence, without inventing extra effects.
 /// This read-only query never removes items or their separate Tinker grants,
 /// legacy stat bonuses or enhancements. Half Here/dream-body endpoints share
 /// their owner's equipment; stats-only Mini-Me and decoys inherit none.
@@ -101,13 +105,13 @@ pub fn has_effect(r: &Run, actor: &Actor, named_effect: &str) -> bool {
 }
 
 /// Count distinct carried items, not quantity, with the same ownership/exclusions.
-/// O(I + C) worst-case time, O(1) additional memory. Light alone uses the count
-/// as magnitude; other fixed powers use has_effect's boolean result.
+/// O(I + C) worst-case time, O(1) additional memory. Quantity is not a ring count.
 pub fn count_effect(r: &Run, actor: &Actor, named_effect: &str) -> usize {
     if !crate::revision50::enabled(r)
         || !matches!(named_effect, STEALTH | LIGHT | REGENERATION | TRANSFERENCE | FLIGHT
             | FIRE_RESISTANCE | POISON_RESISTANCE | CORROSION_RESISTANCE | ICE_IMMUNITY
-            | WILLPOWER | PROTECTION | SLAYING | REAPING | SUSTAIN_STRENGTH)
+            | WILLPOWER | PROTECTION | SLAYING | REAPING | SUSTAIN_STRENGTH | SWIMMING)
+        || (named_effect == SWIMMING && r.simulation_revision.value_or(29.) < 52.)
         || actor.dead.value_or(false)
         || crate::revision50_nightmares::is_decoy(actor)
         || actor.conditions.get("miniMe") == Some(&1.0)
@@ -128,7 +132,13 @@ pub fn count_effect(r: &Run, actor: &Actor, named_effect: &str) -> usize {
 /// Natural HP fraction per normal world turn, before existing creature/Drown
 /// multipliers and suppression. Never advances time or regenerates any energy.
 pub fn natural_hp_rate(r: &Run, actor: &Actor) -> f64 {
-    if has_effect(r, actor, REGENERATION) { 0.004 } else { 0.002 }
+    0.002 * stack_multiplier(r, actor, REGENERATION, 2.0)
+}
+
+/// Compose a per-ring multiplier after one ownership-aware inventory scan.
+/// O(I + C) time, O(1) memory; no RNG, save state, or per-copy effects loop.
+pub fn stack_multiplier(r: &Run, actor: &Actor, effect: &str, per_copy: f64) -> f64 {
+    per_copy.powf(stacking_count(r, actor, effect) as f64)
 }
 
 /// Apply after scaling; combat rounds the result for revision 51 and later.
@@ -143,5 +153,11 @@ pub fn resist_damage(r: &Run, actor: &Actor, kind: &str, damage: f64) -> f64 {
         "cold" => return if has_effect(r, actor, ICE_IMMUNITY) { 0.0 } else { damage },
         _ => return damage,
     };
-    if has_effect(r, actor, effect) { damage * 0.5 } else { damage }
+    damage * stack_multiplier(r, actor, effect, 0.5)
+}
+
+/// Preserve recorded pre-R52 fixed-power behavior; Light already stacked.
+pub fn stacking_count(r: &Run, actor: &Actor, effect: &str) -> usize {
+    let count = count_effect(r, actor, effect);
+    if r.simulation_revision.value_or(29.) < 52. && effect != LIGHT { count.min(1) } else { count }
 }
