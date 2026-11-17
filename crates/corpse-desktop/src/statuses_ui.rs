@@ -81,7 +81,7 @@ impl ConditionMeters {
 pub fn hover_description(revision: f64, status: &Status) -> String {
     if revision >= 52. && status.name == "Fast" { return "Fast: can move two tiles per action, or move once then attack. Slowed suppresses the extra movement.".into(); }
     if revision >= 52. && status.name == "Haste" { return format!("Haste: takes two complete actions per world turn. Slowed suppresses Haste.{}",
-        status.duration.map_or_else(String::new,|n|format!(" {n} turns remaining."))); }
+        status.duration.map_or_else(String::new,|n|format!(" {} turns remaining.", crate::stat_presentation::whole_number(n)))); }
     format!(
         "{} {}.",
         status.name,
@@ -89,7 +89,7 @@ pub fn hover_description(revision: f64, status: &Status) -> String {
             || "ongoing".into(),
             |d| format!(
                 "{} {} remaining",
-                d + 0.,
+                crate::stat_presentation::whole_number(d),
                 if d == 1. { "turn" } else { "turns" }
             )
         )
@@ -131,7 +131,7 @@ pub fn display_name(name:&str)->&str {
 pub fn summary(statuses: &[Status]) -> String {
     statuses.iter().map(|s| {
         let name = display_name(&s.name);
-        s.duration.map_or_else(|| name.to_string(), |n| format!("{name} {n}"))
+        s.duration.map_or_else(|| name.to_string(), |n| format!("{name} {}", crate::stat_presentation::whole_number(n)))
     }).collect::<Vec<_>>().join(", ")
 }
 
@@ -409,11 +409,11 @@ pub fn observe(run: &Run, actor: &Actor) -> Vec<Status> {
             if run.simulation_revision.value_or(29.0) >= 52.0 {
                 let severity: f64 = actor.conditions.iter().filter(|(key, _)| key.starts_with("venom:"))
                     .map(|(_, value)| value.max(0.0)).sum();
-                status.name = format!("Envenomed {severity}");
+                status.name = format!("Envenomed {}", crate::stat_presentation::whole_number(severity));
             } else {
                 let potency = actor.conditions.iter().filter(|(key, _)| key.starts_with("venom:"))
                     .map(|(_, value)| combat::damage_packet(run, actor, *value, "venom", false)).fold(0.0, |sum, n| sum + n);
-                status.name = format!("Envenomed: {potency} damage/turn");
+                status.name = format!("Envenomed: {} damage/turn", crate::stat_presentation::whole_number(potency));
             }
         }
     }
@@ -829,5 +829,14 @@ mod revision52_venom_tests {
         assert_eq!(r,before);
         r.player.conditions.insert("venom:20:7".into(),1.);
         assert!(observe(&r,&r.player).iter().any(|s|s.name=="Envenomed 1"));
+    }
+}
+
+#[cfg(test)] mod integer_status_presentation_tests {
+    #[test] fn fractional_duration_is_displayed_as_a_whole_turn_without_mutation() {
+        let status=super::Status{name:"Burning".into(),duration:Some(2.6)};
+        assert_eq!(super::summary(&[status.clone()]),"Burning 3");
+        assert_eq!(super::hover_description(52.,&status),"Burning 3 turns remaining.");
+        assert_eq!(status.duration,Some(2.6));
     }
 }

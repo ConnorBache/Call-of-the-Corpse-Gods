@@ -128,3 +128,19 @@ fn frames(r:&Run)->Vec<render::View> {
     }
     assert_eq!(r,before);
 }
+
+#[test]
+fn reselect_ability_clears_highlight_and_target_ink_without_a_turn() {
+    let r=room();let before=r.clone();let mut v=observe::observe(&r);
+    let mut pending=Some("kative-cogworks".to_string());let mut attacker=None;
+    let mut riptide=targeting_ui::RiptideTarget::default();
+    sync_pointer_view(&mut v,&r,Some((11,10)),vec![],None);
+    sync_ability_preview(&mut v,&r,pending.as_deref(),attacker,false);
+    assert_eq!(v.selected_ability.as_deref(),Some("kative-cogworks"));
+    assert!(targeting_ui::cancel_reselected_ability("kative-cogworks",&mut pending,&mut attacker,&mut riptide));
+    sync_pointer_view(&mut v,&r,Some((11,10)),vec![],None);
+    sync_ability_preview(&mut v,&r,pending.as_deref(),attacker,false);
+    assert!(v.selected_ability.is_none());
+    assert!(v.target_path.is_empty() && v.target_area.is_empty() && v.target_impact.is_none());
+    assert_eq!(r,before);
+}

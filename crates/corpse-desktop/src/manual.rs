@@ -564,9 +564,7 @@ fn stat_rows(entry: &Entry, revision: f64) -> Vec<(&'static str, String)> {
 // Legacy templates can retain fractional stats. Round only the rendered text,
 // never actor values or gameplay, and do not print repeating binary fractions.
 fn display_stat_number(value: f64) -> String {
-    let value = format!("{value:.2}");
-    let compact = value.trim_end_matches('0').trim_end_matches('.');
-    if compact == "-0" { "0".into() } else { compact.into() }
+    crate::stat_presentation::whole_number(value)
 }
 fn stat_value_size(p: &Painter, value: &str, width: i32) -> u16 {
     (12..=24).rev().find(|size| p.prose_width(value, *size, true) <= width).unwrap_or(12)
@@ -1119,11 +1117,11 @@ mod tests {
     }
     #[test]
     fn r52_bestiary_fractional_legacy_numbers_are_concise_display_only() {
-        assert_eq!(display_stat_number(-50. / 3.), "-16.67");
+        assert_eq!(display_stat_number(-50. / 3.), "-17");
         assert_eq!(display_stat_number(1000.), "1000");
-        assert_eq!(display_stat_number(1.25), "1.25");
+        assert_eq!(display_stat_number(1.25), "1");
         assert_eq!(display_stat_number(-0.00001), "0");
-        assert_eq!(display_stat_number(3.5), "3.5");
+        assert_eq!(display_stat_number(3.5), "4");
     }
     #[test]
     fn r52_bestiary_fungus_setup_metadata_matches_its_executable_stencil() {

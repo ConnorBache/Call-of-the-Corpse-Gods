@@ -241,6 +241,6 @@ fn cursor_render_keeps_observed_footer_and_does_not_mutate_save() {
     let y = with_text.inspection_notice_y() as usize;
     let from = y * with_text.width * 4; let to = (y+24).min(with_text.height) * with_text.width * 4;
     assert_ne!(&with_text.pixels[from..to],&blank.pixels[from..to],"observed terrain text must be visibly painted");
-    assert_eq!(crate::inspection_ui::footer_text("Save failed.",Some(&report)),"Save failed.");
+    assert_eq!(crate::inspection_ui::footer_text("Save failed.",Some(&report)),report.scene);
     assert_eq!(engine.save().unwrap(),before);
 }

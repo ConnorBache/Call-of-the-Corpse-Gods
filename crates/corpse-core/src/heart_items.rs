@@ -303,14 +303,15 @@ mod fast_reward_tests {
         assert_eq!(effective_heart_rewards(&r, &enhanced).blessings, 0.5);
     }
     #[test]
-    fn compressed_first_level_costs_one_and_following_thresholds_are_unchanged() {
+    fn compressed_level_costs_start_at_one_and_double() {
         let mut r = room(true); r.level = 1.; r.compressed_depths = true.into();
         assert_eq!(crate::progression::level_up_cost(&r), 1.);
         r.exp = 1.; r.gods.clear();
         crate::progression::level_up(&mut r);
         assert_eq!(r.level, 2.); assert_eq!(r.exp, 0.);
-        assert_eq!(crate::progression::level_up_cost(&r), 4.);
-        r.level = 3.; assert_eq!(crate::progression::level_up_cost(&r), 8.);
+        assert_eq!(crate::progression::level_up_cost(&r), 2.);
+        r.level = 3.; assert_eq!(crate::progression::level_up_cost(&r), 4.);
+        r.level = 4.; assert_eq!(crate::progression::level_up_cost(&r), 8.);
         r.level = 1.; r.compressed_depths = Field::Missing;
         assert_eq!(crate::progression::level_up_cost(&r), 2.);
     }

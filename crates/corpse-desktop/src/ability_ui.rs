@@ -444,7 +444,7 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
         "Erase Metaphysical" => "10 NRG/hit".into(),
         "Nova" => format!("{} NRG/blast", corpse_core::abilities::nova_attack_cost(r.simulation_revision.value_or(29.))),
         "Uncast" => "10 NRG/spell".into(),
-        "Rage at the Dying of the Light" => format!("{} NRG/rescue", c("rageCost")),
+        "Rage at the Dying of the Light" => format!("{} NRG/rescue", crate::stat_presentation::whole_number(c("rageCost"))),
         "You Shall Never Be Rid of Me" => if c("pelianUsed") > 0. {
             "Spent/level"
         } else {
@@ -453,30 +453,30 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
         .into(),
         "Revert" => "2 NRG + 1 charge".into(),
         "Fortune Teller" => "1 fortune".into(),
-        "Blood Weapon" => format!("{} HP", corpse_core::divine_combat::blood_weapon_hp_cost_for_run(r, p)),
+        "Blood Weapon" => format!("{} HP", crate::stat_presentation::whole_number(corpse_core::divine_combat::blood_weapon_hp_cost_for_run(r, p))),
         "Blood Letting" => "10 HP".into(),
         "See The Future" => {
             if active {
                 "Free return".into()
             } else if r50(r) {
-                format!("All own reserve + {} player NRG", p.energy)
+                format!("All own reserve + {} player NRG", crate::stat_presentation::whole_number(p.energy))
             } else {
-                format!("{} NRG", p.energy)
+                format!("{} NRG", crate::stat_presentation::whole_number(p.energy))
             }
         }
         "Unspeak" => {
             if active {
-                format!("{upkeep} NRG/t")
+                format!("{upkeep:.0} NRG/t")
             } else {
                 "Target NRG/t".into()
             }
         }
         _ if craft => "Craft · Pack".into(),
         _ if suppression => "Free".into(),
-        _ if activation > 0. && upkeep > 0. => format!("{activation} NRG + {upkeep}/t"),
-        _ if upkeep > 0. => format!("{upkeep} NRG/t"),
+        _ if activation > 0. && upkeep > 0. => format!("{activation:.0} NRG + {upkeep:.0}/t"),
+        _ if upkeep > 0. => format!("{upkeep:.0} NRG/t"),
         _ if activation > 0. => format!(
-            "{activation} NRG{}",
+            "{activation:.0} NRG{}",
             if flag("action") { " + action" } else { "" }
         ),
         _ => "Free".into(),
@@ -560,7 +560,7 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
             p.reactions.value_or(0.),
             corpse_core::engine::max_reactions_for_revision(r.simulation_revision.value_or(29.), p)
         )),
-        "Rage at the Dying of the Light" => Some(format!("{} NRG/rescue", c("rageCost"))),
+        "Rage at the Dying of the Light" => Some(format!("{} NRG/rescue", crate::stat_presentation::whole_number(c("rageCost")))),
         "You Shall Never Be Rid of Me" => Some(format!(
             "{}/1 rescues",
             if c("pelianUsed") > 0. { 0 } else { 1 }
@@ -733,7 +733,7 @@ pub fn actor_reserve_summary_for_revision(actor: &corpse_core::Actor, id: &str, 
 }
 /// Mirrors atomic core split payment and Future's own-reserve/player drain.
 pub fn payment_blocker(r: &Run, id: &str, cost: f64) -> Option<String> {
-    if !r50(r) {return (r.player.energy<cost).then(||format!("Needs {cost} energy"));}
+    if !r50(r) {return (r.player.energy<cost).then(||format!("Needs {cost:.0} energy"));}
     use corpse_core::revision50_ability_energy::{plan_payment_for_revision, plan_future_payment_for_revision, EnergyError, FUTURE_ID};
     let plan = if id == FUTURE_ID {
         if r.future.is_some() { return None; }
@@ -748,7 +748,7 @@ pub fn payment_blocker(r: &Run, id: &str, cost: f64) -> Option<String> {
     }
     plan.err().map(|error|match error {
         EnergyError::MissingReserve=>"Reserve not configured".into(),
-        EnergyError::InsufficientEnergy=>format!("Reserve and player energy cannot cover {cost} energy"),
+        EnergyError::InsufficientEnergy=>format!("Reserve and player energy cannot cover {cost:.0} energy"),
         _=>"Ability energy configuration is invalid".into(),
     })
 }

@@ -85,21 +85,21 @@ impl CreatureReport {
         }
     }
 }
-/// Reuse the already visibility-filtered inspection report. Action/error notices
-/// keep precedence; no extra world observation, pathfinding or simulation query.
-pub fn footer_text<'a>(notice: &'a str, report: Option<&'a Report>) -> &'a str {
-    if !notice.is_empty() { notice } else { report.map_or("", |report| report.scene.as_str()) }
+/// Only already visibility-filtered inspection belongs in the inspector footer.
+/// Action notices never replace it; no additional world observation is performed.
+pub fn footer_text<'a>(_notice: &str, report: Option<&'a Report>) -> &'a str {
+    report.map_or("", |report| report.scene.as_str())
 }
 #[cfg(test)]
 mod footer_tests {
     use super::*;
     #[test]
-    fn inspect_footer_restores_observed_text_without_hiding_action_notices() {
+    fn inspect_footer_contains_only_observed_information() {
         let report = Report { scene: "Floor with a visible heart".into(), ..Default::default() };
-        assert_eq!(footer_text("", Some(&report)), report.scene);
-        assert_eq!(footer_text("Select an enemy.", Some(&report)), "Select an enemy.");
-        assert_eq!(footer_text("Save failed.", Some(&report)), "Save failed.");
-        assert_eq!(footer_text("", None), "");
+        for notice in ["", "Select an enemy.", "Targeting cancelled.", "Save failed."] {
+            assert_eq!(footer_text(notice, Some(&report)), report.scene);
+            assert_eq!(footer_text(notice, None), "");
+        }
     }
 }
 /// Detached observation uncertainty, never canonical log or inventory text.
@@ -745,7 +745,7 @@ fn compact_condition(s: &statuses_ui::Status) -> String {
         }
     }
     if let Some(d) = s.duration {
-        format!("{name} ({d}t)")
+        format!("{name} ({}t)", crate::stat_presentation::whole_number(d))
     } else {
         name
     }
@@ -789,11 +789,11 @@ fn heart(r: &Run, a: &Actor) -> String {
         for (name, v) in values {
             if let Some(v) = v.as_ref().filter(|&&n| n != 0.) {
                 let (name,v)=crate::stat_presentation::bonus(name,*v);
-                parts.push(format!("{}{v} {name}", if v >= 0. { "+" } else { "" }));
+                parts.push(format!("{}{} {name}", if v >= 0. { "+" } else { "" }, crate::stat_presentation::whole_number(v)));
             }
         }
     }
-    parts.push(format!("{} Energy", i.energy.value_or(0.)));
+    parts.push(format!("{} Energy", crate::stat_presentation::whole_number(i.energy.value_or(0.))));
     format!("Heart: {}", parts.join(" · "))
 }
 fn stat_values(b: &PartialStats) -> [(&str, &Field<f64>); 8] {
@@ -859,7 +859,7 @@ fn creature_presented(r:&Run,a:&Actor,tile:Option<&vision::ObservedCell>, projec
         resources: {
             let mut text = format!("{}Health {}/{}",
                 if owner.id != a.id { "Shared with you · " } else { "" },
-                crate::stat_presentation::current_health(owner.hp), owner.max_hp);
+                crate::stat_presentation::current_health(owner.hp), crate::stat_presentation::whole_number(owner.max_hp));
             if owner.id == r.player.id || crate::monster_status_ui::energy_capable(r.simulation_revision.value_or(29.), a) {
                 text.push_str(&format!(" · Energy {}/{}", owner.energy.ceil(),
                     if ability(owner, "Boundless Hunger") { "∞".into() }
@@ -1339,10 +1339,10 @@ fn bow_text_presented(r:&Run,bow:&Item,a:&Actor,trace:&crate::targeting_ui::Trac
         shot.maximum = 0.;
     }
     format!(
-        "Bow shot: {:.1}% hit · {}–{} damage · uses 1 arrow.",
-        shot.chance * 100.,
-        shot.minimum,
-        shot.maximum
+        "Bow shot: {}% hit · {}–{} damage · uses 1 arrow.",
+        crate::stat_presentation::whole_number(shot.chance * 100.),
+        crate::stat_presentation::whole_number(shot.minimum),
+        crate::stat_presentation::whole_number(shot.maximum)
     )
 }
 #[derive(Clone)]
@@ -1712,7 +1712,7 @@ fn gas_exposure(r: &Run, a: &Actor, g: &corpse_core::GasPresence) -> String {
     let prefix = format!(
         "{} present (volume {}{})",
         gas_label(&g.r#type),
-        g.concentration,
+        crate::stat_presentation::whole_number(g.concentration),
         if g.concentration == 0. {
             "; lingering gas layer"
         } else {
@@ -1737,7 +1737,7 @@ fn gas_exposure(r: &Run, a: &Actor, g: &corpse_core::GasPresence) -> String {
             let raw = a.max_hp * (1. / 15.) * (1. + cond(a, "gasVulnerable").max(0.));
             let kind = if g.r#type == "caustic" { "caustic" } else { "breatherGas" };
             return format!("{prefix}: {} HP per normal turn while present, after damage resistance.",
-                combat::damage_packet(r, a, raw, kind, true));
+                crate::stat_presentation::whole_number(combat::damage_packet(r, a, raw, kind, true)));
         }
         return format!(
             "{prefix}: {} HP per normal turn while present, before damage prevention.",
@@ -2991,8 +2991,9 @@ fn format_attack(a: &Attack, yours: bool) -> String {
         let high = corpse_core::hanged::split(a.defender_hp, energy - paid[1], a.strike.maximum);
         let subject = if yours { "You hit them" } else { "They hit you" };
         return format!("{subject} {hit}% of the time for {}–{} damage. With Hanged, this hit removes {}–{} HP and {}–{} main energy.",
-            a.strike.minimum, a.strike.maximum,
-            low.hp.min(a.defender_hp), high.hp.min(a.defender_hp), low.energy + paid[0], high.energy + paid[1]);
+            crate::stat_presentation::whole_number(a.strike.minimum), crate::stat_presentation::whole_number(a.strike.maximum),
+            crate::stat_presentation::whole_number(low.hp.min(a.defender_hp)), crate::stat_presentation::whole_number(high.hp.min(a.defender_hp)),
+            crate::stat_presentation::whole_number(low.energy + paid[0]), crate::stat_presentation::whole_number(high.energy + paid[1]));
     }
     let hits = (a.defender_hp.max(0.) / a.strike.maximum).ceil();
     let count = format!("{hits} {}", if hits == 1. { "hit" } else { "hits" });
@@ -3697,9 +3698,26 @@ mod revision52_bow_tier_preview_tests {
                 let before=serde_json::to_vec(&r).unwrap();
                 let text=bow_text_presented(&r,&bow,&target,&trace);
                 assert!(text.contains(range),"{text}");
-                assert!(text.contains("50.0% hit"),"{text}");
+                assert!(text.contains("50% hit"),"{text}");
                 assert_eq!(serde_json::to_vec(&r).unwrap(),before);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod integer_combat_presentation_tests {
+    use super::*;
+    #[test]
+    fn fractional_hanged_forecast_rounds_only_the_displayed_endpoints() {
+        let attack=Attack { strike:Strike {chance:0.483333333,minimum:2.49,maximum:4.51},
+            defender_hp:1.25,defender_max_hp:12.5,hanged_energy:Some(100.),
+            hanged_surrender_main_cost:Some([0.1,0.2]),..Default::default() };
+        let before=attack.clone();
+        let text=format_attack(&attack,false);
+        assert!(text.contains("48% of the time for 2–5 damage"), "{text}");
+        assert!(text.contains("0–0 HP and 9–17 main energy"), "{text}");
+        assert_eq!(attack,before);
+        assert!(!text.as_bytes().windows(3).any(|w|w[0].is_ascii_digit()&&w[1]==b'.'&&w[2].is_ascii_digit()), "{text}");
     }
 }

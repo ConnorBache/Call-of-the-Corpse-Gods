@@ -1,4 +1,4 @@
-//! Fixed-geometry Pack projection. UI grouping is never simulation stacking.
+//! Measured Pack projection. UI grouping is never simulation stacking.
 //!
 //! The owner must refresh after engine dispatch, discard this view when replacing
 //! a session, and consume all input while the drawer is open. Only `Order` edits
@@ -217,6 +217,7 @@ pub struct PackView {
         crate::typography_ui::Overrides,
     )>,
     text_metrics: Option<TextMetrics>,
+    minimum_list_width: i32,
     button_metrics: Option<TextMetrics>,
     groups: Vec<Group>,
     stamp: Stamp,
@@ -274,6 +275,7 @@ impl PackView {
             refresh_count: 0,
             metric_signature: None,
             text_metrics: None,
+            minimum_list_width: 402,
             button_metrics: None,
             groups: display_groups(run),
             stamp: Stamp::observe(run),
@@ -298,7 +300,10 @@ impl PackView {
             crate::typography_ui::overrides(&p.profile, Role::Primary),
         );
         let changed = self.metric_signature.as_ref() != Some(&signature);
-        let layout=PackLayout::resolve(&p.profile, Rect(map.0,map.1,map.2,map.3));
+        let area = Rect(0, map.1, p.logical_width(), map.3);
+        let mut layout = PackLayout::resolve_measured(&p.profile, area, self.minimum_list_width);
+        // Row height is content-derived; geometry/style/content invalidate it together.
+        layout.row = self.layout.row;
         if !changed && !self.content_metrics_dirty && self.layout==layout && self.text_metrics.is_some() && self.button_metrics.is_some(){return;}
         let _timing=corpse_core::timing::span("desktop.pack.configure_rebuild");
         #[cfg(test)]{self.configure_rebuilds+=1;}
@@ -320,6 +325,20 @@ impl PackView {
                 self.button_metrics.as_mut().unwrap().ensure(p, &b.label);
             }
         }
+        // O(A*E + label bytes), only on content/style/geometry invalidation.
+        // Reserve room even before the longest legal Tinkered amulet is acquired.
+        let row_labels: Vec<_> = self.groups.iter().map(|g| self.row_label(g)).collect();
+        let metrics = self.text_metrics.as_mut().unwrap();
+        let longest = longest_tinkered_amulet_name(p, self.stamp.revision);
+        metrics.ensure(p, &longest);
+        let mut width = metrics.width(&longest);
+        for label in &row_labels { metrics.ensure(p, label); width = width.max(metrics.width(label)); }
+        self.minimum_list_width = width.ceil() as i32 + 58 + 100 + 8 + 4;
+        self.layout = PackLayout::resolve_measured(&p.profile, area, self.minimum_list_width);
+        // At very narrow viewports or large user fonts, wrap instead of clipping.
+        let name_width = (self.layout.list.2 - 58 - 100 - 8 - 4).max(1);
+        let lines = row_labels.iter().map(|label| metrics.wrap(label, name_width).len()).max().unwrap_or(1);
+        self.layout.row = self.layout.row.max(lines as i32 * metrics.line + 12);
         self.list_scroll = self.list_scroll.clamp(0, self.list_max_scroll());
         self.detail_scroll = self.detail_scroll.clamp(0, self.detail_max_scroll());
     }
@@ -1050,34 +1069,16 @@ impl PackView {
                 (y + self.layout.row).min(self.layout.list.1 + self.layout.list.3)
                     - y.max(self.layout.list.1),
             ));
-            let width = if self.read_only || self.request.is_some() {
-                57
-            } else {
-                51
-            };
             let reserve=crate::render::resource_ui::amulet_reserve(&g.item,self.stamp.revision);
             let right_pad=if self.read_only||self.request.is_some(){6}else{58};
             let meter_width=if reserve.is_some(){((self.layout.list.2-right_pad)/3).clamp(60,100)}else{0};
-            p.text_role(
-                Role::Inventory,
-                &self.text_metrics.as_ref().map_or_else(
-                    || ellipsize(&label, width),
-                    |m| {
-                        m.ellipsize(
-                            &label,
-                            self.layout.list.2-right_pad-if reserve.is_some(){meter_width+8}else{0},
-                        )
-                    },
-                ),
-                self.layout.list.0 + 2,
-                y + 6,
-                14,
-                if valid {
-                    p.profile.rgb("ui.colors.headings")
-                } else {
-                    p.profile.rgb("ui.colors.primary")
-                },
-            );
+            let available = (self.layout.list.2-right_pad-if reserve.is_some(){meter_width+8}else{0}-4).max(1);
+            let lines = self.text_metrics.as_ref().map_or_else(|| vec![label.clone()], |m| m.wrap(&label, available));
+            for (line_index, line) in lines.iter().enumerate() {
+                p.text_role(Role::Inventory, line, self.layout.list.0 + 2,
+                    y + 6 + line_index as i32 * self.detail_line_height(), 14,
+                    if valid { p.profile.rgb("ui.colors.headings") } else { p.profile.rgb("ui.colors.primary") });
+            }
             if let Some((energy,capacity))=reserve {
                 crate::render::resource_ui::paint_bar(p,"",&format!("{energy:.0}/{capacity:.0}"),
                     self.layout.list.0+self.layout.list.2-right_pad-meter_width,y+4,meter_width,19,
@@ -1238,6 +1239,23 @@ fn tinker_blocker(r: &Run) -> Option<String> {
     } else {
         None
     }
+}
+/// Measure the actual catalog combinations, not character counts: proportional
+/// fonts can make a shorter name wider. The catalog is bounded (12 effects, 72 powers).
+fn longest_tinkered_amulet_name(p: &Painter, revision: f64) -> String {
+    let mut longest = String::new();
+    let mut width = 0.;
+    for effect in ["lightning", "firebolt", "poison", "iceblast", "acid", "blinking", "beckoning", "discord", "obstruction", "roots", "teleportation", "floods"] {
+        let item = Item { kind: "amulet".into(), effect: effect.to_string().into(), ..Default::default() };
+        let name = corpse_core::revision50_amulet_effects::display_name(&item).unwrap();
+        for a in progression::catalog_for_revision(revision).iter().filter(|a| !a.id.starts_with("kative-")) {
+            let ability = match a.id.as_str() { "shrail-rage-at-the-dying-of-the-light" => "Ragelight", "pelian-you-shall-never-be-rid-of-me" => "Never Be Rid of Me", _ => &a.name };
+            let label = format!("Tier 4 {name} and {ability}");
+            let measured = p.measure_text_role(Role::Inventory, &label, 14);
+            if measured > width { width = measured; longest = label; }
+        }
+    }
+    longest
 }
 fn tinker_eligible(i: &Item) -> bool {
     corpse_core::tinker::target_eligible(i)
@@ -2645,10 +2663,7 @@ mod appearance_tests {
             view.configure(&p, frame.map.tuple());
             let layout = view.layout;
             assert_eq!(view.bounds(), layout.bounds.tuple());
-            assert_eq!(
-                layout.row,
-                p.profile.number("ui.layout.inventoryRowHeight") as i32
-            );
+            assert!(layout.row >= p.profile.number("ui.layout.inventoryRowHeight") as i32);
             let (_, first) = view.row_positions()[0];
             assert_eq!(view.click(layout.list.0 + 8, first + 2), PackAction::None);
             assert!(view.selected.is_some());
@@ -3304,5 +3319,39 @@ mod revision52_composite_accuracy_tests {
                 assert_eq!(describe_item(&r,&item),format!("{} ×{}",item.name,count));
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod widest_amulet_tests {
+    use super::*;
+    #[test]
+    fn widest_tinkered_amulet_fits_default_pack_and_narrow_views_wrap() {
+        let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.simulation_revision = 52.0.into();
+        let mut p = Painter::new();
+        let longest = longest_tinkered_amulet_name(&p, 52.);
+        eprintln!("Widest amulet: {} ({} px)", longest, p.measure_text_role(Role::Inventory, &longest, 14));
+        assert!(longest.starts_with("Tier 4 Amulet of "));
+        let mut view = PackView::observe(&run);
+        view.configure(&p, p.frame().map.tuple());
+        assert!(view.layout.bounds.2 > 760);
+        let available = view.layout.list.2 - 58 - 100 - 8 - 4;
+        assert!(view.text_metrics.as_ref().unwrap().width(&longest) <= available as f64);
+        assert!(view.layout.bounds.0 >= 0 && view.layout.bounds.0 + view.layout.bounds.2 <= p.logical_width());
+        // Carry the maximum name to exercise wrapping at a deliberately large font.
+        let mut group = display_groups(&run).into_iter().next().unwrap();
+        group.name = longest;
+        view.groups = vec![group];
+        view.content_metrics_dirty = true;
+        p.profile = Profile::from_value(serde_json::json!({"typography":{"inventory":{"fontSize":32}}})).unwrap();
+        view.configure(&p, p.frame().map.tuple());
+        let metrics = view.text_metrics.as_ref().unwrap();
+        let lines = metrics.wrap(&view.groups[0].name, (view.layout.list.2 - 170).max(1));
+        assert!(lines.len() > 1);
+        assert!(view.layout.row >= lines.len() as i32 * metrics.line + 12);
+        let rebuilds = view.configure_rebuilds;
+        view.configure(&p, p.frame().map.tuple());
+        assert_eq!(view.configure_rebuilds, rebuilds);
     }
 }

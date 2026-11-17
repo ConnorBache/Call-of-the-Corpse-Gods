@@ -1,5 +1,12 @@
 //! Display units only. Save fields and simulation arithmetic remain unchanged.
 use corpse_core::Actor;
+/// Round rendered quantities only, avoiding fractional noise and negative zero.
+/// O(1) numeric work plus output digits; simulation values are never changed.
+pub fn whole_number(value: f64) -> String {
+    let rounded = value.round();
+    if rounded == 0. { "0".into() } else { format!("{rounded:.0}") }
+}
+
 /// Current HP labels use whole units without depicting a living fraction as zero.
 /// O(1), display only: exact HP, bar proportions and death thresholds are untouched.
 pub fn current_health(hp: f64) -> f64 { hp.ceil().max(0.) }
@@ -101,5 +108,13 @@ mod zero_health_display_tests {
         }
         for hp in [-10., -0.25, -0., 0.] { assert_eq!(super::current_health(hp), 0.); }
         assert_eq!(super::current_health(1.25), 2.);
+    }
+}
+
+#[cfg(test)] mod integer_quantity_tests {
+    #[test] fn display_rounds_signed_quantities_without_binary_noise() {
+        for (value,expected) in [(2.49,"2"),(2.5,"3"),(-2.5,"-3"),(-0.01,"0"),(1e9,"1000000000")] {
+            assert_eq!(super::whole_number(value),expected);
+        }
     }
 }

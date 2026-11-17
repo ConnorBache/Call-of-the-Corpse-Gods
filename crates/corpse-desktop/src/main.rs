@@ -1057,12 +1057,12 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         }
                         if pending_item.take().is_some() {
                             inventory=run.as_ref().is_some_and(|r|r.run.status=="playing");
-                            notice = "Targeting cancelled.".into();
+                            notice.clear();
                             continue;
                         }
                         if pending_ability.take().is_some() {
                             implant_attacker = None; riptide_target.cancel();
-                            notice = "Targeting cancelled.".into();
+                            notice.clear();
                             continue;
                         }
                         if ability_detail.take().is_some() {
@@ -1548,6 +1548,10 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         command = Some(Command::Ascend);
                     }
                     if let Some(Command::Ability { id, .. }) = &command {
+                        if targeting_ui::cancel_reselected_ability(id, &mut pending_ability, &mut implant_attacker, &mut riptide_target) {
+                            notice.clear();
+                            continue;
+                        }
                         if r.run.simulation_revision.value_or(29.) >= 50. && !ability_ui::runtime_supported(&r.run, id) { notice = "This ability is not yet available in this build.".into(); continue; }
                         if id == "kative-tinker" {
                             let view =
@@ -1970,6 +1974,10 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     .map(|a| a.id.clone())
                                 {
                                     if !ability_ui::command_binding_allowed(&r.run, &id) { continue; }
+                                    if targeting_ui::cancel_reselected_ability(&id, &mut pending_ability, &mut implant_attacker, &mut riptide_target) {
+                                        notice.clear();
+                                        continue;
+                                    }
                                     if id=="kative-cogworks" {
                                         if let Some(mode)=cogworks_ui::bubble_hit(x,y,painter.hud_left(),ability_ui::top(&painter.profile)+i as i32*ability_ui::row(&painter.profile)) {
                                             notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&Command::Ability{id:id.clone(),target:Field::Value(mode as f64),x:Field::Missing,y:Field::Missing}){Ok(_)=>targeting_ui::cogworks_prompt(&r.run),Err(e)=>e.to_string()};

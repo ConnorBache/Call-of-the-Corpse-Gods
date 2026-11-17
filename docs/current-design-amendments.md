@@ -789,9 +789,27 @@ The final physical floor uses full depth-40 content and the Administrator/finale
 there is no separate depth-39 floor. Godbeast milestones appear on displayed floors
 3, 5, 8, 10, 13, 15, 18, 20. Heart stat rewards remain doubled. Heart blessings
 are half their prior Fast Mode awards; the first level-up costs one blessing,
-with later costs unchanged. Sap retains its fill-to-next-level effect.
+with later costs doubled successively: entering levels 2, 3, 4 costs 1, 2, 4
+blessings respectively (corrected 2026-11-17). Sap retains its fill-to-next-level effect.
 
 `compressedDepths` explicitly versions this route and reward contract in saves,
 replays, temporal snapshots and future anchors. Existing saves/replays without
 this flag keep their original route and reward rules rather than being destructively
 renumbered. New normal/debug starts always use the twenty-floor contract.
+
+## Targeting, inspection, numeric displays and Pack width (2026-11-17)
+
+Selecting an already-targeted divine ability again cancels its targeting state and
+removes its highlight without a simulation turn. This includes secondary-target
+selection. Inspector content is exclusively the observed tile/entity report;
+notifications and targeting-cancellation messages do not replace it.
+
+Player-facing combat quantities, including Hanged HP/energy endpoints, bow
+forecasts and combat stat labels, render in whole units. Simulation values remain
+unchanged. Living fractional current HP continues to display at least one HP.
+
+The Pack reserves the measured width of the longest Tier 4 amulet plus a legal
+non-Kative Tinker ability name, its reserve bar and controls. At default typography
+the maximum is “Tier 4 Amulet of Teleportation and Are You Sure About That?”.
+The Pack can span the sidebars; narrow viewports or oversized fonts wrap labels
+rather than hide them with ellipses.

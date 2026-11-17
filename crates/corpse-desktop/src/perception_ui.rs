@@ -14,8 +14,8 @@ pub fn range_label(run:&Run,actor:&Actor)->Option<String> {
         corpse_core::combat::effective_stats(run,actor).perception))))
 }
 fn number(n:f64)->String {
-    // Keep fractional modifiers meaningful, but avoid floating point noise.
-    let s=format!("{n:.2}");s.trim_end_matches('0').trim_end_matches('.').to_owned()
+    // Presentation only; sight calculations retain their full precision.
+    crate::stat_presentation::whole_number(n)
 }
 pub fn tile_label(run:&Run,cell:&vision::ObservedCell)->Option<String> {
     if !rules::enabled(run)||!cell.current { return None; }

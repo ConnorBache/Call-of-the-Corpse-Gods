@@ -561,3 +561,37 @@ mod riptide_tests {
     }
 
 }
+
+/// Re-selecting a targeted ability is a UI-only cancellation. Drop both stages
+/// together so reopening cannot reuse an earlier victim or rally selection.
+pub fn cancel_reselected_ability(id: &str, pending: &mut Option<String>,
+    implant_attacker: &mut Option<f64>, riptide: &mut RiptideTarget) -> bool {
+    if pending.as_deref() != Some(id) { return false; }
+    *pending = None;
+    *implant_attacker = None;
+    riptide.cancel();
+    true
+}
+#[cfg(test)]
+mod reselect_tests {
+    use super::*;
+    #[test]
+    fn same_ability_cancels_both_targeting_stages() {
+        for id in ["etill-riptide", "ursa-implant-thought", "kative-cogworks"] {
+            let mut pending=Some(id.to_string());
+            let mut attacker=Some(123.);
+            let mut riptide=RiptideTarget { enemy: Some(456.) };
+            assert!(cancel_reselected_ability(id,&mut pending,&mut attacker,&mut riptide));
+            assert_eq!(pending,None); assert_eq!(attacker,None); assert_eq!(riptide.enemy(),None);
+            assert!(!cancel_reselected_ability(id,&mut pending,&mut attacker,&mut riptide));
+        }
+    }
+    #[test]
+    fn different_ability_is_not_a_reselection() {
+        let mut pending=Some("etill-riptide".to_string());
+        let mut attacker=Some(123.);let mut riptide=RiptideTarget { enemy: Some(456.) };
+        assert!(!cancel_reselected_ability("kative-cogworks",&mut pending,&mut attacker,&mut riptide));
+        assert_eq!(pending.as_deref(),Some("etill-riptide"));
+        assert_eq!(attacker,Some(123.));assert_eq!(riptide.enemy(),Some(456.));
+    }
+}

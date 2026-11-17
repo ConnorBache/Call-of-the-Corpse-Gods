@@ -2087,7 +2087,7 @@ estimates are not performance measurements.
 Each projected ability scans the player's B acquired abilities to identify the first shared-reaction owner: O(B) time, O(1) extra memory per row, O(B²) for all rows, consistent with existing per-row catalog projection. Values use serialized counters/deadlines; no simulation mutation or new timer. Each visible counter paints a fixed-size box/drop and bounded progress meter, O(P + D) native software pixel work (P = indicator pixel area, D = number-glyph raster work/cache misses), O(D) temporary formatting storage. HUD cache keys include indicator values, so counters repaint when only their value changes. Tests compare full/retained/tile rendering at 1280×800, 1920×1080 and 960×1200; timings not measured.
 
 ## Twenty-floor blessing rewards (2026-11-16)
-The compressed-route flag selects heart blessing rewards and first-level threshold in O(1) time and O(1) extra memory per reward/threshold lookup. Heart stat scaling still touches eight fixed fields; no scan or extra persisted item copy is introduced. Sap computes the deficit against the same threshold in O(1). Existing level-up catalog offer selection retains its prior complexity. Native focused regressions cover reward ratios, fractional precision, unchanged stat bonuses, and the first/subsequent cost boundaries; no new performance claim is made.
+The compressed-route flag selects heart blessing rewards and doubling level thresholds in O(1) time and O(1) extra memory per reward/threshold lookup. Heart stat scaling still touches eight fixed fields; no scan or extra persisted item copy is introduced. Sap computes the deficit against the same threshold in O(1). Existing level-up catalog offer selection retains its prior complexity. Native focused regressions cover reward ratios, fractional precision, unchanged stat bonuses, and the first/subsequent cost boundaries; no new performance claim is made.
 
 ### Twenty-floor route (2026-11-16)
 Route coordinate conversions, adjacent-floor routing, reward multipliers and
@@ -2095,3 +2095,19 @@ level thresholds are O(1) time and memory. Existing floor generation remains the
 same algorithm per physical floor, now at most 20 floors for new runs; one-floor
 lookahead retained. Save/replay/snapshot flag adds O(1) space. Display conversion
 does not affect simulation RNG. Legacy routes keep their existing algorithms.
+
+### Integer player-facing combat quantities (2026-11-17)
+Combat forecasts (including Hanged HP/main-energy endpoints and bows), Bestiary stats,
+perception labels, and resource-change percentages round only at text formatting.
+The shared numeric formatter performs O(1) arithmetic and O(D) output work/storage
+for D rendered digits per quantity, at existing UI refresh frequency. Prediction,
+resource balances, saves, RNG, and visibility retain their original precision.
+Regression checks exercise fractional Hanged values and signed/near-zero labels.
+
+### Measured inventory width (2026-11-17)
+Pack configuration reserves the widest Tier 4 Tinkered amulet name from the current catalog. On typography/content/viewport invalidation, it measures E×A labels (E=12 amulet effects, A≤72 divine abilities, excluding Kative) and G carried labels; time O(E×A×L + G×L), with L label length including font measurement, plus existing detail wrapping. Scratch is O(L + G×L); cached scalar advances remain O(distinct glyphs). Unchanged configuration skips this scan. Width is bounded by the viewport; when the measured label cannot fit, it wraps and grows rows rather than discarding text. No simulation, RNG, save, or replay state is changed. Tests cover normal font fit, oversized font fallback, and unchanged-layout caching; no measured performance claim.
+
+### Ability reselection and inspection-only footer (2026-11-17)
+- Per mouse/keyboard ability activation, compare the selected ability ID (length `L`): O(L) time and O(1) extra memory; successful reselection clears the two-stage target state without simulation mutation or turn advancement. Existing redraw/preview work is unchanged and not included in this comparison bound.
+- Inspector footer reads the existing visibility-filtered report in O(1) time/O(1) extra memory; action/error notices no longer replace inspection content. No new perception, pathfinding, or simulation query.
+- Regression checks: `reselect_tests`, `reselect_ability_clears_highlight_and_target_ink_without_a_turn`, `inspect_footer_contains_only_observed_information`, and `cursor_render_keeps_observed_footer_and_does_not_mutate_save`. Bounds above are static analysis, not timing measurements.

@@ -143,10 +143,9 @@ fn choose<'a>(pool: &[&'a Ability], owned: &[String], sample: f64) -> &'a Abilit
     }
     pool.last().unwrap()
 }
-/// O(1); the twenty-floor rules change only the first purchased level.
+/// O(1); twenty-floor level costs begin at one and double for each subsequent level.
 pub fn level_up_cost(r: &Run) -> f64 {
-    if r.compressed_depths.value_or(false) && r.level == 1. { 1. }
-    else { 2.0f64.powf(r.level) }
+    2.0f64.powf(r.level - if r.compressed_depths.value_or(false) { 1. } else { 0. })
 }
 /// O(A²) with fixed authored A=72; deterministic god/pool and RNG order.
 pub fn level_up(r: &mut Run) {

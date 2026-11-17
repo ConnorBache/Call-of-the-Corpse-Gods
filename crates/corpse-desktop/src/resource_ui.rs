@@ -5,11 +5,8 @@ use super::Painter;
 pub fn percent_text(percent: Option<f64>) -> String {
     let Some(value) = percent.filter(|v| v.is_finite() && *v != 0.) else { return String::new(); };
     let sign = if value > 0. { "+" } else { "-" };
-    let magnitude = value.abs();
-    if magnitude < 0.1 { format!("{sign}<0.1%") }
-    else if magnitude < 1. { format!("{sign}{magnitude:.1}%") }
-    else if magnitude < 100_000. { format!("{sign}{magnitude:.0}%") }
-    else { format!("{sign}{magnitude:.1e}%") }
+    let magnitude = value.abs().round();
+    format!("{sign}{}%", crate::stat_presentation::whole_number(magnitude))
 }
 pub fn change_suffix(run: &Run, key: &str, value: f64, maximum: f64) -> String {
     let label = percent_text(corpse_core::resources::player_change_percent(run,key,value,maximum));

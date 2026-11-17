@@ -27,9 +27,9 @@ fn resource_ui_formats_capped_positive_negative_zero_and_small_changes(){
     assert_eq!(value_text("Health",202.,202.,"+5%"),"202/202 - +5%");
     assert_eq!(value_text("Health",0.,202.,"-100%"),"0/202 - -100%");
     assert_eq!(percent_text(Some(0.)),"");assert_eq!(percent_text(None),"");
-    assert_eq!(percent_text(Some(0.04)),"+<0.1%");assert_eq!(percent_text(Some(-0.5)),"-0.5%");
-    assert_eq!(percent_text(Some(1e-12)),"+<0.1%");
-    assert_eq!(percent_text(Some(1e9)),"+1.0e9%");
+    assert_eq!(percent_text(Some(0.04)),"+0%");assert_eq!(percent_text(Some(-0.5)),"-1%");
+    assert_eq!(percent_text(Some(1e-12)),"+0%");
+    assert_eq!(percent_text(Some(1e9)),"+1000000000%");
     assert_eq!(value_text("Health",0.25,202.,"-99%"),"1/202 - -99%");
     assert_eq!(crate::ability_ui::reserve_summary(&r,ID).unwrap(),"Reserve 0/10 - -100%");
     let before=r.clone();let _=crate::observe::observe(&r);assert!(r==before,"observation mutated the Run");
@@ -73,7 +73,7 @@ fn resource_ui_full_zero_and_only_delta_changes_repaint_at_normal_and_portrait_s
         assert!(text.starts_with('…'));assert!(text.ends_with(" - +100%"));
         assert!(x>=start&&x+text_width(&full,&text,size)<=right);
         old.hp=1e18;old.max_hp=1e18;old.energy=1e18;old.max_energy=1e18;
-        old.blessings=1e18;old.blessing_goal=1e18;old.resource_changes=["+1.0e9%".into(),"-100%".into(),"+100%".into()];
+        old.blessings=1e18;old.blessing_goal=1e18;old.resource_changes=["+1000000000%".into(),"-100%".into(),"+100%".into()];
         full.game_at(&old,"",false,0.);save_png(&full,&format!("resource-large-{w}x{h}"));
     }
 }
