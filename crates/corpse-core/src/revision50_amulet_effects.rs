@@ -136,6 +136,7 @@ pub fn admission(r: &Run, c: &Command) -> Option<Result<ActivationPlan, String>>
         Command::Use { id } => (*id, None), _ => return None };
     let item = r.inventory.iter().find(|i| i.id == id)?;
     if !is_amulet(item) {return None}
+    if crate::revision52_amulet_tiers::retired(r,item) {return Some(Err(crate::revision52_amulet_tiers::RETIRED_MESSAGE.into()));}
     let Some((x,y)) = aim else { return Some(Err("Choose a target for this amulet.".into())); };
     let Some(profile)=crate::revision52_amulet_tiers::profile(r,item) else {return Some(Err("Invalid amulet tier.".into()));};
     let valid=if let Some(kind)=effect(item) {target_valid_with_range(r,kind,x,y,profile.range.unwrap_or(10.))
@@ -404,6 +405,7 @@ pub fn corrosion_penalty(r:&Run,a:&Actor)->f64 {
 /// UI-only admission. Never query a hidden occupant or unrevealed tile/door.
 /// Definitive collision remains in atomic command admission.
 pub fn target_blocker_ui(r:&Run,item:&Item,x:f64,y:f64)->Option<&'static str> {
+    if crate::revision52_amulet_tiers::retired(r,item) {return Some(crate::revision52_amulet_tiers::RETIRED_MESSAGE);}
     target_blocker_ui_base(r,item,x,y).or_else(|| {
         (r.simulation_revision.value_or(29.)>=52.&&effect(item)==Some(Effect::Blinking)
             &&known_blink_stays_put(r,item,x,y)).then_some("There is no reachable empty square to blink to.")
@@ -461,6 +463,7 @@ fn ice_area(out:&mut AimPreview,o:&crate::vision::TerrainObservation,center:(usi
 /// physical terrain policy as launch. O(observation + floor clone + ray-plan +
 /// V*A*P), O(F+V+A+P) scratch. Unknown cells terminate the route, even if remembered.
 pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
+    if crate::revision52_amulet_tiers::retired(r,item) {return AimPreview::default();}
     let mut out=AimPreview::default();
     let Some(kind)=effect(item) else {
         out.area=crate::revision50_control_amulets::preview(r,item,x,y);
@@ -482,7 +485,7 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
             return out;
         }
         if control==Some(crate::revision50_control_amulets::ControlEffect::Beckoning) {
-            out.delivery=crate::revision50_control_amulets::beckoning_preview_with_range(r,x,y,crate::revision52_amulet_tiers::profile(r,item).and_then(|p|p.range).unwrap_or(8.));
+            out.delivery=crate::revision50_control_amulets::beckoning_preview_with_range(r,x,y,crate::revision52_amulet_tiers::profile(r,item).and_then(|p|p.range).unwrap_or(f64::INFINITY));
         }
         return out;
     };
@@ -983,7 +986,7 @@ mod tests {
         assert_eq!(hp(&r,20.),470.);assert_eq!(hp(&r,21.),500.);
     }
     #[test] fn r52_hidden_interceptor_never_changes_preview_or_admission() {
-        for kind in [Effect::Iceblast,Effect::Blinking,Effect::Firebolt,Effect::Poison,Effect::Acid] {
+        for kind in [Effect::Iceblast,Effect::Blinking,Effect::Firebolt,Effect::Poison] {
             let mut r=r52_room();add(&mut r,kind,1.);
             r.player.conditions.shift_remove("allSeeingReveal");r.player.conditions.shift_remove("allSeeingDepth");
             let p=aim_preview(&r,&r.inventory[0],18.,10.);let c=Command::UseAt{id:1.,x:18.,y:10.};
@@ -1004,15 +1007,15 @@ mod tests {
             assert_eq!(aim_preview(&changed,&item,18.,10.),p);assert!(p.area.is_empty());assert!(p.impact.is_none());
         }
     }
-    #[test] fn r52_lightning_still_pierces_and_acid_keeps_range_eight() {
-        for kind in [Effect::Lightning,Effect::Firebolt,Effect::Poison,Effect::Acid] {
+    #[test] fn r52_lightning_still_pierces_and_retired_acid_has_no_preview() {
+        for kind in [Effect::Lightning,Effect::Firebolt,Effect::Poison] {
             let mut r=r52_room();add(&mut r,kind,1.);enemy(&mut r,20.,14.,10.);enemy(&mut r,21.,20.,10.);
             let p=aim_preview(&r,&r.inventory[0],18.,10.);let ray=trace(&r,kind,18.,10.);
             assert_eq!(p.delivery,ray.points.iter().skip(1).map(|p|(p.x as usize,p.y as usize)).collect::<Vec<_>>());
             if kind==Effect::Lightning {assert!(p.delivery.contains(&(20,10)));assert_eq!(ray.targets,vec![20.,21.]);}
             else {assert_eq!(p.impact,Some((14,10)));assert_eq!(ray.targets,vec![20.]);}
         }
-        let r=r52_room();let item=make_amulet(Effect::Acid,1.).unwrap();assert_eq!(aim_preview(&r,&item,20.,10.).delivery.last(),Some(&(18,10)));
+        let r=r52_room();let item=make_amulet(Effect::Acid,1.).unwrap();assert!(aim_preview(&r,&item,20.,10.).delivery.is_empty());
     }
     #[test] fn r52_finite_portal_rays_and_save_restore_are_deterministic() {
         for kind in [Effect::Iceblast,Effect::Blinking] {

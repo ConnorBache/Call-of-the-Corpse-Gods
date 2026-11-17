@@ -12,6 +12,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         revert_policy: Field::Missing,
         snapshot_from: Field::Missing,
         firebolt_travel_from: Field::Missing,
+        amulet_rules_from: Field::Missing,
         seed: seed.into(),
         mode: mode.into(),
         dev: false,

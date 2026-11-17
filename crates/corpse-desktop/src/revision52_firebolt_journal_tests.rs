@@ -135,3 +135,31 @@ fn firebolt_markerless_empty_or_torn_tail_adopts_only_the_durable_command_prefix
         assert!(migrated);assert_eq!(decoded.save().unwrap(),expected.save().unwrap());
     }
 }
+
+#[test]
+fn amulet_markerless_journal_keeps_old_roots_damage_then_adopts_current_rules() {
+    for metadata in [false,true] {
+        let mut initial=room();initial.firebolt_travel_from=0usize.into();initial.amulet_rules_from=Field::Null;
+        initial.floor_mut().unwrap().tiles.fill("floor".into());
+        let depth=initial.depth;let a=initial.actors_at_mut(depth).iter_mut().find(|a|a.id==950.).unwrap();a.x=14.;
+        let item=initial.inventory.iter_mut().find(|i|i.id==900.).unwrap();
+        item.effect="roots".to_string().into();item.name="Tier 1 Amulet of Roots".into();item.amulet_tier=1.0.into();
+        let mut old=Core::new(initial.clone()).unwrap();
+        let mut checkpoint:serde_json::Value=serde_json::from_str(&session_store::encode(&old,Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("amuletRulesFrom");
+        let header=if metadata {log::Header::for_metadata_revision(Some(52.))} else {log::Header::for_revision(Some(52.))}.unwrap();
+        let mut file=log::encode_initial(&checkpoint.to_string(),&header).unwrap();
+        let command=Command::UseAt{id:900.,x:14.,y:10.};
+        old.dispatch(&command).unwrap();
+        assert!(hp(&old.run)<500.,"historical roots damage must execute in the durable tail");
+        let after=Stamp::capture(&old);append(&mut file,vec![Operation::Command{command,after}],metadata);
+        old.run.amulet_rules_from=old.run.replay.len().into();
+        let (decoded,_)=session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.save().unwrap(),old.save().unwrap());
+        export_twice(&initial,&decoded);
+        let dir=Sandbox::new();let path=dir.path();std::fs::write(&path,&file.bytes).unwrap();
+        let (loaded,_)=load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}

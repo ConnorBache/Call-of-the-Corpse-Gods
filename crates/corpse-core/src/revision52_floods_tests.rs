@@ -1,5 +1,6 @@
 //! Reconstructed R52 Floods regressions from the released behavior contract.
-//! These tests are new verification, not a recovered copy of the missing suite.
+//! The retired amulet is not available in current gameplay. Retained water
+//! primitive regressions protect old temporary terrain and its expiration.
 use super::*;
 use crate::{Command, Field, Item, Stats, revision50_amulet_effects as effects,
     revision50_amulets as energy, revision50_control_amulets as control,
@@ -8,6 +9,7 @@ use crate::{Command, Field, Item, Stats, revision50_amulet_effects as effects,
 fn room() -> Run {
     let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
     r.simulation_revision = 52.0.into();
+    r.amulet_rules_from=Field::Null;
     r.player.x = 10.; r.player.y = 10.;
     r.player.hp = 1000.; r.player.max_hp = 1000.; r.player.base_max_hp = 1000.0.into();
     r.player.energy = 10000.;
@@ -96,7 +98,7 @@ fn diagonal_lanes_consume_their_own_terminal_shallows() {
 }
 
 #[test]
-fn repeated_casts_pay_reserve_then_player_and_third_wave_is_paid_empty() {
+fn repeated_legacy_casts_pay_reserve_then_player_and_third_wave_is_paid_empty() {
     let mut r = room(); let rng = r.rng; let energy = r.player.energy;
     assert_eq!(wave_receipt(&mut r).len(),15);
     assert_eq!(r.inventory[0].amulet_state.as_ref().unwrap().energy,0.);
@@ -322,7 +324,7 @@ fn invalid_water_records_reject_before_dispatch_or_snapshot_mutation() {
 #[test]
 fn legacy_shallow_stop_and_r52_only_description_preserve_all_other_profiles() {
     for revision in [50.,51.] {
-        let mut r=room();r.simulation_revision=revision.into();r.inventory[0].amulet_tier=Field::Missing;
+        let mut r=room();r.simulation_revision=revision.into();if revision<52. {r.amulet_rules_from=Field::Missing;}r.inventory[0].amulet_tier=Field::Missing;
         tile(&mut r,12,10,"shallow-water");let before=preview(&r,false,15.,10.);
         assert!(!before.contains(&(12,10)));assert!(!before.contains(&(13,10)));assert_eq!(before.len(),11);
         let rng=r.rng;cast(&mut r);assert_eq!(r.rng,rng);
@@ -351,7 +353,7 @@ fn selected_target_wave_exit_ends_duel_before_a_later_wave_hit() {
 #[test]
 fn released_floods_rejects_nontargeted_use_without_payment_or_terrain_change() {
     for revision in [50.,51.,52.] {
-        let mut r=room();r.simulation_revision=revision.into();
+        let mut r=room();r.simulation_revision=revision.into();if revision<52. {r.amulet_rules_from=Field::Missing;}
         if revision<52. {r.inventory[0].amulet_tier=Field::Missing;}
         let before=r.clone();
         let error=effects::command(&mut r,&Command::Use{id:901.}).unwrap_err();
@@ -384,12 +386,12 @@ fn released_floods_rejects_unpublished_current_metadata_in_saves_and_snapshots()
 }
 
 #[test]
-fn released_floods_recorded_use_at_replays_with_save_load_recasts_and_expiry() {
+fn legacy_floods_recorded_use_at_replays_with_save_load_recasts_and_expiry() {
     use crate::replay::{ReplayRecord,ReplaySession};
     let initial=room();let mut e=crate::temporal::Engine::new(initial.clone()).unwrap();
     for command in [Command::UseAt{id:901.,x:15.,y:10.},Command::Wait,
         Command::UseAt{id:901.,x:15.,y:10.}] {
-        e.dispatch(&command).unwrap();e=crate::temporal::Engine::load(&e.save().unwrap()).unwrap();
+        e.dispatch(&command).unwrap();e=crate::temporal::Engine::new(crate::storage::deserialize_compatible(&e.save().unwrap()).unwrap()).unwrap();
     }
     assert_eq!(e.run.floor().unwrap().tiles[cell(&e.run,11,10)],"water");
     for _ in 0..12 {e.dispatch(&Command::Wait).unwrap();}

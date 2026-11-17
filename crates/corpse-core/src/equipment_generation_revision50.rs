@@ -14,9 +14,16 @@ pub const AMULETS: [&str; 12] = [
     "lightning", "firebolt", "poison", "iceblast", "acid", "blinking",
     "beckoning", "discord", "obstruction", "roots", "teleportation", "floods",
 ];
+pub const CURRENT_AMULETS: [&str; 10] = [
+    "lightning", "firebolt", "poison", "iceblast", "blinking",
+    "beckoning", "discord", "obstruction", "roots", "teleportation",
+];
 /// One uniform draw within the requested group; no depth/tier/stat roll.
 /// O(1) lookup and O(item bytes) allocation. The returned ID is supplied by caller.
 pub fn create(kind: &str, rng: &mut GenerationRng, id: f64, revision: f64) -> Result<Item, String> {
+    create_with_amulet_rules(kind,rng,id,revision,true)
+}
+pub fn create_with_amulet_rules(kind: &str, rng: &mut GenerationRng, id: f64, revision: f64, current:bool) -> Result<Item,String> {
     match kind {
         "ring" => {
             let mut item = Item { id, kind: "ring".into(), glyph: "=".into(),
@@ -26,7 +33,7 @@ pub fn create(kind: &str, rng: &mut GenerationRng, id: f64, revision: f64) -> Re
                 .ok_or("Missing authored ring name")?.into();
             Ok(item)
         }
-        "amulet" => make_amulet(pick(&AMULETS, rng), id, revision),
+        "amulet" => make_amulet(pick(if revision == 52. && current {&CURRENT_AMULETS[..]} else {&AMULETS[..]}, rng), id, revision),
         // Bow remains the starting bow; Composite bow was the only non-melee
         // ordinary weapon in the existing drop pool. No unusable equip bonuses.
         "weapon" => crate::equipment::make_equipment("Composite bow", id).map_err(|e| e.0),

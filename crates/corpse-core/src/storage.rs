@@ -159,6 +159,7 @@ pub fn validate(run: &Run) -> Result<()> {
         || ground_and_memory.filter(|i| marked(i)).any(|i| {
         !crate::borge::weapon_enabled(run) || !crate::borge::is_shard(i) || !i.dream_ground.value_or(false)
     }) { return Err(invalid("Invalid dream ground item")); }
+    crate::amulet_rules::validate(run).map_err(StorageError)?;
     crate::firebolt_travel::validate(run).map_err(StorageError)?;
     crate::validation::validate(run)?;
     Ok(())

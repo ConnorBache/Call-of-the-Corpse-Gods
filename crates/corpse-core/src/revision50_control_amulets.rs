@@ -68,7 +68,7 @@ fn beckoning_destinations(player:&Actor,a:&Actor)->Vec<Point> {
 }
 /// Known-only pull route in the same deterministic candidate order as commit.
 /// O(observation + A*visibility + 8*(B+L*(A*P+M+H))), O(V+A+L+B)
-/// scratch; L<=18, B cloned actor fields, M terrain modifications, H habitat/traits.
+/// scratch; L bounded by floor dimensions, B cloned actor fields, M terrain modifications, H habitat/traits.
 /// A route is shown only when every cell is currently observed. Hidden actors
 /// never participate; preview is geometry, not a promise that admission succeeds.
 pub fn beckoning_preview(r:&Run,x:f64,y:f64)->Vec<(usize,usize)> {beckoning_preview_with_range(r,x,y,8.)}
@@ -108,7 +108,7 @@ pub fn beckoning_preview_with_range(r:&Run,x:f64,y:f64,range:f64)->Vec<(usize,us
     }
     vec![]
 }
-/// At most eight bounded ray checks (range eight, up to sixteen in R52), each scans same-plane
+/// At most eight ray checks (bounded by floor dimensions), each scans same-plane
 /// occupancy and portal destinations. O(8*L*(A+P+M)), O(L) scratch.
 fn beckoning_plan(r:&Run,x:f64,y:f64,range:f64)->Option<(f64,Vec<Point>)> {
     let a=visible_target(r,x,y,range)?;
@@ -240,28 +240,36 @@ pub fn validate_terrain(r:&Run)->Result<(),String> {
         }
     }Ok(())
 }
-pub fn target_valid(r:&Run,kind:ControlEffect,x:f64,y:f64)->bool {target_valid_with_profile(r,kind,x,y,base_profile(kind))}
+fn run_profile(r:&Run,kind:ControlEffect)->Profile {
+    let mut p=base_profile(kind);
+    if crate::amulet_rules::current(r) {match kind {
+        ControlEffect::Beckoning|ControlEffect::Discord=>p.range=None,
+        ControlEffect::Roots=>{p.duration=Some(8.);p.periodic_damage=0.;}, _=>{},
+    }}
+    p
+}
+pub fn target_valid(r:&Run,kind:ControlEffect,x:f64,y:f64)->bool {target_valid_with_profile(r,kind,x,y,run_profile(r,kind))}
 pub fn target_valid_with_profile(r:&Run,kind:ControlEffect,x:f64,y:f64,p:Profile)->bool {
-    if !crate::revision50::enabled(r) {return false}
+    if !crate::revision50::enabled(r) || (crate::amulet_rules::current(r)&&kind==ControlEffect::Floods) {return false}
     if crate::dreamwalking::dream_actor(r,&r.player)!=crate::dreamwalking::context_dream(r) {
         return target_valid_with_profile(&crate::dreamwalking::observation_run(r),kind,x,y,p)
     }
     if matches!(kind,ControlEffect::Beckoning|ControlEffect::Discord|ControlEffect::Roots)
-        && visible_target(r,x,y,p.range.unwrap_or(8.))
+        && visible_target(r,x,y,p.range.unwrap_or(f64::INFINITY))
             .is_some_and(|a|crate::revision50::duel_blocks(r,&r.player,a)) {return false}
     match kind {
-        ControlEffect::Beckoning=>beckoning_plan(r,x,y,p.range.unwrap()).is_some(),
-        ControlEffect::Discord=>visible_target(r,x,y,8.).is_some(),
+        ControlEffect::Beckoning=>beckoning_plan(r,x,y,p.range.unwrap_or(f64::INFINITY)).is_some(),
+        ControlEffect::Discord=>visible_target(r,x,y,p.range.unwrap_or(f64::INFINITY)).is_some(),
         ControlEffect::Roots=>visible_target(r,x,y,6.).is_some_and(|a|!engine::flying_in(r,a)),
         ControlEffect::Obstruction=>obstruction_cells(r,x,y).is_some_and(|cells| {
             let f=crate::dreamwalking::floor_for(r,&r.player).unwrap();
             crate::vision::visible(r,x as usize,y as usize) && cells.into_iter().all(|at|can_replace_terrain(r,at)
                 && crate::portals::occupied_at(r,&r.player,(at%f.width())as f64,(at/f.width())as f64,None).is_none())
         }),
-        ControlEffect::Teleportation|ControlEffect::Floods=>crate::revision50_wave_teleport::target_valid_with_range(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(8.)),
+        ControlEffect::Teleportation|ControlEffect::Floods=>crate::revision50_wave_teleport::target_valid_with_range(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(f64::INFINITY)),
     }
 }
-pub fn execute(r:&mut Run,kind:ControlEffect,x:f64,y:f64)->Result<(),EngineError> {execute_with_profile(r,kind,x,y,base_profile(kind))}
+pub fn execute(r:&mut Run,kind:ControlEffect,x:f64,y:f64)->Result<(),EngineError> {execute_with_profile(r,kind,x,y,run_profile(r,kind))}
 pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)->Result<(),EngineError> {
     if !target_valid_with_profile(r,kind,x,y,p) {return Err(EngineError("The control amulet target is no longer valid.".into()))}
     // R52 casts use the same committed collision ray as other targeted magic.
@@ -283,12 +291,12 @@ pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)
                 || crate::revision50_nightmares::is_decoy(a) || crate::revision50::duel_blocks(r,&r.player,a)
                 || (kind==ControlEffect::Roots && engine::flying_in(r,a)) {return Ok(())}
             // Beckoning retains its separately authored legal pull-path checks.
-            if kind==ControlEffect::Beckoning && beckoning_plan(r,x,y,p.range.unwrap()).is_none(){return Ok(())}
+            if kind==ControlEffect::Beckoning && beckoning_plan(r,x,y,p.range.unwrap_or(f64::INFINITY)).is_none(){return Ok(())}
         }
     }
     match kind {
         ControlEffect::Beckoning=>{
-            let (id,path)=beckoning_plan(r,x,y,p.range.unwrap()).unwrap();
+            let (id,path)=beckoning_plan(r,x,y,p.range.unwrap_or(f64::INFINITY)).unwrap();
             let original=engine::actor(r,id).unwrap().clone();
             let mut traveled=vec![crate::events::EventPoint::from(&original)];
             for p in path.iter().skip(1) {
@@ -302,16 +310,16 @@ pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)
             }
             crate::events::cue(r,&original,"A07","root",crate::events::Stage::Travel,&traveled);
         },
-        ControlEffect::Discord=>{let id=intercepted.unwrap_or_else(||visible_target(r,x,y,8.).unwrap().id);engine::actor_mut_trusted(r,id).unwrap().conditions.insert(DISCORD.into(),p.duration.unwrap());let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A08","crossed-ring",crate::events::Stage::Special,&[a.into()]);},
+        ControlEffect::Discord=>{let id=intercepted.unwrap_or_else(||visible_target(r,x,y,p.range.unwrap_or(f64::INFINITY)).unwrap().id);engine::actor_mut_trusted(r,id).unwrap().conditions.insert(DISCORD.into(),p.duration.unwrap());let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A08","crossed-ring",crate::events::Stage::Special,&[a.into()]);},
         ControlEffect::Roots=>{
-            let id=intercepted.unwrap_or_else(||visible_target(r,x,y,6.).unwrap().id);let depth=r.depth;let source=r.player.id;let tiered=tiers::enabled(r);
+            let id=intercepted.unwrap_or_else(||visible_target(r,x,y,6.).unwrap().id);let depth=r.depth;let source=r.player.id;let legacy_tier=tiers::enabled(r)&&!crate::amulet_rules::current(r);
             let a=engine::actor_mut_trusted(r,id).unwrap();
-            for (key,value) in [(ROOTS,4.),(ROOT_X,a.x),(ROOT_Y,a.y),(ROOT_DEPTH,depth),(ROOT_SOURCE,source)] {a.conditions.insert(key.into(),value);}
-            if tiered {a.conditions.insert(tiers::ROOTS_DAMAGE.into(),p.periodic_damage);}
+            for (key,value) in [(ROOTS,p.duration.unwrap()),(ROOT_X,a.x),(ROOT_Y,a.y),(ROOT_DEPTH,depth),(ROOT_SOURCE,source)] {a.conditions.insert(key.into(),value);}
+            if legacy_tier {a.conditions.insert(tiers::ROOTS_DAMAGE.into(),p.periodic_damage);} else {a.conditions.shift_remove(tiers::ROOTS_DAMAGE);}
             let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A10","root",crate::events::Stage::Special,&[a.into()]);
         },
         ControlEffect::Obstruction=>{let cells=obstruction_cells(r,x,y).unwrap();add_temporary_terrain(r,&cells,"wall",p.duration.unwrap());crate::events::at(r,"A09","slab",crate::events::Stage::Special,&crate::animation_amulets::cell_points(r,&cells));},
-        ControlEffect::Teleportation|ControlEffect::Floods=>crate::revision50_wave_teleport::execute_with_profile(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(8.),p.direct_damage)?,
+        ControlEffect::Teleportation|ControlEffect::Floods=>crate::revision50_wave_teleport::execute_with_profile(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(f64::INFINITY),p.direct_damage)?,
     }Ok(())
 }
 pub fn discordant(r:&Run,a:&Actor)->bool {crate::revision50::enabled(r)&&engine::condition(a,DISCORD)>0.}
@@ -378,8 +386,12 @@ pub fn tick_actor(r:&mut Run,id:f64)->Result<(),EngineError> {
             // Like ordinary status provenance, player source zero maps to the
             // inactive-floor proxy's player identity for indirect kill credit.
             let source=engine::actor(r,id).unwrap().conditions.get(ROOT_SOURCE).copied().map(|source|if source==0. {r.player.id}else{source});
-            let damage=if tiers::enabled(r){engine::actor(r,id).unwrap().conditions.get(tiers::ROOTS_DAMAGE).copied().unwrap_or(3.)}else{3.};
-            engine::damage_environment(r,id,damage,source,"roots",true)?;
+            // Current Roots immobilizes only, including old captured damage rates.
+            // Do not send a zero packet through combat: that could trigger procs.
+            if !crate::amulet_rules::current(r) {
+                let damage=if tiers::enabled(r){engine::actor(r,id).unwrap().conditions.get(tiers::ROOTS_DAMAGE).copied().unwrap_or(3.)}else{3.};
+                engine::damage_environment(r,id,damage,source,"roots",true)?;
+            }
             if let Some(a)=engine::actor_mut_trusted(r,id) {engine::tick_condition(a,ROOTS);}
             if engine::actor(r,id).is_some_and(|a|engine::condition(a,ROOTS)<=0.) {break_roots(r,id)}
         }
@@ -391,11 +403,12 @@ pub fn tick_actor(r:&mut Run,id:f64)->Result<(),EngineError> {
 /// UI checks only visible actors and observed terrain. Hidden occupants never
 /// change previews or error prose; full transactional admission checks them.
 pub fn target_blocker_ui(r:&Run,item:&Item,x:f64,y:f64)->Option<&'static str> {
+    if tiers::retired(r,item) {return Some(tiers::RETIRED_MESSAGE);}
     let kind=effect(item)?;
     let p=tiers::profile(r,item)?;
-    if matches!(kind,ControlEffect::Teleportation|ControlEffect::Floods) {return crate::revision50_wave_teleport::target_blocker_ui_with_range(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(8.))}
+    if matches!(kind,ControlEffect::Teleportation|ControlEffect::Floods) {return crate::revision50_wave_teleport::target_blocker_ui_with_range(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(f64::INFINITY))}
     if kind!=ControlEffect::Obstruction {
-        let range=p.range.unwrap_or(8.);
+        let range=p.range.unwrap_or(f64::INFINITY);
         let Some(a)=visible_target(r,x,y,range) else{return Some("Choose a visible creature within this amulet's range.")};
         if kind==ControlEffect::Roots&&engine::flying_in(r,a) {return Some("Roots require a grounded creature.")}
         return None
@@ -410,9 +423,10 @@ pub fn target_blocker_ui(r:&Run,item:&Item,x:f64,y:f64)->Option<&'static str> {
     None
 }
 pub fn preview(r:&Run,item:&Item,x:f64,y:f64)->Vec<(usize,usize)> {
+    if tiers::retired(r,item) {return vec![];}
     let Some(kind)=effect(item) else{return vec![]};
     let Some(p)=tiers::profile(r,item) else{return vec![]};
-    if matches!(kind,ControlEffect::Teleportation|ControlEffect::Floods) {return crate::revision50_wave_teleport::preview_with_range(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(8.))}
+    if matches!(kind,ControlEffect::Teleportation|ControlEffect::Floods) {return crate::revision50_wave_teleport::preview_with_range(r,kind==ControlEffect::Teleportation,x,y,p.range.unwrap_or(f64::INFINITY))}
     if target_blocker_ui(r,item,x,y).is_some() {return vec![]}
     if kind==ControlEffect::Obstruction {
         let f=crate::dreamwalking::floor_for(r,&r.player).unwrap();let Some(o)=crate::vision::observe_terrain(r) else{return vec![]};

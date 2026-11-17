@@ -848,3 +848,28 @@ Novas use irregular gas-like radial lobes and a weighted cellular expansion inst
 
 ### Restored maintained-thread visuals — November 17, 2026
 Bonded By Unseen Threads restores the October 15 instruction: a clear linked status and faint red thread between player and target for the active link. I Came For You uses the same thin-thread presentation in its existing gold color. The November 17 outgoing-line activation grows the thread to its target; the resulting maintained link follows actor movement. Only currently observed line cells render; hidden gaps are not connected. Existing action snapshots defer visible telepathy and linked-status results until the growing line finishes. These are presentation changes, not new visibility or telepathy mechanics.
+
+## Amulet retirement and control revision (2026-11-17)
+
+Current Revision 52 runs no longer generate Acid or Floods amulets. Existing
+saved instances retain their IDs, tier, reserve and any Tinker grants, but are
+shown as retired and have no Apply action; direct activation is rejected before
+payment, RNG or world mutation. This is a read-time compatibility policy, not
+inventory deletion or replacement. Existing acid statuses and temporary water
+continue to expire normally. Divine Floods, flooding potions and unrelated acid
+mechanics are unchanged. Historical Revision 50/51 behavior remains available.
+
+Beckoning and Discord have unlimited targeting range at every tier, with existing
+visibility, line-of-effect/interception and legal pull-path restrictions retained.
+Obstruction remains unlimited range. Roots immobilizes for eight normal turns,
+deals no damage at any tier, and retains its six-tile range and existing break
+conditions. Existing captured Roots damage values remain loadable but do not
+produce damage in current runs; an existing countdown is not extended by loading.
+Recasting Roots sets eight turns and clears the obsolete captured damage value.
+All surviving amulet energy costs, reserves, and other tier effects are unchanged.
+
+Old Revision 52 recordings use an explicit amulet-rules command boundary: replay
+initial generation and the pre-amendment command prefix retain their historical
+roster and mechanics. New runs start with the amendment; a live old save adopts
+it at its current command boundary. This prevents changing historical recordings
+while ensuring removed amulets cannot be used by continuing an old live save.

@@ -159,6 +159,9 @@ pub fn create_run(seed: &str, mode: &str, start_floor: u32) -> Result<Run, Strin
     create_run_revision(seed, mode, false, start_floor, PROFILE, 33.)
 }
 pub fn create_run_revision(seed: &str, mode: &str, dev: bool, start_floor: u32, profile: &str, revision: f64) -> Result<Run, String> {
+    create_run_revision_amulet_policy(seed, mode, dev, start_floor, profile, revision, &0usize.into())
+}
+pub(crate) fn create_run_revision_amulet_policy(seed: &str, mode: &str, dev: bool, start_floor: u32, profile: &str, revision: f64, policy: &Field<usize>) -> Result<Run, String> {
     if !(1..=40).contains(&start_floor) || profile != PROFILE || ![31., 32., 33., 34., 35., 36., 37., 38., 39., 40., 41., 42., 43., 44., 45., 46., 50., 51., 52.].contains(&revision) {
         return Err("Unsupported playtest floor, profile or simulation revision.".into());
     }
@@ -166,6 +169,7 @@ pub fn create_run_revision(seed: &str, mode: &str, dev: bool, start_floor: u32, 
         return Err("Enter a nonempty seed of at most 160 bytes without control characters.".into());
     }
     let mut r = crate::startup::new_run_shell_revision(seed, mode, dev, revision)?;
+    crate::amulet_rules::apply_replay_policy(&mut r, policy, 0);
     r.playtest = Profile { version: 1, start_floor, profile: PROFILE.into(), prior_hearts: 0, prior_blessings: 0., sources: vec![], candidates: vec![], debug: None }.into();
     for id in r.player.abilities.clone() { crate::progression::initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, &id, r.tick)?; }
     let to = crate::startup::initial_generation_target(revision, start_floor);

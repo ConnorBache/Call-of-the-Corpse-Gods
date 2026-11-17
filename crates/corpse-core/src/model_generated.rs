@@ -1712,6 +1712,9 @@ pub struct Run {
     /// Firebolt-only command boundary; Null is an explicit legacy playback prefix.
     #[serde(rename = "fireboltTravelFrom", default, skip_serializing_if = "Field::is_missing")]
     pub firebolt_travel_from: Field<usize>,
+    /// Amulet rules command boundary; Null denotes a legacy replay prefix.
+    #[serde(rename = "amuletRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub amulet_rules_from: Field<usize>,
     #[serde(rename = "metrics")]
     pub metrics: IndexMap<String, f64>,
     #[serde(rename = "dev")]

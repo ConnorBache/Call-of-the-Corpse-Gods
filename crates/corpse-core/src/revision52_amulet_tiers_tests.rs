@@ -36,8 +36,8 @@ fn enemy(r:&mut Run,id:f64,x:f64,y:f64) {
 fn cast(r:&mut Run,id:f64,x:f64,y:f64) {effects::command(r,&Command::UseAt{id,x,y}).unwrap().unwrap();}
 fn hp(r:&Run,id:f64)->f64 {engine::actor(r,id).unwrap().hp}
 fn ring(effect:&str)->Item {Item{id:800.,kind:"ring".into(),effect:effect.to_string().into(),..Default::default()}}
-// Assert the intentional R52 birth differences, then compare every other field
-// with the frozen R51 item, including identity, subtype and untouched RNG draws.
+// Normalize intentional R52 birth metadata for structural generation checks.
+// The active subtype roster changed; identity and RNG draw counts stay stable.
 fn normalize(i:&mut Item) {
     let state=i.amulet_state.as_mut().unwrap();assert_eq!(state.energy,10.);state.energy=50.;
     i.amulet_tier=Field::Missing;if let Some(n)=effects::display_name(i){i.name=n.into();}
@@ -49,29 +49,29 @@ fn normalize(i:&mut Item) {
     for depth in 1..=40 {assert_eq!(tier_for_depth(depth),if depth<=4{1}else{(depth/5+1)as u8});}
     for (c,key) in keys.iter().enumerate() {for tier in 1..=9 {
         let i=amulet(key,tier,901.);let p=profile(&r,&i).unwrap();
-        assert_eq!(p.tier,tier);assert_eq!(p.direct_damage+p.periodic_damage,DAMAGE[(tier-1)as usize][c]);
+        assert_eq!(p.tier,tier);assert_eq!(p.direct_damage+p.periodic_damage,if *key=="roots" {0.} else {DAMAGE[(tier-1)as usize][c]});
         if tier>1 {assert!(DAMAGE[(tier-1)as usize][c]>DAMAGE[(tier-2)as usize][c]);}
         assert_eq!(energy::BASE_ENERGY,effects::item_spec(&i).unwrap().capacity);
         assert_eq!(i.amulet_state.as_ref().unwrap().energy,10.);
     }}
 }
-#[test] fn generation_changes_only_tier_name_and_reserve_without_rng_or_id_draws() {
+#[test] fn generation_uses_active_roster_without_extra_rng_or_id_draws() {
     for depth in 1..=40 {for seed in 1..=24 {
         let mut a=GenerationRng::new(seed);let mut b=a;let(mut ai,mut bi)=(100.,100.);
         let old=crate::equipment::create_equipment_revision("amulet",&mut a,&mut ai,depth,&[],51.).unwrap();
         let mut new=crate::equipment::create_equipment_revision("amulet",&mut b,&mut bi,depth,&[],52.).unwrap();
         assert_eq!(new.amulet_tier.value_or(0.),tier_for_depth(depth)as f64);
-        assert_eq!((a.state,ai),(b.state,bi));normalize(&mut new);assert_eq!(new,old);
+        assert_eq!((a.state,ai),(b.state,bi));normalize(&mut new);assert_eq!(new.kind,old.kind);assert_eq!(new.id,old.id);assert!(!matches!(new.effect.as_ref().map(String::as_str),Some("acid"|"floods")));
     }}
 }
-#[test] fn first_four_floor_density_and_subtype_stream_stay_identical() {
+#[test] fn first_four_floor_density_and_rng_draw_count_stay_identical() {
     for depth in 1..=4 {for seed in 1..=8 {
         let mut old=room();old.simulation_revision=51.0.into();old.seed=format!("amulet-early-{seed}");let mut new=old.clone();new.simulation_revision=52.0.into();
         let mut a=GenerationRng::new(seed);let mut b=a;
         let legacy=crate::equipment::generate_floor_loot_for_run(&mut old,depth,&mut a,&[],5).unwrap();
         let mut tiered=crate::equipment::generate_floor_loot_for_run(&mut new,depth,&mut b,&[],5).unwrap();
         for i in &mut tiered {if i.kind=="amulet" {assert_eq!(i.amulet_tier.value_or(0.),1.);normalize(i);}}
-        assert_eq!(legacy,tiered);assert_eq!((old.next_id,a.state),(new.next_id,b.state));
+        assert_eq!(legacy.len(),tiered.len());for (a,b) in legacy.iter().zip(&tiered) {assert_eq!((&a.kind,a.id),(&b.kind,b.id));if b.kind!="amulet" {assert_eq!(a,b);} else {assert!(!matches!(b.effect.as_ref().map(String::as_str),Some("acid"|"floods")));}}assert_eq!((old.next_id,a.state),(new.next_id,b.state));
     }}
 }
 #[test] fn special_rewards_use_birth_floor_without_altering_draws() {
@@ -80,7 +80,7 @@ fn normalize(i:&mut Item) {
         let old=crate::equipment::make_godbeast_permanent_revision(40,901.,&mut a,51.).unwrap();
         let mut new=crate::equipment::make_godbeast_permanent_revision(40,901.,&mut b,52.).unwrap();
         if new.kind=="amulet" {found+=1;assert_eq!(new.amulet_tier.value_or(0.),9.);normalize(&mut new);}
-        assert_eq!(old,new);assert_eq!(a.state,b.state);
+        if new.kind!="amulet" {assert_eq!(old,new);} else {assert_eq!(old.id,new.id);assert!(!matches!(new.effect.as_ref().map(String::as_str),Some("acid"|"floods")));}assert_eq!(a.state,b.state);
     }assert!(found>0);
 }
 #[test] fn missing_tier_is_base_and_birth_never_retiers_or_recharges() {
@@ -104,7 +104,7 @@ fn normalize(i:&mut Item) {
     let mut r=room();r.player.conditions.insert(ROOTS_DAMAGE.into(),26.);assert!(validate_run(&r).is_err());
 }
 #[test] fn direct_packets_use_exact_instance_tier_bypass_dr_and_keep_cost() {
-    for (kind,column,x) in [("lightning",0,14.),("firebolt",1,14.),("acid",2,14.),("iceblast",3,14.),("floods",4,12.)] {
+    for (kind,column,x) in [("lightning",0,14.),("firebolt",1,14.),("iceblast",3,14.)] {
         let mut r=room();enemy(&mut r,100.,x,10.);let i=amulet(kind,9,901.);let cost=effects::item_spec(&i).unwrap().activation_cost;r.inventory.push(i);
         let main_energy=r.player.energy;
         cast(&mut r,901.,x,10.);assert_eq!(hp(&r,100.),1000.-DAMAGE[8][column],"{kind}");
@@ -114,7 +114,7 @@ fn normalize(i:&mut Item) {
     }
 }
 #[test] fn resistance_rounds_once_and_immunities_still_block() {
-    for (kind,protection,expected) in [("acid","corrosion-resistance",47.),("firebolt","fire-resistance",47.),("iceblast","ice-immunity",0.)] {
+    for (kind,protection,expected) in [("firebolt","fire-resistance",47.),("iceblast","ice-immunity",0.)] {
         let mut r=room();enemy(&mut r,100.,14.,10.);engine::actor_mut_trusted(&mut r,100.).unwrap().copied_inventory=vec![ring(protection)].into();
         r.inventory.push(amulet(kind,9,901.));cast(&mut r,901.,14.,10.);assert_eq!(hp(&r,100.),1000.-expected, "{kind}");
     }
@@ -133,27 +133,31 @@ fn normalize(i:&mut Item) {
     crate::monster_statuses::tick_poisoned(&mut r,100.).unwrap();assert_eq!(hp(&r,100.),952.);
     assert!(r.player.reaping_ledger.is_missing());
 }
-#[test] fn roots_capture_rate_refresh_replace_and_expire_or_break() {
-    let mut r=room();enemy(&mut r,100.,14.,10.);r.inventory=vec![amulet("roots",9,901.),amulet("roots",1,902.)];
-    cast(&mut r,901.,14.,10.);assert_eq!(hp(&r,100.),1000.);r.inventory.remove(0);
-    control::tick_actor(&mut r,100.).unwrap();assert_eq!(hp(&r,100.),974.);
-    cast(&mut r,902.,14.,10.);assert_eq!(engine::condition(engine::actor(&r,100.).unwrap(),ROOTS_DAMAGE),3.);
-    for _ in 0..4 {control::tick_actor(&mut r,100.).unwrap();}
-    assert_eq!(hp(&r,100.),962.);assert!(!engine::actor(&r,100.).unwrap().conditions.contains_key(ROOTS_DAMAGE));
-    r.inventory[0].amulet_tier=9.0.into();cast(&mut r,902.,14.,10.);
-    engine::actor_mut_trusted(&mut r,100.).unwrap().conditions.insert("burning".into(),2.);
-    control::tick_actor(&mut r,100.).unwrap();assert_eq!(hp(&r,100.),962.);assert!(!engine::actor(&r,100.).unwrap().conditions.contains_key(ROOTS_DAMAGE));
+#[test] fn roots_refresh_eight_turns_without_damage_at_every_tier() {
+    for tier in 1..=9 {
+        let mut r=room();enemy(&mut r,100.,14.,10.);r.inventory.push(amulet("roots",tier,901.));
+        cast(&mut r,901.,14.,10.);assert_eq!(engine::condition(engine::actor(&r,100.).unwrap(),control::ROOTS),8.);
+        control::tick_actor(&mut r,100.).unwrap();cast(&mut r,901.,14.,10.);
+        assert_eq!(engine::condition(engine::actor(&r,100.).unwrap(),control::ROOTS),8.);
+        r.inventory.clear();
+        for remaining in (0..8).rev() {control::tick_actor(&mut r,100.).unwrap();assert_eq!(hp(&r,100.),1000.);assert_eq!(engine::condition(engine::actor(&r,100.).unwrap(),control::ROOTS),remaining as f64);}
+        assert!(!engine::actor(&r,100.).unwrap().conditions.contains_key(ROOTS_DAMAGE));
+    }
 }
-#[test] fn roots_reject_flight_without_cost_and_legacy_missing_rate_is_three() {
+#[test] fn roots_reject_flight_and_ignore_legacy_damage_capture() {
     let mut r=room();enemy(&mut r,100.,14.,10.);r.inventory.push(amulet("roots",9,901.));
     engine::actor_mut_trusted(&mut r,100.).unwrap().conditions.insert("flying".into(),5.);
     let before=r.clone();assert!(effects::command(&mut r,&Command::UseAt{id:901.,x:14.,y:10.}).is_err());assert_eq!(r,before);
     engine::actor_mut_trusted(&mut r,100.).unwrap().conditions.shift_remove("flying");cast(&mut r,901.,14.,10.);
-    engine::actor_mut_trusted(&mut r,100.).unwrap().conditions.shift_remove(ROOTS_DAMAGE);
-    control::tick_actor(&mut r,100.).unwrap();assert_eq!(hp(&r,100.),997.);
+    for rate in [None,Some(26.)] {
+        let a=engine::actor_mut_trusted(&mut r,100.).unwrap();a.conditions.shift_remove(ROOTS_DAMAGE);if let Some(rate)=rate {a.conditions.insert(ROOTS_DAMAGE.into(),rate);}
+        control::tick_actor(&mut r,100.).unwrap();assert_eq!(hp(&r,100.),1000.);
+    }
+    engine::actor_mut_trusted(&mut r,100.).unwrap().conditions.insert("burning".into(),2.);
+    control::tick_actor(&mut r,100.).unwrap();assert_eq!(engine::condition(engine::actor(&r,100.).unwrap(),control::ROOTS),0.);
 }
 #[test] fn utility_profile_endpoints_keep_cost_shape_and_target_count() {
-    let r=room();for tier in 1..=9 {for (kind,base,is_range) in [("blinking",10.,true),("beckoning",8.,true),("teleportation",8.,true),("discord",6.,false),("obstruction",8.,false)] {
+    let r=room();for tier in 1..=9 {for (kind,base,is_range) in [("blinking",10.,true),("teleportation",8.,true),("discord",6.,false),("obstruction",8.,false)] {
         let p=profile(&r,&amulet(kind,tier,901.)).unwrap();assert_eq!(if is_range{p.range}else{p.duration},Some(base+(tier-1)as f64));
     }}
     let mut r=room();r.inventory.push(amulet("discord",9,901.));enemy(&mut r,100.,14.,10.);cast(&mut r,901.,14.,10.);
@@ -175,8 +179,8 @@ fn normalize(i:&mut Item) {
     cast(&mut r,901.,18.,10.);assert_eq!(r.player.x,10.);assert_eq!(r.inventory[0].amulet_state.as_ref().unwrap().energy,0.);
     assert_eq!(r.player.energy,main_energy-10.);
 }
-#[test] fn extended_beckon_and_teleport_range_use_the_same_visible_preview() {
-    for kind in ["beckoning","teleportation"] {
+#[test] fn extended_teleport_range_uses_the_same_visible_preview() {
+    for kind in ["teleportation"] {
         let mut r=room();enemy(&mut r,100.,25.,10.);r.inventory=vec![amulet(kind,9,901.),amulet(kind,1,902.)];
         assert!(effects::target_blocker_ui(&r,&r.inventory[0],25.,10.).is_none());assert!(effects::target_blocker_ui(&r,&r.inventory[1],25.,10.).is_some());
         assert!(!effects::aim_preview(&r,&r.inventory[0],25.,10.).area.is_empty());
@@ -260,13 +264,13 @@ fn normalize(i:&mut Item) {
 }
 #[test] fn tinker_keeps_tier_identity_reserve_and_names_the_actual_item() {
     let mut r=room();r.gods=(0..12).filter(|g|*g!=8).map(|g|g as f64).collect();
-    r.inventory.push(amulet("acid",9,901.));r.inventory[0].amulet_state.as_mut().unwrap().energy=7.;
+    r.inventory.push(amulet("firebolt",9,901.));r.inventory[0].amulet_state.as_mut().unwrap().energy=7.;
     crate::revision50_ability_energy::initialize_reserve(&mut r.player,"kative-tinker",0.,0.).unwrap();
     assert!(crate::tinker::activate(&mut r,Some(901.)).unwrap());let i=&r.inventory[0];
     assert_eq!(i.amulet_tier.value_or(0.),9.);assert_eq!(i.amulet_state.as_ref().unwrap().energy,7.);assert_eq!(i.id,901.);
     assert!(i.tinkered.value_or(false));assert!(i.granted_ability.as_ref().is_some_and(|s|!s.is_empty()));
     let name=crate::revision50_item_knowledge::display_name(&r,i);
-    assert!(name.starts_with("Tier 9 Amulet of Acid and "), "{name}");
+    assert!(name.starts_with("Tier 9 Amulet of Firebolt and "), "{name}");
     assert!(r.log.iter().any(|s|s.starts_with(&format!("{name} is blessed"))));
 }
 #[test] fn offscreen_periodic_packets_keep_cast_rates_after_item_removal() {
@@ -274,8 +278,8 @@ fn normalize(i:&mut Item) {
     cast(&mut r,901.,14.,10.);cast(&mut r,902.,14.,10.);r.inventory.clear();let depth=r.depth;
     r.floor_mut().unwrap().last_tick=0.;r.floor_mut().unwrap().dirty=true;r.depth=2.;r.tick=1.;
     crate::offscreen::tick_inactive_floors(&mut r).unwrap();let a=r.actors_at(depth).iter().find(|a|a.id==100.).unwrap();
-    assert_eq!(engine::condition(a,effects::POISON_DAMAGE),28.);assert_eq!(engine::condition(a,ROOTS_DAMAGE),26.);
-    assert_eq!(engine::condition(a,control::ROOTS),3.);assert!(a.hp<975.);
+    assert_eq!(engine::condition(a,effects::POISON_DAMAGE),28.);assert_eq!(engine::condition(a,ROOTS_DAMAGE),0.);
+    assert_eq!(engine::condition(a,control::ROOTS),7.);assert_eq!(a.hp,972.);
 }
 #[test] fn travel_and_cloned_loadouts_never_upgrade_or_refill() {
     let mut r=room();r.inventory=vec![amulet("acid",1,901.),amulet("acid",9,902.)];r.inventory[0].amulet_state.as_mut().unwrap().energy=3.;r.inventory[1].amulet_state.as_mut().unwrap().energy=9.;
@@ -290,4 +294,50 @@ fn normalize(i:&mut Item) {
     let mut r=room();r.inventory.push(amulet("iceblast",9,901.));enemy(&mut r,100.,14.,10.);enemy(&mut r,101.,18.,10.);
     let p=effects::aim_preview(&r,&r.inventory[0],18.,10.);assert_eq!(p.impact,Some((14,10)));assert_eq!(p.area.len(),9);
     cast(&mut r,901.,18.,10.);assert_eq!(hp(&r,100.),912.);assert_eq!(hp(&r,101.),1000.);
+}
+
+#[test] fn beckoning_discord_and_obstruction_work_beyond_old_caps_at_all_tiers() {
+    for tier in [1,9] {for kind in ["beckoning","discord","obstruction"] {
+        let mut r=room();let i=amulet(kind,tier,901.);assert_eq!(profile(&r,&i).unwrap().range,None);r.inventory.push(i);
+        if kind!="obstruction" {enemy(&mut r,100.,30.,10.);}
+        assert!(effects::target_blocker_ui(&r,&r.inventory[0],30.,10.).is_none(),"{kind}");
+        assert!(!effects::aim_preview(&r,&r.inventory[0],30.,10.).area.is_empty(),"{kind}");
+        if kind=="beckoning" {assert!(!effects::aim_preview(&r,&r.inventory[0],30.,10.).delivery.is_empty());}
+        cast(&mut r,901.,30.,10.);
+        if kind=="beckoning" {let a=engine::actor(&r,100.).unwrap();assert_eq!((a.x,a.y),(11.,10.));}
+        if kind=="discord" {assert_eq!(engine::condition(engine::actor(&r,100.).unwrap(),control::DISCORD),6.+(tier-1)as f64);}
+        if kind=="obstruction" {assert_eq!(r.floor().unwrap().revision50_temporary_terrain.as_ref().unwrap().len(),3);}
+    }}
+}
+#[test] fn retired_amulets_load_preserve_tinker_and_cannot_activate() {
+    for kind in ["acid","floods"] {
+        let mut r=room();let mut i=amulet(kind,9,901.);i.tinkered=true.into();i.granted_ability="shrail-execute".to_string().into();i.amulet_state.as_mut().unwrap().energy=7.;r.inventory.push(i);
+        let loaded=crate::storage::deserialize(&crate::storage::serialize(&r).unwrap()).unwrap();assert_eq!(loaded.inventory,r.inventory);
+        let before=r.clone();assert!(effects::command(&mut r,&Command::UseAt{id:901.,x:14.,y:10.}).is_err());assert_eq!(r,before);
+        assert!(effects::target_blocker_ui(&r,&r.inventory[0],14.,10.).is_some());
+    }
+}
+#[test] fn historical_revisions_keep_four_turn_damaging_roots_and_finite_controls() {
+    for revision in [50.,51.] {
+        let mut r=room();r.simulation_revision=revision.into();enemy(&mut r,100.,14.,10.);
+        control::execute(&mut r,control::ControlEffect::Roots,14.,10.).unwrap();
+        assert_eq!(engine::condition(engine::actor(&r,100.).unwrap(),control::ROOTS),4.);
+        control::tick_actor(&mut r,100.).unwrap();assert_eq!(hp(&r,100.),997.);
+        engine::actor_mut_trusted(&mut r,100.).unwrap().x=30.;
+        assert!(!control::target_valid(&r,control::ControlEffect::Discord,30.,10.));
+        assert!(!control::target_valid(&r,control::ControlEffect::Beckoning,30.,10.));
+    }
+}
+
+#[test]
+fn historical_r52_policy_keeps_retired_acid_and_floods_usable() {
+    for (kind, damage) in [("acid",40.),("floods",20.)] {
+        let mut r=room();r.amulet_rules_from=Field::Null;
+        enemy(&mut r,100.,12.,10.);r.inventory.push(amulet(kind,1,901.));
+        assert!(!retired(&r,&r.inventory[0]));
+        assert!(effects::target_blocker_ui(&r,&r.inventory[0],12.,10.).is_none(),"{kind}");
+        cast(&mut r,901.,12.,10.);
+        assert_eq!(hp(&r,100.),1000.-damage,"{kind}");
+        assert_eq!(r.inventory[0].amulet_state.as_ref().unwrap().energy,0.);
+    }
 }

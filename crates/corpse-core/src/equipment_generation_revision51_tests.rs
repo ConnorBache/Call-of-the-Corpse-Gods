@@ -93,7 +93,7 @@ fn primary_policy_preserves_later_floor_algorithm_for_equal_incoming_bow_budget(
                     let mut rng = stream(&run.seed, depth); let mut expected_rng = rng;
                     let mut expected_id = run.next_id; let mut expected_budget = generated;
                     let expected = generate_floor_loot_with_budget(depth, &mut expected_rng,
-                        &mut expected_id, &[], count, 51., Some(&mut expected_budget)).unwrap();
+                        &mut expected_id, &[], count, 51., Some(&mut expected_budget),true).unwrap();
                     let actual = generate_floor_loot_for_run(&mut run, depth, &mut rng, &[], count).unwrap();
                     assert_eq!(actual, expected); assert_eq!(run.next_id, expected_id);
                     assert_eq!(rng.state, expected_rng.state);

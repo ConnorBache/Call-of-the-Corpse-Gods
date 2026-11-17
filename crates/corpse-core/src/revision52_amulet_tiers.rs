@@ -26,6 +26,11 @@ pub struct Profile {
     pub duration: Option<f64>,
 }
 pub fn enabled(r: &Run) -> bool { r.simulation_revision.value_or(29.) == 52. }
+/// Retired powers remain readable in old saves, never usable in current runs.
+pub fn retired(r: &Run, item: &Item) -> bool {
+    crate::amulet_rules::current(r) && item.kind == "amulet" && matches!(item.effect.as_ref().map(String::as_str), Some("acid" | "floods"))
+}
+pub const RETIRED_MESSAGE: &str = "This amulet has been retired.";
 pub fn tier_for_depth(depth: u32) -> u8 { (depth.clamp(1,40) / 5 + 1) as u8 }
 pub fn valid_item(item: &Item, revision: f64) -> bool {
     match item.amulet_tier {
@@ -67,13 +72,22 @@ pub fn profile(r: &Run, item: &Item) -> Option<Profile> {
         "obstruction" => p.duration=Some(8.+extra),
         _ => return None,
     }
+    if crate::amulet_rules::current(r) {
+        match item.effect.as_ref()?.as_str() {
+            "beckoning" | "discord" => p.range=None,
+            "roots" => {p.periodic_damage=0.;p.duration=Some(8.);},
+            _ => {},
+        }
+    }
     Some(p)
 }
 pub fn display_name(r:&Run,item:&Item)->Option<String> {
     let name=crate::revision50_amulet_effects::display_name(item)?;
-    if enabled(r) {Some(format!("Tier {} {name}",profile(r,item)?.tier))} else {Some(name.into())}
+    if retired(r,item) {Some(format!("Retired Tier {} {name}",profile(r,item)?.tier))}
+    else if enabled(r) {Some(format!("Tier {} {name}",profile(r,item)?.tier))} else {Some(name.into())}
 }
 pub fn description(r:&Run,item:&Item)->Option<String> {
+    if retired(r,item) {return Some(RETIRED_MESSAGE.into());}
     if !enabled(r) {return crate::revision50_amulet_effects::description(item).map(str::to_owned);}
     let p=profile(r,item)?;
     Some(match item.effect.as_ref()?.as_str() {
@@ -85,17 +99,19 @@ pub fn description(r:&Run,item:&Item)->Option<String> {
         "blinking"=>format!("Blink along a {} tile line.",p.range?),
         "discord"=>format!("Makes a creature and all other creatures hostile to each other for {} turns.",p.duration?),
         "obstruction"=>format!("Creates a three-tile wall perpendicular to your aim for {} turns.",p.duration?),
-        "roots"=>format!("Roots a creature in place for 4 turns, dealing {} damage each normal turn.",p.periodic_damage),
+        "roots"=>if crate::amulet_rules::current(r) {"Roots a creature in place for 8 turns.".into()} else {format!("Roots a creature in place for 4 turns, dealing {} damage each normal turn.",p.periodic_damage)},
         "floods"=>format!("Sends a 3×5 wave that deals {} damage, pushes creatures up to 2 tiles, extinguishes fire, and leaves shallow water for 12 turns. Existing shallow water consumes each lane and becomes deep water for 12 turns.",p.direct_damage),
         _=>crate::revision50_amulet_effects::description(item)?.into(),
     })
 }
 pub fn details(r:&Run,item:&Item)->Option<String> {
+    if retired(r,item) {return None;}
     if !enabled(r) {return crate::revision50_amulet_effects::details_for_run(r,item).map(str::to_owned);}
     let p=profile(r,item)?;
     Some(match item.effect.as_ref()?.as_str() {
         "blinking"=>return None,
-        "beckoning"=>format!("Targets a visible creature within {} tiles with a clear path to you.",p.range?),
+        "beckoning"=>if crate::amulet_rules::current(r) {"Targets a visible creature at unlimited range with a clear path to you.".into()} else {format!("Targets a visible creature within {} tiles with a clear path to you.",p.range?)},
+        "discord" if crate::amulet_rules::current(r)=>"Targets a visible creature at unlimited range.".into(),
         "teleportation"=>format!("Targets a visible creature within {} tiles.",p.range?),
         _=>crate::revision50_amulet_effects::details_for_run(r,item)?.into(),
     })

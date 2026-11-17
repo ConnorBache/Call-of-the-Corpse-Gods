@@ -521,6 +521,7 @@ pub fn new_run_shell_revision(
         divine_revision: 1.0.into(),
         enemy_health_revision: 1.0.into(),
         simulation_revision: revision.into(),
+        amulet_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         firebolt_travel_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         composite_bow_generated: if revision >= 51. { false.into() } else { crate::Field::Missing },
         rng: crate::rng::seed_hash(&full_seed) as f64,
@@ -736,7 +737,11 @@ fn finish_new_run(mut r: Run, revision: f64) -> Result<Run, String> {
 /// Authored content coordinates remain internal; route and rewards are explicit.
 /// Historical replays must use their explicit revision/mode constructor instead.
 pub fn create_avatar_run(seed: &str) -> Result<Run, String> {
+    create_avatar_run_amulet_policy(seed, &0usize.into())
+}
+pub(crate) fn create_avatar_run_amulet_policy(seed: &str, policy: &crate::Field<usize>) -> Result<Run, String> {
     let mut r = new_run_shell_revision(seed, "Avatar", false, 52.)?;
+    crate::amulet_rules::apply_replay_policy(&mut r, policy, 0);
     r.fast_mode = true.into();
     r.compressed_depths = true.into();
     let to = crate::fast_mode::arrival_target(&r, r.depth as u32);
@@ -745,7 +750,11 @@ pub fn create_avatar_run(seed: &str) -> Result<Run, String> {
 }
 /// Historical Fast startup is retained only for old seed replays.
 pub fn create_avatar_run_fast(seed: &str) -> Result<Run, String> {
+    create_avatar_run_fast_amulet_policy(seed, &0usize.into())
+}
+pub(crate) fn create_avatar_run_fast_amulet_policy(seed: &str, policy: &crate::Field<usize>) -> Result<Run, String> {
     let mut r = new_run_shell_revision(seed, "Avatar", false, 52.)?;
+    crate::amulet_rules::apply_replay_policy(&mut r, policy, 0);
     r.fast_mode = true.into();
     let to = crate::fast_mode::arrival_target(&r, r.depth as u32);
     ensure_floors(&mut r, to)?;
@@ -764,7 +773,11 @@ pub fn create_run_revision(
     dev: bool,
     revision: f64,
 ) -> Result<Run, String> {
+    create_run_revision_amulet_policy(seed, mode, dev, revision, &0usize.into())
+}
+pub(crate) fn create_run_revision_amulet_policy(seed: &str, mode: &str, dev: bool, revision: f64, policy: &crate::Field<usize>) -> Result<Run, String> {
     let mut r = new_run_shell_revision(seed, mode, dev, revision)?;
+    crate::amulet_rules::apply_replay_policy(&mut r, policy, 0);
     let to = initial_generation_target(revision, 1);
     ensure_floors(&mut r, to)?;
     finish_new_run(r, revision)

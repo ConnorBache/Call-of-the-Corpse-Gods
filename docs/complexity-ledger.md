@@ -2221,3 +2221,30 @@ Nova receipt envelopes are radial/lobed with a nominal radius plus at most two c
 
 ### Maintained thread presentation restoration (November 17)
 Bond and I Came For You project at most two current player-to-target tethers per observed scene. Each costs O(A + L + visible_actor) time, O(L) extra memory, A actors and L <= max(floor width,height)+1 Bresenham cells; visibility uses existing core query cost. Only admitted current terrain cells are retained, and painting does not connect across omitted gaps. Painting costs O(L * max(cell pixel width,height)) alpha blends. Activation uses the same thin geometry with a growing prefix; persistent endpoint changes invalidate the map through existing overlay equality. No simulation, RNG or visibility writes. Motion, off/dead cleanup, timer-sentinel I Came activation, missing observation and gap clipping are regression tested. Alpha and 32ms/cell are visual calibration, not timing measurements.
+
+### Current amulet retirement and unlimited control targeting (2026-11-17)
+
+Retirement is an O(effect-name bytes) read-only predicate per display, targeting
+admission and command; it allocates no simulation state. Old saved item homes,
+copies and temporal snapshots retain their serialized shape; no migration scan
+or replacement RNG draw is introduced. Spawn selection remains one uniform draw
+from a fixed-size table (10 current choices, 12 historical choices).
+
+Beckoning removes the old 8–16-cell distance bound, not the map bounds. For floor
+width W, height H, ray length L is O(max(W,H)); eight candidate adjacent landing
+squares each test L cells. Each step retains existing occupancy/portal/terrain
+helpers, O(8*L*(A+P+M+H_t)) worst case, with A same-plane actors, P portal data,
+M terrain modifications and H_t habitat/trait queries, O(L+actor clone bytes)
+scratch. Preview additionally uses existing observation and visibility cost and
+only known cells/actors; no hidden-state leak or extra pathfinding is introduced.
+Discord still scans visible actors and traces one map-bounded committed ray, with
+unchanged shared ray/portal bounds. Roots has O(1) status work per actor normal
+turn after existing terrain lookup, and no damage/proc packet in current rules.
+
+Replay compatibility adds one O(1) command-boundary scalar. Before replay seed
+world generation, the recorded policy selects the historical or current roster;
+the same policy is propagated through primary floor loot, budget loot and boss
+rewards. It consumes no extra random draws. Historical recorded commands retain
+their original mechanics until the recorded boundary. Live loading adopts current
+rules while retaining existing item payloads. Temporal snapshots preserve the
+host policy rather than rewinding the rules amendment.

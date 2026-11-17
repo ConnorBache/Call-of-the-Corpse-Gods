@@ -22,6 +22,11 @@ pub(super) fn primary_kind(seed: &str, depth: u32) -> Option<&'static str> {
 pub(super) fn generate(
     primary: &str, rng: &mut GenerationRng, next_id: &mut f64, revision:f64,
 ) -> Result<Vec<Item>, String> {
+    generate_with_amulet_rules(primary,rng,next_id,revision,true)
+}
+pub(super) fn generate_with_amulet_rules(
+    primary:&str,rng:&mut GenerationRng,next_id:&mut f64,revision:f64,current:bool,
+)->Result<Vec<Item>,String> {
     let counts = KINDS.map(|kind| if kind == primary { 3 } else { rng.integer(1, 2) });
     let mut items = Vec::with_capacity(counts.iter().sum::<i32>() as usize);
     for (kind, count) in KINDS.into_iter().zip(counts) {
@@ -37,7 +42,7 @@ pub(super) fn generate(
                     ..Default::default()
                 }
             } else {
-                super::revision50::create(kind, rng, *next_id, revision)?
+                super::revision50::create_with_amulet_rules(kind, rng, *next_id, revision,current)?
             };
             *next_id += 1.;
             items.push(item);

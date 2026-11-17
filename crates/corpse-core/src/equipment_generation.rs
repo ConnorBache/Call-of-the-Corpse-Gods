@@ -157,8 +157,14 @@ pub fn create_equipment_revision(
     kind: &str, rng: &mut GenerationRng, next_id: &mut f64,
     depth: u32, owned: &[String], revision: f64,
 ) -> Result<Item, String> {
+    create_equipment_with_amulet_rules(kind,rng,next_id,depth,owned,revision,true)
+}
+fn create_equipment_with_amulet_rules(
+    kind: &str, rng: &mut GenerationRng, next_id: &mut f64,
+    depth: u32, owned: &[String], revision: f64, current:bool,
+) -> Result<Item,String> {
     if revision >= 50.0 {
-        let mut item = revision50::create(kind, rng, *next_id, revision)?;
+        let mut item = revision50::create_with_amulet_rules(kind, rng, *next_id, revision,current)?;
         crate::revision52_amulet_tiers::initialize_birth(&mut item, revision, depth)?;
         *next_id += 1.0;
         return Ok(item);
@@ -221,7 +227,7 @@ pub fn generate_floor_loot_revision(
 ) -> Result<Vec<Item>, String> {
     let mut generated = false;
     generate_floor_loot_with_budget(depth, rng, next_id, excluded, count, revision,
-        if revision >= 51. { Some(&mut generated) } else { None })
+        if revision >= 51. { Some(&mut generated) } else { None },true)
 }
 /// Production entry point: all generated floors share the persisted run budget.
 /// Same bounded loot cost, plus a one-time import scan documented in unique_composite_bow.
@@ -235,21 +241,22 @@ pub fn generate_floor_loot_for_run(
     if !(2..=20).contains(&count) {
         return Err("Invalid ordinary loot slot count".into());
     }
+    let current=crate::amulet_rules::current(run);
     crate::unique_composite_bow::initialize(run);
     if let Some(primary) = revision51::primary_kind(&run.seed, depth) {
-        let mut items=revision51::generate(primary, rng, &mut run.next_id, revision)?;
+        let mut items=revision51::generate_with_amulet_rules(primary, rng, &mut run.next_id, revision,current)?;
         for item in &mut items {crate::revision52_amulet_tiers::initialize_birth(item,revision,depth)?;}
         return Ok(items);
     }
     let mut generated = run.composite_bow_generated.value_or(false);
     let items = generate_floor_loot_with_budget(depth, rng, &mut run.next_id, excluded, count,
-        revision, Some(&mut generated))?;
+        revision, Some(&mut generated),current)?;
     run.composite_bow_generated = generated.into();
     Ok(items)
 }
 fn generate_floor_loot_with_budget(
     depth: u32, rng: &mut GenerationRng, next_id: &mut f64,
-    excluded: &[String], count: usize, revision: f64, mut bow_generated: Option<&mut bool>,
+    excluded: &[String], count: usize, revision: f64, mut bow_generated: Option<&mut bool>, current:bool,
 ) -> Result<Vec<Item>, String> {
     if !(2..=20).contains(&count) {
         return Err("Invalid ordinary loot slot count".into());
@@ -271,7 +278,7 @@ fn generate_floor_loot_with_budget(
                 &revision50::JEWELRY_KINDS[..]
             } else { kinds }, rng),
         };
-        let i = create_equipment_revision(kind, rng, next_id, depth, &excluded, revision)?;
+        let i = create_equipment_with_amulet_rules(kind, rng, next_id, depth, &excluded, revision,current)?;
         if crate::unique_composite_bow::is_composite(&i) {
             if let Some(generated) = bow_generated.as_deref_mut() { *generated = true; }
         }
@@ -315,7 +322,7 @@ pub fn make_godbeast_permanent_for_run(
     let kinds = if run.composite_bow_generated.value_or(false) {
         &revision50::JEWELRY_KINDS[..]
     } else { &revision50::KINDS[..] };
-    let mut item = revision50::create(pick(kinds, rng), rng, id, revision)?;
+    let mut item = revision50::create_with_amulet_rules(pick(kinds, rng), rng, id, revision,crate::amulet_rules::current(run))?;
     crate::revision52_amulet_tiers::initialize_birth(&mut item, revision, depth)?;
     if crate::unique_composite_bow::is_composite(&item) { run.composite_bow_generated = true.into(); }
     Ok(item)

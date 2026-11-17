@@ -86,7 +86,7 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
         let operations=parse_operations(payload,metadata)?;commands=commands.checked_add(operations.len()).ok_or("Recording command count overflow")?;
         if commands>maximum_commands {return Err("Recording exceeds admitted command bound".into());}Ok(())
     })?;
-    let (mut engine,kind,firebolt_migrated)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
+    let (mut engine,kind,firebolt_migrated,amulet_migrated)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
     if engine.run.simulation_revision.as_ref().copied()!=Some(header.simulation_revision as f64) {
         return Err("Save journal requires its original simulation revision".into());
     }
@@ -104,7 +104,11 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
         engine.run.firebolt_travel_from=corpse_core::Field::Missing;
         corpse_core::firebolt_travel::admit_current(&mut engine.run)?;
     }
-    Ok((engine,kind,firebolt_migrated))
+    if amulet_migrated {
+        engine.run.amulet_rules_from=corpse_core::Field::Missing;
+        corpse_core::amulet_rules::admit_current(&mut engine.run)?;
+    }
+    Ok((engine,kind,firebolt_migrated || amulet_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]

@@ -83,7 +83,7 @@ fn rat(r:&mut Run,id:f64,x:f64,y:f64)->Actor {let mut a=crate::population::creat
  let mut r=room();r.player.hp=100.;r.player.max_hp=100.;r.player.conditions.insert("poisoned".into(),1.);r.player.conditions.insert(crate::revision50_amulet_effects::POISON_DAMAGE.into(),6.);r.player.conditions.insert(crate::revision50_amulet_effects::ACID_TURNS.into(),1.);r.player.conditions.insert(crate::revision50_amulet_effects::ACID_PENALTY.into(),10.);
  let out=crate::engine::dispatch(&mut r,&crate::Command::Wait).unwrap();for key in ["A03","A05"]{assert!(out.events.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal==key)),"expiry {key}");}
  let mut r=room();let mut a=rat(&mut r,123.,11.,10.);for (key,value)in [(crate::revision50_control_amulets::ROOTS,1.),("r50RootsX",a.x),("r50RootsY",a.y),("r50RootsDepth",r.depth)]{a.conditions.insert(key.into(),value);}*crate::engine::actor_mut_trusted(&mut r,123.).unwrap()=a;
- events::begin();crate::revision50_control_amulets::tick_actor(&mut r,123.).unwrap();let out=events::finish();assert!(out.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="A10"&&a.style=="root-tighten")));assert!(out.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="A10"&&a.style=="dissolve-root")));assert!(!crate::engine::actor(&r,123.).unwrap().conditions.contains_key(crate::revision50_control_amulets::ROOTS));
+ events::begin();crate::revision50_control_amulets::tick_actor(&mut r,123.).unwrap();let out=events::finish();assert!(!out.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="A10"&&a.style=="root-tighten")));assert_eq!(crate::engine::actor(&r,123.).unwrap().hp,100.);assert!(out.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="A10"&&a.style=="dissolve-root")));assert!(!crate::engine::actor(&r,123.).unwrap().conditions.contains_key(crate::revision50_control_amulets::ROOTS));
  events::begin();crate::revision50_control_amulets::tick_actor(&mut r,123.).unwrap();assert!(events::finish().is_empty());
 }
 #[test]fn animation_actual_nova_blast_has_exact_footprint_without_legacy_hold(){
@@ -151,7 +151,7 @@ fn rat(r:&mut Run,id:f64,x:f64,y:f64)->Actor {let mut a=crate::population::creat
 }
 #[test]fn animation_all_bolt_amulets_light_tiles_and_fire_has_no_generic_spark(){
  use crate::revision50_amulet_effects::{self as amulets,Effect};
- for effect in [Effect::Lightning,Effect::Firebolt,Effect::Poison,Effect::Acid]{
+ for effect in [Effect::Lightning,Effect::Firebolt,Effect::Poison]{
   let mut r=room();r.player.abilities.push("isheilah-spellslinger".into());r.player.energy=1000.;r.inventory.push(amulets::make_amulet(effect,900.).unwrap());rat(&mut r,123.,14.,10.);
   events::begin();amulets::command(&mut r,&crate::Command::UseAt{id:900.,x:14.,y:10.}).unwrap();let out=events::finish();
   let key=crate::animation_amulets::key(effect);let route=out.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.proposal==key&&a.stage==Stage::Travel)).unwrap();

@@ -1245,7 +1245,7 @@ fn tinker_blocker(r: &Run) -> Option<String> {
 fn longest_tinkered_amulet_name(p: &Painter, revision: f64) -> String {
     let mut longest = String::new();
     let mut width = 0.;
-    for effect in ["lightning", "firebolt", "poison", "iceblast", "acid", "blinking", "beckoning", "discord", "obstruction", "roots", "teleportation", "floods"] {
+    for effect in ["lightning", "firebolt", "poison", "iceblast", "blinking", "beckoning", "discord", "obstruction", "roots", "teleportation"] {
         let item = Item { kind: "amulet".into(), effect: effect.to_string().into(), ..Default::default() };
         let name = corpse_core::revision50_amulet_effects::display_name(&item).unwrap();
         for a in progression::catalog_for_revision(revision).iter().filter(|a| !a.id.starts_with("kative-")) {
@@ -1402,7 +1402,8 @@ fn item_actions(run: &Run, item: &Item) -> Vec<Button> {
         }), (cooldown>0).then(||format!("Teleport is ready in {cooldown} turns.")),
             "Teleport to a random standable spot; 100-turn cooldown.".into());
     }
-    if run.simulation_revision.value_or(29.)>=50. && corpse_core::revision50_amulet_effects::is_amulet(item) {
+    if run.simulation_revision.value_or(29.)>=50. && corpse_core::revision50_amulet_effects::is_amulet(item)
+        && !corpse_core::revision52_amulet_tiers::retired(run,item) {
         let blocker=corpse_core::revision50_amulets::plan_item_activation(run,item.id,
             corpse_core::revision50_amulet_effects::item_spec_for_revision(item,run.simulation_revision.value_or(29.)).as_ref()).err()
             .map(corpse_core::revision50_amulet_effects::admission_message);
@@ -1886,6 +1887,7 @@ fn append_named_jewelry(run: &Run, i: &Item, lines: &mut Vec<String>) -> bool {
     }
     if let Some(description) = corpse_core::revision52_amulet_tiers::description(run, i) {
         lines.push(description);
+        if corpse_core::revision52_amulet_tiers::retired(run,i) {return true;}
         let spec=corpse_core::revision50_amulet_effects::item_spec_for_revision(i,run.simulation_revision.value_or(29.)).unwrap();
         let energy=i.amulet_state.as_ref().map_or(spec.capacity,|s|s.energy.min(spec.capacity));
         let base=spec.activation_cost;
@@ -3249,13 +3251,13 @@ mod quiet_pack_copy_tests {
 mod released_floods_pack_tests {
     use super::*;
     #[test]
-    fn released_floods_apply_keeps_targeting_at_every_revision() {
+    fn legacy_floods_apply_keeps_targeting_and_current_retired_items_have_no_apply() {
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         r.player.energy=100.;r.player.abilities.clear();r.player.active.clear();r.inventory.clear();
         let mut item=Item{id:901.,kind:"amulet".into(),effect:"floods".to_string().into(),..Default::default()};
         corpse_core::revision50_amulets::initialize_item_for_revision(&mut item,52.).unwrap();r.inventory.push(item.clone());
         for revision in [50.,51.,52.] {
-            r.simulation_revision=revision.into();let buttons=item_actions(&r,&item);let apply=buttons.iter().find(|b|b.label=="Apply").unwrap();assert!(apply.blocker.is_none());
+            r.simulation_revision=revision.into();r.amulet_rules_from=if revision==52. {Field::Null}else{Field::Missing};let buttons=item_actions(&r,&item);let apply=buttons.iter().find(|b|b.label=="Apply").unwrap();assert!(apply.blocker.is_none());
             assert!(matches!(apply.action,ButtonAction::Target(PackTarget::UseAt(901.))));
             assert_eq!(apply.tip,"Choose a target for this amulet.");
             for (width,height) in [(1280,800),(960,1200)] {
@@ -3272,6 +3274,14 @@ mod released_floods_pack_tests {
                 let rect=view.button_rects().into_iter().find(|(i,_)|*i==index).unwrap().1;
                 assert_eq!(view.click(rect.0+3,rect.1+3),expected);
             }
+        }
+        r.simulation_revision=52.0.into();r.amulet_rules_from=Field::Missing;
+        for effect in ["acid","floods"] {
+            item.effect=effect.to_string().into();r.inventory=vec![item.clone()];
+            assert!(!item_actions(&r,&item).iter().any(|b|b.label=="Apply"));
+            let mut lines=Vec::new();assert!(append_named_jewelry(&r,&item,&mut lines));
+            assert_eq!(lines,vec![corpse_core::revision52_amulet_tiers::RETIRED_MESSAGE]);
+            assert!(corpse_core::revision50_item_knowledge::display_name(&r,&item).starts_with("Retired"));
         }
     }
 }
