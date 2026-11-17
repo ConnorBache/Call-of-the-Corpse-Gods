@@ -92,6 +92,9 @@ impl Replays {
         let Some(s) = self.session.as_mut() else {
             return;
         };
+        let sequence_before = s.engine.run.clone();
+        let profile = self.profile.clone();
+        let observer = corpse_core::events::PresentationObserver::install(|run| std::rc::Rc::new(run.clone()));
         let before=s.record.commands.get(s.cursor)
             .filter(|command|crate::staged_firebolt::needs_snapshot(&s.engine.run,command))
             .map(|_|observe::observe_with_profile(&s.engine.run,&self.profile));
@@ -105,6 +108,7 @@ impl Replays {
                         now,
                         false,
                     );
+                    self.effects.sequence.capture_run(sequence_before, observer.take(), &self.effects.cues, &profile);
                     if let Some(before)=before {self.effects.firebolt_terrain.capture(before,&self.effects.cues);}
                     self.effects.defer_until_frame(now);
                 }
@@ -189,6 +193,7 @@ impl Replays {
         p.firebolt_terrain=None;
         if let Some(v)=self.view.as_mut(){crate::hallucination_ui::apply_view(v,crate::hallucination_ui::sample(now,reduced));}
         if let (Some(s), Some(v)) = (&self.session, &self.view) {
+            let v = self.effects.sequence.view(now).unwrap_or(v);
             self.effects.firebolt_terrain.prepare(v,&self.effects.cues,now,reduced,&mut self.paint_stage);
             p.firebolt_terrain=self.paint_stage.take();
             p.game_at(v, "", false, if reduced { 0. } else { now });

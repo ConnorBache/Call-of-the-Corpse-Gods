@@ -33,7 +33,7 @@ pub fn preflight_for(r: &Run, owner_id: f64, x: f64, y: f64) -> Result<(), Strin
         || x < 0. || y < 0. || x >= f.width() as f64 || y >= f.height() as f64
     { return Err("Select a visible unoccupied square.".into()); }
     if r.simulation_revision.value_or(29.)>=51. && p.id!=r.player.id && p.state!="ally"
-        && crate::revision51_stairs::stair_cell(f,y as usize*f.width()+x as usize) {
+        && (crate::revision51_stairs::stair_cell(f,y as usize*f.width()+x as usize) || (r.simulation_revision.value_or(29.)>=52. && crate::borge::reserved_cell(f,y as usize*f.width()+x as usize))) {
         return Err("Enemy hallucinations cannot appear on stairs.".into());
     }
     if std::iter::once(&r.player).chain(r.actors_at(r.depth)).any(|a| {

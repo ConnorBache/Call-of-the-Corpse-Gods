@@ -105,6 +105,7 @@ pub(crate) fn free(r: &Run, x: f64, y: f64, a: Option<&Actor>) -> bool {
     let i = y as usize * f.width() + x as usize;
     !["wall", "tree", "chasm", "pit"].contains(&f.tiles[i].as_str())
         && !crate::environment::blocks_movement(f, i)
+        && !(r.simulation_revision.value_or(29.)>=52. && a.is_none() && crate::borge::reserved_cell(f,i))
         && a.is_none_or(|a| !engine::bulwark_blocks(r, a, x, y)
             && !crate::revision51_stairs::blocked(r,a,x,y))
         && !std::iter::once(&r.player).chain(r.actors_at(r.depth)).any(|b| {

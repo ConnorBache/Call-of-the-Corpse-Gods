@@ -23,6 +23,14 @@ pub fn solid_at(f: &Floor, x: f64, y: f64) -> bool {
         && x>=0. && y>=0. && x<f.width() as f64 && y<f.height() as f64
         && f.tiles[y as usize*f.width()+x as usize] != "chasm"
 }
+/// Body and altar are reserved against hostile occupancy, independently of
+/// terrain replacement. O(1), no RNG or serialized state.
+pub fn reserved_cell(f: &Floor, at: usize) -> bool {
+    if at >= f.tiles.len() || f.width() == 0 { return false; }
+    let (x,y)=((at%f.width()) as f64,(at/f.width()) as f64);
+    f.godbeast_event.as_ref().is_some_and(|e| e.kind=="Borge"
+        && (contains(e,x,y) || e.altar.as_ref().is_some_and(|p|p.x==x&&p.y==y)))
+}
 pub fn interaction_at(r: &Run, x: f64, y: f64) -> bool {
     if !x.is_finite() || !y.is_finite() || x.fract()!=0. || y.fract()!=0. { return false; }
     r.floor().is_some_and(|f| f.godbeast_event.as_ref().is_some_and(|e| e.kind=="Borge"
@@ -187,5 +195,44 @@ pub fn consume_weapon(r:&mut Run,id:f64)->Result<(),EngineError> {
     crate::equipment::settle_removed(r,before)?;
     crate::animation_enemy::mark(r,&r.player,"E74","dissolve-shard",crate::events::Stage::Special);
     engine::log(r,"The Shard of the Borge disintegrates.","player");
+    Ok(())
+}
+
+#[cfg(test)]
+#[path="borge_occupancy_tests.rs"]
+mod occupancy_tests;
+
+/// Admission-only repair for saves made before hostile Borge occupancy was
+/// forbidden. Plan all relocations first, stable distance/y/x ties, no RNG.
+/// O(F+A+T*V*(P+A)) time and O(A+T+P) scratch (T trapped actors, V cells,
+/// P portal aliases/topology); restricted to Borge floors at admission.
+pub fn repair_hostile_occupancy(r: &mut Run) -> Result<(), String> {
+    if r.simulation_revision.value_or(29.)<52. {return Ok(());}
+    let mut plans=Vec::new();
+    for f in &r.floors {
+        if !f.godbeast_event.as_ref().is_some_and(|e|e.kind=="Borge") {continue;}
+        let w=f.width();
+        let mut occupied:std::collections::HashSet<usize>=r.actors_at(f.depth).iter()
+            .filter(|a|!a.dead.value_or(false)&&a.hp>0.)
+            .filter_map(|a|crate::portals::cell(f,a.x,a.y)).collect();
+        if f.depth==r.depth {if let Some(at)=crate::portals::cell(f,r.player.x,r.player.y){occupied.insert(at);}}
+        for a in r.actors_at(f.depth) {
+            if a.dead.value_or(false)||a.hp<=0.||!crate::revision51_stairs::restricted(r,a)
+                || !crate::portals::cell(f,a.x,a.y).is_some_and(|at|reserved_cell(f,at)) {continue;}
+            let target=(0..f.tiles.len()).filter(|&at| {
+                !reserved_cell(f,at)&&!occupied.contains(&at)
+                    && !crate::portals::aliases(f,at).iter().any(|alias|occupied.contains(alias))
+                    && matches!(f.tiles[at].as_str(),"floor"|"grass"|"shallow-water"|"water")
+                    && !crate::environment::blocks_movement(f,at)
+                    && !crate::revision51_stairs::stair_cell(f,at)
+                    && crate::ichor::habitat_path_allowed(f,a,at)
+            }).min_by_key(|&at|(((at%w) as i32-a.x as i32).abs().max(((at/w) as i32-a.y as i32).abs()),at));
+            let at=target.ok_or("No valid square to relocate a creature off the Borge")?;
+            occupied.insert(at);plans.push((f.depth,a.id,(at%w) as f64,(at/w) as f64));
+        }
+    }
+    for (depth,id,x,y) in plans {
+        if let Some(a)=r.actors_at_mut(depth).iter_mut().find(|a|a.id==id) {a.x=x;a.y=y;}
+    }
     Ok(())
 }

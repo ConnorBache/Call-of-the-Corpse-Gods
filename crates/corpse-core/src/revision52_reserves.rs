@@ -55,8 +55,9 @@ fn normalize_actor(actor: &mut Actor) {
         if let Some(pilot) = state.pilot.as_mut() { normalize_actor(pilot); }
     }
 }
-/// Boundary-only O(A+B+I+K) scan, A actors (including pilots), B reserve entries,
-/// I physical/carried/debug items and K remembered/detected items. Invalid later
+/// Boundary-only O(A+B+I+K+P) scan, A actors (including pilots), B reserve entries,
+/// I physical/carried/debug items, K remembered/detected items, P player abilities.
+/// Missing owned Future adds at most one constant-size reserve entry. Invalid later
 /// entries reject before any write. COW actor/ground blocks detach only if their
 /// reserve values change; cost includes copying each changed block's payload.
 /// Future anchors stay immutable and normalize when restored, not recursively.
@@ -77,6 +78,14 @@ pub fn normalize_run(run: &mut Run) -> Result<(), String> {
         if let Some(debug) = &profile.debug {
             for reward in debug.pending.iter().chain(&debug.stash) { check_item(&reward.item)?; }
         }
+    }
+    // Older/debug checkpoints could own Future without its bookkeeping reserve.
+    // Repair only absent state, at admission/restore, with no free energy. Do not
+    // use acquisition reconciliation here: it would refill missing reserves.
+    if run.player.abilities.iter().any(|id| id == abilities::FUTURE_ID)
+        && !run.player.ability_reserves.as_ref().is_some_and(|m| m.contains_key(abilities::FUTURE_ID)) {
+        abilities::initialize_reserve(&mut run.player, abilities::FUTURE_ID, CAPACITY, 0.)
+            .map_err(|e| format!("Invalid Future reserve migration: {e:?}"))?;
     }
     normalize_actor(&mut run.player);
     for actors in run.actors.values_mut() {
@@ -102,5 +111,71 @@ pub fn normalize_run(run: &mut Run) -> Result<(), String> {
             for reward in debug.pending.iter_mut().chain(&mut debug.stash) { normalize_item(&mut reward.item, 52.); }
         }
     }
+    crate::borge::repair_hostile_occupancy(run)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod future_reserve_tests {
+    use super::*;
+    use crate::Field;
+    fn fixture() -> Run {
+        let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.simulation_revision = 52.0.into();
+        run.player.abilities = vec![abilities::FUTURE_ID.into()];
+        run.player.ability_reserves = Field::Missing;
+        run.player.energy = 17.;
+        run.future = None;
+        run
+    }
+    #[test]
+    fn future_reserve_missing_checkpoint_repaired_without_granting_energy() {
+        for empty_map in [false, true] {
+            let mut run = fixture();
+            if empty_map { run.player.ability_reserves = Default::default();
+                run.player.ability_reserves.get_or_insert_with(Default::default); }
+            let raw = crate::storage::serialize(&run).unwrap();
+            let mut loaded = crate::storage::deserialize(&raw).unwrap();
+            let reserve = loaded.player.ability_reserves.as_ref().unwrap()[abilities::FUTURE_ID];
+            assert_eq!(reserve, AbilityReserve { capacity: 10., energy: 0. });
+            assert_eq!(loaded.player.energy, 17.);
+            let plan = abilities::plan_future_payment_for_revision(&loaded.player,52.).unwrap();
+            assert_eq!(plan.actor_energy_spent(),17.);
+            assert_eq!(plan.reserve_energy_spent(),0.);
+            let before = crate::storage::serialize(&loaded).unwrap();
+            normalize_run(&mut loaded).unwrap();
+            assert_eq!(crate::storage::serialize(&loaded).unwrap(),before);
+        }
+    }
+    #[test]
+    fn future_reserve_repaired_engine_can_capture_and_restore() {
+        let mut run=fixture();run.offers.clear();run.player.conditions.clear();run.player.active.clear();
+        run.history.clear();run.replay.clear();run.haste_snapshot=Field::Missing;
+        let mut engine=crate::temporal::Engine::new(run).unwrap();
+        let command=crate::Command::Ability{id:abilities::FUTURE_ID.into(),target:Field::Missing,x:Field::Missing,y:Field::Missing};
+        engine.dispatch(&command).unwrap();
+        assert!(engine.run.future.is_some());assert_eq!(engine.run.player.energy,0.);
+        engine.dispatch(&command).unwrap();
+        assert!(engine.run.future.is_none());
+        assert_eq!(engine.run.player.ability_reserves.as_ref().unwrap()[abilities::FUTURE_ID].energy,0.);
+    }
+    #[test]
+    fn future_reserve_migration_preserves_existing_charge_and_rejects_invalid() {
+        for energy in [0., 3., 10.] {
+            let mut run = fixture();
+            abilities::initialize_reserve(&mut run.player,abilities::FUTURE_ID,10.,energy).unwrap();
+            normalize_run(&mut run).unwrap();
+            assert_eq!(run.player.ability_reserves.as_ref().unwrap()[abilities::FUTURE_ID].energy,energy);
+            assert_eq!(run.player.energy,17.);
+        }
+        let mut run=fixture();run.player.ability_reserves=Field::Null;
+        let before=run.clone();assert!(normalize_run(&mut run).is_err());assert_eq!(run,before);
+    }
+    #[test]
+    fn future_reserve_migration_does_not_touch_unowned_or_legacy_abilities() {
+        let mut run=fixture();run.player.abilities.clear();normalize_run(&mut run).unwrap();
+        assert!(run.player.ability_reserves.is_missing());
+        let mut run=fixture();run.simulation_revision=50.0.into();normalize_run(&mut run).unwrap();
+        assert!(run.player.ability_reserves.is_missing());
+    }
 }

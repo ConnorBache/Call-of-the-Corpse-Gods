@@ -1,4 +1,5 @@
 //! Revision51 reserves stair tiles for the player and existing friendly actors.
+//! R52 also shares the hostile-placement guard for Borge body/altar cells.
 //! Queries are pure: no placement repair, random draws or new serialized state.
 use crate::{Actor, Floor, Run, engine, movement::{self, Point}};
 
@@ -21,7 +22,8 @@ pub fn stair_cell(f: &Floor, at: usize) -> bool {
             .is_some_and(|edit| tile(&edit.tile)))
 }
 pub fn blocked_cell(r: &Run, a: &Actor, f: &Floor, at: usize) -> bool {
-    restricted(r, a) && stair_cell(f, at)
+    restricted(r, a) && (stair_cell(f, at)
+        || (r.simulation_revision.value_or(29.)>=52. && crate::borge::reserved_cell(f,at)))
 }
 pub fn blocked(r: &Run, a: &Actor, x: f64, y: f64) -> bool {
     r.floor().is_some_and(|f| crate::portals::cell(f, x, y)
@@ -30,7 +32,8 @@ pub fn blocked(r: &Run, a: &Actor, x: f64, y: f64) -> bool {
 /// Revived corpses become hostile even if they were allies before death.
 pub fn blocks_revival(r: &Run, f: &Floor, a: &Actor) -> bool {
     r.simulation_revision.value_or(29.) >= 51. && crate::portals::cell(f, a.x, a.y)
-        .is_some_and(|at| stair_cell(f, at))
+        .is_some_and(|at| stair_cell(f, at)
+            || (r.simulation_revision.value_or(29.)>=52. && crate::borge::reserved_cell(f,at)))
 }
 /// A stair chase ends at its accessible edge instead of standing on the stair.
 /// Constant geometry work plus the existing actor-passability/terrain lookup;

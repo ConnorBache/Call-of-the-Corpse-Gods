@@ -563,6 +563,7 @@ pub fn dispatch(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineError
         Ok(mut out) => {
             if let Some(snapshot)=animation_snapshot {let player=candidate.player.id;crate::dreamwalking::with_actor(&mut candidate,player,|r|snapshot.finish(r));}
             if let Some(snapshot)=observation_animation {let player=candidate.player.id;crate::dreamwalking::with_actor(&mut candidate,player,|r|snapshot.finish(r));}
+            crate::events::checkpoint(&candidate);
             out.events = crate::events::finish();
             if let Some(snapshot) = out.pending_snapshot.as_mut() {
                 crate::mutation_journal::make_mut(&mut snapshot.state).future = future.clone();

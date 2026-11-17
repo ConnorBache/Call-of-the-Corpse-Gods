@@ -46,6 +46,7 @@ pub enum CustomIndicator {
     Nightmares { count: u64, until: u64 },
     Reactions(u64),
     Rescue(bool),
+    Future(bool),
     Blood { count: u64, progress: u64 },
 }
 #[derive(Clone)]
@@ -324,6 +325,7 @@ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::Upkeep
             || (a.as_str()=="isheilah-missed-me" && !corpse_core::hanged::enabled(r.simulation_revision.value_or(29.)))
     });
     row.indicator = match id {
+        "morae-see-the-future" => Some(CustomIndicator::Future(r.future.is_some())),
         "ursa-waking-nightmares" => Some(CustomIndicator::Nightmares {
             count:r.player.nightmares.value_or(0.).max(0.) as u64,
             until:(r.player.conditions.get("nightmareAt").copied().unwrap_or(r.tick+100.)-r.tick).max(0.).ceil() as u64,
@@ -339,7 +341,7 @@ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::Upkeep
     };
     row.name=display_text(&row.name).into_owned();
     row.description=display_text(&row.description).into_owned();
-    if r50(r) && r50_uses_energy(id) {
+    if r50(r) && r50_uses_energy(id) && id != "morae-see-the-future" {
         row.reserve=r.player.ability_reserves.as_ref().and_then(|m|m.get(id))
             .filter(|s|corpse_core::revision50_ability_energy::valid_reserve(s))
             .map(|s|{let s=corpse_core::revision52_reserves::project_reserve(*s,r.simulation_revision.value_or(29.));(s.energy,s.capacity)});
@@ -583,7 +585,7 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
     let paid = activation > 0. || upkeep > 0. || matches!(n,
         "Execute" | "Commandment" | "Never Surrender" | "Make Slippery" |
         "Erase Metaphysical" | "Nova" | "Unspeak" | "Rage at the Dying of the Light" | "See The Future");
-    let reserve = (paid || r50_uses_energy(id)).then(||reserve_summary(r,id)
+    let reserve = (id != "morae-see-the-future" && (paid || r50_uses_energy(id))).then(||reserve_summary(r,id)
         .or_else(||r50(r).then(||"Reserve not configured".into()))).flatten();
     if let Some(summary)=&reserve { cost=format!("{summary} · {cost}"); }
     let upkeep_due=(upkeep-corpse_core::abilities::prepaid_upkeep(r,&r.player,id)).max(0.);
@@ -747,6 +749,7 @@ pub fn payment_blocker(r: &Run, id: &str, cost: f64) -> Option<String> {
         return Some("Silence prevents this energy-paid activation".into());
     }
     plan.err().map(|error|match error {
+        EnergyError::MissingReserve if id == FUTURE_ID=>"Cannot save this state".into(),
         EnergyError::MissingReserve=>"Reserve not configured".into(),
         EnergyError::InsufficientEnergy=>format!("Reserve and player energy cannot cover {cost:.0} energy"),
         _=>"Ability energy configuration is invalid".into(),
@@ -1250,10 +1253,10 @@ mod revision50_future_ui_tests {
         let id=corpse_core::revision50_ability_energy::FUTURE_ID;
         r.player.abilities=vec![id.into()];
         assert!(runtime_supported(&r,id));assert!(!runtime_supported(&r,"numo-revert"));
-        assert_eq!(payment_blocker(&r,id,0.).as_deref(),Some("Reserve not configured"));
+        assert_eq!(payment_blocker(&r,id,0.).as_deref(),Some("Cannot save this state"));
         corpse_core::revision50_ability_energy::acquire(&mut r.player,&[id.into()]).unwrap();
         let row=observe(&r,id);assert!(row.supported);assert!(row.cost.contains("All own reserve + 0 player NRG"));
-        assert!(!row.state.contains("Unavailable"));assert!(row.description.contains("leaving other reserves untouched"));
+        assert!(!row.state.contains("Unavailable"));assert!(!row.description.contains("leaving other reserves untouched"));
         r.player.conditions.insert("silenced".into(),1.);assert!(observe(&r,id).state.contains("Unavailable"));
         r.player.ability_reserves.as_mut().unwrap()[id].energy=0.;assert!(!observe(&r,id).state.contains("Unavailable"));
         r.future=Some("not decoded by UI".to_string().into());r.player.energy=20.;

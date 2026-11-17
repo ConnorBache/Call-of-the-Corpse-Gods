@@ -34,6 +34,10 @@ pub fn potion_name(effect: &str) -> Option<&'static str> {
 /// Callers must first admit the item through their own inventory/ground knowledge.
 pub fn display_name(r: &Run, item: &Item) -> String {
     let mut name=base_display_name(r,item);
+    if crate::revision50::enabled(r) && item.kind == "heart"
+        && item.source_actor_id.as_ref().is_some() && item.borge_depth.as_ref().is_some() {
+        name.push_str(" (marked)");
+    }
     if !crate::revision50::enabled(r)||!item.tinkered.value_or(false)||!matches!(item.kind.as_str(),"ring"|"amulet"){return name;}
     // Tinker is admitted once. An existing grant is retained in the primary
     // field, and the new grant is appended; otherwise it is the primary grant.
@@ -118,4 +122,26 @@ pub fn potion_description_for_revision(item:&Item,revision:f64)->String {
   i.additional_granted_abilities=vec!["shrail-rage-at-the-dying-of-the-light".into()];assert!(display_name(&r,&i).ends_with(" and Ragelight"));
   i.tinkered=false.into();assert!(!display_name(&r,&i).contains(" and "));r.simulation_revision=49.0.into();assert_eq!(display_name(&r,&i),i.name);
  }
+}
+
+#[cfg(test)]
+mod marked_heart_tests {
+    use super::*;
+    #[test]
+    fn marked_heart_pickup_names_preserve_identity_and_provenance() {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.inventory.clear();r.offers.clear();
+        let mut heart=Item { id: 909., kind: "heart".into(), name: "Rat heart".into(), source_actor_id: 44.0.into(), borge_depth: 12.0.into(), ..Default::default() };
+        let before=heart.clone();
+        assert_eq!(display_name(&r,&heart),"Rat heart (marked)");assert_eq!(heart,before);
+        let (depth,x,y)=(r.depth,r.player.x,r.player.y);
+        r.ground_at_mut(depth).clear();r.ground_at_mut(depth).push(crate::GroundItem {x,y,item:heart.clone(),..Default::default()});
+        assert_eq!(crate::inventory::collect_underfoot(&mut r,100.).unwrap(),1);
+        assert!(r.log.iter().any(|line|line=="You pick up Rat heart (marked)."));
+        let carried=&r.inventory[0];assert_eq!(carried.name,heart.name);assert_eq!(carried.source_actor_id,heart.source_actor_id);assert_eq!(carried.borge_depth,heart.borge_depth);
+        assert_eq!(display_name(&r,carried),"Rat heart (marked)");
+        heart.borge_depth=crate::Field::Missing;assert_eq!(display_name(&r,&heart),"Rat heart");
+        heart.borge_depth=12.0.into();heart.source_actor_id=crate::Field::Missing;assert_eq!(display_name(&r,&heart),"Rat heart");
+        r.simulation_revision=49.0.into();assert_eq!(display_name(&r,&before),"Rat heart");
+    }
 }

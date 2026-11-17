@@ -21,7 +21,7 @@ pub fn summon(r:&mut Run,id:f64,target:f64)->Result<bool,String> {
         if x<0. || y<0. || x>=f.width() as f64 || y>=f.height() as f64
             || occupied.iter().any(|&(ox, oy)| crate::portals::same_cell(f, ox as f64, oy as f64, x, y)) || crate::engine::bulwark_blocks(r,&a,x,y)
             || (r.simulation_revision.value_or(29.)>=51. && a.state!="ally"
-                && crate::revision51_stairs::stair_cell(f,y as usize*f.width()+x as usize))
+                && (crate::revision51_stairs::stair_cell(f,y as usize*f.width()+x as usize) || (r.simulation_revision.value_or(29.)>=52. && crate::borge::reserved_cell(f,y as usize*f.width()+x as usize))))
             || !matches!(f.tiles[y as usize*f.width()+x as usize].as_str(),"floor"|"grass"|"up"|"down") {continue;}
         cells.push((x,y));
     }}

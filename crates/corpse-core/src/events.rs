@@ -33,6 +33,7 @@ struct Batch {
     player_action:u32,
     next_action: u32,
     serial:u64,
+    frames: Vec<PresentationFrame>,
     chilled_applied:Vec<f64>,
     attacks: Vec<u32>,
     damage: std::collections::HashMap<u64,u64>,
@@ -41,6 +42,42 @@ struct Batch {
     explosions: indexmap::IndexMap<String, PresentationEvent>,
 }
 thread_local! {static PENDING:std::cell::RefCell<Option<Batch>>=const{std::cell::RefCell::new(None)};}
+/// Opaque, detached presentation checkpoints supplied by the host, never serialized in Run.
+/// The core does not depend on a renderer or delay simulation for an animation.
+#[derive(Clone)]
+pub struct PresentationFrame { pub action: u32, pub observation: std::rc::Rc<dyn std::any::Any> }
+type Observer = std::rc::Rc<dyn Fn(&Run) -> std::rc::Rc<dyn std::any::Any>>;
+thread_local! {
+    static OBSERVER: std::cell::RefCell<Option<Observer>> = const { std::cell::RefCell::new(None) };
+    static COMPLETED: std::cell::RefCell<Vec<PresentationFrame>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+/// Scoped opt-in: headless simulation/replays have zero observation work unless
+/// their host installs this callback. Probes roll frames back with their receipts.
+pub struct PresentationObserver { previous: Option<Observer> }
+impl PresentationObserver {
+    pub fn install(f: impl Fn(&Run) -> std::rc::Rc<dyn std::any::Any> + 'static) -> Self {
+        COMPLETED.with(|c| c.borrow_mut().clear());
+        Self { previous: OBSERVER.with(|o| o.replace(Some(std::rc::Rc::new(f)))) }
+    }
+    pub fn take(&self) -> Vec<PresentationFrame> { COMPLETED.with(|c| std::mem::take(&mut *c.borrow_mut())) }
+}
+impl Drop for PresentationObserver {
+    fn drop(&mut self) { OBSERVER.with(|o| *o.borrow_mut() = self.previous.take()); COMPLETED.with(|c| c.borrow_mut().clear()); }
+}
+/// Capture action boundaries while a host explicitly requests presentation. O(host callback) per action, <=128
+/// frames per command; beyond the cap the host holds the last safe observation
+/// until the entire command completes. Hosts must knowledge-filter before painting.
+pub(crate) fn checkpoint(r: &Run) {
+    let wanted = PENDING.with(|p| p.borrow().as_ref().is_some_and(|b| b.frames.len() < 128));
+    if !wanted { return; }
+    let observer = OBSERVER.with(|o| o.borrow().clone());
+    let Some(observer) = observer else { return; };
+    let observation = observer(r);
+    PENDING.with(|p| if let Some(b) = p.borrow_mut().as_mut() {
+        if b.frames.last().is_some_and(|f| f.action == b.next_action) { b.frames.pop(); }
+        b.frames.push(PresentationFrame { action: b.next_action, observation });
+    });
+}
 pub(crate) fn begin() {
     #[cfg(test)] if SUPPRESS_RECORDING.with(|s|s.get()){PENDING.with(|p|*p.borrow_mut()=None);return}
     PENDING.with(|p| *p.borrow_mut() = Some(Batch::default()));
@@ -50,6 +87,7 @@ pub(crate) fn finish() -> Vec<PresentationEvent> {
         p.borrow_mut()
             .take()
             .map(|mut b| {
+                COMPLETED.with(|c| *c.borrow_mut() = b.frames);
                 b.events.extend(b.explosions.into_values());
                 b.events
             })
@@ -214,7 +252,7 @@ pub(crate) struct Probe {
     _thread: std::marker::PhantomData<std::rc::Rc<()>>,
 }
 impl Probe {
-    /// O(E+B) clone for E ordinary events (legacy<=128, R52<=4096), B pending explosion entries.
+    /// O(E+B+F) clone for E ordinary events, B explosion entries, F<=128 frame references.
     /// Clone precedes mutation, so allocation panic leaves the outer batch intact.
     pub(crate) fn begin()->Self {
         let saved=PENDING.with(|p| {let mut slot=p.borrow_mut();let fork=slot.clone();std::mem::replace(&mut *slot,fork)});
@@ -283,6 +321,7 @@ pub struct AnimationCue {
 }
 pub fn enabled(r: &Run) -> bool { r.simulation_revision.value_or(29.) >= 52. }
 pub fn next_action(r: &Run) {
+    checkpoint(r);
     if enabled(r) { PENDING.with(|p| { if let Some(b)=p.borrow_mut().as_mut() { b.next_action=b.next_action.saturating_add(1); b.action=b.next_action; } }); }
 }
 pub fn begin_player_action(r:&Run){next_action(r);if enabled(r){PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){b.player_action=b.action;});}}
@@ -432,3 +471,17 @@ pub fn morph(r:&Run,a:&Actor,key:&str,old_glyph:String){let serial=emission_seri
 /// Detached receipt of a successful real adjacency status application.
 pub fn note_chill(r:&Run,id:f64){if enabled(r){PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){if !b.chilled_applied.contains(&id){b.chilled_applied.push(id);}});}}
 pub fn chill_applied(id:f64)->bool{PENDING.with(|p|p.borrow().as_ref().is_some_and(|b|b.chilled_applied.contains(&id)))}
+
+#[cfg(test)] mod presentation_observer_tests {
+ use super::*;
+ #[test] fn presentation_observer_probe_rollback_and_headless_cleanup() {
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  let observer=PresentationObserver::install(|r|std::rc::Rc::new(r.player.hp));
+  begin(); next_action(&r); r.player.hp=17.;
+  {let _probe=Probe::begin();next_action(&r);r.player.hp=3.;next_action(&r);}
+  r.player.hp=11.;checkpoint(&r);finish();
+  let frames=observer.take();assert_eq!(frames.len(),2);
+  assert_eq!(*frames.last().unwrap().observation.downcast_ref::<f64>().unwrap(),11.);
+  drop(observer);begin();next_action(&r);checkpoint(&r);assert!(PENDING.with(|p|p.borrow().as_ref().unwrap().frames.is_empty()));finish();
+ }
+}

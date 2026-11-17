@@ -47,7 +47,8 @@ fn room()->Run{
 
 #[test]fn action_animation_busy_room_latency_and_interruption_are_bounded(){
  let mut fx=effects::Effects::default();let events=(0..200).flat_map(|action|[Stage::Travel,Stage::Impact,Stage::Special,Stage::Health,Stage::Death].map(move|stage|event("E70","collapse",stage,action,&[(2.,3.)]))).collect();
- fx.add(events,1.,1.,1000.,false);assert!(fx.cues.iter().all(|c|c.started<=1350.));assert!(!fx.animate(1451.));
+ fx.add(events,1.,1.,1000.,false);assert!(fx.animate(1451.));
+ for pair in fx.cues.chunks(5).collect::<Vec<_>>().windows(2) { let end=pair[0].iter().map(|c|c.started+effects::duration(&c.event)).fold(0f64,f64::max);assert!(pair[1][0].started>=end); }
  fx.add(vec![event("P23","speed",Stage::Travel,0,&[(3.,3.)])],2.,1.,1100.,false);assert_eq!(fx.cues.len(),1);assert_eq!(fx.cues[0].started,1100.);
  fx.add(vec![],2.,1.,1101.,true);assert!(fx.cues.is_empty());
 }
@@ -216,9 +217,9 @@ fn room()->Run{
  for (key,step) in [("shared",40.),("A02",32.)] {
   let route:Vec<_>=(0..30).map(|x|(x as f64,3.)).collect();let mut fx=effects::Effects::default();
   fx.add(vec![event(key,"bolt",Stage::Travel,0,&route),event(key,"spark",Stage::Impact,0,&route[29..])],1.,1.,0.,false);
-  assert_eq!(fx.cues[1].started,30.*step);
+  assert_eq!(fx.cues[1].started,effects::duration(&fx.cues[0].event));
   for i in [0,1,5,20,29] {let tiles=effects::tiles(&fx.cues[0],i as f64*step,false);assert_eq!(tiles.last().map(|p|p.x),Some(i));}
-  assert!(fx.animate(500.));assert!(!fx.animate(30.*step+200.));
+  assert!(fx.animate(500.));assert!(!fx.animate(fx.cues[1].started+effects::duration(&fx.cues[1].event)));
  }
 }
 #[test]fn brogue_dispatch_time_never_consumes_unpainted_travel(){
@@ -269,4 +270,64 @@ fn magic_brightness_preserves_routes_fades_and_reduced_motion() {
   assert!(tiles[0].glyph.is_none());
   assert!(effects::tiles(&cue,1000.,false).is_empty());
  }
+}
+
+#[test]
+fn sequencing_descent_travel_flash_then_ground_changes() {
+ let mut r=room(); r.player.abilities.clear(); r.actors_at_mut(r.depth).clear();
+ r.inventory.push(corpse_core::Item{id:900.,kind:"potion".into(),name:"Potion of Descent".into(),glyph:"!".into(),effect:"descent".to_string().into(),identified:true.into(),..Default::default()});
+ let mut engine=temporal::Engine::new(r).unwrap(); let mut fx=effects::Effects::default();
+ let time=std::time::Instant::now();
+ dispatch(&mut engine,&mut fx,0.,&Command::Throw{id:900.,x:20.,y:10.}).unwrap();
+ eprintln!("sequenced descent dispatch {:?}",time.elapsed());
+ fx.begin_frame(0.);
+ let travel=fx.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|a.stage==Stage::Travel&&a.delivery==Delivery::Projectile)).unwrap();
+ let action=travel.event.animation.as_ref().unwrap().action;
+ let end=fx.cues.iter().filter(|c|c.event.animation.as_ref().is_some_and(|a|a.action==action)).map(|c|c.started+effects::duration(&c.event)).fold(0f64,f64::max);
+ let flash_time=fx.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|a.action==action&&a.stage!=Stage::Travel)).map_or(end-1.,|c|c.started+18.);
+ let tile=|v:&View|v.terrain_snapshot.as_ref().unwrap().cells[10*v.width+20].tile.clone();
+ let final_view=observe::observe(&engine.run);
+ assert_ne!(tile(&final_view).as_deref(),Some("floor"));
+ for (now,label) in [(0.,"before"),(travel.started+80.,"travel"),(flash_time,"flash")] {
+  let v=fx.sequence.view(now).expect("hold before impact ends"); assert_eq!(tile(v).as_deref(),Some("floor"));
+  let mut p=Painter::new();p.game_at(v,"",false,0.);p.effects(v,&fx.cues,now,false);capture(&p,&format!("sequence-descent-{label}"));
+ }
+ let v=fx.sequence.view(end).unwrap_or(&final_view);assert_ne!(tile(v).as_deref(),Some("floor"));
+ let mut p=Painter::new();p.game_at(v,"",false,0.);capture(&p,"sequence-descent-after");
+}
+#[test]
+fn sequencing_actions_do_not_overlap() {
+ let mut fx=effects::Effects::default();
+ fx.add(vec![event("A01","bolt",Stage::Travel,1,&[(1.,1.),(2.,1.)]),event("A01","stitch",Stage::Health,1,&[(2.,1.)]),event("E18","bolt",Stage::Travel,2,&[(2.,1.),(1.,1.)])],1.,1.,0.,false);
+ let first_end=fx.cues.iter().filter(|c|c.event.animation.as_ref().unwrap().action==1).map(|c|c.started+effects::duration(&c.event)).fold(0f64,f64::max);
+ let next=fx.cues.iter().find(|c|c.event.animation.as_ref().unwrap().action==2).unwrap();assert!(next.started>=first_end);
+}
+#[test]
+fn sequencing_intermediate_health_and_visibility_are_not_future_state() {
+ let mut r=room(); r.player.hp=100.; let before=observe::observe(&r);
+ r.player.hp=80.; let middle=observe::observe(&r);
+ r.player.hp=50.; let after=observe::observe(&r);
+ let mut fx=effects::Effects::default();
+ fx.add(vec![event("P01","stitch",Stage::Special,1,&[(10.,10.)]),event("E18","bolt",Stage::Special,2,&[(10.,10.)])],1.,1.,0.,false);
+ let end1=fx.cues[0].started+effects::duration(&fx.cues[0].event);
+ let end2=fx.cues[1].started+effects::duration(&fx.cues[1].event);
+ fx.sequence.capture(before,vec![corpse_core::events::PresentationFrame{action:1,observation:std::rc::Rc::new(middle)},corpse_core::events::PresentationFrame{action:2,observation:std::rc::Rc::new(after)}],&fx.cues,appearance_profile::Profile::defaults());
+ assert_eq!(fx.sequence.view(0.).unwrap().hp,100.);
+ assert_eq!(fx.sequence.view(end1).unwrap().hp,80.);
+ assert_eq!(fx.sequence.view(end2-1.).unwrap().hp,80.);
+ assert!(fx.sequence.view(end2).is_none());
+ fx.defer_until_frame(0.);assert!(fx.presentation_pending(10000.));
+ fx.begin_frame(10000.);assert_eq!(fx.sequence.view(10000.).unwrap().hp,100.);
+ assert_eq!(fx.sequence.view(10000.+end1).unwrap().hp,80.);
+ fx.clear();assert!(!fx.presentation_pending(0.));
+}
+#[test]
+fn sequencing_observer_does_not_change_simulation_and_reports_cost() {
+ let mut r=room();r.player.abilities.clear();
+ for i in 0..20 {let mut a=corpse_core::population::create_actor_revision("rat",200.+i as f64,20.+(i%10) as f64,12.+(i/10) as f64,false,52.).unwrap();a.hp=100.;r.actors_at_mut(r.depth).push(a);}
+ let mut expected=r.clone();let t=std::time::Instant::now();corpse_core::engine::dispatch(&mut expected,&Command::Wait).unwrap();let plain=t.elapsed();
+ let mut engine=temporal::Engine::new(r).unwrap();let mut fx=effects::Effects::default();let t=std::time::Instant::now();dispatch(&mut engine,&mut fx,0.,&Command::Wait).unwrap();
+ eprintln!("dense room: core {:?}; observed {:?}",plain,t.elapsed());
+ assert_eq!(engine.run.player.hp,expected.player.hp);assert_eq!(engine.run.rng,expected.rng);assert_eq!(engine.run.tick,expected.tick);
+ assert_eq!(serde_json::to_value(&engine.run.actors).unwrap(),serde_json::to_value(&expected.actors).unwrap());
 }

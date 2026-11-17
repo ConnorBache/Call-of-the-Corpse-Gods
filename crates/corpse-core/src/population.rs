@@ -461,6 +461,9 @@ pub fn create_population_actor_revision(
     if revision >= 51. && crate::revision51_stairs::stair_cell(f,at) {
         return Err("Enemies cannot spawn on stairs".into());
     }
+    if revision >=52. && crate::borge::reserved_cell(f,at) {
+        return Err("Enemies cannot spawn on the Borge or its altar".into());
+    }
     let w = f.width();
     let (x, y) = ((at % w) as f64, (at / w) as f64);
     let mut a = if ["fungus", "bastidion", "vent-fungus"].contains(&kind) {
@@ -1027,6 +1030,7 @@ pub fn populate_hordes_revision(
             .copied()
             .filter(|at| {
                 !blocked.contains(at)
+                    && !(revision>=52. && crate::borge::reserved_cell(f,*at))
                     && !sampler.occupied.contains(at)
                     && horde.kinds.iter().all(|k| !fuel[k].contains(at))
             })

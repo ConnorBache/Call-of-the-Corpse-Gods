@@ -436,7 +436,7 @@ pub fn enemy_action_options(
                     || y >= f.height() as f64
                     || crate::engine::bulwark_blocks(r, &a, x, y)
                     || (r.simulation_revision.value_or(29.)>=51. && a.state!="ally"
-                        && crate::revision51_stairs::stair_cell(f,y as usize*w+x as usize))
+                        && (crate::revision51_stairs::stair_cell(f,y as usize*w+x as usize) || (r.simulation_revision.value_or(29.)>=52. && crate::borge::reserved_cell(f,y as usize*w+x as usize))))
                     || !matches!(
                         f.tiles[y as usize * w + x as usize].as_str(),
                         "floor" | "grass" | "up" | "down"

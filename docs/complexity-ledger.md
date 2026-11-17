@@ -2111,3 +2111,47 @@ Pack configuration reserves the widest Tier 4 Tinkered amulet name from the curr
 - Per mouse/keyboard ability activation, compare the selected ability ID (length `L`): O(L) time and O(1) extra memory; successful reselection clears the two-stage target state without simulation mutation or turn advancement. Existing redraw/preview work is unchanged and not included in this comparison bound.
 - Inspector footer reads the existing visibility-filtered report in O(1) time/O(1) extra memory; action/error notices no longer replace inspection content. No new perception, pathfinding, or simulation query.
 - Regression checks: `reselect_tests`, `reselect_ability_clears_highlight_and_target_ink_without_a_turn`, `inspect_footer_contains_only_observed_information`, and `cursor_render_keeps_observed_footer_and_does_not_mutate_save`. Bounds above are static analysis, not timing measurements.
+
+### See the Future confirmation and snapshot indicator (2026-11-17)
+The desktop confirmation gate examines one command and the owned ability list (A entries, bounded catalog); O(A) time and O(1) additional memory before queuing a command. Its Y/N/Escape reducer is O(1), and cancellation never dispatches or changes save state. Both keyboard and mouse activation use this gate. Snapshot presence is O(1); rendering its box/spiral uses a fixed sample count and constant extra memory. Gameplay payment and temporal capture/restore are unchanged and retain their existing complexity.
+Load/restore repair of an owned missing See the Future reserve adds O(P) owned-ability scanning and one expected O(1) map lookup/insertion (constant ID, at most one entry allocated) to reserve normalization. All state validation precedes repair; existing entries and player energy are unchanged. Immutable anchors normalize on the existing restore path.
+
+### Marked-heart presentation (2026-11-17)
+Shared item-name formatting adds `(marked)` from existing Borge provenance using constant metadata checks and O(N) output allocation for N displayed name bytes, per item-name observation. No provenance, pickup, altar, heart-consumption, save, or replay mechanics are changed. Pack reuses that name instead of adding a second marker; legacy rows retain their presentation fallback.
+
+### Hostile Borge occupancy (2026-11-17)
+Borge body/altar metadata checks are O(1) per placement candidate. Existing movement, path masks, teleport, forced movement/current/fall, revival, and offscreen arrival share the hostile placement guard; population and raw summon candidate lists also check it. No extra RNG draws or persistent gameplay fields. Player interaction and old revisions remain unchanged. Admission/restore repair scans Borge-floor actors and, only for T overlapping living hostiles, scans V cells for a deterministic nearest valid free cell; portal-alias checks contribute P topology work per cell and existing habitat predicates scan A actor trait keys. Worst-case O(F + creatures + T*V*(P+A)) time, O(creatures+T+P) scratch. Plans precede coordinate writes; a floor with no valid destination is rejected rather than silently leaving overlap. Ordinary valid saves incur only the Borge-floor actor scan. Generation installs the Borge event before population, whose shared candidate/admission guards now reserve its cells.
+
+### Ordered animation observations (2026-11-17)
+The desktop opts into a scoped, non-serialized core callback during dispatch.
+At each action boundary it captures a detached COW Run clone, capped at 128.
+After visible receipts are filtered, only the last boundary before each visible
+animated action is projected through the normal player-knowledge-filtered
+observer; quiet scheduler actions do not each build a View. Raw checkpoints are
+then discarded, never passed to the painter or persisted. The callback is absent
+in headless simulation. No gameplay RNG, save or replay-command format changes.
+Speculative `events::Probe` rollback restores frame references with receipts.
+
+Let F<=128 be checkpoints, C the Run clone cost (including non-COW fields),
+R retained nonshared Run data, S<=F selected scenes, O the full observation cost
+(visibility rays, terrain, actors and inventory), V View storage, E<=4096 cues.
+Dispatch adds O(F*C+S*O+E log E) time and O(F*R+S*V+E) memory. Run clones
+share COW floors/actor storage but histories and metadata cannot be treated as
+free. Probe cloning costs O(F) references, not deep checkpoint copies. Sequence
+lookup is O(S*E); bounds above apply. Active sequencing uses ordinary full-frame
+native raster/GPU paint/upload, invalidating the retained tile cache afterward.
+Beyond the checkpoint cap, the last safe scene stays until the rest of the cues
+finish; no future/hidden scene is substituted. Save during animation writes the
+already committed canonical simulation, not a checkpoint.
+
+Performance must be measured on dense/deep rooms and multiple-proc turns.
+The rejected prototype observed every scheduler boundary: a 21-creature debug
+fixture took ~8.2s versus ~88ms core-only. The selected-scene implementation is
+explicitly intended to avoid that regression; do not infer release-platform
+performance from debug test figures or from these asymptotic bounds.
+
+Focused validation: the optimized 21-creature debug test measured ~86ms for
+observed desktop dispatch versus ~76ms core-only in the same suite run. This
+is one fixture, not a release benchmark, and excludes the 17.7s combined raster
+capture suite. Four new sequence regressions pass within 34 animation tests;
+the transactional-observer rollback/headless regression also passes.

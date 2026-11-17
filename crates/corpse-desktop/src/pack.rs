@@ -1592,7 +1592,7 @@ pub(crate) fn displayed_name(run: &Run, i: &Item) -> String {
         i.name.clone()
     };
     let name = name.replace("Potion of Offense", "Potion of Damage").replace("Potion of Defense", "Potion of HP").replace("Potion of offense", "Potion of Damage").replace("Potion of defense", "Potion of HP");
-    let name = if marked_heart(i) { format!("{name} · Borge-marked") } else { name };
+    let name = if !corpse_core::revision50::enabled(run) && marked_heart(i) { format!("{name} (marked)") } else { name };
     match magic_nature(run, i) {
         Some(nature) if !nature.is_empty() => format!("{name} ({nature} magic)"),
         _ => name,
@@ -1721,7 +1721,7 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
         } else { stats };
         let mut text = format!(
             "{}{} <heart>\n{}\n{} blessings · {} energy",
-            i.name,
+            displayed_name(run, i),
             if i.quantity.value_or(1.) > 1. {
                 format!(" ×{}", i.quantity.value_or(1.))
             } else {
@@ -2161,12 +2161,17 @@ mod tests {
     }
     #[test]
     fn borge_heart_provenance_is_visible_and_refreshes_without_changing_reward() {
-        let mut r=run();let mut h=heart(201.);r.inventory=vec![h.clone()];let mut view=PackView::observe(&r);
-        assert!(!displayed_name(&r,&h).contains("Borge"));
+        for revision in [29.,52.] {
+        let mut r=run();r.simulation_revision=revision.into();let mut h=heart(201.);r.inventory=vec![h.clone()];let mut view=PackView::observe(&r);
+        assert!(!displayed_name(&r,&h).contains("marked"));
         h.source_actor_id=44.0.into();h.borge_depth=12.0.into();r.inventory[0]=h.clone();view.refresh(&r);
-        assert!(displayed_name(&r,&h).contains("Borge-marked"));assert!(describe_item(&r,&h).contains("exact heart"));assert!(describe_item(&r,&h).contains("depth 12"));
+        assert!(displayed_name(&r,&h).contains("(marked)"));assert!(describe_item(&r,&h).contains("exact heart"));assert!(describe_item(&r,&h).contains("depth 12"));
         assert_eq!(h.bonus,heart(201.).bonus);assert_eq!(h.exp,heart(201.).exp);assert_eq!(h.energy,heart(201.).energy);
-        assert!(view.groups[0].name.contains("Borge-marked"));
+        assert!(view.groups[0].name.contains("(marked)"));
+        assert_eq!(view.groups[0].name.matches("(marked)").count(),1);
+        assert!(view.row_label(&view.groups[0]).contains("(marked)"));
+        assert!(describe_item(&r,&h).lines().next().unwrap().contains("(marked)"));
+        }
     }
     #[test]
     fn source_grouping_and_descriptions_64_cases() {

@@ -25,10 +25,12 @@ mod creature_presentation;
 mod hallucination_ui;
 mod effects;
 mod staged_firebolt;
+mod action_sequence;
 mod action_marks;
 mod embedded_assets;
 mod entity_profile;
 mod hazards_ui;
+mod future_confirmation;
 mod inspection_ui;
 mod manual;
 mod bestiary_progress;
@@ -698,6 +700,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
         #[cfg(test)] input_loop_tests::inject(&sdl,&mut canvas,&painter)?;
         for mut event in events.poll_iter() {
+            // Never expose final-state inspection or admit another turn while a
+            // detached action sequence is still being presented. Window/quit
+            // events remain responsive; held/queued gameplay input is discarded.
+            if screen == Screen::Game && effects.presentation_pending(start.elapsed().as_millis() as f64)
+                && !matches!(event, Event::Quit { .. } | Event::Window { .. }) { continue; }
             if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
             let dead=screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead");
             match death_pause.event(dead,&event) {
@@ -1006,8 +1013,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         }
                         continue;
                     }
-                    if let Some((command, message)) = hazard_prompt.take() {
-                        if key == Keycode::Y {
+                    if hazard_prompt.is_some() {
+                        if let Some(command) = future_confirmation::answer(&mut hazard_prompt, key) {
+                            if matches!(&command, Command::Ability { id, .. } if id == "morae-see-the-future" || id == "numo-revert") {
+                                condition_meters.reset();
+                            }
                             if let Some(r) = run.as_mut() {
                                 notice = match dispatch(
                                     r,
@@ -1019,8 +1029,6 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     Err(e) => e.to_string(),
                                 };
                             }
-                        } else if key != Keycode::N && key != Keycode::Escape {
-                            hazard_prompt = Some((command, message));
                         }
                         continue;
                     }
@@ -1581,6 +1589,10 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         }
                     }
                     if let Some(c) = command {
+                        if let Some(message) = future_confirmation::message(&r.run, &c) {
+                            hazard_prompt = Some((c, message.into()));
+                            continue;
+                        }
                         if matches!(&c,Command::Ability{id,..} if id=="numo-revert"||id=="morae-see-the-future")
                         {
                             condition_meters.reset();
@@ -2007,6 +2019,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                         notice = if r.run.simulation_revision.value_or(29.) >= 50. { targeting_ui::ability_prompt(&id) } else { "Select a target. Escape cancels." }.into();
                                         if id=="kative-cogworks" { notice=targeting_ui::cogworks_prompt(&r.run); }
                                         pending_ability = Some(id);
+                                        continue;
+                                    }
+                                    let command = Command::Ability { id: id.clone(), target: Field::Missing, x: Field::Missing, y: Field::Missing };
+                                    if let Some(message) = future_confirmation::message(&r.run, &command) {
+                                        hazard_prompt = Some((command, message.into()));
                                         continue;
                                     }
                                     if id == "numo-revert" || id == "morae-see-the-future" {
@@ -2554,7 +2571,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;
             inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;
         }
-        if !help.active() && screen == Screen::Game && travel.as_ref().is_some_and(|(_, next)| now >= *next) {
+        if !effects.presentation_pending(now) && !help.active() && screen == Screen::Game && travel.as_ref().is_some_and(|(_, next)| now >= *next) {
             if let (Some((mut walk, _)), Some(r)) = (travel.take(), run.as_mut()) {
                 let quiet = walk.exploring();
                 match walk.next_command(&r.run) {
@@ -2579,7 +2596,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
         }
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
-        if !help.active() && screen == Screen::Game && !health_warning.active() && resting.as_ref().is_some_and(|rest| now >= rest.next) {
+        if !effects.presentation_pending(now) && !help.active() && screen == Screen::Game && !health_warning.active() && resting.as_ref().is_some_and(|rest| now >= rest.next) {
             if let Some(r) = run.as_mut() {
                 let before = resting.take().unwrap();
                 if r.run.status == "playing" && r.run.offers.is_empty() {
@@ -2625,9 +2642,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         if !minimized&&drawable_w>0&&drawable_h>0 {effects.begin_frame(now);}
         effects.configure_motion(action_reduced,action_instant);
         if effects.profile.as_ref()!=Some(&painter.profile){effects.profile=Some(painter.profile.clone());}
-        let old_cues = (effects.cues.len(),effects.plane_transition.is_some());
+        let old_cues = (effects.cues.len(),effects.plane_transition.is_some(),effects.sequence.active());
         if !minimized&&drawable_w>0&&drawable_h>0 {effects.prune(now);}
-        dirty |= (effects.cues.len(),effects.plane_transition.is_some()) != old_cues;
+        dirty |= (effects.cues.len(),effects.plane_transition.is_some(),effects.sequence.active()) != old_cues;
         let transient = effects.animate(now) || (screen==Screen::ReplayGame&&replays.animating(now));
         let frame = if reduced {
             18
@@ -2698,7 +2715,16 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 Screen::Scores => profiles.paint(&mut painter),
                 Screen::Settings => { if let Some(form) = display_form.as_ref() { form.draw(&mut painter); } },
                 Screen::Game => {
-                    if let Some(r) = &run {
+                    if let Some(staged) = effects.sequence.view(now) {
+                        // Paint only the historical observation, including HUD
+                        // and visibility. Final-state tooltips/modals cannot leak.
+                        painter.tile_clip_enabled = false;
+                        painter.firebolt_terrain = None;
+                        painter.game_at(staged, "", false, if reduced { 0. } else { now });
+                        painter.effects(staged, &effects.cues, now, action_reduced);
+                        tile_plan.invalidate(); tile_overlays.invalidate();
+                        force_texture_upload = true;
+                    } else if let Some(r) = &run {
                         {
                             if dirty || cached_view.is_none() {
                                 let _observe_timing=corpse_core::timing::span("desktop.ui.observe_world");
@@ -2904,7 +2930,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 }
             }
             help.paint(&mut painter);
-            if screen==Screen::Game{if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
+            if screen==Screen::Game && !effects.sequence.pending(now){if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
             if let Some(frame)=painter.gpu.as_ref(){
                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
@@ -2924,8 +2950,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             if full_upload||!upload_rects.is_empty()||force_present{let _present_timing=corpse_core::timing::span("desktop.texture.present");canvas.clear();canvas.copy(&texture,None,None)?;canvas.present();}
             }
-            health_warning.presented();
-            death_pause.presented(screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead"));
+            if !effects.presentation_pending(now) { health_warning.presented(); }
+            death_pause.presented(!effects.sequence.pending(now)&&screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead"));
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
             dirty = false;
             cosmetic_dirty = false;
@@ -3147,6 +3173,8 @@ mod tests {
 }
 
 /// Core command + receipt/event processing, plus O(I) dagger lookup for I items.
+/// Ordered playback retains <=128 COW boundary checkpoints and projects only
+/// visible-action boundaries; detailed clone/visibility bounds: complexity-ledger.
 /// Every R52 command while Dreamwalking, or one capable of entering/changing a
 /// plane/floor, captures a full outgoing observation: existing observation cost
 /// plus O(View bytes) retained memory, even if that command does not transition.
@@ -3164,7 +3192,12 @@ fn dispatch(
     let before_view=(engine.run.simulation_revision.value_or(29.)>=52.&&can_change_plane).then(||observe::observe_with_profile(&engine.run,effects.profile.as_ref().unwrap_or_else(||appearance_profile::Profile::defaults())));
     let before_travel=staged_firebolt::needs_snapshot(&engine.run,command).then(||
         observe::observe_with_profile(&engine.run,effects.profile.as_ref().unwrap_or_else(||appearance_profile::Profile::defaults())));
+    let profile = effects.profile.clone().unwrap_or_default();
+    let sequence_before = engine.run.clone();
+    let observer = corpse_core::events::PresentationObserver::install(|run| std::rc::Rc::new(run.clone()));
     let mut out = engine.dispatch(command)?;
+    let frames = observer.take();
+    drop(observer);
     session_store::changed();
     let rewind = matches!(command,Command::Ability{id,..} if id=="numo-revert" || id=="morae-see-the-future");
     effects.add(
@@ -3174,6 +3207,7 @@ fn dispatch(
         now,
         rewind,
     );
+    effects.sequence.capture_run(sequence_before, frames, &effects.cues, &profile);
     if let Some(before)=before_travel {effects.firebolt_terrain.capture(before,&effects.cues);}
     effects.defer_until_frame(now);
     if before_plane!=corpse_core::dreamwalking::active(&engine.run)||before_depth!=engine.run.depth{if let Some(before)=before_view{effects.plane_changed(before,now);if let Some(t)=effects.plane_transition.as_mut(){t.ascend=matches!(command,Command::Ability{id,..}if id=="anavani-ascend");}}}

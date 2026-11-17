@@ -813,3 +813,7 @@ non-Kative Tinker ability name, its reserve bar and controls. At default typogra
 the maximum is “Tier 4 Amulet of Teleportation and Are You Sure About That?”.
 The Pack can span the sidebars; narrow viewports or oversized fonts wrap labels
 rather than hide them with ellipses.
+
+
+Implementation hold (2026-11-17): Never Ending Flesh's nonlethal-only crossing and 25%-of-maximum-HP heal are provisional pending the designer's answer about lethal hits and healing basis. Do not treat these choices as settled or publish the combined release before clarification.
+Approved-fixes-only export: the provisional Never Ending Flesh implementation is excluded from this source. The hold above applies to the separate combined candidate; existing Relentless Pursuit behavior is preserved here while clarification is pending.

@@ -20,6 +20,20 @@ pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
             p.border(x,y,30,21,[255,219,113]);
             centered(p,&count.to_string(),x,y+3,30,12,[30,23,13]);
         }
+        CustomIndicator::Future(ready)=>{
+            p.border(x,y,23,23,[174,142,241]);
+            if ready {
+                // Sample a two-turn spiral directly, avoiding font fallback glyphs.
+                for step in 0..160 {
+                    let t=step as f64/159.;
+                    let angle=t*std::f64::consts::TAU*2.;
+                    let radius=1.+7.*t;
+                    let px=x+11+(radius*angle.cos()).round() as i32;
+                    let py=y+11+(radius*angle.sin()).round() as i32;
+                    p.rect(px,py,2,2,[192,168,255]);
+                }
+            }
+        }
         CustomIndicator::Rescue(ready)=>{
             if ready {p.rect(x,y,21,21,[59,150,255]);}
             p.border(x,y,21,21,[99,177,255]);
@@ -104,5 +118,29 @@ mod tests {
                 save(&full,&format!("custom-indicators-{step}-{w}x{h}"));old=v;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod future_indicator_tests {
+    use super::*;
+    #[test]
+    fn future_box_spiral_tracks_snapshot_without_mutation() {
+        let id="morae-see-the-future";
+        let mut r:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.player.abilities=vec![id.into()];r.offers.clear();r.future=None;
+        corpse_core::revision50_ability_energy::acquire_for_revision(&mut r.player,&[id.into()],52.).unwrap();
+        let before=r.clone();
+        let row=crate::ability_ui::observe(&r,id);
+        assert_eq!(row.indicator,Some(CustomIndicator::Future(false)));assert_eq!(row.reserve,None);
+        assert!(!row.cost.contains("Reserve"));assert!(!row.state.contains("Unavailable"));assert_eq!(r,before);
+        r.future=Some(corpse_core::future_anchor::FutureAnchor::from_text(corpse_core::storage::serialize(&r).unwrap()));
+        assert_eq!(crate::ability_ui::observe(&r,id).indicator,Some(CustomIndicator::Future(true)));
+        let mut empty=Painter::new();empty.try_resize(1280,800).unwrap();empty.set_responsive_canvas(true);
+        paint(&mut empty,CustomIndicator::Future(false),4,4,25);
+        let mut full=Painter::new();full.try_resize(1280,800).unwrap();full.set_responsive_canvas(true);
+        paint(&mut full,CustomIndicator::Future(true),4,4,25);
+        assert_ne!(empty.pixels,full.pixels);
+        for y in 0..800 { for x in 0..1280 {if !(5..26).contains(&x)||!(5..26).contains(&y) {let i=(y*1280+x)*4;assert_eq!(&empty.pixels[i..i+4],&full.pixels[i..i+4]);}}}
     }
 }
