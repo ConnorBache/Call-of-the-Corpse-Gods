@@ -2273,3 +2273,6 @@ The terminal-scene keyboard check adds one fixed key comparison per keyboard eve
 ### Five-turn status-gas refresh (2026-11-17)
 
 For each existing environmental exposure, select the policy and one authored duration in O(1), then use the existing recipient ring lookup (O(I + C), inventory items plus copied/equipment grants) and max with the countdown in O(1). Extra memory is O(1) per actor; no new grid pass, RNG consumption or stored gas timers. Across A exposed actors the existing duration queries cost O(A(I+C)); gas propagation and normal status expiration costs are unchanged. Bounds are existing inventory/actor limits. These are code-path estimates, not new profiling measurements; validate with current_gas_status and replay-boundary fixtures.
+
+### Samara maximum-HP rule confirmation (2026-11-17)
+No runtime algorithm changed: each existing razorleaf contact computes 2% of maximum HP in O(1) time and O(1) scratch before the existing damage pipeline. Existing emitter-field generation and actor exposure iteration are unchanged. Regression fixtures check wounded actors and serialization; they are not performance measurements.
