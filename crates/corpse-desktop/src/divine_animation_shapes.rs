@@ -18,7 +18,7 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
  let a=e.animation.as_ref()?;let total=duration(e)?;let s=a.style.as_str();
  if age<0.||age>=total{return Some(vec![])}
  let center=(e.to.x.round() as i32,e.to.y.round() as i32);
- let mut color=if s=="wave-reveal-yellow"{[255,235,45]}else if s=="wave-reveal-white"{[255,255,255]}else if s=="wave-reveal-purple"{[185,75,255]}else if s.starts_with("nova-"){nova_color(s,default)}else{default};
+ let mut color=if s=="wave-reveal-telepathy"{[45,140,255]}else if s=="wave-reveal-fire"{[255,90,20]}else if s=="wave-reveal-darkness"{[0,0,0]}else if s=="wave-reveal-shattering"{[90,210,255]}else if s=="wave-reveal-yellow"{[255,235,45]}else if s=="wave-reveal-white"{[255,255,255]}else if s=="wave-reveal-purple"{[185,75,255]}else if s.starts_with("nova-"){nova_color(s,default)}else{default};
  if s=="light100"||s.starts_with("moving-actor"){color=[255,255,255];}
  let make=|x,y,light,glyph|Tile{x,y,color,light,field_strength:if s=="light100"||s.starts_with("moving-actor"){1.}else{0.85},glyph,mark:None};
  if s=="thread-grow"{return Some(vec![])}
@@ -66,7 +66,7 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
  }
  if (s=="map-reveal"||s.starts_with("wave-reveal")){
   let max=allowed.iter().map(|&(x,y)|((x-center.0).pow(2)+(y-center.1).pow(2))as f64).fold(1.,f64::max).sqrt();
-  return Some(allowed.into_iter().filter_map(|(x,y)|{let dist=(((x-center.0).pow(2)+(y-center.1).pow(2))as f64).sqrt();let t=age-dist/max*650.;(t>=0.&&t<250.).then(||make(x,y,0.95*(1.-t/250.),None))}).collect())
+  return Some(allowed.into_iter().filter_map(|(x,y)|{let dist=(((x-center.0).pow(2)+(y-center.1).pow(2))as f64).sqrt();let t=age-(dist/max*10.-1e-9).ceil().max(0.)*65.;(t>=0.&&t<250.).then(||make(x,y,0.95*(1.-t/250.),None))}).collect())
  }
  let head=((age/60.).floor() as usize).min(a.cells.len().saturating_sub(1));
  Some(a.cells.iter().enumerate().filter_map(|(i,p)|{if i>head||head-i>2{return None}Some(make(p.x as i32,p.y as i32,if i==head{1.}else{0.5/(head-i)as f64},if i==head&&s.starts_with("moving-actor"){e.glyph.clone()}else{None}))}).collect())

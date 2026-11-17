@@ -81,8 +81,8 @@ fn offscreen_wounds_finish_after_source_disappears_and_do_not_repeat() {
     let before=r.clone();crate::offscreen::catch_up_floor(&mut r,depth).unwrap();assert_eq!(r,before);
 }
 #[test]
-fn temporal_snapshots_and_cleansing_preserve_or_remove_whole_wounds() {
-    let mut r=room();let id=r.player.id;after_melee(&mut r,&source("killspawn"),id,13.,true).unwrap();
+fn temporal_snapshots_and_historical_cleansing_preserve_or_remove_whole_wounds() {
+    let mut r=room();r.potion_rules_from=crate::Field::Null;let id=r.player.id;after_melee(&mut r,&source("killspawn"),id,13.,true).unwrap();
     let original=r.player.conditions.clone();
     let snapshot=crate::temporal::Snapshot::capture(&r);
     let future=crate::future_anchor::FutureAnchor::capture41(&r).unwrap();

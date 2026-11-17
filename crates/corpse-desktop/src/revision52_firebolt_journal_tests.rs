@@ -163,3 +163,29 @@ fn amulet_markerless_journal_keeps_old_roots_damage_then_adopts_current_rules() 
         assert!(loaded.pending_batch().base_token.is_none());
     }
 }
+
+#[test]
+fn potion_markerless_journal_keeps_retired_flooding_then_adopts_current_rules() {
+    for metadata in [false,true] {
+        let mut initial=room();initial.firebolt_travel_from=0usize.into();initial.potion_rules_from=Field::Null;
+        initial.floor_mut().unwrap().tiles.fill("floor".into());
+        initial.inventory.push(corpse_core::Item{id:901.,kind:"potion".into(),glyph:"!".into(),name:"Potion of Flooding".into(),effect:"flooding".to_string().into(),identified:true.into(),..Default::default()});
+        let mut old=Core::new(initial.clone()).unwrap();
+        let mut checkpoint:serde_json::Value=serde_json::from_str(&session_store::encode(&old,Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("potionRulesFrom");
+        let header=if metadata {log::Header::for_metadata_revision(Some(52.))} else {log::Header::for_revision(Some(52.))}.unwrap();
+        let mut file=log::encode_initial(&checkpoint.to_string(),&header).unwrap();
+        let command=Command::Throw{id:901.,x:14.,y:10.};
+        old.dispatch(&command).unwrap();
+        assert_eq!(tile(&old.run,14),"shallow-water","historical Flooding must execute in the durable tail");
+        let after=Stamp::capture(&old);append(&mut file,vec![Operation::Command{command,after}],metadata);
+        old.run.potion_rules_from=old.run.replay.len().into();
+        let (decoded,_)=session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.save().unwrap(),old.save().unwrap());
+        export_twice(&initial,&decoded);
+        let dir=Sandbox::new();let path=dir.path();std::fs::write(&path,&file.bytes).unwrap();
+        let (loaded,_)=load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}

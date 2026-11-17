@@ -4,6 +4,7 @@ fn fixture()->serde_json::Value {serde_json::from_str(include_str!("../../../fix
 fn fingerprint(r:&Run)->String {
     let mut v=crate::storage::canonical_value(r).unwrap();
     v.as_object_mut().unwrap().shift_remove("amuletRulesFrom");
+    v.as_object_mut().unwrap().shift_remove("potionRulesFrom");
     format!("{:016x}",serde_json::to_vec(&v).unwrap().iter().fold(0xcbf29ce484222325u64,|h,b|(h ^ *b as u64).wrapping_mul(0x100000001b3)))
 }
 #[test]

@@ -56,14 +56,22 @@ fn select_mouse(view:&mut PackView,id:f64) {
 #[test]
 fn r52_amulet_ui_all_effects_use_shared_profile_copy_and_unchanged_costs() {
     let mut r=room();let p=Painter::new();
+    for policy in [Field::Missing,Field::Null] {
+    r.amulet_rules_from=policy;
     for depth in [1,20,40] {for effect in EFFECTS {
         let amulet=item(effect,900.,depth,17.);r.inventory=vec![amulet];
         let amulet=&r.inventory[0];let profile=tiers::profile(&r,amulet).unwrap();
-        let title=format!("Tier {} {}",profile.tier,amulets::display_name(amulet).unwrap());
+        let retired=!matches!(r.amulet_rules_from,Field::Null) && matches!(effect,"acid"|"floods");
+        let title=format!("{}Tier {} {}",if retired {"Retired "}else{""},profile.tier,amulets::display_name(amulet).unwrap());
         let spec=amulets::item_spec(amulet).unwrap();
-        let mut expected=vec![title.clone(),"Amulet".into(),tiers::description(&r,amulet).unwrap(),
-            format!("Amulet energy: 10/10 · Activation: {} energy.",spec.activation_cost)];
-        if let Some(details)=tiers::details(&r,amulet){expected.push(details);}
+        let mut expected=vec![title.clone(),"Amulet".into(),tiers::description(&r,amulet).unwrap()];
+        if !retired {
+            expected.push(format!("Amulet energy: 10/10 · Activation: {} energy.",spec.activation_cost));
+            if let Some(details)=tiers::details(&r,amulet){expected.push(details);}
+        } else {
+            assert_eq!(expected[2],tiers::RETIRED_MESSAGE);
+        }
+        assert_eq!(item_actions(&r,amulet).iter().any(|b|b.label=="Apply"),!retired);
         let expected=expected.join("\n");let before=r.clone();
         assert_eq!(displayed_name(&r,amulet),title);
         assert_eq!(describe_item(&r,amulet),expected);
@@ -77,9 +85,10 @@ fn r52_amulet_ui_all_effects_use_shared_profile_copy_and_unchanged_costs() {
         assert_eq!(view.detail_lines().iter().filter(|(line,_)|line==&title).count(),1);
         assert_eq!(r,before);
         r.player.abilities.push("kative-appropriate".into());
-        assert!(describe_item(&r,&r.inventory[0]).contains(&format!("Activation: {} energy",(spec.activation_cost-10.).max(0.))));
+        if retired {assert_eq!(describe_item(&r,&r.inventory[0]),expected);}
+        else {assert!(describe_item(&r,&r.inventory[0]).contains(&format!("Activation: {} energy",(spec.activation_cost-10.).max(0.))));}
         r.player.abilities.clear();
-    }}
+    }}}
 }
 
 #[test]
@@ -198,7 +207,12 @@ fn r52_amulet_ui_tier_range_mouse_keyboard_and_known_collision_match() {
     assert!(PackTarget::UseAt(903.).aim_preview(&r,Some((28,10))).delivery.contains(&(25,10)));
     for id in [904.,905.] {assert!(PackTarget::UseAt(id).target_blocker(&r,24.,10.).is_none());}
     for effect in ["beckoning","teleportation"] {
-        r.inventory.push(item(effect,906.,1,50.));assert!(PackTarget::UseAt(906.).target_blocker(&r,24.,10.).is_some());r.inventory.pop();
+        r.inventory.push(item(effect,906.,1,50.));
+        // Beckoning is now unlimited; Teleportation keeps its authored tier range.
+        assert_eq!(PackTarget::UseAt(906.).target_blocker(&r,24.,10.).is_some(),effect=="teleportation");
+        r.amulet_rules_from=Field::Null;
+        assert!(PackTarget::UseAt(906.).target_blocker(&r,24.,10.).is_some(),"historical {effect}");
+        r.amulet_rules_from=Field::Missing;r.inventory.pop();
     }
     // Hidden blockers cannot affect previews or UI admission.
     r.player.conditions.clear();r.actors_at_mut(r.depth)[0].x=14.;

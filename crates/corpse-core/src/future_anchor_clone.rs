@@ -57,6 +57,7 @@ fn clone_anchor_state(run:&Run)->Run {
             replay_snapshot_from: Default::default(),
             firebolt_travel_from: Default::default(),
             amulet_rules_from: Default::default(),
+            potion_rules_from: Default::default(),
             metrics: run.metrics.clone(),
             dev: run.dev.clone(),
             known_potions: run.known_potions.clone(),

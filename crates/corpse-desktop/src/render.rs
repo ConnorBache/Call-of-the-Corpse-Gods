@@ -2803,7 +2803,7 @@ impl Painter {
         self.border(map_right-1,8,left-map_right+2,panel_bottom-7,edge);
         self.border(left,8,self.logical_width()-left-8,panel_bottom-7,edge);
         self.border(left,stats_top,self.logical_width()-left-8,panel_bottom-stats_top+1,edge);
-        if let Some(veil) = crate::illumination_ui::immersion_color(v) {
+        if let Some(veil) = crate::illumination_ui::screen_tint(v) {
             // Rebuilt base pixels only: clipped/tile paths tint their disjoint
             // repainted regions once, never previously tinted retained pixels.
             // O(selected native pixels), O(1) scratch; GPU records one alpha quad.

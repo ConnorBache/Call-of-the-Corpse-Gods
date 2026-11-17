@@ -259,7 +259,7 @@ pub fn potion_appearance(r: &Run, effect: &str) -> String {
     )
 }
 pub fn potion_description(r: &Run, i: &Item) -> String {
-    if crate::revision50::enabled(r) { return crate::revision50_item_knowledge::potion_description_for_revision(i,r.simulation_revision.value_or(29.)); }
+    if crate::revision50::enabled(r) { return crate::revision50_item_knowledge::potion_description_for_run(r,i); }
     let nature = potion_nature(r, i);
     let suffix = nature
         .as_ref()

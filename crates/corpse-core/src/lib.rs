@@ -138,6 +138,7 @@ pub mod mini_me;
 pub mod monster_chill;
 
 pub mod potions;
+mod potion_animation;
 pub mod revision50_potions;
 
 pub mod godbeast_interactions;
@@ -219,6 +220,7 @@ pub mod animation_amulets;
 /// Firebolt-only travel amendment and command-ledger compatibility policy.
 pub mod firebolt_travel;
 pub mod amulet_rules;
+pub mod potion_rules;
 pub mod animation_player;
 pub mod animation_shapes;
 #[cfg(test)] mod animation_contract_tests;

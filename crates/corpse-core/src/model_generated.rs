@@ -1715,6 +1715,9 @@ pub struct Run {
     /// Amulet rules command boundary; Null denotes a legacy replay prefix.
     #[serde(rename = "amuletRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub amulet_rules_from: Field<usize>,
+    /// Potion rules command boundary; Null denotes a legacy replay prefix.
+    #[serde(rename = "potionRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub potion_rules_from: Field<usize>,
     #[serde(rename = "metrics")]
     pub metrics: IndexMap<String, f64>,
     #[serde(rename = "dev")]

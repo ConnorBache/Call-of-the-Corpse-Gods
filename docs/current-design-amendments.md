@@ -873,3 +873,7 @@ initial generation and the pre-amendment command prefix retain their historical
 roster and mechanics. New runs start with the amendment; a live old save adopts
 it at its current command boundary. This prevents changing historical recordings
 while ensuring removed amulets cannot be used by continuing an old live save.
+
+### Approved screen status tints (2026-11-17)
+
+Only these player statuses tint the game screen: Burning orange-red; Poisoned green; Hemophilia and Bleeding red; Confused white; Silenced and Silenced by aura black. Envenomed and every other status add no tint. Existing underwater blue remains. Overlapping approved color families contribute equally to a single bounded 34/255 veil; duplicate aliases in a family do not increase weight. The veil follows the detached presented state and local illumination, preserving darkness and animation/effect ordering. This is presentation only.

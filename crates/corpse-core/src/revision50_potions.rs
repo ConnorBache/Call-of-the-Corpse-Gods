@@ -4,6 +4,12 @@
 use crate::{Actor, Field, Floor, Run, engine::{self, EngineError}};
 use serde::{Deserialize, Serialize};
 pub const ORDINARY: [&str;20] = ["healing","energy","incineration","caustic gas","paralysis","confusion","telepathy","levitation","speed","invisibility","descent","cleansing","fire immunity","darkness","flooding","freezing","repulsion","discord","teleportation","shattering"];
+pub const CURRENT_ORDINARY: [&str;17] = ["healing","energy","incineration","caustic gas","paralysis","confusion","telepathy","levitation","speed","invisibility","descent","fire immunity","darkness","freezing","discord","teleportation","shattering"];
+pub const RETIRED_MESSAGE: &str = "This potion has been retired.";
+pub fn retired(r:&Run,item:&crate::Item)->bool {
+    crate::potion_rules::current(r) && item.kind=="potion" && matches!(item.effect.as_ref().map(String::as_str),Some("cleansing"|"flooding"|"repulsion"))
+}
+pub fn roster(current:bool)->&'static [&'static str] {if current {&CURRENT_ORDINARY} else {&ORDINARY}}
 pub const FIRE_IMMUNITY:&str="r50FireImmunity";
 pub fn new_effect(effect:&str)->bool {ORDINARY[11..].contains(&effect)}
 pub fn condition_key(key:&str)->bool {matches!(key,FIRE_IMMUNITY|"r50FireImmunityFresh")}
@@ -159,15 +165,16 @@ fn repulsion(r:&mut Run,x:f64,y:f64,strength:f64)->Result<(),EngineError> {
         crate::revision50_wave_teleport::push_steps(r,id,dx,dy,(3.*strength).ceil() as usize)?;
     }Ok(())
 }
-/// O(25*(P+M)) topology/Claywall admission; doors/grates use existing small maps.
+/// O((2R+1)²*(P+M)) topology/Claywall admission, R=6 current and 2 historical; doors/grates use existing small maps.
 /// Ordinary walls, trees, doors, grates and Obstruction are destructible. Event
 /// structures, boundary walls, portal cells and Claywalls are never changed.
 fn shatter(r:&mut Run,x:f64,y:f64) {
     let revision = r.simulation_revision.value_or(29.);
+    let radius=if crate::potion_rules::current(r) {6} else {2};
     let f=r.floor().unwrap();let w=f.width();let h=f.height();
-    let cells:Vec<_>=square(f,x,y,2).into_iter().filter(|&at| {
+    let cells:Vec<_>=square(f,x,y,radius).into_iter().filter(|&at| {
         let (xx,yy)=(at%w,at/w);
-        (xx as f64-x).hypot(yy as f64-y)<=2.&&xx>0&&yy>0&&xx+1<w&&yy+1<h
+        (xx as f64-x).hypot(yy as f64-y)<=radius as f64&&xx>0&&yy>0&&xx+1<w&&yy+1<h
             &&!crate::borge::solid_at(f,xx as f64,yy as f64)&&!crate::epidite::solid_at(f,xx as f64,yy as f64)
             &&crate::portals::pair_at(f,at).is_none()&&crate::portals::exits(f,at)==vec![at]&&crate::portals::aliases(f,at)==vec![at]
             && f.permanent_fire.as_ref().is_none_or(|v|!v.contains(&(at as f64)))
@@ -204,8 +211,29 @@ fn shatter(r:&mut Run,x:f64,y:f64) {
         if changed {f.dirty=true;crate::ichor::enqueue_opening_revision(f,at,revision);}
     }
 }
+/// A five-cell-diameter circle. O(25 + A) world queries and O(A) target IDs;
+/// fire admission retains water, walls, immunity and source ownership rules.
+pub fn incinerate(r:&mut Run,x:f64,y:f64,strength:f64)->Result<(),EngineError> {
+    let cells:Vec<_>=square(r.floor().unwrap(),x,y,2).into_iter().filter(|&at| {
+        let w=r.floor().unwrap().width();
+        ((at%w) as f64-x).hypot((at/w) as f64-y)<=2.
+    }).collect();
+    let w=r.floor().unwrap().width();
+    let targets:Vec<_>=std::iter::once(&r.player).chain(r.actors_at(r.depth))
+        .filter(|a|mutable_target(r,a.id)&&cells.contains(&(a.y as usize*w+a.x as usize)))
+        .map(|a|a.id).collect();
+    for at in cells {
+        crate::environment::ignite(r,(at%w) as f64,(at/w) as f64,Some((8.*strength).ceil()),Some(r.player.id)).map_err(EngineError)?;
+    }
+    for id in targets {
+        let random=crate::rng::random(r);let revision=r.simulation_revision.value_or(29.);
+        crate::corpses::apply_burning_revision(engine::actor_mut_trusted(r,id).unwrap(),revision,random,Some(-2.),Some(1.),Some(strength));
+    }
+    Ok(())
+}
 pub fn apply(r:&mut Run,effect:&str,target:Option<f64>,x:f64,y:f64,strength:f64,fresh:bool)->Result<bool,EngineError> {
     if !new_effect(effect){return Ok(false)}
+    if crate::potion_rules::current(r)&&matches!(effect,"cleansing"|"flooding"|"repulsion") {return Err(EngineError(RETIRED_MESSAGE.into()))}
     if !crate::revision50::enabled(r){return Err(EngineError("This potion requires revision 50.".into()))}
     let target=target.filter(|&id|mutable_target(r,id));
     match effect {

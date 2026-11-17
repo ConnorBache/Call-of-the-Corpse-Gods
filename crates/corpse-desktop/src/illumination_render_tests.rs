@@ -280,3 +280,37 @@ fn remembered_decorations_are_neutral_and_chasm_custom_grading_survives() {
         let default=crate::observe::observe(&run);assert_ne!(center(&view).fg,center(&default).fg,"{key} must not be overwritten by raw Brogue ink");
     }
 }
+
+#[test]
+fn approved_status_tints_are_detached_bounded_and_order_independent() {
+    use crate::{illumination_ui::screen_tint, statuses_ui::Status};
+    let mut view=crate::observe::observe(&room(0.,"floor",false));
+    view.player_statuses.clear();
+    assert_eq!(screen_tint(&view),None);
+    let set=|name:&str|Status{name:name.into(),duration:Some(5.)};
+    for (name,color) in [("Burning",[255,80,20]),("Poisoned",[25,200,60]),("Bleeding",[230,20,30]),("Hemophilia",[230,20,30]),("Confused",[255,255,255]),("Silenced",[0,0,0]),("Silenced by aura",[0,0,0])] {
+        view.player_statuses=vec![set(name)];assert_eq!(screen_tint(&view),Some(color),"{name}");
+    }
+    for name in ["Envenomed 2","Envenomed","Telepathy","Invisible","Hallucinating","Paralyzed","Rooted","Haste","Flying"] {
+        view.player_statuses=vec![set(name)];assert_eq!(screen_tint(&view),None,"{name}");
+    }
+    view.player_statuses=vec![set("Burning"),set("Poisoned")];let mixed=screen_tint(&view);
+    assert_eq!(mixed,Some([140,140,40]));view.player_statuses.reverse();assert_eq!(screen_tint(&view),mixed);
+    view.player_statuses=vec![set("Bleeding"),set("Hemophilia")];assert_eq!(screen_tint(&view),Some([230,20,30]));
+    view.deep_water=true;view.player_statuses.clear();assert_eq!(screen_tint(&view),crate::illumination_ui::immersion_color(&view));
+}
+
+#[test]
+fn approved_status_tint_transitions_match_full_retained_and_tiled_rendering() {
+    let mut retained=RetainedGame::default();let mut cached=Painter::new();let mut full=Painter::new();let mut tiled=Painter::new();let mut plan=TilePlanner::default();let mut previous=None;
+    let mut run=room(0.,"floor",false);
+    for status in [Some("burning"),Some("poisoned"),Some("confused"),Some("silenced"),None] {
+        run.player.conditions.clear();if let Some(status)=status {run.player.conditions.insert(status.into(),5.);}
+        let frozen=serde_json::to_vec(&run).unwrap();let view=crate::observe::observe(&run);
+        let damage=retained.update(&mut cached,&view,"",0.,true,false).unwrap();assert_eq!(damage.area(),cached.width*cached.height);
+        plan.replace_view(previous.as_ref(),&view,&tiled);plan.finish_damage(&mut tiled);assert_eq!(tiled.tile_mask.area(),tiled.width*tiled.height);
+        plan.paint_base(&mut tiled,&view,"",0.);tiled.tile_clip_enabled=false;plan.clear_frame();full.game_at(&view,"",false,0.);
+        assert_eq!(cached.pixels,full.pixels);assert_eq!(tiled.pixels,full.pixels);
+        assert_eq!(serde_json::to_vec(&run).unwrap(),frozen);previous=Some(view);
+    }
+}

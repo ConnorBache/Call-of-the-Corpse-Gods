@@ -58,7 +58,7 @@ fn base_display_name(r: &Run, item: &Item) -> String {
     }
     if item.kind == "potion" {
         if let Some(name) = item.effect.as_ref().and_then(|effect| potion_name(effect)) {
-            return format!("{name}{}", if item.diluted.value_or(false) { " (diluted)" } else { "" });
+            return format!("{}{name}{}", if crate::revision50_potions::retired(r,item) {"Retired "} else {""}, if item.diluted.value_or(false) { " (diluted)" } else { "" });
         }
     }
     crate::revision50_creature_identity::display_name(&item.name).into_owned()
@@ -95,6 +95,23 @@ pub fn potion_effect_description(effect: &str, diluted: bool) -> Option<String> 
         "Veridian Sap" => "Fully restores health and energy and grants the blessings still needed for your next level.".into(),
         _ => return None,
     })
+}
+
+/// Current live copy follows the same policy as mechanics; historical replay copy
+/// remains unchanged. O(effect bytes + output bytes), constant scratch.
+pub fn potion_description_for_run(run:&Run,item:&Item)->String {
+    if crate::revision50_potions::retired(run,item) {
+        return format!("{}\n{}",display_name(run,item),crate::revision50_potions::RETIRED_MESSAGE);
+    }
+    if crate::potion_rules::current(run) {
+        let description=match item.effect.as_ref().map(String::as_str) {
+            Some("incineration")=>Some("Ignites a 5-tile-diameter circle at the impact location."),
+            Some("shattering")=>Some("Destroys destructible walls and obstacles within 6 tiles of the impact location."),
+            _=>None,
+        };
+        if let Some(description)=description { return format!("{}\n{description}",display_name(run,item)); }
+    }
+    potion_description_for_revision(item,run.simulation_revision.value_or(29.))
 }
 
 pub fn potion_description(item: &Item) -> String {
@@ -143,5 +160,22 @@ mod marked_heart_tests {
         heart.borge_depth=crate::Field::Missing;assert_eq!(display_name(&r,&heart),"Rat heart");
         heart.borge_depth=12.0.into();heart.source_actor_id=crate::Field::Missing;assert_eq!(display_name(&r,&heart),"Rat heart");
         r.simulation_revision=49.0.into();assert_eq!(display_name(&r,&before),"Rat heart");
+    }
+}
+
+#[cfg(test)]
+mod potion_policy_copy_tests {
+    use super::*;
+    #[test]
+    fn potion_footprint_copy_tracks_live_and_historical_rules() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        for (effect,current,legacy) in [("incineration","5-tile-diameter","impact square"),("shattering","within 6 tiles","within 2 tiles")] {
+            let item=Item{kind:"potion".into(),effect:effect.to_string().into(),..Default::default()};
+            r.potion_rules_from=crate::Field::Missing;
+            assert!(potion_description_for_run(&r,&item).contains(current));
+            r.potion_rules_from=crate::Field::Null;
+            assert!(potion_description_for_run(&r,&item).contains(legacy));
+        }
     }
 }

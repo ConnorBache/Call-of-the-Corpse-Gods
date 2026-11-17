@@ -44,6 +44,9 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
     if item.kind != "potion" || effect.is_empty() {
         return Ok(false);
     }
+    if crate::revision50_potions::retired(r,&item) {
+        return Err(EngineError(crate::revision50_potions::RETIRED_MESSAGE.into()));
+    }
     if !supported(&effect) {
         return Err(EngineError(
             "This potion effect is not yet supported natively.".into(),
@@ -57,6 +60,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
             .find(|a| !a.dead.value_or(false) && (!crate::portals::enabled(r)||crate::dreamwalking::same_plane(r,&r.player,a)) && crate::portals::same_position(r,a,x,y))
             .map(|a| a.id)
     };
+    let potion_wave = crate::potion_animation::begin(r,&effect,x,y,target);
     let pool = target.map(|id| crate::half_here::owner_id(r, actor(r, id).unwrap()));
     let energy_before = pool.map(|id| actor(r, id).unwrap().energy).unwrap_or(0.0);
     let hp_before = pool.map(|id| actor(r,id).unwrap().hp).unwrap_or(0.0);
@@ -113,6 +117,9 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
                     crate::inventory::remember_detected_items(r).map_err(EngineError)?;
                 }
             }
+        }
+        "incineration" if crate::potion_rules::current(r) => {
+            crate::revision50_potions::incinerate(r,x,y,strength)?;
         }
         "incineration" => {
             crate::environment::ignite(r, x, y, Some((8.0 * strength).ceil()), Some(r.player.id))
@@ -228,7 +235,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
     let healing_item=matches!(effect.as_str(),"healing"|"energy"|"Veridian Sap");
     let hp_increased=pool.and_then(|id|actor(r,id)).is_some_and(|a|a.hp>hp_before);
     let energy_increased=pool.and_then(|id|actor(r,id)).is_some_and(|a|a.energy>energy_before);
-    if !crate::events::enabled(r) || thrown || !healing_item || hp_increased {
+    if potion_wave.is_none() && (!crate::events::enabled(r) || thrown || !healing_item || hp_increased) || (potion_wave.is_some() && thrown) {
         crate::events::actor_event(
             r,&r.player,
             if thrown {"projectile"} else if healing_item {"heal"} else {"pulse"},
@@ -263,5 +270,6 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
         crate::travel::collapse_descent(r, x, y, strength < 1.0).map_err(EngineError)?;
     }
     crate::progression::level_up(r);
+    if let Some(action)=potion_wave {crate::events::checkpoint_for_action(r,action);}
     Ok(true)
 }

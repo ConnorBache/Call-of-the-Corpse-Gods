@@ -76,6 +76,43 @@ pub fn immersion_color(view: &crate::render::View) -> Option<Rgb> {
     Some(display.map_or([20,78,170],|light|light.apply([20,78,170])))
 }
 
+/// A single bounded veil for the approved player afflictions and immersion.
+/// Reads the detached presented View, never the live simulation. O(S + C),
+/// S status labels and C cells only when illumination lookup is needed; O(1) space.
+/// Fixed status names here are projection identities, not formatted durations.
+pub fn screen_tint(view: &crate::render::View) -> Option<Rgb> {
+    let mut active = [false; 5];
+    for status in &view.player_statuses {
+        match status.name.as_str() {
+            "Burning" => active[0] = true,
+            "Poisoned" => active[1] = true,
+            "Hemophilia" | "Bleeding" => active[2] = true,
+            "Confused" => active[3] = true,
+            "Silenced" | "Silenced by aura" => active[4] = true,
+            _ => {} // In particular, Envenomed is not Poisoned.
+        }
+    }
+    let mut sum = [0u32; 3];
+    let mut count = 0u32;
+    for (enabled, color) in active.into_iter().zip([[255,80,20], [25,200,60], [230,20,30], [255,255,255], [0,0,0]]) {
+        if enabled {
+            for i in 0..3 { sum[i] += color[i]; }
+            count += 1;
+        }
+    }
+    if view.deep_water {
+        for (total, value) in sum.iter_mut().zip([20,78,170]) { *total += value; }
+        count += 1;
+    }
+    if count == 0 { return None; }
+    // Equal-weight, order-independent mean; opacity remains 34/255 regardless
+    // of overlap. Related aliases share one tint, avoiding duplicate weighting.
+    let color = sum.map(|v| ((v + count / 2) / count) as u8);
+    let light = view.cells.iter().rev().find(|cell|cell.actor_id == Some(view.player_id))
+        .and_then(|cell|cell.display_light);
+    Some(light.map_or(color, |light|light.apply(color)))
+}
+
 /// Default unexplored terrain is genuinely black; explicit palette edits remain honored.
 pub fn unexplored(profile:&Profile)->Rgb {
     if profile.is_default("fog.unexplored") {[0;3]} else {profile.rgb("fog.unexplored")}

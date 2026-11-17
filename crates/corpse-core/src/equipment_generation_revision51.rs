@@ -27,6 +27,9 @@ pub(super) fn generate(
 pub(super) fn generate_with_amulet_rules(
     primary:&str,rng:&mut GenerationRng,next_id:&mut f64,revision:f64,current:bool,
 )->Result<Vec<Item>,String> {
+    generate_with_item_rules(primary,rng,next_id,revision,current,revision>=52.)
+}
+pub(super) fn generate_with_item_rules(primary:&str,rng:&mut GenerationRng,next_id:&mut f64,revision:f64,current:bool,current_potions:bool)->Result<Vec<Item>,String> {
     let counts = KINDS.map(|kind| if kind == primary { 3 } else { rng.integer(1, 2) });
     let mut items = Vec::with_capacity(counts.iter().sum::<i32>() as usize);
     for (kind, count) in KINDS.into_iter().zip(counts) {
@@ -37,7 +40,7 @@ pub(super) fn generate_with_amulet_rules(
                     name: "Unidentified potion".into(),
                     kind: kind.into(),
                     glyph: "!".into(),
-                    effect: (*super::pick(&crate::revision50_potions::ORDINARY, rng)).to_string().into(),
+                    effect: (*super::pick(crate::revision50_potions::roster(current_potions), rng)).to_string().into(),
                     identified: false.into(),
                     ..Default::default()
                 }

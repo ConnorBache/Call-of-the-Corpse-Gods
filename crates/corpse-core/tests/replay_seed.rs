@@ -13,6 +13,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         snapshot_from: Field::Missing,
         firebolt_travel_from: Field::Missing,
         amulet_rules_from: Field::Missing,
+        potion_rules_from: Field::Missing,
         seed: seed.into(),
         mode: mode.into(),
         dev: false,

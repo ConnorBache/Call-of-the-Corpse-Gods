@@ -1414,7 +1414,8 @@ fn item_actions(run: &Run, item: &Item) -> Vec<Button> {
         push("Use on…", ButtonAction::Target(PackTarget::UseAt(item.id)), None,
             "Choose an adjacent living creature. The shard is consumed only on success.".into());
     }
-    if matches!(item.kind.as_str(), "heart" | "potion" | "tool" | "food") && !corpse_core::ahvamitt::is_mask(item) {
+    if matches!(item.kind.as_str(), "heart" | "potion" | "tool" | "food") && !corpse_core::ahvamitt::is_mask(item)
+        && !corpse_core::revision50_potions::retired(run,item) {
         let label = match item.kind.as_str() {
             "tool" if corpse_core::phantasmii_generation::is_dagger(item) => "Apply",
             "heart" | "food" => "Eat",
@@ -1492,7 +1493,8 @@ fn item_actions(run: &Run, item: &Item) -> Vec<Button> {
         None,
         String::new(),
     );
-    if !corpse_core::borge::is_shard(item) || corpse_core::borge::weapon_enabled(run) {
+    if (!corpse_core::borge::is_shard(item) || corpse_core::borge::weapon_enabled(run))
+        && !corpse_core::revision50_potions::retired(run,item) {
     push(
         "Throw",
         ButtonAction::Target(PackTarget::Throw(item.id)),
@@ -1910,6 +1912,7 @@ fn titlecase(s: &str) -> String {
     }
 }
 fn describe_potion(run: &Run, i: &Item) -> String {
+    if corpse_core::revision50_potions::retired(run,i) { return inventory::potion_description(run,i); }
     if corpse_core::revision50::enabled(run) {
         return format!("{}\nDrink to affect yourself, or throw to apply at the impact point.", inventory::potion_description(run, i));
     }
@@ -3373,5 +3376,33 @@ mod widest_amulet_tests {
         let rebuilds = view.configure_rebuilds;
         view.configure(&p, p.frame().map.tuple());
         assert_eq!(view.configure_rebuilds, rebuilds);
+    }
+}
+
+#[cfg(test)]
+mod retired_potion_ui_tests {
+    use super::*;
+    #[test]
+    fn retired_potions_keep_identity_and_drop_but_not_effect_actions_or_copy() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.potion_rules_from=Field::Missing;
+        for effect in ["cleansing","flooding","repulsion"] {
+            let item=Item{id:903.,kind:"potion".into(),name:format!("Potion of {effect}"),effect:effect.to_string().into(),diluted:true.into(),quantity:2.0.into(),..Default::default()};
+            let before=item.clone();
+            let actions=item_actions(&r,&item);
+            assert!(!actions.iter().any(|a|matches!(a.label.as_str(),"Drink"|"Apply"|"Throw")));
+            assert!(actions.iter().any(|a|a.label=="Drop"));
+            assert!(displayed_name(&r,&item).starts_with("Retired Potion"));
+            assert!(describe_potion(&r,&item).ends_with(corpse_core::revision50_potions::RETIRED_MESSAGE));
+            assert!(!describe_potion(&r,&item).contains("Drink to"));
+            assert_eq!(item,before);
+            r.potion_rules_from=Field::Null;
+            let actions=item_actions(&r,&item);
+            assert!(actions.iter().any(|a|a.label=="Drink"));
+            assert!(actions.iter().any(|a|a.label=="Throw"));
+            assert!(!describe_potion(&r,&item).contains("retired"));
+            assert!(!displayed_name(&r,&item).starts_with("Retired"));
+            r.potion_rules_from=Field::Missing;
+        }
     }
 }

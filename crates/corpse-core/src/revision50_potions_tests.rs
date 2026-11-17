@@ -310,3 +310,61 @@ fn dose(r:&mut Run,effect:&str,x:f64,y:f64,thrown:bool,diluted:bool) {
     assert_eq!(r,settled); // No HP, capacity, actor, item, clock or RNG mutation.
     assert!(!crate::equipment::flush_health(&mut r));
 }
+
+#[test] fn current_potion_retirement_is_non_destructive_and_legacy_is_playable() {
+    for effect in ["cleansing","flooding","repulsion"] {
+        let mut r=room();r.simulation_revision=52.0.into();
+        r.inventory.push(Item{id:800.,kind:"potion".into(),name:format!("Potion of {effect}"),effect:effect.to_string().into(),..Default::default()});
+        let before=r.clone();
+        assert!(crate::potions::apply(&mut r,0,10.,10.,false).is_err());assert_eq!(r,before);
+        r.potion_rules_from=Field::Null;
+        assert!(crate::potions::apply(&mut r,0,10.,10.,false).unwrap());
+    }
+}
+#[test] fn current_incineration_is_radius_two_and_historical_is_one_cell() {
+    for current in [false,true] {
+        let mut r=room();r.simulation_revision=52.0.into();
+        if !current {r.potion_rules_from=Field::Null;}
+        creature(&mut r,42.,12.,10.);creature(&mut r,43.,12.,12.);
+        dose(&mut r,"incineration",10.,10.,true,false);
+        let f=r.floor().unwrap();let fire=&f.environment.as_ref().unwrap().fire;
+        assert_eq!(fire.iter().filter(|&&v|v>0.).count(),if current {13}else{1});
+        assert_eq!(engine::condition(engine::actor(&r,42.).unwrap(),"burning")>0.,current);
+        assert_eq!(engine::condition(engine::actor(&r,43.).unwrap(),"burning"),0.);
+    }
+}
+#[test] fn current_shattering_radius_six_preserves_outside_cells() {
+    for current in [false,true] {
+        let mut r=room();r.simulation_revision=52.0.into();
+        if !current {r.potion_rules_from=Field::Null;}
+        let w=r.floor().unwrap().width();
+        for (x,y) in [(12,10),(16,10),(16,11)] {r.floor_mut().unwrap().tiles[y*w+x]="wall".into();}
+        dose(&mut r,"shattering",10.,10.,true,false);
+        let tiles=&r.floor().unwrap().tiles;
+        assert_eq!(tiles[10*w+12],"floor");
+        assert_eq!(tiles[10*w+16],if current {"floor"}else{"wall"});
+        assert_eq!(tiles[11*w+16],"wall");
+    }
+}
+#[test] fn current_potion_roster_and_both_generation_paths_retire_three() {
+    assert_eq!(CURRENT_ORDINARY.len(),17);
+    for depth in [1,5] {
+        let mut seen=std::collections::HashSet::new();
+        for seed in 1..=80 {
+            let mut r=room();r.simulation_revision=52.0.into();r.seed=format!("potions-{seed}");
+            let mut rng=crate::rng::GenerationRng::new(crate::rng::seed_hash(&r.seed));
+            for item in crate::equipment::generate_floor_loot_for_run(&mut r,depth,&mut rng,&[],20).unwrap() {
+                if item.kind=="potion" {assert!(!retired(&r,&item));seen.insert(item.effect.into_option().unwrap());}
+            }
+        }
+        assert_eq!(seen,CURRENT_ORDINARY.iter().map(|s|s.to_string()).collect(),"depth {depth}");
+    }
+}
+#[test] fn current_incineration_keeps_water_and_wall_fire_admission() {
+    let mut r=room();r.simulation_revision=52.0.into();let w=r.floor().unwrap().width();
+    r.floor_mut().unwrap().tiles[10*w+11]="water".into();
+    r.floor_mut().unwrap().tiles[10*w+12]="wall".into();
+    dose(&mut r,"incineration",10.,10.,true,false);
+    let fire=&r.floor().unwrap().environment.as_ref().unwrap().fire;
+    assert_eq!(fire[10*w+11],0.);assert_eq!(fire[10*w+12],0.);assert!(fire[10*w+9]>0.);
+}

@@ -407,3 +407,29 @@ fn death_swift_corpse_is_visible_before_nova_and_input_stays_blocked() {
         assert!(final_view.creatures.iter().any(|c|c.id==123.));
     }
 
+
+#[test]
+fn potion_wave_actual_telepathy_and_review_fixtures(){
+ for effect in ["telepathy","incineration","darkness","shattering"] {
+  let mut run=room();run.potion_rules_from=0usize.into();run.player.conditions.clear();run.player.stats.perception=0.;run.player.abilities.clear();run.floor_mut().unwrap().lights.fill(0.);
+  let d=run.depth;run.actors_at_mut(d)[0].x=35.;run.actors_at_mut(d)[0].state="sleeping".into();
+  if effect=="shattering" {let f=run.floor_mut().unwrap();let w=f.width();for x in 11..=16 {f.tiles[12*w+x]="wall".into();}}
+  run.inventory.push(corpse_core::Item{id:900.,kind:"potion".into(),name:format!("Potion of {effect}"),glyph:"!".into(),effect:effect.to_string().into(),..Default::default()});
+  let before=run.clone();let observer=corpse_core::events::PresentationObserver::install(|r|std::rc::Rc::new(r.clone()));
+  let events=corpse_core::engine::dispatch(&mut run,&Command::Use{id:900.}).unwrap().events;let frames=observer.take();
+  let serialized=serde_json::to_vec(&run).unwrap();
+  let export_frames:Vec<_>=frames.iter().map(|f|serde_json::json!({"action":f.action,"run":f.observation.downcast_ref::<Run>().unwrap()})).collect();
+  if let Ok(dir)=std::env::var("CORPSE_POTION_EXPORT_DIR"){std::fs::create_dir_all(&dir).unwrap();std::fs::write(format!("{dir}/{effect}.json"),serde_json::to_vec(&serde_json::json!({"before":before,"after":run,"events":events,"frames":export_frames})).unwrap()).unwrap();}
+  let mut fx=effects::Effects::default();fx.add(events,run.tick,run.depth,0.,false);fx.sequence.capture_run(before,frames,&fx.cues,crate::appearance_profile::Profile::defaults());
+  assert!(fx.presentation_pending(0.));
+  if effect=="telepathy" {
+   let cue=fx.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|a.style=="wave-reveal-telepathy")).unwrap();
+   let max=cue.event.animation.as_ref().unwrap().cells.iter().map(|p|((p.x-10.).powi(2)+(p.y-10.).powi(2)).sqrt()).fold(1f64,f64::max);
+   let arrival=cue.started+(25./max*10.-1e-9).ceil()*65.;
+   assert!(!fx.sequence.view(arrival-0.01).unwrap().creatures.iter().any(|c|c.id==123.));
+   assert!(fx.sequence.view(arrival).unwrap().creatures.iter().any(|c|c.id==123.));
+   assert!(corpse_core::vision::telepathic(&run,&run.actors_at(d)[0]));
+  }
+  assert_eq!(serialized,serde_json::to_vec(&run).unwrap());
+ }
+}

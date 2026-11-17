@@ -128,7 +128,7 @@ impl TilePlanner{
     for i in 0..self.current.bounds.len(){self.footprint(self.current.bounds[i]);}
     for i in 0..self.scratch.bounds.len(){self.footprint(self.scratch.bounds[i]);}
    }
-   if old.deep_water != new.deep_water || crate::illumination_ui::immersion_color(old) != crate::illumination_ui::immersion_color(new) { self.full=true; }
+   if old.deep_water != new.deep_water || crate::illumination_ui::screen_tint(old) != crate::illumination_ui::screen_tint(new) { self.full=true; }
    // UI compares borrowed fields; no cloned panel descriptor or Scene.
    let left=p.hud_left();let top=super::chronicle_height(&p.profile)+20;
    if old.log_groups!=new.log_groups||old.chronicle_offset!=new.chronicle_offset{if let Some(r)=p.logical_damage_rect(0,0,left,top){self.mark_native_rect(r);}}

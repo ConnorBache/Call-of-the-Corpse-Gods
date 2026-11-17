@@ -227,7 +227,7 @@ pub fn generate_floor_loot_revision(
 ) -> Result<Vec<Item>, String> {
     let mut generated = false;
     generate_floor_loot_with_budget(depth, rng, next_id, excluded, count, revision,
-        if revision >= 51. { Some(&mut generated) } else { None },true)
+        if revision >= 51. { Some(&mut generated) } else { None },true,revision>=52.)
 }
 /// Production entry point: all generated floors share the persisted run budget.
 /// Same bounded loot cost, plus a one-time import scan documented in unique_composite_bow.
@@ -242,21 +242,22 @@ pub fn generate_floor_loot_for_run(
         return Err("Invalid ordinary loot slot count".into());
     }
     let current=crate::amulet_rules::current(run);
+    let current_potions=crate::potion_rules::current(run);
     crate::unique_composite_bow::initialize(run);
     if let Some(primary) = revision51::primary_kind(&run.seed, depth) {
-        let mut items=revision51::generate_with_amulet_rules(primary, rng, &mut run.next_id, revision,current)?;
+        let mut items=revision51::generate_with_item_rules(primary, rng, &mut run.next_id, revision,current,current_potions)?;
         for item in &mut items {crate::revision52_amulet_tiers::initialize_birth(item,revision,depth)?;}
         return Ok(items);
     }
     let mut generated = run.composite_bow_generated.value_or(false);
     let items = generate_floor_loot_with_budget(depth, rng, &mut run.next_id, excluded, count,
-        revision, Some(&mut generated),current)?;
+        revision, Some(&mut generated),current,current_potions)?;
     run.composite_bow_generated = generated.into();
     Ok(items)
 }
 fn generate_floor_loot_with_budget(
     depth: u32, rng: &mut GenerationRng, next_id: &mut f64,
-    excluded: &[String], count: usize, revision: f64, mut bow_generated: Option<&mut bool>, current:bool,
+    excluded: &[String], count: usize, revision: f64, mut bow_generated: Option<&mut bool>, current:bool,current_potions:bool,
 ) -> Result<Vec<Item>, String> {
     if !(2..=20).contains(&count) {
         return Err("Invalid ordinary loot slot count".into());
@@ -290,7 +291,7 @@ fn generate_floor_loot_with_budget(
     for _ in permanents..count {
         let id = *next_id;
         *next_id += 1.0;
-        let effect = *pick(if revision>=50. {&crate::revision50_potions::ORDINARY[..]} else {&POTIONS[..]}, rng);
+        let effect = *pick(if revision>=50. {crate::revision50_potions::roster(current_potions)} else {&POTIONS[..]}, rng);
         items.push(Item {
             id,
             name: "Unidentified potion".into(),
