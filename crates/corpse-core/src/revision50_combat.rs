@@ -233,9 +233,10 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
     if !has(a, MASOCHISM) || a.dead.value_or(false) { return; }
     let maximum = crate::divine_combat::health_from_stats(r, a, &crate::combat::effective_stats(r, a));
     if masochism_crossings(before_hp, a.hp, maximum) == 0 { return; }
+    let duration = crate::monster_statuses::status_duration(r,a,10.);
     let resolving = r.resolving_tick.value_or(false);
     let Some(a) = engine::actor_mut_trusted(r, id) else { return; };
-    let duration = engine::condition(a, "hasted").max(10.);
+    let duration = engine::condition(a, "hasted").max(duration);
     a.conditions.insert("hasted".into(), duration);
     if resolving { a.conditions.shift_remove("hastedFresh"); }
     else { a.conditions.insert("hastedFresh".into(), 1.); }

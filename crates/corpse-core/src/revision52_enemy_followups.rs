@@ -68,11 +68,12 @@ pub fn after_melee(r: &mut Run, source: &Actor, target: f64, dealt: f64, melee: 
     } else if species(source, "killspawn") {
         let budget = crate::combat::nearest_damage(crate::revision50_rings::resist_damage(r, &body, "bleeding", dealt * 0.5));
         if budget <= 0. { return Ok(()); }
+        let turns = crate::monster_statuses::status_duration(r, &body, BLEED_TURNS as f64) as usize;
         let tick = r.tick;
         let a = engine::actor_mut_trusted(r, target).unwrap();
         let base = (budget / BLEED_TURNS as f64).floor();
         let extra = budget as usize % BLEED_TURNS;
-        for offset in 1..=BLEED_TURNS {
+        for offset in 1..=turns {
             let amount = base + f64::from(offset <= extra);
             if amount > 0. {
                 *a.conditions.entry(format!("{BLEED_PREFIX}{}:{}", tick + offset as f64, source.id)).or_default() += amount;

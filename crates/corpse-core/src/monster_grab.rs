@@ -109,8 +109,9 @@ pub fn deep_water(r: &mut Run, id: f64, target: f64) -> bool {
         return false;
     }
     if crate::revision50_nightmares::strike(r, target) { return true; }
+    let duration = crate::monster_statuses::status_duration(r, &b, 4.0);
     let b = actor_mut_trusted(r, target).unwrap();
-    b.conditions.insert("grabbed".into(), 4.0);
+    b.conditions.insert("grabbed".into(), duration);
     b.conditions.insert("grabbedBy".into(), id);
     let b = b.clone();
     crate::monster_horn::report(r, &a, &b, "grabs its prey in the deep water.");
@@ -131,8 +132,9 @@ pub fn hold_action(r: &mut Run, id: f64, target: f64) -> bool {
     }
     if crate::revision50_nightmares::strike(r, target) { return true; }
     let fresh=condition(&b,"grabbed")<=0.;
+    let duration = crate::monster_statuses::status_duration(r, &b, 3.0);
     let b = actor_mut_trusted(r, target).unwrap();
-    b.conditions.insert("grabbed".into(), 3.0);
+    b.conditions.insert("grabbed".into(), duration);
     b.conditions.insert("grabbedBy".into(), id);
     let b = b.clone();
     if crate::enemy_traits::definition(&a).is_some_and(|d| d.id == "maulchild") {

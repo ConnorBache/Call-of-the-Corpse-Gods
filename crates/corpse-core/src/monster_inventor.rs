@@ -417,8 +417,7 @@ fn breathe_fire_inner(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
             let random = crate::rng::random(r);
             let player = if id == r.player.id { 1.0 } else { 0.0 };
             let revision = r.simulation_revision.value_or(29.);
-            crate::corpses::apply_burning_revision(
-                actor_mut_trusted(r, v).unwrap(),
+            crate::corpses::apply_burning_run(r, v,
                 revision,
                 random,
                 Some(id),

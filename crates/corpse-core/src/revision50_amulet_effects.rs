@@ -234,9 +234,10 @@ fn poison(r: &mut Run, id: f64, source: f64) {poison_with_damage(r,id,source,6.)
 fn poison_with_damage(r: &mut Run, id: f64, source: f64,damage:f64) {
     if engine::actor(r,id).zip(engine::actor_any(r,source))
         .is_some_and(|(target,source)|crate::revision50::duel_blocks(r,source,target)) {return;}
+    let duration = engine::actor(r,id).map_or(20., |a| crate::monster_statuses::status_duration(r,a,20.));
     if crate::monster_statuses::apply_status(r,id,"poisoned",20.,Some(source)) {
         let a = engine::actor_mut_trusted(r,id).unwrap();
-        a.conditions.insert("poisoned".into(),20.);
+        a.conditions.insert("poisoned".into(),duration);
         a.conditions.insert(POISON_DAMAGE.into(),damage);
         let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A03","split-ring",crate::events::Stage::Special,&[a.into()]);
     } else if let Some(a)=engine::actor(r,id){crate::events::cue(r,a,"A03","rejected-poison",crate::events::Stage::Impact,&[a.into()]);}
@@ -246,10 +247,11 @@ fn acid(r: &mut Run, id: f64, source: &Actor) -> Result<(),EngineError> {acid_wi
 fn acid_with_damage(r: &mut Run, id: f64, source: &Actor,damage:f64) -> Result<(),EngineError> {
     let Some(a) = engine::actor(r,id) else { return Ok(()); };
     if crate::revision50::duel_blocks(r,source,a) || crate::revision50_combat::oblivious_blocks(r,a,Some(source)) || crate::revision50_nightmares::is_decoy(a) {return Ok(());}
+    let duration = crate::monster_statuses::status_duration(r,a,6.);
     let penalty = 10. * crate::revision50_rings::stack_multiplier(r,a,crate::revision50_rings::CORROSION_RESISTANCE,0.5);
     engine::damage_direct_with_source_snapshot(r,id,damage,source,"acid",true)?;
     if let Some(a) = engine::actor_mut_trusted(r,id).filter(|a|!a.dead.value_or(false)&&a.hp>0.) {
-        a.conditions.insert(ACID_TURNS.into(),6.);
+        a.conditions.insert(ACID_TURNS.into(),duration);
         a.conditions.insert(ACID_PENALTY.into(),penalty);
         let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A05","cracked-shield",crate::events::Stage::Special,&[a.into()]);
     }
@@ -264,7 +266,7 @@ fn ignite_target(r: &mut Run, id: f64, source: &Actor) {
         || engine::condition(a,"underwater")>0.
         || crate::revision50::duel_blocks(r,source,a) || crate::revision50_combat::oblivious_blocks(r,a,Some(source)) {return;}
     let random = crate::rng::random(r);
-    crate::corpses::apply_burning(engine::actor_mut_trusted(r,id).unwrap(),random,Some(-2.),Some(1.),None);
+    crate::corpses::apply_burning_run(r,id,r.simulation_revision.value_or(29.),random,Some(-2.),Some(1.),None);
 }
 fn fire_path(r: &mut Run, ray: &Ray) -> Result<(),EngineError> {
     let frozen = crate::environment::frozen_environment(r);

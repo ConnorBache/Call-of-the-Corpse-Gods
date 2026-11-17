@@ -10,6 +10,10 @@ pub const RINGS: [&str; 14] = [
     "fire-resistance", "poison-resistance", "sustain-strength", "willpower",
     "protection", "slaying", "ice-immunity", "corrosion-resistance",
 ];
+pub const CURRENT_RINGS: [&str; 10] = [
+    "stealth", "light", "regeneration", "vampirism", "reaping", "flight",
+    "willpower", "protection", "slaying", "swimming",
+];
 pub const AMULETS: [&str; 12] = [
     "lightning", "firebolt", "poison", "iceblast", "acid", "blinking",
     "beckoning", "discord", "obstruction", "roots", "teleportation", "floods",
@@ -24,10 +28,13 @@ pub fn create(kind: &str, rng: &mut GenerationRng, id: f64, revision: f64) -> Re
     create_with_amulet_rules(kind,rng,id,revision,true)
 }
 pub fn create_with_amulet_rules(kind: &str, rng: &mut GenerationRng, id: f64, revision: f64, current:bool) -> Result<Item,String> {
+    create_with_item_rules(kind,rng,id,revision,current,revision>=52.)
+}
+pub fn create_with_item_rules(kind: &str, rng: &mut GenerationRng, id: f64, revision: f64, current:bool,current_rings:bool) -> Result<Item,String> {
     match kind {
         "ring" => {
             let mut item = Item { id, kind: "ring".into(), glyph: "=".into(),
-                effect: (*pick(&RINGS, rng)).to_string().into(), identified: true.into(),
+                effect: (*pick(if revision>=52. && current_rings { &CURRENT_RINGS[..] } else { &RINGS[..] }, rng)).to_string().into(), identified: true.into(),
                 ..Default::default() };
             item.name = crate::revision50_rings::display_name(&item)
                 .ok_or("Missing authored ring name")?.into();

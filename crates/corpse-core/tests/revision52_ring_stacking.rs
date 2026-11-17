@@ -1,7 +1,8 @@
 use corpse_core::{Run,Item,Field,Stats,combat,revision50_rings as rings};
 fn room()->Run {
  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
- r.simulation_revision=52.0.into();r.inventory.clear();r.player.conditions.clear();r.player.abilities.clear();r.player.active.clear();r.player.equipment_abilities=Field::Missing;r.player.stats=Stats::default();r.player.hp=20.;r.player.max_hp=100.;r
+ r.simulation_revision=52.0.into();r.ring_rules_from=Field::Null; // Historical R52 ring roster/powers.
+r.inventory.clear();r.player.conditions.clear();r.player.abilities.clear();r.player.active.clear();r.player.equipment_abilities=Field::Missing;r.player.stats=Stats::default();r.player.hp=20.;r.player.max_hp=100.;r
 }
 fn copies(r:&mut Run,effect:&str,n:usize){r.inventory=(0..n).map(|i|Item{id:900.+i as f64,kind:"ring".into(),effect:effect.to_string().into(),..Default::default()}).collect();}
 fn close(a:f64,b:f64){assert!((a-b).abs()<1e-9,"{a} != {b}");}

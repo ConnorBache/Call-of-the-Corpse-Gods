@@ -189,3 +189,61 @@ fn potion_markerless_journal_keeps_retired_flooding_then_adopts_current_rules() 
         assert!(loaded.pending_batch().base_token.is_none());
     }
 }
+
+#[test]
+fn ring_markerless_journal_keeps_old_resistance_then_adopts_current_rules() {
+    for metadata in [false,true] {
+        let mut initial=room();initial.firebolt_travel_from=0usize.into();initial.ring_rules_from=Field::Null;
+        initial.inventory.push(corpse_core::Item{id:901.,kind:"ring".into(),glyph:"=".into(),name:"Ring of Poison Resistance".into(),effect:"poison-resistance".to_string().into(),identified:true.into(),..Default::default()});
+        initial.player.conditions.insert("poisoned".into(),5.);
+        initial.player.conditions.insert("r50PoisonDamage".into(),6.);
+        assert_eq!(corpse_core::revision50_rings::resist_damage(&initial,&initial.player,"poison",6.),3.);
+        let mut current=initial.clone();current.ring_rules_from=0usize.into();
+        let mut current=Core::new(current).unwrap();current.dispatch(&Command::Wait).unwrap();
+        let mut old=Core::new(initial.clone()).unwrap();
+        let mut checkpoint:serde_json::Value=serde_json::from_str(&session_store::encode(&old,Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("ringRulesFrom");
+        let header=if metadata {log::Header::for_metadata_revision(Some(52.))} else {log::Header::for_revision(Some(52.))}.unwrap();
+        let mut file=log::encode_initial(&checkpoint.to_string(),&header).unwrap();
+        let command=Command::Wait;old.dispatch(&command).unwrap();
+        assert!(old.run.player.hp>current.run.player.hp,"historical resistance must affect the durable tail's poison tick");
+        let after=Stamp::capture(&old);append(&mut file,vec![Operation::Command{command,after}],metadata);
+        old.run.ring_rules_from=old.run.replay.len().into();
+        let (decoded,_)=session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.save().unwrap(),old.save().unwrap());
+        assert_eq!(corpse_core::revision50_rings::resist_damage(&decoded.run,&decoded.run.player,"poison",6.),6.);
+        export_twice(&initial,&decoded);
+        let dir=Sandbox::new();let path=dir.path();std::fs::write(&path,&file.bytes).unwrap();
+        let (loaded,_)=load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}
+
+#[test]
+fn gas_markerless_journal_keeps_old_confusion_then_adopts_five_turn_refresh() {
+    for metadata in [false,true] {
+        let mut initial=room();initial.firebolt_travel_from=0usize.into();initial.gas_rules_from=Field::Null;
+        let f=initial.floor().unwrap();let at=initial.player.y as usize*f.width()+initial.player.x as usize;
+        corpse_core::environment::add_gas(initial.floor_mut().unwrap(),at,"confusion",100.,-1.).unwrap();
+        let mut current=initial.clone();current.gas_rules_from=0usize.into();
+        let mut current=Core::new(current).unwrap();current.dispatch(&Command::Wait).unwrap();
+        let mut old=Core::new(initial.clone()).unwrap();
+        let mut checkpoint:serde_json::Value=serde_json::from_str(&session_store::encode(&old,Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("gasRulesFrom");
+        let header=if metadata {log::Header::for_metadata_revision(Some(52.))} else {log::Header::for_revision(Some(52.))}.unwrap();
+        let mut file=log::encode_initial(&checkpoint.to_string(),&header).unwrap();
+        let command=Command::Wait;old.dispatch(&command).unwrap();
+        assert!(corpse_core::engine::condition(&old.run.player,"confused")>corpse_core::engine::condition(&current.run.player,"confused"),"durable tail must retain historical eight-turn confusion");
+        let after=Stamp::capture(&old);append(&mut file,vec![Operation::Command{command,after}],metadata);
+        old.run.gas_rules_from=old.run.replay.len().into();
+        let (decoded,_)=session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.save().unwrap(),old.save().unwrap());
+        assert!(corpse_core::gas_rules::current(&decoded.run));
+        export_twice(&initial,&decoded);
+        let dir=Sandbox::new();let path=dir.path();std::fs::write(&path,&file.bytes).unwrap();
+        let (loaded,_)=load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}

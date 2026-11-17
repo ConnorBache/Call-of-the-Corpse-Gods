@@ -310,11 +310,12 @@ pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)
             }
             crate::events::cue(r,&original,"A07","root",crate::events::Stage::Travel,&traveled);
         },
-        ControlEffect::Discord=>{let id=intercepted.unwrap_or_else(||visible_target(r,x,y,p.range.unwrap_or(f64::INFINITY)).unwrap().id);engine::actor_mut_trusted(r,id).unwrap().conditions.insert(DISCORD.into(),p.duration.unwrap());let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A08","crossed-ring",crate::events::Stage::Special,&[a.into()]);},
+        ControlEffect::Discord=>{let id=intercepted.unwrap_or_else(||visible_target(r,x,y,p.range.unwrap_or(f64::INFINITY)).unwrap().id);let duration=crate::monster_statuses::status_duration(r,engine::actor(r,id).unwrap(),p.duration.unwrap());engine::actor_mut_trusted(r,id).unwrap().conditions.insert(DISCORD.into(),duration);let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A08","crossed-ring",crate::events::Stage::Special,&[a.into()]);},
         ControlEffect::Roots=>{
             let id=intercepted.unwrap_or_else(||visible_target(r,x,y,6.).unwrap().id);let depth=r.depth;let source=r.player.id;let legacy_tier=tiers::enabled(r)&&!crate::amulet_rules::current(r);
+            let duration=crate::monster_statuses::status_duration(r,engine::actor(r,id).unwrap(),p.duration.unwrap());
             let a=engine::actor_mut_trusted(r,id).unwrap();
-            for (key,value) in [(ROOTS,p.duration.unwrap()),(ROOT_X,a.x),(ROOT_Y,a.y),(ROOT_DEPTH,depth),(ROOT_SOURCE,source)] {a.conditions.insert(key.into(),value);}
+            for (key,value) in [(ROOTS,duration),(ROOT_X,a.x),(ROOT_Y,a.y),(ROOT_DEPTH,depth),(ROOT_SOURCE,source)] {a.conditions.insert(key.into(),value);}
             if legacy_tier {a.conditions.insert(tiers::ROOTS_DAMAGE.into(),p.periodic_damage);} else {a.conditions.shift_remove(tiers::ROOTS_DAMAGE);}
             let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A10","root",crate::events::Stage::Special,&[a.into()]);
         },

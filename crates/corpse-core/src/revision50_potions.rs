@@ -227,7 +227,7 @@ pub fn incinerate(r:&mut Run,x:f64,y:f64,strength:f64)->Result<(),EngineError> {
     }
     for id in targets {
         let random=crate::rng::random(r);let revision=r.simulation_revision.value_or(29.);
-        crate::corpses::apply_burning_revision(engine::actor_mut_trusted(r,id).unwrap(),revision,random,Some(-2.),Some(1.),Some(strength));
+        crate::corpses::apply_burning_run(r,id,revision,random,Some(-2.),Some(1.),Some(strength));
     }
     Ok(())
 }
@@ -238,7 +238,7 @@ pub fn apply(r:&mut Run,effect:&str,target:Option<f64>,x:f64,y:f64,strength:f64,
     let target=target.filter(|&id|mutable_target(r,id));
     match effect {
         "cleansing"=>{if let Some(id)=target {cleanse(r,id)}},
-        "fire immunity"=>{if let Some(id)=target {crate::potions::timed(engine::actor_mut_trusted(r,id).unwrap(),FIRE_IMMUNITY,20.*strength,fresh);}},
+        "fire immunity"=>{if let Some(id)=target {crate::potions::timed_status(r,id,FIRE_IMMUNITY,20.*strength,fresh);}},
         "darkness"=>darkness(r,x,y,strength),
         "flooding"=>{
             let cells:Vec<_>=square(r.floor().unwrap(),x,y,1).into_iter().filter(|&at|crate::revision50_control_amulets::can_replace_terrain(r,at)).collect();
@@ -254,7 +254,7 @@ pub fn apply(r:&mut Run,effect:&str,target:Option<f64>,x:f64,y:f64,strength:f64,
             for id in targets {crate::monster_statuses::apply_status(r,id,"slowed",3.*strength,Some(r.player.id));}
         },
         "repulsion"=>repulsion(r,x,y,strength)?,
-        "discord"=>{if let Some(id)=target.filter(|&id|harmful_target(r,id)){crate::potions::timed(engine::actor_mut_trusted(r,id).unwrap(),crate::revision50_control_amulets::DISCORD,10.*strength,fresh);}},
+        "discord"=>{if let Some(id)=target.filter(|&id|harmful_target(r,id)){crate::potions::timed_status(r,id,crate::revision50_control_amulets::DISCORD,10.*strength,fresh);}},
         "teleportation"=>{if let Some(id)=target.filter(|&id|harmful_target(r,id)){crate::revision50_wave_teleport::teleport(r,id)?;}},
         "shattering"=>shatter(r,x,y),
         _=>unreachable!(),

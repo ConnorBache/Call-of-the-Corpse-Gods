@@ -1883,7 +1883,7 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
 }
 fn append_named_jewelry(run: &Run, i: &Item, lines: &mut Vec<String>) -> bool {
     if !corpse_core::revision50::enabled(run) { return false; }
-    if let Some(description) = corpse_core::revision50_rings::description(i) {
+    if let Some(description) = corpse_core::revision50_rings::description_for_run(run,i) {
         lines.push(description.into());
         return true;
     }
@@ -3403,6 +3403,25 @@ mod retired_potion_ui_tests {
             assert!(!describe_potion(&r,&item).contains("retired"));
             assert!(!displayed_name(&r,&item).starts_with("Retired"));
             r.potion_rules_from=Field::Missing;
+        }
+    }
+}
+
+#[cfg(test)]
+mod current_ring_ui_tests {
+    use super::*;
+    #[test]
+    fn retired_rings_show_no_active_effect_copy_and_keep_drop() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.ring_rules_from=0usize.into();
+        for effect in ["fire-resistance","poison-resistance","sustain-strength","ice-immunity","corrosion-resistance"] {
+            let item=Item{id:903.,kind:"ring".into(),effect:effect.to_string().into(),..Default::default()};
+            let before=item.clone();let mut text=vec![];
+            assert!(append_named_jewelry(&r,&item,&mut text));assert_eq!(text,vec!["Retired ring."]);
+            assert!(displayed_name(&r,&item).starts_with("Retired Ring of "));
+            assert!(item_actions(&r,&item).iter().any(|a|a.label=="Drop"));assert_eq!(item,before);
+            r.ring_rules_from=Field::Null;text.clear();assert!(append_named_jewelry(&r,&item,&mut text));assert_ne!(text,vec!["Retired ring."]);
+            r.ring_rules_from=0usize.into();
         }
     }
 }

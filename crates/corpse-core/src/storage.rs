@@ -161,6 +161,8 @@ pub fn validate(run: &Run) -> Result<()> {
     }) { return Err(invalid("Invalid dream ground item")); }
     crate::amulet_rules::validate(run).map_err(StorageError)?;
     crate::potion_rules::validate(run).map_err(StorageError)?;
+    crate::ring_rules::validate(run).map_err(StorageError)?;
+    crate::gas_rules::validate(run).map_err(StorageError)?;
     crate::firebolt_travel::validate(run).map_err(StorageError)?;
     crate::validation::validate(run)?;
     Ok(())

@@ -331,10 +331,11 @@ pub fn enemy_action_options(
             let nearby = crate::portals::actor_distance(r, &a, recipient) <= 10.0;
             let same = if crate::revision50::enabled(r) {!crate::revision50_control_amulets::hostile(r,&a,recipient)}
                 else {(other==player||recipient.state=="ally")== (a.state=="ally")};
+            let duration = crate::monster_statuses::status_duration(r,recipient,5.0);
             let b = actor_mut_trusted(r, other).unwrap();
             if nearby {
                 if same {
-                    b.conditions.insert("screamEmboldened".into(), 5.0);
+                    b.conditions.insert("screamEmboldened".into(), duration);
                     b.conditions.insert("screamBonus".into(), 5.0 * multiplier);
                     b.conditions
                         .insert("screamPerception".into(), 20.0 * multiplier);
@@ -342,10 +343,10 @@ pub fn enemy_action_options(
                     if disorient {
                         b.conditions.shift_remove("screamWeakened");
                         b.conditions.shift_remove("screamPenalty");
-                        b.conditions.insert("disoriented".into(), 5.0);
+                        b.conditions.insert("disoriented".into(), duration);
                         b.conditions.insert("disorientedPenalty".into(), 5.0 * multiplier);
                     } else {
-                        b.conditions.insert("screamWeakened".into(), 5.0);
+                        b.conditions.insert("screamWeakened".into(), duration);
                         b.conditions.insert("screamPenalty".into(), 5.0 * multiplier);
                     }
                 }
@@ -592,7 +593,8 @@ pub fn enemy_hit_effects(r: &mut Run, id: f64, target: f64) {
         0.0
     };
     if strength > 0.0 {
-        let key = format!("venom:{}:{}", r.tick + 5.0, id);
+        let duration = crate::monster_statuses::status_duration(r, &b, 5.0);
+        let key = format!("venom:{}:{}", r.tick + duration, id);
         let stacked = r.simulation_revision.value_or(29.0) >= 52.0;
         let now = r.tick;
         let b = actor_mut_trusted(r, target).unwrap();
@@ -605,7 +607,7 @@ pub fn enemy_hit_effects(r: &mut Run, id: f64, target: f64) {
         } else {
             *b.conditions.entry(key).or_insert(0.0) += strength;
         }
-        b.conditions.insert("envenomed".into(), 5.0);
+        b.conditions.insert("envenomed".into(), duration);
         let b = b.clone();
         if id == r.player.id
             || target == r.player.id

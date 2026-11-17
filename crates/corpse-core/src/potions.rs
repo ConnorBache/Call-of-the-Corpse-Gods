@@ -14,6 +14,12 @@ pub(crate) fn timed(a: &mut Actor, key: &str, duration: f64, fresh: bool) {
         a.conditions.shift_remove(&format!("{key}Fresh"));
     }
 }
+/// Admit a fresh potion duration before merging with the surviving timer.
+pub(crate) fn timed_status(r: &mut Run, id: f64, key: &str, duration: f64, fresh: bool) {
+    let Some(a) = actor(r,id) else { return };
+    let duration = crate::monster_statuses::status_duration(r,a,duration);
+    timed(actor_mut_trusted(r,id).unwrap(),key,duration,fresh);
+}
 pub fn supported(effect: &str) -> bool {
     crate::revision50_potions::new_effect(effect) || matches!(
         effect,
@@ -112,7 +118,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
                         .abilities
                         .iter()
                         .any(|a| a == "isheilah-tools-of-the-trade");
-                timed(actor_mut_trusted(r, id).unwrap(), key, turns * strength, fresh);
+                timed_status(r, id, key, turns * strength, fresh);
                 if effect == "detect magic" && pool == Some(r.player.id) {
                     crate::inventory::remember_detected_items(r).map_err(EngineError)?;
                 }
@@ -127,8 +133,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
             if let Some(id) = target {
                 let random = crate::rng::random(r);
                 let revision = r.simulation_revision.value_or(29.);
-                crate::corpses::apply_burning_revision(
-                    actor_mut_trusted(r, id).unwrap(),
+                crate::corpses::apply_burning_run(r, id,
                     revision,
                     random,
                     Some(-2.0),
@@ -157,8 +162,8 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
                         actor(r, id).unwrap(),
                         "enemy:beast:gas-immunity",
                     ) {
-                        timed(
-                            actor_mut_trusted(r, id).unwrap(),
+                        timed_status(
+                            r, id,
                             "paralyzed",
                             5.0 * strength,
                             false,
@@ -174,6 +179,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
                 } else {
                     id
                 };
+                let incoming = crate::monster_statuses::status_duration(r,actor(r,id).unwrap(),20.0 * strength).ceil();
                 let a = actor_mut_trusted(r, id).unwrap();
                 let key = format!("buff:{effect}");
                 let timer = format!("buffTicks:{effect}");
@@ -189,7 +195,7 @@ pub fn apply(r: &mut Run, index: usize, x: f64, y: f64, thrown: bool) -> Result<
                     .get(&timer)
                     .copied()
                     .unwrap_or(0.0)
-                    .max((20.0 * strength).ceil());
+                    .max(incoming);
                 a.conditions.insert(key, old.max(bonus));
                 a.conditions.insert(timer, duration);
             }

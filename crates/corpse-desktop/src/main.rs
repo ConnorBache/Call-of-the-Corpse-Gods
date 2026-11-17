@@ -730,8 +730,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 gameplay_pause::Decision::Block=>continue,
                 gameplay_pause::Decision::Pass=>{},
             }
-            let dead=screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead");
-            match death_pause.event(dead,&event) {
+            let terminal_status=run.as_ref().filter(|_|screen==Screen::Game).map(|r|r.run.status.as_str()).unwrap_or("playing");
+            match death_pause.event_for_status(terminal_status,&event) {
                 death_pause::Decision::Advance=>{summary=run.as_ref().map(|r|corpse_core::profile::summarize_run(&r.run));summary_scroll=0;screen=Screen::Summary;dirty=true;continue;},
                 death_pause::Decision::Block=>continue,
                 death_pause::Decision::Pass=>{},
@@ -2592,7 +2592,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         }
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
         effects.gameplay_pause.observe(run.as_ref().filter(|_|screen==Screen::Game).map(|r|&r.run));
-        if screen==Screen::Game&&(effects.gameplay_pause.active()||effects.gameplay_pause.waiting||health_warning.active()||run.as_ref().is_some_and(|r|r.run.status=="dead")) {
+        if screen==Screen::Game&&(effects.gameplay_pause.active()||effects.gameplay_pause.waiting||health_warning.active()||run.as_ref().is_some_and(|r|death_pause::terminal(&r.run.status))) {
             travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;
             inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;
         }
@@ -2974,6 +2974,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             help.paint(&mut painter);
             if screen==Screen::Game && !effects.sequence.pending(now) && !effects.gameplay_pause.fall_active(){if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
             if screen==Screen::Game && !effects.presentation_pending(now) && effects.gameplay_pause.active() && (!health_warning.active()||effects.gameplay_pause.fall_active()){painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,effects.gameplay_pause.text());}
+            if screen==Screen::Game && !effects.presentation_pending(now) && !effects.gameplay_pause.active() && run.as_ref().is_some_and(|r|death_pause::terminal(&r.run.status)){painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,gameplay_pause::CONTINUE);}
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
             if let Some(frame)=painter.gpu.as_ref(){
                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
@@ -2994,7 +2995,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             if full_upload||!upload_rects.is_empty()||force_present{let _present_timing=corpse_core::timing::span("desktop.texture.present");canvas.clear();canvas.copy(&texture,None,None)?;canvas.present();}
             }
             if !effects.presentation_pending(now) { if effects.gameplay_pause.active()&&(!health_warning.active()||effects.gameplay_pause.fall_active()){effects.gameplay_pause.presented();}else{health_warning.presented();} }
-            death_pause.presented(!effects.gameplay_pause.active()&&!effects.sequence.pending(now)&&screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead"));
+            death_pause.presented(!effects.gameplay_pause.active()&&!effects.presentation_pending(now)&&screen==Screen::Game&&run.as_ref().is_some_and(|r|death_pause::terminal(&r.run.status)));
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
             dirty = false;
             cosmetic_dirty = false;

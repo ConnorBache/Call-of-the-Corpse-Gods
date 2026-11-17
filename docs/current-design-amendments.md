@@ -877,3 +877,13 @@ while ensuring removed amulets cannot be used by continuing an old live save.
 ### Approved screen status tints (2026-11-17)
 
 Only these player statuses tint the game screen: Burning orange-red; Poisoned green; Hemophilia and Bleeding red; Confused white; Silenced and Silenced by aura black. Envenomed and every other status add no tint. Existing underwater blue remains. Overlapping approved color families contribute equally to a single bounded 34/255 veil; duplicate aliases in a family do not increase weight. The veil follows the detached presented state and local illumination, preserving darkness and animation/effect ordering. This is presentation only.
+
+### Ring roster and Willpower amendment — November 17, 2026
+
+Current ordinary ring loot is Stealth, Light, Regeneration, Vampirism, Reaping, Flight, Willpower, Protection, Slaying and Swimming. Fire Resistance, Poison Resistance, Sustain Strength, Ice Immunity and Corrosion Resistance no longer generate or provide their named effects. Existing instances retain their IDs, inventory slots and separate Tinker grants; their UI identifies them as retired. The Swimming island-escape safeguard remains in addition to ordinary loot.
+
+Willpower halves every finite incoming status duration, beneficial or harmful, with duplicate copies multiplying the reduction and the resulting duration rounded up. Permanent/infinite states are not shortened. It applies when a status is granted or refreshed, not again when a saved state is reconstructed or a timer ticks. Historical replay command prefixes retain the earlier ring pool and effects through the independent `ringRulesFrom` policy marker, without changing simulation revision 52.
+
+### Status-gas duration amendment — November 17, 2026
+
+Paralysis, confusion and hallucinogenic gas refresh their respective statuses to five turns on each environmental exposure. Apply the recipient's Willpower duration reduction once to the incoming five turns, rounding up, before retaining the greater of that duration and the existing countdown. Contact never adds durations or shortens an already longer effect. Existing immunity and hallucination recipient restrictions remain unchanged. After leaving gas, ordinary status clocks expire the remaining duration. This changes status duration, not gas-cloud lifetime; caustic/breather damage, inert Blood Mist and other non-status gases are unchanged. Historical replay commands retain their former 2/8/2 durations through the separate gas-rules policy boundary.

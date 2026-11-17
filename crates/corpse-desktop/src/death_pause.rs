@@ -1,9 +1,17 @@
 //! Presentation/input gate only: the terminal run remains available for archiving.
 use sdl2::{event::Event,keyboard::Keycode};
+pub fn terminal(status: &str) -> bool { matches!(status, "dead" | "won") }
 #[derive(Default)]
 pub struct DeathPause { active:bool, presented:bool, space_down:bool }
 #[derive(Debug,PartialEq)] pub enum Decision {Pass,Block,Advance}
 impl DeathPause {
+ pub fn event_for_status(&mut self,status:&str,event:&Event)->Decision {
+  let decision=self.event(terminal(status),event);
+  // Preserve victory's existing menu/movement/click controls, but never let a
+  // queued input skip the first terminal frame or bypass Space freshness.
+  if status=="won" && self.presented && decision==Decision::Block
+   && !matches!(event,Event::KeyDown{keycode:Some(Keycode::Space),..}|Event::KeyUp{keycode:Some(Keycode::Space),..}) {Decision::Pass}else{decision}
+ }
  pub fn observe(&mut self,dead:bool){if dead!=self.active{self.active=dead;self.presented=false;}}
  pub fn presented(&mut self,dead:bool){self.observe(dead);if dead{self.presented=true;}}
  pub fn event(&mut self,dead:bool,event:&Event)->Decision {
@@ -17,6 +25,27 @@ impl DeathPause {
 }
 #[cfg(test)]mod tests {
  use super::*;use sdl2::keyboard::Mod;
+ #[test] fn victory_preserves_prior_controls_after_presentation(){
+  let mut g=DeathPause::default();assert_eq!(g.event_for_status("won",&key(Keycode::Kp2,false)),Decision::Block);
+  g.presented(true);assert_eq!(g.event_for_status("won",&key(Keycode::Kp2,false)),Decision::Pass);
+  let click=Event::MouseButtonDown{timestamp:0,window_id:0,which:0,mouse_btn:sdl2::mouse::MouseButton::Left,clicks:1,x:10,y:10};
+  assert_eq!(g.event_for_status("won",&click),Decision::Pass);
+  assert_eq!(g.event_for_status("won",&key(Keycode::Space,true)),Decision::Block);
+  g.event_for_status("won",&release());assert_eq!(g.event_for_status("won",&key(Keycode::Space,false)),Decision::Advance);
+ }
+ #[test] fn victory_uses_same_fresh_space_gate_as_death(){
+  for status in ["won","dead"] {
+   assert!(terminal(status));let mut g=DeathPause::default();
+   assert_eq!(g.event(terminal(status),&key(Keycode::Space,false)),Decision::Block);
+   g.presented(terminal(status));
+   assert_eq!(g.event(terminal(status),&key(Keycode::Space,true)),Decision::Block);
+   assert_eq!(g.event(terminal(status),&key(Keycode::Kp2,false)),Decision::Block);
+   g.event(terminal(status),&release());
+   assert_eq!(g.event(terminal(status),&key(Keycode::Space,false)),Decision::Advance);
+  }
+  assert!(!terminal("playing"));
+ }
+
  fn key(k:Keycode,repeat:bool)->Event{Event::KeyDown{timestamp:0,window_id:0,keycode:Some(k),scancode:None,keymod:Mod::NOMOD,repeat}}
  fn release()->Event{Event::KeyUp{timestamp:0,window_id:0,keycode:Some(Keycode::Space),scancode:None,keymod:Mod::NOMOD,repeat:false}}
  #[test]fn only_fresh_space_after_death_frame_advances(){let mut g=DeathPause::default();assert_eq!(g.event(false,&key(Keycode::Space,false)),Decision::Pass);g.presented(true);assert_eq!(g.event(true,&key(Keycode::Space,true)),Decision::Block);assert_eq!(g.event(true,&key(Keycode::Space,false)),Decision::Block);assert_eq!(g.event(true,&release()),Decision::Block);assert_eq!(g.event(true,&key(Keycode::Space,false)),Decision::Advance);}

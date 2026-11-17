@@ -17,6 +17,10 @@ pub struct ReplayRecord {
     pub amulet_rules_from: Field<usize>,
     #[serde(default, skip_serializing_if = "Field::is_missing")]
     pub potion_rules_from: Field<usize>,
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub ring_rules_from: Field<usize>,
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub gas_rules_from: Field<usize>,
     pub seed: String,
     pub mode: String,
     #[serde(default, skip_serializing_if = "Field::is_missing")]
@@ -49,6 +53,8 @@ impl ReplayRecord {
             snapshot_from: match run.replay_snapshot_from {Field::Value(n) if n>0=>Field::Value(n),_=>Field::Missing},
             amulet_rules_from: match run.amulet_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             potion_rules_from: match run.potion_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            ring_rules_from: match run.ring_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            gas_rules_from: match run.gas_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             firebolt_travel_from: match run.firebolt_travel_from { Field::Value(n) => n.into(), _ => Field::Missing },
             seed: run.seed.clone(),
             mode: run.mode.clone(),
@@ -84,6 +90,14 @@ impl ReplayRecord {
             && matches!(self.potion_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid potion rules replay boundary".into()));
         }
+        if !self.ring_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.ring_rules_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Invalid ring rules replay boundary".into()));
+        }
+        if !self.gas_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.gas_rules_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Invalid gas rules replay boundary".into()));
+        }
         let valid=if self.version==1.0 {self.revert_policy.is_missing()&&self.snapshot_from.is_missing()}
         else if self.version==2.0 {match self.revert_policy.as_ref().map(String::as_str) {
             Some("snapshot")=>self.snapshot_from.is_missing(),
@@ -96,6 +110,8 @@ impl ReplayRecord {
     fn apply_policy(&self,engine:&mut Engine,cursor:usize) {
         crate::amulet_rules::apply_replay_policy(&mut engine.run, &self.amulet_rules_from, cursor);
         crate::potion_rules::apply_replay_policy(&mut engine.run, &self.potion_rules_from, cursor);
+        crate::ring_rules::apply_replay_policy(&mut engine.run, &self.ring_rules_from, cursor);
+        crate::gas_rules::apply_replay_policy(&mut engine.run, &self.gas_rules_from, cursor);
         crate::firebolt_travel::apply_replay_policy(&mut engine.run, &self.firebolt_travel_from, cursor);
         if cursor==0 {engine.set_legacy_revert(self.version==1.0||self.revert_policy.as_ref().map(String::as_str)==Some("legacy"));}
         if self.version==2.0&&self.snapshot_from.as_ref()==Some(&cursor) {engine.set_legacy_revert(false);}
@@ -126,6 +142,8 @@ impl ReplaySession {
         crate::firebolt_travel::apply_replay_policy(&mut initial, &record.firebolt_travel_from, 0);
         crate::amulet_rules::apply_replay_policy(&mut initial, &record.amulet_rules_from, 0);
         crate::potion_rules::apply_replay_policy(&mut initial, &record.potion_rules_from, 0);
+        crate::ring_rules::apply_replay_policy(&mut initial, &record.ring_rules_from, 0);
+        crate::gas_rules::apply_replay_policy(&mut initial, &record.gas_rules_from, 0);
         let mut engine=Engine::new(initial.clone())?;
         record.apply_policy(&mut engine,0);
         Ok(Self {
@@ -156,6 +174,8 @@ impl ReplaySession {
         crate::firebolt_travel::apply_replay_policy(&mut initial, &record.firebolt_travel_from, 0);
         crate::amulet_rules::apply_replay_policy(&mut initial, &record.amulet_rules_from, 0);
         crate::potion_rules::apply_replay_policy(&mut initial, &record.potion_rules_from, 0);
+        crate::ring_rules::apply_replay_policy(&mut initial, &record.ring_rules_from, 0);
+        crate::gas_rules::apply_replay_policy(&mut initial, &record.gas_rules_from, 0);
         let mut engine=Engine::new(initial.clone())?;
         record.apply_policy(&mut engine,0);
         Ok(Self {
@@ -181,7 +201,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor);}
+        if self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor);}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -198,6 +218,8 @@ impl ReplaySession {
         crate::firebolt_travel::apply_replay_policy(&mut initial, &self.record.firebolt_travel_from, 0);
         crate::amulet_rules::apply_replay_policy(&mut initial, &self.record.amulet_rules_from, 0);
         crate::potion_rules::apply_replay_policy(&mut initial, &self.record.potion_rules_from, 0);
+        crate::ring_rules::apply_replay_policy(&mut initial, &self.record.ring_rules_from, 0);
+        crate::gas_rules::apply_replay_policy(&mut initial, &self.record.gas_rules_from, 0);
         self.engine = Engine::new(initial)?;
         self.record.apply_policy(&mut self.engine,0);
         self.cursor = 0;
@@ -206,15 +228,15 @@ impl ReplaySession {
 }
 
 fn create_initial(record: &ReplayRecord) -> Result<Run, String> {
-    if record.compressed_depths.value_or(false) { return crate::startup::create_avatar_run_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from); }
-    if record.fast_mode.value_or(false) { return crate::startup::create_avatar_run_fast_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from); }
+    if record.compressed_depths.value_or(false) { return crate::startup::create_avatar_run_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from); }
+    if record.fast_mode.value_or(false) { return crate::startup::create_avatar_run_fast_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from); }
     if let Some(p) = record.playtest.as_ref() {
         if p.version == 2 {return Err("DEBUG loadout edits are not command-ledger replayable; use the saved session instead.".into());}
-        let run = crate::playtest::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, p.start_floor, &p.profile, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from)?;
+        let run = crate::playtest::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, p.start_floor, &p.profile, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from)?;
         if run.playtest != record.playtest { return Err("Playtest replay starting profile does not match this build.".into()); }
         Ok(run)
     } else if record.playtest.is_missing() {
-        crate::startup::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from)
+        crate::startup::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from)
     } else { Err("Invalid null playtest replay profile.".into()) }
 }
 

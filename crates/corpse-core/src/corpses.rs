@@ -82,6 +82,16 @@ pub fn advance_corpse_burning(a: &mut Actor, elapsed: f64) {
     }
 }
 /// Revisioned ignition keeps the public frozen helper and legacy samples intact.
+/// Scale a fresh burn before merging it with an existing duration.
+pub fn apply_burning_run(r: &mut crate::Run, id: f64, revision: f64, random: f64,
+    owner: Option<f64>, player: Option<f64>, strength: Option<f64>) -> f64 {
+    let Some(a) = crate::engine::actor(r,id) else {return 0.;};
+    let raw = ((6. + (random * 5.).floor()) * strength.unwrap_or(1.)).ceil();
+    let duration = crate::monster_statuses::status_duration(r,a,raw);
+    let a = crate::engine::actor_mut_trusted(r,id).unwrap();
+    if crate::revision51_ichor_fire::extinguish(revision,a) || crate::revision50_potions::fire_immune(a) {return 0.;}
+    apply_burning_duration(a,duration,owner,player)
+}
 pub fn apply_burning_revision(
     a: &mut Actor,
     revision: f64,
@@ -102,6 +112,9 @@ pub fn apply_burning(
 ) -> f64 {
     if crate::revision50_potions::fire_immune(a) {return 0.;}
     let duration = ((6. + (random * 5.).floor()) * strength.unwrap_or(1.)).ceil();
+    apply_burning_duration(a,duration,owner,player)
+}
+fn apply_burning_duration(a: &mut Actor, duration:f64, owner:Option<f64>, player:Option<f64>) -> f64 {
     let old = a.conditions.get("burning").copied().unwrap_or(0.);
     a.conditions.insert("burning".into(), old.max(duration));
     if let Some(v) = owner {

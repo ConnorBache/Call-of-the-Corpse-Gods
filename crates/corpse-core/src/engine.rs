@@ -2970,9 +2970,10 @@ fn attack_base_with_accuracy(
                 .iter()
                 .any(|id| id == "enemy:pale:gas-vulnerability")
         {
+            let duration = crate::monster_statuses::status_duration(r,actor_any(r,bid).unwrap(),5.0);
             let b = actor_any_mut(r, bid).unwrap();
             b.conditions.insert("gasVulnerable".into(), 1.0);
-            b.conditions.insert("gasVulnerableTicks".into(), 5.0);
+            b.conditions.insert("gasVulnerableTicks".into(), duration);
             if let Some(b)=actor_any(r,bid){crate::animation_enemy::mark(r,b,"E58","cracked-shield",crate::events::Stage::Special);}
         }
     }
@@ -4506,10 +4507,11 @@ fn after_damage_with_source(
     if a.dead.value_or(false) && s.abilities.iter().any(|id| id == "grisha-death-swift") {
         let resolving = r.resolving_tick.value_or(false);
         let owner_id = crate::half_here::owner_id(r, &s);
+        let duration = actor_any(r,owner_id).map(|a|crate::monster_statuses::status_duration(r,a,3.0)).unwrap_or(3.0);
         let Some(owner) = actor_any_mut(r, owner_id) else {
             return;
         };
-        let haste = condition(owner, "hasted").max(3.0);
+        let haste = condition(owner, "hasted").max(duration);
         owner.conditions.insert("hasted".into(), haste);
         if resolving {
             owner.conditions.shift_remove("hastedFresh");
@@ -4528,10 +4530,11 @@ fn after_damage_with_source(
         && in_bounds(r, s.x, s.y)
         && a.active.iter().any(|id| id == "etill-float-away")
     {
+        let duration = crate::monster_statuses::status_duration(r,&a,2.0);
         actor_mut_trusted(r, victim)
             .unwrap()
             .conditions
-            .insert("flying".into(), condition(&a, "flying").max(2.0));
+            .insert("flying".into(), condition(&a, "flying").max(duration));
         crate::animation_player::local(r,&a,"P28","rise",crate::events::Stage::Special);
         if crate::portals::enabled(r) {
             let (dx,dy)=crate::portals::direction_toward(r,&a,s.x,s.y);

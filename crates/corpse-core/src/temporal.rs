@@ -52,7 +52,7 @@ impl Snapshot {
     pub fn value(&self) -> Result<Value> {
         let mut v = serde_json::to_value(&*self.state)?;
         let o = v.as_object_mut().unwrap();
-        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom"] {
+        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom"] {
             o.shift_remove(k);
         }
         if let Some(c) = self.cursor {
@@ -105,6 +105,8 @@ impl Snapshot {
         o.shift_remove("fireboltTravelFrom");
         o.shift_remove("amuletRulesFrom");
         o.shift_remove("potionRulesFrom");
+        o.shift_remove("ringRulesFrom");
+        o.shift_remove("gasRulesFrom");
         let state = serde_json::from_value(v)?;
         crate::revision52_amulet_tiers::validate_run(&state).map_err(StorageError)?;
         crate::revision50_control_amulets::validate_terrain(&state).map_err(StorageError)?;
@@ -121,6 +123,8 @@ impl Snapshot {
         restored.firebolt_travel_from = run.firebolt_travel_from.clone();
         restored.amulet_rules_from = run.amulet_rules_from.clone();
         restored.potion_rules_from = run.potion_rules_from.clone();
+        restored.ring_rules_from = run.ring_rules_from.clone();
+        restored.gas_rules_from = run.gas_rules_from.clone();
         crate::revision52_reserves::normalize_run(&mut restored).map_err(StorageError)?;
         crate::revision50::settle_current_duels(&mut restored);
         if let Some(c) = self.cursor {
@@ -526,6 +530,8 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.firebolt_travel_from = Field::Missing;
     copy.amulet_rules_from = Field::Missing;
     copy.potion_rules_from = Field::Missing;
+    copy.ring_rules_from = Field::Missing;
+    copy.gas_rules_from = Field::Missing;
     run.future = Some(storage::serialize(&copy)?.into());
     Ok(())
 }
@@ -549,6 +555,8 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.firebolt_travel_from=run.firebolt_travel_from.clone();
     restored.amulet_rules_from=run.amulet_rules_from.clone();
     restored.potion_rules_from=run.potion_rules_from.clone();
+    restored.ring_rules_from=run.ring_rules_from.clone();
+    restored.gas_rules_from=run.gas_rules_from.clone();
     restored.run_id=run.run_id.clone();restored.future=None;
     *history=next_history;*run=restored;retain_costs(run,ledger);crate::health_dirty::invalidate(run);
 }
@@ -568,6 +576,8 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
     restored.firebolt_travel_from = run.firebolt_travel_from.clone();
         restored.amulet_rules_from = run.amulet_rules_from.clone();
         restored.potion_rules_from = run.potion_rules_from.clone();
+        restored.ring_rules_from = run.ring_rules_from.clone();
+        restored.gas_rules_from = run.gas_rules_from.clone();
     restored.run_id = run.run_id.clone();
     restored.future = None;
     let policy = history.full_snapshot;
@@ -726,7 +736,7 @@ fn snapshot_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Run {
 fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
     let _timing = crate::timing::span("history.journal_header");
     let mut value = serde_json::to_value(snapshot_header(snapshot, mask_dream_floors))?;
-    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom"] {
+    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom"] {
         value.as_object_mut().unwrap().shift_remove(key);
     }
     Ok(value)
@@ -1004,6 +1014,8 @@ impl Engine {
         if run.replay_snapshot_from.is_missing() {run.replay_snapshot_from=Field::Value(run.replay.len());}
         crate::amulet_rules::admit_current(&mut run).map_err(StorageError)?;
         crate::potion_rules::admit_current(&mut run).map_err(StorageError)?;
+        crate::ring_rules::admit_current(&mut run).map_err(StorageError)?;
+        crate::gas_rules::admit_current(&mut run).map_err(StorageError)?;
         crate::firebolt_travel::admit_current(&mut run).map_err(StorageError)?;
         storage::validate(&run)?;
         storage::validate_current_revision(&run)?;
@@ -1036,6 +1048,8 @@ impl Engine {
         // Loading for live play adopts current rules even from an old playback checkpoint.
         if matches!(run.amulet_rules_from, Field::Null) { run.amulet_rules_from = Field::Missing; }
         if matches!(run.potion_rules_from, Field::Null) { run.potion_rules_from = Field::Missing; }
+        if matches!(run.ring_rules_from, Field::Null) { run.ring_rules_from = Field::Missing; }
+        if matches!(run.gas_rules_from, Field::Null) { run.gas_rules_from = Field::Missing; }
         Self::new(run)
     }
     /// New41 borrows current state after O(F+L) trail/retired-history validation.

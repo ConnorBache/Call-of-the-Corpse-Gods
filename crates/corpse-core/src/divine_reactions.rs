@@ -190,11 +190,12 @@ pub fn apply_bleeding(r: &mut Run, a: &Actor, target_id: f64, dealt: f64, offens
     {
         return;
     }
+    let incoming = engine::actor(r,target_id).map(|b| crate::monster_statuses::status_duration(r,b,offense.max(0.0))).unwrap_or(0.);
     if let Some(b) = engine::actor_mut_trusted(r, target_id) {
         if b.dead.value_or(false) {
             return;
         }
-        let duration = engine::condition(b, "bleeding").max(offense.max(0.0));
+        let duration = engine::condition(b, "bleeding").max(incoming);
         b.conditions.insert("bleeding".into(), duration);
         b.conditions.insert("bleedSourceId".into(), a.id);
         if duration>0. {let b=b.clone();crate::animation_player::local(r,&b,"P38","droplet-two",crate::events::Stage::Special);}

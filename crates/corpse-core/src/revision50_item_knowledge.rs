@@ -54,7 +54,7 @@ fn base_display_name(r: &Run, item: &Item) -> String {
     if let Some(name) = crate::revision52_amulet_tiers::display_name(r,item) { return name; }
     if let Some(name) = crate::revision50_rings::display_name(item)
         .or_else(|| crate::revision50_amulet_effects::display_name(item)) {
-        return name.into();
+        return if crate::revision50_rings::retired(r,item) { format!("Retired {name}") } else { name.into() };
     }
     if item.kind == "potion" {
         if let Some(name) = item.effect.as_ref().and_then(|effect| potion_name(effect)) {

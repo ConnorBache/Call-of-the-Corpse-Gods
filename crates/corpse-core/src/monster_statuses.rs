@@ -22,14 +22,26 @@ pub fn status_source(r: &Run, a: &Actor, key: &str) -> Option<f64> {
         .find(|a| a.id == id)
         .map(|a| a.id)
 }
-/// Only incoming confusion/hallucination and explicitly authored enemy curses
-/// call this helper. Existing clocks and ordinary poison/slow are unaffected.
+/// Raw ring scaling shared by historical mental/curse admission and the current
+/// all-status admission below. Never pass an existing countdown through this.
 /// O(I + C) ring query, O(1) scratch; no RNG or retained resistance state.
 pub fn willpower_duration(r: &Run, target: &Actor, duration: f64) -> f64 {
     if duration.is_finite() && duration > 0.
         && crate::revision50_rings::has_effect(r, target, crate::revision50_rings::WILLPOWER)
     {
         (duration * crate::revision50_rings::stack_multiplier(r, target, crate::revision50_rings::WILLPOWER, 0.5)).ceil()
+    } else {
+        duration
+    }
+}
+
+/// Scale a newly authored finite status duration, never an existing countdown.
+/// Current rings affect beneficial and harmful statuses equally. Call before
+/// max/refresh composition; cooldowns, state flags and indefinite traits are not
+/// durations. Owner-aware ring lookup is O(I + C), O(1) additional memory.
+pub fn status_duration(r: &Run, target: &Actor, duration: f64) -> f64 {
+    if crate::ring_rules::current(r) {
+        willpower_duration(r, target, duration)
     } else {
         duration
     }
@@ -46,14 +58,14 @@ pub fn apply_curse(
     duration: f64,
     source: f64,
 ) -> bool {
-    let duration = match (actor(r, target), crate::engine::actor_any(r, source)) {
+    let duration = if crate::ring_rules::current(r) { duration } else { match (actor(r, target), crate::engine::actor_any(r, source)) {
         (Some(a), Some(b)) if crate::half_here::owner_id(r, a) != crate::half_here::owner_id(r, b)
             && (crate::revision50_control_amulets::discord_hostility(r,a,b)
                 || (crate::half_here::owner_id(r, a) == r.player.id || a.state == "ally")
                     != (crate::half_here::owner_id(r, b) == r.player.id || b.state == "ally")) =>
             willpower_duration(r, a, duration),
         _ => duration,
-    };
+    }};
     apply_status(r, target, key, duration, Some(source))
 }
 
@@ -80,6 +92,7 @@ pub fn apply_status(
         };
         if !reachable { return false; }
     }
+    let duration = actor(r,target).map_or(duration, |a| status_duration(r,a,duration));
     let prior=actor(r,target).map_or(0.,|a|condition(a,key));
     let curse_key=source.and_then(|id|crate::engine::actor_any(r,id)).and_then(|a| {
         if a.abilities.iter().any(|s|s=="enemy:beast:bloodmancy") {Some("E04")}

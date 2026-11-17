@@ -18,8 +18,23 @@ pub const PROTECTION: &str = "protection";
 pub const SLAYING: &str = "slaying";
 pub const ICE_IMMUNITY: &str = "ice-immunity";
 pub const CORROSION_RESISTANCE: &str = "corrosion-resistance";
-/// R52 island safeguard. It is not added to the ordinary randomized ring pool.
+/// Swimming is ordinary loot under current rules and remains an island safeguard.
 pub const SWIMMING: &str = "swimming";
+
+/// Removed powers retain their serialized identity and inventory slot.
+pub fn removed_effect(effect: &str) -> bool {
+    matches!(effect, FIRE_RESISTANCE | POISON_RESISTANCE | SUSTAIN_STRENGTH | ICE_IMMUNITY | CORROSION_RESISTANCE)
+}
+pub fn retired(r: &Run, item: &Item) -> bool {
+    crate::ring_rules::current(r) && effect(item).is_some_and(removed_effect)
+}
+pub fn description_for_run(r: &Run, item: &Item) -> Option<&'static str> {
+    if retired(r, item) { return Some("Retired ring."); }
+    if crate::ring_rules::current(r) && effect(item) == Some(WILLPOWER) {
+        return Some("Halves the duration of all status effects.");
+    }
+    description(item)
+}
 
 /// Canonical named-ring identity, independent of wearing or run revision.
 /// Only these explicit powers have been authored. Unknown/legacy effects are not
@@ -108,6 +123,7 @@ pub fn has_effect(r: &Run, actor: &Actor, named_effect: &str) -> bool {
 /// O(I + C) worst-case time, O(1) additional memory. Quantity is not a ring count.
 pub fn count_effect(r: &Run, actor: &Actor, named_effect: &str) -> usize {
     if !crate::revision50::enabled(r)
+        || (crate::ring_rules::current(r) && removed_effect(named_effect))
         || !matches!(named_effect, STEALTH | LIGHT | REGENERATION | TRANSFERENCE | FLIGHT
             | FIRE_RESISTANCE | POISON_RESISTANCE | CORROSION_RESISTANCE | ICE_IMMUNITY
             | WILLPOWER | PROTECTION | SLAYING | REAPING | SUSTAIN_STRENGTH | SWIMMING)

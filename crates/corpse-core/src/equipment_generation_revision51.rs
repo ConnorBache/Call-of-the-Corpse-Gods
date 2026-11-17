@@ -27,9 +27,9 @@ pub(super) fn generate(
 pub(super) fn generate_with_amulet_rules(
     primary:&str,rng:&mut GenerationRng,next_id:&mut f64,revision:f64,current:bool,
 )->Result<Vec<Item>,String> {
-    generate_with_item_rules(primary,rng,next_id,revision,current,revision>=52.)
+    generate_with_item_rules(primary,rng,next_id,revision,current,revision>=52.,revision>=52.)
 }
-pub(super) fn generate_with_item_rules(primary:&str,rng:&mut GenerationRng,next_id:&mut f64,revision:f64,current:bool,current_potions:bool)->Result<Vec<Item>,String> {
+pub(super) fn generate_with_item_rules(primary:&str,rng:&mut GenerationRng,next_id:&mut f64,revision:f64,current:bool,current_potions:bool,current_rings:bool)->Result<Vec<Item>,String> {
     let counts = KINDS.map(|kind| if kind == primary { 3 } else { rng.integer(1, 2) });
     let mut items = Vec::with_capacity(counts.iter().sum::<i32>() as usize);
     for (kind, count) in KINDS.into_iter().zip(counts) {
@@ -45,7 +45,7 @@ pub(super) fn generate_with_item_rules(primary:&str,rng:&mut GenerationRng,next_
                     ..Default::default()
                 }
             } else {
-                super::revision50::create_with_amulet_rules(kind, rng, *next_id, revision,current)?
+                super::revision50::create_with_item_rules(kind, rng, *next_id, revision,current,current_rings)?
             };
             *next_id += 1.;
             items.push(item);

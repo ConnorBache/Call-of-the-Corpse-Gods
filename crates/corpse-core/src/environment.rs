@@ -1162,8 +1162,7 @@ pub fn refresh_burning_from_fire(r: &mut Run, id: f64) -> Result<(), String> {
     let player = p.and_then(|p| p.player.get(i)).copied().unwrap_or(0.);
     if crate::revision50_combat::oblivious_blocks(r,a,source_actor(r,owner,player).and_then(|id|crate::engine::actor_any(r,id))) {return Ok(());}
     let random = crate::rng::random(r);
-    crate::corpses::apply_burning_revision(
-        crate::engine::actor_mut_trusted(r, id).unwrap(),
+    crate::corpses::apply_burning_run(r, id,
         revision,
         random,
         Some(owner),
@@ -1206,7 +1205,7 @@ pub fn tick_environment_options_with_falls(
     }
     crate::terrain_runtime::melt_burning_snow(r);
     // Hallucination duration is a normal world-turn clock, never an actor/haste clock.
-    // Decay before exposure; gas refresh below sets exactly two, never adds.
+    // Decay before exposure; contact below refreshes duration, never adds to it.
     if native_hooks {
         for &id in &ids {
             let a = crate::engine::actor_mut_trusted(r, id).unwrap();
@@ -1313,8 +1312,7 @@ pub fn tick_environment_options_with_falls(
                 }
             } else {
                 let random = crate::rng::random(adapter.run);
-                crate::corpses::apply_burning_revision(
-                    crate::engine::actor_mut_trusted(adapter.run, id).unwrap(),
+                crate::corpses::apply_burning_run(adapter.run, id,
                     revision,
                     random,
                     None,
@@ -1463,22 +1461,25 @@ pub fn tick_environment_options_with_falls(
         }
         if !gas_immune(&a) && !crate::revision50_combat::oblivious_blocks(r,&a,source.and_then(|id|crate::engine::actor_any(r,id))) {
             let hallucination_contact = hallucination_affects(r, &a);
+            let five_turn_gas = crate::gas_rules::current(r);
+            let paralysis_duration = crate::monster_statuses::status_duration(r, &a, if five_turn_gas { 5. } else { 2. });
             let mental_duration = match gas.as_deref() {
-                Some("hallucinogenic") => crate::monster_statuses::willpower_duration(r, &a, 2.),
-                Some("confusion") => crate::monster_statuses::willpower_duration(r, &a, 8.),
+                Some("hallucinogenic") => crate::monster_statuses::willpower_duration(r, &a, if five_turn_gas { 5. } else { 2. }),
+                Some("confusion") => crate::monster_statuses::willpower_duration(r, &a, if five_turn_gas { 5. } else { 8. }),
                 _ => 0.,
             };
             let before=crate::engine::actor(r,id).unwrap();
             let prior=[cond(before,"paralyzed"),cond(before,"hallucinating"),cond(before,"confused")];
             let a = crate::engine::actor_mut_trusted(r, id).unwrap();
             if gas.as_deref() == Some("paralysis") {
-                let v = cond(a, "paralyzed").max(2.);
+                let v = cond(a, "paralyzed").max(paralysis_duration);
                 a.conditions.insert("paralyzed".into(), v);
             }
             if native_hooks && hallucination_contact && gas.as_deref() == Some("hallucinogenic")
                 && !a.abilities.iter().any(|id| id == "enemy:pale:gas-immunity")
             {
-                a.conditions.insert("hallucinating".into(), mental_duration);
+                let duration = if five_turn_gas { cond(a, "hallucinating").max(mental_duration) } else { mental_duration };
+                a.conditions.insert("hallucinating".into(), duration);
             }
             if gas.as_deref() == Some("confusion") {
                 let v = cond(a, "confused").max(mental_duration);

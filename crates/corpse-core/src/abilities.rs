@@ -973,7 +973,8 @@ fn activate_inner(
                 return Ok(false);
             }
             r.player.hp = r.player.max_hp;
-            r.player.conditions.insert("paralyzed".into(), 51.0);
+            let duration = crate::monster_statuses::status_duration(r,&r.player,51.0);
+            r.player.conditions.insert("paralyzed".into(), duration);
             crate::animation_player::local(r,&r.player,"P32","fold",crate::events::Stage::Special);
             log(r, "You use Sudden Sleep.", "player");
             emit_activation(r, "Sudden Sleep", target, x, y);
@@ -992,10 +993,11 @@ fn activate_inner(
             if !pay(r, id, 20.0) {
                 return Ok(false);
             }
+            let duration = crate::monster_statuses::status_duration(r,crate::engine::actor(r,tid).unwrap(),10.0);
             crate::engine::actor_mut_trusted(r, tid)
                 .unwrap()
                 .conditions
-                .insert("paralyzed".into(), 10.0);
+                .insert("paralyzed".into(), duration);
             log(r, "You use Make Kneel.", "player");
         }
         "dawel-silent-strike"
