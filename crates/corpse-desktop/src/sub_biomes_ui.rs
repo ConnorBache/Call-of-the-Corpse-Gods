@@ -22,10 +22,10 @@ mod tests {
         let before=r.clone();
         let o=corpse_core::vision::observe_terrain(&r).unwrap();
         assert!(o.cells[10*w+11].ice); assert!(o.cells[10*w+12].puddles); assert!(o.cells[10*w+13].hellfire);
-        assert_eq!(crate::inspection_ui::observe_tile(&r,11,10).title,"Ice");
+        assert!(crate::inspection_ui::observe_tile(&r,11,10).title.is_empty());
         let puddle=crate::inspection_ui::observe_tile(&r,12,10);
-        assert_eq!(puddle.title,"Puddle"); assert!(puddle.scene.contains("a puddle sits on the ground."),"{}",puddle.scene);
-        assert_eq!(crate::inspection_ui::observe_tile(&r,13,10).title,"Hellfire");
+        assert!(puddle.title.is_empty()); assert!(puddle.scene.contains("a puddle sits on the ground."),"{}",puddle.scene);
+        assert!(crate::inspection_ui::observe_tile(&r,13,10).title.is_empty());
         let v=crate::observe::observe(&r);
         assert!(v.cells.iter().any(|c|c.x==11&&c.y==10&&c.label=="Ice"&&c.glyph=="_"));
         assert!(v.cells.iter().any(|c|c.x==12&&c.y==10&&c.label=="Puddle"&&c.glyph=="~"));
@@ -38,7 +38,7 @@ mod tests {
         let f=r.floor_mut().unwrap();f.ice.as_mut().unwrap()[at]=true;f.snow.as_mut().unwrap()[at]=true;
         assert!(corpse_core::terrain_runtime::melt_snow(r.floor_mut().unwrap(),at));
         let report=crate::inspection_ui::observe_tile(&r,11,10);
-        assert_eq!(report.title,"Ice");assert!(report.scene.contains("a puddle sits on the ground."));
+        assert!(report.title.is_empty());assert!(report.scene.contains("a puddle sits on the ground."));
     }
     #[test]
     fn r37_terrain_remembers_last_seen_layers_without_hidden_updates() {

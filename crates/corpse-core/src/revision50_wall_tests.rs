@@ -177,11 +177,11 @@ fn hp(r:&Run)->f64 {r.floor().unwrap().revision50_terrain.as_ref().unwrap()[0].h
  for (selected,built,removed) in [(1,"pit-sink","pit-rise"),(2,"slab","slab-sink")] {
   let mut r=animation_room(52.);r.player.x=16.;
   crate::events::begin();assert!(select_mode(&mut r,selected as f64));assert!(crate::events::finish().is_empty());
-  crate::events::begin();assert!(activate_cogworks(&mut r,20.,14.).unwrap());let events=crate::events::finish();let cues:Vec<_>=events.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P61").collect();assert_eq!(cues.len(),1);assert_eq!(cues[0].style,built);assert!(!cues[0].cells.is_empty());
+  crate::events::begin();assert!(activate_cogworks(&mut r,20.,14.).unwrap());let events=crate::events::finish();let cues:Vec<_>=events.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P61" && a.style!="cogworks-throw").collect();assert_eq!(cues.len(),1);assert_eq!(cues[0].style,built);assert!(!cues[0].cells.is_empty());
   let reserve=&r.player.ability_reserves.as_ref().unwrap()[COGWORKS];assert_eq!((reserve.capacity,reserve.energy,r.player.energy),(10.,0.,0.));
   let footprint=r.floor().unwrap().revision50_terrain.as_ref().unwrap()[0].cells.clone();assert!(cues[0].cells.iter().all(|p|footprint.contains(&Cell{x:p.x as i32,y:p.y as i32})));
   crate::events::begin();assert!(select_mode(&mut r,3.));assert!(crate::events::finish().is_empty());
-  crate::events::begin();assert!(activate_cogworks(&mut r,20.,14.).unwrap());let events=crate::events::finish();let cues:Vec<_>=events.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P61").collect();assert_eq!(cues.len(),1);assert_eq!(cues[0].style,removed);assert!(cues[0].cells.iter().all(|p|footprint.contains(&Cell{x:p.x as i32,y:p.y as i32})));assert!(r.floor().unwrap().revision50_terrain.as_ref().unwrap().is_empty());
+  crate::events::begin();assert!(activate_cogworks(&mut r,20.,14.).unwrap());let events=crate::events::finish();let cues:Vec<_>=events.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P61" && a.style!="cogworks-throw").collect();assert_eq!(cues.len(),1);assert_eq!(cues[0].style,removed);assert!(cues[0].cells.iter().all(|p|footprint.contains(&Cell{x:p.x as i32,y:p.y as i32})));assert!(r.floor().unwrap().revision50_terrain.as_ref().unwrap().is_empty());
   let reserve=&r.player.ability_reserves.as_ref().unwrap()[COGWORKS];assert_eq!((reserve.capacity,reserve.energy,r.player.energy),(10.,0.,0.));
  }
 }

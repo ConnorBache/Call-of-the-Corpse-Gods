@@ -167,8 +167,10 @@ pub struct Creature {
     pub statuses: Vec<crate::statuses_ui::Status>,
     pub meters: Vec<crate::statuses_ui::Meter>,
 }
+#[derive(Clone)]
 #[cfg_attr(test, derive(Debug))]
 pub struct View {
+    pub ability_overlays: crate::persistent_ability_overlays::Overlays,
     /// Detached known-only R51 creature-sight contours, selected by two-way hover.
     pub perception_boundaries: Vec<crate::perception_ui::Boundary>,
     pub hallucination_cells: Vec<usize>,
@@ -1836,6 +1838,9 @@ impl Painter {
             if cue.event.depth != v.depth {
                 continue;
             }
+            if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style.starts_with("moving-actor")) {
+                if cues.iter().any(|next|next.started>cue.started&&next.started<=now&&next.event.animation.as_ref().is_some_and(|b|b.action==a.action&&b.style.starts_with("moving-actor"))){continue;}
+            }
             for tile in crate::effects::tiles(cue, now, reduced) {
                 if tile.x < 0 || tile.y < 0 || tile.x >= v.width as i32 || tile.y >= v.height as i32
                 {
@@ -1854,6 +1859,17 @@ impl Painter {
             }
         }
         let (cw, ch, ox, oy) = self.map_layout(v.width, v.height);
+        // Suppress every previous step's snapshot glyph until the push completes.
+        let moving_actions:std::collections::BTreeSet<_>=cues.iter().filter_map(|c|{
+            let a=c.event.animation.as_ref()?;
+            (a.style.starts_with("moving-actor")&&now>=c.started&&now<c.started+crate::effects::duration(&c.event)).then_some(a.action)
+        }).collect();
+        for cue in cues {if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style.starts_with("moving-actor")&&moving_actions.contains(&a.action)) {
+            if let Some(origin)=a.cells.first() {if origin.x>=0.&&origin.y>=0.&&origin.x<v.width as f64&&origin.y<v.height as f64 {
+                let i=origin.y as usize*v.width+origin.x as usize;
+                if let Some(Some(cell))=actors.get(i) {self.rect(ox+origin.x as i32*cw,oy+origin.y as i32*ch,cw,ch,cell.bg);actors[i]=None;}
+            }}
+        }}
         for tile in tiles.values() {
             let x = ox + tile.x * cw;
             let y = oy + tile.y * ch;
@@ -1861,7 +1877,7 @@ impl Painter {
             let direct = direct_cells[index];
             let display = display_lights[index];
             let field = tile.color.map(|c| (c as f64 * tile.field_strength).round() as u8);
-            let field = if direct {
+            let field = if tile.field_strength>=1. {field} else if direct {
                 display.map_or(field,|light|light.apply(field))
             } else {
                 crate::color::telepathic(field, true)
@@ -1888,7 +1904,7 @@ impl Painter {
             // A traveling glyph is the only foreground animation primitive.
             // Local feedback preserves the entity's canonical identity above light.
             if let Some(g) = &tile.glyph {
-                let color = if direct { crate::illumination_ui::paint_color(tile.color, display) }
+                let color = if tile.field_strength>=1. {tile.color} else if direct { crate::illumination_ui::paint_color(tile.color, display) }
                     else { crate::color::telepathic(tile.color, false) };
                 self.map_identity_alpha(g, x, y, cw, ch, color, tile.light);
             }
@@ -2727,7 +2743,7 @@ impl Painter {
             }
         }
         } // interaction marks
-        if map_damage { crate::perception_ui::paint(self,v); }
+        if map_damage { crate::persistent_ability_overlays::paint(self,v); crate::perception_ui::paint(self,v); }
         let footer_top=self.frame().map.1+self.frame().map.3;
         if self.intersects_damage(0,footer_top,self.logical_width(),self.logical_height()-footer_top) {
         #[cfg(test)]

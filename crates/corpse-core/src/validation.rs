@@ -81,7 +81,8 @@ fn cell_list(v: &Value, n: usize, p: &str) -> Result<()> {
     let a = array(v, p)?;
     req(a.len() <= n && a.iter().all(|x| cell(x, n)), p)
 }
-const GAS: [&str; 9] = [
+const GAS: [&str; 10] = [
+    "bloodMist",
     "hallucinogenic",
     "caustic",
     "breather",
@@ -623,6 +624,10 @@ fn floor(f: &Value, n: usize, w: usize, h: usize) -> Result<()> {
     }
     if let Some(e) = f.get("environment") {
         object(e, "environment")?;
+        if let Some(v)=e.get("bloodMistTurns") {
+            let a=array(v,"blood mist duration")?;
+            req(a.len()==n && a.iter().all(|v|integer(v) && num(v).is_some_and(|n|(0.0..=5.0).contains(&n))),"blood mist duration")?;
+        }
         for key in GAS.into_iter().chain(["fire"]) {
             if let Some(v) = e.get(key) {
                 let a = array(v, key)?;

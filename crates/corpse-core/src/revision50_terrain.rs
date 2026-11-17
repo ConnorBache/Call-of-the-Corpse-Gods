@@ -81,7 +81,8 @@ pub fn activate_clay(r:&mut crate::Run,x:f64,y:f64)->Result<bool,crate::engine::
     r.floor_mut().unwrap().revision50_terrain=modifications.into();
     if !crate::revision50_ability_energy::spend(r,r.player.id,CLAY_ARMY,COST) {*r=before;return Ok(false);}
     crate::engine::log(r,"A Clay Soldier rises where you stood.","player");
-    crate::events::at(r,"P63","rise",crate::events::Stage::Special,&plan.cells.iter().map(|c|crate::events::EventPoint{x:c.x as f64,y:c.y as f64}).collect::<Vec<_>>());
+    let mut origin=r.player.clone(); origin.x=f64::from(departure.x); origin.y=f64::from(departure.y);
+    crate::animation_shapes::nova(r,&origin,"P63","nova-yellow-small",2);
     presentation.commit();
     Ok(true)
 }
@@ -162,6 +163,7 @@ pub fn activate_cogworks(r:&mut crate::Run,x:f64,y:f64)->Result<bool,crate::engi
         // remove performs all saved-data and selection checks before changing a tile.
         if remove(revision,r.floor_mut().unwrap(),&mut modifications,center).is_err() {return Ok(false);}
         r.floor_mut().unwrap().revision50_terrain=modifications.into();
+        cogworks_throw(r,x,y);
         crate::events::at(r,"P61",if removed_kind==Kind::Pit {"pit-rise"}else{"slab-sink"},crate::events::Stage::Special,&removed_cells.iter().map(|c|crate::events::EventPoint{x:c.x as f64,y:c.y as f64}).collect::<Vec<_>>());
         crate::engine::log(r,"You remove your Cogworks terrain without spending energy.","player");
         return Ok(true);
@@ -185,9 +187,18 @@ pub fn activate_cogworks(r:&mut crate::Run,x:f64,y:f64)->Result<bool,crate::engi
     // by commit above, and no actor mutation occurs during that terrain operation.
     let paid=crate::revision50_ability_energy::spend(r,r.player.id,COGWORKS,COST);
     debug_assert!(paid);
+    cogworks_throw(r,x,y);
     crate::events::at(r,"P61",if selected==2 {"slab"} else {"pit-sink"},crate::events::Stage::Special,&plan.cells.iter().map(|c|crate::events::EventPoint{x:c.x as f64,y:c.y as f64}).collect::<Vec<_>>());
     crate::engine::log(r,if selected==2 {"You create a Cogworks wall with 200 shared HP."} else {"You create a Cogworks pit."},"player");
     Ok(true)
+}
+/// Pure visual throw; does not change terrain reach or consume gameplay RNG.
+fn cogworks_throw(r:&crate::Run,x:f64,y:f64) {
+    let cells:Vec<_>=crate::portals::linear_cells(crate::movement::Point{x:r.player.x as i32,y:r.player.y as i32},crate::movement::Point{x:x as i32,y:y as i32})
+        .into_iter().map(|p|crate::events::EventPoint{x:f64::from(p.x),y:f64::from(p.y)}).collect();
+    let serial=crate::events::emission_serial();
+    crate::events::travel(r,&r.player,"P61","cogworks-throw",&cells,crate::events::Delivery::Projectile,Some("o"));
+    crate::events::decorate(serial,"P61","cogworks-throw",crate::events::EventPoint{x,y},"#ff9a20",Some((&r.player).into()));
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Placement { pub kind: Kind, pub cells: Vec<Cell> }

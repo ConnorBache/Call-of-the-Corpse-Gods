@@ -188,7 +188,17 @@ fn flood_with_damage(r:&mut Run,x:f64,y:f64,policy:WaterStop,damage:f64)->Result
 pub fn execute(r:&mut Run,teleportation:bool,x:f64,y:f64)->Result<(),EngineError> {execute_with_profile(r,teleportation,x,y,8.,20.)}
 pub fn execute_with_profile(r:&mut Run,teleportation:bool,x:f64,y:f64,range:f64,damage:f64)->Result<(),EngineError> {
     if !target_valid_with_range(r,teleportation,x,y,range){return Err(EngineError("Invalid amulet target.".into()))}
-    if teleportation {let id=target(r,x,y).unwrap().id;teleport(r,id)}
+    if teleportation {
+        let id=if r.simulation_revision.value_or(29.)>=52. {
+            let hit=crate::animation_amulets::control_cast(r,"A11",x,y);
+            let Some(a)=hit.actor_id.and_then(|id|engine::actor(r,id)) else{return Ok(())};
+            if crate::half_here::owner_id(r,a)==r.player.id || a.hp<=0. || a.dead.value_or(false)
+                || crate::dreamwalking::inert(r,a) || crate::revision50_terrain::is_soldier(a)
+                || crate::revision50_nightmares::is_decoy(a) {return Ok(())}
+            a.id
+        } else {target(r,x,y).unwrap().id};
+        teleport(r,id)
+    }
     else {let id=r.player.id;crate::dreamwalking::with_actor(r,id,|r|flood_with_damage(r,x,y,WATER_STOP,damage))}
 }
 
@@ -211,6 +221,13 @@ mod tests {
     fn creature(r:&mut Run,id:f64,x:f64,y:f64) {
         let a=Actor{id,x,y,hp:100.,max_hp:100.,state:"hunting".into(),..Default::default()};
         let d=r.depth;r.actors_at_mut(d).push(a);
+    }
+    #[test] fn authored_teleport_cast_intercepts_nearer_actor() {
+        let mut r=room();r.simulation_revision=52.0.into();creature(&mut r,100.,14.,14.);creature(&mut r,101.,17.,14.);
+        crate::events::begin();execute(&mut r,true,17.,14.).unwrap();let events=crate::events::finish();
+        assert_ne!((engine::actor(&r,100.).unwrap().x,engine::actor(&r,100.).unwrap().y),(14.,14.));
+        assert_eq!((engine::actor(&r,101.).unwrap().x,engine::actor(&r,101.).unwrap().y),(17.,14.));
+        assert!(events.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="A11"&&a.delivery==crate::events::Delivery::Magic)));
     }
     #[test] fn teleport_rejects_self_and_wrong_plane_without_rng() {
         let mut r=room();let rng=r.rng;

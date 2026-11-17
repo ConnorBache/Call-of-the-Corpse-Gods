@@ -60,7 +60,10 @@ fn quiet_ui_unused_reserves_are_hidden_without_mutating_them(){
     let before=r.clone();
     for a in corpse_core::progression::catalog_for_revision(50.){
         let row=crate::ability_ui::observe(&r,&a.id);
-        assert_eq!(row.cost.contains("Reserve"),crate::ability_ui::r50_uses_energy(&a.id),"{}",a.name);
+        if a.id=="morae-see-the-future" {
+            assert!(!row.cost.contains("Reserve"));
+            assert!(matches!(row.indicator,Some(crate::ability_ui::CustomIndicator::Future(_))));
+        } else { assert_eq!(row.cost.contains("Reserve"),crate::ability_ui::r50_uses_energy(&a.id),"{}",a.name); }
         assert!(!row.description.contains("Ability energy is spent first"),"{}",a.name);
     }
     for id in ["isheilah-quick-hand","ursa-sleep-walk","lichor-blood-letting","kative-appropriate"]{

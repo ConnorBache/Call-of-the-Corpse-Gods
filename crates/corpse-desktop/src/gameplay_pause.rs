@@ -1,0 +1,92 @@
+//! Desktop-only acknowledgments. No queued command or wait loop is serialized.
+use corpse_core::{Command,Run};
+use sdl2::{event::Event,keyboard::Keycode};
+use std::rc::Rc;
+pub const CONTINUE:&str="Press space to continue";
+pub const PARALYZED:&str="You are paralyzed. Press space to wait until un-paralyzed";
+#[derive(Default)]pub struct Pause {
+ pub enabled:bool,
+ pending:Option<Command>,
+ pub outcome:Option<Rc<crate::render::View>>,
+ paralysis:bool,
+ pub waiting:bool,
+ presented:bool,
+ space_down:bool,
+ bypass:bool,
+}
+pub enum Decision {Pass,Block,Continue(Option<Command>)}
+impl Pause {
+ pub fn fall_active(&self)->bool{self.pending.is_some()||self.outcome.is_some()}
+ pub fn active(&self)->bool{self.pending.is_some()||self.outcome.is_some()||self.paralysis&&!self.waiting}
+ pub fn text(&self)->&'static str {if self.pending.is_some()||self.outcome.is_some(){CONTINUE}else{PARALYZED}}
+ pub fn reset(&mut self){let enabled=self.enabled;*self=Self::default();self.enabled=enabled;}
+ pub fn presented(&mut self){if self.active(){self.presented=true;}}
+ pub fn observe(&mut self,r:Option<&Run>){
+  let paralyzed=r.is_some_and(|r|r.status=="playing"&&r.offers.is_empty()&&corpse_core::engine::condition(&r.player,"paralyzed")>0.);
+  if paralyzed!=self.paralysis {self.paralysis=paralyzed;self.presented=false;if !paralyzed{self.waiting=false;}}
+  if r.is_none(){self.reset();}
+ }
+ pub fn stop_waiting(&mut self){self.waiting=false;self.presented=false;}
+ pub fn defer(&mut self,c:&Command){self.pending=Some(c.clone());self.presented=false;self.waiting=false;}
+ pub fn hold_outcome(&mut self,view:crate::render::View){self.outcome=Some(Rc::new(view));self.presented=false;self.waiting=false;}
+ pub fn take_bypass(&mut self)->bool{std::mem::take(&mut self.bypass)}
+ pub fn release(&mut self,e:&Event){if matches!(e,Event::KeyUp{keycode:Some(Keycode::Space),..}){self.space_down=false;}}
+ pub fn event(&mut self,e:&Event)->Decision{
+  let fresh=matches!(e,Event::KeyDown{keycode:Some(Keycode::Space),repeat:false,..})&&!self.space_down;
+  match e {Event::KeyDown{keycode:Some(Keycode::Space),..}=>self.space_down=true,Event::KeyUp{keycode:Some(Keycode::Space),..}=>self.space_down=false,_=>{}}
+  if self.waiting && matches!(e,Event::KeyDown{repeat:false,..}|Event::MouseButtonDown{..}) {self.stop_waiting();return Decision::Block;}
+  if !self.active(){return Decision::Pass;}
+  if fresh&&self.presented {
+   self.presented=false;
+   if let Some(c)=self.pending.take(){self.bypass=true;return Decision::Continue(Some(c));}
+   if self.outcome.take().is_some(){return Decision::Continue(None);}
+   self.waiting=true;return Decision::Continue(None);
+  }
+  if matches!(e,Event::Quit{..}|Event::Window{..}|Event::RenderTargetsReset{..}|Event::RenderDeviceReset{..}){Decision::Pass}else{Decision::Block}
+ }
+}
+pub fn needs_ack(r:&Run,c:&Command)->bool {
+ if r.status!="playing"||!r.offers.is_empty(){return false;}
+ let Some(f)=r.floor()else{return false;};
+ let tile=|x:f64,y:f64|corpse_core::portals::cell(f,x,y).and_then(|i|f.tiles.get(i));
+ let current=tile(r.player.x,r.player.y).is_some_and(|t|t=="chasm");
+ match c {
+  Command::Move{dx,dy}=>!corpse_core::travel::flying(r,&r.player)&&(
+   tile(r.player.x+dx,r.player.y+dy).is_some_and(|t|t=="chasm")&&
+   corpse_core::vision::visible(r,(r.player.x+dx)as usize,(r.player.y+dy)as usize)
+   ||crate::hazards_ui::intentional(r,c).is_some_and(|s|s.to_ascii_lowercase().contains("chasm"))),
+  Command::Descend=>current,
+  Command::Ability{id,..}=>id=="anavani-ascend"&&current,
+  _=>false,
+ }
+}
+pub fn paint(p:&mut crate::render::Painter,text:&str){p.centered_sheet(|p|{
+ p.rect(280,320,720,110,[12,10,20]);p.border(280,320,720,110,[255,217,53]);
+ if text==PARALYZED {p.text("You are paralyzed.",304,340,20,[255,248,232]);p.text("Press space to wait until un-paralyzed",304,378,18,[255,248,232]);}
+ else {p.text(text,304,359,20,[255,248,232]);}
+});}
+#[cfg(test)]mod tests{
+ use super::*;use sdl2::keyboard::Mod;
+ fn key(k:Keycode,repeat:bool)->Event{Event::KeyDown{timestamp:0,window_id:0,keycode:Some(k),scancode:None,keymod:Mod::NOMOD,repeat}}
+ fn release()->Event{Event::KeyUp{timestamp:0,window_id:0,keycode:Some(Keycode::Space),scancode:None,keymod:Mod::NOMOD,repeat:false}}
+ fn room()->Run{serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap()}
+ #[test]fn queued_held_and_escape_do_not_acknowledge(){let mut p=Pause::default();p.defer(&Command::Descend);assert!(matches!(p.event(&key(Keycode::Space,false)),Decision::Block));p.presented();assert!(matches!(p.event(&key(Keycode::Escape,false)),Decision::Block));assert!(matches!(p.event(&key(Keycode::Space,true)),Decision::Block));p.event(&release());assert!(matches!(p.event(&key(Keycode::Space,false)),Decision::Continue(Some(Command::Descend))));assert!(p.take_bypass());assert!(!p.take_bypass());}
+ #[test]fn paralysis_wait_ends_and_can_stop_for_danger(){let mut r=room();r.player.conditions.insert("paralyzed".into(),3.);let mut p=Pause::default();p.observe(Some(&r));assert_eq!(p.text(),PARALYZED);p.presented();assert!(matches!(p.event(&key(Keycode::Space,false)),Decision::Continue(None)));assert!(p.waiting);p.stop_waiting();assert!(p.active());r.player.conditions.remove("paralyzed");p.observe(Some(&r));assert!(!p.active());assert!(!p.waiting);}
+ #[test]fn chasm_and_ascend_are_preflight_without_mutating_run(){let mut r=room();r.player.x=2.;r.player.y=2.;let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+3]="chasm".into();f.tiles[2*w+2]="chasm".into();f.lights.fill(100.);let before=r.clone();assert!(needs_ack(&r,&Command::Move{dx:1.,dy:0.}));assert!(needs_ack(&r,&Command::Descend));assert!(needs_ack(&r,&Command::Ability{id:"anavani-ascend".into(),target:corpse_core::Field::Missing,x:corpse_core::Field::Missing,y:corpse_core::Field::Missing}));assert_eq!(r,before);}
+ #[test]fn dispatch_queues_before_chasm_changes_and_only_fresh_space_releases(){
+  let mut r=room();r.player.x=2.;r.player.y=2.;let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+3]="chasm".into();f.lights.fill(100.);
+  let mut e=crate::temporal::Engine::new(r).unwrap();let before=e.run.clone();let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+  let out=crate::dispatch(&mut e,&mut fx,0.,&Command::Move{dx:1.,dy:0.}).unwrap();assert!(!out.took_turn);assert_eq!(e.run,before);assert!(fx.gameplay_pause.active());
+  assert!(matches!(fx.gameplay_pause.event(&key(Keycode::Escape,false)),Decision::Block));fx.gameplay_pause.presented();assert!(matches!(fx.gameplay_pause.event(&key(Keycode::Space,false)),Decision::Continue(Some(Command::Move{..}))));
+ }
+ #[test]fn actual_waits_remove_paralysis_and_do_not_continue_afterward(){
+  let mut r=room();r.player.conditions.clear();r.player.conditions.insert("paralyzed".into(),2.);r.player.abilities.clear();r.player.active.clear();r.actors_at_mut(r.depth).clear();
+  let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.environment=corpse_core::Field::Missing;
+  let mut e=crate::temporal::Engine::new(r).unwrap();let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;fx.gameplay_pause.observe(Some(&e.run));fx.gameplay_pause.presented();fx.gameplay_pause.event(&key(Keycode::Space,false));
+  let mut count=0;while fx.gameplay_pause.waiting&&count<10{crate::dispatch(&mut e,&mut fx,count as f64*1000.,&Command::Wait).unwrap();fx.gameplay_pause.observe(Some(&e.run));count+=1;}
+  assert!(count>0&&count<10);assert_eq!(corpse_core::engine::condition(&e.run.player,"paralyzed"),0.);assert!(!fx.gameplay_pause.waiting);
+ }
+
+ #[test]fn paralysis_wait_is_not_rest_until_change(){let mut r=room();r.player.conditions.insert("paralyzed".into(),3.);let mut p=Pause::default();p.observe(Some(&r));p.presented();p.event(&key(Keycode::Space,false));r.player.hp-=1.;r.actors_at_mut(r.depth)[0].state="hunting".into();p.observe(Some(&r));assert!(p.waiting,"damage/new threat alone must not cancel the requested paralysis wait");r.status="dead".into();p.observe(Some(&r));assert!(!p.waiting);}
+
+}

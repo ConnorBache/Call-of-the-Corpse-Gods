@@ -71,7 +71,7 @@ pub fn create_for(r: &mut Run, owner_id: f64, x: f64, y: f64) -> Result<f64, Str
     let charges=p.nightmares.value_or(0.0);
     crate::engine::actor_mut_trusted(r,owner_id).unwrap().nightmares=(charges-1.0).into();
     r.next_id += 1.;
-    crate::animation_player::local(r,&decoy,"P31","summon",crate::events::Stage::Special);
+    crate::animation_shapes::line(r,crate::engine::actor(r,owner_id).unwrap(),(&decoy).into(),"P31","line-grow","#000000");
     r.actors_at_mut(r.depth).push(decoy);
     if let Some(f) = r.floor_mut() { f.dirty = true; }
     Ok(id)

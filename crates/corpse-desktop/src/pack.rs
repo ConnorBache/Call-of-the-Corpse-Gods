@@ -2236,6 +2236,8 @@ mod tests {
     // description/preview helpers. Its weapon fixtures all have zero Offense;
     // literal rounded ranges pin the new numeric copy rather than its formula.
     fn requested_copy_over_frozen_pack_description(old: &str) -> String {
+        // Approved arrow-copy cut retains only its name and quantity.
+        if old.starts_with("Arrows ×") { return old.lines().next().unwrap().to_string(); }
         let equipped = old.contains("Weapon · Main hand")
             || old.contains("Weapon · Offhand") || old.contains("Weapon · Both hands");
         let suffix = if equipped { "" } else { " with current stats" };
@@ -2664,6 +2666,9 @@ mod appearance_tests {
             json!({"ui":{"layout":{"rightSidebarWidth":600,"sidebarWidthPercent":40,"chronicleHeight":260,"inventoryRowHeight":24,"buttonHeight":54,"buttonPadding":16,"borderWidth":4},"colors":{"panel":"#123456","selected":"#654321","button":"#223344"}},"typography":{"inventory":{"fontSize":32,"lineHeight":2},"primary":{"fontSize":22},"tooltips":{"fontSize":22}}}),
         ] {
             p.profile = Profile::from_value(appearance).unwrap();
+            // Each profile starts a fresh pack: prior Home/scroll state must not
+            // offset the first-row click after a large font reflow.
+            view = PackView::observe(&run);
             let frame = modal_ui::Frame::from_profile(&p.profile);
             view.configure(&p, frame.map.tuple());
             let layout = view.layout;

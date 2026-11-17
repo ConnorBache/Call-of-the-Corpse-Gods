@@ -1107,6 +1107,11 @@ pub struct EnvironmentalStateProvenanceEntry {
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct EnvironmentalState {
+    #[serde(rename = "bloodMist", default, skip_serializing_if = "Field::is_missing")]
+    pub blood_mist: Field<Vec<f64>>,
+    #[serde(rename = "bloodMistTurns", default, skip_serializing_if = "Field::is_missing")]
+    pub blood_mist_turns: Field<Vec<f64>>,
+
     #[serde(rename = "gasType", default, skip_serializing_if = "Field::is_missing")]
     pub gas_type: Field<Vec<Option<GasType>>>,
     #[serde(

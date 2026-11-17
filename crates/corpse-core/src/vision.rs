@@ -470,7 +470,9 @@ fn telepathic_for_owner(r: &Run, p: &Actor, target: &Actor, origins: &[&Actor]) 
     if target.dead.value_or(false) {
         return false;
     }
-    (p.id==r.player.id && target.perfect.value_or(false))
+    (r.simulation_revision.value_or(29.)>=52. && p.id==r.player.id && target.hp>0.
+        && crate::borge::is_marked_target(r,target) && crate::dreamwalking::same_plane(r,p,target))
+        || (p.id==r.player.id && target.perfect.value_or(false))
         || origins.iter().any(|o| condition(o, "telepathic") > 0.0)
         || (condition(p, "cameTurns") > 0.0 && condition(p, "cameTarget") == target.id)
         || (has(p, "numo-mind-read")

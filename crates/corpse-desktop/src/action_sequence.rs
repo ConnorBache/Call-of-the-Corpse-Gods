@@ -9,6 +9,7 @@ pub struct Sequence {
     frames: Vec<(u32, Rc<View>)>,
     ends: Vec<(u32, f64)>,
     finish: f64,
+    reveals: Vec<(f64, f64, Rc<View>)>,
 }
 impl Sequence {
     pub fn clear(&mut self) { *self = Self::default(); }
@@ -29,12 +30,40 @@ impl Sequence {
         for action in actions {
             if let Some(index) = frames.iter().rposition(|f| f.action < action) { selected.insert(index); }
         }
+        for cue in cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")) {
+            let action=cue.event.animation.as_ref().unwrap().action;
+            if let Some(index)=frames.iter().position(|f|f.action==action){selected.insert(index);}
+        }}
         for (index, frame) in frames.into_iter().enumerate() {
             if !selected.contains(&index) { continue; }
             if let Some(run) = frame.observation.downcast_ref::<corpse_core::Run>() {
                 self.frames.push((frame.action, Rc::new(observe(run,profile))));
             } else if let Ok(view) = frame.observation.downcast::<View>() {
                 self.frames.push((frame.action,view));
+            }
+        }
+        for cue in cues {
+            if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")) {
+                if let Some((_,after))=self.frames.iter().find(|(id,_)|*id==a.action) {
+                    let base=self.frames.iter().rev().find(|(id,_)|*id<a.action).map(|(_,v)|v).or(self.before.as_ref()).unwrap();
+                    let center=(cue.event.to.x,cue.event.to.y);
+                    let allowed:std::collections::BTreeSet<_>=a.cells.iter().map(|p|(p.x as usize,p.y as usize)).collect();
+                    let distance=|c:&crate::render::Cell|((c.x as f64-center.0).powi(2)+(c.y as f64-center.1).powi(2)).sqrt();
+                    let max=after.cells.iter().filter(|c|allowed.contains(&(c.x,c.y))).map(distance).fold(1f64,f64::max);
+                    for step in 0..=10 {
+                        let radius=max*step as f64/10.;let mut view=(**base).clone();
+                        let updates:std::collections::BTreeMap<_,_>=after.cells.iter().filter(|c|allowed.contains(&(c.x,c.y))&&distance(c)<=radius).map(|c|((c.x,c.y),c.clone())).collect();
+                        view.cells.retain(|c|!updates.contains_key(&(c.x,c.y)));view.cells.extend(updates.into_values());
+                        if a.style.starts_with("wave-reveal") {
+                            let reached=|id:f64|base.cells.iter().chain(after.cells.iter()).any(|c|c.actor_id==Some(id)&&allowed.contains(&(c.x,c.y))&&distance(c)<=radius);
+                            view.creatures.retain(|c|!reached(c.id)||after.creatures.iter().any(|n|n.id==c.id));
+                            for creature in &mut view.creatures {if reached(creature.id){if let Some(new)=after.creatures.iter().find(|c|c.id==creature.id){*creature=new.clone();}}}
+                            if reached(after.player_id){view.hp=after.hp;view.dead=after.dead;view.player_statuses=after.player_statuses.clone();view.player_meters=after.player_meters.clone();}
+
+                        }
+                        self.reveals.push((cue.started+step as f64*65.,cue.started+duration(&cue.event),Rc::new(view)));
+                    }
+                }
             }
         }
         for cue in cues {
@@ -46,13 +75,14 @@ impl Sequence {
             }
         }
     }
-    pub fn shift(&mut self, amount: f64) { self.finish += amount; for (_,end) in &mut self.ends { *end += amount; } }
+    pub fn shift(&mut self, amount: f64) { self.finish += amount; for (start,end,_) in &mut self.reveals {*start+=amount;*end+=amount;} for (_,end) in &mut self.ends { *end += amount; } }
     pub fn active(&self) -> bool { self.before.is_some() }
     pub fn pending(&self, now: f64) -> bool { self.before.is_some() && now < self.finish }
     /// O(F*A), bounded by 128 frames and 4096 receipts, no view clones per paint.
     /// A frame can contain quiet actions too, but never an unfinished action.
     pub fn view(&self, now: f64) -> Option<&View> {
         if !self.pending(now) { return None; }
+        if let Some((_,_,view))=self.reveals.iter().rev().find(|(start,end,_)|now>=*start&&now<*end){return Some(view);}
         self.frames.iter().rev().find(|(id,_)| self.ends.iter().all(|(action,end)| action > id || now >= *end))
             .map(|(_,v)|v.as_ref()).or(self.before.as_deref())
     }
@@ -66,4 +96,39 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
         let player = detached.player.id;
         corpse_core::dreamwalking::with_actor(&mut detached, player, |r| crate::observe::observe_with_profile(r,profile))
     } else { crate::observe::observe_with_profile(run,profile) }
+}
+
+#[cfg(test)]mod wave_tests{
+ use super::*;use corpse_core::events::{AnimationCue,Delivery,EventPoint,PresentationEvent,Stage};
+ #[test]fn revelation_advances_only_through_receipt_cells(){
+  let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let profile=crate::appearance_profile::Profile::defaults();
+  let mut before=observe(&run,profile);before.cells.clear();let mut after=before.clone();
+  for x in [0,5,10] {after.cells.push(crate::render::Cell{x,y:0,glyph:".".into(),label:"revealed".into(),..Default::default()});}
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P72".into(),style:"map-reveal".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.},EventPoint{x:10.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None})};
+  let cue=Cue{event,started:0.,held:false,static_marks:false};let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[cue],profile);
+  assert_eq!(sequence.view(0.).unwrap().cells.len(),1);assert_eq!(sequence.view(400.).unwrap().cells.len(),1);assert_eq!(sequence.view(700.).unwrap().cells.len(),2);assert!(!sequence.view(700.).unwrap().cells.iter().any(|c|c.x==5));assert!(sequence.view(900.).is_none());
+ }
+}
+
+#[cfg(test)] mod damage_wave_tests {
+ use super::*;
+ use corpse_core::events::{AnimationCue,Delivery,EventPoint,PresentationEvent,Stage};
+ #[test] fn damage_status_and_death_wait_for_wave_arrival() {
+  let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+  let profile=crate::appearance_profile::Profile::defaults();
+  let mut before=observe(&run,profile);before.player_id=1.;before.hp=50.;before.dead=false;before.player_statuses.clear();
+  before.creatures=vec![crate::render::Creature { perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,id:2.,name:"Victim".into(),glyph:"v".into(),color:[255,255,255],state:"Hunting".into(),distance:5.,hp:10.,max_hp:10.,energy:0.,max_energy:0.,uses_energy:false,statuses:vec![],meters:vec![] }];
+  before.cells=vec![crate::render::Cell {x:5,y:0,actor_id:Some(2.),glyph:"v".into(),..Default::default()},crate::render::Cell {x:10,y:0,actor_id:Some(1.),glyph:"@".into(),..Default::default()}];
+  let mut after=before.clone();after.creatures.clear();after.cells[0].actor_id=None;after.cells[0].glyph="x".into();after.hp=0.;after.dead=true;after.player_statuses.push(crate::statuses_ui::Status{name:"Stunned".into(),duration:Some(2.)});
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"E18".into(),style:"wave-reveal-purple".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None})};
+  let cue=Cue{event:event.clone(),started:0.,held:false,static_marks:false};let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[cue],profile);
+  let early=sequence.view(324.).unwrap();assert_eq!(early.creatures[0].hp,10.);assert_eq!(early.cells.iter().find(|c|c.x==5).unwrap().glyph,"v");assert_eq!(early.hp,50.);assert!(!early.dead);assert!(early.player_statuses.is_empty());
+  let middle=sequence.view(325.).unwrap();assert!(middle.creatures.is_empty());assert_eq!(middle.cells.iter().find(|c|c.x==5).unwrap().glyph,"x");assert_eq!(middle.hp,50.);assert!(!middle.dead);assert!(middle.player_statuses.is_empty());
+  assert_eq!(sequence.view(649.).unwrap().hp,50.);
+  let hit=sequence.view(650.).unwrap();assert_eq!(hit.hp,0.);assert!(hit.dead);assert_eq!(hit.player_statuses[0].name,"Stunned");
+  // Confirm the renderer's wave actually lights each recipient at these boundaries.
+  assert!(!crate::divine_animation_shapes::tiles(&event,324.,false,[0,0,0]).unwrap().iter().any(|t|t.x==5));
+  assert!(crate::divine_animation_shapes::tiles(&event,325.,false,[0,0,0]).unwrap().iter().any(|t|t.x==5));
+  assert!(crate::divine_animation_shapes::tiles(&event,650.,false,[0,0,0]).unwrap().iter().any(|t|t.x==10));
+ }
 }

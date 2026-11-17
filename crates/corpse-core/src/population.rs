@@ -597,13 +597,13 @@ pub fn validate_encounter_metadata(records: &Field<Vec<crate::EncounterRecord>>)
             return false;
         }
         if let Some(kind) = e.kind.as_ref() {
-            if !["horde", "machine"].contains(&kind.as_str()) {
+            if !["horde", "machine", "verdania-guard"].contains(&kind.as_str()) {
                 return false;
             }
         } else if !e.kind.is_missing() {
             return false;
         }
-        if e.kind.as_ref().is_some_and(|k| k == "horde") {
+        if e.kind.as_ref().is_some_and(|k| k == "horde" || k == "verdania-guard") {
             if e.leader_id.as_ref() != e.actor_ids.first()
                 || e.follower_ids.as_ref().map(|v| v.as_slice()) != Some(&e.actor_ids[1..])
                 || !e.setup_indices.is_empty()

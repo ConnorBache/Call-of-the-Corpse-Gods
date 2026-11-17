@@ -2155,3 +2155,60 @@ observed desktop dispatch versus ~76ms core-only in the same suite run. This
 is one fixture, not a release benchmark, and excludes the 17.7s combined raster
 capture suite. Four new sequence regressions pass within 34 animation tests;
 the transactional-observer rollback/headless regression also passes.
+
+## Persistent divine overlays (November 17, 2026)
+Reverse Entropy projects the union of radius-10 portal-aware player endpoint areas on each world observation, including unknown space by explicit design. It stores only perimeter edges, never hidden terrain or actors. With V floor cells, H origins (at most 2) and K portal nodes, endpoint metric setup is O(H K³), then radius projection O(V H K), O(V+K+E) temporary/output storage (E<=4V). Without portals the radius projection is O(V H). Riptide probes at most V distinct cells using shared direction, portal and passability rules; if each probe costs P(A,K), worst case O(V P(A,K)), O(V) storage. It stops at unknown cells and nondeterministic portal branches, rather than revealing blockers or promising a random destination. Neither projection consumes RNG or mutates simulation. Geometry remains detached during animation playback. Painting is O(E + L*C), where L line segments and C cell pixel span; no per-frame pathfinding. Overlay changes invalidate the map in both redraw modes to erase previous lines. Timing not measured; validate with a portal-dense floor and repeated effect toggles.
+
+### Authored divine presentation geometry (November 17)
+`animation_shapes` builds receipt-only straight lines and bounded area footprints.
+For a line of length L (bounded to the larger current floor dimension), construction
+is O(L) time and O(L) extra memory, plus O(L*V) for existing visibility query cost V.
+An authored radius R is capped at 12: O(R²) candidates/memory plus O(R²*V) admission.
+Called on actual casts/procs, not every render frame. Receipt decoration is O(1).
+No RNG, gameplay position/state, save or replay fields change. Runtime renderer cost
+and presentation checkpoint memory remain separate from geometry construction.
+
+## Authored divine animation patterns (November 17, 2026)
+The desktop renderer consumes only visibility-filtered receipt cells C; no gameplay RNG or simulation time is used. Deterministic nova cellular waves evaluate at most 12 generations of eight-neighbor propagation: O(12 C log C) time and O(C) scratch per cue/frame. Box, line and moving glyph projection are O(C log C) including the admitted-cell set, O(C) space. Event phase scheduling is O(E log E) for E<=4096 cues; each phase and separate travel step finishes before its successor. Input waits for all finite local, projectile, HUD and plane cues, not perpetual ambient motion. Persistent explosion markers are not finite animations. All-Seeing Eyes keeps eleven detached radial snapshots of C view cells: O(11 C log C) setup and O(11 C) additional memory; per-frame view selection is O(11) plus existing bounded action selection. No full runtime benchmark or Windows verification claimed.
+
+### Authored divine presentation routes and flourishes (November 17, 2026)
+Death Swift, Erase Metaphysical, Witch Hatred, Mini-Me, Clay Army and See the Future emit bounded area receipts through `animation_shapes` on successful effects only. Radius is 2 for small effects, 6 for Future (helper caps all radii at 12). Each area costs O(r²·V) time and O(r²) scratch, where V is the existing visibility-query cost; no gameplay RNG or saved fields are added. Fortune casts and Sparkle emit O(L·V) observed-cell route receipts (L bounded by floor dimensions); Cogworks uses the existing 7,200-step-capped straight-cell helper before normal visibility filtering. Commandment emits two endpoints per actual displacement step and thus adds O(P·V) receipt work for P already-resolved pushes, bounded by floor tile count. All-Seeing Eyes emits an O(T·V) floor reveal receipt with O(T) temporary points at paid activation, not per frame; renderer must remain player-knowledge-aware. These are asymptotic estimates, not measured frame costs.
+
+## Blood Mist (November 17, 2026)
+Overflowing emits an inert gas on each spent-blood rescue. A dose is provisionally
+100 volume; repeated doses add volume and refresh mixed mist to five environment
+updates. Emission checks at most nine cells (O(1)), then existing first-use
+environment hydration can cost O(N) time/memory for N floor cells. It preserves
+pre-existing gas at the origin and uses adjacent empty/mist cells if necessary.
+The normal gas diffusion pass carries remaining lifetime through its contributor
+lists: O(N) time and O(N) extra memory per pass on the fixed eight-neighbor grid.
+Expiration is O(N) time, O(1) extra space once per world update, independent of
+actor haste and presentation time. Optional serialized channel/lifetime arrays
+preserve absent fields on older saves. Rewind uses ordinary serialized state;
+the experimental four-column gas capture pilot explicitly reports mist duration
+unsupported rather than claiming complete coverage. No measured performance
+claim. Test with blood_mist focused tests and environment regressions.
+
+## Requested enemy spells and wave presentation (2026-11-17)
+- Dryad healing eligibility adds the existing bounded projectile admission query per candidate (A actors; at most 256 branch traces on portal floors), then one committed route for the chosen spell. Scratch and worst-case follow `projectiles::possible_shot_range`; it is not a constant-cost LOS check. Ordinary LOS/range/allegiance remain required. Committed portal forks may miss the selected recipient; they never heal a blocked target.
+- Scream presentation scans F floor cells and applies portal distance/LOS predicates where the underlying spell requires them: O(F*(distance+LOS)), O(F) detached admitted cell receipts. No animation RNG or serialized world-time dependencies. Banshee current R52 targeting additionally scans A living endpoints, then existing damage hooks per victim; old revisions retain player-only targeting. Banshee has no artificial new range cap.
+- Borge mark telepathy checks F floor records (bounded authored route) per target query; no cache, RNG or changes to generic telepathy immunity. Only the active, unrewarded exact mark grants this sense, in the player's plane.
+- Desktop radial wave snapshots are presentation-only; core mutations commit atomically and the renderer exposes each affected location at wave arrival. Tests distinguish core outcome validation from platform/runtime animation validation.
+
+### Guarded Verdania tap (November 17)
+At new R52 Verdania population, a single 8-neighbor BFS ranks dry tap sites by shortest path distance from the up stair. V is map cells, C eligible +2-layer roster packs, M<=5 pack size, K unique species. One initial-fuel exclusion scan per K species is cached; planning is O(K*V + V log V + V*C*M) assuming the existing fuel helper is linear, extra O(K*V + C + V). Every legal walking/swimming neighbor of a selected tap must be a safe dry spawn cell and is occupied by exactly one member of one existing pack (no pack multiplication). This immediate approach cut handles alternate paths without per-candidate graph searches. Impossible geometry fails explicitly and uses the existing eight complete-floor retry bound. No per-turn cost, no measured performance claim.
+
+### Desktop continuation pauses (November 17)
+Health/continuation input admission is O(1). Intentional fall preflight uses existing
+hazard/visibility queries (no RNG); forced-fall presentation retains one O(View)
+pre-action observed scene. Outgoing cues are filtered O(E) per paint while held,
+E bounded by the receipt cap. Paralysis waiting dispatches at most one normal Wait
+per loop/display animation boundary, with O(1) status/choice checks;
+never an unbounded synchronous simulation loop. Required pauses or player input stop
+waiting. Pauses, queued intent and waiting are ephemeral, not saved or replayed.
+
+## Targeted control amulet travel (2026-11-17)
+Per committed R52 control cast, one shared physical ray trace (L traversed cells, A actors, P portal/link-query cost) costs O(ray-plan + L*(A+P)), O(L) detached receipt scratch. It is bounded by the ray engine's existing traversal/cycle limits and consumes no extra visual RNG. Cast snapshots/visibility filtering retain existing event costs. Per aiming preview, reuse of knowledge-filtered Iceblast geometry costs its existing O(observation + floor clone + ray-plan + V*A*P), O(F+V+A+P) scratch; no additional nested aiming recursion occurs beyond one control-to-geometric-item call. Obstruction footprint admission remains existing three-cell checks. No performance timings measured.
+
+## Bestiary fixed-species correction (2026-11-17)
+Bestiary R52 reference-depth lookup now uses canonical species keys, including the nest-only Queen, at unchanged O(R*L) fixed-catalog scan cost. Fungus rows call the authoritative O(1) revisioned fungus template factory rather than reconstructing obsolete depth-scaled templates. No extra cache, simulation access, or renderer work. Tests assert current fixed stats and legacy historical ranges independently.

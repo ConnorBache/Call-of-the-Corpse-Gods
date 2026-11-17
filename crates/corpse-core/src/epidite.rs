@@ -55,6 +55,7 @@ pub fn world_turn(r: &mut Run) -> Result<(), EngineError> {
     r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().epidite_age = (age as f64).into();
     if age != 0 { return Ok(()); }
     let source = Actor { id:-1., x:e.x, y:e.y, name:"Epidite".into(), ..Default::default() };
+    let wave_action=crate::events::current_action();
     let exposed: std::collections::HashSet<u64> = r.ground.get(&r.depth.to_string()).into_iter().flat_map(|g|g.iter())
         .filter(|g|g.item.kind == "heart" && !g.item.blessed.value_or(false) && sees(r,&source,g.x,g.y))
         .map(|g|g.item.id.to_bits()).collect();
@@ -74,7 +75,9 @@ pub fn world_turn(r: &mut Run) -> Result<(), EngineError> {
             let (x,y)=((i%w)as f64,(i/w)as f64);
             sees(r,&source,x,y).then_some(crate::events::EventPoint{x,y})
         }).collect();
-        crate::events::at(r,"E77","wave-gold",crate::events::Stage::Special,&cells);
+        let serial=crate::events::emission_serial();
+        crate::events::at(r,"E77","wave-reveal-yellow",crate::events::Stage::Special,&cells);
+        crate::events::decorate(serial,"E77","wave-reveal-yellow",(&source).into(),"#ffff40",None);
     } else { crate::events::emit(r, crate::events::PresentationEvent {
         kind:"burst".into(), from:Some(crate::events::EventPoint{x:e.x,y:e.y}),
         to:crate::events::EventPoint{x:e.x,y:e.y}, glyph:Some("✧".into()),
@@ -86,5 +89,6 @@ pub fn world_turn(r: &mut Run) -> Result<(), EngineError> {
             engine::damage_environment(r,id,DAMAGE,None,"epidite",true)?;
         }
     }
+    crate::events::checkpoint_for_action(r,wave_action);
     Ok(())
 }

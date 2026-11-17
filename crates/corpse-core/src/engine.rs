@@ -1210,7 +1210,7 @@ fn move_actor_step(
         && crate::dreamwalking::same_plane(r,&r.player,&a)
         && crate::revision50_ability_energy::spend(r, r.player.id, "isheilah-make-slippery", 8.0)
     {
-        crate::animation_player::local(r,&a,"P15","skid",crate::events::Stage::Special);
+        crate::animation_shapes::area(r,&a,"P15","box-contract",2,"#a040ff",crate::events::Stage::Special);
         return Ok(false);
     }
     let f = r.floor().unwrap();
@@ -2947,7 +2947,7 @@ fn attack_base_with_accuracy(
                 owner.active.retain(|id| id != &removed);
             }
             crate::half_here::sync(r);
-            crate::animation_player::local(r,&current_b,"P51","dissolve",crate::events::Stage::Special);
+            crate::animation_shapes::nova(r,&current_b,"P51","nova-black-small",2);
             if defender_owner == r.player.id && removed == "etill-phase-through" {
                 crate::divine_environment::settle_phase_loss(r, true).map_err(EngineError)?;
             }
@@ -3561,14 +3561,16 @@ fn damage_environment_core(
     {
         log(
             r,
-            format!(
+            if kind=="caustic" && victim==r.player.id && source_snapshot.as_ref().is_some_and(|a|crate::revision52_enemy_followups::species(a,"blorb")) {
+                format!("You take {n:.0} damage from the Blorb's caustic slime.")
+            } else {format!(
                 "{cause} deals {n} damage to {}.",
                 if victim == r.player.id {
                     "you"
                 } else {
                     crate::actor_presentation::name(r, &a)
                 }
-            ),
+            )},
             if source == Some(r.player.id) {
                 "player"
             } else if source.is_some() {
@@ -4514,7 +4516,7 @@ fn after_damage_with_source(
         } else {
             owner.conditions.insert("hastedFresh".into(), 1.0);
         }
-        crate::animation_player::local(r,&s,"P52","speed",crate::events::Stage::Death);
+        crate::animation_shapes::nova(r,&s,"P52","nova-green-small",2);
     }
     if a.hp > 0.0
         && (float_away_eligible || r.simulation_revision.value_or(29.) < 52.)

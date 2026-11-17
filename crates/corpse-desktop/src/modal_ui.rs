@@ -269,18 +269,18 @@ mod tests {
     fn default_geometry_and_changed_css_baselines_are_preserved() {
         let p = Profile::default();
         let frame = Frame::from_profile(&p);
-        assert_eq!(frame.map, Rect(0, 119, 985, 603));
+        assert_eq!(frame.map, Rect(0, 119, 733, 598));
         let pack = PackLayout::resolve(&p, frame.map);
-        assert_eq!(pack.bounds, Rect(213, 210, 760, 500));
-        assert_eq!(pack.list, Rect(225, 328, 402, 370));
-        assert_eq!(pack.detail, Rect(639, 328, 322, 370));
+        assert_eq!(pack.bounds, Rect(12, 205, 709, 500));
+        assert_eq!(pack.list, Rect(24, 323, 374, 370));
+        assert_eq!(pack.detail, Rect(410, 323, 299, 370));
         assert_eq!(pack.button_height, 32);
         assert_eq!(pack.button_padding, 8);
         assert_eq!(inspection_bounds(&p), Rect(24, 138, 520, 572));
         let p = p.set("ui.layout.buttonHeight", json!(54)).unwrap();
         let frame = Frame::from_profile(&p);
         assert_eq!(frame.command, 58);
-        assert_eq!(frame.map.1 + frame.map.3, 710);
+        assert_eq!(frame.map.1 + frame.map.3, crate::render::toolbar_y(&p)-inspection_strip_height(&p));
         assert_eq!(PackLayout::resolve(&p, frame.map).button_height, 54);
     }
     #[test]

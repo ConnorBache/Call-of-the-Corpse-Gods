@@ -111,10 +111,21 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
             "A banshee's shriek pierces through the dungeon!",
             "enemy",
         );
-        let a = actor(r, id).unwrap();
-        crate::events::audible_banshee(r,a);
-        if crate::vision::line_of_sight(r, a, &r.player) {
-            crate::engine::damage_environment(r, r.player.id, crate::balance52::local_amount(r, a, "monsterSpecialDamage", 100.), Some(id), "banshee", true)
+        let a = actor(r, id).unwrap().clone();
+        if crate::events::enabled(r) {
+            crate::animation_enemy::wave(r,&a,"E11",false,None,true,true);
+        let wave_action=crate::events::current_action();
+            let mut victims:Vec<_>=std::iter::once(&r.player).chain(r.actors_at(r.depth))
+                .filter(|b|b.id!=id&&!b.dead.value_or(false)&&b.hp>0.
+                    &&crate::dreamwalking::same_plane(r,&a,b)&&crate::vision::line_of_sight(r,&a,b))
+                .map(|b|(b.id,(b.x-a.x).hypot(b.y-a.y))).collect();
+            // Match the presentation's geometric outward radius, stable actor-ID ties.
+            victims.sort_by(|(ia,da),(ib,db)|da.total_cmp(db).then_with(||ia.total_cmp(ib)));
+            let damage=crate::balance52::local_amount(r,&a,"monsterSpecialDamage",100.);
+            for (victim,_) in victims {crate::engine::damage_environment(r,victim,damage,Some(id),"banshee",true).map_err(|e|e.to_string())?;}
+            crate::events::checkpoint_for_action(r,wave_action);
+        } else if crate::vision::line_of_sight(r, &a, &r.player) {
+            crate::engine::damage_environment(r, r.player.id, crate::balance52::local_amount(r, &a, "monsterSpecialDamage", 100.), Some(id), "banshee", true)
                 .map_err(|e| e.to_string())?;
         }
     }
@@ -125,7 +136,8 @@ pub fn ursa_death_cry(r: &mut Run, id: f64, origin: crate::movement::Point) {
     if !a.dead.value_or(false) || !has_ursa_death_cry(a) {
         return;
     }
-    crate::animation_enemy::mark(r, a, "E19", "sound-pale", crate::events::Stage::Special);
+    let wave_action=crate::events::current_action();
+    crate::animation_enemy::wave(r,a,"E19",true,None,false,false);
     let partner = a.conditions.get("monsterUrsaPartnerId").copied();
     let major = r
         .actors_at(r.depth)
@@ -149,6 +161,7 @@ pub fn ursa_death_cry(r: &mut Run, id: f64, origin: crate::movement::Point) {
         crate::travel::clear_floor_chase(a);
         let a=a.clone(); crate::animation_enemy::mark(r, &a, "E20", "eye", crate::events::Stage::Special);
     }
+    crate::events::checkpoint_for_action(r,wave_action);
 }
 /// Ordinary enemy branch of combat.syncHealth; linked and copied player bodies
 /// remain explicit scheduler gates, rather than being treated as enemies.

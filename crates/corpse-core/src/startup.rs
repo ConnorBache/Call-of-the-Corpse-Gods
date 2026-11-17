@@ -134,6 +134,8 @@ fn spawn_floor_inner(r: &mut Run, depth: u32) -> Result<(), String> {
     )?;
     refresh_razorleaves(&mut f, &actors);
     let machines = p::plan_machine_spawns_revision(&f, &p::blocked_cells(&f), r.simulation_revision.value_or(29.0))?;
+    crate::verdania_guard::place(r, &mut f, &mut actors, &machines.reserved_cells)?;
+    refresh_razorleaves(&mut f, &actors);
     let mut preview = f.clone();
     let mut preview_id = 0.0;
     let mut machine_rng = p::population_random(&format!("{seed}:floor:{depth}:machine-enemies"));
@@ -393,6 +395,7 @@ fn spawn_floor_inner(r: &mut Run, depth: u32) -> Result<(), String> {
     if r.simulation_revision.value_or(29.0) >= 38.0 {
         validate_complete_floor_transitions(&f)?;
     }
+    if !reference_floor { crate::verdania_guard::validate(&f,&actors)?; }
     f.dirty = false;
     f.last_tick = 0.0;
     r.floors[fi] = Arc::new(f);
@@ -576,6 +579,7 @@ fn retryable_generation_error(error: &str) -> bool {
     error.starts_with("Structural generation quality exhausted:")
         || error.starts_with("Required generated item invalid/occupied on floor")
         || error.starts_with("Isolated island")
+        || error == "No guarded Verdania tap location"
         || [
             "Generated floor has no safe route between transitions",
             "No legal space for generated loot",
@@ -944,4 +948,34 @@ fn export_rejected_swimming_candidate() {
     ensure_floors(&mut r,40).expect("Diagnostic generation failed; rejected final candidates were exported");
     assert_eq!(r.floors.len(),40);
     eprintln!("DIAGNOSTIC_GENERATION_ACCEPTED seed={} floors={}",r.seed,r.floors.len());
+}
+
+#[cfg(test)]
+mod verdania_production_tests {
+    use super::*;
+    #[test]
+    fn populated_guard_sweep_all_biomes_and_depths() {
+        let mut retries=0;
+        for domain in ["Dungeon","Cave","Meadow","Forest","Archipelago","Mountain"] {
+            for depth in [5u32,25,35,37] {
+                let mut r=new_run_shell_revision(&format!("0-1-2:guard-sweep-{domain}-{depth}"),"Avatar",false,52.).unwrap();
+                r.fast_mode=true.into();r.compressed_depths=true.into();r.depth=depth as f64;
+                ensure_floors_attempts(&mut r,depth,COMPLETE_FLOOR_ATTEMPT_LIMIT,&|d,seed,up,attempt|{
+                    let mut f=crate::generation::generate_floor_revision(d,seed.wrapping_add(attempt*1031),domain,false,79,up,52.)?;
+                    let at=f.tiles.iter().position(|t|t=="floor").unwrap();
+                    f.godbeast=true;
+                    f.godbeast_event=crate::GodbeastEvent{kind:"Veridian".into(),display_name:"Verdania".to_string().into(),x:(at%f.width()) as f64,y:(at/f.width()) as f64,..Default::default()}.into();
+                    Ok(f)
+                }).unwrap_or_else(|e|panic!("{domain} {depth}: {e}"));
+                let f=r.floors.last().unwrap();
+                crate::verdania_guard::validate(f,r.actors_at(depth as f64)).unwrap();
+                let attempt=f.generation.as_ref().unwrap().stages.iter().find(|s|s.id=="cleanup").unwrap().details.as_ref().unwrap()["populationAttempt"];
+                retries+=attempt as usize;
+                eprintln!("VERDANIA_PRODUCTION domain={domain} depth={depth} accepted_attempt={attempt}");
+                assert_eq!(r.ground[&depth.to_string()].iter().filter(|g|g.item.effect.as_ref().map(String::as_str)==Some("tree-tap")).count(),1);
+                assert!(crate::population::validate_encounter_metadata(&f.encounters));
+            }
+        }
+        eprintln!("VERDANIA_PRODUCTION 24 populated cases; total retries={retries}");
+    }
 }

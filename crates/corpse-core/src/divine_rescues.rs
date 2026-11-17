@@ -35,7 +35,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
                     if cost == 0.0 { 1.0 } else { cost * 2.0 },
                 );
                 half_here::sync(r);
-                crate::animation_player::local(r, engine::actor(r,id).unwrap(), "P01", "collapse-snap", crate::events::Stage::Health);
+                crate::animation_shapes::nova(r, engine::actor(r,id).unwrap(), "P01", "nova-red-small", 2);
                 return true;
             }
             engine::actor_mut_trusted(r, id)
@@ -47,6 +47,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
             let a = engine::actor_mut_trusted(r, id).unwrap();
             a.blood = (a.blood.value_or(0.0) - 1.0).into();
             a.hp = 1.0;
+            crate::blood_mist::emit(r, id);
             half_here::sync(r);
             crate::animation_player::local(r, engine::actor(r,id).unwrap(), "P37", "droplet-empty", crate::events::Stage::Health);
             return true;
@@ -60,7 +61,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
             a.conditions.insert("pelianUsed".into(), 1.0);
             a.active.retain(|s| s != &ability);
             half_here::sync(r);
-            crate::animation_player::local(r, engine::actor(r,id).unwrap(), "P07", "fold-reopen", crate::events::Stage::Health);
+            crate::animation_shapes::nova(r, engine::actor(r,id).unwrap(), "P07", "nova-blue-small", 2);
             return true;
         }
     }

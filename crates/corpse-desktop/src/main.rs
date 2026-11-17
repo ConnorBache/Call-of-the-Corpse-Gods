@@ -1,3 +1,4 @@
+mod gameplay_pause;
 mod health_warning;
 mod death_pause;
 mod gpu_render;
@@ -24,6 +25,7 @@ mod creature_abilities_ui;
 mod creature_presentation;
 mod hallucination_ui;
 mod effects;
+mod divine_animation_shapes;
 mod staged_firebolt;
 mod action_sequence;
 mod action_marks;
@@ -46,6 +48,7 @@ mod menu_visit;
 mod modal_ui;
 mod observe;
 mod perception_ui;
+mod persistent_ability_overlays;
 mod pack;
 mod portal_ui;
 mod non_euclidean_ui;
@@ -564,6 +567,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     video.text_input().start();
     let start = Instant::now();
     let mut effects = effects::Effects::default();
+    effects.gameplay_pause.enabled=true;
     let mut screen = if args
         .iter()
         .any(|s| s == "--manual" || s == "--manual-entry")
@@ -700,12 +704,32 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
         #[cfg(test)] input_loop_tests::inject(&sdl,&mut canvas,&painter)?;
         for mut event in events.poll_iter() {
+            effects.gameplay_pause.release(&event);health_warning.release(&event);
             // Never expose final-state inspection or admit another turn while a
             // detached action sequence is still being presented. Window/quit
             // events remain responsive; held/queued gameplay input is discarded.
             if screen == Screen::Game && effects.presentation_pending(start.elapsed().as_millis() as f64)
                 && !matches!(event, Event::Quit { .. } | Event::Window { .. }) { continue; }
             if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+            effects.gameplay_pause.observe(run.as_ref().filter(|_|screen==Screen::Game).map(|r|&r.run));
+            if health_warning.active()&&!effects.gameplay_pause.fall_active() {
+                effects.gameplay_pause.stop_waiting();
+                match health_warning.event(&event){
+                    health_warning::Decision::Dismiss=>{dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;continue;},
+                    health_warning::Decision::Block=>continue,
+                    health_warning::Decision::Pass=>{},
+                }
+            }
+            match effects.gameplay_pause.event(&event) {
+                gameplay_pause::Decision::Continue(command)=>{
+                    if let (Some(command),Some(r))=(command,run.as_mut()) {
+                        notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&command){Ok(_)=>String::new(),Err(e)=>e.to_string()};
+                    }
+                    dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;continue;
+                },
+                gameplay_pause::Decision::Block=>continue,
+                gameplay_pause::Decision::Pass=>{},
+            }
             let dead=screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead");
             match death_pause.event(dead,&event) {
                 death_pause::Decision::Advance=>{summary=run.as_ref().map(|r|corpse_core::profile::summarize_run(&r.run));summary_scroll=0;screen=Screen::Summary;dirty=true;continue;},
@@ -1597,7 +1621,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         {
                             condition_meters.reset();
                         }
-                        if let Some(message) = hazards_ui::intentional(&r.run, &c) {
+                        if let Some(message) = hazards_ui::intentional(&r.run, &c).filter(|_|!gameplay_pause::needs_ack(&r.run,&c)) {
                             hazard_prompt = Some((c, message));
                             continue;
                         }
@@ -2567,16 +2591,17 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             else if shutter.animating(now,reduced){cosmetic_dirty=true;}
         }
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
-        if screen==Screen::Game&&(health_warning.active()||run.as_ref().is_some_and(|r|r.run.status=="dead")) {
+        effects.gameplay_pause.observe(run.as_ref().filter(|_|screen==Screen::Game).map(|r|&r.run));
+        if screen==Screen::Game&&(effects.gameplay_pause.active()||effects.gameplay_pause.waiting||health_warning.active()||run.as_ref().is_some_and(|r|r.run.status=="dead")) {
             travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;
             inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;
         }
-        if !effects.presentation_pending(now) && !help.active() && screen == Screen::Game && travel.as_ref().is_some_and(|(_, next)| now >= *next) {
+        if !effects.presentation_pending(now) && !effects.gameplay_pause.active() && !effects.gameplay_pause.waiting && !help.active() && screen == Screen::Game && travel.as_ref().is_some_and(|(_, next)| now >= *next) {
             if let (Some((mut walk, _)), Some(r)) = (travel.take(), run.as_mut()) {
                 let quiet = walk.exploring();
                 match walk.next_command(&r.run) {
                     Ok(Some(command)) => {
-                        if let Some(message) = hazards_ui::intentional(&r.run, &command) {
+                        if let Some(message) = hazards_ui::intentional(&r.run, &command).filter(|_|!gameplay_pause::needs_ack(&r.run,&command)) {
                             hazard_prompt = Some((command, message));
                         } else {
                             match dispatch(r, &mut effects, now, &command) {
@@ -2596,7 +2621,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
         }
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
-        if !effects.presentation_pending(now) && !help.active() && screen == Screen::Game && !health_warning.active() && resting.as_ref().is_some_and(|rest| now >= rest.next) {
+        if !effects.presentation_pending(now) && !effects.gameplay_pause.active() && !effects.gameplay_pause.waiting && !help.active() && screen == Screen::Game && !health_warning.active() && resting.as_ref().is_some_and(|rest| now >= rest.next) {
             if let Some(r) = run.as_mut() {
                 let before = resting.take().unwrap();
                 if r.run.status == "playing" && r.run.offers.is_empty() {
@@ -2618,6 +2643,20 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 dirty = true;
             }
         }
+
+        // One normal Wait per displayed animation boundary, never a tight simulation loop.
+        if screen==Screen::Game && effects.gameplay_pause.waiting && !effects.presentation_pending(now) && !health_warning.active() {
+            if let Some(r)=run.as_mut() {
+                if r.run.status=="playing" && r.run.offers.is_empty() && corpse_core::engine::condition(&r.run.player,"paralyzed")>0. {
+                    match dispatch(r,&mut effects,now,&Command::Wait) {
+                        Ok(_)=>{if r.run.status!="playing"||!r.run.offers.is_empty(){effects.gameplay_pause.stop_waiting();}},
+                        Err(e)=>{notice=e.to_string();effects.gameplay_pause.stop_waiting();},
+                    }
+                }else{effects.gameplay_pause.stop_waiting();}
+                effects.gameplay_pause.observe(Some(&r.run));dirty=true;
+            }
+        }
+        if health_warning.active(){effects.gameplay_pause.stop_waiting();}
 
         if let Some(r) = run.as_ref() {
             if let Err(e) = autosave.flush_tracked(std::path::Path::new(&save_path), r, session_kind, false)
@@ -2715,13 +2754,16 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 Screen::Scores => profiles.paint(&mut painter),
                 Screen::Settings => { if let Some(form) = display_form.as_ref() { form.draw(&mut painter); } },
                 Screen::Game => {
-                    if let Some(staged) = effects.sequence.view(now) {
+                    if let Some(staged) = effects.gameplay_pause.outcome.as_deref().or_else(||effects.sequence.view(now)) {
                         // Paint only the historical observation, including HUD
                         // and visibility. Final-state tooltips/modals cannot leak.
                         painter.tile_clip_enabled = false;
                         painter.firebolt_terrain = None;
                         painter.game_at(staged, "", false, if reduced { 0. } else { now });
-                        painter.effects(staged, &effects.cues, now, action_reduced);
+                        if effects.gameplay_pause.outcome.is_some(){
+                            let outgoing:Vec<_>=effects.cues.iter().filter(|c|c.event.depth==staged.depth).cloned().collect();
+                            painter.effects(staged,&outgoing,now,action_reduced);
+                        }else{painter.effects(staged,&effects.cues,now,action_reduced);}
                         tile_plan.invalidate(); tile_overlays.invalidate();
                         force_texture_upload = true;
                     } else if let Some(r) = &run {
@@ -2930,7 +2972,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 }
             }
             help.paint(&mut painter);
-            if screen==Screen::Game && !effects.sequence.pending(now){if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
+            if screen==Screen::Game && !effects.sequence.pending(now) && !effects.gameplay_pause.fall_active(){if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
+            if screen==Screen::Game && !effects.presentation_pending(now) && effects.gameplay_pause.active() && (!health_warning.active()||effects.gameplay_pause.fall_active()){painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,effects.gameplay_pause.text());}
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
             if let Some(frame)=painter.gpu.as_ref(){
                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
@@ -2939,7 +2982,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 }
                 canvas.present();
             }else{
-            let upload=tile_overlay::upload_plan(&painter,!tile_frame||force_texture_upload||health_warning.active());
+            let upload=tile_overlay::upload_plan(&painter,!tile_frame||force_texture_upload||health_warning.active()||effects.gameplay_pause.active());
             let full_upload=upload.full;
             let upload_rects=&upload.rectangles;
             {let _upload_timing=corpse_core::timing::span("desktop.texture.upload");
@@ -2950,8 +2993,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             if full_upload||!upload_rects.is_empty()||force_present{let _present_timing=corpse_core::timing::span("desktop.texture.present");canvas.clear();canvas.copy(&texture,None,None)?;canvas.present();}
             }
-            if !effects.presentation_pending(now) { health_warning.presented(); }
-            death_pause.presented(!effects.sequence.pending(now)&&screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead"));
+            if !effects.presentation_pending(now) { if effects.gameplay_pause.active()&&(!health_warning.active()||effects.gameplay_pause.fall_active()){effects.gameplay_pause.presented();}else{health_warning.presented();} }
+            death_pause.presented(!effects.gameplay_pause.active()&&!effects.sequence.pending(now)&&screen==Screen::Game&&run.as_ref().is_some_and(|r|r.run.status=="dead"));
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
             dirty = false;
             cosmetic_dirty = false;
@@ -3186,6 +3229,11 @@ fn dispatch(
     command: &Command,
 ) -> Result<corpse_core::engine::DispatchOutcome, corpse_core::engine::EngineError> {
     if engine.run.status=="dead" {return Err(corpse_core::engine::EngineError("Run has ended.".into()));}
+    let acknowledged=effects.gameplay_pause.take_bypass();
+    if effects.gameplay_pause.enabled && !acknowledged && gameplay_pause::needs_ack(&engine.run,command) {
+        effects.gameplay_pause.defer(command);return Ok(Default::default());
+    }
+
     let before_plane=corpse_core::dreamwalking::active(&engine.run);
     let before_depth=engine.run.depth;
     let can_change_plane=before_plane||matches!(command,Command::Ability{id,..}if id=="anavani-ascend")||matches!(command,Command::Use{id}if engine.run.inventory.iter().any(|i|i.id==*id&&corpse_core::phantasmii_generation::is_dagger(i)))||matches!(command,Command::Ability{id,..}if id==corpse_core::dreamwalking::DREAMWALK_ID||id==corpse_core::dreamwalking::WAKE_UP_ID);
@@ -3207,6 +3255,10 @@ fn dispatch(
         now,
         rewind,
     );
+    if effects.gameplay_pause.enabled && !acknowledged && engine.run.depth>before_depth
+        && !matches!(command,Command::Descend) {
+        effects.gameplay_pause.hold_outcome(action_sequence::observe(&sequence_before,&profile));
+    }
     effects.sequence.capture_run(sequence_before, frames, &effects.cues, &profile);
     if let Some(before)=before_travel {effects.firebolt_terrain.capture(before,&effects.cues);}
     effects.defer_until_frame(now);
@@ -3973,3 +4025,5 @@ mod revision52_floods_ui_tests;
   assert_eq!(serde_json::to_value(corpse_core::profile::summarize_run(&engine.run)).unwrap(),serde_json::to_value(corpse_core::profile::summarize_run(&before)).unwrap());
  }
 }
+
+#[cfg(test)] mod animation_video_capture;

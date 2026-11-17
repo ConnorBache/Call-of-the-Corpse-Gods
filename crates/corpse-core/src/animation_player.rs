@@ -101,23 +101,27 @@ impl Snapshot {
       if let Some(target)=a.conditions.get("riptideTarget").and_then(|&id|engine::actor(r,id)){local(r,target,p,"root",Stage::Special);}
       if a.conditions.contains_key("riptideTarget"){events::at(r,p,"bracket",Stage::Special,&[EventPoint{x:engine::condition(a,"riptideX"),y:engine::condition(a,"riptideY")}]);}
       if !a.conditions.contains_key("riptideTarget"){local(r,a,p,style,Stage::Special);}
+     } else if id=="isheilah-make-slippery" && on {
+      if let Some(target)=a.conditions.get("slipperyTarget").and_then(|&id|engine::actor(r,id)) {
+       crate::animation_shapes::area(r,target,p,"box-contract",2,"#a040ff",Stage::Special);
+      } else {local(r,a,p,style,Stage::Special);}
      } else if id=="dawel-unspeak" && on {
       if let Some(target)=a.conditions.get("unspeakTarget").and_then(|&id|engine::actor(r,id)) {local(r,target,p,"sound-barred",Stage::Special);}else{local(r,a,p,style,Stage::Special);}
      } else if id=="morae-bonded-by-unseen-threads" && on {
       if let Some(target)=a.conditions.get("bondedTarget").and_then(|&id|engine::actor(r,id)).filter(|b|visible(r,b)) {
-       events::link(r,a,target,p,"stitch-bond",Stage::Special);
+       crate::animation_shapes::line(r,a,target.into(),p,"line-hold","#b050e8");
       } else {local(r,a,p,style,Stage::Special);}
      } else {local(r,a,p,style,Stage::Special);}
     }
    }
    if !active(before,"pelian-fated-duel") && active(a,"pelian-fated-duel") {
     let (x,y)=(engine::condition(a,"r50DuelX"),engine::condition(a,"r50DuelY"));
-    let cells:Vec<_>=(-2i32..=2).flat_map(|dy|(-2i32..=2).filter(move |dx|dx.abs()==2||dy.abs()==2).map(move |dx|EventPoint{x:x+dx as f64,y:y+dy as f64})).collect();
-    events::cue(r,a,"P09","bracket",Stage::Special,&cells);
+    let mut center=a.clone();center.x=x;center.y=y;
+    crate::animation_shapes::area(r,&center,"P09","box-expand",2,"#ffd340",Stage::Special);
    }
-   for (key,p,style) in [("cameTarget","P08","bracket"),("bloodWeaponReady","P41","droplet"),("lucky","P67","stitch-bright"),("unlucky","P67","stitch-inverted"),("distracted","P20","bracket")] {
+   for (key,p,style) in [("cameTarget","P08","bracket"),("bloodWeaponReady","P41","droplet"),("distracted","P20","bracket")] {
     if engine::condition(a,key)>0. && before.conditions.get(key)!=a.conditions.get(key) {
-     if key=="cameTarget" {if let Some(target)=engine::actor(r,engine::condition(a,key)) {local(r,target,p,style,Stage::Special);}}
+     if key=="cameTarget" {if let Some(target)=engine::actor(r,engine::condition(a,key)) {crate::animation_shapes::line(r,a,target.into(),p,"line-grow","#ffd340");}}
      else {local(r,a,p,style,Stage::Special);}
     }
    }
@@ -219,9 +223,9 @@ pub fn shadow_active(r:&Run,a:&Actor)->bool {
   let snap=Snapshot::capture(&r).unwrap();r.player.hp-=20.;events::begin();snap.finish(&r);assert_eq!(styles(),vec!["shield-harden"]);
   let snap=Snapshot::capture(&r).unwrap();r.player.hp+=20.;events::begin();snap.finish(&r);assert_eq!(styles(),vec!["shield-soften"]);
  }
- #[test] fn fortune_knots_distinguish_bright_and_inverted_and_stay_quiet(){
-  for (key,style) in [("lucky","stitch-bright"),("unlucky","stitch-inverted")] {
-   let mut r=room();let snap=Snapshot::capture(&r).unwrap();r.player.conditions.insert(key.into(),1.);events::begin();snap.finish(&r);assert_eq!(styles(),vec![style]);
+ #[test] fn fortune_snapshot_does_not_duplicate_explicit_cast_animation(){
+  for key in ["lucky","unlucky"] {
+   let mut r=room();let snap=Snapshot::capture(&r).unwrap();r.player.conditions.insert(key.into(),1.);events::begin();snap.finish(&r);assert!(styles().is_empty());
    let snap=Snapshot::capture(&r).unwrap();events::begin();snap.finish(&r);assert!(styles().is_empty());
   }
  }
@@ -235,11 +239,11 @@ pub fn shadow_active(r:&Run,a:&Actor)->bool {
   for hidden in [false,true] {
    let mut r=room();let mut target=r.player.clone();target.id=900.;target.x+=1.;target.state="hunting".into();if hidden{target.conditions.insert("invisible".into(),1.);}
    r.actors_at_mut(r.depth).push(target);let snap=Snapshot::capture(&r).unwrap();r.player.active.push("morae-bonded-by-unseen-threads".into());r.player.conditions.insert("bondedTarget".into(),900.);
-   events::begin();snap.finish(&r);let cues=events::finish();assert_eq!(cues.len(),1);assert_eq!(cues[0].animation.as_ref().unwrap().style,if hidden{"stitch"}else{"stitch-bond"});assert_eq!(cues[0].from.is_some(),!hidden);
+   events::begin();snap.finish(&r);let cues=events::finish();assert_eq!(cues.len(),1);assert_eq!(cues[0].animation.as_ref().unwrap().style,if hidden{"stitch"}else{"line-hold"});assert_eq!(cues[0].from.is_some(),!hidden);
   }
  }
  #[test] fn real_rescues_blood_gain_and_bleed_have_distinct_styles(){
-  for (ability,style) in [(crate::divine_rescues::RAGE,"collapse-snap"),(crate::divine_rescues::PELIAN,"fold-reopen"),(crate::divine_rescues::OVERFLOWING,"droplet-empty")] {
+  for (ability,style) in [(crate::divine_rescues::RAGE,"nova-red-small"),(crate::divine_rescues::PELIAN,"nova-blue-small"),(crate::divine_rescues::OVERFLOWING,"droplet-empty")] {
    let mut r=room();r.player.abilities=vec![ability.into()];r.player.active=r.player.abilities.clone();r.player.blood=1.0.into();r.player.hp=-1.;let id=r.player.id;events::begin();assert!(crate::divine_rescues::try_rescue(&mut r,id,false));assert_eq!(styles(),vec![style]);
   }
   let mut r=room();r.player.abilities=vec![crate::divine_rescues::OVERFLOWING.into()];r.player.blood=0.0.into();r.player.damage_bank=0.0.into();let id=r.player.id;events::begin();crate::divine_rescues::accrue_damage(&mut r,id,50.);assert_eq!(styles(),vec!["droplet-fill"]);

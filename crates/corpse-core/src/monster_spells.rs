@@ -211,6 +211,7 @@ pub fn heal_others(r: &mut Run, id: f64) -> Result<bool, String> {
             || crate::divine_environment::healing_suppressed(r, b)
             || distance(r, &a, b) > 6.0
             || !crate::vision::line_of_sight(r, &a, b)
+            || (crate::events::enabled(r) && crate::projectiles::possible_shot_range(r,&a,b,6.).is_none())
         {
             continue;
         }
@@ -223,6 +224,19 @@ pub fn heal_others(r: &mut Run, id: f64) -> Result<bool, String> {
     let Some(b) = target else { return Ok(false) };
     if !crate::monster_horn::spell_spend(r, id, 5.0) {
         return Ok(false);
+    }
+    if crate::events::enabled(r) {
+        let landed=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
+        let cells=crate::events::take_path(&a);let serial=crate::events::emission_serial();
+        crate::events::travel(r,&a,"E17","line-grow",&cells,crate::events::Delivery::Magic,None);
+        // Keep travel metadata clipped to observable terrain as well as its cells.
+        if let Some(end)=cells.iter().rev().find(|p|crate::vision::directly_visible_tile(r,p.x as usize,p.y as usize)) {
+            crate::events::decorate(serial,"E17","line-grow",end.clone(),"#40ff60",Some((&a).into()));
+        }
+        if landed.actor_id!=Some(b.id) {
+            let ready=r.tick+2.;actor_mut_trusted(r,id).unwrap().conditions.insert("monsterHealReadyAt".into(),ready);
+            return Ok(true);
+        }
     }
     let owner = crate::half_here::owner_id(r, &b);
     let heal_amount = crate::balance52::local_amount(r, &a, "monsterHealAmount", 25.);
@@ -240,7 +254,6 @@ pub fn heal_others(r: &mut Run, id: f64) -> Result<bool, String> {
     report(r, &a, &b, "restores an injured companion.");
     if crate::events::enabled(r) {
         if healed {
-            crate::events::link(r,&a,&b,"E17","leaf-green",crate::events::Stage::Special);
             crate::animation_enemy::mark(r,&b,"E17","stitch-green",crate::events::Stage::Health);
         }
     } else {crate::events::actor_event(r, &a, "heal", "Healing", Some((&b).into()), None);}

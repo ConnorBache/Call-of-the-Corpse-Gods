@@ -207,6 +207,7 @@ fn displayed_material_settings(
 
 fn gas_color(kind: &str) -> Rgb {
     match kind {
+        "bloodMist" => [185, 30, 60],
         "caustic" => [86, 255, 55],
         "breather" => [35, 213, 157],
         "paralysis" => [161, 62, 255],
@@ -893,6 +894,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
     View {
         ground_entities,
         perception_boundaries,
+        ability_overlays: crate::persistent_ability_overlays::observe(run,terrain_snapshot.as_deref()),
         hallucination_cells:cells.iter().enumerate().filter_map(|(i,c)|c.hallucination.is_some().then_some(i)).collect(),
         hallucination_phase:0,
         dreamwalking: corpse_core::dreamwalking::active(run),
@@ -1685,8 +1687,8 @@ fn terrain_frame_palette(
             }
             if let Some(gas) = h.gas.as_ref() {
                 let key = format!("gas:{}", gas.r#type);
-                let fallback=(gas.r#type=="hallucinogenic" && profile.resolved_material(&key,crate::appearance_profile::MaterialParent::None).is_none())
-                    .then(|| {let color=gas_color("hallucinogenic");(color,color)});
+                let fallback=(matches!(gas.r#type.as_str(),"hallucinogenic"|"bloodMist") && profile.resolved_material(&key,crate::appearance_profile::MaterialParent::None).is_none())
+                    .then(|| {let color=gas_color(&gas.r#type);(color,color)});
                 let (_, c) =
                     crate::appearance_material::feature_colors(profile, &key, x, y, seed, fallback);
                 let c = crate::color::gas_field(c);
@@ -2220,7 +2222,8 @@ mod feeding_observation_tests {
         for y in 1..f.height()-1 {for x in 1..w-1 {f.tiles[y*w+x]="floor".into();}}
         f.lights=vec![100.;n];f.environment=corpse_core::Field::Missing;f.vents=corpse_core::Field::Missing;
         let at=10*w+11;f.tiles[at]="wall".into();let mut marks=vec![false;n];marks[at]=true;f.bloody_walls=marks.into();
-        assert_eq!(crate::inspection_ui::observe_tile(&r,11,10).title,"Bloody wall");
+        assert!(crate::inspection_ui::observe_tile(&r,11,10).title.is_empty());
+        assert!(crate::inspection_ui::observe_tile(&r,11,10).lines.iter().any(|line| line.contains("Blood coats this solid wall.")));
         assert!(observe(&r).cells.iter().any(|c|c.x==11&&c.y==10&&c.label=="Bloody wall"));
         let mut mask=vec![false;n];mask[at]=true;corpse_core::hazard_memory::remember_observed_hazards(r.floor_mut().unwrap(),&mask,0.);
         let f=r.floor_mut().unwrap();f.remembered_tiles=f.tiles.clone().into();f.seen=vec![true;n];
@@ -2751,8 +2754,8 @@ fn terrain_frame_palette_json_reference(
             }
             if let Some(gas) = h.gas.as_ref() {
                 let key = format!("gas:{}", gas.r#type);
-                let fallback=(gas.r#type=="hallucinogenic" && profile.material(&key,None).is_none())
-                    .then(|| {let color=gas_color("hallucinogenic");(color,color)});
+                let fallback=(matches!(gas.r#type.as_str(),"hallucinogenic"|"bloodMist") && profile.material(&key,None).is_none())
+                    .then(|| {let color=gas_color(&gas.r#type);(color,color)});
                 let (_, c) =
                     crate::appearance_material::feature_colors(profile, &key, x, y, seed, fallback);
                 let c = crate::color::gas_field(c);

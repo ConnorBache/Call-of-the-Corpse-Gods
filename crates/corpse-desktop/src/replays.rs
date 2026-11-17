@@ -326,13 +326,14 @@ mod staged_playback_tests {
         assert!(replay.paint_stage.is_none());assert!(painter.firebolt_terrain.is_none());
     }
     #[test]
-    fn reduced_and_instant_replay_never_hold_terrain_or_autoplay() {
+    fn reduced_and_instant_replay_wait_for_visible_static_feedback() {
         for instant in [false,true] {
             let mut replay=replay();let mut painter=Painter::new();
             replay.configure_motion(true,instant);replay.step(0.);
-            assert!(replay.ready_for_step(0.));replay.paint(&mut painter,1000.,false);
+            assert!(!replay.ready_for_step(0.));replay.paint(&mut painter,1000.,false);
             assert!(replay.paint_stage.is_none());assert!(painter.firebolt_terrain.is_none());
-            assert!(replay.ready_for_step(1000.));
+            assert!(!replay.ready_for_step(1000.));
+            assert!(replay.ready_for_step(10000.));
         }
     }
 }

@@ -2,7 +2,7 @@
 use crate::propagation::{self, Dissipation, GasGrid, GridSize, RandomInt};
 use crate::{EnvironmentalState, EnvironmentalStateProvenanceEntry, Field, Floor, Run};
 use indexmap::IndexMap;
-pub const GAS_TYPES: [&str; 9] = [
+pub const GAS_TYPES: [&str; 10] = [
     "caustic",
     "breather",
     "paralysis",
@@ -12,9 +12,11 @@ pub const GAS_TYPES: [&str; 9] = [
     "hydrogen",
     "steam",
     "hallucinogenic",
+    "bloodMist",
 ];
 fn channel<'a>(e: &'a EnvironmentalState, gas: &str) -> &'a [f64] {
     match gas {
+        "bloodMist" => e.blood_mist.as_ref().map(Vec::as_slice).unwrap_or(&[]),
         "caustic" => &e.caustic,
         "breather" => &e.breather,
         "paralysis" => &e.paralysis,
@@ -100,7 +102,7 @@ pub fn refresh_gas_views(e: &mut EnvironmentalState) {
     let n = e.fire.len();
     for gas in GAS_TYPES {
         // Optional native channel must not alter legacy save/trace bytes.
-        if gas == "hallucinogenic" && e.hallucinogenic.is_missing()
+        if ((gas == "hallucinogenic" && e.hallucinogenic.is_missing()) || (gas == "bloodMist" && e.blood_mist.is_missing()))
             && !e.gas_type.as_ref().unwrap().iter().any(|g| g.as_deref() == Some(gas))
         { continue; }
         let values = (0..n)
@@ -113,6 +115,7 @@ pub fn refresh_gas_views(e: &mut EnvironmentalState) {
             })
             .collect();
         match gas {
+            "bloodMist" => e.blood_mist = Field::Value(values),
             "caustic" => e.caustic = values,
             "breather" => e.breather = values,
             "paralysis" => e.paralysis = values,
@@ -263,6 +266,11 @@ pub fn initialize(f: &mut Floor) -> Result<&mut EnvironmentalState, String> {
             owner: vec![-1.; n], player: vec![0.; n],
         });
     }
+    if e.blood_mist.as_ref().is_some() || e.gas_type.as_ref().unwrap().iter().any(|g|g.as_deref()==Some("bloodMist")) {
+        e.blood_mist.get_or_insert_with(||vec![0.;n]);
+        e.blood_mist_turns.get_or_insert_with(||vec![5.;n]);
+        e.provenance.as_mut().unwrap().entry("bloodMist".into()).or_insert_with(||EnvironmentalStateProvenanceEntry{owner:vec![-1.;n],player:vec![0.;n]});
+    }
     Ok(e)
 }
 struct GasPass<'a> {
@@ -274,6 +282,9 @@ struct GasPass<'a> {
     descent: &'a [bool],
     frozen: &'a [bool],
     rng: &'a mut u32,
+    old_mist_turns: Option<Vec<f64>>,
+    live_mist_turns: Option<Vec<f64>>,
+    next_mist_turns: Option<Vec<f64>>,
     old_volume: Vec<f64>,
     old_player: Vec<f64>,
     live_owner: Vec<f64>,
@@ -324,14 +335,21 @@ impl GasGrid for GasPass<'_> {
     fn dissipation(&self, g: Option<String>) -> Dissipation {
         match g.as_deref() {
             None | Some("explosive" | "hydrogen") => Dissipation::None,
+            Some("bloodMist") => Dissipation::None,
             Some("paralysis" | "confusion" | "hallucinogenic" | "steam") => Dissipation::Quick,
             _ => Dissipation::Normal,
         }
     }
     fn on_type_change(&mut self, i: usize, _: Option<String>, _: Option<String>, source: usize) {
-        self.live_owner[i] = self.live_owner[source]
+        self.live_owner[i] = self.live_owner[source];
+        if let Some(v)=&mut self.live_mist_turns {v[i]=v[source];}
     }
     fn on_cell_resolved(&mut self, i: usize, source: usize, contributors: &[usize], output: u16) {
+        if let (Some(old),Some(next))=(&self.old_mist_turns,&mut self.next_mist_turns) {
+            next[i]=if self.e.gas_type.as_ref().unwrap()[i].as_deref()==Some("bloodMist") && output>0 {
+                contributors.iter().map(|&j|old[j]).fold(self.live_mist_turns.as_ref().map_or(0.,|v|v[source]),f64::max)
+            } else {0.};
+        }
         self.next_owner[i] = self.live_owner[source];
         let total: f64 = contributors.iter().map(|&j| self.old_volume[j]).sum();
         let player: f64 = contributors.iter().map(|&j| self.old_player[j]).sum();
@@ -402,6 +420,9 @@ pub fn propagate_gas(f: &mut Floor, rng: &mut u32, frozen: &[bool]) -> Result<()
             descent: &descent,
             frozen,
             rng,
+            old_mist_turns: e.blood_mist_turns.as_ref().cloned(),
+            live_mist_turns: e.blood_mist_turns.as_ref().cloned(),
+            next_mist_turns: e.blood_mist_turns.as_ref().map(|_|vec![0.;n]),
             old_volume: e.gas_volume.as_ref().unwrap().clone(),
             old_player: e.gas_player.as_ref().unwrap().clone(),
             live_owner: e.gas_owner.as_ref().unwrap().clone(),
@@ -421,6 +442,7 @@ pub fn propagate_gas(f: &mut Floor, rng: &mut u32, frozen: &[bool]) -> Result<()
                     pass.e.gas_player.as_ref().unwrap()[i].to_bits() != pass.next_player[i].to_bits());
             }
         }
+        if let Some(next)=pass.next_mist_turns { pass.e.blood_mist_turns=next.into(); }
         pass.e.gas_owner = pass.next_owner.into();
         pass.e.gas_player = pass.next_player.into();
         let tracked = pass.tracked;
@@ -681,6 +703,12 @@ pub fn add_gas(
             owner: vec![-1.; n], player: vec![0.; n],
         });
     }
+    if gas == "bloodMist" {
+        let n=e.fire.len();
+        e.blood_mist.get_or_insert_with(||vec![0.;n]);
+        e.blood_mist_turns.get_or_insert_with(||vec![0.;n])[i]=5.;
+        e.provenance.as_mut().unwrap().entry(gas.into()).or_insert_with(||EnvironmentalStateProvenanceEntry{owner:vec![-1.;n],player:vec![0.;n]});
+    }
     let added = amount.floor();
     let volume = (crate::rng::to_u32(e.gas_volume.as_ref().unwrap()[i] + added) & 65535) as f64;
     crate::capture_pilot::mark_gas_write(depth_bits, i, e.gas_type.as_ref().unwrap()[i].as_deref() != Some(gas));
@@ -700,6 +728,7 @@ pub fn add_gas(
     for kind in GAS_TYPES {
         let value = if kind == gas { volume } else { 0. };
         match kind {
+            "bloodMist" => {if let Some(v)=e.blood_mist.as_mut(){v[i]=value;}},
             "caustic" => e.caustic[i] = value,
             "breather" => e.breather[i] = value,
             "paralysis" => e.paralysis[i] = value,
@@ -1155,6 +1184,7 @@ pub fn tick_environment_options_with_falls(
     pending_falls: &[f64],
 ) -> Result<(), String> {
     let _timing_function = crate::timing::span("environment.total");
+    crate::blood_mist::tick(r.floor_mut().ok_or("Missing floor")?)?;
     crate::revision50_control_amulets::expire_terrain(r);
     let _timing_environment_stage = crate::timing::span("environment.setup");
     validate_supported_with_falls(r, pending_falls)?;

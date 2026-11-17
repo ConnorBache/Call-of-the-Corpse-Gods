@@ -138,6 +138,7 @@ impl TilePlanner{
    // O(K) old/new interaction cells and scratch. Include minimum native strokes,
    // not only tile interiors; fractional-scale corners can cross their boundary.
    if old.path!=new.path||old.target_path!=new.target_path||old.target_area!=new.target_area||old.target_impact!=new.target_impact||old.target_color!=new.target_color||old.possible_exits!=new.possible_exits||old.hover!=new.hover{for v in [old,new]{for &(x,y)in v.path.iter().chain(&v.target_path).chain(&v.target_area).chain(v.target_impact.iter()).chain(&v.possible_exits).chain(v.hover.iter()){if x<g.w&&y<g.h{self.mark_tile(y*g.w+x);self.footprint(p.interaction_damage_rect(g.ox+x as i32*g.cw,g.oy+y as i32*g.ch,g.cw,g.ch));}}}}
+   if old.ability_overlays!=new.ability_overlays {self.full=true;}
    if old.perception_boundaries!=new.perception_boundaries {
     for v in [old,new] {for b in &v.perception_boundaries {for r in crate::perception_ui::bounds(p,v,b){self.mark_native_rect(r);}}}
    }

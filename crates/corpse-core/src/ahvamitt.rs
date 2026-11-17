@@ -80,9 +80,9 @@ pub fn attack(r:&mut Run,id:f64)->Result<bool,EngineError> {
         if let Some(e)=r.floor_mut().and_then(|f|f.godbeast_event.as_mut()).filter(|e|e.kind=="Ahvamitt") { e.reward_created=true.into(); }
     }
     if let Some((x,y))=at {
-        crate::animation_enemy::mark(r, &a, "E75", "mask-fold", crate::events::Stage::Special);
+        crate::animation_shapes::nova(r,&a,"E75","nova-rainbow-small",2);
         let a=engine::actor_mut_trusted(r,id).unwrap();a.x=x;a.y=y;
-        let a=a.clone(); crate::revision50::duel_actor_changed(r,id); crate::animation_enemy::mark(r, &a, "E75", "mask-unfold", crate::events::Stage::Special);
+        let a=a.clone(); crate::revision50::duel_actor_changed(r,id); crate::animation_shapes::nova(r,&a,"E75","nova-rainbow-small",2);
     } else if finds<2 { crate::animation_enemy::mark(r, &a, "E75", "diamond-gold", crate::events::Stage::Special); }
     r.floor_mut().unwrap().dirty=true;
     Ok(true)

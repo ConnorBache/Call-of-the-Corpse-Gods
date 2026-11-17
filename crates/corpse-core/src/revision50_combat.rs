@@ -48,11 +48,11 @@ pub fn oblivious_blocks(r: &Run, target: &Actor, source: Option<&Actor>) -> bool
 /// a miss, a full-quarter-health target, insufficient funds, or Witch-Hatred kill.
 pub fn lethal_hit(r: &mut Run, a: &Actor, b: &Actor) -> bool {
     if !enabled(r) || !enemies(r, a, b) { return false; }
-    if witch_senses(r, a, b) { crate::animation_player::local(r,b,"P54","crossed-ring",crate::events::Stage::Impact); return true; }
+    if witch_senses(r, a, b) { crate::animation_shapes::area(r,b,"P54","box-expand",2,"#501060",crate::events::Stage::Special); return true; }
     let health = owner(r, b);
     let eligible = health.hp > 0. && health.hp < health.max_hp * 0.25;
     let killed=eligible && abilities::endpoint_active(r, a, EXECUTE) && crate::revision50_ability_energy::spend(r, a.id, EXECUTE, execute_cost(r.simulation_revision.value_or(29.)));
-    if killed {crate::animation_player::local(r,b,"P02","slash",crate::events::Stage::Impact);}
+    if killed {crate::animation_shapes::nova(r,b,"P02","nova-red-small",2);}
     killed
 }
 fn cell_open(r: &Run, a: &Actor, x: f64, y: f64, ignored: Option<f64>) -> bool {
@@ -161,7 +161,11 @@ pub fn after_attack(r: &mut Run, attacker: &Actor, target: &Actor) -> Result<(),
     for _ in 0..limit {
         let before=engine::actor(r,b.id).cloned();
         if !push_step(r, b.id, dx, dy)? { break; }
-        if r.depth==depth {if let (Some(before),Some(after))=(before,engine::actor(r,b.id)) {crate::events::link(r,&before,after,"P60",if maximum {"speed-commandment"}else{"wave-pressure"},crate::events::Stage::Travel);}}
+        if r.depth==depth {if let (Some(before),Some(after))=(before,engine::actor(r,b.id)) {
+            let glyph=crate::actor_presentation::apparent_kind(r,&before)
+                .and_then(|kind|crate::population::catalog().actors.get(kind)).map(|a|a.glyph.as_str()).unwrap_or(&before.glyph);
+            crate::events::travel(r,&before,"P60","moving-actor",&[(&before).into(),after.into()],crate::events::Delivery::Projectile,Some(glyph));
+        }}
         if r.depth != depth || r.status != "playing" || engine::actor(r, a.id).is_none() { break; }
         let Some(b) = engine::actor(r, b.id) else { break; };
         if !seen.insert((b.x as i32,b.y as i32)) { break; }
@@ -268,7 +272,7 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
 
 #[cfg(test)] mod animation_commandment_style_tests {
  use super::*;
- #[test] fn paid_long_push_and_passive_or_unfunded_push_are_distinct(){
+ #[test] fn every_push_step_animates_the_actor_with_white_trail(){
   for mode in [0,1,2] {
    let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.x=2.;r.player.y=2.;r.player.conditions.clear();r.player.abilities=vec![COMMANDMENT.into()];r.player.active=if mode==0{vec![]}else{r.player.abilities.clone()};r.player.energy=0.;r.player.ability_reserves=crate::Field::Missing;r.inventory.clear();
    // The paid push still costs 20: ten reserve plus ten main energy in R52.
@@ -277,7 +281,7 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
    let mut target=r.player.clone();target.id=900.;target.x=3.;target.state="hunting".into();target.abilities.clear();target.active.clear();target.ability_reserves=crate::Field::Missing;r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(target.clone());
    let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=crate::Field::Missing;f.non_euclidean=crate::Field::Missing;let w=f.width();f.tiles[2*w+6]="wall".into();
    let a=r.player.clone();crate::events::begin();after_attack(&mut r,&a,&target).unwrap();let e=crate::events::finish();let styles:Vec<_>=e.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P60").map(|a|a.style.as_str()).collect();
-   assert_eq!(styles,if mode==1{vec!["speed-commandment","speed-commandment"]}else{vec!["wave-pressure"]});
+   assert_eq!(styles,if mode==1{vec!["moving-actor","moving-actor"]}else{vec!["moving-actor"]});
    assert_eq!(engine::actor(&r,900.).unwrap().x,if mode==1{5.}else{4.});
    let reserve=&r.player.ability_reserves.as_ref().unwrap()[COMMANDMENT];assert_eq!((reserve.capacity,reserve.energy,r.player.energy),(10.,0.,0.));
   }

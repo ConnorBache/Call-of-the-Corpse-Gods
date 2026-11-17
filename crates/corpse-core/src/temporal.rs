@@ -1177,7 +1177,7 @@ impl Engine {
                 }
                 if crate::events::enabled(&self.run) && id=="morae-see-the-future" && future_was_active!=self.run.future.is_some() {
                     let player_id=self.run.player.id;
-                    crate::dreamwalking::with_actor(&mut self.run,player_id,|r|crate::animation_player::local(r,&r.player,"P71",if future_was_active {"ripple"}else{"fold"},crate::events::Stage::Special));
+                    crate::dreamwalking::with_actor(&mut self.run,player_id,|r|crate::animation_shapes::nova(r,&r.player,"P71","nova-pink-large",6));
                 }
                 if signature(&self.run) != before_signature {
                     let label = if id == "numo-revert" {

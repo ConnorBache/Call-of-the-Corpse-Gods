@@ -5,7 +5,7 @@ pub fn route(r:&Run,source:&Actor,kind:Effect,points:&[crate::movement::Point],i
     let mut cells:Vec<_>=points.iter().map(|p|EventPoint{x:p.x as f64,y:p.y as f64}).collect();
     if let Some(p)=impact{cells.push(EventPoint{x:p.x as f64,y:p.y as f64});}
     let style=match kind{Effect::Lightning=>"bolt",Effect::Firebolt=>"ember",Effect::Poison=>"dart",Effect::Acid=>"glob",_=>"ripple"};
-    if matches!(kind,Effect::Lightning|Effect::Firebolt|Effect::Poison|Effect::Acid){
+    if matches!(kind,Effect::Lightning|Effect::Firebolt|Effect::Poison|Effect::Acid|Effect::Iceblast|Effect::Blinking){
         events::travel(r,source,key(kind),style,&cells,events::Delivery::Magic,None);
     }else{events::cue(r,source,key(kind),style,Stage::Travel,&cells);}
     if kind!=Effect::Firebolt {if let Some(p)=cells.last(){events::cue(r,source,key(kind),"spark",Stage::Impact,std::slice::from_ref(p));}}
@@ -23,4 +23,14 @@ pub fn expired_statuses(r:&Run,before:&Actor){
  for (condition,key,style) in [(crate::revision50_amulet_effects::ACID_TURNS,"A05","shield-close"),(crate::revision50_amulet_effects::POISON_DAMAGE,"A03","dissolve-ring")] {
   if crate::engine::condition(before,condition)>0.&&crate::engine::condition(after,condition)<=0. {events::cue(r,after,key,style,Stage::Special,&[after.into()]);}
  }
+}
+
+/// Commit the actual collision/portal ray once; animation consumes that detached
+/// receipt, never re-traces it or consumes extra randomness.
+pub(crate) fn control_cast(r:&mut Run,key:&str,x:f64,y:f64)->crate::projectiles::Landing {
+    let source=r.player.clone();
+    let landing=crate::projectiles::trace_committed_from_actor(r,&source,x,y);
+    let cells=events::take_path(&source);
+    events::travel(r,&source,key,"bolt",&cells,events::Delivery::Magic,None);
+    landing
 }

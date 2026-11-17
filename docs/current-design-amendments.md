@@ -817,3 +817,25 @@ rather than hide them with ellipses.
 
 Implementation hold (2026-11-17): Never Ending Flesh's nonlethal-only crossing and 25%-of-maximum-HP heal are provisional pending the designer's answer about lethal hits and healing basis. Do not treat these choices as settled or publish the combined release before clarification.
 Approved-fixes-only export: the provisional Never Ending Flesh implementation is excluded from this source. The hold above applies to the separate combined candidate; existing Relentless Pursuit behavior is preserved here while clarification is pending.
+
+### Persistent divine geometry — November 17, 2026
+Riptide retains a blue line along the currently predictable pull route while active, stopping at observed blockers or unknown/nondeterministic continuation; it is recalculated after world changes, not left as a straight line through obstacles. Reverse Entropy retains a bright white outline of its actual radius, including in darkness and unknown space. That outline does not reveal terrain or occupants. Disabling the ability removes its overlay.
+
+### November 17: distinct divine animation receipt geometry
+Ragelight and Execute use red small novas on successful save/victim respectively;
+Never Be Rid of Me uses blue. Fated Duel's existing 5×5 boundary expands through
+alternating circle/square stages; Make Slippery contracts a 5×5 square on its target.
+I Came For You grows a golden connection; Implant Thought holds a purple connection
+through the attack; Mind Slave grows that connection then contracts a purple square.
+Half Here and Waking Nightmares connect creation sites in cyan and black respectively.
+These receipts do not alter gameplay ranges, costs, simulation randomness or turns.
+The presentation layer controls when resulting state becomes visible.
+
+### November 17: Space continuation prompts
+Health threshold acknowledgments now require a fresh Space, not Escape. Paralysis
+shows “You are paralyzed. Press space to wait until un-paralyzed”; acknowledgment
+runs normal Wait actions one presentation boundary at a time, stopping when paralysis ends, for a required health/death pause, choices, or user
+interruption. Damage or a newly seen threat alone does not cancel this waiting. Intentional
+known chasm entry/Descend and Ascend from chasm are queued before dispatch. Forced
+falls hold the prior observed scene until Space before displaying their outcome;
+authoritative simulation remains atomic and may already have computed that result.

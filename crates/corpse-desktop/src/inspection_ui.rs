@@ -256,6 +256,7 @@ fn gas_label(kind: &str) -> &str {
         "breather" => "Gasser gas",
         "paralysis" => "Paralysis gas",
         "confusion" => "Confusion gas",
+        "bloodMist" => "Blood Mist",
         "hallucinogenic" => "Hallucinogenic gas",
         "flammable" => "Flammable gas",
         "explosive" => "Explosive gas",
@@ -3259,9 +3260,14 @@ mod bow_tests {
                 .find(|i| i.id == c["bow"].as_f64().unwrap())
                 .unwrap();
             let trace = serde_json::from_value(c["trace"].clone()).unwrap();
+            // Integer-only display was approved after the v48 forecast oracle.
+            let original=c["expected"].as_str().unwrap();
+            let expected=if let Some((chance, suffix))=original.strip_prefix("Bow shot: ").and_then(|rest| rest.split_once('%')) {
+                format!("Bow shot: {:.0}%{suffix}",chance.parse::<f64>().unwrap().round())
+            } else { original.to_string() };
             assert_eq!(
                 bow_text(&r, bow, a, &trace),
-                c["expected"].as_str().unwrap(),
+                expected,
                 "{}",
                 c["name"]
             );

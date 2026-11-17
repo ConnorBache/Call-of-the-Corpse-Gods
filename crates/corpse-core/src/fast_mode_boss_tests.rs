@@ -41,11 +41,21 @@ fn assert_population(r: &Run, depth: u32, kind: &str) {
         generation::ordinary_blessing_budget(generation::BudgetSeed::Number(seed), depth).unwrap() as f64,
         "Fast does not compensate the destination's ordinary population budget");
     let ordinary_ids: std::collections::HashSet<_> = f.encounters.as_ref().unwrap().iter()
+        .filter(|e|e.kind.as_ref().map(String::as_str)!=Some("verdania-guard"))
         .flat_map(|e| e.actor_ids.iter().map(|id| *id as u64)).collect();
     let ordinary_rewards: f64 = r.actors_at(depth as f64).iter()
         .filter(|a| ordinary_ids.contains(&(a.id as u64)) && !a.heartless.value_or(false))
         .map(|a| crate::inventory::heart_for(a, 0.).unwrap().exp.value_or(0.)).sum();
     assert_eq!(ordinary_rewards, f.enemy_blessing_budget.value_or(0.));
+    // Authored Verdania guard is an additional rewarded encounter, not part of
+    // the unchanged ordinary horde/machine budget.
+    let guards:Vec<_>=f.encounters.as_ref().unwrap().iter().filter(|e|e.kind.as_ref().map(String::as_str)==Some("verdania-guard")).collect();
+    assert_eq!(guards.len(),usize::from(kind=="Veridian"));
+    for guard in guards {
+        assert!(guard.sleeping);
+        assert!(guard.actor_ids.iter().all(|id|r.actors_at(depth as f64).iter().any(|a|a.id==*id&&a.state=="sleeping")));
+        assert!(guard.actor_ids.len()<=5);
+    }
 
     // These four bodies exist on every production floor. The displaced Phantasmii
     // encounter must use destination31's Gargantuan tier, not milestone30's tier.

@@ -166,7 +166,7 @@ pub fn commit(r: &mut Run, a: Actor) -> Result<(), String> {
     crate::creature_index::check_next_creature_id(r)?;
     r.next_id+=1.0;
     r.player.conditions.insert("miniMeId".into(), a.id);
-    crate::animation_player::local(r,&a,"P62","gear",crate::events::Stage::Special);
+    crate::animation_shapes::nova(r,&a,"P62","nova-orange-small",2);
     r.actors_at_mut(r.depth).push(a);
     Ok(())
 }

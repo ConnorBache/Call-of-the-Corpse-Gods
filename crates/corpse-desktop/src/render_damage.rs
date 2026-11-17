@@ -137,6 +137,7 @@ struct Scene {
     chronicle:Vec<crate::chronicle::Group>,chronicle_offset:usize,hud:HudKey,enemies:Vec<EnemyInk>,ground:Vec<super::enemy_list::GroundEntity>,
     paths:Vec<(usize,usize)>,targets:Vec<(usize,usize)>,target_area:Vec<(usize,usize)>,target_impact:Option<(usize,usize)>,target_color:Option<[u8;3]>,exits:Vec<(usize,usize)>,hover:Option<(usize,usize)>,
     perception_boundaries:Vec<crate::perception_ui::Boundary>,
+    ability_overlays:crate::persistent_ability_overlays::Overlays,
     deep_water:bool,immersion_color:Option<Rgb>,dream:bool,seeds:(u32,u32),provenance:String,
 }
 #[cfg(test)]
@@ -162,7 +163,7 @@ impl Scene {
                 if !c.animations.is_empty()||c.pulse_speed!=0. {animated.push(b);}
             }
         }
-        Self{order:v.cells.iter().map(|c|(c.x,c.y)).collect(),stacks,bounds,buckets,animated,chronicle:v.log_groups.clone(),chronicle_offset:v.chronicle_offset,hud:HudKey::from(v),ground:v.ground_entities.clone(),enemies:v.creatures.iter().map(|a|EnemyInk{perception_range:a.perception_range.clone(),identity_outline:a.identity_outline,id:a.id.to_bits(),name:a.name.clone(),glyph:a.glyph.clone(),state:a.state.clone(),color:a.color,distance:a.distance.to_bits(),resources:[a.hp.to_bits(),a.max_hp.to_bits(),a.energy.to_bits(),a.max_energy.to_bits()],shared:a.shared_resources,uses_energy:a.uses_energy,invulnerable:a.invulnerable,statuses:a.statuses.clone(),meters:a.meters.clone()}).collect(),paths:v.path.clone(),targets:v.target_path.clone(),target_area:v.target_area.clone(),target_impact:v.target_impact,target_color:v.target_color,exits:v.possible_exits.clone(),hover:v.hover,perception_boundaries:v.perception_boundaries.clone(),deep_water:v.deep_water,immersion_color:crate::illumination_ui::immersion_color(v),dream:v.dreamwalking,seeds:(v.cosmetic_seed,v.fire_seed),provenance:v.provenance.clone()}
+        Self{order:v.cells.iter().map(|c|(c.x,c.y)).collect(),stacks,bounds,buckets,animated,chronicle:v.log_groups.clone(),chronicle_offset:v.chronicle_offset,hud:HudKey::from(v),ground:v.ground_entities.clone(),enemies:v.creatures.iter().map(|a|EnemyInk{perception_range:a.perception_range.clone(),identity_outline:a.identity_outline,id:a.id.to_bits(),name:a.name.clone(),glyph:a.glyph.clone(),state:a.state.clone(),color:a.color,distance:a.distance.to_bits(),resources:[a.hp.to_bits(),a.max_hp.to_bits(),a.energy.to_bits(),a.max_energy.to_bits()],shared:a.shared_resources,uses_energy:a.uses_energy,invulnerable:a.invulnerable,statuses:a.statuses.clone(),meters:a.meters.clone()}).collect(),paths:v.path.clone(),targets:v.target_path.clone(),target_area:v.target_area.clone(),target_impact:v.target_impact,target_color:v.target_color,exits:v.possible_exits.clone(),hover:v.hover,perception_boundaries:v.perception_boundaries.clone(),ability_overlays:v.ability_overlays.clone(),deep_water:v.deep_water,immersion_color:crate::illumination_ui::immersion_color(v),dream:v.dreamwalking,seeds:(v.cosmetic_seed,v.fire_seed),provenance:v.provenance.clone()}
     }
     /// O(covered32px buckets + K log K), K intersecting cell stack indices.
     /// Sorted indices preserve global terrain/item/actor z-order exactly.
@@ -209,6 +210,7 @@ impl RetainedGame {
                 if previous.enemies!=next.enemies||previous.ground!=next.ground{add(&mut damage,entities,0,left-entities,p.logical_height());}
                 if previous.provenance!=next.provenance{add(&mut damage,0,775,super::WIDTH as i32,25);}
                 if previous.paths!=next.paths||previous.targets!=next.targets||previous.target_area!=next.target_area||previous.target_impact!=next.target_impact||previous.target_color!=next.target_color||previous.exits!=next.exits||previous.hover!=next.hover{previous.add_interactions(p,v,&mut damage);next.add_interactions(p,v,&mut damage);}
+                if previous.ability_overlays!=next.ability_overlays {add(&mut damage,layout.2,layout.3,layout.0*v.width as i32,layout.1*v.height as i32);}
                 if previous.perception_boundaries!=next.perception_boundaries {
                     for scene in [previous,next] {for b in scene.perception_boundaries.iter().filter(|b|[p.enemy_hover,self.selection.as_ref().and_then(|s|s.enemy)].contains(&Some(b.actor))){for r in crate::perception_ui::bounds(p,v,b){damage.add(r);}}}
                 }

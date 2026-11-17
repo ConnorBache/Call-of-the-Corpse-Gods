@@ -152,8 +152,7 @@ fn implant_thought(r:&mut Run,target:&Field<f64>,x:&Field<f64>,y:&Field<f64>)->R
         && crate::portals::actor_chebyshev(r,&attacker,a)<=1.).cloned() else {return Ok(false)};
     if engine::attack_blocker(r,&attacker,&victim,0.,false).is_some() {return Ok(false)}
     if crate::abilities::energy_activation_silenced(r,&r.player) || !crate::revision50_ability_energy::spend(r,r.player.id,"numo-implant-thought",15.) {return Ok(false)}
-    crate::events::link(r,&r.player,&attacker,"P19","stitch-thought",crate::events::Stage::Special);
-    crate::events::link(r,&attacker,&victim,"P19","notch-target",crate::events::Stage::Special);
+    crate::animation_shapes::line(r,&r.player,(&attacker).into(),"P19","line-hold","#a040ff");
     engine::attack(r,tid,victim.id,1.)?;
     engine::log(r,"You use Implant Thought.","player");
     Ok(true)
@@ -302,7 +301,7 @@ mod tests {
   r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(enemy);let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=Field::Missing;f.non_euclidean=Field::Missing;
   crate::events::begin();assert!(!implant_thought(&mut r,&999.0.into(),&2.0.into(),&2.0.into()).unwrap());assert!(crate::events::finish().is_empty());
   crate::events::begin();assert!(implant_thought(&mut r,&900.0.into(),&2.0.into(),&2.0.into()).unwrap());let events=crate::events::finish();
-  for (style,from,to) in [("stitch-thought",(2.,2.),(3.,2.)),("notch-target",(3.,2.),(2.,2.))] {
+  for (style,from,to) in [("line-hold",(2.,2.),(3.,2.))] {
    let e=events.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P19"&&a.style==style)).unwrap();
    assert_eq!(e.from,Some(crate::events::EventPoint{x:from.0,y:from.1}));assert_eq!(e.to,crate::events::EventPoint{x:to.0,y:to.1});
   }

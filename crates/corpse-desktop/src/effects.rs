@@ -154,6 +154,7 @@ pub fn tiles(cue: &Cue, now: f64, reduced: bool) -> Vec<Tile> {
 pub struct PlaneTransition {pub before:crate::render::View,pub started:f64,pub ascend:bool}
 #[derive(Default)]
 pub struct Effects {
+    pub gameplay_pause:crate::gameplay_pause::Pause,
     pub sequence: crate::action_sequence::Sequence,
     pub plane_transition:Option<PlaneTransition>,
     pub profile:Option<crate::appearance_profile::Profile>,
@@ -168,6 +169,7 @@ impl Effects {
     pub fn configure_motion(&mut self,reduced:bool,instant:bool){self.reduced=reduced;self.instant=instant;for c in &mut self.cues{c.static_marks=reduced||instant;}if reduced||instant{self.plane_transition=None;}}
     pub fn plane_changed(&mut self,before:crate::render::View,now:f64){if !self.reduced&&!self.instant{self.plane_transition=Some(PlaneTransition{before,started:now,ascend:false});}}
     pub fn clear(&mut self) {
+        self.gameplay_pause.reset();
         self.sequence.clear();
         self.plane_transition=None;
         self.cues.clear();
@@ -210,20 +212,16 @@ impl Effects {
                     || ranged.contains(&a.action))
         }));
         events.sort_by_key(|e|e.animation.as_ref().map(|a|(a.action,a.stage)));
-        // Impacts follow the actual admitted route, not a fixed short timer.
-        let mut arrivals=std::collections::BTreeMap::<u32,f64>::new();
-        for e in &events {if let Some(a)=&e.animation {if a.stage==Stage::Travel {
-            let end=duration(e);let t=arrivals.entry(a.action).or_default();*t=t.max(end);
-        }}}
-        let mut action=None;let mut base=now;let mut action_end=now;
+        // O(E log E) schedule: each phase completes before the next phase.
+        let mut phase_lengths=std::collections::BTreeMap::new();
+        for e in &events {if let Some(a)=&e.animation {let d=phase_lengths.entry((a.action,a.stage)).or_insert(0f64);if a.stage==Stage::Travel {*d+=duration(e)}else{*d=d.max(duration(e));}}}
+        let mut starts=std::collections::BTreeMap::new();let mut cursor=now;
+        for (key,len) in phase_lengths {starts.insert(key,cursor);cursor+=len;}
+        let mut travel_offsets=std::collections::BTreeMap::<u32,f64>::new();
+        let mut action_end=now;
         for mut event in events {
             if self.instant {if let Some(a)=event.animation.as_mut(){if a.stage==corpse_core::events::Stage::Travel && !a.style.starts_with("wave") && !a.style.starts_with("fan"){if let Some(last)=a.cells.last().cloned(){a.cells=vec![last];}}}}
-            let started=if self.instant {now} else if let Some(a)=&event.animation {
-                if action!=Some(a.action) {base=action_end;action=Some(a.action);}
-                let arrival=if self.reduced{140.}else{arrivals.get(&a.action).copied().unwrap_or(140.)};
-                let offset=match a.stage {Stage::Travel=>0.,Stage::Impact=>arrival,Stage::Special=>arrival+15.,Stage::Health=>arrival+30.,Stage::Death=>arrival+60.};
-                base+offset
-            }else{now};
+            let started=if self.instant {now} else if let Some(a)=&event.animation {let offset=if a.stage==Stage::Travel {let offset=travel_offsets.entry(a.action).or_default();let old=*offset;*offset+=duration(&event);old}else{0.};starts[&(a.action,a.stage)]+offset}else{action_end};
             action_end = action_end.max(started + duration(&event));
             let held = explosion(&event);
             if held {
@@ -236,6 +234,10 @@ impl Effects {
                 static_marks:self.reduced||self.instant,
             });
         }
+        // Held lines remain visible through every later phase of their action.
+        let mut ends=std::collections::BTreeMap::<u32,f64>::new();
+        for c in &self.cues {if let Some(a)=&c.event.animation {let end=ends.entry(a.action).or_default();*end=end.max(c.started+duration(&c.event));}}
+        for c in &mut self.cues {if let Some(a)=&mut c.event.animation {if a.style=="line-hold"||a.style=="moving-actor" {a.style=format!("{}:{}",a.style,ends[&a.action]-c.started);}}}
         if self.cues.len() > 4096 {
             self.cues.drain(..self.cues.len() - 4096);
         }
@@ -251,13 +253,8 @@ impl Effects {
             if let Some(t)=&mut self.plane_transition{t.started+=shift;}
         }
     }
-    pub fn presentation_pending(&self,now:f64)->bool { self.sequence.pending(now) || (self.pending_frame.is_some() && self.sequence.active()) }
-    pub fn travel_pending(&self,now:f64)->bool{
-        if self.sequence.pending(now) { return true; }
-        !self.reduced&&!self.instant&&(self.pending_frame.is_some()||self.cues.iter().any(|c|
-            c.event.animation.as_ref().is_some_and(|a|a.stage==Stage::Travel&&a.delivery!=Delivery::Local)
-                &&now-c.started<duration(&c.event)))
-    }
+    pub fn presentation_pending(&self,now:f64)->bool { self.sequence.pending(now) || self.pending_frame.is_some() || self.animate(now) }
+    pub fn travel_pending(&self,now:f64)->bool{ self.presentation_pending(now) }
     pub fn redraw_panels(&self,now:f64)->bool {self.plane_transition.as_ref().is_some_and(|p|now-p.started<250.)||!inventory_marks(&self.cues,now).is_empty()}
     pub fn animate(&self, now: f64) -> bool {
         self.plane_transition.as_ref().is_some_and(|p|now-p.started<250.) || self.cues.iter().any(|c| !c.held && now - c.started < duration(&c.event))
@@ -319,6 +316,7 @@ fn travel_end(e:&PresentationEvent)->f64{
     e.animation.as_ref().map_or(140.,|a|if a.delivery==Delivery::Local{140.}else{arrival_ms(e,a.cells.len().max(1))})
 }
 pub(crate) fn duration(e:&PresentationEvent)->f64 {
+    if let Some(d)=crate::divine_animation_shapes::duration(e){return d;}
     e.animation.as_ref().map_or(240.,|a|match a.stage {
         Stage::Travel=>travel_end(e)+if a.delivery==Delivery::Magic{MAGIC_TAIL_MS}else{0.},
         Stage::Impact=>100.,Stage::Special=>125.,Stage::Health=>100.,Stage::Death=>100.})
@@ -351,6 +349,7 @@ fn action_tiles(cue: &Cue, age: f64, reduced: bool) -> Vec<Tile> {
         }
         proposal_color(&a.proposal)
     }, |s| crate::color::hex(s));
+    if let Some(tiles)=crate::divine_animation_shapes::tiles(e,age,reduced,color){return tiles;}
     let travel = a.stage == corpse_core::events::Stage::Travel;
     let projectile = travel && a.delivery==Delivery::Projectile;
     let magic = travel && a.delivery==Delivery::Magic;

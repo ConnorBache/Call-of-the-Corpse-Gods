@@ -771,7 +771,12 @@ fn activate_inner(
                     a.conditions.insert("temporaryAlly".into(), 5.0);
                 }
             }
-            if let Some(a)=crate::engine::actor(r,tid) {crate::animation_player::local(r,a,if id=="morae-sever-fate" {"P70"}else{"P22"},if id=="morae-sever-fate" {"slash"}else{"stitch"},crate::events::Stage::Special);}
+            if let Some(a)=crate::engine::actor(r,tid) {
+                if id=="numo-mind-slave" {
+                    crate::animation_shapes::line(r,&r.player,a.into(),"P22","line-hold","#a040ff");
+                    crate::animation_shapes::area(r,a,"P22","box-contract",2,"#a040ff",crate::events::Stage::Special);
+                } else {crate::animation_player::local(r,a,"P70","slash",crate::events::Stage::Special);}
+            }
             let name = &crate::progression::catalog_for_revision(r.simulation_revision.value_or(29.0))
                 .iter()
                 .find(|a| a.id == id)
@@ -869,6 +874,12 @@ fn activate_inner(
                 } else {
                     "unlucky"
                 };
+                // The visible casting cue also plays on same-value reapplication.
+                if tid == r.player.id {
+                    crate::animation_shapes::nova(r,&r.player,"P67","nova-blue-small",2);
+                } else if let Some(recipient)=crate::engine::actor(r,tid) {
+                    crate::animation_shapes::line(r,&r.player,recipient.into(),"P67","line-grow","#a050ff");
+                }
                 crate::engine::actor_mut_trusted(r, tid)
                     .unwrap()
                     .conditions
@@ -919,7 +930,12 @@ fn activate_inner(
             }
             r.player.conditions.insert("allSeeingReveal".into(), 1.0);
             r.player.conditions.insert("allSeeingDepth".into(), r.depth);
-            crate::animation_player::local(r,&r.player,"P72","eye",crate::events::Stage::Special);
+            if let Some(f)=r.floor() {
+                let cells:Vec<_>=(0..f.tiles.len()).map(|i|crate::events::EventPoint{x:(i%f.width()) as f64,y:(i/f.width()) as f64}).collect();
+                let serial=crate::events::emission_serial();
+                crate::events::cue(r,&r.player,"P72","map-reveal",crate::events::Stage::Special,&cells);
+                crate::events::decorate(serial,"P72","map-reveal",(&r.player).into(),"#ffb0ee",None);
+            }
             log(r, "You use All-Seeing Eyes.", "player");
         }
         BULWARK => {
@@ -1047,6 +1063,7 @@ fn activate_inner(
             if !pay(r, id, 20.0) {
                 return Ok(false);
             }
+            crate::animation_shapes::line(r,&r.player,crate::events::EventPoint{x,y},"P58","light100","#ffffff");
             crate::environment::place_sparkle(r, x, y).map_err(EngineError)?;
             let wet=r.floor().is_some_and(|f|if r.simulation_revision.value_or(29.)>=52. {
                 crate::revision51_fire_water::quenches(f,y as usize*f.width()+x as usize,r.simulation_revision.value_or(29.))
@@ -1836,4 +1853,39 @@ mod remember_passive_reference {
         r.player.conditions.insert("remembered:etill-phase-through".into(),r.tick+1.);
         assert_eq!(projected_player_upkeep(&r),0.);
     }
+}
+
+#[cfg(test)] mod authored_animation_cast_tests {
+ use super::*;
+ fn export(name:&str,before:&Run,after:&Run,events:&[crate::events::PresentationEvent]) {
+  if let Ok(dir)=std::env::var("CORPSE_ANIMATION_EXPORT_DIR") {
+   std::fs::create_dir_all(&dir).unwrap();std::fs::write(std::path::Path::new(&dir).join(format!("{name}.json")),serde_json::to_vec(&serde_json::json!({"before":before,"after":after,"events":events})).unwrap()).unwrap();
+  }
+ }
+ fn room()->Run {
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+  r.simulation_revision=52.0.into();r.player.conditions.clear();r.player.active.clear();r.player.abilities.clear();r.player.energy=1000.;r.player.x=8.;r.player.y=8.;
+  r.player.ability_reserves=Field::Missing; r.actors_at_mut(r.depth).clear();
+  let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);r
+ }
+ #[test] fn fortune_self_nova_and_repeated_enemy_cast_have_real_receipts(){
+  let mut r=room();let id="morae-fortune-teller";r.player.abilities.push(id.into());
+  let mut target=r.player.clone();target.id=900.;target.x=10.;target.state="hunting".into();target.abilities.clear();r.actors_at_mut(r.depth).push(target);
+  for (tid,style) in [(r.player.id,"nova-blue-small"),(900.,"line-grow"),(900.,"line-grow")] {
+   let before=r.clone();crate::events::begin();activate(&mut r,id,&tid.into(),&Field::Missing,&Field::Missing).unwrap();
+   let out=crate::events::finish();export(if tid==r.player.id {"fortune-self"}else{"fortune-enemy"},&before,&r,&out);assert!(out.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P67" && a.style==style)),"{style}");
+  }
+ }
+ #[test] fn sparkle_travels_as_bright_light_before_local_impact(){
+  let mut r=room();r.player.abilities.push(SPARKLE.into());crate::revision50_ability_energy::initialize_reserve(&mut r.player,SPARKLE,10.,10.).unwrap();let before=r.clone();crate::events::begin();
+  activate(&mut r,SPARKLE,&Field::Missing,&10.0.into(),&8.0.into()).unwrap();
+  let out=crate::events::finish();export("sparkle",&before,&r,&out);let cues:Vec<_>=out.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P58").collect();
+  assert_eq!(cues[0].style,"light100");assert_eq!(cues[0].delivery,crate::events::Delivery::Magic);assert!(cues.len()>=2);
+ }
+ #[test] fn all_seeing_has_radial_reveal_centered_on_player(){
+  let mut r=room();r.player.abilities.push(ALL_SEEING.into());crate::revision50_ability_energy::initialize_reserve(&mut r.player,ALL_SEEING,10.,10.).unwrap();let before=r.clone();crate::events::begin();
+  activate(&mut r,ALL_SEEING,&Field::Missing,&Field::Missing,&Field::Missing).unwrap();
+  let out=crate::events::finish();export("all-seeing-eyes",&before,&r,&out);let e=out.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P72")).unwrap();
+  assert_eq!(e.animation.as_ref().unwrap().style,"map-reveal");assert_eq!(e.to,(&r.player).into());assert!(e.animation.as_ref().unwrap().cells.len()>1);
+ }
 }

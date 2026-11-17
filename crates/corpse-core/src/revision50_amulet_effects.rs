@@ -464,7 +464,24 @@ pub fn aim_preview(r:&Run,item:&Item,x:f64,y:f64)->AimPreview {
     let mut out=AimPreview::default();
     let Some(kind)=effect(item) else {
         out.area=crate::revision50_control_amulets::preview(r,item,x,y);
-        if crate::revision50_control_amulets::effect(item)==Some(crate::revision50_control_amulets::ControlEffect::Beckoning) {
+        let control=crate::revision50_control_amulets::effect(item);
+        if r.simulation_revision.value_or(29.)>=52. && control.is_some_and(|k|k!=crate::revision50_control_amulets::ControlEffect::Floods) {
+            // Reuse the bounded, knowledge-only non-piercing ray geometry.
+            // The synthetic item is solely a geometry selector, not an activation.
+            let geometry=Item{kind:"amulet".into(),effect:"iceblast".to_string().into(),..Default::default()};
+            let path=aim_preview(r,&geometry,x,y);
+            out.delivery=path.delivery;out.possible_exits=path.possible_exits;out.impact=path.impact;
+            out.area.clear();
+            if let Some((xx,yy))=out.impact {
+                if control==Some(crate::revision50_control_amulets::ControlEffect::Obstruction) {
+                    out.area=crate::revision50_control_amulets::preview(r,item,xx as f64,yy as f64);
+                } else if r.actors_at(r.depth).iter().any(|a|a.hp>0.&&!a.dead.value_or(false)
+                    &&crate::dreamwalking::same_plane(r,&r.player,a)&&crate::vision::visible_actor(r,a)
+                    &&crate::portals::same_position(r,a,xx as f64,yy as f64)) {out.area.push((xx,yy));}
+            }
+            return out;
+        }
+        if control==Some(crate::revision50_control_amulets::ControlEffect::Beckoning) {
             out.delivery=crate::revision50_control_amulets::beckoning_preview_with_range(r,x,y,crate::revision52_amulet_tiers::profile(r,item).and_then(|p|p.range).unwrap_or(8.));
         }
         return out;

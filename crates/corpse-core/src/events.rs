@@ -68,16 +68,25 @@ impl Drop for PresentationObserver {
 /// frames per command; beyond the cap the host holds the last safe observation
 /// until the entire command completes. Hosts must knowledge-filter before painting.
 pub(crate) fn checkpoint(r: &Run) {
-    let wanted = PENDING.with(|p| p.borrow().as_ref().is_some_and(|b| b.frames.len() < 128));
+    let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.next_action));
+    checkpoint_for_action(r,action);
+}
+/// Capture a wave's completed state under its original action even when nested
+/// reactions emitted later actions. Ordered insertion preserves boundary lookup.
+pub(crate) fn checkpoint_for_action(r:&Run,action:u32) {
+    let wanted = PENDING.with(|p| p.borrow().as_ref().is_some_and(|b| b.frames.len() < 128 || b.frames.iter().any(|f|f.action==action)));
     if !wanted { return; }
     let observer = OBSERVER.with(|o| o.borrow().clone());
     let Some(observer) = observer else { return; };
     let observation = observer(r);
     PENDING.with(|p| if let Some(b) = p.borrow_mut().as_mut() {
-        if b.frames.last().is_some_and(|f| f.action == b.next_action) { b.frames.pop(); }
-        b.frames.push(PresentationFrame { action: b.next_action, observation });
+        let frame=PresentationFrame{action,observation};
+        if let Some(at)=b.frames.iter().position(|f|f.action==action){b.frames[at]=frame;}
+        else {let at=b.frames.partition_point(|f|f.action<action);b.frames.insert(at,frame);}
     });
 }
+pub(crate) fn current_action()->u32 {PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action))}
+
 pub(crate) fn begin() {
     #[cfg(test)] if SUPPRESS_RECORDING.with(|s|s.get()){PENDING.with(|p|*p.borrow_mut()=None);return}
     PENDING.with(|p| *p.borrow_mut() = Some(Batch::default()));
@@ -386,6 +395,16 @@ pub fn travel(r:&Run,a:&Actor,proposal:&str,style:&str,cells:&[EventPoint],deliv
         if delivery==Delivery::Projectile{e.glyph=glyph.map(str::to_owned);}
     });
 }
+/// Decorate an admitted cue without inventing cells or changing simulation state.
+/// Exact receipt identity prevents a filtered cue from decorating an earlier event.
+pub fn decorate(since:u64,proposal:&str,style:&str,center:EventPoint,color:&str,from:Option<EventPoint>) {
+    if emission_serial()==since{return;}
+    PENDING.with(|p|if let Some(e)=p.borrow_mut().as_mut().and_then(|b|b.events.last_mut()) {
+        if e.animation.as_ref().is_some_and(|a|a.proposal==proposal&&a.style==style) {
+            e.to=center;e.color=Some(color.into());e.from=from;
+        }
+    });
+}
 /// Known launched-item identity for detached landing presentation. This annotates
 /// the current action's admitted physical route only; no world or RNG mutation.
 pub(crate) fn projectile_item(r:&Run,item_id:f64){
@@ -396,7 +415,7 @@ pub(crate) fn projectile_item(r:&Run,item_id:f64){
             .find(|a|a.action==action&&a.stage==Stage::Travel&&a.delivery==Delivery::Projectile){a.item_id=Some(item_id);}
     });
 }
-fn emission_serial()->u64{PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.serial))}
+pub fn emission_serial()->u64{PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.serial))}
 fn set_glyph(proposal:&str,stage:Stage,last:Option<&EventPoint>,glyph:String){PENDING.with(|p|{if let Some(e)=p.borrow_mut().as_mut().and_then(|b|b.events.last_mut()){
     if e.animation.as_ref().is_some_and(|a|a.proposal==proposal&&a.stage==stage)&&last==Some(&e.to){e.glyph=Some(glyph);}
 }});}
@@ -474,6 +493,12 @@ pub fn chill_applied(id:f64)->bool{PENDING.with(|p|p.borrow().as_ref().is_some_a
 
 #[cfg(test)] mod presentation_observer_tests {
  use super::*;
+ #[test] fn wave_checkpoint_retains_original_action_after_nested_reaction(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  let observer=PresentationObserver::install(|r|std::rc::Rc::new(r.player.hp));begin();next_action(&r);let wave=current_action();
+  next_action(&r);r.player.hp=42.;checkpoint_for_action(&r,wave);checkpoint(&r);finish();let frames=observer.take();
+  assert_eq!(*frames.iter().find(|f|f.action==wave).unwrap().observation.downcast_ref::<f64>().unwrap(),42.);assert!(frames.windows(2).all(|p|p[0].action<p[1].action));
+ }
  #[test] fn presentation_observer_probe_rollback_and_headless_cleanup() {
   let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
   let observer=PresentationObserver::install(|r|std::rc::Rc::new(r.player.hp));

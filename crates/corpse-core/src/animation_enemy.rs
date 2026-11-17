@@ -120,7 +120,27 @@ pub fn healed(r:&Run,before:&Actor,after:&Actor,key:&str) {
 }
 pub fn revived(r:&Run,a:&Actor) {
     let phoenix=a.abilities.iter().any(|s|s=="enemy:beast:phoenix");
-    mark(r,a,if phoenix{"E16"}else{"E70"},if phoenix{"ember-rise"}else{"rise"},Stage::Death);
+    if phoenix { crate::animation_shapes::nova(r,a,"E16","nova-redorange-small",2); }
+    else {mark(r,a,"E70","rise",Stage::Death);}
+}
+
+/// Outward wave geometry, admitted independently per cell. O(F * (distance + LOS))
+/// for F floor cells; no RNG or terrain mutation. Sound may pass walls when the
+/// underlying mechanic does. The desktop reveals outcome snapshots radially.
+pub fn wave(r:&Run,a:&Actor,key:&str,white:bool,radius:Option<f64>,los:bool,audible:bool) {
+    if !events::enabled(r) {return;}
+    let Some(f)=r.floor() else{return;};let w=f.width();let mut cells=Vec::new();
+    let mut point=a.clone();
+    for i in 0..f.tiles.len() {
+        point.x=(i%w)as f64;point.y=(i/w)as f64;
+        if radius.is_none_or(|v|crate::portals::point_distance(r,a,point.x,point.y)<=v)
+            && (!los||crate::vision::line_of_sight(r,a,&point)) {cells.push(EventPoint::from(&point));}
+    }
+    let style=if white {"wave-reveal-white"}else{"wave-reveal-purple"};
+    let serial=events::emission_serial();
+    if audible {events::at(r,key,style,Stage::Special,&cells);}
+    else {events::cue(r,a,key,style,Stage::Special,&cells);}
+    events::decorate(serial,key,style,a.into(),if white{"#ffffff"}else{"#b94bff"},None);
 }
 
 #[cfg(test)] mod outcome_tests {
@@ -196,7 +216,7 @@ pub fn revived(r:&Run,a:&Actor) {
         r.player.hp-=25.;let before=r.player.hp;
         events::begin();assert!(crate::monster_spells::heal_others(&mut r,900.).unwrap());let out=events::finish();
         assert!(r.player.hp>before);assert_eq!(out.iter().filter(|e|e.animation.as_ref().is_some_and(|v|v.proposal=="E17" && v.style=="stitch-green")).count(),1);
-        let link=out.iter().find(|e|e.animation.as_ref().is_some_and(|v|v.proposal=="E17" && v.style=="leaf-green")).unwrap();
+        let link=out.iter().find(|e|e.animation.as_ref().is_some_and(|v|v.proposal=="E17" && v.style=="line-grow")).unwrap();
         assert_eq!(link.from,Some(EventPoint{x:4.,y:2.}));assert_eq!(link.to,EventPoint::from(&r.player));
     }
 
@@ -251,7 +271,7 @@ pub fn revived(r:&Run,a:&Actor) {
         r.actors_at_mut(r.depth).push(source.clone());
         let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+5]="wall".into();
         let target=r.player.id;events::begin();assert!(crate::monster_ruin::special_action(&mut r,900.,target).unwrap());
-        let out=events::finish();let rings:Vec<_>=out.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="E51"&&a.style=="crossed-ring-violet").collect();
+        let out=events::finish();let rings:Vec<_>=out.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="E51"&&a.style=="wave-reveal-purple").collect();
         assert_eq!(rings.len(),1);assert!(rings[0].cells.len()>2);
         for p in &rings[0].cells {assert!((p.x-source.x).hypot(p.y-source.y)<=3.);}
         assert!(!rings[0].cells.contains(&EventPoint{x:6.,y:2.}));
@@ -319,4 +339,43 @@ pub fn expired_statuses(r:&Run,before:&Actor) {
   r.player.conditions.insert("poisoned".into(),5.);events::begin();expired_statuses(&r,&before);assert!(events::finish().is_empty());
   r.player.conditions.insert("poisoned".into(),0.);r.simulation_revision=51.0.into();events::begin();expired_statuses(&r,&before);assert!(events::finish().is_empty());
  }
+}
+
+#[cfg(test)] mod requested_enemy_visual_tests {
+ use super::*;
+ fn room()->Run {let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.x=2.;r.player.y=2.;r.player.hp=1000.;r.player.max_hp=1000.;r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();r.inventory.clear();r.actors_at_mut(r.depth).clear();let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);r}
+ #[test] fn dryad_requires_unblocked_spell_and_emits_green_path(){
+  let mut r=room();r.player.hp=900.;let mut a=crate::population::create_actor_revision("dryad",900.,4.,2.,false,52.).unwrap();a.state="ally".into();a.energy=100.;r.actors_at_mut(r.depth).push(a);
+  let block=Actor{id:901.,x:3.,y:2.,hp:100.,max_hp:100.,state:"hunting".into(),..Default::default()};r.actors_at_mut(r.depth).push(block);
+  assert!(!crate::monster_spells::heal_others(&mut r,900.).unwrap());assert_eq!(r.player.hp,900.);
+  r.actors_at_mut(r.depth).retain(|a|a.id!=901.);events::begin();assert!(crate::monster_spells::heal_others(&mut r,900.).unwrap());let e=events::finish();let path=e.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.style=="line-grow")).unwrap();assert_eq!(path.color.as_deref(),Some("#40ff60"));assert!(r.player.hp>900.);
+ }
+ #[test] fn banshee_wave_hits_other_creatures_and_records_source_center(){
+  let mut r=room();r.tick=30.;r.floor_mut().unwrap().monster_entry_tick=0.0.into();let a=crate::population::create_actor_revision("banshee",900.,4.,2.,false,52.).unwrap();r.actors_at_mut(r.depth).push(a);
+  let b=Actor{id:901.,x:5.,y:2.,hp:1000.,max_hp:1000.,name:"Near target".into(),state:"hunting".into(),..Default::default()};r.actors_at_mut(r.depth).push(b);
+  events::begin();events::next_action(&r);crate::lifecycle::world_turn(&mut r).unwrap();let e=events::finish();assert!(r.player.hp<1000.);assert!(crate::engine::actor(&r,901.).unwrap().hp<1000.);let wave=e.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.style=="wave-reveal-purple")).unwrap();assert_eq!(wave.to,EventPoint{x:4.,y:2.});
+  let near=r.log.iter().position(|s|s.starts_with("Banshee shriek deals")&&s.ends_with("Near target.")).unwrap();let player=r.log.iter().position(|s|s.starts_with("Banshee shriek deals")&&s.ends_with("you.")).unwrap();assert!(near<player,"near monster resolves before farther player");
+ }
+ #[test] fn phoenix_has_redorange_nova(){let r=room();let mut a=r.player.clone();a.abilities=vec!["enemy:beast:phoenix".into()];events::begin();revived(&r,&a);assert!(events::finish().iter().any(|e|e.animation.as_ref().is_some_and(|a|a.style=="nova-redorange-small")));}
+ #[test] fn borge_mark_reveals_fungus_identity_without_global_telepathy(){
+  let mut r=room();let mut a=crate::population::create_actor_revision("bastidion",900.,40.,20.,false,52.).unwrap_or_else(|_|Actor{id:900.,x:40.,y:20.,hp:100.,max_hp:100.,creature_kind:"bastidion".to_string().into(),..Default::default()});a.conditions.insert("invisible".into(),20.);r.player.conditions.insert("hallucinating".into(),20.);r.floor_mut().unwrap().godbeast_event=crate::GodbeastEvent{kind:"Borge".into(),sacrifice_actor_id:900.0.into(),..Default::default()}.into();
+  assert!(crate::vision::telepathic(&r,&a));assert!(crate::actor_presentation::identity_known(&r,&a));assert!(crate::actor_presentation::apparent_kind(&r,&a).is_none());a.id=901.;assert!(!crate::vision::telepathic(&r,&a));a.id=900.;r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().reward_created=true.into();assert!(!crate::vision::telepathic(&r,&a));
+ }
+ #[test] fn blorb_caustic_log_names_slime(){let mut r=room();let source=crate::population::create_actor_revision("blorb",900.,3.,2.,false,52.).unwrap();let id=r.player.id;crate::engine::damage_direct_with_source_snapshot(&mut r,id,1.,&source,"caustic",true).unwrap();assert!(r.log.iter().any(|s|s=="You take 1 damage from the Blorb's caustic slime."));}
+ #[test] #[ignore] fn export_requested_enemy_animation_video_fixtures(){
+  fn export(name:&str,r:Run,run:impl FnOnce(&mut Run)) {let before=r.clone();let mut after=r;events::begin();events::next_action(&after);run(&mut after);events::checkpoint(&after);let cues=events::finish();std::fs::create_dir_all("/tmp/animation-video-fixtures").unwrap();std::fs::write(format!("/tmp/animation-video-fixtures/{name}.json"),serde_json::to_vec(&serde_json::json!({"before":before,"after":after,"events":cues})).unwrap()).unwrap();}
+  for (name,ability,x,y) in [("witch-summon","witch",6.,4.),("beckon","beckon",10.,4.),("stone-seal","wall-seal",5.,4.)] {
+   let mut r=room();let mut a=crate::population::create_actor_revision(if ability=="witch"{"witch"}else if ability=="beckon"{"horn-3"}else{"horn-5"},900.,x,y,false,52.).unwrap();a.abilities=vec![format!("enemy:beast:{ability}")];a.energy=100.;a.conditions.clear();r.actors_at_mut(r.depth).push(a);
+   export(name,r,|r|{let target=r.player.id;if ability=="witch"{assert!(crate::witch::summon(r,900.,target).unwrap());}else{assert!(crate::monster_horn::special_action(r,900.,target).unwrap());}});
+  }
+  let mut r=room();r.player.hp=900.;let mut a=crate::population::create_actor_revision("dryad",900.,8.,2.,false,52.).unwrap();a.state="ally".into();a.energy=100.;r.actors_at_mut(r.depth).push(a);export("dryad",r,|r|{crate::monster_spells::heal_others(r,900.).unwrap();});
+  let mut r=room();r.tick=30.;r.floor_mut().unwrap().monster_entry_tick=0.0.into();r.actors_at_mut(r.depth).push(crate::population::create_actor_revision("banshee",900.,6.,4.,false,52.).unwrap());r.actors_at_mut(r.depth).push(Actor{id:901.,x:9.,y:4.,hp:1000.,max_hp:1000.,name:"Target".into(),glyph:"t".into(),state:"hunting".into(),..Default::default()});export("banshee",r,|r|{crate::lifecycle::world_turn(r).unwrap();});
+  let mut r=room();let mut a=crate::population::create_actor_revision("phoenix",900.,6.,4.,false,52.).unwrap();a.dead=true.into();a.hp=0.;r.actors_at_mut(r.depth).push(a);export("phoenix",r,|r|{let tick=r.tick;let a=crate::engine::actor_mut_trusted(r,900.).unwrap();crate::corpses::revive_corpse(a,tick);let a=a.clone();revived(r,&a);});
+  let mut r=room();let mut a=crate::population::create_actor_revision("ursa-minor",900.,6.,4.,false,52.).unwrap();a.dead=true.into();a.hp=0.;r.actors_at_mut(r.depth).push(a);export("ursa-minor",r,|r|crate::lifecycle::ursa_death_cry(r,900.,crate::movement::Point{x:6,y:4}));
+  let mut r=room();let mut a=Actor{id:900.,x:6.,y:4.,hp:1000.,max_hp:1000.,energy:100.,name:"Pale Screamer".into(),glyph:"s".into(),state:"hunting".into(),abilities:vec!["enemy:pale:scream".into()],..Default::default()};a.conditions.insert("bestiaryTraitsInitialized".into(),1.);r.actors_at_mut(r.depth).push(a);export("screamer",r,|r|{let id=r.player.id;crate::ai::enemy_action_options(r,900.,id,false).unwrap();});
+  let mut r=room();let mut a=r.player.clone();a.id=900.;a.x=4.;a.y=2.;a.name="Zillennia".into();a.glyph="Z".into();a.state="hunting".into();a.abilities=vec!["enemy:beast:ruin-pulse".into()];a.energy=100.;r.actors_at_mut(r.depth).push(a);export("ruin",r,|r|{let id=r.player.id;crate::monster_ruin::special_action(r,900.,id).unwrap();});
+  let mut r=room();let w=r.floor().unwrap().width();r.floor_mut().unwrap().tiles[w+1]="up".into();r.actors_at_mut(r.depth).push(crate::ahvamitt::actor_revision(900.,6.,4.,52.));export("ahvamitt",r,|r|{crate::ahvamitt::attack(r,900.).unwrap();});
+  let mut r=room();r.floor_mut().unwrap().godbeast_event=crate::GodbeastEvent{kind:"Epidite".into(),x:6.,y:4.,epidite_age:29.0.into(),..Default::default()}.into();export("epidite",r,|r|{crate::epidite::world_turn(r).unwrap();});
+ }
+
 }

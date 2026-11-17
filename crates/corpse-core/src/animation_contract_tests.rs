@@ -57,9 +57,19 @@ fn rat(r:&mut Run,id:f64,x:f64,y:f64)->Actor {let mut a=crate::population::creat
 #[test]fn animation_recipient_heal_requires_actual_visible_recipient(){
  let mut r=room();r.player.conditions.clear();let mut dryad=crate::population::create_actor_revision("dryad",123.,11.,10.,false,52.).unwrap();dryad.energy=100.;r.actors_at_mut(r.depth).push(dryad);
  let b=rat(&mut r,124.,12.,10.);let a=crate::engine::actor_mut_trusted(&mut r,b.id).unwrap();a.hp=20.;a.conditions.insert("invisible".into(),10.);
- events::begin();assert!(crate::monster_spells::heal_others(&mut r,123.).unwrap());let out=events::finish();assert!(crate::engine::actor(&r,124.).unwrap().hp>20.);assert!(!out.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="E17")));
+ events::begin();assert!(crate::monster_spells::heal_others(&mut r,123.).unwrap());let out=events::finish();assert!(crate::engine::actor(&r,124.).unwrap().hp>20.);// A visible caster's spell path is observable, but the invisible recipient's
+ // identity and healing outcome are not.
+ let grove:Vec<_>=out.iter().filter(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="E17")).collect();
+ assert!(!grove.is_empty());
+ assert!(grove.iter().all(|e|{let cue=e.animation.as_ref().unwrap();cue.stage==Stage::Travel&&cue.style=="line-grow"&&e.label.is_none()&&e.glyph.is_none()&&cue.cells.iter().all(|p|crate::vision::directly_visible_tile(&r,p.x as usize,p.y as usize))}));
  crate::engine::actor_mut_trusted(&mut r,123.).unwrap().conditions.shift_remove("monsterHealReadyAt");crate::engine::actor_mut_trusted(&mut r,124.).unwrap().conditions.clear();
- events::begin();assert!(crate::monster_spells::heal_others(&mut r,123.).unwrap());assert!(events::finish().iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="E17")));
+ events::begin();assert!(crate::monster_spells::heal_others(&mut r,123.).unwrap());assert!(events::finish().iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="E17"&&a.stage==Stage::Health)));
+ // An unobserved caster may not disclose its spell or recipient.
+ crate::engine::actor_mut_trusted(&mut r,123.).unwrap().conditions.shift_remove("monsterHealReadyAt");
+ crate::engine::actor_mut_trusted(&mut r,123.).unwrap().conditions.insert("invisible".into(),10.);
+ crate::engine::actor_mut_trusted(&mut r,124.).unwrap().conditions.insert("invisible".into(),10.);
+ events::begin();assert!(crate::monster_spells::heal_others(&mut r,123.).unwrap());
+ assert!(!events::finish().iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="E17")));
 }
 #[test]fn animation_bond_damage_pulses_only_observed_real_recipient(){
  for hidden in [false,true] {

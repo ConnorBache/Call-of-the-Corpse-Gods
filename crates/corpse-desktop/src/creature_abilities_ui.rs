@@ -1261,7 +1261,8 @@ mod tests {
             );
             assert_eq!(
                 details,
-                c["details"].as_str().unwrap(),
+                // Later approved copy cut removes this duplicate shared-body limitation.
+                c["details"].as_str().unwrap().replace(" This body cannot use that power independently.", ""),
                 "{} details",
                 c["name"]
             );

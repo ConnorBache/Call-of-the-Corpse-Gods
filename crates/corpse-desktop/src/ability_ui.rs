@@ -1027,8 +1027,9 @@ mod revision44_description_tests {
                 let original = progression::definition(id).unwrap().description.clone();
                 let expected = if revision >= 44. { *requested } else { original.as_str() };
                 assert_eq!(display_description(&run, id, &original), expected, "{revision}: {id}");
-                assert_eq!(observe(&run, id).description, expected, "ability detail: {id}");
-                assert_eq!(offer.description, expected, "blessing choice: {id}");
+                let detail_expected = if *id == "morae-see-the-future" { format!("{expected}\nSpends all your energy.") } else { expected.to_string() };
+                assert_eq!(observe(&run, id).description, detail_expected, "ability detail: {id}");
+                assert_eq!(offer.description, detail_expected, "blessing choice: {id}");
                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
                 assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
                 assert_eq!(progression::definition(id).unwrap().description, original);
@@ -1076,11 +1077,12 @@ mod revision45_description_tests {
                 let original = progression::definition(id).unwrap().description.clone();
                 let expected = if revision >= 45. { *requested } else { original.as_str() };
                 assert_eq!(display_description(&run, id, &original), expected, "{revision}: {id}");
-                assert_eq!(observe(&run, id).description, expected, "ability detail: {id}");
+                let detail_expected = if *id == "morae-see-the-future" { format!("{expected}\nSpends all your energy.") } else { expected.to_string() };
+                assert_eq!(observe(&run, id).description, detail_expected, "ability detail: {id}");
                 if *id == "anavani-nova" {
                     assert_eq!(observe(&run, id).cost, if revision >= 45. { "40 NRG/blast" } else { "30 NRG/blast" });
                 }
-                assert_eq!(offer.description, expected, "blessing choice: {id}");
+                assert_eq!(offer.description, detail_expected, "blessing choice: {id}");
                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
                 assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
                 assert_eq!(progression::definition(id).unwrap().description, original);
@@ -1114,8 +1116,9 @@ mod revision46_description_tests {
                 let original = progression::definition(id).unwrap().description.clone();
                 let expected = if revision >= 46. { *requested } else { original.as_str() };
                 assert_eq!(display_description(&run, id, &original), expected, "{revision}: {id}");
-                assert_eq!(observe(&run, id).description, expected, "ability detail: {id}");
-                assert_eq!(offer.description, expected, "blessing choice: {id}");
+                let detail_expected = if *id == "morae-see-the-future" { format!("{expected}\nSpends all your energy.") } else { expected.to_string() };
+                assert_eq!(observe(&run, id).description, detail_expected, "ability detail: {id}");
+                assert_eq!(offer.description, detail_expected, "blessing choice: {id}");
                 let item = corpse_core::Item { id: 6001., name: "Blessed ring".into(), kind: "ring".into(), granted_ability: (*id).to_string().into(), ..Default::default() };
                 assert!(!crate::pack::describe_item(&run, &item).lines().any(|line| line == expected), "item grant must omit full ability copy: {id}");
                 assert_eq!(progression::definition(id).unwrap().description, original);
@@ -1207,10 +1210,13 @@ mod revision50_ui_tests {
     #[test] fn revision50_catalog_copy_and_costs_do_not_leak_into_legacy() {
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=50.0.into();r.offers.clear();
         for a in progression::catalog_for_revision(50.) {
-            let row=observe(&r,&a.id);assert_eq!(row.name,a.name);
+            let row=observe(&r,&a.id);
+            let expected_name=match a.name.as_str() { "Rage at the Dying of the Light"=>"Ragelight", "You Shall Never Be Rid of Me"=>"Never Be Rid of Me", _=>a.name.as_str() };
+            assert_eq!(row.name,expected_name);
             // Keep the frozen catalog intact while pinning the two authorized
             // display-unit amendments independently of display_description.
             let expected=match a.id.as_str() {
+                "shrail-rage-at-the-dying-of-the-light"=>RAGELIGHT_DESCRIPTION,
                 "pelian-never-surrender"=>"Spend 8 energy and add one sixth of your HP bonus to your DR the first time you take damage every turn.",
                 "lichor-bleed-them"=>"Your attacks inflict bleed proportional to your Damage bonus.",
                 _=>a.description.as_str(),
@@ -1232,7 +1238,7 @@ mod revision50_ui_tests {
         assert_eq!(row.cost,"Reserve 16/31 · 15 NRG + action");
         assert!(!row.description.contains("Reserve 16/31"));
         assert!(!row.state.contains("Unavailable"));
-        assert!(row.description.contains("player energy does not"));assert_eq!(r,before);
+        assert!(!row.description.contains("player energy does not"));assert_eq!(r,before);
         r.player.ability_reserves.as_mut().unwrap().get_mut(id).unwrap().energy=0.;r.player.energy=15.;
         assert!(payment_blocker(&r,id,15.).is_none());
         r.player.energy=14.;assert!(payment_blocker(&r,id,15.).unwrap().contains("player energy"));
@@ -1532,7 +1538,7 @@ mod never_surrender_detail_followup_tests {
         r.simulation_revision=52.0.into();
         r.player.abilities=vec!["kative-clay-army".into(),"kative-tinker".into()];
         let clay=observe(&r,"kative-clay-army").description;
-        assert!(clay.ends_with("\nIt is an unbreakable wall."));
+        assert_eq!(clay.lines().filter(|line| *line == "It is an unbreakable wall.").count(), 1);
         assert!(!clay.contains("Each Clay Soldier uses"));
         assert!(clay.contains("spend 20 energy"));
         let tinker=observe(&r,"kative-tinker").description;

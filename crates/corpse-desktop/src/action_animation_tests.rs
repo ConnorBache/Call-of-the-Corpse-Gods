@@ -69,11 +69,11 @@ fn room()->Run{
    let mut e=event(key,style,Stage::Special,0,&[]);let a=e.animation.as_mut().unwrap();a.surface=Some("inventory".into());a.item_id=id;cues.push(e);
   }
   let mut fx=effects::Effects::default();fx.add(cues,1.,1.,0.,false);
-  assert!(effects::inventory_marks(&fx.cues,180.).iter().any(|(_,m,c,_)|m.style=="spark-god-11"&&*c==ability_ui::god_color(11)));
+  assert!(effects::inventory_marks(&fx.cues,80.).iter().any(|(_,m,c,_)|m.style=="spark-god-11"&&*c==ability_ui::god_color(11)));
   let energy=effects::inventory_hud_anchor(&p,&action_marks::Mark{style:"energy-drain".into(),progress:500,direction:None});assert_eq!(energy.0,p.hud_left()+12);assert!(energy.1<=118&&energy.1+energy.3>=126);
   let pack_anchor=effects::inventory_hud_anchor(&p,&action_marks::Mark{style:"pack-capacity".into(),progress:500,direction:None});assert_eq!(p.toolbar_action(pack_anchor.0+12,pack_anchor.1+12),Some(render::TOOLBAR_VISIBLE_ACTIONS[0]));
-  p.game_at(&view,"",false,0.);effects::paint_inventory_hud(&mut p,&view,&fx.cues,180.,false);capture(&p,&format!("hud-closed-pack-{width}x{height}"));
-  let mut pack=pack::PackView::observe(&r);pack.configure(&p,p.frame().map.tuple());pack.paint(&mut p);pack.paint_action_marks(&mut p,&fx.cues,180.);effects::paint_inventory_hud(&mut p,&view,&fx.cues,180.,true);capture(&p,&format!("hud-open-pack-{width}x{height}"));
+  p.game_at(&view,"",false,0.);effects::paint_inventory_hud(&mut p,&view,&fx.cues,80.,false);capture(&p,&format!("hud-closed-pack-{width}x{height}"));
+  let mut pack=pack::PackView::observe(&r);pack.configure(&p,p.frame().map.tuple());pack.paint(&mut p);pack.paint_action_marks(&mut p,&fx.cues,80.);effects::paint_inventory_hud(&mut p,&view,&fx.cues,80.,true);capture(&p,&format!("hud-open-pack-{width}x{height}"));
  }
 }
 #[test]fn action_animation_actual_control_amulet_native_captures(){

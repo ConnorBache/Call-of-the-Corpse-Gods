@@ -438,11 +438,11 @@ fn trim_transparent_margin(art:Picture)->Picture {
 }
 const STAT_LABELS: [&str; 7] = ["HP", "Energy", "Accuracy", "Damage", "Dodge", "DR", "Perception"];
 
-/// The current catalog owns R52 natural/context floor rows, not the Bestiary's
-/// historical appearance metadata. Exact context keys never borrow other births.
+/// The current catalog owns R52 species reference rows, not the Bestiary's
+/// historical appearance metadata. Birth contexts share their canonical species.
 fn birth_depths(entry: &Entry, revision: f64) -> Vec<usize> {
     if revision == 52. {
-        let key = if entry.id == "saidribee-queen" { "nest:saidribee-queen" } else { &entry.id };
+        let key = corpse_core::balance52::canonical_kind(&entry.id);
         let depths: Vec<_> = corpse_core::balance52::profiles().iter()
             .filter(|r| r.kind == key).map(|r| r.floor as usize).collect();
         if !depths.is_empty() { return depths; }
@@ -499,10 +499,7 @@ fn birth_actor(entry: &Entry, depth: usize, revision: f64) -> Option<corpse_core
             .filter(|a| a.zillennia_quality.as_ref().is_some_and(|q| entry.id == format!("zillennia:{q}")));
     }
     if entry.id == "bastidion" {
-        let mut actor=corpse_core::population::catalog().fungi.get(depth.checked_sub(1)?).cloned()?;
-        actor.stats.accuracy=corpse_core::combat::creature_birth_accuracy(revision,actor.stats.accuracy);
-        actor.stats.dodge=corpse_core::combat::creature_birth_dodge(revision,actor.stats.dodge);
-        return Some(actor);
+        return corpse_core::population::fungus_revision(depth as u32, revision).ok();
     }
     let (birth_revision, profile_key) = match entry.id.as_str() {
         // Keep the Sphinx chamber body; add only the R52 Accuracy/Dodge baselines below.
@@ -1087,10 +1084,10 @@ mod tests {
             }
         }
         let rat = manual.catalog.entries.iter().find(|e| e.id == "rat").unwrap();
-        assert_eq!(stat_rows(rat, 52.)[0].1, "40–82");
-        assert_eq!(stat_rows(rat, 52.).iter().find(|r| r.0 == "Damage").unwrap().1, "14–24");
+        assert_eq!(stat_rows(rat, 52.)[0].1, "40");
+        assert_eq!(stat_rows(rat, 52.).iter().find(|r| r.0 == "Damage").unwrap().1, "14");
         assert_ne!(stat_rows(rat, 52.), stat_rows(rat, 51.));
-        assert_ne!(birth_actor(rat, 1, 52.).unwrap().max_hp, birth_actor(rat, 3, 52.).unwrap().max_hp);
+        assert_eq!(actor_stat_values(&birth_actor(rat, 1, 52.).unwrap(),52.), actor_stat_values(&birth_actor(rat, 3, 52.).unwrap(),52.));
     }
     #[test]
     fn r52_bestiary_fungus_and_zillennia_use_real_depth_templates() {
@@ -1099,12 +1096,10 @@ mod tests {
             let fungus = manual.catalog.entries.iter().find(|e| e.id == "bastidion").unwrap();
             let actors: Vec<_> = birth_depths(fungus, revision).iter()
                 .map(|&d| {
-                    let mut a=corpse_core::population::catalog().fungi[d-1].clone();
-                    if revision >= 52. { a.stats.accuracy += 15.; a.stats.dodge = (10. + a.stats.dodge).max(10.); }
-                    a
+corpse_core::population::fungus_revision(d as u32, revision).unwrap()
                 }).collect();
             assert_ranges(fungus, &actors, revision);
-            assert_eq!(stat_rows(fungus, revision)[0].1, if revision >= 51. { "154–574" } else { "154–622" });
+            assert_eq!(stat_rows(fungus, revision)[0].1, if revision == 52. { "154" } else if revision >= 51. { "154–574" } else { "154–622" });
             for entry in manual.catalog.entries.iter().filter(|e| e.id.starts_with("zillennia:")) {
                 let actors: Vec<_> = entry.conditional_depths.iter().map(|&depth| {
                     let actor = corpse_core::population::zillennia_revision(depth as u32, revision).unwrap();
@@ -1172,7 +1167,7 @@ mod tests {
             }
             assert_ranges(queen, &queens, revision);
         }
-        assert_eq!(stat_rows(queen, 52.)[0].1, "430–694");
+        assert_eq!(stat_rows(queen, 52.)[0].1, "430");
         assert!(stat_rows(queen, 29.).iter().all(|r| r.1 == "Varies"));
         let sphinx = manual.catalog.entries.iter().find(|e| e.id == "sphinx").unwrap();
         let guardian = corpse_core::population::create_actor("sphinx", 0., 0., 0., false).unwrap();
@@ -1189,7 +1184,7 @@ mod tests {
         assert!(stat_rows(&variable, 52.).iter().all(|r| r.1 == "Varies"));
     }
     #[test]
-    fn r52_bestiary_natural_ranges_do_not_mix_summon_or_nest_profiles() {
+    fn r52_bestiary_natural_and_context_births_share_species_profiles() {
         let manual = Manual::new();
         for (kind, context) in [("short-saidri", "queen:short-saidri"),
             ("saidri-guardian", "nest:saidri-guardian"), ("pale:Jackal", "birther:pale:Jackal"),
@@ -1200,7 +1195,7 @@ mod tests {
             assert_ranges(entry, &actors, 52.);
             let contextual = corpse_core::balance52::profile(context, 30.).unwrap();
             let natural = birth_actor(entry, 30, 52.).unwrap();
-            assert_ne!((natural.stats.offense, natural.max_hp, natural.stats.accuracy),
+            assert_eq!((natural.stats.offense, natural.max_hp, natural.stats.accuracy),
                 (contextual.offense, 100. + 6. * contextual.defense, contextual.accuracy + 15.));
         }
     }

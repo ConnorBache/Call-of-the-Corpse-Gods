@@ -309,6 +309,8 @@ pub fn enemy_action_options(
         return Ok(true);
     }
     if a.abilities.iter().any(|id| id == "enemy:pale:scream") && enemy_spend(r, id, 15.0) {
+        crate::animation_enemy::wave(r,&a,"E65",true,Some(10.),false,false);
+        let wave_action=crate::events::current_action();
         let multiplier = if a.name.starts_with("Greater ") {
             2.0
         } else {
@@ -356,7 +358,8 @@ pub fn enemy_action_options(
             }
             let b=b.clone(); if show { crate::animation_enemy::mark(r,&b,"E65",if same {"diamond-warm"}else{"crossed-ring-violet"},crate::events::Stage::Special); }
         }
-        crate::events::actor_event(r, &a, "pulse", "Scream", None, None);
+        if !crate::events::enabled(r) {crate::events::actor_event(r, &a, "pulse", "Scream", None, None);}
+        crate::events::checkpoint_for_action(r,wave_action);
         if vision::visible_actor(r, &a) {
             log(
                 r,

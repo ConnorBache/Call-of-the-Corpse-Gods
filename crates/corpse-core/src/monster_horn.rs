@@ -166,6 +166,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
             }
         }
         if !choices.is_empty() && spell_spend(r, id, 12.0) {
+            crate::animation_shapes::line(r,&a,(&b).into(),"E39","line-grow","#ffd340");
             let q = &choices[(crate::rng::random(r) * choices.len() as f64).floor() as usize];
             let relocated=!crate::revision50_nightmares::is_decoy(&b) && (b.x!=q.x || b.y!=q.y);
             if crate::events::enabled(r) {if relocated {crate::animation_enemy::mark(r,&b,"E39","bracket-fold-gold",crate::events::Stage::Travel);}}
@@ -230,6 +231,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         if choices.len() >= 3 && spell_spend(r, id, 15.0) {
             let (x, y) = choices[(crate::rng::random(r) * choices.len() as f64).floor() as usize];
             let i = y as usize * r.floor().unwrap().width() + x as usize;
+            crate::animation_shapes::line(r,&a,crate::events::EventPoint{x,y},"E40","line-grow","#ffd340");
             r.floor_mut().unwrap().tiles[i] = "wall".into();
             r.floor_mut().unwrap().dirty = true;
             let tick = r.tick;

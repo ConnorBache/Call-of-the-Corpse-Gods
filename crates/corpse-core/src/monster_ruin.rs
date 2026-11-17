@@ -57,16 +57,8 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
     }
     // Presentation reuses the exact point-distance and LOS admission rules.
     // O(N*(portal distance+LOS)) on a successful cast, no RNG or geometry writes.
-    if crate::events::enabled(r) {
-        let f=r.floor().unwrap();let w=f.width();let mut cells=Vec::new();
-        let mut point=a.clone();
-        for i in 0..f.tiles.len() {
-            point.x=(i%w)as f64;point.y=(i/w)as f64;
-            if crate::portals::point_distance(r,&a,point.x,point.y)<=3.
-                && crate::vision::line_of_sight(r,&a,&point) {cells.push(crate::events::EventPoint::from(&point));}
-        }
-        crate::events::cue(r,&a,"E51","crossed-ring-violet",crate::events::Stage::Special,&cells);
-    }
+    crate::animation_enemy::wave(r,&a,"E51",false,Some(3.),true,false);
+        let wave_action=crate::events::current_action();
     // O(A * (A + LOS + damage)), stable source array snapshot, no target RNG.
     let ids: Vec<f64> = std::iter::once(&r.player)
         .chain(r.actors_at(r.depth))
@@ -111,6 +103,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
     let b = actor(r, target).unwrap_or(&b);
     let b = b.clone();
     crate::monster_horn::report(r, &a, &b, "unleashes a pulse of ruin.");
+    crate::events::checkpoint_for_action(r,wave_action);
     Ok(true)
 }
 

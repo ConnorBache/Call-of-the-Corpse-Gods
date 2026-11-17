@@ -264,6 +264,28 @@ pub fn target_valid_with_profile(r:&Run,kind:ControlEffect,x:f64,y:f64,p:Profile
 pub fn execute(r:&mut Run,kind:ControlEffect,x:f64,y:f64)->Result<(),EngineError> {execute_with_profile(r,kind,x,y,base_profile(kind))}
 pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)->Result<(),EngineError> {
     if !target_valid_with_profile(r,kind,x,y,p) {return Err(EngineError("The control amulet target is no longer valid.".into()))}
+    // R52 casts use the same committed collision ray as other targeted magic.
+    // Admission stays aim-only: hidden blockers may intercept after payment,
+    // never leak their existence through preflight validity.
+    let (mut x,mut y)=(x,y);
+    let mut intercepted=None;
+    if r.simulation_revision.value_or(29.)>=52. && matches!(kind,ControlEffect::Beckoning|ControlEffect::Discord|ControlEffect::Roots|ControlEffect::Obstruction) {
+        let key=match kind {ControlEffect::Beckoning=>"A07",ControlEffect::Discord=>"A08",ControlEffect::Roots=>"A10",_=>"A09"};
+        let hit=crate::animation_amulets::control_cast(r,key,x,y);
+        x=hit.x;y=hit.y;intercepted=hit.actor_id;
+        if kind==ControlEffect::Obstruction {
+            // Terrain cannot be erected on the intercepting creature.
+            if hit.actor_id.is_some() || !target_valid_with_profile(r,kind,x,y,p) {return Ok(())}
+        } else {
+            let Some(a)=hit.actor_id.and_then(|id|engine::actor(r,id)) else{return Ok(())};
+            if a.id==r.player.id || a.hp<=0. || a.dead.value_or(false)
+                || crate::dreamwalking::inert(r,a) || crate::revision50_terrain::is_soldier(a)
+                || crate::revision50_nightmares::is_decoy(a) || crate::revision50::duel_blocks(r,&r.player,a)
+                || (kind==ControlEffect::Roots && engine::flying_in(r,a)) {return Ok(())}
+            // Beckoning retains its separately authored legal pull-path checks.
+            if kind==ControlEffect::Beckoning && beckoning_plan(r,x,y,p.range.unwrap()).is_none(){return Ok(())}
+        }
+    }
     match kind {
         ControlEffect::Beckoning=>{
             let (id,path)=beckoning_plan(r,x,y,p.range.unwrap()).unwrap();
@@ -280,9 +302,9 @@ pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)
             }
             crate::events::cue(r,&original,"A07","root",crate::events::Stage::Travel,&traveled);
         },
-        ControlEffect::Discord=>{let id=visible_target(r,x,y,8.).unwrap().id;engine::actor_mut_trusted(r,id).unwrap().conditions.insert(DISCORD.into(),p.duration.unwrap());let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A08","crossed-ring",crate::events::Stage::Special,&[a.into()]);},
+        ControlEffect::Discord=>{let id=intercepted.unwrap_or_else(||visible_target(r,x,y,8.).unwrap().id);engine::actor_mut_trusted(r,id).unwrap().conditions.insert(DISCORD.into(),p.duration.unwrap());let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A08","crossed-ring",crate::events::Stage::Special,&[a.into()]);},
         ControlEffect::Roots=>{
-            let id=visible_target(r,x,y,6.).unwrap().id;let depth=r.depth;let source=r.player.id;let tiered=tiers::enabled(r);
+            let id=intercepted.unwrap_or_else(||visible_target(r,x,y,6.).unwrap().id);let depth=r.depth;let source=r.player.id;let tiered=tiers::enabled(r);
             let a=engine::actor_mut_trusted(r,id).unwrap();
             for (key,value) in [(ROOTS,4.),(ROOT_X,a.x),(ROOT_Y,a.y),(ROOT_DEPTH,depth),(ROOT_SOURCE,source)] {a.conditions.insert(key.into(),value);}
             if tiered {a.conditions.insert(tiers::ROOTS_DAMAGE.into(),p.periodic_damage);}
@@ -420,6 +442,38 @@ mod tests {
             stats:crate::Stats{accuracy:100.,offense:10.,max_hp:100.0.into(),..Default::default()},..Default::default()});
     }
     fn item(effect:&str)->Item {Item{id:900.,kind:"amulet".into(),effect:effect.to_string().into(),equipped:"amulet".to_string().into(),..Default::default()}}
+    #[test] fn authored_control_magic_draws_actual_ray_and_intercepts_first_creature() {
+        for (kind,key,condition) in [(ControlEffect::Discord,"A08",DISCORD),(ControlEffect::Roots,"A10",ROOTS)] {
+            let mut r=room();r.simulation_revision=52.0.into();
+            creature(&mut r,100.,14.,14.,"hunting");creature(&mut r,101.,17.,14.,"hunting");
+            crate::events::begin();execute(&mut r,kind,17.,14.).unwrap();let events=crate::events::finish();
+            assert!(engine::condition(engine::actor(&r,100.).unwrap(),condition)>0.);
+            assert_eq!(engine::condition(engine::actor(&r,101.).unwrap(),condition),0.);
+            let cue=events.iter().filter_map(|e|e.animation.as_ref()).find(|a|a.proposal==key&&a.stage==crate::events::Stage::Travel).unwrap();
+            assert_eq!(cue.delivery,crate::events::Delivery::Magic);
+            assert_eq!(cue.cells.last().unwrap().x,14.);
+        }
+    }
+    #[test] fn authored_control_magic_wall_stops_effect_without_hidden_admission_probe() {
+        for (kind,condition) in [(ControlEffect::Discord,DISCORD),(ControlEffect::Roots,ROOTS)] {
+            let mut r=room();r.simulation_revision=52.0.into();creature(&mut r,101.,17.,14.,"hunting");
+            let w=r.floor().unwrap().width();r.floor_mut().unwrap().tiles[14*w+14]="wall".into();
+            assert!(target_valid(&r,kind,17.,14.));
+            execute(&mut r,kind,17.,14.).unwrap();
+            assert_eq!(engine::condition(engine::actor(&r,101.).unwrap(),condition),0.);
+        }
+    }
+    #[test] fn authored_control_preview_stops_at_known_blocker_without_scouting() {
+        let mut r=room();r.simulation_revision=52.0.into();creature(&mut r,100.,14.,14.,"hunting");creature(&mut r,101.,17.,14.,"hunting");
+        let i=item("discord");let before=r.clone();
+        let preview=crate::revision50_amulet_effects::aim_preview(&r,&i,17.,14.);
+        assert_eq!(preview.delivery.last(),Some(&(14,14)));assert_eq!(preview.area,vec![(14,14)]);assert_eq!(r,before);
+    }
+    #[test] fn authored_obstruction_never_builds_beyond_a_creature() {
+        let mut r=room();r.simulation_revision=52.0.into();creature(&mut r,100.,14.,14.,"hunting");
+        execute(&mut r,ControlEffect::Obstruction,18.,14.).unwrap();
+        let w=r.floor().unwrap().width();assert_eq!(r.floor().unwrap().tiles[14*w+18],"floor");
+    }
     #[test] fn beckoning_pulls_nearest_adjacent_and_breaks_roots() {
         let mut r=room();creature(&mut r,100.,17.,14.,"hunting");
         execute(&mut r,ControlEffect::Roots,17.,14.).unwrap();

@@ -34,6 +34,7 @@ pub fn summon(r:&mut Run,id:f64,target:f64)->Result<bool,String> {
         return Ok(r.player.energy<player_energy);
     }
     let (x,y)=cells[(crate::rng::random(r)*cells.len() as f64).floor() as usize];
+    crate::animation_shapes::line(r,&a,crate::events::EventPoint{x,y},"E08","line-grow","#b94bff");
     let kind=["night-crawler","skin-walker"][(crate::rng::random(r)*2.).floor() as usize];
     let mut child=crate::population::create_actor_revision(kind,r.next_id,x,y,false,33.)?;
     crate::revision50_combat::mark_new_caster(&mut child,kind,r.simulation_revision.value_or(29.));
