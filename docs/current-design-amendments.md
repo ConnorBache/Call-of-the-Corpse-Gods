@@ -839,3 +839,12 @@ interruption. Damage or a newly seen threat alone does not cancel this waiting. 
 known chasm entry/Descend and Ascend from chasm are queued before dispatch. Forced
 falls hold the prior observed scene until Space before displaying their outcome;
 authoritative simulation remains atomic and may already have computed that result.
+
+#### Death Swift ordering — November 17, 2026
+The victim visibly dies before Death Swift's green nova plays on its beneficiary. The death and nova have separate presentation boundaries; gameplay simulation remains atomic and no extra turn is consumed.
+
+## November17 nova visual correction
+Novas use irregular gas-like radial lobes and a weighted cellular expansion instead of filling a perfect square. Wisps can reach beyond the former nominal square radius, without changing gameplay range or revealing hidden cells. The outward front remains brisk (small540ms, large810ms); smooth trailing state fades last660/990ms. Total animation/input lock is1200/1800ms. Fated Duel/Make Slippery squares are unchanged.
+
+### Restored maintained-thread visuals — November 17, 2026
+Bonded By Unseen Threads restores the October 15 instruction: a clear linked status and faint red thread between player and target for the active link. I Came For You uses the same thin-thread presentation in its existing gold color. The November 17 outgoing-line activation grows the thread to its target; the resulting maintained link follows actor movement. Only currently observed line cells render; hidden gaps are not connected. Existing action snapshots defer visible telepathy and linked-status results until the growing line finishes. These are presentation changes, not new visibility or telepathy mechanics.

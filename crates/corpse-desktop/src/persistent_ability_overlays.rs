@@ -4,7 +4,9 @@ use corpse_core::{Run, vision};
 use crate::render::{Painter, View};
 use crate::perception_ui::Edge;
 #[derive(Clone,Debug,Default,PartialEq,Eq)]
-pub struct Overlays { pub entropy:Vec<Edge>, pub riptide:Vec<(usize,usize)> }
+pub struct Overlays { pub entropy:Vec<Edge>, pub riptide:Vec<(usize,usize)>, pub threads:Vec<Thread> }
+#[derive(Clone,Debug,PartialEq,Eq)]
+pub struct Thread { pub cells:Vec<(usize,usize)>, pub color:[u8;3] }
 /// Portal metric setup O(H*K^3), then O(V*H*K + L*movement_probe) per
 /// observation; O(V+K+L) storage. V floor area, H<=2 origins, L<=V.
 pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
@@ -36,6 +38,19 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
             if y==0||!inside[(y-1)*w+x]{out.entropy.push(Edge{x,y,vertical:false});}
             if y+1==h||!inside[(y+1)*w+x]{out.entropy.push(Edge{x,y:y+1,vertical:false});}
         }}
+    }
+    // Two maintained player links; recompute endpoints after every actor move.
+    // O(A + L) per link plus visible_actor, with L <= max(width,height).
+    for (id,key,timer,color) in [
+        ("morae-bonded-by-unseen-threads","bondedTarget",None,[255,48,64]),
+        ("pelian-i-came-for-you","cameTarget",Some("cameTurns"),[255,211,64]),
+    ] {
+        if timer.map_or_else(||!run.player.active.iter().any(|s|s==id),|k|corpse_core::engine::condition(&run.player,k)<=0.) {continue;}
+        let Some(a)=run.actors_at(run.depth).iter().find(|a|a.id==corpse_core::engine::condition(&run.player,key)&&a.hp>0.&&!a.dead.value_or(false)&&corpse_core::dreamwalking::same_plane(run,&run.player,a)) else {continue;};
+        if !vision::visible_actor(run,a){continue;}
+        let cells=line_cells((run.player.x as i32,run.player.y as i32),(a.x as i32,a.y as i32),w.max(h)+1).into_iter().filter(|&(x,y)|
+            x<w&&y<h&&o.and_then(|o|o.cells.get(y*w+x)).is_some_and(|c|c.current&&c.tile.is_some())).collect();
+        out.threads.push(Thread{cells,color});
     }
     if !run.player.active.iter().any(|s|s=="etill-riptide"){return out;}
     let c=corpse_core::engine::condition;
@@ -69,6 +84,25 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
     }
     out
 }
+/// Ordered Bresenham connection, never a gameplay path or visibility grant.
+fn line_cells((mut x,mut y):(i32,i32),(tx,ty):(i32,i32),limit:usize)->Vec<(usize,usize)> {
+    let dx=(tx-x).abs();let dy=-(ty-y).abs();
+    if dx.max(-dy) as usize>limit{return vec![];}
+    let sx=if x<tx{1}else{-1};let sy=if y<ty{1}else{-1};let mut error=dx+dy;let mut cells=Vec::new();
+    loop {if x>=0&&y>=0{cells.push((x as usize,y as usize));}if x==tx&&y==ty{break;}
+        let e=2*error;if e>=dy{error+=dy;x+=sx;}if e<=dx{error+=dx;y+=sy;}}
+    cells
+}
+/// Draw only neighboring admitted cells, never bridge a hidden gap.
+pub fn paint_thread(p:&mut Painter,layout:(i32,i32,i32,i32),cells:&[(usize,usize)],color:[u8;3],alpha:u8){
+    let(cw,ch,ox,oy)=layout;
+    for pair in cells.windows(2){let((ax,ay),(bx,by))=(pair[0],pair[1]);
+        if ax.abs_diff(bx)>1||ay.abs_diff(by)>1{continue;}
+        let(x0,y0)=(ox+ax as i32*cw+cw/2,oy+ay as i32*ch+ch/2);
+        let(x1,y1)=(ox+bx as i32*cw+cw/2,oy+by as i32*ch+ch/2);
+        p.faint_line(x0,y0,x1,y1,color,alpha);
+    }
+}
 pub fn paint(p:&mut Painter,v:&View){
     let(cw,ch,ox,oy)=p.map_layout(v.width,v.height);let old=p.clip;
     p.clip=Some((ox,oy,cw*v.width as i32,ch*v.height as i32));
@@ -85,11 +119,43 @@ pub fn paint(p:&mut Painter,v:&View){
         let n=(x1-x0).abs().max((y1-y0).abs()).max(1);
         for i in 0..=n {p.rect(x0+(x1-x0)*i/n,y0+(y1-y0)*i/n,2,2,[55,140,255]);}
     }
+    for thread in &v.ability_overlays.threads {paint_thread(p,(cw,ch,ox,oy),&thread.cells,thread.color,85);}
     p.clip=old;
 }
 #[cfg(test)] mod tests {
     use super::*;
     fn run()->Run{serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap()}
+    #[test] fn faint_thread_survives_small_window_and_does_not_bridge_gap(){
+        let mut p=Painter::new();p.resize(960,600);p.set_responsive_canvas(true);
+        let before=p.pixels.clone();
+        paint_thread(&mut p,(16,16,100,100),&[(1,1),(2,1),(3,1)],[255,48,64],85);
+        assert_ne!(p.pixels,before,"one-native-pixel thread must survive downscaling");
+        p.pixels.copy_from_slice(&before);
+        paint_thread(&mut p,(16,16,100,100),&[(1,1),(3,1)],[255,48,64],85);
+        assert_eq!(p.pixels,before,"hidden middle tile must not be bridged");
+    }
+    #[test] fn links_track_motion_expire_and_do_not_bridge_unknown_cells(){
+        let mut r=crate::non_euclidean_ui::tests::scene();r.simulation_revision=52.0.into();
+        r.floor_mut().unwrap().non_euclidean=corpse_core::Field::Missing;
+        r.player.x=10.;r.player.y=10.;
+        let a=corpse_core::population::create_actor_revision("bear",901.,16.,10.,false,52.).unwrap();
+        r.actors_at_mut(r.depth).push(a);
+        r.player.active.push("morae-bonded-by-unseen-threads".into());
+        r.player.conditions.insert("bondedTarget".into(),901.);
+        let mut o=vision::observe_terrain(&r).unwrap();for c in &mut o.cells{c.current=true;c.tile=Some("floor".into());}
+        let before=r.clone();let first=observe(&r,Some(&o));assert_eq!(first.threads[0].color,[255,48,64]);
+        assert_eq!(first.threads[0].cells.first(),Some(&(10,10)));assert_eq!(first.threads[0].cells.last(),Some(&(16,10)));assert_eq!(r,before);
+        r.player.x=11.;r.actors_at_mut(r.depth).last_mut().unwrap().y=11.;
+        let moved=observe(&r,Some(&o));assert_eq!(moved.threads[0].cells.first(),Some(&(11,10)));assert_eq!(moved.threads[0].cells.last(),Some(&(16,11)));
+        assert!(observe(&r,None).threads[0].cells.is_empty());
+        let w=r.floor().unwrap().width();o.cells[10*w+12].current=false;
+        assert!(!observe(&r,Some(&o)).threads[0].cells.contains(&(12,10)));
+        r.player.active.clear();assert!(observe(&r,Some(&o)).threads.is_empty());
+        r.player.conditions.insert("cameTarget".into(),901.);r.player.conditions.insert("cameTurns".into(),1.);
+        assert_eq!(observe(&r,Some(&o)).threads[0].color,[255,211,64]);
+        r.player.conditions.insert("cameTurns".into(),0.);assert!(observe(&r,Some(&o)).threads.is_empty());
+        r.player.active.push("morae-bonded-by-unseen-threads".into());r.actors_at_mut(r.depth).last_mut().unwrap().hp=0.;assert!(observe(&r,Some(&o)).threads.is_empty());
+    }
     #[test] fn entropy_visible_without_observation_and_removed_on_toggle(){
         let mut r=run();r.player.active.push("dawel-reverse-entropy".into());
         assert!(!observe(&r,None).entropy.is_empty());

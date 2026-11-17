@@ -15,7 +15,22 @@ pub fn area(r:&Run,a:&Actor,key:&str,style:&str,radius:i32,color:&str,stage:Stag
 }
 pub fn nova(r:&Run,a:&Actor,key:&str,style:&str,radius:i32) {
     let color=if style.contains("red"){"#ff3030"}else if style.contains("blue"){"#4080ff"}else if style.contains("green"){"#40ff60"}else if style.contains("black"){"#000000"}else if style.contains("orange"){"#ff9a20"}else if style.contains("yellow"){"#ffff40"}else{"#ff60c8"};
-    area(r,a,key,style,radius,color,Stage::Special);
+    // Lobed radial envelope: the old square was an unintended visible boundary.
+    // The extra two cells leave room for wisps beyond the nominal radius, but
+    // admission still goes through the ordinary visibility-filtered cue path.
+    let radius=radius.clamp(1,10);
+    let reach=radius+2;
+    let mut cells=Vec::new();
+    for dy in -reach..=reach {for dx in -reach..=reach {
+        let angle=(dy as f64).atan2(dx as f64);
+        let edge=radius as f64+0.7+0.65*(3.*angle+0.4).sin()+0.55*(5.*angle-0.8).cos();
+        if ((dx*dx+dy*dy) as f64).sqrt()<=edge.max(1.) {
+            cells.push(EventPoint{x:a.x+f64::from(dx),y:a.y+f64::from(dy)});
+        }
+    }}
+    let serial=events::emission_serial();
+    events::cue(r,a,key,style,Stage::Special,&cells);
+    events::decorate(serial,key,style,a.into(),color,None);
 }
 /// Straight visual connection, not an attack/LoE trace. O(max(dx,dy)) candidates,
 /// bounded by the current floor dimensions; hidden cells are omitted by events::travel.
@@ -38,7 +53,11 @@ pub fn line(r:&Run,a:&Actor,to:EventPoint,key:&str,style:&str,color:&str) {
  fn room()->Run {let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.x=4.;r.player.y=4.;r.player.conditions.clear();let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);r}
  #[test] fn nova_and_box_have_centered_explicit_footprints_without_mutation(){
   let r=room();let before=serde_json::to_value(&r).unwrap();events::begin();nova(&r,&r.player,"P01","nova-red-small",2);area(&r,&r.player,"P09","box-expand",2,"#ffd340",Stage::Special);let e=events::finish();assert_eq!(e.len(),2);
-  for e in e {assert_eq!(e.to,EventPoint{x:4.,y:4.});assert_eq!(e.animation.unwrap().cells.len(),25);}
+  assert_eq!(e[0].to,EventPoint{x:4.,y:4.});
+  let cells=&e[0].animation.as_ref().unwrap().cells;
+  assert!(cells.iter().any(|p|(p.x-4.).abs()>2.||(p.y-4.).abs()>2.));
+  assert!(!cells.iter().any(|p|p.x==8.&&p.y==8.));
+  assert_eq!(e[1].animation.as_ref().unwrap().cells.len(),25);
   assert_eq!(before,serde_json::to_value(&r).unwrap());
  }
  #[test] fn line_is_ordered_and_held_and_does_not_grant_visibility(){

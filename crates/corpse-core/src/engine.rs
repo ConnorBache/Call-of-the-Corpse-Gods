@@ -4516,6 +4516,10 @@ fn after_damage_with_source(
         } else {
             owner.conditions.insert("hastedFresh".into(), 1.0);
         }
+        // The killing action is complete before Death Swift's celebratory nova.
+        // Capture the corpse/removed victim in a separate presentation boundary;
+        // this does not advance the simulation clock or consume an extra turn.
+        crate::events::next_action(r);
         crate::animation_shapes::nova(r,&s,"P52","nova-green-small",2);
     }
     if a.hp > 0.0

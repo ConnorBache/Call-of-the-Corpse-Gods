@@ -721,6 +721,14 @@ impl Painter {
         self.native_fill(left, top, self.native_x((x + w) as f64).max(left + 1),
             self.native_y((y + h) as f64).max(top + 1), c, 255);
     }
+    /// One-native-pixel alpha line, so thin tethers survive downscaled windows.
+    pub fn faint_line(&mut self,x0:i32,y0:i32,x1:i32,y1:i32,color:Rgb,alpha:u8){
+        let(mut x,mut y)=(self.native_x(x0 as f64),self.native_y(y0 as f64));
+        let(tx,ty)=(self.native_x(x1 as f64),self.native_y(y1 as f64));
+        let dx=(tx-x).abs();let dy=-(ty-y).abs();let sx=if x<tx{1}else{-1};let sy=if y<ty{1}else{-1};let mut error=dx+dy;
+        loop {self.native_fill(x,y,x+1,y+1,color,alpha);if x==tx&&y==ty{break;}
+            let e=2*error;if e>=dy{error+=dy;x+=sx;}if e<=dx{error+=dx;y+=sy;}}
+    }
     /// O(clipped native area), O(1) space; batches adjacent logical pixel footprints.
     /// Unlike opaque rect, zero-size subpixel footprints do not get a minimum stroke.
     pub fn blend_rect(&mut self, x: i32, y: i32, w: i32, h: i32, c: Rgb, a: u8) {
@@ -1859,6 +1867,15 @@ impl Painter {
             }
         }
         let (cw, ch, ox, oy) = self.map_layout(v.width, v.height);
+        for cue in cues {if cue.event.depth==v.depth {if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style=="thread-grow") {
+            let age=now-cue.started;
+            if age>=0.&&age<crate::effects::duration(&cue.event) {
+                let count=if reduced{a.cells.len()}else{(age/32.).floor() as usize+1};
+                let cells=a.cells.iter().take(count).filter(|c|c.x>=0.&&c.y>=0.&&c.x<v.width as f64&&c.y<v.height as f64&&known[c.y as usize*v.width+c.x as usize]).map(|c|(c.x as usize,c.y as usize)).collect::<Vec<_>>();
+                let color=if a.proposal=="P08"{[255,211,64]}else{[255,48,64]};
+                crate::persistent_ability_overlays::paint_thread(self,(cw,ch,ox,oy),&cells,color,110);
+            }
+        }}}
         // Suppress every previous step's snapshot glyph until the push completes.
         let moving_actions:std::collections::BTreeSet<_>=cues.iter().filter_map(|c|{
             let a=c.event.animation.as_ref()?;

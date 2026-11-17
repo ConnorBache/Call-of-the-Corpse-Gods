@@ -331,3 +331,79 @@ fn sequencing_observer_does_not_change_simulation_and_reports_cost() {
  assert_eq!(engine.run.player.hp,expected.player.hp);assert_eq!(engine.run.rng,expected.rng);assert_eq!(engine.run.tick,expected.tick);
  assert_eq!(serde_json::to_value(&engine.run.actors).unwrap(),serde_json::to_value(&expected.actors).unwrap());
 }
+
+#[test]
+fn death_swift_corpse_is_visible_before_nova_and_input_stays_blocked() {
+    for heartless in [true, false] {
+        let mut run = room();
+        run.player.abilities = vec!["grisha-death-swift".into()];
+        run.player.stats.accuracy = 10000.;
+        let depth = run.depth;
+        let victim = &mut run.actors_at_mut(depth)[0];
+        victim.x = 11.; victim.y = 10.; victim.hp = 1.;
+        victim.conditions.clear(); victim.abilities.clear(); victim.heartless = heartless.into();
+        let before = run.clone();
+        let observer = corpse_core::events::PresentationObserver::install(|r| std::rc::Rc::new(r.clone()));
+        let out = corpse_core::engine::dispatch(&mut run, &Command::Move { dx: 1., dy: 0. }).unwrap();
+        let frames = observer.take();
+        let mut fx = effects::Effects::default();
+        fx.add(out.events, run.tick, run.depth, 0., false);
+        fx.sequence.capture_run(before, frames, &fx.cues, crate::appearance_profile::Profile::defaults());
+        let nova = fx.cues.iter().find(|c| c.event.animation.as_ref().is_some_and(|a| a.proposal == "P52")).unwrap();
+        let start = nova.started;
+        let end = start + effects::duration(&nova.event);
+        let death = fx.cues.iter().find(|c| c.event.animation.as_ref().is_some_and(|a| a.stage == Stage::Death)).unwrap();
+        assert!(death.started + effects::duration(&death.event) <= start);
+        let view = fx.sequence.view(start).expect("nova must hold a detached view");
+        if heartless {
+            assert!(view.cells.iter().any(|c| c.x == 11 && c.y == 10 && c.corpse));
+        } else {
+            // Ordinary hearts draw above corpses; the ground inspector still records
+            // the dead actor, and the living monster row must already be gone.
+            assert!(view.ground_entities.iter().any(|g| g.x == 11 && g.y == 10 && matches!(g.kind, crate::render::enemy_list::GroundKind::Corpse)));
+            assert!(view.cells.iter().any(|c| c.x == 11 && c.y == 10 && c.label.contains("<heart>")));
+        }
+        assert!(!view.creatures.iter().any(|c| c.id == 123.));
+        assert!(fx.presentation_pending(start));
+        assert!(fx.presentation_pending(end - 1.));
+        let serialized = serde_json::to_vec(&run).unwrap();
+        let mut painter = Painter::new();
+        painter.game_at(view, "", false, 0.);
+        let corpse_pixels = painter.pixels.clone();
+        painter.effects(view, &fx.cues, start + (end-start)*0.4, false);
+        assert_ne!(painter.pixels, corpse_pixels, "nova must render over the already-dead scene");
+        capture(&painter, "death-swift-corpse-before-nova");
+        assert_eq!(serialized, serde_json::to_vec(&run).unwrap(), "painting must never spend another turn");
+    }
+    }
+
+#[test]
+    fn i_came_telepathy_is_not_presented_until_thread_finishes() {
+        let mut run=room();
+        run.player.conditions.clear();
+        run.player.stats.perception=0.;
+        run.player.abilities=vec!["pelian-i-came-for-you".into()];
+        corpse_core::revision50_ability_energy::initialize_reserve(&mut run.player,"pelian-i-came-for-you",10.,10.).unwrap();
+        run.floor_mut().unwrap().lights.fill(0.);
+        let d=run.depth;
+        run.actors_at_mut(d)[0].x=35.;
+        run.actors_at_mut(d)[0].state="sleeping".into();
+        let before=run.clone();
+        assert!(!corpse_core::vision::visible_actor(&before,&before.actors_at(d)[0]));
+        let observer=corpse_core::events::PresentationObserver::install(|r|std::rc::Rc::new(r.clone()));
+        let out=corpse_core::engine::dispatch(&mut run,&Command::Ability{id:"pelian-i-came-for-you".into(),target:123.0.into(),x:35.0.into(),y:10.0.into()}).unwrap();
+        let frames=observer.take();
+        assert!(corpse_core::vision::telepathic(&run,&run.actors_at(d)[0]));
+        let mut fx=effects::Effects::default();fx.add(out.events,run.tick,run.depth,0.,false);
+        fx.sequence.capture_run(before,frames,&fx.cues,crate::appearance_profile::Profile::defaults());
+        let line=fx.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|a.proposal=="P08"&&a.style=="thread-grow")).unwrap();
+        let end=line.started+effects::duration(&line.event);
+        for time in [line.started,(line.started+end)/2.,end-1.] {
+            let view=fx.sequence.view(time).unwrap();
+            assert!(!view.creatures.iter().any(|c|c.id==123.),"telepathic identity revealed before line finished at {time}");
+            assert!(fx.presentation_pending(time));
+        }
+        let final_view=observe::observe(&run);
+        assert!(final_view.creatures.iter().any(|c|c.id==123.));
+    }
+

@@ -6,9 +6,9 @@ use std::collections::{BTreeMap,BTreeSet};
 pub fn duration(e:&PresentationEvent)->Option<f64>{
  let a=e.animation.as_ref()?;let s=a.style.as_str();
  if let Some(d)=s.strip_prefix("line-hold:").or_else(||s.strip_prefix("moving-actor:")).and_then(|d|d.parse().ok()){return Some(d)}
- if s.starts_with("nova-"){Some(if s.ends_with("large"){800.}else{480.})}
+ if s.starts_with("nova-"){Some(if s.ends_with("large"){1800.}else{1200.})}
  else if s.starts_with("box-"){Some(500.)}
- else if s=="line-grow"||s=="line-hold"{Some(a.cells.len().max(1) as f64*32.+100.)}
+ else if s=="thread-grow"||s=="line-grow"||s=="line-hold"{Some(a.cells.len().max(1) as f64*32.+100.)}
  else if (s=="map-reveal"||s.starts_with("wave-reveal")){Some(900.)}
  else if s.starts_with("moving-actor")||s=="light100"{Some(a.cells.len().max(1) as f64*60.+100.)}
  else {None}
@@ -21,21 +21,39 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
  let mut color=if s=="wave-reveal-yellow"{[255,235,45]}else if s=="wave-reveal-white"{[255,255,255]}else if s=="wave-reveal-purple"{[185,75,255]}else if s.starts_with("nova-"){nova_color(s,default)}else{default};
  if s=="light100"||s.starts_with("moving-actor"){color=[255,255,255];}
  let make=|x,y,light,glyph|Tile{x,y,color,light,field_strength:if s=="light100"||s.starts_with("moving-actor"){1.}else{0.85},glyph,mark:None};
+ if s=="thread-grow"{return Some(vec![])}
  if reduced{return Some(a.cells.iter().map(|p|make(p.x as i32,p.y as i32,0.55,None)).collect())}
  let phase=(age/total).clamp(0.,1.);
  let allowed:BTreeSet<_>=a.cells.iter().map(|p|(p.x as i32,p.y as i32)).collect();
  if s.starts_with("nova-"){
-  // O(C*G*8), G<=12, O(C) scratch. Each generation ignites neighbors from
-  // the preceding frontier, with deterministic asymmetric one-generation delays.
+  // Deterministic cellular arrival field, no simulation RNG. Weighted neighbor
+  // growth avoids the old eight-neighbor Chebyshev (perfect square) front.
+  // O(C² + 8C log C), bounded by the admitted nova envelope; O(C) scratch.
   let seed=allowed.iter().min_by_key(|(x,y)|(x-center.0).abs()+(y-center.1).abs()).copied();
-  let mut born=BTreeMap::new();if let Some(p)=seed{born.insert(p,0usize);}
-  for generation in 1..=12 {let next:Vec<_>=allowed.iter().copied().filter(|p|!born.contains_key(p)).filter(|&(x,y)|{
-    let neighbors=(-1..=1).flat_map(|dy|(-1..=1).map(move|dx|(dx,dy))).filter(|&(dx,dy)|dx!=0||dy!=0).filter_map(|(dx,dy)|born.get(&(x+dx,y+dy))).filter(|&&g|g<generation).count();
-    let hash=(x as u32).wrapping_mul(73856093)^(y as u32).wrapping_mul(19349663);
-    neighbors>0 && (neighbors>1||hash%3!=0||generation%2==0)
-  }).collect();for p in next{born.insert(p,generation);}}
-  let generation_ms=if s.ends_with("large"){55.}else{48.};
-  return Some(born.into_iter().filter_map(|((x,y),g)|{let t=age-g as f64*generation_ms;(t>=0.&&t<150.).then(||{let mut tile=make(x,y,0.95*(1.-t/150.),None);if s.contains("rainbow"){let colors=[[255,45,55],[255,150,30],[255,240,45],[60,255,100],[50,160,255],[170,70,255]];tile.color=colors[(g+(x-center.0).unsigned_abs()as usize)%colors.len()];}tile})}).collect())
+  let mut born=BTreeMap::<(i32,i32),u32>::new();
+  let mut settled=BTreeSet::new();
+  if let Some(p)=seed{born.insert(p,0);}
+  loop {
+   let next=born.iter().filter(|(p,_)|!settled.contains(*p)).min_by_key(|(p,t)|(**t,**p)).map(|(p,t)|(*p,*t));
+   let Some(((x,y),at))=next else{break};settled.insert((x,y));
+   for dy in -1i32..=1 {for dx in -1i32..=1 {
+    let p=(x+dx,y+dy);if (dx==0&&dy==0)||!allowed.contains(&p)||settled.contains(&p){continue}
+    let rx=p.0-center.0;let ry=p.1-center.1;
+    let hash=(rx as u32).wrapping_mul(73856093)^(ry as u32).wrapping_mul(19349663);
+    let step=if dx!=0&&dy!=0{140}else{100};
+    let arrival=at+step+hash%91;
+    if born.get(&p).is_none_or(|old|arrival<*old){born.insert(p,arrival);}
+   }}
+  }
+  let max=born.values().copied().max().unwrap_or(1).max(1)as f64;
+  let propagation=total*0.45;
+  let fade=total*0.55;
+  return Some(born.into_iter().filter_map(|((x,y),arrival)|{
+   let t=age-arrival as f64/max*propagation;
+   (t>=0.&&t<fade).then(||{let mut tile=make(x,y,0.95*(1.-t/fade),None);
+    if s.contains("rainbow"){let colors=[[255,45,55],[255,150,30],[255,240,45],[60,255,100],[50,160,255],[170,70,255]];tile.color=colors[((arrival/100)as usize+(x-center.0).unsigned_abs()as usize)%colors.len()];}tile
+   })
+  }).collect())
  }
  if s.starts_with("box-"){
   let radius=allowed.iter().map(|&(x,y)|(x-center.0).abs().max((y-center.1).abs())).max().unwrap_or(0).max(1);
@@ -57,10 +75,10 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
 #[cfg(test)]mod tests{
  use super::*;use corpse_core::events::{AnimationCue,Delivery,EventPoint,Stage};
  fn event(style:&str)->PresentationEvent{let cells=(-2..=2).flat_map(|y|(-2..=2).map(move|x|EventPoint{x:x as f64,y:y as f64})).collect();PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P01".into(),style:style.into(),stage:Stage::Special,action:1,cells,delivery:Delivery::Local,surface:None,item_id:None})}}
- #[test]fn nova_is_deterministic_neighbor_growth_and_never_invents_cells(){let e=event("nova-red-small");let first=tiles(&e,0.,false,[0,0,0]).unwrap();assert_eq!(first.len(),1);assert_eq!((first[0].x,first[0].y),(0,0));let later=tiles(&e,120.,false,[0,0,0]).unwrap();assert!(later.len()>1);assert!(later.iter().all(|t|(-2..=2).contains(&t.x)&&(-2..=2).contains(&t.y)&&t.color==[255,35,55]));assert!(tiles(&e,480.,false,[0,0,0]).unwrap().is_empty());}
+ #[test]fn nova_is_deterministic_neighbor_growth_and_never_invents_cells(){let e=event("nova-red-small");let first=tiles(&e,0.,false,[0,0,0]).unwrap();assert_eq!(first.len(),1);assert_eq!((first[0].x,first[0].y),(0,0));let later=tiles(&e,500.,false,[0,0,0]).unwrap();assert!(later.len()>1);assert!(later.iter().all(|t|(-2..=2).contains(&t.x)&&(-2..=2).contains(&t.y)&&t.color==[255,35,55]));assert!(tiles(&e,1200.,false,[0,0,0]).unwrap().is_empty());}
  #[test]fn box_expands_point_circle_square_and_contracts(){let e=event("box-expand");assert_eq!(tiles(&e,0.,false,[1,2,3]).unwrap().len(),1);assert_eq!(tiles(&e,100.,false,[1,2,3]).unwrap().len(),4);assert_eq!(tiles(&e,200.,false,[1,2,3]).unwrap().len(),8);assert_eq!(tiles(&e,400.,false,[1,2,3]).unwrap().len(),16);let e=event("box-contract");assert_eq!(tiles(&e,0.,false,[1,2,3]).unwrap().len(),16);assert_eq!(tiles(&e,400.,false,[1,2,3]).unwrap().len(),1);}
  #[test]fn growing_line_keeps_completed_prefix(){let mut e=event("line-grow");e.animation.as_mut().unwrap().cells=(0..5).map(|x|EventPoint{x:x as f64,y:0.}).collect();assert_eq!(tiles(&e,0.,false,[1,2,3]).unwrap().len(),1);assert_eq!(tiles(&e,64.,false,[1,2,3]).unwrap().len(),3);assert_eq!(tiles(&e,160.,false,[1,2,3]).unwrap().len(),5);}
- #[test]fn local_effects_block_input_without_scene_capture(){let mut fx=crate::effects::Effects::default();fx.add(vec![event("nova-red-small")],1.,1.,0.,false);assert!(fx.presentation_pending(0.));assert!(fx.presentation_pending(479.));assert!(!fx.presentation_pending(480.));}
+ #[test]fn local_effects_block_input_without_scene_capture(){let mut fx=crate::effects::Effects::default();fx.add(vec![event("nova-red-small")],1.,1.,0.,false);assert!(fx.presentation_pending(0.));assert!(fx.presentation_pending(1199.));assert!(!fx.presentation_pending(1200.));}
  #[test]fn cast_travel_finishes_before_same_action_displacement(){
   let mut cast=event("line-grow");
   let a=cast.animation.as_mut().unwrap();a.proposal="A07".into();a.stage=Stage::Travel;a.delivery=Delivery::Magic;a.cells=(0..5).map(|x|EventPoint{x:x as f64,y:0.}).collect();
@@ -74,5 +92,5 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
   assert_eq!(fx.cues[2].started,20.+cast_duration+move_duration);
   assert!(fx.presentation_pending(fx.cues[2].started));
  }
- #[test]fn stages_finish_before_next_phase_starts(){let a=event("nova-red-small");let mut b=event("pulse");b.animation.as_mut().unwrap().stage=Stage::Health;let mut fx=crate::effects::Effects::default();fx.add(vec![a,b],1.,1.,0.,false);assert_eq!(fx.cues[1].started,480.);assert!(fx.presentation_pending(579.));assert!(!fx.presentation_pending(580.));}
+ #[test]fn stages_finish_before_next_phase_starts(){let a=event("nova-red-small");let mut b=event("pulse");b.animation.as_mut().unwrap().stage=Stage::Health;let mut fx=crate::effects::Effects::default();fx.add(vec![a,b],1.,1.,0.,false);assert_eq!(fx.cues[1].started,1200.);assert!(fx.presentation_pending(1299.));assert!(!fx.presentation_pending(1300.));}
 }

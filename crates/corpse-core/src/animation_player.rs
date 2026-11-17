@@ -109,7 +109,7 @@ impl Snapshot {
       if let Some(target)=a.conditions.get("unspeakTarget").and_then(|&id|engine::actor(r,id)) {local(r,target,p,"sound-barred",Stage::Special);}else{local(r,a,p,style,Stage::Special);}
      } else if id=="morae-bonded-by-unseen-threads" && on {
       if let Some(target)=a.conditions.get("bondedTarget").and_then(|&id|engine::actor(r,id)).filter(|b|visible(r,b)) {
-       crate::animation_shapes::line(r,a,target.into(),p,"line-hold","#b050e8");
+       crate::animation_shapes::line(r,a,target.into(),p,"thread-grow","#ff3040");
       } else {local(r,a,p,style,Stage::Special);}
      } else {local(r,a,p,style,Stage::Special);}
     }
@@ -121,7 +121,7 @@ impl Snapshot {
    }
    for (key,p,style) in [("cameTarget","P08","bracket"),("bloodWeaponReady","P41","droplet"),("distracted","P20","bracket")] {
     if engine::condition(a,key)>0. && before.conditions.get(key)!=a.conditions.get(key) {
-     if key=="cameTarget" {if let Some(target)=engine::actor(r,engine::condition(a,key)) {crate::animation_shapes::line(r,a,target.into(),p,"line-grow","#ffd340");}}
+     if key=="cameTarget" {if let Some(target)=engine::actor(r,engine::condition(a,key)) {crate::animation_shapes::line(r,a,target.into(),p,"thread-grow","#ffd340");}}
      else {local(r,a,p,style,Stage::Special);}
     }
    }
@@ -239,7 +239,7 @@ pub fn shadow_active(r:&Run,a:&Actor)->bool {
   for hidden in [false,true] {
    let mut r=room();let mut target=r.player.clone();target.id=900.;target.x+=1.;target.state="hunting".into();if hidden{target.conditions.insert("invisible".into(),1.);}
    r.actors_at_mut(r.depth).push(target);let snap=Snapshot::capture(&r).unwrap();r.player.active.push("morae-bonded-by-unseen-threads".into());r.player.conditions.insert("bondedTarget".into(),900.);
-   events::begin();snap.finish(&r);let cues=events::finish();assert_eq!(cues.len(),1);assert_eq!(cues[0].animation.as_ref().unwrap().style,if hidden{"stitch"}else{"line-hold"});assert_eq!(cues[0].from.is_some(),!hidden);
+   events::begin();snap.finish(&r);let cues=events::finish();assert_eq!(cues.len(),1);assert_eq!(cues[0].animation.as_ref().unwrap().style,if hidden{"stitch"}else{"thread-grow"});assert_eq!(cues[0].from.is_some(),!hidden);
   }
  }
  #[test] fn real_rescues_blood_gain_and_bleed_have_distinct_styles(){
