@@ -123,6 +123,7 @@ pub struct Cell {
     pub background_overlay: Option<(Rgb, f64)>,
     pub emphasis: f64,
     pub pulse_speed: f64,
+    pub fire_flicker: bool,
     pub x: usize,
     pub y: usize,
     pub glyph: String,
@@ -2460,6 +2461,9 @@ impl Painter {
                 if let Animation::Fire { phase,speed,colors } = animation {
                     ink=crate::appearance_material::fire_ink(*colors,*phase,*speed,now);
                 }
+            }
+            if cell.fire_flicker && now > 0. {
+                ink=crate::color_profile::grade(ink,crate::entity_profile::fire_flicker(now,cell.x as i32,cell.y as i32),1.,1.);
             }
             if cell.pulse_speed != 0. && now > 0. {
                 ink = crate::color_profile::grade(

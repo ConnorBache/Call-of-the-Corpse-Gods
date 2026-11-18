@@ -2276,3 +2276,8 @@ For each existing environmental exposure, select the policy and one authored dur
 
 ### Samara maximum-HP rule confirmation (2026-11-17)
 No runtime algorithm changed: each existing razorleaf contact computes 2% of maximum HP in O(1) time and O(1) scratch before the existing damage pipeline. Existing emitter-field generation and actor exposure iteration are unchanged. Regression fixtures check wounded actors and serialization; they are not performance measurements.
+
+### Cosmetic creature glyph refresh and Bombardier flicker
+- Inputs: detached creature identity/profile and public tile coordinates; no simulation mutations or RNG.
+- Identity defaults resolve once per admitted creature observation in O(1) time/space. Frozen catalogs and serialized actors retain their replay-compatible identities.
+- Live directly visible Bombardier glyphs vary orange brightness using two smooth cosmetic waves. Paint O(1) per glyph; one boolean per cell. Existing retained/tile dirty planners enroll those cells for ambient repaint, not the full map. Corpses, telepathic sensing, explicit appearance overrides and reduced-motion snapshots do not flicker.

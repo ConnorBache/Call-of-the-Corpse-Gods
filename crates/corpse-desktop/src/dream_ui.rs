@@ -45,6 +45,7 @@ pub fn override_cell(cell: &mut Cell, now: f64, seed: u32) {
     // Fire, water, gas and torch effects otherwise repaint their authored hues.
     cell.animations.clear();
     cell.pulse_speed = 0.;
+    cell.fire_flicker = false;
 }
 
 #[cfg(test)]

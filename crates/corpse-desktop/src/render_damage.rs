@@ -160,7 +160,7 @@ impl Scene {
             if let Some(b)=p.cell_damage_rect(c,v.width,v.height){
                 bounds.entry(at).and_modify(|r:&mut Rect|*r=r.union(b)).or_insert(b);
                 for by in b.y/32..=(b.bottom()-1)/32{for bx in b.x/32..=(b.right()-1)/32{buckets.entry((bx,by)).or_default().push(i);}}
-                if !c.animations.is_empty()||c.pulse_speed!=0. {animated.push(b);}
+                if !c.animations.is_empty()||c.pulse_speed!=0.||c.fire_flicker {animated.push(b);}
             }
         }
         Self{order:v.cells.iter().map(|c|(c.x,c.y)).collect(),stacks,bounds,buckets,animated,chronicle:v.log_groups.clone(),chronicle_offset:v.chronicle_offset,hud:HudKey::from(v),ground:v.ground_entities.clone(),enemies:v.creatures.iter().map(|a|EnemyInk{perception_range:a.perception_range.clone(),identity_outline:a.identity_outline,id:a.id.to_bits(),name:a.name.clone(),glyph:a.glyph.clone(),state:a.state.clone(),color:a.color,distance:a.distance.to_bits(),resources:[a.hp.to_bits(),a.max_hp.to_bits(),a.energy.to_bits(),a.max_energy.to_bits()],shared:a.shared_resources,uses_energy:a.uses_energy,invulnerable:a.invulnerable,statuses:a.statuses.clone(),meters:a.meters.clone()}).collect(),paths:v.path.clone(),targets:v.target_path.clone(),target_area:v.target_area.clone(),target_impact:v.target_impact,target_color:v.target_color,exits:v.possible_exits.clone(),hover:v.hover,perception_boundaries:v.perception_boundaries.clone(),ability_overlays:v.ability_overlays.clone(),deep_water:v.deep_water,immersion_color:crate::illumination_ui::screen_tint(v),dream:v.dreamwalking,seeds:(v.cosmetic_seed,v.fire_seed),provenance:v.provenance.clone()}

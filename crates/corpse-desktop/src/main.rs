@@ -3642,7 +3642,7 @@ mod menu_seed_creation_tests {
 /// Only redraw eligibility; no observation, simulation state or RNG access.
 fn cached_view_needs_idle_paint(v:&render::View,p:&appearance_profile::Profile)->bool {
     v.dreamwalking || appearance_light::animated(p) || appearance_material::animated(p)
-        || v.cells.iter().any(|c|!c.animations.is_empty()||c.pulse_speed!=0.)
+        || v.cells.iter().any(|c|!c.animations.is_empty()||c.pulse_speed!=0.||c.fire_flicker)
         || (p.number("path.animationSpeed")>0.&&!v.path.is_empty())
 }
 #[cfg(test)]mod dream_idle_redraw_tests {
@@ -3651,7 +3651,7 @@ fn cached_view_needs_idle_paint(v:&render::View,p:&appearance_profile::Profile)-
  #[test]fn dream_view_idle_eligibility_without_other_animations(){
   let r:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
   let before=serde_json::to_vec(&r).unwrap();let mut v=observe::observe(&r);
-  for c in &mut v.cells {c.animations.clear();c.pulse_speed=0.;}v.path.clear();v.dreamwalking=false;
+  for c in &mut v.cells {c.animations.clear();c.pulse_speed=0.;c.fire_flicker=false;}v.path.clear();v.dreamwalking=false;
   assert!(!cached_view_needs_idle_paint(&v,appearance_profile::Profile::defaults()));
   v.dreamwalking=true;assert!(cached_view_needs_idle_paint(&v,appearance_profile::Profile::defaults()));
   assert_eq!(serde_json::to_vec(&r).unwrap(),before);

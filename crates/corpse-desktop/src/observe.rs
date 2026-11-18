@@ -417,6 +417,7 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         }; if marked { format!("{label} · Borge-marked") } else { label } },
         emphasis: entity.emphasis,
         pulse_speed: entity.speed,
+        fire_flicker: entity.fire_flicker && !dead && !telepathic && !player,
         actor_id: Some(a.id),
         controllable_ally: !dead && a.state == "ally" && a.perfect.value_or(false)
             && corpse_core::dreamwalking::same_plane(run, &run.player, a),

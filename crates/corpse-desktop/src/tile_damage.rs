@@ -73,7 +73,7 @@ impl Index{
    let gx=((g.cw as f64*(e-1.)/2.).ceil()as i32).max(0)+(ax*g.cw as f64/15.).ceil()as i32+3;
    let gy=((g.ch as f64*(e-1.)/2.).ceil()as i32).max(0)+(ay*g.ch as f64/15.).ceil()as i32+3;
    self.bounds.push(p.logical_damage_rect(g.ox+c.x as i32*g.cw-gx-extra,g.oy+c.y as i32*g.ch-gy,g.cw+2*gx+2*extra,g.ch+2*gy+(g.ch/2).max(7)));
-   if !c.animations.is_empty()||c.pulse_speed!=0.{self.animated.push(i);}
+   if !c.animations.is_empty()||c.pulse_speed!=0.||c.fire_flicker{self.animated.push(i);}
    if c.x>=g.w||c.y>=g.h{continue;}let at=c.y*g.w+c.x;if self.tail[at]!=usize::MAX{self.next[self.tail[at]]=i;}else{self.head[at]=i;}self.tail[at]=i;
   }
  }
@@ -83,7 +83,7 @@ fn animation_eq(a:&Animation,b:&Animation)->bool{match(a,b){(Animation::Fire{pha
 /// Exact already-observed paint values. No hashes, live state or float normalization.
 fn paint_eq(a:&Cell,b:&Cell)->bool{
  if a.cogworks!=b.cogworks || a.bottom_aligned!=b.bottom_aligned { return false; }
- a.display_light==b.display_light&&a.unlit_ink==b.unlit_ink&&a.timeweave==b.timeweave&&a.duel_edges==b.duel_edges&&a.italic==b.italic&&a.non_euclidean==b.non_euclidean&&a.dream_entity==b.dream_entity&&a.fire==b.fire&&a.material_background==b.material_background&&a.entity_ink==b.entity_ink&&a.x==b.x&&a.y==b.y&&a.glyph==b.glyph&&a.label==b.label&&a.edges==b.edges&&a.current==b.current&&a.direct==b.direct&&a.controllable_ally==b.controllable_ally&&a.heartless==b.heartless&&a.corpse==b.corpse&&a.superscript==b.superscript&&a.subscript==b.subscript&&a.arrow==b.arrow&&a.fg==b.fg&&a.bg==b.bg&&bits(a.emphasis,b.emphasis)&&bits(a.pulse_speed,b.pulse_speed)&&a.actor_id.map(f64::to_bits)==b.actor_id.map(f64::to_bits)&&match(a.background_overlay,b.background_overlay){(None,None)=>true,(Some((ac,aa)),Some((bc,ba)))=>ac==bc&&bits(aa,ba),_=>false}&&a.underlays.len()==b.underlays.len()&&a.underlays.iter().zip(&b.underlays).all(|((ag,ac,aa),(bg,bc,ba))|ag==bg&&ac==bc&&bits(*aa,*ba))&&a.animations.len()==b.animations.len()&&a.animations.iter().zip(&b.animations).all(|(a,b)|animation_eq(a,b))
+ a.display_light==b.display_light&&a.unlit_ink==b.unlit_ink&&a.timeweave==b.timeweave&&a.duel_edges==b.duel_edges&&a.italic==b.italic&&a.non_euclidean==b.non_euclidean&&a.dream_entity==b.dream_entity&&a.fire==b.fire&&a.fire_flicker==b.fire_flicker&&a.material_background==b.material_background&&a.entity_ink==b.entity_ink&&a.x==b.x&&a.y==b.y&&a.glyph==b.glyph&&a.label==b.label&&a.edges==b.edges&&a.current==b.current&&a.direct==b.direct&&a.controllable_ally==b.controllable_ally&&a.heartless==b.heartless&&a.corpse==b.corpse&&a.superscript==b.superscript&&a.subscript==b.subscript&&a.arrow==b.arrow&&a.fg==b.fg&&a.bg==b.bg&&bits(a.emphasis,b.emphasis)&&bits(a.pulse_speed,b.pulse_speed)&&a.actor_id.map(f64::to_bits)==b.actor_id.map(f64::to_bits)&&match(a.background_overlay,b.background_overlay){(None,None)=>true,(Some((ac,aa)),Some((bc,ba)))=>ac==bc&&bits(aa,ba),_=>false}&&a.underlays.len()==b.underlays.len()&&a.underlays.iter().zip(&b.underlays).all(|((ag,ac,aa),(bg,bc,ba))|ag==bg&&ac==bc&&bits(*aa,*ba))&&a.animations.len()==b.animations.len()&&a.animations.iter().zip(&b.animations).all(|(a,b)|animation_eq(a,b))
 }
 #[cfg(test)]
 mod cogworks_damage_tests {
@@ -110,7 +110,7 @@ impl TilePlanner{
   if !self.valid||g!=self.geometry||old.is_none(){self.full=true;}else{let old=old.unwrap();
    for at in 0..self.scratch.head.len(){let mut a=self.current.head[at];let mut b=self.scratch.head[at];let mut equal=true;let mut animated=false;
     if a==usize::MAX&&b==usize::MAX{if self.eligibility.enabled{self.eligibility.both_no_paint_layers+=1;}continue;}
-    while a!=usize::MAX&&b!=usize::MAX{let ac=&old.cells[a];let bc=&new.cells[b];animated|=!ac.animations.is_empty()||!bc.animations.is_empty()||ac.pulse_speed!=0.||bc.pulse_speed!=0.;
+    while a!=usize::MAX&&b!=usize::MAX{let ac=&old.cells[a];let bc=&new.cells[b];animated|=!ac.animations.is_empty()||!bc.animations.is_empty()||ac.pulse_speed!=0.||ac.fire_flicker||bc.pulse_speed!=0.||bc.fire_flicker;
      if self.eligibility.enabled{self.eligibility.compared_layers+=1;if ac.current!=bc.current||ac.direct!=bc.direct{self.eligibility.memory_transition+=1;}if ac.fg!=bc.fg||ac.bg!=bc.bg{self.eligibility.changed_colors+=1;}}
      if !paint_eq(ac,bc){equal=false;}a=self.current.next[a];b=self.scratch.next[b];}
     equal&=a==usize::MAX&&b==usize::MAX;

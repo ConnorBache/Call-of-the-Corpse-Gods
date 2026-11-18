@@ -6,6 +6,7 @@ pub struct Entity {
     pub background: Option<Rgb>,
     pub emphasis: f64,
     pub speed: f64,
+    pub fire_flicker: bool,
 }
 pub fn resolve(
     p: &Profile,
@@ -15,6 +16,8 @@ pub fn resolve(
     glyph: &str,
     color: Rgb,
 ) -> Entity {
+    // Cosmetic identities only: never rewrite actor/save/replay simulation data.
+    let (glyph, color) = if group == "creatures" { creature_identity(key, glyph, color) } else { (glyph, color) };
     let defaults = Profile::defaults();
     let entry = if defaults.value(&format!("entities.{group}.{key}")).is_some() {
         p.value(&format!("entities.{group}.{key}"))
@@ -74,6 +77,7 @@ pub fn resolve(
             1.,
         ),
         background,
+        fire_flicker: group == "creatures" && key == "bombardier" && !explicit && !changed("color") && !changed("glyph"),
         emphasis: settings["emphasis"].as_f64().unwrap_or(1.),
         speed: settings["animationSpeed"].as_f64().unwrap_or(0.),
     }
@@ -100,4 +104,26 @@ pub fn materials_animated(p: &Profile) -> bool {
                     .is_some_and(|v| v != 0. && v != 1.)
             })
         })
+}
+
+/// Preserve transformed/sensed colors and explicit profile overrides.
+pub fn creature_identity<'a>(key: &str, glyph: &'a str, color: Rgb) -> (&'a str, Rgb) {
+    let glyph = match (key, glyph) {
+        ("bombardier", "x") => "b",
+        ("dryad", "y") => "d",
+        ("pale:Breather", "h") | ("Pale Gasser", "h") => "g",
+        ("pale:Greater Breather", "H") | ("Greater Pale Gasser", "H") => "G",
+        _ => glyph,
+    };
+    let color = match (key, color) {
+        ("giant-beetle", [148,177,170]) => [138,90,50],
+        _ => color,
+    };
+    (glyph, color)
+}
+
+/// Smooth irregular ember brightness, not a fire terrain overlay or simulation RNG.
+pub fn fire_flicker(now: f64, x: i32, y: i32) -> f64 {
+    let phase=crate::color::cosmetic_hash(x,y,19)*std::f64::consts::TAU;
+    0.86 + 0.09*(now/173.+phase).sin() + 0.05*(now/71.+phase*1.7).sin()
 }

@@ -24,7 +24,7 @@ fn capture(p:&Painter,name:&str) {
 #[test]
 fn revision50_creature_identity_observation_manual_and_custom_preferences() {
     let r=room();let before=r.clone();let view=crate::observe::observe(&r);
-    for (id,name,glyph) in [(200.,"Blorb","b"),(201.,"Bear","B"),(202.,"Dire Bear","B"),(203.,"Corpse Fungus","F"),(204.,"Pale Chomper","c"),(205.,"Pale Gasser","h"),(206.,"Hemogoblin Inventor","h"),(207.,"Yeti","Y"),(208.,"Devil's Samara Tree","T"),(209.,"Banshee","B"),(210.,"Short-legged Saidribee","b"),(211.,"Long-legged Saidribee","b"),(212.,"Saidribee Guardian","B"),(213.,"Pale Birther","b"),(214.,"Greater Pale Birther","B"),(215.,"Chimera","C"),(216.,"Sphinx","S")] {
+    for (id,name,glyph) in [(200.,"Blorb","b"),(201.,"Bear","B"),(202.,"Dire Bear","B"),(203.,"Corpse Fungus","F"),(204.,"Pale Chomper","c"),(205.,"Pale Gasser","g"),(206.,"Hemogoblin Inventor","h"),(207.,"Yeti","Y"),(208.,"Devil's Samara Tree","T"),(209.,"Banshee","B"),(210.,"Short-legged Saidribee","b"),(211.,"Long-legged Saidribee","b"),(212.,"Saidribee Guardian","B"),(213.,"Pale Birther","b"),(214.,"Greater Pale Birther","B"),(215.,"Chimera","C"),(216.,"Sphinx","S")] {
         let c=cell(&view,id);assert_eq!((&*c.label,&*c.glyph),(name,glyph));
         assert_eq!(view.creatures.iter().find(|a|a.id==id).unwrap().name,name);
         assert_eq!(crate::inspection_ui::observe_tile(&r,c.x,c.y).title,name);
@@ -123,4 +123,26 @@ fn revision50_creature_rank_observation_and_native_captures() {
         let mut p=Painter::new();p.resize(width,height);p.game_at(&view,"",false,0.);capture(&p,&format!("creature-ranks-{width}x{height}"));
         let first=p.pixels.clone();p.game_at(&view,"",false,0.);assert_eq!(p.pixels,first);
     }
+}
+
+#[test]
+fn beetle_gasser_dryad_cosmetic_identity_and_flicker() {
+    let mut r=room();r.actors_at_mut(r.depth).clear();
+    let kinds=[("bombardier","b","#E69B40"),("dryad","d","#81CF94"),("pale:Breather","g","#B9B8B1"),("pale:Greater Breather","G","#F0E8DC"),("giant-beetle","Q","#8a5a32"),("shellback-beetle","q","#C7985B")];
+    for (i,(kind,_,_)) in kinds.iter().enumerate() { r.actors_at_mut(r.depth).push(population::create_actor_revision(kind,600.+i as f64,7.+i as f64,10.,false,50.).unwrap()); }
+    let before=r.clone();let view=crate::observe::observe(&r);assert_eq!(r,before);
+    let manual=crate::manual::Manual::new();
+    for (i,(kind,glyph,color)) in kinds.iter().enumerate() {
+        let c=cell(&view,600.+i as f64);assert_eq!(&c.glyph,glyph);assert_eq!(c.fire_flicker,i==0);assert!(!c.fire);
+        assert_eq!(view.creatures.iter().find(|a|a.id==600.+i as f64).unwrap().glyph,*glyph);
+        let e=manual.catalog.entries.iter().find(|e|e.id==*kind).unwrap();assert_eq!((&*e.glyph,e.color.to_lowercase()),(*glyph,color.to_lowercase()));
+        let identity=crate::entity_profile::resolve(&Profile::default(),"creatures",kind,None,&r.actors_at(r.depth)[i].glyph,crate::color::hex(&r.actors_at(r.depth)[i].color));assert_eq!(identity.color,crate::color::hex(color));
+    }
+    let custom=Profile::default().set("entities.creatures.bombardier.inherited",false.into()).unwrap().set("entities.creatures.bombardier.glyph","!".into()).unwrap().set("entities.creatures.bombardier.color","#00ffff".into()).unwrap();
+    let custom_view=crate::observe::observe_with_profile(&r,&custom);assert!(!cell(&custom_view,600.).fire_flicker);assert_eq!(cell(&custom_view,600.).glyph,"!");
+    let mut p=Painter::new();p.resize(1280,800);p.game_at(&view,"",false,100.);let first=p.pixels.clone();capture(&p,"glyph-update-100ms");p.game_at(&view,"",false,330.);capture(&p,"glyph-update-330ms");
+    let c=cell(&view,600.);let(cw,ch,ox,oy)=p.map_layout(view.width,view.height);let(x,y)=(ox+c.x as i32*cw,oy+c.y as i32*ch);
+    let mut different=0;for yy in p.native_y(y as f64)..p.native_y((y+ch) as f64){for xx in p.native_x(x as f64)..p.native_x((x+cw) as f64){let i=(yy as usize*p.width+xx as usize)*4;if first[i..i+4]!=p.pixels[i..i+4]{different+=1;}}}assert!(different>0,"Bombardier glyph must actually flicker in native pixels");
+    let mut retained=crate::render::RetainedGame::default();let mut cached=Painter::new();cached.resize(1280,800);retained.update(&mut cached,&view,"",100.,true,true).unwrap();retained.update(&mut cached,&view,"",330.,true,false).unwrap();assert_eq!(cached.pixels,p.pixels,"animated damage must redraw the beetle");
+    r.actors_at_mut(r.depth)[0].hp=0.;r.actors_at_mut(r.depth)[0].dead=true.into();let dead=crate::observe::observe(&r);assert!(dead.cells.iter().filter(|c|c.actor_id==Some(600.)).all(|c|!c.fire_flicker));
 }
