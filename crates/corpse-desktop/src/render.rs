@@ -2662,7 +2662,7 @@ impl Painter {
             let cogworks=a.id=="kative-cogworks";
             let orb_width=if passive{0}else if cogworks{50}else{18};
             let name_x=left+18+orb_width;
-            let bar_width=rail_width/3;
+            let bar_width=if matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::FutureFloors{..})){140.min(rail_width/2)}else{rail_width/3};
             let bar_x=left+12+rail_width-bar_width;
             let name_width=if reserve.is_some()||a.fortunes.is_some()||a.indicator.is_some(){bar_x-name_x-8}else{rail_width-12-orb_width};
             let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);

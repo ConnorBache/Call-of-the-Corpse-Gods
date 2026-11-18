@@ -77,7 +77,7 @@ fn resource_turn_free_command_haste_and_rejected_move_preserve_baseline() {
 }
 #[test]
 fn resource_turn_save_resume_and_future_restore_exact_baselines() {
-    let mut r=room();add_reserve(&mut r,ID,10.);begin_resource_turn(&mut r);
+    let mut r=room();r.future_floor_rules_from=Field::Null;add_reserve(&mut r,ID,10.);begin_resource_turn(&mut r);
     r.player.hp=181.8;r.player.energy=80.;
     let history=r.resource_history.clone();let raw=crate::storage::serialize(&r).unwrap();
     let loaded=crate::storage::deserialize(&raw).unwrap();assert_eq!(loaded.resource_history,history);
@@ -86,7 +86,7 @@ fn resource_turn_save_resume_and_future_restore_exact_baselines() {
     assert!(e.run.future.is_some());let paid_history=e.run.resource_history.clone();
     close(delta(&e.run,"energy",e.run.player.energy,100.),-100.);
     close(delta(&e.run,&ability_key(ID),0.,10.),-100.);
-    e.dispatch(&Command::Wait).unwrap();let mut resumed=temporal::Engine::load(&e.save().unwrap()).unwrap();
+    e.dispatch(&Command::Wait).unwrap();let mut resumed=temporal::Engine::load_replay_checkpoint(&e.save().unwrap()).unwrap();
     resumed.dispatch(&ability(ID)).unwrap();assert!(resumed.run.future.is_none());
     assert_eq!(resumed.run.resource_history,paid_history);
     close(delta(&resumed.run,"energy",resumed.run.player.energy,100.),-100.);

@@ -589,6 +589,9 @@ fn flag(d: &Divine, f: &str) -> bool {
     d.flags.iter().any(|s| s == f)
 }
 fn price(r: &Run, a: &Actor, d: &Divine) -> (String, bool) {
+    if d.id==corpse_core::future_floor::ID && a.id==r.player.id && corpse_core::future_floor::enabled(r) {
+        return ("No energy cost".into(),false);
+    }
     let name = d.name.as_str();
     let toggle = flag(d, "toggle");
     let craft = flag(d, "craft") && !toggle && !flag(d, "activate");
@@ -708,6 +711,9 @@ fn price(r: &Run, a: &Actor, d: &Divine) -> (String, bool) {
 }
 fn divine(r: &Run, a: &Actor, d: &Divine, compact: bool) -> String {
     let own = owner(r, a);
+    if d.id==corpse_core::future_floor::ID && own.id==r.player.id && corpse_core::future_floor::enabled(r) {
+        return if compact {"Futuresight.".into()} else {crate::ability_ui::FUTURE_FLOOR_DESCRIPTION.into()};
+    }
     let enabled = own.active.contains(&d.id);
     let (price, lacks) = price(r, own, d);
     let mut notes = Vec::new();
@@ -957,14 +963,16 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
             parts.push(if compact {"Magickal Caster."} else {"Counts as a Magickal Caster for Witch-Hatred."}.into());
         } else if let Some(d)=corpse_core::progression::definition_for_revision(r.simulation_revision.value_or(29.),id)
             .filter(|_|r.simulation_revision.value_or(29.)>=50.) {
+            let floor_future=id==corpse_core::future_floor::ID && own.id==r.player.id && corpse_core::future_floor::enabled(r);
             let toggle=d.flags.iter().any(|flag|flag=="toggle");
-            let state=if toggle {if source.active.contains(id) {" (active)"} else {" (inactive)"}} else {""};
-            let reserve=if d.name == "Hanged" { String::new() } else { crate::ability_ui::actor_reserve_summary_for_revision(source,id,r.simulation_revision.value_or(29.))
+            let state=if floor_future {if corpse_core::future_floor::active(r) {" (active)"} else {" (used)"}} else if toggle {if source.active.contains(id) {" (active)"} else {" (inactive)"}} else {""};
+            let reserve=if d.name == "Hanged" || floor_future { String::new() } else { crate::ability_ui::actor_reserve_summary_for_revision(source,id,r.simulation_revision.value_or(29.))
                 .map(|s|format!(" {s}." )).unwrap_or_default() };
-            let description = if r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender" {
+            let description = if floor_future || (r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender") {
                 crate::ability_ui::display_description(r, id, &d.description)
             } else { d.description.as_str() };
-            parts.push(if compact {format!("{}{state}.{reserve}",d.name)} else {format!("{}{state}: {description}{reserve}",d.name)});
+            let name=if floor_future {"Futuresight"}else{d.name.as_str()};
+            parts.push(if compact {format!("{name}{state}.{reserve}")} else {format!("{name}{state}: {description}{reserve}")});
             divine_actions |= d.flags.iter().any(|flag|matches!(flag.as_str(),"toggle"|"activate"|"target"|"action"));
         } else if let Some(e) = meta(id) {
             if !applies(source, id, &idset) {
@@ -1344,5 +1352,20 @@ mod revision52_fast_copy_tests {
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         let a=corpse_core::population::create_actor_revision("cave-bat",800.,10.,10.,false,52.).unwrap();
         for revision in [51.,52.] {r.simulation_revision=revision.into();let before=r.clone();let (short,long)=describe(&r,&a);for text in [short,long] {assert_eq!(text.contains("move once then attack"),revision>=52.);}assert_eq!(r,before);}
+    }
+}
+
+#[cfg(test)] mod floor_future_description_tests {
+    use super::*;
+    #[test] fn floor_rewind_player_description_has_current_state_without_energy_tutorial() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.future_floor_rules_from=0usize.into();
+        r.player.abilities=vec![corpse_core::future_floor::ID.into()];r.player.active.clear();
+        let before=r.clone();let (compact,detail)=describe(&r,&r.player);
+        let both=format!("{compact} {detail}");
+        assert!(both.contains(crate::ability_ui::FUTURE_FLOOR_DESCRIPTION));assert!(both.contains("(active)"));
+        assert!(!both.contains("reserve"));assert!(!both.contains("Spends all"));assert_eq!(r,before);
+        r.future_floor=Some(corpse_core::future_floor::State{depth:r.depth,anchor:None,used_floors:vec![r.depth]});
+        let (compact,detail)=describe(&r,&r.player);assert!(format!("{compact} {detail}").contains("(used)"));
     }
 }

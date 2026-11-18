@@ -16,6 +16,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         potion_rules_from: Field::Missing,
         ring_rules_from: Field::Missing,
         gas_rules_from: Field::Missing,
+        future_floor_rules_from: Field::Missing,
         seed: seed.into(),
         mode: mode.into(),
         dev: false,

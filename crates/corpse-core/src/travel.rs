@@ -800,7 +800,7 @@ fn travel_inner(r: &mut Run, next: f64, falling: bool, vertical: bool, voluntary
     crate::revision50::duel_actor_changed(r,r.player.id);
     crate::environment::refresh_burning_from_fire(r, r.player.id)?;
     let landing_water = r.floor().unwrap().tiles[pos] == "water";
-    if falling && !landing_water {
+    if falling && !landing_water && !crate::future_floor::enabled(r) {
         let exact_chasm_cost = voluntary_chasm && r.simulation_revision.value_or(29.0)>=43.0;
         engine::damage_environment(r, r.player.id, r.player.max_hp * 0.25, None, "fall", exact_chasm_cost)
             .map_err(|e| e.0)?;
@@ -864,6 +864,11 @@ fn travel_inner(r: &mut Run, next: f64, falling: bool, vertical: bool, voluntary
     }
     r.rally = None;
     restore_returning_ally_stair_followers(r)?;
+    crate::future_floor::capture_entry(r)?;
+    if falling && !landing_water && crate::future_floor::enabled(r) {
+        let exact_chasm_cost = voluntary_chasm && r.simulation_revision.value_or(29.0)>=43.0;
+        engine::damage_environment(r, r.player.id, r.player.max_hp * 0.25, None, "fall", exact_chasm_cost).map_err(|e| e.0)?;
+    }
     engine::monster_floor_entered(r);
     engine::monster_prepare_player_turn(r).map_err(|e| e.0)?;
     let domain = r.floor().unwrap().domain.clone();
@@ -1158,6 +1163,7 @@ pub fn fall_actors_one_level(
     } else {
         instigator
     };
+    if player_falls { crate::future_floor::capture_entry(&mut head)?; }
     for (a, p) in &plans {
         let id = a.id;
         let prior = engine::actor(&head, id)

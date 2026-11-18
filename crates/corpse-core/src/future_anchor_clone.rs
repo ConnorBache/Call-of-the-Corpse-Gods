@@ -60,6 +60,8 @@ fn clone_anchor_state(run:&Run)->Run {
             potion_rules_from: Default::default(),
             ring_rules_from: Default::default(),
             gas_rules_from: Default::default(),
+            future_floor_rules_from: Default::default(),
+            future_floor: None,
             metrics: run.metrics.clone(),
             dev: run.dev.clone(),
             known_potions: run.known_potions.clone(),

@@ -1,3 +1,9 @@
+# Futuresight floor-entry update (November 18, 2026)
+
+The current ability is named **Futuresight**. It rewinds to the last floor entry on manual activation or death, once per floor, without an energy payment. A green ready dot replaces the old spiral/reserve, and the 1–20 tracker crosses out spent floors. The ledger survives saves, revisits and rewinds. Pre-amendment saves initially use their loaded position because no historical entry image exists. Old seed replays retain the earlier rules through a command boundary.
+
+The historical verification below describes the superseded ability, not current live behavior.
+
 # See the Future UI update
 
 - Keyboard F and clicking See the Future both ask `Spend all your energy to see the future?` before capturing the snapshot.

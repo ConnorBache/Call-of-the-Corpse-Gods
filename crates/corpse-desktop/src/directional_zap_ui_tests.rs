@@ -279,6 +279,8 @@ fn empty_direction_uses_existing_haste_spellslinger_and_future_accounting() {
     assert!(second.took_turn); assert_eq!(engine.run.tick, tick + 1.);
     for appropriate in [false, true] {
         let mut r = room(Effect::Poison);
+        // Historical paid-Future recording contract, not the current floor rewind.
+        r.future_floor_rules_from=Field::Null;
         r.player.abilities.push("morae-see-the-future".into());
         if appropriate { r.player.abilities.push("kative-appropriate".into()); }
         corpse_core::revision50_ability_energy::acquire_for_revision(&mut r.player,

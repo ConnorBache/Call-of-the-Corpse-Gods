@@ -20,6 +20,22 @@ pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
             p.border(x,y,30,21,[255,219,113]);
             centered(p,&count.to_string(),x,y+3,30,12,[30,23,13]);
         }
+        CustomIndicator::FutureFloors{used}=>{
+            // Fixed 20-floor tracker: bounded O(20) work, no simulation changes.
+            let cell=width/10;
+            for floor in 1..=20 {
+                let col=(floor-1)%10;let row=(floor-1)/10;
+                let bx=x+col*cell;let by=y+row*15;
+                centered(p,&floor.to_string(),bx,by,cell,8,INK);
+                if used&(1 << (floor-1))!=0 {
+                    // Deliberate X over the number, not a replacement glyph.
+                    for step in 0..10 {
+                        p.rect(bx+(cell-10)/2+step,by+step,1,1,[243,108,255]);
+                        p.rect(bx+(cell-10)/2+9-step,by+step,1,1,[243,108,255]);
+                    }
+                }
+            }
+        }
         CustomIndicator::Future(ready)=>{
             p.border(x,y,23,23,[174,142,241]);
             if ready {
@@ -128,7 +144,7 @@ mod future_indicator_tests {
     fn future_box_spiral_tracks_snapshot_without_mutation() {
         let id="morae-see-the-future";
         let mut r:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
-        r.simulation_revision=52.0.into();r.player.abilities=vec![id.into()];r.offers.clear();r.future=None;
+        r.simulation_revision=52.0.into();r.future_floor_rules_from=corpse_core::Field::Null;r.player.abilities=vec![id.into()];r.offers.clear();r.future=None;
         corpse_core::revision50_ability_energy::acquire_for_revision(&mut r.player,&[id.into()],52.).unwrap();
         let before=r.clone();
         let row=crate::ability_ui::observe(&r,id);
@@ -142,5 +158,45 @@ mod future_indicator_tests {
         paint(&mut full,CustomIndicator::Future(true),4,4,25);
         assert_ne!(empty.pixels,full.pixels);
         for y in 0..800 { for x in 0..1280 {if !(5..26).contains(&x)||!(5..26).contains(&y) {let i=(y*1280+x)*4;assert_eq!(&empty.pixels[i..i+4],&full.pixels[i..i+4]);}}}
+    }
+}
+
+#[cfg(test)]
+mod floor_future_tests {
+    use super::*;
+    use corpse_core::{Run,future_floor};
+    #[test]
+    fn floor_future_native_tracker_screenshots() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();r.future_floor_rules_from=0usize.into();r.fast_mode=true.into();r.compressed_depths=true.into();
+        r.player.abilities=vec!["morae-fortune-teller".into(),future_floor::ID.into(),"morae-all-seeing-eyes".into()];
+        r.offers.clear();r.player.conditions.clear();r.player.active.clear();
+        r.future_floor=Some(future_floor::State{depth:r.depth,anchor:None,used_floors:vec![5.,11.,15.]});
+        let before=r.clone();let row=crate::ability_ui::observe(&r,future_floor::ID);
+        assert!(row.active);assert_eq!(row.reserve,None);assert!(row.cost.is_empty());
+        assert_eq!(row.description,crate::ability_ui::FUTURE_FLOOR_DESCRIPTION);
+        assert_eq!(row.indicator,Some(CustomIndicator::FutureFloors{used:(1<<2)|(1<<5)|(1<<7)}));
+        assert_eq!(r,before);
+        for (width,height) in [(1920,1080),(1280,800),(960,1200)] {
+            for spent in [false,true] {
+                if spent {r.future_floor.as_mut().unwrap().used_floors.push(r.depth);}
+                let mut p=Painter::new();p.try_resize(width,height).unwrap();p.set_responsive_canvas(true);
+                let view=crate::observe::observe(&r);p.game_at(&view,"",false,0.);
+                let ready=crate::ability_ui::observe(&r,future_floor::ID);assert_eq!(ready.active,!spent);
+                if let Ok(dir)=std::env::var("CORPSE_FUTURE_REVIEW") {
+                    std::fs::create_dir_all(&dir).unwrap();
+                    let mut enc=png::Encoder::new(std::fs::File::create(format!("{dir}/futuresight-{}-{width}x{height}.png",if spent{"used"}else{"ready"})).unwrap(),width as u32,height as u32);
+                    enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);enc.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+                    if width==1920 {
+                        let(x,y,w,h)=(1530usize,235usize,380usize,150usize);
+                        let mut detail=Vec::with_capacity(w*h*4);
+                        for row in y..y+h {detail.extend_from_slice(&p.pixels[(row*width+x)*4..(row*width+x+w)*4]);}
+                        let mut enc=png::Encoder::new(std::fs::File::create(format!("{dir}/futuresight-{}-detail.png",if spent{"used"}else{"ready"})).unwrap(),w as u32,h as u32);
+                        enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);enc.write_header().unwrap().write_image_data(&detail).unwrap();
+                    }
+                }
+                if spent {r.future_floor.as_mut().unwrap().used_floors.retain(|d|*d!=r.depth);}
+            }
+        }
     }
 }

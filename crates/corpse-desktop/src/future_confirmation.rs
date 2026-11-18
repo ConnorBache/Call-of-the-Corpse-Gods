@@ -3,6 +3,7 @@ use corpse_core::{Command, Run};
 use sdl2::keyboard::Keycode;
 
 pub fn message(run: &Run, command: &Command) -> Option<&'static str> {
+    if corpse_core::future_floor::enabled(run) {return None;}
     if !matches!(command, Command::Ability { id, .. } if id == "morae-see-the-future")
         || !run.player.abilities.iter().any(|id| id == "morae-see-the-future") {
         return None;

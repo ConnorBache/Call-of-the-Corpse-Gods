@@ -149,7 +149,7 @@ mod future_reserve_tests {
     }
     #[test]
     fn future_reserve_repaired_engine_can_capture_and_restore() {
-        let mut run=fixture();run.offers.clear();run.player.conditions.clear();run.player.active.clear();
+        let mut run=fixture();run.future_floor_rules_from=Field::Null;run.offers.clear();run.player.conditions.clear();run.player.active.clear();
         run.history.clear();run.replay.clear();run.haste_snapshot=Field::Missing;
         let mut engine=crate::temporal::Engine::new(run).unwrap();
         let command=crate::Command::Ability{id:abilities::FUTURE_ID.into(),target:Field::Missing,x:Field::Missing,y:Field::Missing};

@@ -47,6 +47,7 @@ pub enum CustomIndicator {
     Reactions(u64),
     Rescue(bool),
     Future(bool),
+    FutureFloors { used: u32 },
     Blood { count: u64, progress: u64 },
 }
 #[derive(Clone)]
@@ -70,7 +71,7 @@ pub struct AbilityView {
 /// catalog identity, replays and saved state. O(text bytes), borrowed if absent.
 pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
     let mut result = std::borrow::Cow::Borrowed(text);
-    for (old,new) in [("Rage at the Dying of the Light","Ragelight"),("You Shall Never Be Rid of Me","Never Be Rid of Me")] {
+    for (old,new) in [("Rage at the Dying of the Light","Ragelight"),("You Shall Never Be Rid of Me","Never Be Rid of Me"),("See The Future","Futuresight"),("See the Future","Futuresight")] {
         if result.contains(old) { result = std::borrow::Cow::Owned(result.replace(old,new)); }
     }
     result
@@ -78,7 +79,9 @@ pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
 /// O(1) presentation-only override: never changes catalog text used by offer tags.
 pub const EXECUTE_DESCRIPTION:&str="When active, you kill enemies in one hit if they have less than 25% of their HP remaining. Every time you do so, spend 10 energy.";
 pub const RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
+pub const FUTURE_FLOOR_DESCRIPTION:&str="Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+    if id=="morae-see-the-future" && corpse_core::future_floor::enabled(run) {return FUTURE_FLOOR_DESCRIPTION;}
     if id=="shrail-execute"&&run.simulation_revision.value_or(29.)>=52. {return EXECUTE_DESCRIPTION;}
     if id=="shrail-rage-at-the-dying-of-the-light" {return RAGELIGHT_DESCRIPTION;}
     if run.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender" {
@@ -348,6 +351,23 @@ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::Upkeep
         if row.reserve.is_some() {
             row.pending_reserve_loss=forecast.reserve_energy.get(id).copied().unwrap_or(0.);
         }
+    }
+    if id=="morae-see-the-future" && corpse_core::future_floor::enabled(r) {
+        row.description=FUTURE_FLOOR_DESCRIPTION.into();
+        row.name="Futuresight".into();
+        row.active=corpse_core::future_floor::active(r);
+        row.mode="Active".into();
+        row.cost.clear();
+        row.state.clear();
+        row.reserve=None;
+        let mut used=0u32;
+        if let Some(state)=&r.future_floor {
+            for &depth in &state.used_floors {
+                let floor=corpse_core::fast_mode::display_depth(r,depth) as u32;
+                if (1..=20).contains(&floor) {used|=1 << (floor-1);}
+            }
+        }
+        row.indicator=Some(CustomIndicator::FutureFloors{used});
     }
     row
 }
@@ -1523,8 +1543,7 @@ mod never_surrender_detail_followup_tests {
   r.player.ability_reserves=corpse_core::Field::Missing;
   corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,10.).unwrap();
   for energy in [0.,100.] {r.player.energy=energy;let before=r.clone();let d=observe(&r,id).description;
-   assert!(d.starts_with("Spend all your energy to save your current state."));
-   assert_eq!(d.lines().filter(|s|s.contains("Spends all")).collect::<Vec<_>>(),vec!["Spends all your energy."]);
+   assert_eq!(d,FUTURE_FLOOR_DESCRIPTION);
    for stale in ["other reserves","after payment","Ability energy is spent first"] {assert!(!d.contains(stale));}
    assert!(!observe(&r,"kative-appropriate").description.contains("minimum of zero"));assert!(r==before);
   }

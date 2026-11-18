@@ -182,7 +182,7 @@ fn save_load_and_snapshot_restore_recompute_conditional_haste() {
 
 #[test]
 fn see_the_future_roundtrip_restores_ring_contact_and_original_haste_phase() {
-    let mut r=room();tile(&mut r,10,10,"water");r.phase="haste".to_string().into();
+    let mut r=room();r.future_floor_rules_from=Field::Null;tile(&mut r,10,10,"water");r.phase="haste".to_string().into();
     r.player.abilities.push("morae-see-the-future".into());
     crate::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
     let mut e=crate::temporal::Engine::new(r).unwrap();
@@ -191,7 +191,7 @@ fn see_the_future_roundtrip_restores_ring_contact_and_original_haste_phase() {
     let tick=e.run.tick;
     assert!(!e.dispatch(&Command::Move{dx:1.,dy:0.}).unwrap().took_turn);
     assert!(!ai::is_hasted_in(&e.run,&e.run.player));
-    let mut loaded=crate::temporal::Engine::load(&e.save().unwrap()).unwrap();
+    let mut loaded=crate::temporal::Engine::load_replay_checkpoint(&e.save().unwrap()).unwrap();
     loaded.dispatch(&future).unwrap();assert!(loaded.run.future.is_none());
     assert_eq!((loaded.run.player.x,loaded.run.player.y),(10.,10.));assert_eq!(loaded.run.tick,tick);
     assert_eq!(loaded.run.phase.as_ref().map(String::as_str),Some("haste"));

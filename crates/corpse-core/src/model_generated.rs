@@ -1724,6 +1724,10 @@ pub struct Run {
     /// Gas status command boundary; Null denotes a legacy replay prefix.
     #[serde(rename = "gasRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub gas_rules_from: Field<usize>,
+    #[serde(rename = "futureFloorRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub future_floor_rules_from: Field<usize>,
+    #[serde(rename = "futureFloor", default, skip_serializing_if = "Option::is_none")]
+    pub future_floor: Option<crate::future_floor::State>,
     #[serde(rename = "metrics")]
     pub metrics: IndexMap<String, f64>,
     #[serde(rename = "dev")]

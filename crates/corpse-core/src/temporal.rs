@@ -52,7 +52,7 @@ impl Snapshot {
     pub fn value(&self) -> Result<Value> {
         let mut v = serde_json::to_value(&*self.state)?;
         let o = v.as_object_mut().unwrap();
-        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom"] {
+        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "futureFloorRulesFrom"] {
             o.shift_remove(k);
         }
         if let Some(c) = self.cursor {
@@ -107,6 +107,7 @@ impl Snapshot {
         o.shift_remove("potionRulesFrom");
         o.shift_remove("ringRulesFrom");
         o.shift_remove("gasRulesFrom");
+        o.shift_remove("futureFloorRulesFrom");
         let state = serde_json::from_value(v)?;
         crate::revision52_amulet_tiers::validate_run(&state).map_err(StorageError)?;
         crate::revision50_control_amulets::validate_terrain(&state).map_err(StorageError)?;
@@ -125,6 +126,8 @@ impl Snapshot {
         restored.potion_rules_from = run.potion_rules_from.clone();
         restored.ring_rules_from = run.ring_rules_from.clone();
         restored.gas_rules_from = run.gas_rules_from.clone();
+        restored.future_floor_rules_from = run.future_floor_rules_from.clone();
+        restored.future_floor = run.future_floor.clone();
         crate::revision52_reserves::normalize_run(&mut restored).map_err(StorageError)?;
         crate::revision50::settle_current_duels(&mut restored);
         if let Some(c) = self.cursor {
@@ -532,6 +535,8 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.potion_rules_from = Field::Missing;
     copy.ring_rules_from = Field::Missing;
     copy.gas_rules_from = Field::Missing;
+    copy.future_floor_rules_from = Field::Missing;
+    copy.future_floor = None;
     run.future = Some(storage::serialize(&copy)?.into());
     Ok(())
 }
@@ -557,6 +562,8 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.potion_rules_from=run.potion_rules_from.clone();
     restored.ring_rules_from=run.ring_rules_from.clone();
     restored.gas_rules_from=run.gas_rules_from.clone();
+    restored.future_floor_rules_from=run.future_floor_rules_from.clone();
+    restored.future_floor=run.future_floor.clone();
     restored.run_id=run.run_id.clone();restored.future=None;
     *history=next_history;*run=restored;retain_costs(run,ledger);crate::health_dirty::invalidate(run);
 }
@@ -578,6 +585,8 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.potion_rules_from = run.potion_rules_from.clone();
         restored.ring_rules_from = run.ring_rules_from.clone();
         restored.gas_rules_from = run.gas_rules_from.clone();
+        restored.future_floor_rules_from = run.future_floor_rules_from.clone();
+        restored.future_floor = run.future_floor.clone();
     restored.run_id = run.run_id.clone();
     restored.future = None;
     let policy = history.full_snapshot;
@@ -736,7 +745,7 @@ fn snapshot_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Run {
 fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
     let _timing = crate::timing::span("history.journal_header");
     let mut value = serde_json::to_value(snapshot_header(snapshot, mask_dream_floors))?;
-    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom"] {
+    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "futureFloorRulesFrom"] {
         value.as_object_mut().unwrap().shift_remove(key);
     }
     Ok(value)
@@ -1016,6 +1025,7 @@ impl Engine {
         crate::potion_rules::admit_current(&mut run).map_err(StorageError)?;
         crate::ring_rules::admit_current(&mut run).map_err(StorageError)?;
         crate::gas_rules::admit_current(&mut run).map_err(StorageError)?;
+        crate::future_floor::admit_current(&mut run).map_err(StorageError)?;
         crate::firebolt_travel::admit_current(&mut run).map_err(StorageError)?;
         storage::validate(&run)?;
         storage::validate_current_revision(&run)?;
@@ -1028,6 +1038,8 @@ impl Engine {
             let revision=run.simulation_revision.clone();
             if let Some(anchor)=run.future.as_mut(){anchor.promote41(&revision);}
         }
+        crate::future_floor::validate_anchor(&run).map_err(StorageError)?;
+        crate::future_floor::ensure_entry(&mut run).map_err(StorageError)?;
         Ok(Self { run, history })
     }
     /// O(1) policy selection, clearing at most five encoded cache handles.
@@ -1050,6 +1062,7 @@ impl Engine {
         if matches!(run.potion_rules_from, Field::Null) { run.potion_rules_from = Field::Missing; }
         if matches!(run.ring_rules_from, Field::Null) { run.ring_rules_from = Field::Missing; }
         if matches!(run.gas_rules_from, Field::Null) { run.gas_rules_from = Field::Missing; }
+        if matches!(run.future_floor_rules_from, Field::Null) { run.future_floor_rules_from = Field::Missing; }
         Self::new(run)
     }
     /// New41 borrows current state after O(F+L) trail/retired-history validation.
@@ -1077,11 +1090,23 @@ impl Engine {
         if !retains_revert_history(&self.run) && matches!(command, crate::Command::Ability { id, .. } if id == "numo-revert") {
             return Err(crate::engine::EngineError("Revert is unavailable under revision41 rules".into()));
         }
-        if self.run.status == "playing" && self.run.future.is_none()
+        if !crate::future_floor::enabled(&self.run) && self.run.status == "playing" && self.run.future.is_none()
             && matches!(command, crate::Command::Ability { id, .. }
                 if id == "morae-see-the-future" && self.run.player.abilities.contains(id))
         {
             validate_future_capture(&self.run).map_err(err)?;
+        }
+        crate::future_floor::ensure_entry(&mut self.run).map_err(crate::engine::EngineError)?;
+        if crate::future_floor::enabled(&self.run) && matches!(command, crate::Command::Ability{id,..} if id==crate::future_floor::ID) {
+            if self.run.status!="playing" || !self.run.offers.is_empty() || crate::debug_floor::preparing(&self.run)
+                || crate::engine::condition(&self.run.player,"paralyzed")>0. {return Ok(Default::default());}
+            crate::engine::validate_supported(&self.run)?;
+            let mut candidate=self.run.clone();candidate.replay.push(command.clone());
+            crate::events::begin();
+            let restored=crate::future_floor::restore(&mut candidate).map_err(crate::engine::EngineError)?;
+            if restored {let id=candidate.player.id;crate::dreamwalking::with_actor(&mut candidate,id,|r|crate::animation_shapes::nova(r,&r.player,"P71","nova-pink-large",6));}
+            let events=crate::events::finish();self.run=candidate;
+            return Ok(crate::engine::DispatchOutcome{changed:restored,events,..Default::default()});
         }
         self.history.sync_debug_loadout(&self.run);
         // No temporal escape from the debug reconstruction/choice boundary.
@@ -1257,7 +1282,15 @@ impl Engine {
         }
         // Revision41 has no completed/pending rewind state, journal scope or closing capture.
         if !retains_revert_history(&self.run) {
-            return crate::engine::dispatch(&mut self.run, command);
+            let mut out=crate::engine::dispatch(&mut self.run, command)?;
+            if crate::future_floor::enabled(&self.run) && self.run.status=="dead" && crate::future_floor::available(&self.run) {
+                crate::events::begin();
+                crate::future_floor::restore(&mut self.run).map_err(crate::engine::EngineError)?;
+                let id=self.run.player.id;crate::dreamwalking::with_actor(&mut self.run,id,|r|crate::animation_shapes::nova(r,&r.player,"P71","nova-pink-large",6));
+                out.events=crate::events::finish();out.pending_snapshot=None;out.changed=true;
+            }
+            crate::future_floor::ensure_entry(&mut self.run).map_err(crate::engine::EngineError)?;
+            return Ok(out);
         }
         let mut before = Snapshot::capture(&self.run);
         before.incoming = self.history.closing.as_ref().and_then(|s| s.incoming.clone());

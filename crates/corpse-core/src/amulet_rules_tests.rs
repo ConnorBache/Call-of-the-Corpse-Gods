@@ -3,6 +3,10 @@ use crate::{Command, replay::{ReplayRecord,ReplaySession}, temporal::Engine};
 fn fixture()->serde_json::Value {serde_json::from_str(include_str!("../../../fixtures/amulet-prechange-r52.json")).unwrap()}
 fn fingerprint(r:&Run)->String {
     let mut v=crate::storage::canonical_value(r).unwrap();
+    // Frozen legacy fixture predates this explicitly disabled policy marker.
+    assert!(!crate::future_floor::enabled(r));
+    assert!(r.future_floor.is_none());
+    v.as_object_mut().unwrap().shift_remove("futureFloorRulesFrom");
     v.as_object_mut().unwrap().shift_remove("amuletRulesFrom");
     v.as_object_mut().unwrap().shift_remove("potionRulesFrom");
     v.as_object_mut().unwrap().shift_remove("ringRulesFrom");

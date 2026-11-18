@@ -139,7 +139,7 @@ fn fast_seed_replay_restores_mode_and_first_floor_lookahead() {
     let keys:std::collections::BTreeSet<_>=raw.as_object().unwrap().keys().chain(admitted.as_object().unwrap().keys()).collect();
     let differences:Vec<_>=keys.into_iter().filter(|key|raw.get(*key)!=admitted.get(*key)).map(String::as_str).collect();
     eprintln!("FAST_REPLAY_RAW_STARTUP_DIFFERENCES={differences:?}");
-    assert_eq!(differences,vec!["replaySnapshotFrom"],"Only Engine admission's existing replay policy may differ");
+    assert_eq!(differences,vec!["futureFloor", "replaySnapshotFrom"],"Engine admission initializes the floor-entry checkpoint and replay policy");
     assert!(replay.engine.save().unwrap()==opening,"seed replay opening differs from admitted initial engine");
     replay.step().unwrap();assert!(replay.engine.save().unwrap()==expected.save().unwrap(),"seed replay command result differs");
     if let Some(root)=std::env::var_os("COTCG_FAST_MODE_EXPORT_DIR") {

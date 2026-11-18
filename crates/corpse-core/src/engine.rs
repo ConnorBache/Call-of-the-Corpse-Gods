@@ -482,7 +482,7 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
 /// Failure drops the candidate without touching the caller, RNG, logs or temporal ring.
 pub fn dispatch(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineError> {
     let _timing_function = crate::timing::span("command.core_dispatch");
-    if r.status == "playing" && r.future.is_none()
+    if !crate::future_floor::enabled(r) && r.status == "playing" && r.future.is_none()
         && matches!(c, Command::Ability { id, .. }
             if id == "morae-see-the-future" && r.player.abilities.contains(id))
     {

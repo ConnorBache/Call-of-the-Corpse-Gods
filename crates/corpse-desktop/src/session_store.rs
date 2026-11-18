@@ -209,14 +209,14 @@ pub fn decode_bytes(raw: &[u8]) -> Result<(corpse_core::temporal::Engine, Kind),
 pub fn decode(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> { decode_bytes(raw.as_bytes()) }
 /// Legacy JSON input path; O(bytes + validation/history import), unchanged format.
 fn decode_legacy(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> {
-    decode_checkpoint_policy(raw,None).map(|(engine,kind,_,_,_,_,_)|(engine,kind))
+    decode_checkpoint_policy(raw,None).map(|(engine,kind,_,_,_,_,_,_)|(engine,kind))
 }
 /// O(checkpoint bytes + import), once at loading/attachment. Recording policy is
 /// supplied by its authenticated header, never inferred from turn/tick counts.
 /// An old experimental snapshot checkpoint without provenance remains unknown;
 /// it can load/save but cannot falsely claim a reproducible seed-only export.
 /// The final flag reports a markerless R52 journal policy for EOF adoption.
-fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind,bool,bool,bool,bool,bool),String>{
+fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind,bool,bool,bool,bool,bool,bool),String>{
     let v:serde_json::Value=serde_json::from_str(raw).map_err(|e|e.to_string())?;
     let(mut run,kind)=if v.get("nativeSaveVersion").is_some(){let envelope:SaveEnvelope=serde_json::from_value(v).map_err(|e|e.to_string())?;if envelope.native_save_version!=1{return Err("Unsupported native save version.".into())}(envelope.run,envelope.session)}else{(v,Kind::Genuine)};
     let mut firebolt_migrated=false;
@@ -224,6 +224,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
     let mut potion_migrated=false;
     let mut ring_migrated=false;
     let mut gas_migrated=false;
+    let mut future_migrated=false;
     if let Some(legacy)=legacy{
         let object=run.as_object_mut().ok_or("Save checkpoint must be an object")?;
         // A journal's durable tail predates this load. Suppress ordinary live
@@ -243,6 +244,9 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         gas_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
             && object.get("gasRulesFrom").is_none_or(serde_json::Value::is_null);
         if gas_migrated {object.insert("gasRulesFrom".into(),serde_json::Value::Null);}
+        future_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("futureFloorRulesFrom").is_none_or(serde_json::Value::is_null);
+        if future_migrated {object.insert("futureFloorRulesFrom".into(),serde_json::Value::Null);}
         if legacy{
             if let Some(marker)=object.get("replaySnapshotFrom"){
                 let count=object.get("replay").and_then(serde_json::Value::as_array).map_or(0,Vec::len);
@@ -259,7 +263,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         else {corpse_core::temporal::Engine::load(&raw)}.map_err(|e|e.to_string())?;
     if let Some(legacy)=legacy{engine.set_legacy_revert(legacy);}
     corpse_core::engine::validate_supported(&engine.run).map_err(|e|e.to_string())?;
-    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated))
+    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated))
 }
 
 pub fn utc_now() -> String {

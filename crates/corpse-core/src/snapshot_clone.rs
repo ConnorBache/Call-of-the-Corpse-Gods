@@ -58,6 +58,8 @@ fn clone_snapshot_state(run:&Run)->Run {
             potion_rules_from: Default::default(),
             ring_rules_from: Default::default(),
             gas_rules_from: Default::default(),
+            future_floor_rules_from: Default::default(),
+            future_floor: run.future_floor.clone(),
             metrics: run.metrics.clone(),
             dev: run.dev.clone(),
             known_potions: run.known_potions.clone(),

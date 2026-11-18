@@ -223,6 +223,7 @@ pub mod amulet_rules;
 pub mod potion_rules;
 pub mod ring_rules;
 pub mod gas_rules;
+pub mod future_floor;
 pub mod animation_player;
 pub mod animation_shapes;
 #[cfg(test)] mod animation_contract_tests;

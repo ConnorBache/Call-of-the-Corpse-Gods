@@ -480,6 +480,7 @@ fn revision52_timeweave_and_future_commands_do_not_retune_existing_body() {
     a.conditions.insert("monsterSpecialDamage".into(), 600.);
     let expected = a.clone();
     let mut r = birth::scene(1, 52., 73);
+    r.future_floor_rules_from = corpse_core::Field::Null; // Historical paid-anchor command contract.
     r.actors_at_mut(1.).push(a);
     for id in [
         corpse_core::progression::WEAVE_ID,
@@ -506,7 +507,7 @@ fn revision52_timeweave_and_future_commands_do_not_retune_existing_body() {
     assert!(e.run.future.is_some());
     let before = engine::actor(&e.run, 900.).unwrap().clone();
     e.dispatch(&forward).unwrap();
-    let mut e = temporal::Engine::load(&e.save().unwrap()).unwrap();
+    let mut e = temporal::Engine::load_replay_checkpoint(&e.save().unwrap()).unwrap();
     e.dispatch(&future).unwrap();
     assert!(e.run.future.is_none());
     assert_eq!(*engine::actor(&e.run, 900.).unwrap(), before);

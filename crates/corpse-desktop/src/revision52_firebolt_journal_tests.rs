@@ -247,3 +247,33 @@ fn gas_markerless_journal_keeps_old_confusion_then_adopts_five_turn_refresh() {
         assert!(loaded.pending_batch().base_token.is_none());
     }
 }
+
+#[test]
+fn future_markerless_journal_adopts_only_after_durable_tail() {
+    for metadata in [false, true] {
+        let mut initial = room();
+        initial.future_floor_rules_from = Field::Null;
+        initial.future_floor = None;
+        let mut old = Core::new(initial.clone()).unwrap();
+        let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("futureFloorRulesFrom");
+        let header = if metadata { log::Header::for_metadata_revision(Some(52.)) } else { log::Header::for_revision(Some(52.)) }.unwrap();
+        let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+        let command = Command::Wait;
+        old.dispatch(&command).unwrap();
+        let after = Stamp::capture(&old);
+        append(&mut file, vec![Operation::Command { command, after }], metadata);
+        // Explicit legacy Null remains replay policy until normal live adoption.
+        old.run.future_floor_rules_from = Field::Missing;
+        corpse_core::future_floor::admit_current(&mut old.run).unwrap();
+        corpse_core::future_floor::ensure_entry(&mut old.run).unwrap();
+        let (decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+        assert_eq!(decoded.run.future_floor_rules_from, Field::Value(decoded.run.replay.len()));
+        export_twice(&initial, &decoded);
+        let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+        let (loaded, _) = load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}

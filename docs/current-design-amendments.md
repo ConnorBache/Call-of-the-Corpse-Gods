@@ -887,3 +887,10 @@ Willpower halves every finite incoming status duration, beneficial or harmful, w
 ### Status-gas duration amendment — November 17, 2026
 
 Paralysis, confusion and hallucinogenic gas refresh their respective statuses to five turns on each environmental exposure. Apply the recipient's Willpower duration reduction once to the incoming five turns, rounding up, before retaining the greater of that duration and the existing countdown. Contact never adds durations or shortens an already longer effect. Existing immunity and hallucination recipient restrictions remain unchanged. After leaving gas, ordinary status clocks expire the remaining duration. This changes status duration, not gas-cloud lifetime; caustic/breather damage, inert Blood Mist and other non-status gases are unchanged. Historical replay commands retain their former 2/8/2 durations through the separate gas-rules policy boundary.
+
+## Futuresight: floor-entry rewind (2026-11-18)
+Designer text: "Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor."
+
+Current live rules automatically arm it while owned and unused. Activation rewinds immediately without an energy payment or an energy/reserve confirmation. Death also consumes the floor's use and restores the entry image. The consumed-floor ledger survives rewinds, revisits and save/load; leaving/reentering never replenishes a used floor. Each new floor-entry replaces the checkpoint, including ascending and falling. Native UI uses a green ready dot and a 1–20 display-floor tracker, with an X over each consumed floor; no reserve/spiral indicator.
+
+Old seed replays retain their previous ability through an explicit command-index policy boundary. Pre-amendment live saves have no recorded floor-entry checkpoint: loading them establishes a checkpoint at the loaded position, with exact entries from then onward. Floor-entry captures do not contain nested floor-entry anchors.

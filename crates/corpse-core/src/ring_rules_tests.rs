@@ -3,6 +3,10 @@ use crate::{Command, replay::{ReplayRecord,ReplaySession}, temporal::Engine};
 fn fixture()->serde_json::Value {serde_json::from_str(include_str!("../../../fixtures/ring-prechange-r52.json")).unwrap()}
 fn fingerprint(r:&Run)->String {
     let mut v=crate::storage::canonical_value(r).unwrap();
+    // Frozen legacy fixture predates this explicitly disabled policy marker.
+    assert!(!crate::future_floor::enabled(r));
+    assert!(r.future_floor.is_none());
+    v.as_object_mut().unwrap().shift_remove("futureFloorRulesFrom");
     v.as_object_mut().unwrap().shift_remove("ringRulesFrom");
     v.as_object_mut().unwrap().shift_remove("gasRulesFrom");
     format!("{:016x}",serde_json::to_vec(&v).unwrap().iter().fold(0xcbf29ce484222325u64,|h,b|(h ^ *b as u64).wrapping_mul(0x100000001b3)))
@@ -70,7 +74,7 @@ fn future_restore_keeps_all_three_live_amendment_boundaries() {
     crate::temporal::remember_future(&mut e.run,&e.history).unwrap();
     e.run.amulet_rules_from=0usize.into();e.run.potion_rules_from=0usize.into();e.run.ring_rules_from=0usize.into();
     e.dispatch(&Command::Wait).unwrap();
-    let raw=e.save().unwrap();let mut loaded=Engine::load(&raw).unwrap();
+    let raw=e.save().unwrap();let mut loaded=Engine::load_replay_checkpoint(&raw).unwrap();
     assert!(crate::temporal::restore_future(&mut loaded.run,&mut loaded.history).unwrap());
     assert_eq!(loaded.run.amulet_rules_from,Field::Value(0));
     assert_eq!(loaded.run.potion_rules_from,Field::Value(0));
