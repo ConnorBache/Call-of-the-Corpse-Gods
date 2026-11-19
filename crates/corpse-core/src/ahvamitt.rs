@@ -94,7 +94,6 @@ pub fn teleport(r:&mut Run)->Result<bool,EngineError> {
     crate::dreamwalking::with_actor(r,id,|r| {
         let a=r.player.clone();
         let Some((x,y))=destination(r,&a) else{return Ok(false)};
-        crate::animation_enemy::mark(r,&a,"P74","mask-iris",crate::events::Stage::Travel);
         r.player.x=x;r.player.y=y;
         crate::revision50::duel_actor_changed(r,id);
         r.player.conditions.insert("ahvamittTeleportReadyAt".into(),r.tick+COOLDOWN);
@@ -102,8 +101,9 @@ pub fn teleport(r:&mut Run)->Result<bool,EngineError> {
         crate::zillennia_ground::on_arrival(r,id);
         crate::environment::refresh_burning_from_fire(r,id).map_err(EngineError)?;
         engine::log(r,if crate::revision50::enabled(r) {"The Masque of the Trickster whisks you away."} else {"The Mask of Trickery whisks you away."},"player");
-        if crate::events::enabled(r) {crate::animation_enemy::mark(r,&r.player,"P74","mask-unfold",crate::events::Stage::Special);}
-        else {crate::events::actor_event(r,&r.player,"pulse","Teleport",None,None);}
+        if crate::events::enabled(r) {
+            if (a.x,a.y)!=(r.player.x,r.player.y) {crate::animation_shapes::short_nova(r,&r.player,"P74",crate::animation_shapes::ISHEILAH);}
+        } else {crate::events::actor_event(r,&r.player,"pulse","Teleport",None,None);}
         Ok(true)
     })
 }

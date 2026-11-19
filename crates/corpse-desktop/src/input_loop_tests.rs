@@ -19,7 +19,7 @@ pub struct State<'a> {
 enum Input {
     Key(Keycode, Mod, bool),
     Motion((usize, usize)),
-    Help,
+    Toolbar(usize),
     Resize(u32, u32),
 }
 struct Step {
@@ -74,8 +74,8 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
                         x: (x as f64 * scale * ww as f64 / p.width as f64).round() as i32,
                         y: (y as f64 * scale * wh as f64 / p.height as f64).round() as i32, xrel: 1, yrel: 1 }
                 },
-                Input::Help => {
-                    let slot = render::TOOLBAR_VISIBLE_ACTIONS.iter().position(|id| *id == help_ui::ACTION).unwrap();
+                Input::Toolbar(action) => {
+                    let slot = render::TOOLBAR_VISIBLE_ACTIONS.iter().position(|id| id == action).unwrap();
                     let (x, w) = render::toolbar_rect_for_width(slot, p.logical_width());
                     let (ww, wh) = canvas.window().size();
                     let scale = (p.width as f64 / render::WIDTH as f64).min(p.height as f64 / render::HEIGHT as f64);
@@ -155,12 +155,14 @@ pub fn native_input_loop(mut r: corpse_core::Run, directory: PathBuf, software: 
     let mut step = Step::game("cursor-entry", vec![key(Keycode::Return)]); step.cursor = true; step.tile = Some((10,10)); step.capture = true; steps.push(step);
     let mut step = Step::game("cursor-repeat", vec![Input::Key(Keycode::Return,Mod::NOMOD,true)]); step.cursor = true; step.tile = Some((10,10)); steps.push(step);
     let mut step = Step::game("cursor-navigate", vec![key(Keycode::Kp6),key(Keycode::Kp3)]); step.cursor = true; step.tile = Some((12,11)); step.capture = true; steps.push(step);
-    let mut step = Step::game("help-open", vec![Input::Help]); step.cursor = true; step.help = true; step.capture = true; steps.push(step);
+    let mut step = Step::game("help-open", vec![Input::Toolbar(help_ui::ACTION)]); step.cursor = true; step.help = true; step.capture = true; steps.push(step);
     let mut step = Step::game("help-consumes-actions", vec![key(Keycode::Z),Input::Key(Keycode::Z,Mod::LSHIFTMOD,false),key(Keycode::Kp6)]); step.cursor = true; step.help = true; step.tile = Some((12,11)); steps.push(step);
     let mut step = Step::game("help-close", vec![key(Keycode::Escape)]); step.cursor = true; steps.push(step);
     steps.push(Step::game("cursor-exit", vec![key(Keycode::Escape)]));
     steps.push(Step::game("held-escape-stays-game", vec![Input::Key(Keycode::Escape,Mod::NOMOD,true)]));
-    let mut step = Step::game("next-escape-menu", vec![key(Keycode::Escape)]); step.screen = Screen::Menu; steps.push(step);
+    steps.push(Step::game("bare-escape-stays-in-run", vec![key(Keycode::Escape)]));
+    let mut step = Step::game("menu-button-leaves-run", vec![Input::Toolbar(9)]);
+    step.screen = Screen::Menu; steps.push(step);
     steps.push(Step::game("continue", vec![key(Keycode::C)]));
     let mut step = Step::game("queued-pointer-enter", vec![Input::Motion((12,10)),key(Keycode::Return),key(Keycode::Left)]); step.cursor = true; step.tile = Some((11,10)); steps.push(step);
     let mut step = Step::game("mouse-takeover", vec![Input::Motion((13,10))]); step.tile = Some((13,10)); steps.push(step);

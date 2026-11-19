@@ -126,9 +126,10 @@ fn execute_shard_crushing_and_collapse_are_unpreventable() {
     assert_eq!(r.status,"dead");assert_eq!(r.player.energy,1000.);
 }
 #[test]
-fn failed_conversion_runs_existing_rescues_after_energy_is_drained() {
+fn failed_conversion_runs_automatic_ragelight_after_energy_is_drained() {
     let mut r=room();r.player.energy=2.;r.player.abilities.push(corpse_core::divine_rescues::RAGE.into());
-    r.player.active.push(corpse_core::divine_rescues::RAGE.into());packet(&mut r,2.);
+    assert!(!r.player.active.iter().any(|id| id == corpse_core::divine_rescues::RAGE));
+    packet(&mut r,2.);
     assert_eq!((r.player.hp,r.player.energy,r.status.as_str()),(1.,0.,"playing"));
     assert_eq!(r.player.conditions.get("rageCost"),Some(&1.));
 }

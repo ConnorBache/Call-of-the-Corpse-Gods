@@ -1570,17 +1570,14 @@ fn hover_bounds(
         h,
     )
 }
-/// Point-anchor convenience. Prefer paint_hover_at with the actual source tile
-/// rectangle so movement across that tile never shifts the tooltip.
-pub fn paint_hover(report: &Report, p: &mut Painter, x: i32, y: i32) {
-    paint_hover_at(report, p, (x, y, x, y))
-}
-pub fn paint_hover_at(report: &Report, p: &mut Painter, tile: (i32, i32, i32, i32)) {
+/// Paint the passive, bottom-right gameplay card. It creates no input region.
+pub fn paint_hover(report: &Report, p: &mut Painter) {
     let Some(c) = report.creature.as_ref().filter(|c| c.hover_available) else {
-        paint_item_hover(report,p,tile);
+        paint_item_hover(report,p);
         return;
     };
-    let hover_width = modal_ui::hover_bounds_painter(p, tile, 0).2;
+    let hover_width = modal_ui::hover_bounds_painter(p, 0).2;
+    if hover_width <= 30 { return; }
     let line_height = role_line(p, Role::Tooltips, 15, 21);
     let mut rows: Vec<(String, [u8; 3], u16, i32)> = vec![];
     let mut offset = 36.max(12 + role_line(p, Role::Tooltips, 18, 24));
@@ -1620,8 +1617,8 @@ pub fn paint_hover_at(report: &Report, p: &mut Painter, tile: (i32, i32, i32, i3
     add(&c.abilities, MUTED, 15, 4);
     add(&c.heart, GOLD, 14, 0);
     add(&c.bow_shot, INK, 15, 7);
-    // The native map column is the overlay viewport, preserving the right rail.
-    let (x, y, w, h) = modal_ui::hover_bounds_painter(p, tile, offset + 12).tuple();
+    let (x, y, w, h) = modal_ui::hover_bounds_painter(p, offset + 12).tuple();
+    if h <= 0 { return; }
     let old = p.clip;
     p.clip = Some((x, y, w, h));
     // Source #151923f5 composited over the already-painted scene.
@@ -1683,9 +1680,10 @@ pub fn paint_hover_at(report: &Report, p: &mut Painter, tile: (i32, i32, i32, i3
 }
 /// Detached item text uses the existing tooltip geometry and typography.
 /// O(text wrapping/font work + clipped tooltip pixels), no world observation.
-fn paint_item_hover(report: &Report, p: &mut Painter, tile: (i32,i32,i32,i32)) {
+fn paint_item_hover(report: &Report, p: &mut Painter) {
     if report.item_hover.is_empty() { return; }
-    let width=modal_ui::hover_bounds_painter(p,tile,0).2;
+    let width=modal_ui::hover_bounds_painter(p,0).2;
+    if width<=28{return;}
     let line_height=role_line(p,Role::Tooltips,15,21);
     let mut rows=Vec::new();
     for block in &report.item_hover {
@@ -1695,7 +1693,8 @@ fn paint_item_hover(report: &Report, p: &mut Painter, tile: (i32,i32,i32,i32)) {
         rows.push(String::new());
     }
     rows.pop();
-    let (x,y,w,h)=modal_ui::hover_bounds_painter(p,tile,rows.len()as i32*line_height+24).tuple();
+    let (x,y,w,h)=modal_ui::hover_bounds_painter(p,rows.len()as i32*line_height+24).tuple();
+    if h<=0{return;}
     let old=p.clip;p.clip=Some((x,y,w,h));
     let left=x.max(0);let top=y.max(0);
     p.blend_rect(left,top,(x+w).min(p.logical_width())-left,
@@ -1720,6 +1719,13 @@ fn gas_exposure(r: &Run, a: &Actor, g: &corpse_core::GasPresence) -> String {
             ""
         }
     );
+    if g.r#type == "steam" && corpse_core::steam_rules::current(r) {
+        return if corpse_core::environment::steam_can_scald(r, a) {
+            format!("{prefix}: scalds each normal turn while inside, for the same damage as Burning. It does not ignite you.")
+        } else {
+            format!("{prefix}: your fire immunity prevents scalding.")
+        };
+    }
     let corrosive = matches!(g.r#type.as_str(), "caustic" | "breather");
     let immunity = if has(a, "enemy:beast:gas-immunity") {
         Some("Gas Immunity")
@@ -2027,9 +2033,9 @@ mod tests {
         let item=Item{id:900.,kind:"potion".into(),name:"Unidentified potion".into(),effect:"healing".to_string().into(),..Default::default()};
         r.ground_at_mut(r.depth).push(corpse_core::GroundItem{x:11.,y:10.,item,..Default::default()});
         let report=observe_tile(&r,11,10);let mut p=Painter::new();p.clear([20,30,40]);let blank=p.pixels.clone();
-        paint_hover(&report,&mut p,300,300);assert_ne!(p.pixels,blank);assert_eq!(p.clip,None);
+        paint_hover(&report,&mut p);assert_ne!(p.pixels,blank);assert_eq!(p.clip,None);
         r.simulation_revision=49.0.into();let legacy=observe_tile(&r,11,10);assert!(!hover_available(&legacy));
-        p.clear([20,30,40]);paint_hover(&legacy,&mut p,300,300);assert_eq!(p.pixels,blank);
+        p.clear([20,30,40]);paint_hover(&legacy,&mut p);assert_eq!(p.pixels,blank);
     }
     #[test]
     fn r50_item_hover_remembered_properties_do_not_reveal_live_hidden_world() {
@@ -2655,11 +2661,19 @@ fn offhand(r: &Run, a: &Actor, b: &Actor, chance: f64) -> Option<Offhand> {
     } else {
         strike_damage(&initial, ia, ib, primary, 1.25, fury, true)
     };
+    let ragelight = if corpse_core::ragelight_rules::current(&initial) {
+        let id = corpse_core::divine_rescues::RAGE;
+        target.abilities.iter().any(|owned| owned == id)
+            && corpse_core::revision50_ability_energy::can_pay(
+                &initial, target.id, id, cond(target, "rageCost"),
+            )
+    } else {
+        is_active(&initial, ib, "Rage at the Dying of the Light")
+            && target.energy >= cond(target, "rageCost")
+    };
     let revive = chance > 0.
         && high >= target.hp
-        && ((is_active(&initial, ib, "Rage at the Dying of the Light")
-            && target.energy >= cond(target, "rageCost"))
-            || ability(target, "Overflowing")
+        && (ragelight || ability(target, "Overflowing")
             || (is_active(&initial, ib, "You Shall Never Be Rid of Me")
                 && cond(target, "pelianUsed") == 0.));
     let stops = chance > 0. && low >= target.hp && !revive;
@@ -3202,7 +3216,7 @@ mod hover_tests {
             [93, 31, 113],
         );
         let original = p.pixels.clone();
-        paint_hover(&Report::default(), &mut p, 500, 400);
+        paint_hover(&Report::default(), &mut p);
         assert_eq!(p.pixels, original);
         let report = CreatureReport {
             title: "Observed creature".into(),
@@ -3220,21 +3234,30 @@ mod hover_tests {
         }
         .report();
         let before = report.clone();
-        for point in [(10, 130), (900, 690), (600, 400)] {
-            paint_hover(&report, &mut p, point.0, point.1);
-            assert_eq!(p.clip, None);
-            for x in 974..crate::render::WIDTH {
-                for y in 0..crate::render::HEIGHT {
-                    let at = (y * crate::render::WIDTH + x) * 4;
-                    assert_eq!(&p.pixels[at..at + 3], &[93, 31, 113]);
-                }
+        for (width,height) in [(1280,800),(960,1200),(320,200)] {
+            p.resize(width,height);
+            p.set_responsive_canvas(true);
+            p.clear([93,31,113]);
+            let original=p.pixels.clone();
+            let bounds=modal_ui::hover_bounds_painter(&p, i32::MAX);
+            let native=p.logical_damage_rect(bounds.0,bounds.1,bounds.2,bounds.3).unwrap();
+            let map=p.frame().map;
+            assert_eq!(bounds.0+bounds.2,p.logical_width()-8);
+            assert_eq!(bounds.1+bounds.3,map.1+map.3-8);
+            assert!(bounds.0+bounds.2>p.hud_left());
+            assert!(bounds.1>=8);
+            paint_hover(&report, &mut p);
+            assert_ne!(p.pixels,original);
+            assert_eq!(p.clip,None);
+            for (index,(after,before)) in p.pixels.chunks_exact(4).zip(original.chunks_exact(4)).enumerate() {
+                if !native.contains(index%width,index/width) {assert_eq!(after,before);}
             }
         }
         assert_eq!(report, before);
         let mut dead = report.clone();
         dead.creature.as_mut().unwrap().hover_available = false;
         let pixels = p.pixels.clone();
-        paint_hover(&dead, &mut p, 100, 100);
+        paint_hover(&dead, &mut p);
         assert_eq!(p.pixels, pixels);
     }
 }
@@ -3345,11 +3368,10 @@ mod appearance_tests {
                     .write_image_data(&p.pixels)
                     .unwrap();
             }
-            let tile = (710, 680, 730, 700);
-            let hover = modal_ui::hover_bounds_painter(&p, tile, 1000);
+            let hover = modal_ui::hover_bounds_painter(&p, 1000);
             assert!(hover.2 <= p.profile.number("ui.layout.tooltipMaxWidth") as i32);
             let original = report.clone();
-            paint_hover_at(&report, &mut p, tile);
+            paint_hover(&report, &mut p);
             assert_eq!(report, original);
         }
     }

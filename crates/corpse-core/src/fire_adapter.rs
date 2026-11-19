@@ -635,6 +635,11 @@ impl FireScan for FireAdapter<'_> {
     fn caught_fire(&self, i: usize) -> bool {
         self.e().fire_fresh.as_ref().unwrap()[i]
     }
+    fn spreads_neighbors(&self, i: usize) -> bool {
+        self.e().fire_kind.as_ref().unwrap()[i].as_deref() != Some("ichor")
+            || !crate::ichor_fire_rules::current(self.run)
+            || self.run.tick.rem_euclid(2.) == 0.
+    }
     fn expose(&mut self, i: usize, source: usize) {
         let p = self.e().provenance.as_ref().unwrap().get("fire").unwrap();
         let (owner, player) = (p.owner[source], p.player[source]);

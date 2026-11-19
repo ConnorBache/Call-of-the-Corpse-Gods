@@ -26,7 +26,7 @@ This catches multiple transitions in one event batch as well as a worker that
 finishes before the first poll. Summary keyboard/mouse New Descent and dead-game
 Enter explicitly observe the menu before submitting their immediate new launch.
 
-All screen departures use the same observer: ordinary Game Escape/toolbar,
+All screen departures use the same observer: ordinary Game toolbar Menu button,
 DEBUG preparation cancellation, Summary/death, Start/debug setup Back/Cancel,
 ImportSave, Replays, ReplayGame, Scores, Bestiary/Manual, and Settings. Returning
 from a Bestiary opened in Game/ReplayGame returns there, without a menu reroll.

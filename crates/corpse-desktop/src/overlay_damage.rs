@@ -2,7 +2,7 @@
 //! O(displayed effect tiles + hovered tooltip text + pack hover rows), with <=8 regions.
 use crate::{render::{Painter,View},render::damage::{Damage,Rect},pack::PackPaintState};
 #[derive(Clone,PartialEq)]
-pub struct Hover {pub report:crate::inspection_ui::Report,pub tile:(i32,i32,i32,i32),pub bounds:Rect}
+pub struct Hover {pub report:crate::inspection_ui::Report,pub bounds:Rect}
 #[derive(Clone,PartialEq)]
 pub struct Effect {pub x:i32,pub y:i32,pub color:[u8;3],pub light:u64,pub glyph:Option<String>,pub bounds:Rect}
 #[derive(Clone,PartialEq)]
@@ -72,10 +72,10 @@ pub fn effects(p:&Painter,v:&View,cues:&[crate::effects::Cue],now:f64,reduced:bo
 }
 /// Conservative maximum tooltip footprint, using its actual clipped viewport geometry.
 /// Layout wrapping remains in the existing painter; no duplicate prose wrapping here.
-pub fn hover(p:&Painter,report:&crate::inspection_ui::Report,tile:(i32,i32,i32,i32))->Option<Hover>{
+pub fn hover(p:&Painter,report:&crate::inspection_ui::Report)->Option<Hover>{
     if !crate::inspection_ui::hover_available(report){return None;}
-    let r=crate::modal_ui::hover_bounds_painter(p,tile,i32::MAX/4);
-    p.logical_damage_rect(r.0,8,r.2,p.logical_height()-16).map(|bounds|Hover{report:report.clone(),tile,bounds})
+    let r=crate::modal_ui::hover_bounds_painter(p,i32::MAX/4);
+    p.logical_damage_rect(r.0,r.1,r.2,r.3).map(|bounds|Hover{report:report.clone(),bounds})
 }
 #[cfg(test)]mod tests{
     use super::*;

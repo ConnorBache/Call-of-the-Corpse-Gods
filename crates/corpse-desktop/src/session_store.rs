@@ -209,14 +209,14 @@ pub fn decode_bytes(raw: &[u8]) -> Result<(corpse_core::temporal::Engine, Kind),
 pub fn decode(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> { decode_bytes(raw.as_bytes()) }
 /// Legacy JSON input path; O(bytes + validation/history import), unchanged format.
 fn decode_legacy(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> {
-    decode_checkpoint_policy(raw,None).map(|(engine,kind,_,_,_,_,_,_)|(engine,kind))
+    decode_checkpoint_policy(raw,None).map(|(engine,kind,_,_,_,_,_,_,_,_,_,_,_,_,_, _)|(engine,kind))
 }
 /// O(checkpoint bytes + import), once at loading/attachment. Recording policy is
 /// supplied by its authenticated header, never inferred from turn/tick counts.
 /// An old experimental snapshot checkpoint without provenance remains unknown;
 /// it can load/save but cannot falsely claim a reproducible seed-only export.
-/// The final flag reports a markerless R52 journal policy for EOF adoption.
-fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind,bool,bool,bool,bool,bool,bool),String>{
+/// The flags report markerless journal policies for EOF adoption.
+fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool, bool),String>{
     let v:serde_json::Value=serde_json::from_str(raw).map_err(|e|e.to_string())?;
     let(mut run,kind)=if v.get("nativeSaveVersion").is_some(){let envelope:SaveEnvelope=serde_json::from_value(v).map_err(|e|e.to_string())?;if envelope.native_save_version!=1{return Err("Unsupported native save version.".into())}(envelope.run,envelope.session)}else{(v,Kind::Genuine)};
     let mut firebolt_migrated=false;
@@ -224,6 +224,14 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
     let mut potion_migrated=false;
     let mut ring_migrated=false;
     let mut gas_migrated=false;
+    let mut commandment_migrated=false;
+    let mut screamer_migrated=false;
+    let mut ember_migrated=false;
+    let mut ragelight_migrated=false;
+    let mut steam_migrated=false;
+    let mut execute_migrated=false;
+    let mut beckoning_migrated=false;
+    let mut ichor_fire_migrated=false;
     let mut future_migrated=false;
     if let Some(legacy)=legacy{
         let object=run.as_object_mut().ok_or("Save checkpoint must be an object")?;
@@ -244,6 +252,30 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         gas_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
             && object.get("gasRulesFrom").is_none_or(serde_json::Value::is_null);
         if gas_migrated {object.insert("gasRulesFrom".into(),serde_json::Value::Null);}
+        commandment_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64).is_some_and(|r|r>=50.)
+            && object.get("commandmentRulesFrom").is_none_or(serde_json::Value::is_null);
+        if commandment_migrated {object.insert("commandmentRulesFrom".into(),serde_json::Value::Null);}
+        screamer_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64).is_some_and(|r|r>=50.)
+            && object.get("screamerRulesFrom").is_none_or(serde_json::Value::is_null);
+        if screamer_migrated {object.insert("screamerRulesFrom".into(),serde_json::Value::Null);}
+        ember_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64).is_some_and(|r|r>=50.)
+            && object.get("emberRulesFrom").is_none_or(serde_json::Value::is_null);
+        if ember_migrated {object.insert("emberRulesFrom".into(),serde_json::Value::Null);}
+        ragelight_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("ragelightRulesFrom").is_none_or(serde_json::Value::is_null);
+        if ragelight_migrated {object.insert("ragelightRulesFrom".into(),serde_json::Value::Null);}
+        steam_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64).is_some_and(|r|r>=50.)
+            && object.get("steamRulesFrom").is_none_or(serde_json::Value::is_null);
+        if steam_migrated {object.insert("steamRulesFrom".into(),serde_json::Value::Null);}
+        execute_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("executeRulesFrom").is_none_or(serde_json::Value::is_null);
+        if execute_migrated {object.insert("executeRulesFrom".into(),serde_json::Value::Null);}
+        beckoning_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("beckoningRulesFrom").is_none_or(serde_json::Value::is_null);
+        if beckoning_migrated {object.insert("beckoningRulesFrom".into(),serde_json::Value::Null);}
+        ichor_fire_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("ichorFireRulesFrom").is_none_or(serde_json::Value::is_null);
+        if ichor_fire_migrated {object.insert("ichorFireRulesFrom".into(),serde_json::Value::Null);}
         future_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
             && object.get("futureFloorRulesFrom").is_none_or(serde_json::Value::is_null);
         if future_migrated {object.insert("futureFloorRulesFrom".into(),serde_json::Value::Null);}
@@ -263,7 +295,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         else {corpse_core::temporal::Engine::load(&raw)}.map_err(|e|e.to_string())?;
     if let Some(legacy)=legacy{engine.set_legacy_revert(legacy);}
     corpse_core::engine::validate_supported(&engine.run).map_err(|e|e.to_string())?;
-    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated))
+    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,ichor_fire_migrated))
 }
 
 pub fn utc_now() -> String {

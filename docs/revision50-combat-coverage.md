@@ -113,3 +113,7 @@ are unchanged; no per-turn name or AI-predicate inference is introduced. Added
 regression sources check every approved positive, all other catalog negatives,
 legacy/profile preservation, ordinary births, nest birth, real summons and
 Witch-Hatred telepathy/terminal strikes. They await integrated Cargo validation.
+
+### Commandment landed-hit amendment
+
+Current live play applies the existing passive push or paid maximum push only when an attack lands against an enemy. Misses neither push nor spend Commandment energy; Unstoppable Force still resolves on attempted enemy attacks. Replay and journal prefixes recorded before this amendment retain their original miss behavior; loaded games adopt at the first new command.

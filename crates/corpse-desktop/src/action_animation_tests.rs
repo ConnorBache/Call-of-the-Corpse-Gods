@@ -11,14 +11,14 @@ fn event(key:&str,style:&str,stage:Stage,action:u32,cells:&[(f64,f64)])->Present
 fn capture(p:&Painter,name:&str){if let Ok(dir)=std::env::var("CORPSE_ACTION_REVIEW"){std::fs::create_dir_all(&dir).unwrap();let f=std::fs::File::create(format!("{dir}/{name}.png")).unwrap();let mut enc=png::Encoder::new(f,p.width as u32,p.height as u32);enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);enc.write_header().unwrap().write_image_data(&p.pixels).unwrap();}}
 #[test]fn action_animation_exact_cells_order_and_instant(){
  let route=[(2.,3.),(3.,3.),(15.,11.)];let mut fx=effects::Effects::default();
- fx.add(vec![event("A01","bolt",Stage::Health,0,&route[2..]),event("A01","bolt",Stage::Travel,0,&route),event("E70","collapse",Stage::Death,0,&route[2..])],1.,1.,0.,false);
- assert_eq!(fx.cues[0].event.animation.as_ref().unwrap().stage,Stage::Travel);
- assert!(fx.cues[0].started<fx.cues[1].started&&fx.cues[1].started<fx.cues[2].started);
- for time in [0.,30.,80.,130.]{for t in effects::tiles(&fx.cues[0],time,false){assert!(route.contains(&(t.x as f64,t.y as f64)),"invented route cell");}}
- let a=effects::tiles(&fx.cues[0],20.,true);let b=effects::tiles(&fx.cues[0],100.,true);assert_eq!(a.len(),b.len());assert!(a.iter().zip(&b).all(|(a,b)|a.mark==b.mark&&a.light==b.light));
- fx.configure_motion(true,true);fx.add(vec![event("A01","bolt",Stage::Travel,0,&route),event("E70","collapse",Stage::Death,0,&route[2..])],2.,1.,400.,false);
- assert!(fx.cues.iter().all(|c|c.started==400.));assert_eq!(fx.cues[0].event.animation.as_ref().unwrap().cells.len(),1);
+ let travel=event("A01","bolt",Stage::Travel,0,&route);
+ fx.add(vec![event("A01","bolt",Stage::Health,0,&route[2..]),travel.clone(),event("E70","collapse",Stage::Death,0,&route[2..])],1.,1.,0.,false);
+ assert_eq!(fx.cues.len(),1);assert_eq!(fx.cues[0].event,travel);
+ for time in [0.,30.,80.,130.]{for t in effects::tiles(&fx.cues[0],time,false){assert!(route.contains(&(t.x as f64,t.y as f64)));}}
+ fx.configure_motion(true,true);fx.add(vec![travel],2.,1.,400.,false);
+ assert_eq!(fx.cues[0].started,400.);assert_eq!(fx.cues[0].event.animation.as_ref().unwrap().cells.len(),1);
 }
+
 #[test]fn action_animation_families_use_uniform_tile_light_not_vector_art(){
  let styles=["slash","puncture","droplet","venom-two","venom-four","bracket","root","speed","eye","shield","cracked-shield","bolt","slab","miss","rejected","gear","ember","stitch","dip","dissolve","diamond","mask","split-ring","crossed-ring","wave","sound"];
  let mut p=Painter::new();let mut expected=Painter::new();
@@ -47,9 +47,8 @@ fn room()->Run{
 
 #[test]fn action_animation_busy_room_latency_and_interruption_are_bounded(){
  let mut fx=effects::Effects::default();let events=(0..200).flat_map(|action|[Stage::Travel,Stage::Impact,Stage::Special,Stage::Health,Stage::Death].map(move|stage|event("E70","collapse",stage,action,&[(2.,3.)]))).collect();
- fx.add(events,1.,1.,1000.,false);assert!(fx.animate(1451.));
- for pair in fx.cues.chunks(5).collect::<Vec<_>>().windows(2) { let end=pair[0].iter().map(|c|c.started+effects::duration(&c.event)).fold(0f64,f64::max);assert!(pair[1][0].started>=end); }
- fx.add(vec![event("P23","speed",Stage::Travel,0,&[(3.,3.)])],2.,1.,1100.,false);assert_eq!(fx.cues.len(),1);assert_eq!(fx.cues[0].started,1100.);
+ fx.add(events,1.,1.,1000.,false);fx.defer_until_frame(1000.);assert!(fx.cues.is_empty());assert!(!fx.presentation_pending(1000.));
+ fx.add(vec![event("P23","line-grow",Stage::Travel,0,&[(3.,3.)])],2.,1.,1100.,false);assert_eq!(fx.cues.len(),1);
  fx.add(vec![],2.,1.,1101.,true);assert!(fx.cues.is_empty());
 }
 
@@ -83,11 +82,10 @@ fn room()->Run{
   for(time,label)in [(50.,"travel"),(150.,"special"),(220.,"health"),(290.,"end")]{p.game_at(&view,"",false,0.);p.effects(&view,&fx.cues,time,false);capture(&p,&format!("{effect}-{label}"));}
  }
 }
-#[test]fn action_animation_arrival_and_departure_light_exact_endpoints(){
+#[test]fn action_animation_arrival_and_departure_highlights_are_removed(){
  for style in ["unfold","unfold-moon","mask-unfold","bracket-unfold","fold","fold-moon","mask-iris"] {
-  let mut e=event("P13",style,Stage::Travel,0,&[(2.,3.),(15.,11.)]);e.glyph=Some("@".into());
-  let cue=effects::Cue{event:e,started:0.,held:false,static_marks:false};
-  for age in [0.,30.,80.,130.] {let tiles=effects::tiles(&cue,age,false);assert!(tiles.iter().all(|t|t.glyph.is_none()&&t.mark.is_none()));assert!(tiles.iter().all(|t|[(2,3),(15,11)].contains(&(t.x,t.y))));}
+  let mut e=event("P13",style,Stage::Travel,0,&[(2.,3.),(15.,11.)]);e.glyph=Some("@").map(str::to_owned);
+  let mut fx=effects::Effects::default();fx.add(vec![e],1.,1.,0.,false);assert!(fx.cues.is_empty());assert!(!fx.presentation_pending(0.));
  }
 }
 
@@ -97,21 +95,20 @@ fn room()->Run{
 }
 #[test]fn action_animation_plane_crossfade_is_observed_only_and_interruptible(){
  let r=room();let mut before=observe::observe(&r);let mut after=observe::observe(&r);before.cells.retain(|c|c.x<13);after.cells.retain(|c|c.x>=13);let mut p=Painter::new();let mut hashes=Vec::new();
- for age in [0.,125.,249.,250.] {p.game_at(&after,"",false,0.);p.plane_crossfade(&before,age);hashes.push(crc32fast::hash(&p.pixels));capture(&p,&format!("plane-crossfade-{}",age as i32));}assert_ne!(hashes[0],hashes[1]);assert_eq!(hashes[2],hashes[3]);
- let mut fx=effects::Effects::default();fx.plane_changed(before,100.);assert!(fx.animate(200.));fx.add(vec![],1.,1.,210.,false);assert!(fx.plane_transition.is_none());fx.configure_motion(true,false);fx.plane_changed(observe::observe(&r),300.);assert!(fx.plane_transition.is_none());fx.configure_motion(false,true);fx.plane_changed(observe::observe(&r),300.);assert!(fx.plane_transition.is_none());
+ for age in [0.,125.,249.,250.] {p.game_at(&after,"",false,0.);p.plane_crossfade(&before,age);hashes.push(crc32fast::hash(&p.pixels));capture(&p,&format!("plane-crossfade-{}",age as i32));}assert_eq!(hashes[0],hashes[1]);assert_eq!(hashes[2],hashes[3]);
+ let mut fx=effects::Effects::default();fx.plane_changed(before,100.);assert!(!fx.animate(200.));fx.add(vec![],1.,1.,210.,false);assert!(fx.plane_transition.is_none());fx.configure_motion(true,false);fx.plane_changed(observe::observe(&r),300.);assert!(fx.plane_transition.is_none());fx.configure_motion(false,true);fx.plane_changed(observe::observe(&r),300.);assert!(fx.plane_transition.is_none());
 }
 #[test]fn action_animation_real_dreamwalk_and_wake_crossfade_captures(){
  let mut r=room();r.actors_at_mut(r.depth).clear();r.dreamwalking=corpse_core::dreamwalking::State{unlocked:true,depth:r.depth,..Default::default()}.into();let mut engine=temporal::Engine::new(r).unwrap();let mut fx=effects::Effects::default();let mut p=Painter::new();
  for (id,label)in [(corpse_core::dreamwalking::DREAMWALK_ID,"dream-enter"),(corpse_core::dreamwalking::DREAMWALK_ID,"dream-wake")] {
-  dispatch(&mut engine,&mut fx,100.,&Command::Ability{id:id.into(),target:Field::Missing,x:Field::Missing,y:Field::Missing}).unwrap();assert!(fx.plane_transition.is_some(),"{label}");let view=observe::observe(&engine.run);let transition=fx.plane_transition.as_ref().unwrap();
-  for age in [0.,125.,250.] {p.game_at(&view,"",false,0.);p.plane_crossfade(&transition.before,age);capture(&p,&format!("{label}-{}",age as i32));}
+  dispatch(&mut engine,&mut fx,100.,&Command::Ability{id:id.into(),target:Field::Missing,x:Field::Missing,y:Field::Missing}).unwrap();assert!(fx.plane_transition.is_none(),"{label}");let view=observe::observe(&engine.run);
+  for age in [0.,125.,250.] {p.game_at(&view,"",false,0.);p.plane_crossfade(&view,age);capture(&p,&format!("{label}-{}",age as i32));}
  }
 }
-#[test]fn action_animation_symbolic_links_light_endpoints_without_drawing_a_path(){
+#[test]fn action_animation_symbolic_endpoint_highlights_are_removed(){
  for style in ["droplet-return","arc-redirect","arc-swap-forward","stitch-thought","notch-target","fracture-trait:enemy:beast:venom","wave-advance","speed-push"] {
   let e=event("P68",style,Stage::Special,0,&[(2.,3.),(15.,11.)]);
-  let cue=effects::Cue{event:e,started:0.,held:false,static_marks:false};
-  let tiles=effects::tiles(&cue,30.,false);assert_eq!(tiles.len(),2);assert!(tiles.iter().all(|t|t.glyph.is_none()&&t.mark.is_none()));assert_eq!((tiles[0].x,tiles[0].y),(2,3));assert_eq!((tiles[1].x,tiles[1].y),(15,11));
+  let mut fx=effects::Effects::default();fx.add(vec![e],1.,1.,0.,false);assert!(fx.cues.is_empty());assert!(!fx.travel_pending(0.));
  }
 }
 
@@ -138,7 +135,7 @@ fn room()->Run{
 #[test]fn action_animation_legacy_plane_dispatch_has_no_new_crossfade(){let mut r=room();r.simulation_revision=51.0.into();r.actors_at_mut(r.depth).clear();r.dreamwalking=corpse_core::dreamwalking::State{unlocked:true,depth:r.depth,..Default::default()}.into();let mut engine=temporal::Engine::new(r).unwrap();let mut fx=effects::Effects::default();dispatch(&mut engine,&mut fx,100.,&Command::Ability{id:corpse_core::dreamwalking::DREAMWALK_ID.into(),target:Field::Missing,x:Field::Missing,y:Field::Missing}).unwrap();assert!(corpse_core::dreamwalking::active(&engine.run));assert!(fx.plane_transition.is_none());}
 
 #[test]fn action_animation_actual_ascend_departure_column_capture(){
- let mut r=room();r.depth=2.;r.actors_at_mut(1.).clear();r.floor_mut().unwrap().tiles.fill("floor".into());r.floor_mut().unwrap().lights.fill(100.);let (x,y)=(r.player.x as usize,r.player.y as usize);let f=std::sync::Arc::make_mut(&mut r.floors[0]);let w=f.width();f.tiles[y*w+x]="chasm".into();r.player.conditions.clear();r.player.abilities=vec!["anavani-ascend".into()];r.player.ability_reserves=Field::Missing;corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,"anavani-ascend",50.,50.).unwrap();let mut engine=temporal::Engine::new(r).unwrap();let mut fx=effects::Effects::default();dispatch(&mut engine,&mut fx,0.,&Command::Ability{id:"anavani-ascend".into(),target:Field::Missing,x:Field::Missing,y:Field::Missing}).unwrap();assert_eq!(engine.run.depth,1.);let t=fx.plane_transition.as_ref().expect("real Ascend transition");assert!(t.ascend);let view=observe::observe(&engine.run);let mut p=Painter::new();for age in [0.,125.,250.]{p.game_at(&view,"",false,0.);p.scene_crossfade(&t.before,age,true);capture(&p,&format!("ascend-column-{}",age as i32));}
+ let mut r=room();r.depth=2.;r.actors_at_mut(1.).clear();r.floor_mut().unwrap().tiles.fill("floor".into());r.floor_mut().unwrap().lights.fill(100.);let (x,y)=(r.player.x as usize,r.player.y as usize);let f=std::sync::Arc::make_mut(&mut r.floors[0]);let w=f.width();f.tiles[y*w+x]="chasm".into();r.player.conditions.clear();r.player.abilities=vec!["anavani-ascend".into()];r.player.ability_reserves=Field::Missing;corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,"anavani-ascend",50.,50.).unwrap();let mut engine=temporal::Engine::new(r).unwrap();let mut fx=effects::Effects::default();dispatch(&mut engine,&mut fx,0.,&Command::Ability{id:"anavani-ascend".into(),target:Field::Missing,x:Field::Missing,y:Field::Missing}).unwrap();assert_eq!(engine.run.depth,1.);assert!(fx.plane_transition.is_none());let view=observe::observe(&engine.run);let mut p=Painter::new();for age in [0.,125.,250.]{p.game_at(&view,"",false,0.);p.scene_crossfade(&view,age,true);capture(&p,&format!("ascend-column-{}",age as i32));}
 }
 
 #[test]fn action_animation_actual_construction_and_removal_captures(){
@@ -163,11 +160,11 @@ fn room()->Run{
   for time in [0.,30.,80.] {for t in effects::tiles(&cue,time,false){assert!(t.glyph.is_none()&&t.mark.is_none());assert!([(2,3),(3,3),(15,11)].contains(&(t.x,t.y)));}}
  }
 }
-#[test]fn brogue_plain_melee_stays_quiet_but_ranged_impact_and_ability_proc_remain(){
+#[test]fn brogue_plain_flashes_are_removed_but_ranged_travel_remains(){
  let mut fx=effects::Effects::default();let melee=||vec![event("shared","slash",Stage::Impact,0,&[(2.,3.)]),event("shared","puncture",Stage::Health,0,&[(2.,3.)])];
  fx.add(melee(),1.,1.,0.,false);assert!(fx.cues.is_empty());
- let mut proc=melee();proc.push(event("P01","bracket",Stage::Special,0,&[(2.,3.)]));fx.add(proc,2.,1.,0.,false);assert_eq!(fx.cues.len(),1);assert_eq!(fx.cues[0].event.animation.as_ref().unwrap().proposal,"P01");
- let mut ranged=melee();ranged.push(event("shared","bolt",Stage::Travel,0,&[(1.,3.),(2.,3.)]));fx.add(ranged,3.,1.,0.,false);assert_eq!(fx.cues.len(),3);assert_eq!(fx.cues[1].started,80.,"impact must not precede projectile arrival");
+ let mut proc=melee();proc.push(event("P01","bracket",Stage::Special,0,&[(2.,3.)]));fx.add(proc,2.,1.,0.,false);assert!(fx.cues.is_empty());
+ let mut ranged=melee();ranged.push(event("shared","bolt",Stage::Travel,0,&[(1.,3.),(2.,3.)]));fx.add(ranged,3.,1.,0.,false);assert_eq!(fx.cues.len(),1);assert!(!fx.presentation_pending(80.),"removed impacts cannot extend travel");
 }
 #[test]fn brogue_actual_ordinary_move_and_melee_have_no_cosmetic_flourish(){
  let mut r=room();r.player.abilities.clear();r.actors_at_mut(r.depth).clear();
@@ -179,7 +176,7 @@ fn room()->Run{
  let r=room();let before=observe::observe(&r);let mut p=Painter::new();p.clear([9,10,11]);let pristine=p.pixels.clone();let cell=before.cells.iter().find(|c|c.actor_id==Some(before.player_id)).unwrap();let(cw,ch,ox,oy)=p.map_layout(before.width,before.height);let bounds=p.logical_damage_rect(ox+cell.x as i32*cw,oy+cell.y as i32*ch,cw,ch).unwrap();
  p.scene_crossfade(&before,100.,true);let mut changed=0;
  for(i,(a,b))in pristine.chunks_exact(4).zip(p.pixels.chunks_exact(4)).enumerate(){if a!=b{changed+=1;assert!(bounds.contains(i%p.width,i/p.width),"transition escaped the player tile");}}
- assert!(changed>0);
+ assert_eq!(changed,0);
 }
 
 #[test]fn brogue_tile_renderer_matches_full_for_travel_proc_impact_and_expiry(){
@@ -198,7 +195,7 @@ fn room()->Run{
 }
 
 #[test]fn brogue_ranged_impact_does_not_require_a_disclosed_travel_route(){
- let mut fx=effects::Effects::default();fx.add(vec![event("shared-ranged","slash",Stage::Impact,0,&[(10.,10.)]),event("shared-ranged","puncture",Stage::Health,0,&[(10.,10.)])],1.,1.,0.,false);assert_eq!(fx.cues.len(),2);
+ let mut fx=effects::Effects::default();fx.add(vec![event("shared-ranged","slash",Stage::Impact,0,&[(10.,10.)]),event("shared-ranged","puncture",Stage::Health,0,&[(10.,10.)])],1.,1.,0.,false);assert!(fx.cues.is_empty());assert!(!fx.presentation_pending(0.));
  for cue in &fx.cues{let tiles=effects::tiles(cue,cue.started+20.,false);assert_eq!(tiles.len(),1);assert!(tiles[0].glyph.is_none()&&tiles[0].mark.is_none());}
 }
 
@@ -207,19 +204,21 @@ fn room()->Run{
   let e=event(key,"bolt",Stage::Travel,0,&[(2.,3.),(3.,3.),(15.,11.),(16.,11.),(17.,11.),(18.,11.)]);
   let cue=effects::Cue{event:e,started:0.,held:false,static_marks:false};
   let first=effects::tiles(&cue,0.,false);assert_eq!(first.len(),1);assert_eq!((first[0].x,first[0].y),(2,3));
-  let second=effects::tiles(&cue,32.,false);assert_eq!(second.len(),2);assert!(second[1].light>second[0].light);
-  for t in [0.,32.,64.,96.,128.,192.,240.] {let tiles=effects::tiles(&cue,t,false);assert!(tiles.iter().all(|p|p.glyph.is_none()&&p.mark.is_none()));assert!(tiles.len()<=4);}
-  assert!(effects::tiles(&cue,128.,false).iter().all(|p|(p.x,p.y)!=(2,3)),"tail must retract");
-  assert!(effects::tiles(&cue,320.,false).is_empty());
+  let second=effects::tiles(&cue,16.,false);assert_eq!(second.len(),2);assert!(second[1].light>second[0].light);
+  for t in [0.,16.,32.,48.,64.,96.,120.] {let tiles=effects::tiles(&cue,t,false);assert!(tiles.iter().all(|p|p.glyph.is_none()&&p.mark.is_none()));assert!(tiles.len()<=4);}
+  assert!(effects::tiles(&cue,64.,false).iter().all(|p|(p.x,p.y)!=(2,3)),"tail must retract");
+  assert!(effects::tiles(&cue,160.,false).is_empty());
  }
 }
 #[test]fn brogue_long_routes_keep_per_cell_time_and_impacts_wait_for_arrival(){
- for (key,step) in [("shared",40.),("A02",32.)] {
+ for (key,step) in [("shared",40.),("A02",16.)] {
   let route:Vec<_>=(0..30).map(|x|(x as f64,3.)).collect();let mut fx=effects::Effects::default();
   fx.add(vec![event(key,"bolt",Stage::Travel,0,&route),event(key,"spark",Stage::Impact,0,&route[29..])],1.,1.,0.,false);
-  assert_eq!(fx.cues[1].started,effects::duration(&fx.cues[0].event));
+  assert_eq!(fx.cues.len(),1);
   for i in [0,1,5,20,29] {let tiles=effects::tiles(&fx.cues[0],i as f64*step,false);assert_eq!(tiles.last().map(|p|p.x),Some(i));}
-  assert!(fx.animate(500.));assert!(!fx.animate(fx.cues[1].started+effects::duration(&fx.cues[1].event)));
+  let end=30.*step+if key=="shared"{0.}else{64.};
+  assert_eq!(effects::duration(&fx.cues[0].event),end);
+  assert!(fx.animate(end-1.));assert!(!fx.animate(end));assert!(!fx.presentation_pending(end));
  }
 }
 #[test]fn brogue_dispatch_time_never_consumes_unpainted_travel(){
@@ -308,7 +307,7 @@ fn sequencing_intermediate_health_and_visibility_are_not_future_state() {
  r.player.hp=80.; let middle=observe::observe(&r);
  r.player.hp=50.; let after=observe::observe(&r);
  let mut fx=effects::Effects::default();
- fx.add(vec![event("P01","stitch",Stage::Special,1,&[(10.,10.)]),event("E18","bolt",Stage::Special,2,&[(10.,10.)])],1.,1.,0.,false);
+ fx.add(vec![event("P01","line-grow",Stage::Special,1,&[(10.,10.)]),event("E18","line-grow",Stage::Special,2,&[(10.,10.)])],1.,1.,0.,false);
  let end1=fx.cues[0].started+effects::duration(&fx.cues[0].event);
  let end2=fx.cues[1].started+effects::duration(&fx.cues[1].event);
  fx.sequence.capture(before,vec![corpse_core::events::PresentationFrame{action:1,observation:std::rc::Rc::new(middle)},corpse_core::events::PresentationFrame{action:2,observation:std::rc::Rc::new(after)}],&fx.cues,appearance_profile::Profile::defaults());
@@ -352,8 +351,7 @@ fn death_swift_corpse_is_visible_before_nova_and_input_stays_blocked() {
         let nova = fx.cues.iter().find(|c| c.event.animation.as_ref().is_some_and(|a| a.proposal == "P52")).unwrap();
         let start = nova.started;
         let end = start + effects::duration(&nova.event);
-        let death = fx.cues.iter().find(|c| c.event.animation.as_ref().is_some_and(|a| a.stage == Stage::Death)).unwrap();
-        assert!(death.started + effects::duration(&death.event) <= start);
+        assert!(!fx.cues.iter().any(|c| c.event.animation.as_ref().is_some_and(|a| a.stage == Stage::Death)));
         let view = fx.sequence.view(start).expect("nova must hold a detached view");
         if heartless {
             assert!(view.cells.iter().any(|c| c.x == 11 && c.y == 10 && c.corpse));
@@ -432,4 +430,37 @@ fn potion_wave_actual_telepathy_and_review_fixtures(){
   }
   assert_eq!(serialized,serde_json::to_vec(&run).unwrap());
  }
+}
+
+#[test] fn checklist_highlights_never_schedule_or_extend_real_animations() {
+ let styles=["collapse","gear","eye","shield","droplet","slash","puncture","speed","fold","unfold","wave-ichor","crystal","slab","wave-pressure","arc-redirect","droplet-return"];
+ for (reduced,instant) in [(false,false),(true,false),(false,true)] {
+  let mut fx=effects::Effects::default();fx.configure_motion(reduced,instant);
+  let flashes=styles.iter().enumerate().map(|(i,s)|event("E70",s,Stage::Special,i as u32,&[(2.,3.),(4.,3.)])).collect();
+  fx.add(flashes,1.,1.,0.,false);fx.defer_until_frame(0.);
+  assert!(fx.cues.is_empty());assert!(!fx.presentation_pending(0.));assert!(!fx.travel_pending(0.));assert!(!fx.animate(0.));
+  fx.begin_frame(10.);assert!(!fx.presentation_pending(10.));
+ }
+ for style in ["line-grow","line-hold","thread-grow","nova-pink-small","box-contract","wave-reveal-blue","map-reveal","moving-actor","light100"] {
+  assert!(effects::admitted(&event("P23",style,Stage::Special,0,&[(2.,3.)])),"one visible cell still belongs to {style}");
+  let real=event("P23",style,Stage::Special,0,&[(2.,3.),(3.,3.)]);let mut baseline=effects::Effects::default();baseline.add(vec![real.clone()],1.,1.,0.,false);
+  let mut fx=effects::Effects::default();fx.add(vec![real,event("E70","collapse",Stage::Death,0,&[(2.,3.)]),event("shared","ripple",Stage::Special,1,&[(3.,3.)])],1.,1.,0.,false);
+  assert_eq!(fx.cues.len(),1,"{style}");assert_eq!(fx.cues[0].event,baseline.cues[0].event);assert_eq!(fx.cues[0].started,baseline.cues[0].started);
+  for t in [0.,100.,500.,1200.] {assert_eq!(fx.presentation_pending(t),baseline.presentation_pending(t),"{style}");}
+ }
+ // Both ordinary terminal and creature death flashes are gone, not the Space gate.
+ for kind in ["animation","cosmetic-death"] {let mut death=event("E70","collapse",Stage::Death,0,&[(2.,3.)]);death.kind=kind.into();let mut fx=effects::Effects::default();fx.add(vec![death],1.,1.,0.,false);assert!(fx.cues.is_empty());}
+}
+
+#[test] fn checklist_exceptions_preserve_ui_explosions_and_projectiles() {
+ let mut receipts=vec![event("P57","burst-ember",Stage::Special,0,&[(2.,3.)]),event("E37","burst-ember",Stage::Special,1,&[(2.,3.)]),event("A01","bolt",Stage::Travel,2,&[(2.,3.),(3.,3.)]),event("shared","bolt",Stage::Travel,3,&[(2.,3.),(3.,3.)])];
+ let mut hud=event("A01","energy-drain",Stage::Special,4,&[]);hud.animation.as_mut().unwrap().surface=Some("inventory".into());receipts.push(hud);
+ let mut fx=effects::Effects::default();fx.add(receipts,1.,1.,0.,false);assert_eq!(fx.cues.len(),5);assert_eq!(effects::inventory_marks(&fx.cues,fx.cues[4].started+20.).len(),1);
+ for cue in &fx.cues[..4] {assert!(!effects::tiles(cue,cue.started,false).is_empty());}
+}
+
+#[test] fn checklist_legacy_projectile_requires_an_actual_route() {
+ let mut e=event("shared","bolt",Stage::Travel,0,&[(2.,3.)]);e.animation=None;e.kind="projectile".into();
+ assert!(!effects::admitted(&e));e.from=Some(EventPoint{x:1.,y:3.});assert!(effects::admitted(&e));
+ e.kind="burst".into();e.glyph=Some("人".into());assert!(effects::admitted(&e));
 }

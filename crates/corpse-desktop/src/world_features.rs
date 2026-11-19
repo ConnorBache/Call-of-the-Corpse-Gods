@@ -77,6 +77,18 @@ pub fn object(
         response: None,
     }
 }
+/// Mud, slime, fire, etc. use their authored colors unchanged. Liquid ichor
+/// reflects 82% of its previous linear-light intensity without shifting hue.
+pub fn feature_surface(p: &Profile, key: &str, x: usize, y: usize, seed: u32) -> (Rgb, Rgb) {
+    let (fg, bg) = crate::appearance_material::feature_colors(p, key, x, y, seed, None);
+    if key != "feature:ichor" { return (fg,bg); }
+    // The material color is independent of actual light sources and sight.
+    static DIM: std::sync::LazyLock<[u8; 256]> = std::sync::LazyLock::new(|| {
+        std::array::from_fn(|i| crate::color::from_linear(0.82 * crate::color::to_linear(i as f64)).round() as u8)
+    });
+    (fg.map(|v| DIM[v as usize]), bg.map(|v| DIM[v as usize]))
+}
+
 pub fn overlay(
     p: &Profile,
     key: &str,
@@ -87,7 +99,7 @@ pub fn overlay(
     alpha: f64,
 ) -> (Rgb, f64) {
     let m = p.value(&format!("terrain.{key}")).unwrap();
-    let (_, bg) = crate::appearance_material::feature_colors(p, key, x, y, seed, None);
+    let (_, bg) = feature_surface(p, key, x, y, seed);
     let pulse = crate::appearance_material::material_pulse(
         m["animationSpeed"].as_f64().unwrap_or(1.),
         now,

@@ -144,9 +144,8 @@ fn paint_pair(p:&mut Painter,full:&mut Painter,v:&View,retained:&mut render::Ret
             let mut enc=png::Encoder::new(file,w as u32,h as u32);enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);enc.write_header().unwrap().write_image_data(&p.pixels).unwrap();
         }
         p.resize(1280,800);p.game_at(&v,"",false,0.);
-        let(cw,ch,ox,oy)=p.map_layout(v.width,v.height);
         let report=crate::inspection_ui::observe_tile(&r,23,14);
-        crate::inspection_ui::paint_hover_at(&report,&mut p,(ox+23*cw,oy+14*ch,ox+24*cw,oy+15*ch));
+        crate::inspection_ui::paint_hover(&report,&mut p);
         fn save(p:&Painter,path:String){let file=std::fs::File::create(path).unwrap();let mut enc=png::Encoder::new(file,p.width as u32,p.height as u32);enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);enc.write_header().unwrap().write_image_data(&p.pixels).unwrap();}
         save(&p,format!("{dir}/perception-map-hover.png"));
         let mut dark=r.clone();dark.floor_mut().unwrap().lights.fill(-15.);let dark_view=observe::observe(&dark);p.enemy_hover=None;p.game_at(&dark_view,"",false,0.);
@@ -339,7 +338,6 @@ fn revision52_perception_authored_room_input_overlay_and_core_truth() {
         plan.replace_view(None,&view,&tile);
         let (cw,ch,ox,oy)=tile.map_layout(view.width,view.height);
         let map_point=(ox+actor.x as i32*cw+cw/2,oy+actor.y as i32*ch+ch/2);
-        let anchor=(ox+actor.x as i32*cw,oy+actor.y as i32*ch,ox+(actor.x as i32+1)*cw,oy+(actor.y as i32+1)*ch);
         let layout=render::enemy_list::Layout::resolve_frame(&tile.profile,ox,tile.frame());
         let content=layout.content_view(&tile,&view);
         assert!(render::enemy_list::Content::stair_count(&view)>0,"real stair row precedes enemy");
@@ -359,31 +357,33 @@ fn revision52_perception_authored_room_input_overlay_and_core_truth() {
             next.mark_changes(keys,&tile,&view,&mut plan);keys=Some(next);
             plan.mark_animation(&view,&tile,now,false);
             let state=crate::tile_overlay::Frame{
-                hover:if popup{crate::tile_overlay::hover(&tile,&report,anchor)}else{None},
+                hover:if popup{crate::tile_overlay::hover(&tile,&report)}else{None},
                 ..Default::default()
             };
             if let Some(hover)=&state.hover {
-                assert_eq!(Some(hover.bounds),crate::overlay_damage::hover(&tile,&report,anchor).map(|h|h.bounds),
+                assert_eq!(Some(hover.bounds),crate::overlay_damage::hover(&tile,&report).map(|h|h.bounds),
                     "retained and tile tooltips use the same responsive footprint");
             }
             for rect in track.changes(&tile,&state) {plan.mark_native_rect(rect);}
             crate::tile_overlay::finish_dependencies(&mut tile,&mut plan,&state);
             plan.paint_base(&mut tile,&view,"",now);
             if !tile.tile_mask.is_empty() {if let Some(hover)=&state.hover {
-                crate::inspection_ui::paint_hover_at(&hover.report,&mut tile,hover.tile);
+                crate::inspection_ui::paint_hover(&hover.report,&mut tile);
             }}
             tile.tile_clip_enabled=false;
             full.enemy_hover=tile.enemy_hover;full.enemy_list_offset=tile.enemy_list_offset;
             full.game_at(&view,"",false,now);
             let backdrop_sample=(popup&&w==960).then(|| {
-                let r=crate::modal_ui::hover_bounds_painter(&full,anchor,620);
-                assert!(r.1>render::HEIGHT as i32,"exercise background below old fixed viewport");
-                let point=full.logical_damage_rect(r.0+3,r.1+3,2,2).unwrap();
+                let r=crate::modal_ui::hover_bounds_painter(&full,620);
+                let bottom=r.1+r.3;
+                assert!(bottom>render::HEIGHT as i32,"exercise background below old fixed viewport");
+                assert!(r.0+r.2>full.hud_left(),"card overlaps the right HUD instead of reflowing it");
+                let point=full.logical_damage_rect(r.0+r.2-5,bottom-4,2,2).unwrap();
                 let at=(point.y*full.width+point.x)*4;
                 let expected=full.profile.rgb("ui.colors.tooltip").map(|c|c as u32*245);
                 (at,std::array::from_fn::<_,3,_>(|k|((expected[k]+full.pixels[at+k]as u32*10)/255)as u8))
             });
-            if let Some(hover)=&state.hover {crate::inspection_ui::paint_hover_at(&hover.report,&mut full,hover.tile);}
+            if let Some(hover)=&state.hover {crate::inspection_ui::paint_hover(&hover.report,&mut full);}
             if let Some((at,expected))=backdrop_sample {
                 assert_eq!(&full.pixels[at..at+3],&expected,"portrait hover must paint its translucent background");
             }
@@ -401,7 +401,7 @@ fn revision52_perception_authored_room_input_overlay_and_core_truth() {
                         }}
                     }
                 }
-                // Tooltip damage bounds deliberately overestimate the full column.
+                // Tooltip damage bounds conservatively include its full allowed height.
                 // Require full pixel coverage on the unobscured sidebar pathway.
                 if state.hover.is_none() {assert!(checked_pixels>100);}
             }

@@ -894,3 +894,129 @@ Designer text: "Whenever you activate this ability or die, you are reset to when
 Current live rules automatically arm it while owned and unused. Activation rewinds immediately without an energy payment or an energy/reserve confirmation. Death also consumes the floor's use and restores the entry image. The consumed-floor ledger survives rewinds, revisits and save/load; leaving/reentering never replenishes a used floor. Each new floor-entry replaces the checkpoint, including ascending and falling. Native UI uses a green ready dot and a 1–20 display-floor tracker, with an X over each consumed floor; no reserve/spiral indicator.
 
 Old seed replays retain their previous ability through an explicit command-index policy boundary. Pre-amendment live saves have no recorded floor-entry checkpoint: loading them establishes a checkpoint at the loaded position, with exact entries from then onward. Floor-entry captures do not contain nested floor-entry anchors.
+
+## Screamer scheduled lockout (2026-11-19)
+
+After a successful paid scream, every Pale Screamer variant, including Greater,
+receives a `dontScream` tag and a keyed scheduler deadline. It cannot choose its
+scream again until that deadline expires, and all existing action/energy/target
+conditions still apply. The deadline uses the maximum actual status duration
+applied in that scream's existing recipient pass (normally five world turns).
+Greater doubles strength, not duration. Recipient Willpower adjustments are
+included; a normal caster's own five-turn allied buff still sets the maximum.
+Wake/converge effects outside the radius do not contribute a timed status.
+A scream that applies no timed status has no status duration to wait out.
+
+At tick T, five-turn statuses are decremented at the end of T through T+4; the
+lockout expires before AI at T+5. Haste/free commands do not advance world time.
+This is a local caster lockout, not a scan for whether targets still carry a
+status: early removal, death or other casters refreshing the status do not move
+its deadline. A constant-size owner/deadline receipt remains after tag expiration so historical
+offscreen catch-up still observes the original deadline. Owner identity prevents
+cloning conditions from giving a new actor a cooldown it never earned. Due events resolve by
+global actor ID, including offscreen actors; missing actors are harmless.
+
+The serialized queue and tag rewind with simulation state, including remembered
+futures. `screamerRulesFrom` is a non-rewindable replay command boundary: old
+recorded prefixes keep the previous repeat-scream behavior; live saves adopt at
+the next command. Markerless desktop journal tails finish under old rules before
+adoption and checkpointing. No renderer or ambient timing changes are included.
+
+## Current Avatar starters: at least one combat and energy spender (2026-11-19)
+New production Avatar starts select uniformly among all complete tuples drawn
+from the six current blessings of each selected god. Require at least one Direct
+Combat blessing AND at least one actual energy spender (activation, proc or
+upkeep); the same blessing may satisfy both. Two/three combat blessings are valid.
+This supersedes any exactly-one restriction and the curated production starter
+pools. Historical saves/replays and synthetic profiles retain their recorded
+policy. Full eligibility, RNG, compatibility and complexity: [avatar-starters.md](avatar-starters.md).
+## Mind Read persistent range outline (2026-11-19)
+
+Mind Read now outlines its actual sensing radius whenever possessed: 5 while
+inactive, 20 while active. The outline uses the same persistent, nonblocking
+stroke and unknown-space presentation as Reverse Entropy, but Numo's existing
+palette color (100,255,114). It follows the union of the exact core vision
+origins, including the admitted Half Here clone. Unlike Reverse Entropy's
+portal-metric range, Mind Read uses direct Euclidean coordinate distance. Walls,
+lighting, undiscovered terrain and concealed portals do not change this outline.
+It depicts Mind Read alone, not unrelated floor-wide telepathy or other senses.
+No mechanics, saves, RNG, action timing or finite-animation queues change.
+
+### Spent embers are harmless on contact
+
+An ember tile cannot apply or refresh Burning, and does not count as an active
+fire hazard to creatures. Active fire and hellfire still burn. Walking onto
+spent embers does not extinguish Burning already acquired from actual fire;
+that status still damages and expires normally. Terrain effects and ember
+presentation are unchanged. An old live save adopts the contact rule at its
+next command, while historical replays retain the previous contact rule.
+
+## Normal stairs do not require Space acknowledgment (2026-11-19)
+
+Descending normal stairs, either via Descend (keyboard or button) or by moving
+onto the down tile (keyboard, click or path travel), no longer triggers the fall
+acknowledgment. The desktop reads a command-local committed travel-cause receipt,
+not an input-direction guess. A command that also actually falls is not exempt.
+Chasm preflight confirmation, forced-fall outcome acknowledgment, fresh-Space
+handling, paralysis waiting and death handling remain unchanged. Receipts are
+presentation-only, do not create animations, and are absent from saves/replays.
+In current runs, Ragelight is passive. It automatically attempts its normal
+lethal-damage rescue while owned, with unchanged cost escalation, level-up
+reset, and bypass rules. It has no activation bubble or toggle binding. A red
+box between its name and energy-reserve bar shows the cost of the next rescue.
+
+### Steam scalds while occupied
+
+The active steam layer deals the same 4 HP per normal world tick as Burning,
+before fire resistance. It does not set Burning. If an actor is already Burning,
+its normal fire damage and timer take precedence; it does not take both packets.
+Fire protection applies, not gas-only protection. Steam created by quenching in
+water still scalds. The player is asked before deliberately entering observed
+steam from clean air or another gas. Continuing within steam does not repeat
+the entry prompt; forced movement and hidden steam never prompt.
+Historic replays keep harmless steam until their recorded transition; old live
+saves adopt scalding on their next command.
+Current Execute costs 10 energy when a landed weapon hit takes an enemy from
+at least 25% maximum HP to strictly below 25% without already killing it.
+The finisher is terminal but grants no additional ordinary hit damage or
+Reaping credit. A miss, an already-subthreshold target, a hit ending at exactly
+25%, or a naturally lethal hit costs nothing. Existing replay prefixes keep
+the previous pre-hit trigger.
+## Beckoning consumes the pulled enemy's next action (2026-11-19)
+
+Successful player-side Beckoning now gives the effectively relocated enemy one
+pending action skip. Amulet Beckoning and allied Horn Beckon share this rule;
+there is no Beckoning potion in the current catalog. Invalid, blocked or failed
+pulls, allies, the player, stationary decoys and nontargets do not receive it.
+Repeated pulls refresh one pending skip rather than stacking them. It is an
+action receipt, not paralysis: no new stun animation or timed-status resistance.
+The next scheduled full NPC action consumes it, including an admitted Haste
+bonus action; a later normal action remains available. Fast cannot generate a
+follow-up for a skipped action. Normal upkeep/status/environment clocks continue.
+A pending skip persists across save/load, offscreen simulation and time travel;
+its identity stamp prevents an actor clone inheriting another actor's skip.
+The non-rewindable `beckoningRulesFrom` command boundary preserves legacy replay
+prefixes and journal tails; live R52 saves adopt at their next command boundary.
+
+### Ichor fire spreads at half cadence
+
+Existing Ichor flames attempt to spread to neighboring cells on alternate
+normal world ticks. Ordinary fire and hellfire still spread every world tick.
+Direct ignition, same-cell gas reactions, and Mercuria’s liquid flood are
+unchanged. Unlit Ichor does not ignite on its own. Inactive floors use the same
+world-tick cadence as active floors. Older replay commands retain their
+original fire-spread rules; old live saves adopt the new cadence at their next
+command.
+
+### Entropy does not protect against ichor (R52)
+Entropy's caustic-gas immunity no longer rejects ichor damage packets. Caustic and Gasser gas immunity, beast/pale gas traits, gear resistance, and the independent Ichor-fish fire immunity are unchanged. Entropy's active toggle does not alter this distinction. This adds no liquid-contact damage: ordinary ichor currently supports habitat, regeneration/siphon and ignition; burning ichor delivers fire damage, not an ichor packet. The generic ichor packet API has no live command producer in the native engine; therefore this correction needs no new intra-R52 replay marker. Pre-R52 direct packet semantics remain historical.
+
+### Combat presentation simplification
+Make Slippery retains its activation box but successful repeated movement prevention emits no new box. Commandment's passive one-tile push (including insufficient-energy fallback) has no shove cue; a paid active push has one 240ms white actor-route animation. Each route cell is admitted during actual movement, portal jumps are never interpolated, and a floor transition does not attach old-floor coordinates to the destination floor. Mechanics, payment, collision, arrival and stair/fall behavior are unchanged. Nova's real explosion remains its sole effect; no separate toggle decoration.
+
+Use one short, non-blocking god-color nova for a completed Dream of Time
+Gone By return, Ascend, Dreamwalk/Wake, Masque teleport, Sever Fate,
+Remember, Distract, Blood Weapon hit, Blood Letting cleanse, Sudden Sleep,
+and Overflowing rescue. Anchors, upkeep, charges, blocked casts and blood
+refills do not emit these novas. Erase Metaphysical's actual removal emits
+a purple nova around the enemy. The cue reveals no hidden endpoints.

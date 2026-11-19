@@ -36,10 +36,10 @@ fn prove(run: &Run, xy: (usize,usize)) {
     assert_eq!(ar,br,"complete Report including creature/hallucination");assert_projection(&a,&b);
     let mut painter=Painter::new();painter.resize(1280,800);
     painter.game_at(&a,"",false,1000.);
-    inspection_ui::paint_hover_at(ar.as_ref().unwrap(),&mut painter,(620,380,640,400));
+    inspection_ui::paint_hover(ar.as_ref().unwrap(),&mut painter);
     let pixels=painter.pixels.clone();
     painter.game_at(&b,"",false,1000.);
-    inspection_ui::paint_hover_at(br.as_ref().unwrap(),&mut painter,(620,380,640,400));
+    inspection_ui::paint_hover(br.as_ref().unwrap(),&mut painter);
     assert_eq!(pixels,painter.pixels,"fixed-clock game and actual hover paint");
     assert_eq!(before,serde_json::to_vec(run).unwrap(),"no gameplay/RNG mutation");
 }

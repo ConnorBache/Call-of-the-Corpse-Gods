@@ -1122,9 +1122,12 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             }
                             continue;
                         }
-                        if screen == Screen::Manual {
-                            screen = previous;
-                        } else if screen != Screen::Menu {
+                        // With no panel or targeting mode to cancel, keep the
+                        // live run open. The toolbar Menu button still leaves it.
+                        if screen == Screen::Game && run.as_ref().is_some_and(|r|r.run.status=="playing") {
+                            continue;
+                        }
+                        if screen != Screen::Menu {
                             screen = Screen::Menu;
                         } else {
                             if let Some(r) = run.as_ref() {
@@ -2863,7 +2866,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     Some(pack.paint_state(&painter))
                                 }else{None};
                                 let hover_state=if !inventory&&!inspecting&&ability_detail.is_none()&&history.is_none(){
-                                    hover_report.as_ref().zip(hover_tile).and_then(|(report,(x,y))|{let(cw,ch,ox,oy)=painter.map_layout(current_view.width,current_view.height);tile_overlay::hover(&painter,report,(ox+x as i32*cw,oy+y as i32*ch,ox+(x+1)as i32*cw,oy+(y+1)as i32*ch))})
+                                    hover_report.as_ref().zip(hover_tile).and_then(|(report,_)|tile_overlay::hover(&painter,report))
                                 }else{None};
                                 let shutter_state=history.as_ref().and_then(|_|chronicle_overlay::bounds_painter(&painter,&shutter,now,reduced).and_then(|(x,y,w,h)|painter.logical_damage_rect(x,y,w,h)).map(|bounds|tile_overlay::Shutter{bounds,offset:shutter.offset}));
                                 let mut panels=Vec::new();
@@ -2902,23 +2905,6 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 now,
                                 action_reduced,
                             );
-                            if !inventory&&!inspecting&&ability_detail.is_none()&&history.is_none() {
-                                if let (Some(report), Some((x, y))) = (&hover_report, hover_tile) {
-                                    let view = cached_view.as_ref().unwrap();
-                                    let (cw, ch, ox, oy) =
-                                        painter.map_layout(view.width, view.height);
-                                    inspection_ui::paint_hover_at(
-                                        report,
-                                        &mut painter,
-                                        (
-                                            ox + x as i32 * cw,
-                                            oy + y as i32 * ch,
-                                            ox + (x + 1) as i32 * cw,
-                                            oy + (y + 1) as i32 * ch,
-                                        ),
-                                    );
-                                }
-                            }
                             if inventory {
                                 let pack=pack_view.get_or_insert_with(||pack::PackView::observe(&r.run));
                                 if let Some(state)=planned_overlay.as_ref().and_then(|s|s.pack.as_ref()).or(full_pack_state.as_ref()){
@@ -2927,6 +2913,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 pack.paint_action_marks(&mut painter,&effects.cues,now);
                             }
                             effects::paint_inventory_hud(&mut painter,current_view,&effects.cues,now,inventory);
+                            if !inventory&&!inspecting&&ability_detail.is_none()&&history.is_none() {
+                                if let Some((report,_))=hover_report.as_ref().zip(hover_tile) {
+                                    inspection_ui::paint_hover(report,&mut painter);
+                                }
+                            }
                             if inspecting {
                                 creature_offset = creature_offset.min(
                                     cached_view
@@ -3235,10 +3226,7 @@ fn dispatch(
         effects.gameplay_pause.defer(command);return Ok(Default::default());
     }
 
-    let before_plane=corpse_core::dreamwalking::active(&engine.run);
     let before_depth=engine.run.depth;
-    let can_change_plane=before_plane||matches!(command,Command::Ability{id,..}if id=="anavani-ascend")||matches!(command,Command::Use{id}if engine.run.inventory.iter().any(|i|i.id==*id&&corpse_core::phantasmii_generation::is_dagger(i)))||matches!(command,Command::Ability{id,..}if id==corpse_core::dreamwalking::DREAMWALK_ID||id==corpse_core::dreamwalking::WAKE_UP_ID);
-    let before_view=(engine.run.simulation_revision.value_or(29.)>=52.&&can_change_plane).then(||observe::observe_with_profile(&engine.run,effects.profile.as_ref().unwrap_or_else(||appearance_profile::Profile::defaults())));
     let before_travel=staged_firebolt::needs_snapshot(&engine.run,command).then(||
         observe::observe_with_profile(&engine.run,effects.profile.as_ref().unwrap_or_else(||appearance_profile::Profile::defaults())));
     let profile = effects.profile.clone().unwrap_or_default();
@@ -3246,6 +3234,7 @@ fn dispatch(
     let observer = corpse_core::events::PresentationObserver::install(|run| std::rc::Rc::new(run.clone()));
     let mut out = engine.dispatch(command)?;
     let frames = observer.take();
+    let descents = observer.descents();
     drop(observer);
     session_store::changed();
     let rewind = matches!(command,Command::Ability{id,..} if id=="numo-revert" || id=="morae-see-the-future");
@@ -3257,13 +3246,12 @@ fn dispatch(
         rewind,
     );
     if effects.gameplay_pause.enabled && !acknowledged && engine.run.depth>before_depth
-        && !matches!(command,Command::Descend) {
+        && !descents.stairs_only() {
         effects.gameplay_pause.hold_outcome(action_sequence::observe(&sequence_before,&profile));
     }
     effects.sequence.capture_run(sequence_before, frames, &effects.cues, &profile);
     if let Some(before)=before_travel {effects.firebolt_terrain.capture(before,&effects.cues);}
     effects.defer_until_frame(now);
-    if before_plane!=corpse_core::dreamwalking::active(&engine.run)||before_depth!=engine.run.depth{if let Some(before)=before_view{effects.plane_changed(before,now);if let Some(t)=effects.plane_transition.as_mut(){t.ascend=matches!(command,Command::Ability{id,..}if id=="anavani-ascend");}}}
     Ok(out)
 }
 
@@ -3347,10 +3335,10 @@ fn set_pack_order(engine: &mut temporal::Engine, desired: Field<Vec<f64>>) -> Re
     engine.set_inventory_display_order(desired)
 }
 
-/// O(1) result/state decision plus O(error text). Only an actual accepted turn
-/// closes the pack; a terminal state always wins over reopening a modal.
+/// A committed item use closes the Pack even if no turn advanced. Preserve
+/// prior behavior for other turn-taking commands and rejected/cancelled aim.
 fn finish_pack_dispatch(open:&mut bool,status:&str,result:Result<corpse_core::engine::DispatchOutcome,corpse_core::engine::EngineError>)->String {
-    *open=status=="playing" && !result.as_ref().is_ok_and(|out|out.took_turn);
+    *open=status=="playing" && !result.as_ref().is_ok_and(|out|out.took_turn||out.used_item);
     result.map(|_|String::new()).unwrap_or_else(|e|e.to_string())
 }
 /// Actual command cost and existing pack refresh; UI branches O(1) apart from order data.
@@ -3546,6 +3534,65 @@ mod append_play_sequence_tests;
         apply_pack_action(pack::PackAction::Command(Command::Use{id:9999.}),&mut view,&mut engine,&mut effects,0.,&mut open,&mut target,&mut notice);
         assert!(open);assert_eq!(engine.run.tick,tick+1.);
     }
+    #[test] fn tools_of_the_trade_free_consumable_closes_pack() {
+        let mut run=staged_firebolt::tests::room();
+        run.player.abilities.push("isheilah-tools-of-the-trade".into());
+        run.inventory=vec![corpse_core::Item{id:900.,kind:"potion".into(),name:"Potion of Healing".into(),
+            glyph:"!".into(),effect:"healing".to_string().into(),identified:true.into(),..Default::default()}];
+        let mut engine=temporal::Engine::new(run).unwrap();
+        let mut view=pack::PackView::observe(&engine.run);
+        let mut effects=effects::Effects::default();
+        let (mut open,mut target,mut notice)=(true,None,String::new());
+        let tick=engine.run.tick;
+        apply_pack_action(pack::PackAction::Command(Command::Use{id:900.}),&mut view,&mut engine,
+            &mut effects,0.,&mut open,&mut target,&mut notice);
+        assert!(engine.run.inventory.iter().all(|item|item.id!=900.));
+        assert_eq!(engine.run.tick,tick);
+        assert!(!open&&notice.is_empty());
+    }
+
+    #[test] fn spellslinger_free_targeted_activation_stays_out_of_pack_and_rejected_cast_reopens_it() {
+        let mut run=staged_firebolt::tests::room();
+        run.player.abilities.push("isheilah-spellslinger".into());
+        let mut engine=temporal::Engine::new(run).unwrap();
+        let mut pack=pack::PackView::observe(&engine.run);
+        let mut effects=effects::Effects::default();
+        let (mut open,mut pending,mut notice)=(true,None,String::new());
+        let (tick,energy)=(engine.run.tick,engine.run.inventory[0].amulet_state.as_ref().unwrap().energy);
+        apply_pack_action(pack::PackAction::Target(pack::PackTarget::UseAt(900.)),&mut pack,&mut engine,
+            &mut effects,0.,&mut open,&mut pending,&mut notice);
+        assert!(!open);
+        let view=observe::observe(&engine.run);
+        let command=directional_zap_ui::command(&engine.run,&view,&pending.take().unwrap(),(11,10)).unwrap();
+        let outcome=dispatch(&mut engine,&mut effects,0.,&command).unwrap();
+        assert!(outcome.used_item&&!outcome.took_turn);
+        assert_eq!(engine.run.tick,tick);
+        assert!(engine.run.inventory[0].amulet_state.as_ref().unwrap().energy<energy);
+        assert!(finish_pack_dispatch(&mut open,&engine.run.status,Ok(outcome)).is_empty());assert!(!open);
+
+        let rejected=Command::UseAt{id:900.,x:10.,y:10.};
+        let outcome=dispatch(&mut engine,&mut effects,1000.,&rejected).unwrap();
+        assert!(!outcome.used_item&&!outcome.took_turn);
+        finish_pack_dispatch(&mut open,&engine.run.status,Ok(outcome));
+        assert!(open);
+    }
+
+    #[test] fn throwing_an_item_during_a_haste_bonus_action_keeps_pack_closed() {
+        let mut run=staged_firebolt::tests::room();
+        run.phase="haste".to_string().into();
+        run.player.conditions.insert("hasted".into(),5.);
+        run.inventory=vec![corpse_core::Item{id:900.,kind:"potion".into(),name:"Potion of Healing".into(),
+            glyph:"!".into(),effect:"healing".to_string().into(),identified:true.into(),..Default::default()}];
+        let mut engine=temporal::Engine::new(run).unwrap();
+        let target=pack::PackTarget::Throw(900.);
+        let command=directional_zap_ui::command(&engine.run,&observe::observe(&engine.run),&target,(11,10)).unwrap();
+        let outcome=dispatch(&mut engine,&mut effects::Effects::default(),0.,&command).unwrap();
+        assert!(outcome.used_item&&!outcome.took_turn);
+        let mut open=false;
+        finish_pack_dispatch(&mut open,&engine.run.status,Ok(outcome));
+        assert!(!open);
+    }
+
     #[test] fn free_rejected_target_and_terminal_completion_policy() {
         use corpse_core::engine::{DispatchOutcome,EngineError};
         let mut open=true;
@@ -3702,7 +3749,7 @@ fn sync_enemy_inspection_view(view:&mut render::View,actor:Option<f64>,hover_pat
         assert!(body.contains("CORPSE_TILE_PAINT")||source.contains("CORPSE_TILE_PAINT"));
         let game=&body[body.find("painter.game_at(current_view").unwrap()..];
         let mut after=0;
-        for step in ["painter.game_at(","painter.effects(","inspection_ui::paint_hover_at(","pack.paint(","painter.creatures(","inspection_ui::paint(report", "painter.hazard_prompt(","painter.ability_detail(","painter.blessing_choices(","debug_loadout.paint(","chronicle_overlay::paint(","paint_save_failure(","texture.update(Some", "canvas.copy(&texture"]{
+        for step in ["painter.game_at(","painter.effects(","pack.paint(","inspection_ui::paint_hover(","painter.creatures(","inspection_ui::paint(report", "painter.hazard_prompt(","painter.ability_detail(","painter.blessing_choices(","debug_loadout.paint(","chronicle_overlay::paint(","paint_save_failure(","texture.update(Some", "canvas.copy(&texture"]{
             after+=game[after..].find(step).unwrap_or_else(||panic!("missing/out-of-order layer {step}"))+step.len();
         }
     }

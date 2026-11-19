@@ -89,4 +89,68 @@ pub fn paint(p:&mut crate::render::Painter,text:&str){p.centered_sheet(|p|{
 
  #[test]fn paralysis_wait_is_not_rest_until_change(){let mut r=room();r.player.conditions.insert("paralyzed".into(),3.);let mut p=Pause::default();p.observe(Some(&r));p.presented();p.event(&key(Keycode::Space,false));r.player.hp-=1.;r.actors_at_mut(r.depth)[0].state="hunting".into();p.observe(Some(&r));assert!(p.waiting,"damage/new threat alone must not cancel the requested paralysis wait");r.status="dead".into();p.observe(Some(&r));assert!(!p.waiting);}
 
+ fn stairs_room()->Run {
+  let mut r=room();r.inventory.clear();
+  for depth in r.floors.iter().map(|f|f.depth).collect::<Vec<_>>() {r.actors_at_mut(depth).clear();}
+  r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
+  r.player.x=2.;r.player.y=2.;
+  for floor in &mut r.floors {
+   let f=std::sync::Arc::make_mut(floor);f.tiles.fill("floor".into());f.lights.fill(100.);
+   f.environment=corpse_core::Field::Missing;f.portals=corpse_core::Field::Missing;
+   f.doors=corpse_core::Field::Missing;f.vents=corpse_core::Field::Missing;
+   let w=f.width();f.tiles[2*w+2]="up".into();
+  }
+  r
+ }
+ #[test]fn stairs_pause_direct_keyboard_or_button_descent_needs_no_space(){
+  let mut r=stairs_room();let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+2]="down".into();
+  let mut e=crate::temporal::Engine::new(r).unwrap();let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+  assert!(!needs_ack(&e.run,&Command::Descend));
+  crate::dispatch(&mut e,&mut fx,0.,&Command::Descend).unwrap();
+  assert_eq!(e.run.depth,2.);assert!(!fx.gameplay_pause.active());assert!(fx.gameplay_pause.outcome.is_none());
+ }
+ #[test]fn stairs_pause_move_keyboard_click_or_path_auto_descent_needs_no_space(){
+  // Keyboard steps and click/path travel share this Move dispatch boundary.
+  let mut r=stairs_room();let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+3]="down".into();
+  let mut e=crate::temporal::Engine::new(r).unwrap();let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+  crate::dispatch(&mut e,&mut fx,0.,&Command::Move{dx:1.,dy:0.}).unwrap();
+  assert_eq!(e.run.depth,2.);assert!(!fx.gameplay_pause.active());assert!(fx.gameplay_pause.outcome.is_none());
+ }
+ #[test]fn stairs_pause_forced_flight_expiry_fall_still_holds_even_water_landing(){
+  let mut r=stairs_room();let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+2]="chasm".into();
+  r.player.conditions.insert("flying".into(),1.);
+  let f=std::sync::Arc::make_mut(&mut r.floors[1]);f.tiles[2*w+2]="water".into();
+  let mut e=crate::temporal::Engine::new(r).unwrap();let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+  assert!(!needs_ack(&e.run,&Command::Wait));crate::dispatch(&mut e,&mut fx,0.,&Command::Wait).unwrap();
+  assert_eq!(e.run.depth,2.);assert!(fx.gameplay_pause.fall_active());assert_eq!(fx.gameplay_pause.text(),CONTINUE);
+ }
+ #[test]fn stairs_pause_acknowledged_voluntary_fall_does_not_ask_twice(){
+  let mut r=stairs_room();let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+3]="chasm".into();
+  let mut e=crate::temporal::Engine::new(r).unwrap();let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+  let command=Command::Move{dx:1.,dy:0.};crate::dispatch(&mut e,&mut fx,0.,&command).unwrap();
+  assert_eq!(e.run.depth,1.);assert!(fx.gameplay_pause.active());fx.gameplay_pause.presented();
+  assert!(matches!(fx.gameplay_pause.event(&key(Keycode::Space,false)),Decision::Continue(Some(_))));
+  crate::dispatch(&mut e,&mut fx,1.,&command).unwrap();assert_eq!(e.run.depth,2.);assert!(!fx.gameplay_pause.active());
+ }
+
+ #[test]fn stairs_pause_click_and_generated_path_reach_downstairs_without_ack(){
+  for x in [3,6] {
+   let mut r=stairs_room();let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+x]="down".into();f.seen.fill(true);
+   f.remembered_tiles=f.tiles.clone().into();
+   let mut e=crate::temporal::Engine::new(r).unwrap();let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+   match crate::travel_ui::start(&e.run,x,2) {
+    crate::travel_ui::Start::Direct(command)=>{crate::dispatch(&mut e,&mut fx,0.,&command).unwrap();},
+    crate::travel_ui::Start::Walk(mut path)=>{
+     for step in 0..10 {
+      let Some(command)=path.next_command(&e.run).unwrap()else{break};
+      crate::dispatch(&mut e,&mut fx,step as f64*1000.,&command).unwrap();
+      if !path.after_step(&e.run,false).unwrap(){break;}
+     }
+    },
+    crate::travel_ui::Start::NoPath=>panic!("known clear staircase must be reachable"),
+   }
+   assert_eq!(e.run.depth,2.);assert!(!fx.gameplay_pause.active());
+  }
+ }
+
 }

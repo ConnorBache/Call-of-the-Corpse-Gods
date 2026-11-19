@@ -21,7 +21,7 @@ pub const COMMANDS: [Entry; 9] = [
     Entry { label: "mouse", description: "move cursor to examine terrain and monsters or activate divine abilities" },
     Entry { label: "click", description: "travel" },
     Entry { label: "enter", description: "enable keyboard cursor control" },
-    Entry { label: "esc", description: "exit keyboard cursor control/open main menu" },
+    Entry { label: "esc", description: "exit keyboard cursor control, close panels, or cancel targeting" },
     Entry { label: "numpad", description: "move or attack" },
     Entry { label: "I", description: "open inventory" },
     Entry { label: "Z", description: "rest" },

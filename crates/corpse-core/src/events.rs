@@ -29,6 +29,7 @@ pub struct PresentationEvent {
 }
 #[derive(Default, Clone)]
 struct Batch {
+    descents: PlayerDescents,
     action: u32,
     player_action:u32,
     next_action: u32,
@@ -42,6 +43,20 @@ struct Batch {
     explosions: indexmap::IndexMap<String, PresentationEvent>,
 }
 thread_local! {static PENDING:std::cell::RefCell<Option<Batch>>=const{std::cell::RefCell::new(None)};}
+/// Command-local committed travel causes; never serialized or emitted as cues.
+#[derive(Clone,Copy,Debug,Default,PartialEq,Eq)]
+pub struct PlayerDescents { pub stairs:bool, pub fall:bool, pub other:bool }
+impl PlayerDescents {
+    pub fn stairs_only(self)->bool {self.stairs&&!self.fall&&!self.other}
+}
+/// O(1), opt-in presentation bookkeeping. Speculative probes clone/restore this
+/// with their existing Batch, so rejected routes cannot suppress a real fall.
+pub(crate) fn player_descent(stairs:bool,fall:bool) {
+    if !OBSERVER.with(|o|o.borrow().is_some()){return;}
+    PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){
+        b.descents.stairs|=stairs&&!fall;b.descents.fall|=fall;b.descents.other|=!stairs&&!fall;
+    });
+}
 /// Opaque, detached presentation checkpoints supplied by the host, never serialized in Run.
 /// The core does not depend on a renderer or delay simulation for an animation.
 #[derive(Clone)]
@@ -49,6 +64,7 @@ pub struct PresentationFrame { pub action: u32, pub observation: std::rc::Rc<dyn
 type Observer = std::rc::Rc<dyn Fn(&Run) -> std::rc::Rc<dyn std::any::Any>>;
 thread_local! {
     static OBSERVER: std::cell::RefCell<Option<Observer>> = const { std::cell::RefCell::new(None) };
+    static DESCENTS: std::cell::Cell<PlayerDescents> = const { std::cell::Cell::new(PlayerDescents{stairs:false,fall:false,other:false}) };
     static COMPLETED: std::cell::RefCell<Vec<PresentationFrame>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 /// Scoped opt-in: headless simulation/replays have zero observation work unless
@@ -57,12 +73,14 @@ pub struct PresentationObserver { previous: Option<Observer> }
 impl PresentationObserver {
     pub fn install(f: impl Fn(&Run) -> std::rc::Rc<dyn std::any::Any> + 'static) -> Self {
         COMPLETED.with(|c| c.borrow_mut().clear());
+        DESCENTS.with(|c|c.set(PlayerDescents::default()));
         Self { previous: OBSERVER.with(|o| o.replace(Some(std::rc::Rc::new(f)))) }
     }
+    pub fn descents(&self)->PlayerDescents {DESCENTS.with(|c|c.get())}
     pub fn take(&self) -> Vec<PresentationFrame> { COMPLETED.with(|c| std::mem::take(&mut *c.borrow_mut())) }
 }
 impl Drop for PresentationObserver {
-    fn drop(&mut self) { OBSERVER.with(|o| *o.borrow_mut() = self.previous.take()); COMPLETED.with(|c| c.borrow_mut().clear()); }
+    fn drop(&mut self) { OBSERVER.with(|o| *o.borrow_mut() = self.previous.take()); COMPLETED.with(|c| c.borrow_mut().clear()); DESCENTS.with(|c|c.set(PlayerDescents::default())); }
 }
 /// Capture action boundaries while a host explicitly requests presentation. O(host callback) per action, <=128
 /// frames per command; beyond the cap the host holds the last safe observation
@@ -97,6 +115,7 @@ pub(crate) fn finish() -> Vec<PresentationEvent> {
             .take()
             .map(|mut b| {
                 COMPLETED.with(|c| *c.borrow_mut() = b.frames);
+                DESCENTS.with(|c|c.set(b.descents));
                 b.events.extend(b.explosions.into_values());
                 b.events
             })
@@ -140,6 +159,8 @@ pub fn actor_event(
     target: Option<EventPoint>,
     glyph: Option<&str>,
 ) {
+    // Door state/log updates remain authoritative; opening has no visual cue.
+    if label == "Open door" { return; }
     if r.player.x < 0.0 || (a.id != r.player.id && !vision::visible_actor(r, a)) {
         return;
     }
@@ -378,6 +399,11 @@ pub fn cue(r:&Run,a:&Actor,proposal:&str,style:&str,stage:Stage,cells:&[EventPoi
     let serial=emission_serial();
     at(r,proposal,style,stage,cells);
     if emission_serial()==serial{return}
+    // Only the ordinary corpse collapse is cosmetic. Player/owned endpoint
+    // death and separately authored death abilities keep their own timing.
+    if stage==Stage::Death && style=="collapse" && crate::half_here::owner_id(r,a)!=r.player.id {
+        PENDING.with(|p|if let Some(e)=p.borrow_mut().as_mut().and_then(|b|b.events.last_mut()){e.kind="cosmetic-death".into();});
+    }
     if (stage==Stage::Death&&style!="ripple") || style.contains("fold") || style=="collapse" {
         let glyph=crate::actor_presentation::apparent_kind(r,a).and_then(|kind|crate::population::catalog().actors.get(kind)).map(|t|t.glyph.clone())
             .unwrap_or_else(||if crate::monster_vampire::flying(a){"b".into()}else{a.glyph.clone()});
@@ -509,4 +535,71 @@ pub fn chill_applied(id:f64)->bool{PENDING.with(|p|p.borrow().as_ref().is_some_a
   assert_eq!(*frames.last().unwrap().observation.downcast_ref::<f64>().unwrap(),11.);
   drop(observer);begin();next_action(&r);checkpoint(&r);assert!(PENDING.with(|p|p.borrow().as_ref().unwrap().frames.is_empty()));finish();
  }
+}
+
+#[cfg(test)] mod quiet_door_and_death_tests {
+ use super::*;
+ #[test] fn door_is_quiet_without_suppressing_other_same_action_feedback() {
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  let a=r.player.clone();begin();actor_event(&r,&a,"status","Open door",None,None);
+  actor_event(&r,&a,"status","Other effect",None,None);let e=finish();assert_eq!(e.len(),1);assert_eq!(e[0].animation.as_ref().unwrap().style,"ripple");
+ }
+ #[test] fn death_admission_distinguishes_player_from_other_actors() {
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  r.player.conditions.insert("allSeeingReveal".into(),1.);r.player.conditions.insert("allSeeingDepth".into(),r.depth);
+  r.floor_mut().unwrap().lights.fill(100.);let a=r.player.clone();let mut b=a.clone();b.id=999.;b.state="hunting".into();
+  begin();crate::animation_enemy::death(&r,&a);crate::animation_enemy::death(&r,&b);let e=finish();
+  assert_eq!(e.len(),2);assert_eq!(e[0].kind,"animation");assert_eq!(e[1].kind,"cosmetic-death");assert_eq!(e[1].animation.as_ref().unwrap().style,"collapse");
+ }
+}
+
+#[cfg(test)] mod quiet_door_mechanics_test {
+ use super::*;
+ #[test] fn opening_door_still_moves_and_logs_without_feedback() {
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
+  r.player.x=10.;r.player.y=10.;r.player.conditions.clear();r.player.abilities.clear();r.actors_at_mut(r.depth).clear();
+  let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.environment=crate::Field::Missing;f.portals=crate::Field::Missing;f.non_euclidean=crate::Field::Missing;
+  let cell=10*f.width()+11;let mut doors=indexmap::IndexMap::new();doors.insert(cell.to_string(),crate::model::FloorDoorsEntry{open:false,..Default::default()});f.doors=doors.into();
+  let id=r.player.id;begin();assert!(crate::engine::move_actor(&mut r,id,1.,0.,false).unwrap());let e=finish();
+  assert!(r.floor().unwrap().doors.as_ref().unwrap()[&cell.to_string()].open);assert_eq!((r.player.x,r.player.y),(11.,10.));
+  assert!(e.is_empty(),"door-only movement emitted {e:?}");
+ }
+}
+
+#[cfg(test)]mod descent_receipt_tests {
+ use super::*;
+ #[test]fn stairs_pause_receipt_is_opt_in_nonvisual_and_probe_transactional(){
+  let observer=PresentationObserver::install(|_|std::rc::Rc::new(()));begin();player_descent(true,false);
+  {let _probe=Probe::begin();player_descent(false,true);}
+  assert!(finish().is_empty());assert!(observer.descents().stairs_only());
+  begin();player_descent(true,false);player_descent(false,true);assert!(finish().is_empty());
+  assert!(!observer.descents().stairs_only());assert!(observer.descents().fall);
+  begin();player_descent(false,false);finish();assert!(!observer.descents().stairs_only());
+  drop(observer);begin();player_descent(true,false);finish();assert_eq!(DESCENTS.with(|c|c.get()),PlayerDescents::default());
+ }
+}
+
+/// Collect independently admitted travel receipts while forced movement resolves.
+/// No final-state visibility recheck: each cell was observed at its actual step.
+/// One ordered route, no interpolation across invisible gaps/portal jumps.
+#[derive(Default)]
+pub(crate) struct TravelRoute { event: Option<PresentationEvent> }
+impl TravelRoute {
+    pub(crate) fn capture(&mut self,r:&Run,a:&Actor,cells:&[EventPoint],glyph:&str) {
+        let serial=emission_serial();
+        travel(r,a,"P60","moving-actor-commandment",cells,Delivery::Projectile,Some(glyph));
+        if emission_serial()==serial{return;}
+        let event=PENDING.with(|p|p.borrow_mut().as_mut().and_then(|b|b.events.pop()));
+        let Some(event)=event else{return};
+        if let Some(route)=self.event.as_mut() {
+            let cue=route.animation.as_mut().unwrap();
+            for cell in &event.animation.as_ref().unwrap().cells {
+                if cue.cells.last()!=Some(cell){cue.cells.push(cell.clone());}
+            }
+            route.to=event.to;
+        } else {self.event=Some(event);}
+    }
+    pub(crate) fn finish(self) {
+        if let Some(event)=self.event {PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){b.events.push(event)});}
+    }
 }

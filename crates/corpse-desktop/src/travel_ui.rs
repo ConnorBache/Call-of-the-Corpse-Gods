@@ -1322,6 +1322,22 @@ mod tests {
         assert!(walk.path().is_empty()); assert_eq!(r, before);
     }
     #[test]
+    fn autoexplore_pauses_for_a_new_steam_cloud_before_dispatch() {
+        let mut r = exploration_run();
+        r.simulation_revision=52.0.into();
+        r.player.stats.perception=0.;
+        let mut explore = AutoExplore::default();
+        explore.press(&r); let mut walk = explore.press(&r).unwrap();
+        let f = r.floor_mut().unwrap(); f.lights.fill(100.);
+        corpse_core::environment::add_gas(f,23,"steam",30.,-1.).unwrap();
+        let command = walk.next_command(&r).unwrap().unwrap();
+        assert!(crate::hazards_ui::intentional(&r,&command).unwrap().contains("steam"));
+        let before = r.clone();
+        assert!(!walk.after_step(&r,true).unwrap());
+        assert!(walk.path().is_empty());
+        assert_eq!(r,before);
+    }
+    #[test]
     fn portal_ui_known_pair_route_arrival_and_unknown_mate() {
         let mut r = run(); r.simulation_revision=35.0.into();
         r.player.x=1.;r.player.y=3.;r.player.conditions.clear();r.player.active.clear();r.player.abilities.clear();

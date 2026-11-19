@@ -277,3 +277,225 @@ fn future_markerless_journal_adopts_only_after_durable_tail() {
         assert!(loaded.pending_batch().base_token.is_none());
     }
 }
+
+#[test]
+fn commandment_markerless_journal_adopts_after_recorded_commands() {
+    for metadata in [false, true] {
+        let mut initial = room();
+        initial.firebolt_travel_from = 0usize.into();
+        initial.commandment_rules_from = Field::Null;
+        let mut old = Core::new(initial.clone()).unwrap();
+        let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("commandmentRulesFrom");
+        let header = if metadata { log::Header::for_metadata_revision(Some(52.)) } else { log::Header::for_revision(Some(52.)) }.unwrap();
+        let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+        let command = Command::Wait;
+        old.dispatch(&command).unwrap();
+        append(&mut file, vec![Operation::Command { command, after: Stamp::capture(&old) }], metadata);
+        let (decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.run.commandment_rules_from, Field::Value(1));
+        old.run.commandment_rules_from = 1usize.into();
+        assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+        export_twice(&initial, &decoded);
+        let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+        let (loaded, _) = load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}
+
+#[test]
+fn screamer_markerless_journal_adopts_after_recorded_commands() {
+    for metadata in [false, true] {
+        let mut initial = room();
+        initial.firebolt_travel_from = 0usize.into();
+        initial.screamer_rules_from = Field::Null;
+        let mut old = Core::new(initial.clone()).unwrap();
+        let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("screamerRulesFrom");
+        let header = if metadata { log::Header::for_metadata_revision(Some(52.)) } else { log::Header::for_revision(Some(52.)) }.unwrap();
+        let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+        let command = Command::Wait;
+        old.dispatch(&command).unwrap();
+        append(&mut file, vec![Operation::Command { command, after: Stamp::capture(&old) }], metadata);
+        let (decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.run.screamer_rules_from, Field::Value(1));
+        old.run.screamer_rules_from = 1usize.into();
+        assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+        export_twice(&initial, &decoded);
+        let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+        let (loaded, _) = load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}
+
+#[test]
+fn ember_markerless_journal_adopts_after_durable_commands() {
+    let mut initial = room();
+    initial.ember_rules_from = Field::Null;
+    let mut old = Core::new(initial.clone()).unwrap();
+    let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+    checkpoint["run"].as_object_mut().unwrap().remove("emberRulesFrom");
+    let header = log::Header::for_metadata_revision(Some(52.)).unwrap();
+    let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+    let command = Command::Wait;
+    old.dispatch(&command).unwrap();
+    append(&mut file, vec![Operation::Command { command, after: Stamp::capture(&old) }], true);
+    let (decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+    assert_eq!(decoded.run.ember_rules_from, Field::Value(1));
+    old.run.ember_rules_from = 1usize.into();
+    assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+    export_twice(&initial, &decoded);
+    let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+    let (loaded, _) = load(&path).unwrap();
+    assert!(loaded.pending_batch().checkpoint_required);
+    assert!(loaded.pending_batch().base_token.is_none());
+}
+
+#[test]
+fn ragelight_markerless_journal_replays_old_toggles_before_adopting_passive_rules() {
+    for metadata in [false, true] {
+        let mut initial = room();
+        initial.firebolt_travel_from = 0usize.into();
+        initial.ragelight_rules_from = Field::Null;
+        let id = corpse_core::divine_rescues::RAGE.to_string();
+        initial.player.abilities.push(id.clone());
+        let mut old = Core::new(initial.clone()).unwrap();
+        let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("ragelightRulesFrom");
+        let header = if metadata { log::Header::for_metadata_revision(Some(52.)) } else { log::Header::for_revision(Some(52.)) }.unwrap();
+        let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+        let command = Command::Ability { id: id.clone(), target: Field::Missing, x: Field::Missing, y: Field::Missing };
+        old.dispatch(&command).unwrap();
+        assert!(old.run.player.active.contains(&id));
+        append(&mut file, vec![Operation::Command { command: command.clone(), after: Stamp::capture(&old) }], metadata);
+        let (mut decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.run.ragelight_rules_from, Field::Value(1));
+        old.run.ragelight_rules_from = 1usize.into();
+        assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+        export_twice(&initial, &decoded);
+        assert!(!decoded.dispatch(&command).unwrap().changed);
+        assert_eq!(decoded.run.replay.len(), 1);
+        let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+        let (loaded, _) = load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}
+
+#[test]
+fn steam_markerless_journal_replays_harmless_tail_then_adopts_scalding() {
+    let mut initial = room();
+    initial.steam_rules_from = Field::Null;
+    let f = initial.floor_mut().unwrap();
+    let at = 10*f.width()+10;
+    corpse_core::environment::add_gas(f, at, "steam", 250., -1.).unwrap();
+    let mut old = Core::new(initial.clone()).unwrap();
+    let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+    checkpoint["run"].as_object_mut().unwrap().remove("steamRulesFrom");
+    let header = log::Header::for_metadata_revision(Some(52.)).unwrap();
+    let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+    let command = Command::Wait;
+    old.dispatch(&command).unwrap();
+    assert_eq!(old.run.player.hp,1000.);
+    append(&mut file, vec![Operation::Command { command, after: Stamp::capture(&old) }], true);
+    let (mut decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+    assert_eq!(decoded.run.steam_rules_from, Field::Value(1));
+    old.run.steam_rules_from = 1usize.into();
+    assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+    decoded.dispatch(&Command::Wait).unwrap();
+    assert_eq!(decoded.run.player.hp,996.);
+    export_twice(&initial, &decoded);
+    let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+    let (loaded, _) = load(&path).unwrap();
+    assert!(loaded.pending_batch().checkpoint_required);
+    assert!(loaded.pending_batch().base_token.is_none());
+}
+
+#[test]
+fn execute_markerless_journal_replays_the_old_pre_hit_trigger() {
+    for metadata in [false, true] {
+        let mut initial=room();
+        initial.firebolt_travel_from=0usize.into();
+        initial.execute_rules_from=Field::Null;
+        let id=corpse_core::revision50_combat::EXECUTE;
+        initial.player.abilities.push(id.into());
+        initial.player.active.push(id.into());
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut initial).unwrap();
+        let b=initial.actors_at_mut(1.).iter_mut().find(|b|b.id==950.).unwrap();
+        b.x=11.;b.y=10.;b.hp=24.;
+        let mut old=Core::new(initial.clone()).unwrap();
+        let mut checkpoint:serde_json::Value=serde_json::from_str(&session_store::encode(&old,Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("executeRulesFrom");
+        let header=if metadata {log::Header::for_metadata_revision(Some(52.))} else {log::Header::for_revision(Some(52.))}.unwrap();
+        let mut file=log::encode_initial(&checkpoint.to_string(),&header).unwrap();
+        let command=Command::Move{dx:1.,dy:0.};
+        old.dispatch(&command).unwrap();
+        assert_eq!(old.run.player.ability_reserves.as_ref().unwrap()[id].energy,0.);
+        append(&mut file,vec![Operation::Command{command,after:Stamp::capture(&old)}],metadata);
+        let (decoded,_,migrated)=super::super::incremental_store::decode_with_migration(&file.bytes).unwrap();
+        assert!(migrated);
+        assert_eq!(decoded.run.execute_rules_from,Field::Value(1));
+        old.run.execute_rules_from=1usize.into();
+        assert_eq!(decoded.save().unwrap(),old.save().unwrap());
+        export_twice(&initial,&decoded);
+    }
+}
+
+#[test]
+fn beckoning_markerless_journal_adopts_after_recorded_commands() {
+    for metadata in [false, true] {
+        let mut initial = room();
+        initial.firebolt_travel_from = 0usize.into();
+        initial.beckoning_rules_from = Field::Null;
+        let mut old = Core::new(initial.clone()).unwrap();
+        let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("beckoningRulesFrom");
+        let header = if metadata { log::Header::for_metadata_revision(Some(52.)) } else { log::Header::for_revision(Some(52.)) }.unwrap();
+        let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+        let command = Command::Wait;
+        old.dispatch(&command).unwrap();
+        append(&mut file, vec![Operation::Command { command, after: Stamp::capture(&old) }], metadata);
+        let (decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.run.beckoning_rules_from, Field::Value(1));
+        old.run.beckoning_rules_from = 1usize.into();
+        assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+        export_twice(&initial, &decoded);
+        let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+        let (loaded, _) = load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}
+
+#[test]
+fn ichor_fire_markerless_journal_replays_old_spread_before_adopting_slow_cadence() {
+    let mut initial=room();
+    initial.ichor_fire_rules_from=Field::Null;
+    let f=initial.floor_mut().unwrap();
+    let w=f.width();
+    let mut ichor=vec![0.;f.tiles.len()];
+    for x in 20..=23 {ichor[10*w+x]=100.;}
+    f.ichor=ichor.into();
+    corpse_core::environment::ignite(&mut initial,20.,10.,None,None).unwrap();
+    let burning=|r:&Run,x:usize| r.floor().unwrap().environment.as_ref().unwrap()
+        .fire_kind.as_ref().unwrap()[10*w+x].as_deref()==Some("ichor");
+    let mut old=Core::new(initial.clone()).unwrap();
+    let mut checkpoint:serde_json::Value=serde_json::from_str(&session_store::encode(&old,Kind::Fixture).unwrap()).unwrap();
+    checkpoint["run"].as_object_mut().unwrap().remove("ichorFireRulesFrom");
+    let header=log::Header::for_metadata_revision(Some(52.)).unwrap();
+    let mut file=log::encode_initial(&checkpoint.to_string(),&header).unwrap();
+    let command=Command::Wait;
+    old.dispatch(&command).unwrap();
+    assert!(burning(&old.run,21));
+    append(&mut file,vec![Operation::Command {command,after:Stamp::capture(&old)}],true);
+    let (mut decoded,_)=session_store::decode_bytes(&file.bytes).unwrap();
+    assert_eq!(decoded.run.ichor_fire_rules_from,Field::Value(1));
+    old.run.ichor_fire_rules_from=1usize.into();
+    assert_eq!(decoded.save().unwrap(),old.save().unwrap());
+    for _ in 0..2 {decoded.dispatch(&Command::Wait).unwrap();}
+    assert!(burning(&decoded.run,22));
+    assert!(!burning(&decoded.run,23));
+    export_twice(&initial,&decoded);
+}

@@ -1724,6 +1724,26 @@ pub struct Run {
     /// Gas status command boundary; Null denotes a legacy replay prefix.
     #[serde(rename = "gasRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub gas_rules_from: Field<usize>,
+    #[serde(rename = "commandmentRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub commandment_rules_from: Field<usize>,
+    #[serde(rename = "screamerRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub screamer_rules_from: Field<usize>,
+    #[serde(rename = "ragelightRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub ragelight_rules_from: Field<usize>,
+    #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub execute_rules_from: Field<usize>,
+    #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub beckoning_rules_from: Field<usize>,
+    #[serde(rename = "ichorFireRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub ichor_fire_rules_from: Field<usize>,
+    #[serde(rename = "avatarStarterPolicy", default, skip_serializing_if = "Field::is_missing")]
+    pub avatar_starter_policy: Field<u8>,
+    #[serde(rename = "emberRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub ember_rules_from: Field<usize>,
+    #[serde(rename = "steamRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub steam_rules_from: Field<usize>,
+    #[serde(rename = "screamerSchedule", default, skip_serializing_if = "Option::is_none")]
+    pub screamer_schedule: Option<crate::turn_schedule::Schedule<()>>,
     #[serde(rename = "futureFloorRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub future_floor_rules_from: Field<usize>,
     #[serde(rename = "futureFloor", default, skip_serializing_if = "Option::is_none")]

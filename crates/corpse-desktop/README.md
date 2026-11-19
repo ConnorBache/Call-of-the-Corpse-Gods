@@ -10,7 +10,8 @@ Linux SDL2 runtime is dynamically linked; build.rs creates a linker alias inside
 The menu now opens the authored Seed/Vessel form and creates a real native-generated descent. Avatar is the default; Blessed and Unblessed are available. --seed TEXT and --mode MODE prefill reproducible starts. --fixture PATH explicitly opens a controlled reference-exported migration scene instead. Coverage remains incomplete and is labeled on every gameplay view. Fixture and loaded sessions do not enter ranked scores. Unsupported fixtures are rejected by the native core rather than silently dropping behavior. SDL receives keyboard/window events; no JavaScript runtime, browser engine or webview participates.
 
 Inputs:
-- Enter: open new descent / submit Seed and Vessel; Escape: menu / quit
+- Enter: open new descent / submit Seed and Vessel; Escape: back / quit outside a run
+- During a run, Escape cancels targeting, closes panels or exits the keyboard cursor. Use the Menu button to leave the run.
 - Start form: Tab focuses Seed/Vessel, Left/Right change Vessel, F2 rerolls seed, Ctrl+A clears Seed
 - Arrows, WASD or vi HJKL: move / melee; YUBN or keypad: diagonals
 - Period, Space or keypad 5: wait

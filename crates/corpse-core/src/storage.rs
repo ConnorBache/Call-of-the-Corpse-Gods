@@ -99,7 +99,18 @@ pub fn from_canonical(raw: &str) -> Result<Run> {
     validate(&run)?;
     Ok(run)
 }
+/// Starter provenance is immutable. Missing is legacy even in a current save;
+/// unlike amendments to turn mechanics this policy never migrates at EOF.
+pub(crate) fn validate_avatar_starter_policy(policy: &crate::Field<u8>, revision: f64, mode: &str) -> std::result::Result<(), String> {
+    if policy.is_missing() || (matches!(policy, crate::Field::Value(1)) && revision == 52. && mode == "Avatar") {
+        Ok(())
+    } else {
+        Err("Unsupported Avatar starter policy".into())
+    }
+}
 pub fn validate(run: &Run) -> Result<()> {
+    validate_avatar_starter_policy(&run.avatar_starter_policy, run.simulation_revision.value_or(29.), &run.mode).map_err(StorageError)?;
+    if !run.avatar_starter_policy.is_missing() && !run.playtest.is_missing() { return Err(invalid("Unsupported synthetic playtest starter policy")); }
     crate::revision52_enemy_followups::validate_run(run).map_err(StorageError)?;
     if !crate::fast_mode::valid_configuration(run) { return Err(invalid("Invalid Fast mode flag/revision")); }
     if run.version != 1.0
@@ -163,6 +174,14 @@ pub fn validate(run: &Run) -> Result<()> {
     crate::potion_rules::validate(run).map_err(StorageError)?;
     crate::ring_rules::validate(run).map_err(StorageError)?;
     crate::gas_rules::validate(run).map_err(StorageError)?;
+    crate::commandment_rules::validate(run).map_err(StorageError)?;
+    crate::screamer_rules::validate(run).map_err(StorageError)?;
+    crate::ember_rules::validate(run).map_err(StorageError)?;
+    crate::ragelight_rules::validate(run).map_err(StorageError)?;
+    crate::steam_rules::validate(run).map_err(StorageError)?;
+    crate::execute_rules::validate(run).map_err(StorageError)?;
+    crate::beckoning_rules::validate(run).map_err(StorageError)?;
+    crate::ichor_fire_rules::validate(run).map_err(StorageError)?;
     crate::future_floor::validate(run).map_err(StorageError)?;
     crate::firebolt_travel::validate(run).map_err(StorageError)?;
     crate::validation::validate(run)?;

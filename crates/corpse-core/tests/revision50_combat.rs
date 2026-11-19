@@ -42,14 +42,14 @@ fn witch_hatred_uses_explicit_trait_and_does_not_charge_execute() {
 #[test]
 fn force_pushes_else_swaps_and_old_revision_is_inert() {
     let mut r = room(); r.player.abilities.push(c::FORCE.into()); r.player.active.push(c::FORCE.into());
-    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
     assert_eq!(r.player.x,11.); assert_eq!(engine::actor(&r,1.).unwrap().x,12.);
     let mut r = room(); r.player.abilities.push(c::FORCE.into()); r.player.active.push(c::FORCE.into());
     let w = r.floor().unwrap().width(); r.floor_mut().unwrap().tiles[10*w+12] = "wall".into();
-    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
     assert_eq!(r.player.x,11.); assert_eq!(engine::actor(&r,1.).unwrap().x,10.);
     r.simulation_revision = 49.0.into(); let (a,b) = bodies(&r);
-    c::after_attack(&mut r,&a,&b).unwrap(); assert_eq!(r.player.x,11.);
+    c::after_attack(&mut r,&a,&b,true).unwrap(); assert_eq!(r.player.x,11.);
 }
 #[test]
 fn commandment_passive_one_active_max_and_insufficient_energy_fallback() {
@@ -57,7 +57,7 @@ fn commandment_passive_one_active_max_and_insufficient_energy_fallback() {
         let mut r = room(); r.player.abilities.push(c::COMMANDMENT.into()); r.player.energy = energy;
         if active { r.player.active.push(c::COMMANDMENT.into()); }
         let w = r.floor().unwrap().width(); r.floor_mut().unwrap().tiles[10*w+15] = "wall".into();
-        let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+        let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
         assert_eq!(engine::actor(&r,1.).unwrap().x,expected); assert_eq!(r.player.energy,energy-cost);
     }
 }
@@ -103,7 +103,7 @@ fn replaced_debuff_and_counter_and_nightmare_are_inert() {
 fn commandment_cannot_push_nonflying_enemy_into_chasm() {
     let mut r = room(); r.player.abilities.push(c::COMMANDMENT.into()); r.player.active.push(c::COMMANDMENT.into());
     let w = r.floor().unwrap().width(); r.floor_mut().unwrap().tiles[10*w+12] = "chasm".into();
-    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
     assert_eq!(engine::actor(&r,1.).unwrap().x,11.);
     assert_eq!(r.player.energy,80.);
 }
@@ -111,7 +111,7 @@ fn commandment_cannot_push_nonflying_enemy_into_chasm() {
 fn force_swaps_instead_of_pushing_nonflyer_over_chasm() {
     let mut r = room(); r.player.abilities.push(c::FORCE.into()); r.player.active.push(c::FORCE.into());
     let w = r.floor().unwrap().width(); r.floor_mut().unwrap().tiles[10*w+12] = "chasm".into();
-    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
     assert_eq!(r.player.x,11.); assert_eq!(engine::actor(&r,1.).unwrap().x,10.);
     assert!(!engine::actor(&r,1.).unwrap().dead.value_or(false));
 }
@@ -119,7 +119,7 @@ fn force_swaps_instead_of_pushing_nonflyer_over_chasm() {
 fn commandment_restores_existing_forced_move_value() {
     let mut r = room(); r.player.abilities.push(c::COMMANDMENT.into());
     r.actors_at_mut(1.)[0].conditions.insert("forcedMove".into(),7.);
-    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
     let b = engine::actor(&r,1.).unwrap();
     assert_eq!(b.x,12.); assert_eq!(engine::condition(b,"forcedMove"),7.);
 }
@@ -127,7 +127,7 @@ fn commandment_restores_existing_forced_move_value() {
 fn force_does_not_silently_limit_attack_to_melee_distance() {
     let mut r = room(); r.player.abilities.push(c::FORCE.into()); r.player.active.push(c::FORCE.into());
     r.actors_at_mut(1.)[0].x = 15.;
-    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
     assert_eq!(r.player.x,15.); assert_eq!(engine::actor(&r,1.).unwrap().x,16.);
 }
 #[test]
@@ -135,7 +135,7 @@ fn force_into_killed_target_square_runs_corpse_stomp() {
     let mut r = room(); r.player.abilities.push(c::FORCE.into()); r.player.active.push(c::FORCE.into());
     let (a,b) = bodies(&r);
     let corpse = &mut r.actors_at_mut(1.)[0]; corpse.hp = 0.; corpse.dead = true.into(); corpse.corpse_age = 8.0.into();
-    c::after_attack(&mut r,&a,&b).unwrap();
+    c::after_attack(&mut r,&a,&b,true).unwrap();
     assert_eq!(r.player.x,11.);
     assert_eq!(engine::actor(&r,1.).unwrap().corpse_age.value_or(-1.),0.);
     assert!(engine::actor(&r,1.).unwrap().dead.value_or(false));
@@ -217,7 +217,7 @@ fn commandment_paid_push_uses_reserve_with_empty_shared_bar() {
     r.player.energy = 0.;
     r.player.ability_reserves.as_mut().unwrap().get_mut(c::COMMANDMENT).unwrap().energy = 20.;
     let w = r.floor().unwrap().width(); r.floor_mut().unwrap().tiles[10*w+15] = "wall".into();
-    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b).unwrap();
+    let (a,b) = bodies(&r); c::after_attack(&mut r,&a,&b,true).unwrap();
     assert_eq!(engine::actor(&r,1.).unwrap().x,14.); assert_eq!(r.player.energy,0.);
     assert_eq!(r.player.ability_reserves.as_ref().unwrap()[c::COMMANDMENT].energy,0.);
 }
@@ -249,4 +249,199 @@ fn rage_free_first_rescue_then_uses_own_reserve_and_legacy_stays_unchanged() {
     r.simulation_revision = 49.0.into(); r.player.energy = 2.; r.player.hp = 0.;
     r.player.ability_reserves = Default::default();
     assert!(d::try_rescue(&mut r,id,false)); assert_eq!(r.player.energy,0.);
+}
+
+#[test]
+fn commandment_hit_only_preserves_old_misses_and_unstoppable_force() {
+    for (landed, historical, force, expected_x, expected_spend) in [
+        (false, false, false, 11., 0.),
+        (false, false, true, 12., 0.),
+        (false, true, false, 14., 20.),
+        (true, false, false, 14., 20.),
+    ] {
+        let mut r = room();
+        if historical { r.commandment_rules_from = corpse_core::Field::Null; }
+        r.player.abilities.push(c::COMMANDMENT.into());
+        r.player.active.push(c::COMMANDMENT.into());
+        if force {
+            r.player.abilities.push(c::FORCE.into());
+            r.player.active.push(c::FORCE.into());
+        }
+        r.player.conditions.insert(if landed { "lucky" } else { "unlucky" }.into(), 1.);
+        let w = r.floor().unwrap().width();
+        r.floor_mut().unwrap().tiles[10*w+15] = "wall".into();
+        let player_id = r.player.id;
+        let initial_energy = r.player.energy;
+        engine::attack(&mut r, player_id, 1., 1.).unwrap();
+        let enemy = engine::actor(&r,1.).unwrap();
+        assert_eq!(enemy.hp < 100., landed);
+        assert_eq!(enemy.x, expected_x);
+        assert_eq!(r.player.x, if force { 11. } else { 10. });
+        assert_eq!(r.player.energy, initial_energy - expected_spend);
+    }
+}
+
+#[test]
+fn commandment_does_not_spend_or_move_on_a_landed_friendly_strike() {
+    let mut r = room();
+    r.player.abilities.push(c::COMMANDMENT.into());
+    r.player.active.push(c::COMMANDMENT.into());
+    r.actors_at_mut(1.)[0].state = "ally".into();
+    let (a,b) = bodies(&r);
+    c::after_attack(&mut r, &a, &b, true).unwrap();
+    assert_eq!(r.player.energy, 100.);
+    assert_eq!(engine::actor(&r,1.).unwrap().x, 11.);
+}
+
+#[test]
+fn commandment_policy_adopts_at_end_of_history_and_survives_replay_restart() {
+    use corpse_core::{Command, Field, replay::{ReplayRecord,ReplaySession}, temporal::Engine};
+    let mut initial = room();
+    initial.inventory.clear();
+    let mut record = ReplayRecord::from_run(&initial);
+    record.commands = vec![Command::Wait];
+    let mut old = ReplaySession::from_initial(initial.clone(), record.clone()).unwrap();
+    old.step().unwrap();
+    assert_eq!(old.engine.run.commandment_rules_from, Field::Null);
+    let live = Engine::load(&old.engine.save().unwrap()).unwrap();
+    assert_eq!(live.run.commandment_rules_from, Field::Value(1));
+
+    let mut mixed = ReplaySession::from_initial(initial.clone(), ReplayRecord::try_from_run(&live.run).unwrap()).unwrap();
+    for _ in 0..2 {
+        assert_eq!(mixed.engine.run.commandment_rules_from, Field::Null);
+        mixed.step().unwrap();
+        assert_eq!(mixed.engine.save().unwrap(), live.save().unwrap());
+        mixed.restart().unwrap();
+    }
+    for invalid in [Field::Null, Field::Value(2)] {
+        record.commandment_rules_from = invalid;
+        assert!(ReplaySession::from_initial(initial.clone(), record.clone()).is_err());
+    }
+}
+
+fn execute_room(reserve:f64, energy:f64) -> Run {
+    let mut r=room();
+    r.simulation_revision=52.0.into();
+    r.execute_rules_from=0usize.into();
+    r.player.stats.accuracy=1000.;
+    r.player.energy=energy;
+    r.player.abilities=vec![c::EXECUTE.into()];
+    r.player.active=r.player.abilities.clone();
+    r.player.ability_reserves=Default::default();
+    r.inventory=vec![corpse_core::Item{id:120.,kind:"ring".into(),name:"Ring of Reaping".into(),
+        effect:corpse_core::revision50_rings::REAPING.to_string().into(),..Default::default()}];
+    corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,c::EXECUTE,10.,reserve).unwrap();
+    r.actors_at_mut(1.)[0].stats.dodge=10.;
+    r
+}
+
+fn execute_melee(r:&mut Run) -> bool {
+    let before=r.player.ability_reserves.as_ref().unwrap()[c::EXECUTE].energy;
+    let player=r.player.id;
+    engine::attack(r,player,1.,1.).unwrap();
+    r.player.ability_reserves.as_ref().unwrap()[c::EXECUTE].energy < before
+}
+
+#[test]
+fn execute_crossing_uses_actual_ordinary_damage_and_reaps_only_that_packet() {
+    let mut baseline=execute_room(10.,5.);
+    baseline.player.active.clear();
+    assert!(!execute_melee(&mut baseline));
+    let packet=100.-engine::actor(&baseline,1.).unwrap().hp;
+    assert!(packet>0. && packet<75.);
+    let carry=baseline.player.reaping_ledger.as_ref().unwrap().damage_carry;
+
+    for (start,enabled,reserve,energy,expected_proc,expected_hp) in [
+        (packet+24.,true,10.,5.,true,0.),
+        (packet+24.,true,5.,5.,true,0.),
+        (packet+24.,false,10.,5.,false,24.),
+        (packet+24.,true,5.,4.,false,24.),
+        (packet+25.,true,10.,5.,false,25.),
+        (24.,true,10.,5.,false,(24.-packet).max(0.)),
+        (packet,true,10.,5.,false,0.),
+    ] {
+        let mut r=execute_room(reserve,energy);
+        if !enabled {r.player.active.clear();}
+        r.actors_at_mut(1.)[0].hp=start;
+        assert_eq!(execute_melee(&mut r),expected_proc,"start {start}, reserve {reserve}, energy {energy}");
+        let hp=r.actors_at(1.).iter().find(|a|a.id==1.).map_or(0.,|a|a.hp.max(0.));
+        assert_eq!(hp,expected_hp);
+        assert_eq!(r.player.ability_reserves.as_ref().unwrap()[c::EXECUTE].energy,
+            if expected_proc {0.} else {reserve});
+        assert_eq!(r.player.energy,if expected_proc {energy-(10.-reserve)} else {energy});
+        if expected_proc { assert_eq!(r.player.reaping_ledger.as_ref().unwrap().damage_carry,carry); }
+    }
+}
+#[test]
+fn execute_crossing_bypasses_death_rescues_but_natural_lethality_does_not() {
+    let mut baseline=execute_room(10.,5.);
+    baseline.player.active.clear();
+    execute_melee(&mut baseline);
+    let packet=100.-engine::actor(&baseline,1.).unwrap().hp;
+    for (start,proc) in [(packet+24.,true),(packet,false)] {
+        let mut r=execute_room(10.,5.);
+        let b=&mut r.actors_at_mut(1.)[0];
+        b.hp=start;b.blood=1.0.into();b.abilities.push(corpse_core::divine_rescues::OVERFLOWING.into());
+        assert_eq!(execute_melee(&mut r),proc);
+        if proc {
+            assert!(r.actors_at(1.).iter().all(|a|a.id!=1.||a.hp<=0.));
+        } else {
+            assert_eq!(engine::actor(&r,1.).unwrap().hp,1.);
+            assert_eq!(r.player.ability_reserves.as_ref().unwrap()[c::EXECUTE].energy,10.);
+        }
+    }
+}
+#[test]
+fn execute_crossing_never_charges_on_a_miss_or_witch_hatred() {
+    let mut r=execute_room(10.,5.);
+    r.player.stats.accuracy=0.;
+    r.actors_at_mut(1.)[0].hp=40.;
+    assert!(!execute_melee(&mut r));
+    assert_eq!(engine::actor(&r,1.).unwrap().hp,40.);
+    assert_eq!(r.player.ability_reserves.as_ref().unwrap()[c::EXECUTE].energy,10.);
+
+    let mut r=execute_room(10.,5.);
+    r.player.abilities.push(c::WITCH_HATRED.into());
+    r.actors_at_mut(1.)[0].hp=40.;
+    r.actors_at_mut(1.)[0].abilities.push(c::MAGICKAL_CASTER.into());
+    assert!(!execute_melee(&mut r));
+    assert!(r.actors_at(1.).iter().all(|a|a.id!=1.||a.hp<=0.));
+    assert_eq!(r.player.ability_reserves.as_ref().unwrap()[c::EXECUTE].energy,10.);
+}
+
+#[test]
+fn execute_crossing_admits_bows_and_weapon_throws_but_not_improvised_objects() {
+    use corpse_core::{Command, Item, projectiles};
+    for kind in ["bow shot","weapon","tool"] {
+        let fire=|r:&mut Run| {
+            if kind=="bow shot" {
+                assert!(engine::attack_bow_normal_accuracy_resolved(r,1.,10.,1.).unwrap());
+            } else {
+                let command=Command::Throw{id:123.,x:11.,y:10.};
+                assert_eq!(projectiles::command(r,&command).unwrap(),Some(true));
+            }
+        };
+        let mut initial=execute_room(10.,5.);
+        initial.player.stats.offense=20.;
+        let b=&mut initial.actors_at_mut(1.)[0];
+        b.conditions.insert("paralyzed".into(),5.);
+        if kind!="bow shot" {
+            initial.inventory.push(Item{
+                id:123.,kind:kind.into(),name:"Test thrown item".into(),hands:1.0.into(),
+                damage:0.0.into(),offense_multiplier:1.0.into(),thrown:true.into(),..Default::default()
+            });
+        }
+        let mut baseline=initial.clone();
+        baseline.player.active.clear();
+        fire(&mut baseline);
+        let packet=100.-engine::actor(&baseline,1.).unwrap().hp;
+        assert!(packet>0. && packet<75.,"{kind}: baseline {packet}");
+        initial.actors_at_mut(1.)[0].hp=24.+packet;
+        fire(&mut initial);
+        let target_hp=initial.actors_at(1.).iter().find(|a|a.id==1.).map_or(0.,|a|a.hp.max(0.));
+        let eligible=kind!="tool";
+        assert_eq!(target_hp,if eligible {0.} else {24.},"{kind}");
+        assert_eq!(initial.player.ability_reserves.as_ref().unwrap()[c::EXECUTE].energy,
+            if eligible {0.} else {10.},"{kind}");
+    }
 }

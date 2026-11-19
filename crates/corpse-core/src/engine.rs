@@ -19,6 +19,9 @@ impl std::error::Error for EngineError {}
 #[derive(Debug, Clone, Default)]
 pub struct DispatchOutcome {
     pub took_turn: bool,
+    /// A committed use, throw, or shot, even when no normal turn advanced.
+    /// Presentation-only result; never recorded in saves or replays.
+    pub used_item: bool,
     pub changed: bool,
     pub events: Vec<crate::events::PresentationEvent>,
     pub pending_snapshot: Option<crate::temporal::Snapshot>,
@@ -454,6 +457,10 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
                     "underwater",
                     "forcedMove",
                     "monsterPhoenixRolls",
+                    "beckoningSkipOwner",
+                    "dontScream",
+                    "lastScreamUntil",
+                    "lastScreamOwner",
                     "screamWeakened",
                     "disoriented",
                     "disorientedPenalty",
@@ -482,6 +489,12 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
 /// Failure drops the candidate without touching the caller, RNG, logs or temporal ring.
 pub fn dispatch(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineError> {
     let _timing_function = crate::timing::span("command.core_dispatch");
+    // A stale toggle command is not an action or a command-ledger entry.
+    if crate::ragelight_rules::current(r)
+        && matches!(c, Command::Ability { id, .. } if id == crate::divine_rescues::RAGE)
+    {
+        return Ok(DispatchOutcome::default());
+    }
     if !crate::future_floor::enabled(r) && r.status == "playing" && r.future.is_none()
         && matches!(c, Command::Ability { id, .. }
             if id == "morae-see-the-future" && r.player.abilities.contains(id))
@@ -690,14 +703,20 @@ fn dispatch_inner(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineErr
                 .iter()
                 .any(|i| i.id == *id && matches!(i.kind.as_str(), "heart" | "potion"))
         {
-            crate::inventory::command(r, c)?;
-            return finish(r, false);
+            let used_item=crate::inventory::command(r,c)?==Some(true);
+            let mut out=finish(r,false)?;
+            out.used_item=used_item;
+            return Ok(out);
         }
     }
     if crate::revision50_amulet_effects::admission(r,c).is_some_and(|result|
         result.is_ok_and(|plan| !plan.consumes_action())) {
-        crate::dreamwalking::with_actor(r,r.player.id,|r|crate::inventory::command(r,c))?;
-        return finish(r,false);
+        // The admitted amulet handler returns Some(false) on a successful
+        // activation that Spellslinger makes free; a failure is an Err.
+        let used_item=crate::dreamwalking::with_actor(r,r.player.id,|r|crate::inventory::command(r,c))?.is_some();
+        let mut out=finish(r,false)?;
+        out.used_item=used_item;
+        return Ok(out);
     }
     if let Command::Ability { id, target, x, y } = c {
         if !crate::abilities::is_action(id) && !(r.simulation_revision.value_or(29.)>=52.
@@ -850,6 +869,7 @@ fn dispatch_inner(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineErr
         Command::Craft { heart, item, craft } => crate::crafting::craft(r, *heart, *item, craft)?,
         _ => crate::inventory::command(r, c)?.unwrap_or(false),
     })})?;
+    let used_item=took && matches!(c, Command::Use{..}|Command::UseAt{..}|Command::Throw{..}|Command::Shoot{..});
     if took && r.simulation_revision.value_or(29.)>=52. {
         let fast_first_move = fast_continuation.is_none() && player_moved && !player_move_was_attack
             && ai::fast_movement_enabled(&phase_before,&phase_before.player)
@@ -868,7 +888,9 @@ fn dispatch_inner(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineErr
             r.phase="normal".to_string().into();
             let cap=crate::inventory::carrying_capacity(r)?;
             crate::inventory::collect_underfoot(r,cap)?;
-            return finish_action(r,false);
+            let mut out=finish_action(r,false)?;
+            out.used_item=used_item;
+            return Ok(out);
         }
     }
     let pursuit_bonus = took && !player_was_slowed && !player_move_was_attack && match c {
@@ -943,7 +965,9 @@ fn dispatch_inner(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineErr
         r.history = history;
         r.haste_snapshot = haste;
     }
-    finish(r, took)
+    let mut out=finish(r,took)?;
+    out.used_item=used_item;
+    Ok(out)
 }
 fn finish(r: &mut Run, took: bool) -> Result<DispatchOutcome, EngineError> {
     finish_inner(r, took, took)
@@ -994,6 +1018,7 @@ fn finish_inner(r: &mut Run, took: bool, completed_action: bool) -> Result<Dispa
         events: vec![],
         pending_snapshot: None,
         took_turn: took,
+        used_item: false,
         changed: true,
     })
 }
@@ -1210,7 +1235,6 @@ fn move_actor_step(
         && crate::dreamwalking::same_plane(r,&r.player,&a)
         && crate::revision50_ability_energy::spend(r, r.player.id, "isheilah-make-slippery", 8.0)
     {
-        crate::animation_shapes::area(r,&a,"P15","box-contract",2,"#a040ff",crate::events::Stage::Special);
         return Ok(false);
     }
     let f = r.floor().unwrap();
@@ -1655,6 +1679,7 @@ fn mark_player_surprise(r:&mut Run,source:Option<&Actor>,before:&Actor){
     if let Some(a)=actor_mut_trusted(r,before.id){a.conditions.insert("monsterSurprisedThrough".into(),through);}
 }
 fn complete_actor_action(r: &mut Run, id: f64, bonus: bool, paralyzed: &[f64], cache: &mut PathCache) -> Result<(), EngineError> {
+    if crate::beckoning_skip::consume(r,id){return Ok(());}
     if actor(r,id).is_some_and(|a|surprise_response_blocked(r,a)){return Ok(());}
     let before = actor(r, id).cloned();
     let (result,receipt)=crate::revision52_speed::measure(id,bonus,||actor_action_inner(r,id,bonus,paralyzed,cache));
@@ -1950,6 +1975,7 @@ pub(crate) fn offscreen_haste_actions(r:&mut Run)->Result<(),EngineError> {
             || condition(&before,"paralyzed")>0. || crate::ichor::stranded(r,&before)
             || !ai::is_hasted_in(r,&before)
             || before.abilities.iter().any(|s|s=="enemy:beast:slow"||s=="enemy:pale:slow") {continue;}
+        if crate::beckoning_skip::consume(r,id){continue;}
         let (result,receipt)=crate::revision52_speed::measure(id,true,|| -> Result<(),EngineError> {
             if crate::revision50_control_amulets::discord_turn(r,id,true)? {return Ok(());}
             if crate::creature_feeding::take_turn(r,id,false,true)? {return Ok(());}
@@ -2001,6 +2027,7 @@ fn turn(r: &mut Run) -> Result<(), EngineError> {
     // Leaving the Duel area ends it before the next upkeep charge.
     crate::revision50::settle_duel(r);
     r.tick += 1.0;
+    crate::screamer_schedule::expire(r);
     r.resolving_tick = Field::Value(true);
     crate::creature_feeding::begin_turn(r);
     let mut deferred_phase_fall = false;
@@ -2552,7 +2579,7 @@ fn attack_base_with_fury(
     shard: bool,
     wording: Option<crate::attack_text::Verb>,
 ) -> Result<bool, EngineError> {
-    attack_base_with_accuracy(r, aid, bid, multiplier, explicit_base, secondary, range, miss_chance_multiplier, arrow, fury, landed, melee, projectile_resolved, shard, wording, false, 1.0)
+    attack_base_with_accuracy(r, aid, bid, multiplier, explicit_base, secondary, range, miss_chance_multiplier, arrow, fury, landed, melee, projectile_resolved, shard, wording, false, 1.0, false)
 }
 fn attack_base_with_accuracy(
     r: &mut Run,
@@ -2572,6 +2599,7 @@ fn attack_base_with_accuracy(
     wording: Option<crate::attack_text::Verb>,
     normal_accuracy: bool,
     damage_multiplier: f64,
+    thrown_weapon: bool,
 ) -> Result<bool, EngineError> {
     if r.simulation_revision.value_or(29.)>=52. {crate::revision52_speed::record_attack(aid);}
 
@@ -2643,7 +2671,7 @@ fn attack_base_with_accuracy(
         chance = 1.0;
     }
     for key in ["lucky", "unlucky", "distracted"] {
-        if condition(&a,key)!=0. {crate::animation_player::local(r,&a,if key=="distracted"{"P20"}else{"P67"},"dissolve",crate::events::Stage::Special);}
+        if key!="distracted" && condition(&a,key)!=0. {crate::animation_player::local(r,&a,"P67","dissolve",crate::events::Stage::Special);}
         actor_mut_trusted(r, aid).unwrap().conditions.shift_remove(key);
     }
     if reaction {
@@ -2705,7 +2733,7 @@ fn attack_base_with_accuracy(
     };
     if !hit {
         if blood {
-            crate::divine_combat::consume_blood_weapon_at(r, &a, &b);
+            crate::divine_combat::consume_blood_weapon(r, &a);
         }
         if angel {
             mark_angel(r, aid);
@@ -2740,12 +2768,13 @@ fn attack_base_with_accuracy(
                 action,
                 normal_accuracy,
                 damage_multiplier,
+                thrown_weapon,
             )?;
         }
         nova_after_attack(r, &a, &b)?;
         counter_attack(r, aid, bid, secondary)?;
         mini_me_offhand(r, &a, bid, s.offense, secondary)?;
-        crate::revision50_combat::after_attack(r, &a, &b)?;
+        crate::revision50_combat::after_attack(r, &a, &b, false)?;
         return Ok(false);
     }
     landed.set(true);
@@ -2755,6 +2784,8 @@ fn attack_base_with_accuracy(
         log(r,"The waking nightmare dissolves.","player");return Ok(true);
     }
     let r50_lethal = crate::revision50_combat::lethal_hit(r, &a, &b);
+    let weapon_crossing = crate::execute_rules::current(r) && !shard && !r50_lethal
+        && (melee || arrow || thrown_weapon);
     let variance = 0.75 + rng::random(r) * 0.5;
     let base = if let Some(base) = explicit_base {
         base
@@ -2872,11 +2903,29 @@ fn attack_base_with_accuracy(
             .then(|| crate::actor_presentation::source_name(r, &a).to_string());
         if shard { crate::borge::kill_on_hit(r,bid,aid)?; }
         else {
+            let crossing_before = weapon_crossing.then(|| {
+                let target = actor(r, owner_b).unwrap();
+                (target.hp, target.max_hp * 0.25)
+            });
             actual_hp_damage = apply_hp_loss(r, bid, n, !r50_lethal);
+            let executed = crossing_before.is_some_and(|(before, quarter)| {
+                let after = actor(r, owner_b).unwrap().hp;
+                crate::revision50_combat::execute_crossing(r, &a, &b, before, quarter, after)
+            });
+            let source_display = source_display.or_else(|| (executed && owner_b == r.player.id)
+                .then(|| crate::actor_presentation::source_name(r, &a).to_string()));
             crate::revision50_amulets::reap_direct_hit(r, &a, &b, actual_hp_damage);
             share_bonded_packet(r, bid, n)?;
+            // Finish directly, without manufacturing extra on-hit damage or
+            // giving the remaining HP to Reaping, Bonded, or damage counters.
+            if executed {
+                if let Some(owner) = actor_mut_trusted(r, owner_b) {owner.hp = 0.;}
+                if bid != owner_b {
+                    if let Some(body) = actor_mut_trusted(r, bid) {body.hp = 0.;}
+                }
+            }
             if actor(r, bid).is_some_and(|a| a.hp <= 0.0) {
-                death_core_with_source(r, bid, Some(aid), surprise, None, r50_lethal, None, source_display.as_deref())?;
+                death_core_with_source(r, bid, Some(aid), surprise, None, r50_lethal || executed, None, source_display.as_deref())?;
             }
         }
         crate::half_here::sync(r);
@@ -2947,7 +2996,7 @@ fn attack_base_with_accuracy(
                 owner.active.retain(|id| id != &removed);
             }
             crate::half_here::sync(r);
-            crate::animation_shapes::nova(r,&current_b,"P51","nova-black-small",2);
+            crate::animation_shapes::short_nova(r,&current_b,"P51",crate::animation_shapes::ISHEILAH);
             if defender_owner == r.player.id && removed == "etill-phase-through" {
                 crate::divine_environment::settle_phase_loss(r, true).map_err(EngineError)?;
             }
@@ -3006,7 +3055,7 @@ fn attack_base_with_accuracy(
     nova_after_attack(r, &a, &b)?;
     counter_attack(r, aid, bid, secondary)?;
     mini_me_offhand(r, &a, bid, s.offense, secondary)?;
-    crate::revision50_combat::after_attack(r, &a, &b)?;
+    crate::revision50_combat::after_attack(r, &a, &b, true)?;
     if !secondary
         && actor(r, aid).is_some_and(|a| a.hp > 0.0)
         && actor(r, bid).is_some_and(|a| !a.dead.value_or(false))
@@ -3508,10 +3557,10 @@ fn damage_environment_core(
         return Ok(());
     }
     let has = |id: &str| a.abilities.iter().any(|v| v == id);
-    if (kind == "fire" && (crate::revision51_ichor_fire::immune(r.simulation_revision.value_or(29.), &a) || has("enemy:beast:fire-immunity") || has("anavani-star-power") || (crate::revision50::enabled(r) && crate::revision50_potions::fire_immune(&a))))
+    if (matches!(kind, "fire" | "steam") && (crate::revision51_ichor_fire::immune(r.simulation_revision.value_or(29.), &a) || has("enemy:beast:fire-immunity") || has("anavani-star-power") || (crate::revision50::enabled(r) && crate::revision50_potions::fire_immune(&a))))
         || (kind == "explosion" && (has("enemy:beast:explosion-immunity") || has("anavani-nova")))
         || (["caustic", "ichor", "breatherGas"].contains(&kind)
-            && (has("grisha-entropy")
+            && ((has("grisha-entropy") && (kind != "ichor" || r.simulation_revision.value_or(29.) < 52.))
                 || (kind != "ichor" && has("enemy:beast:gas-immunity"))
                 || (["caustic", "breatherGas"].contains(&kind) && has("enemy:pale:gas-immunity"))))
     {
@@ -3533,6 +3582,7 @@ fn damage_environment_core(
     let cause = match kind {
         "" | "attack" => "",
         "fire" => "Fire",
+        "steam" => "Steam",
         "lightning" => "Lightning",
         "cold" => "Iceblast",
         "acid" => "Acid",
@@ -3564,6 +3614,8 @@ fn damage_environment_core(
             r,
             if kind=="caustic" && victim==r.player.id && source_snapshot.as_ref().is_some_and(|a|crate::revision52_enemy_followups::species(a,"blorb")) {
                 format!("You take {n:.0} damage from the Blorb's caustic slime.")
+            } else if kind=="steam" && victim==r.player.id {
+                format!("Steam scalds you for {n:.0} damage.")
             } else {format!(
                 "{cause} deals {n} damage to {}.",
                 if victim == r.player.id {
@@ -3667,7 +3719,7 @@ fn damage_environment_core(
         }
     }
     crate::half_here::sync(r);
-    after_damage_with_source(r, victim, source, source_snapshot.as_ref(), direct || !matches!(kind, "caustic" | "breatherGas" | "fire" | "poison" | "venom" | "bleeding" | "killspawnBleed" | "hemophilia" | "roots"));
+    after_damage_with_source(r, victim, source, source_snapshot.as_ref(), direct || !matches!(kind, "caustic" | "breatherGas" | "fire" | "steam" | "poison" | "venom" | "bleeding" | "killspawnBleed" | "hemophilia" | "roots"));
     Ok(())
 }
 
@@ -4378,6 +4430,15 @@ pub fn attack_ranged_resolved(
     )?;
     Ok(landed.get())
 }
+/// A committed weapon throw uses the same attack/trajectory as any item throw,
+/// but qualifies for current Execute. Ordinary improvised objects do not.
+pub(crate) fn attack_thrown_weapon_resolved(r:&mut Run,victim:f64,base:f64,range:f64)->Result<bool,EngineError> {
+    let landed=std::cell::Cell::new(false);
+    let resolved=r.floor().is_some_and(crate::non_euclidean_generation::has_links);
+    attack_base_with_accuracy(r,r.player.id,victim,1.,Some(base),false,range,1.,false,
+        None,&landed,false,resolved,false,None,false,1.,true)?;
+    Ok(landed.get())
+}
 /// Bow accuracy is distance-independent without changing projectile semantics.
 /// Collision is already resolved; retain the existing legacy retrace on plain floors.
 pub fn attack_bow_normal_accuracy_resolved(r: &mut Run, victim: f64, base: f64, range: f64) -> Result<bool, EngineError> {
@@ -4387,7 +4448,7 @@ fn attack_bow_scaled_accuracy_resolved(r: &mut Run, victim: f64, base: f64, rang
     let landed = std::cell::Cell::new(false);
     let resolved = r.floor().is_some_and(crate::non_euclidean_generation::has_links);
     attack_base_with_accuracy(r, r.player.id, victim, 1.0, Some(base), false,
-        range, 1.0, true, None, &landed, false, resolved, false, None, true, scale)?;
+        range, 1.0, true, None, &landed, false, resolved, false, None, true, scale, false)?;
     Ok(landed.get())
 }
 pub fn bow_damage_multiplier(revision: f64, item: &Item) -> f64 {
@@ -4434,30 +4495,28 @@ pub fn max_reactions_for_revision(revision: f64, a: &Actor) -> f64 {
     .count() as f64
 }
 
+fn angel_round(r: &Run) -> f64 {
+    r.tick + if r.resolving_tick.value_or(false) { 0.0 } else { 1.0 }
+}
+
+/// The displayed count of The Number of Blood, even if its fifth-turn attack
+/// has already been used. The same clock gates the actual hit.
+pub fn number_of_blood_phase(r: &Run, a: &Actor) -> Option<u8> {
+    let a = actor(r, crate::half_here::owner_id(r, a)).unwrap_or(a);
+    if !a.abilities.iter().any(|id| id == "lichor-the-number-of-blood") { return None; }
+    let phase = angel_round(r) % 5.0;
+    Some(if phase == 0.0 { 5 } else { phase.clamp(1., 4.) as u8 })
+}
+
 pub(crate) fn angel_ready(r: &Run, a: &Actor) -> bool {
     let a = actor(r, crate::half_here::owner_id(r, a)).unwrap_or(a);
-    let round = r.tick
-        + if r.resolving_tick.value_or(false) {
-            0.0
-        } else {
-            1.0
-        };
-    a.abilities
-        .iter()
-        .any(|id| id == "lichor-the-number-of-blood")
-        && round % 5.0 == 0.0
-        && a.conditions
-            .get("angelUsedRound")
-            .is_none_or(|n| *n != round)
+    let round = angel_round(r);
+    a.abilities.iter().any(|id| id == "lichor-the-number-of-blood")
+        && round % 5.0 == 0.0 && a.conditions.get("angelUsedRound") != Some(&round)
 }
 fn mark_angel(r: &mut Run, id: f64) {
     let id = crate::half_here::owner_id(r, actor(r, id).unwrap());
-    let round = r.tick
-        + if r.resolving_tick.value_or(false) {
-            0.0
-        } else {
-            1.0
-        };
+    let round = angel_round(r);
     let a = actor_mut_trusted(r, id).unwrap();
     a.conditions.insert("angelUsed".into(), 1.0);
     a.conditions.insert("angelUsedRound".into(), round);
@@ -4703,6 +4762,7 @@ pub fn resolve_death(
         Some("equipment-loss") => Some("Health lost when equipment was removed"),
         None => None,
         Some("fire") => Some("Fire"),
+        Some("steam") => Some("Steam"),
         Some("caustic") => Some("Caustic gas"),
         Some("ichor") => Some("Caustic ichor"),
         Some("explosion") => Some("An explosion"),
@@ -4713,6 +4773,7 @@ pub fn resolve_death(
         Some("razorleaves") => Some("Razorleaves"),
         Some(
             label @ ("Fire"
+            | "Steam"
             | "Caustic gas"
             | "Caustic ichor"
             | "An explosion"
@@ -5098,4 +5159,118 @@ mod revision52_speed_receipt_tests {
   let mut r=room("wandering");r.player.conditions.insert("unlucky".into(),1.);let player=r.player.id;assert!(!attack_base(&mut r,player,991.,1.,Some(1.),false,4.,1.,true).unwrap());assert!(!surprise_response_blocked(&r,actor(&r,991.).unwrap()));
   let mut r=room("sleeping");r.simulation_revision=51.0.into();let player=r.player.id;attack_base(&mut r,player,991.,1.,Some(1.),false,0.,1.,false).unwrap();assert!(!actor(&r,991.).unwrap().conditions.contains_key("monsterSurprisedThrough"));
  }
+}
+
+#[cfg(test)]mod beckoning_action_tests {
+ use super::*;
+ use crate::{beckoning_skip as skip,revision50_control_amulets as control};
+ fn room()->Run {
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+  r.simulation_revision=52.0.into();r.beckoning_rules_from=0usize.into();r.player.x=12.;r.player.y=14.;
+  r.player.hp=10000.;r.player.max_hp=10000.;r.player.base_max_hp=10000.0.into();r.player.energy=10000.;
+  r.player.stats=Stats{max_energy:10000.,perception:300.,..Default::default()};
+  r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();r.inventory.clear();
+  for a in r.actors.values_mut(){*a=Default::default();}
+  for g in r.ground.values_mut(){*g=Default::default();}
+  r.history.clear();r.future=None;r.haste_snapshot=Field::Missing;r.replay.clear();r.next_id=1000.;r.phase="normal".to_string().into();
+  let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.seen.fill(true);
+  f.environment=Field::Missing;f.doors=Field::Missing;f.vents=Field::Missing;f.portals=Field::Missing;f.non_euclidean=Field::Missing;
+  let mut a=Actor{id:900.,x:17.,y:14.,name:"Giant Rat".into(),glyph:"r".into(),hp:1000.,max_hp:1000.,base_max_hp:1000.0.into(),energy:100.,state:"hunting".into(),stats:Stats{max_energy:100.,offense:100.,accuracy:1000000.,perception:1000.,..Default::default()},..Default::default()};
+  a.conditions.insert("bestiaryTraitsInitialized".into(),1.);r.actors_at_mut(r.depth).push(a);r
+ }
+ fn pull(r:&mut Run){let a=actor(r,900.).unwrap();let(x,y)=(a.x,a.y);control::execute(r,control::ControlEffect::Beckoning,x,y).unwrap();}
+ fn action(r:&mut Run,bonus:bool){complete_actor_action(r,900.,bonus,&[],&mut PathCache::new()).unwrap();}
+ fn equip(r:&mut Run){let mut i=Item{id:950.,kind:"amulet".into(),effect:"beckoning".to_string().into(),..Default::default()};crate::revision50_amulets::initialize_item_for_revision(&mut i,52.).unwrap();crate::revision52_amulet_tiers::initialize_birth(&mut i,52.,1).unwrap();r.inventory.push(i);}
+ #[test]fn beckoning_success_skips_exactly_one_normal_action_without_stun_cue(){
+  let mut r=room();pull(&mut r);let hp=r.player.hp;
+  assert!(actor(&r,900.).unwrap().conditions.contains_key(skip::TAG));
+  crate::events::begin();action(&mut r,false);assert!(crate::events::finish().is_empty());
+  assert_eq!(r.player.hp,hp);assert!(!actor(&r,900.).unwrap().conditions.contains_key(skip::TAG));
+  action(&mut r,false);assert!(r.player.hp<hp);
+ }
+ #[test]fn beckoning_haste_consumes_next_action_then_normal_action_remains(){
+  let mut r=room();actor_mut_trusted(&mut r,900.).unwrap().conditions.insert("hasted".into(),3.);pull(&mut r);let hp=r.player.hp;
+  advance_haste(&mut r).unwrap();assert_eq!(r.player.hp,hp);assert!(!actor(&r,900.).unwrap().conditions.contains_key(skip::TAG));
+  action(&mut r,false);assert!(r.player.hp<hp);
+ }
+ #[test]fn beckoning_ally_failure_and_copied_receipt_are_not_stuns(){
+  let mut r=room();actor_mut_trusted(&mut r,900.).unwrap().state="ally".into();pull(&mut r);assert!(!actor(&r,900.).unwrap().conditions.contains_key(skip::TAG));
+  let mut r=room();let w=r.floor().unwrap().width();for d in movement::DIRECTIONS {r.floor_mut().unwrap().tiles[(14+d.y)as usize*w+(12+d.x)as usize]="wall".into();}
+  let before=r.clone();assert!(control::execute(&mut r,control::ControlEffect::Beckoning,17.,14.).is_err());assert_eq!(r,before);
+  let mut r=room();pull(&mut r);let mut copy=actor(&r,900.).unwrap().clone();copy.id=901.;r.actors_at_mut(r.depth).push(copy);assert!(!skip::consume(&mut r,901.));
+  actor_mut_trusted(&mut r,900.).unwrap().state="ally".into();assert!(!skip::consume(&mut r,900.));
+ }
+ #[test]fn beckoning_horn_only_player_side_effective_enemy_relocation_marks(){
+  let mut r=room();let mut horn=crate::population::create_actor_revision("horn-3",901.,10.,14.,false,52.).unwrap();horn.state="ally".into();horn.energy=100.;horn.abilities=vec!["enemy:beast:beckon".into()];r.actors_at_mut(r.depth).push(horn);
+  assert!(crate::monster_horn::special_action(&mut r,901.,900.).unwrap());assert!(actor(&r,900.).unwrap().conditions.contains_key(skip::TAG));
+  let mut r=room();let mut horn=crate::population::create_actor_revision("horn-3",901.,5.,14.,false,52.).unwrap();horn.state="hunting".into();horn.energy=100.;horn.abilities=vec!["enemy:beast:beckon".into()];r.actors_at_mut(r.depth).push(horn);
+  let player=r.player.id;assert!(crate::monster_horn::special_action(&mut r,901.,player).unwrap());assert!(!r.player.conditions.contains_key(skip::TAG));
+ }
+ #[test]fn beckoning_pending_skip_roundtrips_rewinds_and_offscreen_haste_consumes(){
+  let mut r=room();pull(&mut r);let snapshot=crate::temporal::Snapshot::capture(&r);
+  let saved=crate::storage::serialize(&r).unwrap();let mut loaded=crate::storage::deserialize(&saved).unwrap();assert!(skip::consume(&mut loaded,900.));
+  assert!(skip::consume(&mut r,900.));snapshot.restore(&mut r).unwrap();assert!(actor(&r,900.).unwrap().conditions.contains_key(skip::TAG));
+  let anchor=crate::future_anchor::FutureAnchor::capture41(&r).unwrap();assert!(anchor.wire_text().unwrap().contains(skip::TAG));
+  actor_mut_trusted(&mut r,900.).unwrap().conditions.insert("hasted".into(),2.);offscreen_haste_actions(&mut r).unwrap();assert!(!actor(&r,900.).unwrap().conditions.contains_key(skip::TAG));
+ }
+ #[test]fn beckoning_real_cast_and_legacy_replays_restart_exactly(){
+  for legacy in [false,true]{
+   let mut initial=room();equip(&mut initial);initial.beckoning_rules_from=if legacy{Field::Null}else{0usize.into()};
+   let mut e=crate::temporal::Engine::new(initial.clone()).unwrap();let hp=e.run.player.hp;
+   e.dispatch(&Command::UseAt{id:950.,x:17.,y:14.}).unwrap();
+   if !legacy{assert_eq!(e.run.player.hp,hp);}else{assert!(e.run.player.hp<hp);}
+   e.dispatch(&Command::Wait).unwrap();
+   let record=crate::replay::ReplayRecord::try_from_run(&e.run).unwrap();let mut replay=crate::replay::ReplaySession::from_initial(initial,record).unwrap();
+   for restart in [false,true]{if restart{replay.restart().unwrap();}while replay.step().unwrap(){}assert_eq!(replay.engine.save().unwrap(),e.save().unwrap());}
+  }
+ }
+}
+
+#[cfg(test)]
+mod ichor_immunity_tests {
+    use super::*;
+    fn room() -> Run {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into();
+        r.player.abilities.clear(); r.player.active.clear(); r.player.conditions.clear();
+        r.inventory.clear(); r.actors_at_mut(r.depth).clear();
+        r.player.hp=500.; r.player.max_hp=500.; r.player.stats.dr=0.;
+        r
+    }
+    fn packet(r: &mut Run, kind: &str) {
+        let id=r.player.id;
+        damage_environment(r,id,20.,None,kind,true).unwrap();
+    }
+    #[test]
+    fn entropy_blocks_caustic_but_not_ichor_damage() {
+        for active in [false,true] {
+            let mut r=room();
+            r.player.abilities.push("grisha-entropy".into());
+            if active {r.player.active.push("grisha-entropy".into());}
+            packet(&mut r,"caustic"); packet(&mut r,"breatherGas");
+            assert_eq!(r.player.hp,500.);
+            let mut baseline=room(); packet(&mut baseline,"ichor");
+            packet(&mut r,"ichor");
+            assert!(r.player.hp<500.);
+            assert_eq!(r.player.hp,baseline.player.hp);
+        }
+    }
+    #[test]
+    fn ichor_gas_traits_and_fish_fire_immunity_stay_separate() {
+        for immunity in ["enemy:beast:gas-immunity","enemy:pale:gas-immunity"] {
+            let mut r=room(); r.player.abilities.push(immunity.into());
+            packet(&mut r,"caustic"); assert_eq!(r.player.hp,500.);
+            packet(&mut r,"ichor"); assert!(r.player.hp<500.);
+        }
+        let mut r=room();r.player.abilities.push("grisha-entropy".into());
+        packet(&mut r,"fire"); assert!(r.player.hp<500.);
+        r.player.creature_kind="lesser-ichor-fish".to_string().into();
+        let hp=r.player.hp;packet(&mut r,"fire"); assert_eq!(r.player.hp,hp);
+    }
+    #[test]
+    fn historical_entropy_packet_semantics_are_retained() {
+        let mut r=room();r.simulation_revision=51.0.into();
+        r.player.abilities.push("grisha-entropy".into());
+        packet(&mut r,"ichor");assert_eq!(r.player.hp,500.);
+    }
 }

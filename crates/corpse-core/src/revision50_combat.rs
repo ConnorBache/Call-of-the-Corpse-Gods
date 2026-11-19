@@ -44,16 +44,27 @@ pub fn oblivious_blocks(r: &Run, target: &Actor, source: Option<&Actor>) -> bool
             || crate::vision::detection_chance(r, target, s) <= 0.
     })
 }
-/// Call once after a strike lands, before mitigation. Execute does not spend on
-/// a miss, a full-quarter-health target, insufficient funds, or Witch-Hatred kill.
+/// Pre-damage terminal effects. Current Execute waits for actual ordinary HP loss.
+fn pay_execute(r: &mut Run, a: &Actor, b: &Actor) -> bool {
+    let killed = abilities::endpoint_active(r, a, EXECUTE)
+        && crate::revision50_ability_energy::spend(r, a.id, EXECUTE, execute_cost(r.simulation_revision.value_or(29.)));
+    if killed {crate::animation_shapes::nova(r,b,"P02","nova-red-small",2);}
+    killed
+}
 pub fn lethal_hit(r: &mut Run, a: &Actor, b: &Actor) -> bool {
     if !enabled(r) || !enemies(r, a, b) { return false; }
     if witch_senses(r, a, b) { crate::animation_shapes::area(r,b,"P54","box-expand",2,"#501060",crate::events::Stage::Special); return true; }
+    if crate::execute_rules::current(r) {return false;}
     let health = owner(r, b);
     let eligible = health.hp > 0. && health.hp < health.max_hp * 0.25;
-    let killed=eligible && abilities::endpoint_active(r, a, EXECUTE) && crate::revision50_ability_energy::spend(r, a.id, EXECUTE, execute_cost(r.simulation_revision.value_or(29.)));
-    if killed {crate::animation_shapes::nova(r,b,"P02","nova-red-small",2);}
-    killed
+    eligible && pay_execute(r, a, b)
+}
+
+/// The caller has already applied ordinary HP loss, including redirection.
+/// Neither ordinary overkill nor targets already below the threshold spend energy.
+pub fn execute_crossing(r: &mut Run, a: &Actor, b: &Actor, hp_before: f64, quarter: f64, hp_after: f64) -> bool {
+    crate::execute_rules::current(r) && hp_before >= quarter && hp_after > 0. && hp_after < quarter
+        && enemies(r, a, b) && pay_execute(r, a, b)
 }
 fn cell_open(r: &Run, a: &Actor, x: f64, y: f64, ignored: Option<f64>) -> bool {
     if !engine::actor_passable(r, a, x, y) || engine::bulwark_blocks(r, a, x, y) { return false; }
@@ -111,10 +122,11 @@ fn push_step(r: &mut Run, id: f64, dx: f64, dy: f64) -> Result<bool, engine::Eng
 }
 /// Call once for an attempted attack after damage/reactions, including misses.
 /// Uses the original attack squares so an enemy killed by the hit still yields
-/// its square to Unstoppable Force. Commandment runs after the advance.
+/// its square to Unstoppable Force. Commandment runs after the advance only
+/// after a landed hit under current rules.
 /// Maximum push visits at most V distinct cells (portal loops stop); O(V*A*P)
 /// collision work, O(V) memory, plus existing arrival/plane/portal helper costs.
-pub fn after_attack(r: &mut Run, attacker: &Actor, target: &Actor) -> Result<(), engine::EngineError> {
+pub fn after_attack(r: &mut Run, attacker: &Actor, target: &Actor, landed: bool) -> Result<(), engine::EngineError> {
     if !enabled(r) || !enemies(r, attacker, target) { return Ok(()); }
     let depth = r.depth;
     let Some(a) = engine::actor(r, attacker.id).cloned().filter(|a| a.hp > 0. && !a.dead.value_or(false)) else { return Ok(()); };
@@ -149,7 +161,7 @@ pub fn after_attack(r: &mut Run, attacker: &Actor, target: &Actor) -> Result<(),
         }
     }
     if r.depth != depth || r.status != "playing" { return Ok(()); }
-    if !has(owner(r, &a), COMMANDMENT) { return Ok(()); }
+    if (!landed && crate::commandment_rules::current(r)) || !has(owner(r, &a), COMMANDMENT) { return Ok(()); }
     let Some(b) = engine::actor(r, target.id).cloned().filter(|b| b.hp > 0. && !b.dead.value_or(false)) else { return Ok(()); };
     let Some(current_attacker) = engine::actor(r, a.id).filter(|a| a.hp > 0. && !a.dead.value_or(false)) else { return Ok(()); };
     let (dx,dy) = crate::portals::direction_toward(r, current_attacker, b.x, b.y);
@@ -158,18 +170,20 @@ pub fn after_attack(r: &mut Run, attacker: &Actor, target: &Actor) -> Result<(),
     let limit = if maximum { r.floor().map_or(0, |f| f.tiles.len()) } else { 1 };
     let mut seen = std::collections::HashSet::new();
     seen.insert((b.x as i32,b.y as i32));
+    let mut route=crate::events::TravelRoute::default();
     for _ in 0..limit {
         let before=engine::actor(r,b.id).cloned();
         if !push_step(r, b.id, dx, dy)? { break; }
-        if r.depth==depth {if let (Some(before),Some(after))=(before,engine::actor(r,b.id)) {
+        if maximum && r.depth==depth {if let (Some(before),Some(after))=(before,engine::actor(r,b.id)) {
             let glyph=crate::actor_presentation::apparent_kind(r,&before)
                 .and_then(|kind|crate::population::catalog().actors.get(kind)).map(|a|a.glyph.as_str()).unwrap_or(&before.glyph);
-            crate::events::travel(r,&before,"P60","moving-actor",&[(&before).into(),after.into()],crate::events::Delivery::Projectile,Some(glyph));
+            route.capture(r,&before,&[(&before).into(),after.into()],glyph);
         }}
         if r.depth != depth || r.status != "playing" || engine::actor(r, a.id).is_none() { break; }
         let Some(b) = engine::actor(r, b.id) else { break; };
         if !seen.insert((b.x as i32,b.y as i32)) { break; }
     }
+    route.finish();
     Ok(())
 }
 
@@ -257,7 +271,7 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
  #[test] fn committed_push_and_swap_have_distinct_oriented_styles(){
   for swap in [false,true] {
    let (mut r,b)=room();if swap {let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+4]="wall".into();}
-   let a=r.player.clone();crate::events::begin();after_attack(&mut r,&a,&b).unwrap();let events=crate::events::finish();
+   let a=r.player.clone();crate::events::begin();after_attack(&mut r,&a,&b,true).unwrap();let events=crate::events::finish();
    let styles:Vec<_>=events.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P05").map(|a|a.style.as_str()).collect();
    assert!(styles.contains(&if swap{"arc-swap-forward"}else{"wave-advance"}),"{styles:?}");
    assert!(styles.contains(&if swap{"arc-swap-reverse"}else{"speed-push"}),"{styles:?}");
@@ -266,14 +280,14 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
  }
  #[test] fn dead_target_has_no_displacement_mark(){
   let (mut r,mut b)=room();b.hp=0.;b.dead=true.into();*engine::actor_mut_trusted(&mut r,b.id).unwrap()=b.clone();
-  let a=r.player.clone();crate::events::begin();after_attack(&mut r,&a,&b).unwrap();let events=crate::events::finish();
+  let a=r.player.clone();crate::events::begin();after_attack(&mut r,&a,&b,true).unwrap();let events=crate::events::finish();
   assert!(!events.iter().filter_map(|e|e.animation.as_ref()).any(|a|a.style=="speed-push"||a.style=="arc-swap-reverse"));
  }
 }
 
 #[cfg(test)] mod animation_commandment_style_tests {
  use super::*;
- #[test] fn every_push_step_animates_the_actor_with_white_trail(){
+ #[test] fn only_paid_push_has_one_grouped_observed_route(){
   for mode in [0,1,2] {
    let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();r.player.x=2.;r.player.y=2.;r.player.conditions.clear();r.player.abilities=vec![COMMANDMENT.into()];r.player.active=if mode==0{vec![]}else{r.player.abilities.clone()};r.player.energy=0.;r.player.ability_reserves=crate::Field::Missing;r.inventory.clear();
    // The paid push still costs 20: ten reserve plus ten main energy in R52.
@@ -281,11 +295,29 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
    crate::revision50_ability_energy::initialize_reserve(&mut r.player,COMMANDMENT,10.,if mode==1{10.}else{0.}).unwrap();
    let mut target=r.player.clone();target.id=900.;target.x=3.;target.state="hunting".into();target.abilities.clear();target.active.clear();target.ability_reserves=crate::Field::Missing;r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(target.clone());
    let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=crate::Field::Missing;f.non_euclidean=crate::Field::Missing;let w=f.width();f.tiles[2*w+6]="wall".into();
-   let a=r.player.clone();crate::events::begin();after_attack(&mut r,&a,&target).unwrap();let e=crate::events::finish();let styles:Vec<_>=e.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P60").map(|a|a.style.as_str()).collect();
-   assert_eq!(styles,if mode==1{vec!["moving-actor","moving-actor"]}else{vec!["moving-actor"]});
+   let a=r.player.clone();crate::events::begin();after_attack(&mut r,&a,&target,true).unwrap();let e=crate::events::finish();let styles:Vec<_>=e.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="P60").map(|a|a.style.as_str()).collect();
+   assert_eq!(styles,if mode==1{vec!["moving-actor-commandment"]}else{vec![]});
+   if mode==1 {let cue=e.iter().filter_map(|e|e.animation.as_ref()).find(|a|a.proposal=="P60").unwrap();assert_eq!(cue.cells.iter().map(|p|p.x).collect::<Vec<_>>(),vec![3.,4.,5.]);}
    assert_eq!(engine::actor(&r,900.).unwrap().x,if mode==1{5.}else{4.});
    let reserve=&r.player.ability_reserves.as_ref().unwrap()[COMMANDMENT];assert_eq!((reserve.capacity,reserve.energy,r.player.energy),(10.,0.,0.));
   }
+ }
+}
+
+#[cfg(test)] mod commandment_route_receipt_tests {
+ use super::*;
+ #[test] fn grouped_receipt_keeps_only_observed_route_cells_and_portal_gap(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+  r.simulation_revision=52.0.into();r.player.x=2.;r.player.y=2.;r.player.abilities.clear();r.player.conditions.clear();
+  let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);
+  let p=|x|crate::events::EventPoint{x,y:2.};
+  crate::events::begin();let mut route=crate::events::TravelRoute::default();
+  route.capture(&r,&r.player,&[p(2.),p(3.)],"@");
+  route.capture(&r,&r.player,&[p(3.),p(-1.),p(8.)],"@");
+  // The old-floor receipt remains valid even if an arrival changes floors.
+  let depth=r.depth;r.depth+=1.;route.finish();let events=crate::events::finish();
+  assert_eq!(events.len(),1);assert_eq!(events[0].depth,depth);
+  assert_eq!(events[0].animation.as_ref().unwrap().cells.iter().map(|p|p.x).collect::<Vec<_>>(),vec![2.,3.,8.]);
  }
 }
 
@@ -294,7 +326,7 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
     #[test] fn execute_spends_ten_reserve_first_and_preserves_threshold_and_legacy_cost(){
         for(reserve,energy,expected,remain)in[(10.,0.,true,0.),(5.,5.,true,0.),(0.,10.,true,0.),(5.,4.,false,4.)]{
             let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
-            r.simulation_revision=52.0.into();r.player.abilities=vec![EXECUTE.into()];r.player.active=vec![EXECUTE.into()];r.player.energy=energy;
+            r.simulation_revision=52.0.into();r.execute_rules_from=crate::Field::Null;r.player.abilities=vec![EXECUTE.into()];r.player.active=vec![EXECUTE.into()];r.player.energy=energy;
             crate::revision50_ability_energy::initialize_reserve(&mut r.player,EXECUTE,10.,reserve).unwrap();
             let a=r.player.clone();let mut b=Actor{id:9999.,state:"hunting".into(),hp:24.,max_hp:100.,..Default::default()};
             assert_eq!(lethal_hit(&mut r,&a,&b),expected);assert_eq!(r.player.energy,remain);
@@ -303,4 +335,24 @@ pub fn masochism_after_hp_loss(r: &mut Run, victim: f64, before_hp: f64) {
         }
         assert_eq!(execute_cost(51.),20.);assert_eq!(execute_cost(52.),10.);
     }
+}
+
+#[cfg(test)] mod slippery_presentation_tests {
+ use super::*;
+ #[test] fn activation_box_remains_but_paid_block_has_no_repeat(){
+  let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+  let id="isheilah-make-slippery";
+  r.simulation_revision=52.0.into();r.player.x=2.;r.player.y=2.;r.player.conditions.clear();r.player.active.clear();r.player.abilities=vec![id.into()];r.inventory.clear();
+  r.player.energy=100.;crate::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,0.).unwrap();
+  let mut target=r.player.clone();target.id=990.;target.x=3.;target.state="hunting".into();target.abilities.clear();target.active.clear();
+  r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(target.clone());
+  let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);f.portals=crate::Field::Missing;f.non_euclidean=crate::Field::Missing;
+  let before=crate::animation_player::Snapshot::capture(&r).unwrap();
+  r.player.active.push(id.into());r.player.conditions.insert("slipperyTarget".into(),target.id);
+  crate::events::begin();before.finish(&r);let activation=crate::events::finish();
+  assert!(activation.iter().filter_map(|e|e.animation.as_ref()).any(|a|a.proposal=="P15"&&a.style=="box-contract"));
+  crate::events::begin();assert!(!engine::move_actor(&mut r,target.id,0.,1.,true).unwrap());let blocked=crate::events::finish();
+  assert!(!blocked.iter().filter_map(|e|e.animation.as_ref()).any(|a|a.proposal=="P15"));
+  let after=engine::actor(&r,target.id).unwrap();assert_eq!((after.x,after.y),(target.x,target.y));assert_eq!(r.player.energy,92.);
+ }
 }

@@ -227,6 +227,7 @@ pub trait FireScan {
     fn size(&self) -> GridSize;
     fn is_fire(&self, i: usize) -> bool;
     fn caught_fire(&self, i: usize) -> bool;
+    fn spreads_neighbors(&self, _i: usize) -> bool { true }
     fn expose(&mut self, i: usize, source: usize);
 }
 pub fn spread_existing_fire(g: &mut impl FireScan) {
@@ -235,7 +236,11 @@ pub fn spread_existing_fire(g: &mut impl FireScan) {
         if !g.is_fire(i) || g.caught_fire(i) {
             continue;
         }
+        // Same-cell interactions still run even when this source's cadence
+        // does not allow it to spread across an edge on this world step.
+        let spreads = g.spreads_neighbors(i);
         g.expose(i, i);
+        if !spreads { continue; }
         for (dx, dy) in CARDINALS {
             if let Some(j) = size.adjacent(i, dx, dy) {
                 g.expose(j, i)

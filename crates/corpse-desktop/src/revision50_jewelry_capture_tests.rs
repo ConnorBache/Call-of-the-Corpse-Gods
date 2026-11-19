@@ -139,10 +139,8 @@ fn revision50_jewelry_capture_actual_item_hovers() {
     let mut p=Painter::new();let base=crate::observe::observe(&r);p.game_at(&base,"",false,0.);let baseline=p.pixels.clone();
     let report=crate::inspection_ui::observe_tile(&r,11,10);
     assert!(crate::inspection_ui::hover_available(&report));assert!(report.creature.is_none());
-    let (cw,ch,ox,oy)=p.map_layout(base.width,base.height);
-    let tile=(ox+11*cw,oy+10*ch,ox+12*cw,oy+11*ch);
     let before=serde_json::to_vec(&r).unwrap();
-    crate::inspection_ui::paint_hover_at(&report,&mut p,tile);assert_ne!(p.pixels,baseline);
+    crate::inspection_ui::paint_hover(&report,&mut p);assert_ne!(p.pixels,baseline);
     capture(&p,"freezing-ground-hover");
     p.game_at(&base,"",false,0.);assert_eq!(p.pixels,baseline);
     assert_eq!(serde_json::to_vec(&r).unwrap(),before);

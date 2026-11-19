@@ -223,6 +223,17 @@ pub mod amulet_rules;
 pub mod potion_rules;
 pub mod ring_rules;
 pub mod gas_rules;
+pub mod commandment_rules;
+pub mod screamer_rules;
+pub mod ember_rules;
+/// Ragelight passive rescue amendment and legacy replay boundary.
+pub mod ragelight_rules;
+pub mod steam_rules;
+pub mod execute_rules;
+pub mod beckoning_rules;
+pub mod ichor_fire_rules;
+mod beckoning_skip;
+pub mod screamer_schedule;
 pub mod future_floor;
 pub mod animation_player;
 pub mod animation_shapes;
@@ -256,3 +267,5 @@ mod blood_mist;
 mod verdania_guard;
 
 #[cfg(test)] mod animation_video_fixtures;
+
+pub mod avatar_starters;

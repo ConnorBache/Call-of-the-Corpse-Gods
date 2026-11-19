@@ -184,6 +184,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
                 .unwrap()
                 .conditions
                 .shift_remove("forcedMove");
+            if relocated {crate::beckoning_skip::after_pull(r,id,target);}
             let b = actor(r, target).unwrap().clone();
             if crate::events::enabled(r) {if relocated {crate::animation_enemy::mark(r,&b,"E39","bracket-unfold-gold",crate::events::Stage::Special);}}
             else {crate::events::actor_event(r, &b, "pulse", "Appear", None, None);}

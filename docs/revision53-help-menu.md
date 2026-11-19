@@ -24,9 +24,9 @@ Windows runtime validation.
 Enter enters keyboard inspection at the current valid hover coordinate, or the
 player position. Direction keys move the detached cursor within map bounds.
 Enter again uses the existing map-click path, including travel, attack and
-hazard admission. Escape leaves cursor mode without opening the menu; a later
-fresh Escape retains existing menu behavior. Held Enter/Escape do not repeat
-confirmation or open the menu after cursor exit. Mouse motion takes ownership.
+hazard admission. Escape leaves cursor mode without opening the menu. A later
+fresh Escape also leaves the live run open. Held Enter/Escape do not repeat
+confirmation. Mouse motion takes ownership.
 Other panels, targeting and world replacement clear general cursor mode.
 
 Z dispatches the existing single-turn Wait command; Shift+Z retains rest until
@@ -44,7 +44,7 @@ descriptions. No simulation, save, RNG or time-travel rules are changed.
   IDs are preserved. Main Menu also has a top-right `?` button.
 - F1 and Shift+Slash (`?`) open Help when the underlying view has no conflicting
   modal. The former Shift+Slash-to-Menu behavior becomes Help; the distinct Menu
-  button and Escape retain menu access.
+  button leaves an active run.
 - The heading says Commands, followed by two-column rows. Information is a
   separate heading inside the same scrollable body. Labels are yellow
   `[255,217,53]`; descriptions are white `[255,255,255]`.

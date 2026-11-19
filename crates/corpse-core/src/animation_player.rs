@@ -54,8 +54,8 @@ const TOGGLES:&[(&str,&str,&str)]=&[
  ("ursa-dream-see","P35","eye"),("dawel-unspeak","P45","sound"),
  ("dawel-reverse-entropy","P46","diamond"),("dawel-shadow-in-the-dark","P47","collapse"),
  ("dawel-not-there","P48","split-ring"),("grisha-entropy","P50","spiral"),
- ("grisha-erase-metaphysical","P51","fracture"),("grisha-black-pit","P53","collapse"),
- ("anavani-shine","P55","rise"),("anavani-nova","P57","diamond"),
+ ("grisha-black-pit","P53","collapse"),
+ ("anavani-shine","P55","rise"),
  ("anavani-star-power","P59","ember"),("anavani-commandment","P60","wave"),
  ("morae-bonded-by-unseen-threads","P68","stitch"),("morae-turning-the-wheel","P69","gear")];
 
@@ -63,17 +63,22 @@ const TOGGLES:&[(&str,&str,&str)]=&[
 /// S is existing effective-stat/health derivation for Hardened Blood owners only;
 /// K is bounded actor metadata. No floor clone, RNG, clock, or saved field.
 /// Only actors actually observed before AND after can generate delta effects.
-pub struct Snapshot { depth:f64, actors:Vec<(Actor,f64)>, dream:bool,number_ready:bool }
+pub struct Snapshot { depth:f64, actors:Vec<(Actor,f64)>, dream:bool }
 impl Snapshot {
  pub fn capture(r:&Run)->Option<Self> {
-  events::enabled(r).then(||Self{depth:r.depth,dream:crate::dreamwalking::active(r),number_ready:engine::angel_ready(r,&r.player),actors:std::iter::once(&r.player)
+  events::enabled(r).then(||Self{depth:r.depth,dream:crate::dreamwalking::active(r),actors:std::iter::once(&r.player)
    .chain(r.actors_at(r.depth)).filter(|a|visible(r,a)).map(|a|(a.clone(),protection_band(r,a))).collect()})
  }
  pub fn finish(self,r:&Run) {
   if !events::enabled(r) {return}
-  if self.dream!=crate::dreamwalking::active(r) {local(r,&r.player,"P73","wake",Stage::Special);}
+  if self.dream!=crate::dreamwalking::active(r) {
+   if crate::dreamwalking::active(r) && !crate::dreamwalking::context_dream(r) {
+    // Present at the committed destination, using its own visibility map.
+    let view=crate::dreamwalking::observation_run(r);
+    crate::animation_shapes::short_nova(&view,&view.player,"P73",crate::animation_shapes::URSA);
+   } else {crate::animation_shapes::short_nova(r,&r.player,"P73",crate::animation_shapes::URSA);}
+  }
   if self.depth!=r.depth {return}
-  if !self.number_ready&&engine::angel_ready(r,&r.player){events::inventory(r,"P42","five-notch",None);}
   for (before,protection_before) in &self.actors {
    let Some(a)=engine::actor(r,before.id).filter(|a|visible(r,a)) else {continue};
    let _command_action=(a.id==r.player.id).then(||events::at_action(r,events::player_action()));
@@ -119,13 +124,10 @@ impl Snapshot {
     let mut center=a.clone();center.x=x;center.y=y;
     crate::animation_shapes::area(r,&center,"P09","box-expand",2,"#ffd340",Stage::Special);
    }
-   for (key,p,style) in [("cameTarget","P08","bracket"),("bloodWeaponReady","P41","droplet"),("distracted","P20","bracket")] {
-    if engine::condition(a,key)>0. && before.conditions.get(key)!=a.conditions.get(key) {
-     if key=="cameTarget" {if let Some(target)=engine::actor(r,engine::condition(a,key)) {crate::animation_shapes::line(r,a,target.into(),p,"thread-grow","#ffd340");}}
-     else {local(r,a,p,style,Stage::Special);}
-    }
+   let came=engine::condition(a,"cameTarget");
+   if came>0. && before.conditions.get("cameTarget")!=a.conditions.get("cameTarget") {
+    if let Some(target)=engine::actor(r,came) {crate::animation_shapes::line(r,a,target.into(),"P08","thread-grow","#ffd340");}
    }
-   if !active(before,"ursa-dream-of-time-gone-by") && active(a,"ursa-dream-of-time-gone-by") {local(r,a,"P33","fold",Stage::Special);}
    let protection_after=protection_band(r,a);
    if has(a,"lichor-hardened-blood") && *protection_before!=protection_after {
     local(r,a,"P40",if protection_after>*protection_before {"shield-harden"}else{"shield-soften"},Stage::Special);
@@ -157,6 +159,13 @@ impl Snapshot {
   assert!(cues.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="P13"&&a.style=="shield")));
   assert!(!cues.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.style=="reaction-spent-missed-me")));
  }
+ #[test] fn nova_toggle_has_no_standalone_animation() {
+  let mut r=room();let snapshot=Snapshot::capture(&r).unwrap();
+  r.player.active.push("anavani-nova".into());
+  events::begin();snapshot.finish(&r);assert!(events::finish().is_empty());
+  let snapshot=Snapshot::capture(&r).unwrap();r.player.active.clear();
+  events::begin();snapshot.finish(&r);assert!(events::finish().is_empty());
+ }
  #[test] fn changed_toggle_once_and_no_upkeep_replay(){let mut r=room();let snap=Snapshot::capture(&r).unwrap();r.player.active.push("numo-mind-read".into());events::begin();snap.finish(&r);let e=events::finish();assert_eq!(e.len(),1);assert_eq!(e[0].animation.as_ref().unwrap().proposal,"P21");let snap=Snapshot::capture(&r).unwrap();events::begin();snap.finish(&r);assert!(events::finish().is_empty());}
  #[test] fn old_revision_and_unchanged_movement_are_silent(){let mut r=room();r.simulation_revision=51.0.into();assert!(Snapshot::capture(&r).is_none());r.simulation_revision=52.0.into();events::begin();moved(&r,&r.player,&r.player,"P13","unfold");assert!(events::finish().is_empty());}
  #[test] fn passive_acquisition_has_inventory_only_once_and_no_map_loop(){let mut r=room();let snap=Snapshot::capture(&r).unwrap();r.player.abilities.extend(["ursa-oblivious","grisha-boundless-hunger","kative-appropriate","isheilah-tools-of-the-trade"].map(str::to_owned));events::begin();snap.finish(&r);let cues=events::finish();assert_eq!(cues.len(),2);assert!(cues.iter().all(|e|e.animation.as_ref().unwrap().surface.as_deref()==Some("inventory")));assert_eq!(cues.iter().map(|e|e.animation.as_ref().unwrap().proposal.as_str()).collect::<Vec<_>>(),vec!["P49","P64"]);let snap=Snapshot::capture(&r).unwrap();events::begin();snap.finish(&r);assert!(events::finish().is_empty());}
@@ -183,7 +192,7 @@ impl Snapshot {
   crate::revision50_ability_energy::initialize_reserve(&mut r.player,crate::revision50_combat::EXECUTE,40.,40.).unwrap();
   let a=r.player.clone();let mut b=r.actors_at(r.depth)[0].clone();b.x=3.;b.y=2.;b.state="hunting".into();b.conditions.clear();b.max_hp=100.;b.hp=25.;
   *crate::engine::actor_mut_trusted(&mut r,b.id).unwrap()=b.clone();events::begin();assert!(!crate::revision50_combat::lethal_hit(&mut r,&a,&b));assert!(proposals().is_empty());
-  b.hp=24.;*crate::engine::actor_mut_trusted(&mut r,b.id).unwrap()=b.clone();events::begin();assert!(crate::revision50_combat::lethal_hit(&mut r,&a,&b));assert_eq!(proposals(),vec!["P02"]);
+  b.hp=24.;*crate::engine::actor_mut_trusted(&mut r,b.id).unwrap()=b.clone();events::begin();assert!(crate::revision50_combat::execute_crossing(&mut r,&a,&b,25.,25.,24.));assert_eq!(proposals(),vec!["P02"]);
  }
  #[test] fn full_health_heal_and_empty_reaction_are_quiet(){
   let mut r=room();r.player.abilities=vec![crate::divine_combat::FIGHT_LONG.into()];let a=r.player.clone();
@@ -242,12 +251,171 @@ pub fn shadow_active(r:&Run,a:&Actor)->bool {
    events::begin();snap.finish(&r);let cues=events::finish();assert_eq!(cues.len(),1);assert_eq!(cues[0].animation.as_ref().unwrap().style,if hidden{"stitch"}else{"thread-grow"});assert_eq!(cues[0].from.is_some(),!hidden);
   }
  }
- #[test] fn real_rescues_blood_gain_and_bleed_have_distinct_styles(){
-  for (ability,style) in [(crate::divine_rescues::RAGE,"nova-red-small"),(crate::divine_rescues::PELIAN,"nova-blue-small"),(crate::divine_rescues::OVERFLOWING,"droplet-empty")] {
+ #[test] fn real_rescues_and_bleed_animate_but_blood_gain_is_quiet(){
+  for (ability,style) in [(crate::divine_rescues::RAGE,"nova-red-small"),(crate::divine_rescues::PELIAN,"nova-blue-small"),(crate::divine_rescues::OVERFLOWING,crate::animation_shapes::SHORT_NOVA)] {
    let mut r=room();r.player.abilities=vec![ability.into()];r.player.active=r.player.abilities.clone();r.player.blood=1.0.into();r.player.hp=-1.;let id=r.player.id;events::begin();assert!(crate::divine_rescues::try_rescue(&mut r,id,false));assert_eq!(styles(),vec![style]);
   }
-  let mut r=room();r.player.abilities=vec![crate::divine_rescues::OVERFLOWING.into()];r.player.blood=0.0.into();r.player.damage_bank=0.0.into();let id=r.player.id;events::begin();crate::divine_rescues::accrue_damage(&mut r,id,50.);assert_eq!(styles(),vec!["droplet-fill"]);
+  let mut r=room();r.player.abilities=vec![crate::divine_rescues::OVERFLOWING.into()];r.player.blood=0.0.into();r.player.damage_bank=0.0.into();let id=r.player.id;events::begin();crate::divine_rescues::accrue_damage(&mut r,id,50.);assert!(styles().is_empty());
   r.player.abilities=vec![crate::divine_reactions::BLEED.into()];let a=r.player.clone();let mut b=a.clone();b.id=900.;b.x+=1.;b.state="hunting".into();r.actors_at_mut(r.depth).push(b);
   events::begin();crate::divine_reactions::apply_bleeding(&mut r,&a,900.,10.,10.);assert_eq!(styles(),vec!["droplet-two"]);
  }
+}
+
+#[cfg(test)]
+mod tier_novas {
+    use super::*;
+    use crate::{Field, animation_shapes as shapes};
+
+    fn room() -> Run {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        r.player.x=10.;r.player.y=10.;r.player.hp=100.;r.player.max_hp=100.;
+        r.player.energy=1000.;r.player.stats.max_energy=1000.;
+        r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
+        r.inventory.clear();r.next_id=1000.;
+        r.actors_at_mut(r.depth).clear();
+        let floor=r.floor_mut().unwrap();floor.tiles.fill("floor".into());floor.lights.fill(100.);
+        floor.portals=Field::Missing;floor.non_euclidean=Field::Missing;floor.environment=Field::Missing;
+        floor.doors=Field::Missing;
+        let mut target=crate::population::create_actor_revision("rat",900.,11.,10.,false,52.).unwrap();
+        target.hp=40.;target.max_hp=100.;target.state="hunting".into();target.abilities.clear();target.active.clear();target.conditions.clear();
+        r.actors_at_mut(r.depth).push(target);
+        r
+    }
+    fn grant(r:&mut Run,id:&str) {
+        r.player.abilities.push(id.into());
+        crate::revision50_ability_energy::acquire_for_revision(&mut r.player,&[id.into()],52.).unwrap();
+    }
+    fn activate(r:&mut Run,id:&str,target:Option<f64>) -> Vec<events::PresentationEvent> {
+        let before=Snapshot::capture(r).unwrap();
+        events::begin();
+        crate::abilities::activate(r,id,&target.map_or(Field::Missing,Field::Value),&Field::Missing,&Field::Missing).unwrap();
+        before.finish(r);
+        events::finish()
+    }
+    fn assert_one(events:&[events::PresentationEvent],p:&str,color:&str,at:(f64,f64)) {
+        let cue:Vec<_>=events.iter().filter(|e| e.animation.as_ref().is_some_and(|a|a.proposal==p)).collect();
+        assert_eq!(cue.len(),1,"{p} {events:?}");
+        assert_eq!(cue[0].color.as_deref(),Some(color));
+        assert_eq!(cue[0].animation.as_ref().unwrap().style,shapes::SHORT_NOVA);
+        assert_eq!((cue[0].to.x,cue[0].to.y),at);
+        assert!(cue[0].from.is_none());
+    }
+    fn none(events:&[events::PresentationEvent],p:&str) {
+        assert!(!events.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal==p)));
+    }
+
+    #[test]
+    fn tier_nova_dream_return_waits_for_actual_relocation() {
+        let mut r=room();let id="ursa-dream-of-time-gone-by";grant(&mut r,id);
+        none(&activate(&mut r,id,None),"P33"); // setting the anchor
+        none(&activate(&mut r,id,None),"P33"); // at the same position
+        none(&activate(&mut r,id,None),"P33"); // anchor again
+        r.player.x=9.;
+        let at=10*r.floor().unwrap().width()+10;
+        r.floor_mut().unwrap().tiles[at]="wall".into();
+        none(&activate(&mut r,id,None),"P33"); // blocked return did not commit
+        assert_eq!(r.player.x,9.);
+        r.floor_mut().unwrap().tiles[at]="floor".into();
+        assert_one(&activate(&mut r,id,None),"P33",shapes::URSA,(10.,10.));
+    }
+    #[test]
+    fn tier_nova_distract_remember_and_sever_emit_only_the_confirmed_effect() {
+        let mut r=room();
+        let distract="numo-distract";grant(&mut r,distract);
+        none(&activate(&mut r,distract,None),"P20");
+        assert_one(&activate(&mut r,distract,Some(900.)),"P20",shapes::NUMO,(11.,10.));
+        // An invisible recipient must not leak an actor cue even if applied.
+        r.actors_at_mut(r.depth)[0].conditions.insert("invisible".into(),10.);
+        none(&activate(&mut r,distract,Some(900.)),"P20");
+
+        let remember="numo-remember";grant(&mut r,remember);
+        r.actors_at_mut(r.depth)[0].abilities.push("shrail-fight-long".into());
+        assert_one(&activate(&mut r,remember,Some(900.)),"P24",shapes::NUMO,(10.,10.));
+        none(&activate(&mut r,remember,Some(900.)),"P24");
+
+        let sever="morae-sever-fate";grant(&mut r,sever);
+        r.actors_at_mut(r.depth)[0].conditions.shift_remove("invisible");
+        r.actors_at_mut(r.depth)[0].hp=51.;
+        none(&activate(&mut r,sever,Some(900.)),"P70");
+        r.actors_at_mut(r.depth)[0].hp=49.;
+        assert_one(&activate(&mut r,sever,Some(900.)),"P70",shapes::MORAE,(11.,10.));
+        none(&activate(&mut r,sever,Some(900.)),"P70");
+    }
+    #[test]
+    fn tier_nova_blood_cleanse_charge_hit_and_sleep_onset() {
+        let mut r=room();
+        let let_blood="lichor-blood-letting";grant(&mut r,let_blood);
+        none(&activate(&mut r,let_blood,None),"P39");
+        r.player.conditions.insert("poisoned".into(),5.);
+        r.player.conditions.insert("slowed".into(),5.);
+        assert_one(&activate(&mut r,let_blood,None),"P39",shapes::LICHOR,(10.,10.));
+
+        let weapon="lichor-blood-weapon";grant(&mut r,weapon);
+        none(&activate(&mut r,weapon,None),"P41");
+        let player=r.player.id;
+        events::begin();
+        engine::attack(&mut r,player,900.,1.).unwrap();
+        assert_one(&events::finish(),"P41",shapes::LICHOR,(11.,10.));
+
+        let mut r=room();grant(&mut r,weapon);activate(&mut r,weapon,None);
+        r.player.conditions.insert("distracted".into(),1.);
+        events::begin();engine::attack(&mut r,player,900.,1.).unwrap();
+        none(&events::finish(),"P41");
+        assert_eq!(engine::condition(&r.player,"bloodWeaponReady"),0.);
+
+        let sleep="ursa-sudden-sleep";grant(&mut r,sleep);
+        assert_one(&activate(&mut r,sleep,None),"P32",shapes::URSA,(10.,10.));
+        let before=Snapshot::capture(&r).unwrap();events::begin();before.finish(&r);
+        none(&events::finish(),"P32");
+    }
+    #[test]
+    fn tier_nova_planes_and_masque_emit_once_only_on_success() {
+        let mut r=room();
+        r.dreamwalking=crate::dreamwalking::State{unlocked:true,..Default::default()}.into();
+        for _ in 0..2 {
+            let before=Snapshot::capture(&r).unwrap();
+            events::begin();
+            assert_eq!(crate::dreamwalking::ability(&mut r,crate::dreamwalking::DREAMWALK_ID).unwrap(),Some(true));
+            before.finish(&r);
+            assert_one(&events::finish(),"P73",shapes::URSA,(10.,10.));
+        }
+        let before=Snapshot::capture(&r).unwrap();events::begin();before.finish(&r);none(&events::finish(),"P73");
+
+        // The Masque only chooses cells in an actual stair-connected area.
+        let f=r.floor_mut().unwrap();let w=f.width();
+        f.tiles[w+1]="up".into();f.tiles[2*w+2]="down".into();
+        r.inventory.push(crate::ahvamitt::mask_for_revision(1300.,52.));
+        events::begin();assert!(crate::ahvamitt::teleport(&mut r).unwrap());
+        assert_one(&events::finish(),"P74",shapes::ISHEILAH,(r.player.x,r.player.y));
+        events::begin();assert!(!crate::ahvamitt::teleport(&mut r).unwrap());none(&events::finish(),"P74");
+    }
+    #[test]
+    fn tier_nova_ascend_is_quiet_on_rollback_but_plays_once_on_arrival() {
+        let mut r=room();let ascend="anavani-ascend";grant(&mut r,ascend);
+        let at=10*r.floor().unwrap().width()+10;
+        r.floor_mut().unwrap().tiles[at]="chasm".into();
+        let blocker=&mut r.actors_at_mut(1.)[0];
+        blocker.x=10.;blocker.conditions.insert("paralyzed".into(),10.);
+        r.depth=2.;r.actors_at_mut(2.).clear();
+        let energy=r.player.energy;
+        none(&activate(&mut r,ascend,None),"P56");
+        assert_eq!(r.depth,2.);assert_eq!(r.player.energy,energy);
+        r.actors_at_mut(1.).clear();
+        assert_one(&activate(&mut r,ascend,None),"P56",shapes::ANAVANI,(10.,10.));
+        assert_eq!(r.depth,1.);
+    }
+    #[test]
+    fn tier_nova_erase_occurs_only_on_a_committed_removal() {
+        let mut r=room();let erase="grisha-erase-metaphysical";grant(&mut r,erase);
+        let before=Snapshot::capture(&r).unwrap();r.player.active.push(erase.into());
+        events::begin();before.finish(&r);none(&events::finish(),"P51");
+        r.player.stats.accuracy=1000.;r.actors_at_mut(r.depth)[0].hp=1000.;
+        let player=r.player.id;
+        events::begin();engine::attack(&mut r,player,900.,1.).unwrap();none(&events::finish(),"P51");
+        r.actors_at_mut(r.depth)[0].abilities.push("enemy:beast:fast".into());
+        events::begin();engine::attack(&mut r,player,900.,1.).unwrap();
+        assert_one(&events::finish(),"P51",shapes::ISHEILAH,(11.,10.));
+        assert!(!engine::actor(&r,900.).unwrap().abilities.iter().any(|id|id=="enemy:beast:fast"));
+    }
 }

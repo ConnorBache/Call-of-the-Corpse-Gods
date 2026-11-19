@@ -964,16 +964,21 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
         } else if let Some(d)=corpse_core::progression::definition_for_revision(r.simulation_revision.value_or(29.),id)
             .filter(|_|r.simulation_revision.value_or(29.)>=50.) {
             let floor_future=id==corpse_core::future_floor::ID && own.id==r.player.id && corpse_core::future_floor::enabled(r);
-            let toggle=d.flags.iter().any(|flag|flag=="toggle");
+            let passive_ragelight=id==corpse_core::divine_rescues::RAGE && corpse_core::ragelight_rules::current(r);
+            let toggle=!passive_ragelight && d.flags.iter().any(|flag|flag=="toggle");
             let state=if floor_future {if corpse_core::future_floor::active(r) {" (active)"} else {" (used)"}} else if toggle {if source.active.contains(id) {" (active)"} else {" (inactive)"}} else {""};
             let reserve=if d.name == "Hanged" || floor_future { String::new() } else { crate::ability_ui::actor_reserve_summary_for_revision(source,id,r.simulation_revision.value_or(29.))
                 .map(|s|format!(" {s}." )).unwrap_or_default() };
-            let description = if floor_future || (r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender") {
+            let description = if floor_future || passive_ragelight || id == corpse_core::revision50_combat::EXECUTE || (r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender") {
                 crate::ability_ui::display_description(r, id, &d.description)
             } else { d.description.as_str() };
             let name=if floor_future {"Futuresight"}else{d.name.as_str()};
-            parts.push(if compact {format!("{name}{state}.{reserve}")} else {format!("{name}{state}: {description}{reserve}")});
-            divine_actions |= d.flags.iter().any(|flag|matches!(flag.as_str(),"toggle"|"activate"|"target"|"action"));
+            let rescue_cost=if passive_ragelight {
+                let cost=crate::stat_presentation::whole_number(condition(own,"rageCost"));
+                format!(" Next rescue: {cost} NRG.")
+            } else {String::new()};
+            parts.push(if compact {format!("{name}{state}.{rescue_cost}{reserve}")} else {format!("{name}{state}: {description}{rescue_cost}{reserve}")});
+            divine_actions |= !passive_ragelight && d.flags.iter().any(|flag|matches!(flag.as_str(),"toggle"|"activate"|"target"|"action"));
         } else if let Some(e) = meta(id) {
             if !applies(source, id, &idset) {
                 continue;

@@ -66,6 +66,15 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.potion_rules_from=r.potion_rules_from.clone();
     next.ring_rules_from=r.ring_rules_from.clone();
     next.gas_rules_from=r.gas_rules_from.clone();
+    next.commandment_rules_from=r.commandment_rules_from.clone();
+    next.screamer_rules_from=r.screamer_rules_from.clone();
+    next.ragelight_rules_from=r.ragelight_rules_from.clone();
+    next.execute_rules_from=r.execute_rules_from.clone();
+    next.beckoning_rules_from=r.beckoning_rules_from.clone();
+    next.ichor_fire_rules_from=r.ichor_fire_rules_from.clone();
+    next.avatar_starter_policy=r.avatar_starter_policy.clone();
+    next.ember_rules_from=r.ember_rules_from.clone();
+    next.steam_rules_from=r.steam_rules_from.clone();
     next.future_floor_rules_from=r.future_floor_rules_from.clone();
     next.run_id=r.run_id.clone();
     next.actors.adopt_epoch_from(&r.actors);

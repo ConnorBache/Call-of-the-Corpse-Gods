@@ -24,8 +24,9 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
     if bypass {
         return false;
     }
+    let passive_ragelight = crate::ragelight_rules::current(r);
     for ability in abilities {
-        if ability == RAGE && engine::actor(r, id).unwrap().active.contains(&ability) {
+        if ability == RAGE && (passive_ragelight || engine::actor(r, id).unwrap().active.contains(&ability)) {
             let cost = engine::condition(engine::actor(r, id).unwrap(), "rageCost");
             if crate::revision50_ability_energy::spend(r, id, RAGE, cost) {
                 let a = engine::actor_mut_trusted(r, id).unwrap();
@@ -38,10 +39,12 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
                 crate::animation_shapes::nova(r, engine::actor(r,id).unwrap(), "P01", "nova-red-small", 2);
                 return true;
             }
-            engine::actor_mut_trusted(r, id)
-                .unwrap()
-                .active
-                .retain(|s| s != &ability);
+            if !passive_ragelight {
+                engine::actor_mut_trusted(r, id)
+                    .unwrap()
+                    .active
+                    .retain(|s| s != &ability);
+            }
         }
         if ability == OVERFLOWING && engine::actor(r, id).unwrap().blood.value_or(0.0) > 0.0 {
             let a = engine::actor_mut_trusted(r, id).unwrap();
@@ -49,7 +52,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
             a.hp = 1.0;
             crate::blood_mist::emit(r, id);
             half_here::sync(r);
-            crate::animation_player::local(r, engine::actor(r,id).unwrap(), "P37", "droplet-empty", crate::events::Stage::Health);
+            crate::animation_shapes::short_nova(r,engine::actor(r,id).unwrap(),"P37",crate::animation_shapes::LICHOR);
             return true;
         }
         if ability == PELIAN
@@ -83,13 +86,10 @@ pub fn accrue_damage(r: &mut Run, victim: f64, n: f64) {
     let Some(a) = engine::actor_mut_trusted(r, owner) else {
         return;
     };
-    let blood_before=a.blood.value_or(0.);
     let mut bank = a.damage_bank.value_or(0.0) + n;
     while bank >= 50.0 {
         bank -= 50.0;
         a.blood = (a.blood.value_or(0.0) + 1.0).min(55.0).into();
     }
     a.damage_bank = bank.into();
-    let gained=a.blood.value_or(0.)>blood_before;
-    if gained {crate::animation_player::local(r,engine::actor(r,owner).unwrap(),"P37","droplet-fill",crate::events::Stage::Health);}
 }

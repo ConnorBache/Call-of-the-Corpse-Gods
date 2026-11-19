@@ -122,7 +122,7 @@ impl Staging {
             return target.take().is_some();
         }
         let snapshot=snapshot.unwrap();
-        let mut arrivals=BTreeMap::<usize,bool>::new();
+        let mut departures=BTreeMap::<usize,bool>::new();
         for route in &self.routes {
             let Some(cue)=cues.iter().find(|cue|cue.event.animation.as_ref().is_some_and(|a|
                 a.proposal=="A02"&&a.stage==Stage::Travel&&a.action==route.action)) else {continue;};
@@ -131,11 +131,11 @@ impl Staging {
                 // Never re-expose a previous cell that is now outside direct
                 // observation; legitimate post-command visibility wins.
                 if !snapshot.cells.get(index).is_some_and(|o|o.current&&o.direct&&o.tile.is_some()) {continue;}
-                let reached=now-cue.started>=effects::arrival_ms(&cue.event,position);
-                arrivals.entry(index).and_modify(|seen|*seen|=reached).or_insert(reached);
+                let passed=now-cue.started>=effects::departure_ms(&cue.event,position);
+                departures.entry(index).and_modify(|seen|*seen|=passed).or_insert(passed);
             }
         }
-        let withheld:Vec<_>=arrivals.into_iter().filter_map(|(index,reached)|(!reached).then_some(index)).collect();
+        let withheld:Vec<_>=departures.into_iter().filter_map(|(index,passed)|(!passed).then_some(index)).collect();
         let mut landed=Vec::new();
         for landing in &self.landings {
             let Some(cue)=cues.iter().find(|cue|cue.event.animation.as_ref().is_some_and(|a|a.stage==Stage::Travel&&a.delivery==Delivery::Projectile&&a.action==landing.action&&a.item_id.map(f64::to_bits)==Some(landing.item))) else {continue;};
@@ -157,7 +157,7 @@ impl Staging {
             if withheld.binary_search(&index).is_err() {continue;}
             let old=&self.previous[&index];
             // Keep layer indices stable for native damage. A new fire overlay
-            // paints the old terrain in its original z-slot until arrival.
+            // paints the old terrain in its original z-slot until the beam head leaves.
             // Living actors, corpses, items and other overlays are never reset.
             let replacement=if layer<view.terrain_count {Some(&old.terrain)}
                 else if cell.fire {Some(old.fire.as_ref().unwrap_or(&old.terrain))}else{None};

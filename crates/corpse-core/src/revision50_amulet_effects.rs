@@ -754,9 +754,11 @@ mod tests {
     #[test] fn dispatch_free_activation_then_other_amulet_consumes_turn(){
         let mut r=room();add(&mut r,Effect::Lightning,1.);add(&mut r,Effect::Poison,2.);r.player.abilities.push("isheilah-spellslinger".into());
         let tick=r.tick;let rng=r.rng;
-        assert!(!engine::dispatch(&mut r,&Command::UseAt{id:1.,x:11.,y:10.}).unwrap().took_turn);
+        let free=engine::dispatch(&mut r,&Command::UseAt{id:1.,x:11.,y:10.}).unwrap();
+        assert!(free.used_item&&!free.took_turn);
         assert_eq!(r.tick,tick);assert_eq!(r.rng,rng);assert_eq!(r.inventory[0].amulet_state.as_ref().unwrap().energy,25.);
-        assert!(engine::dispatch(&mut r,&Command::UseAt{id:2.,x:11.,y:10.}).unwrap().took_turn);assert_eq!(r.tick,tick+1.);
+        let paid=engine::dispatch(&mut r,&Command::UseAt{id:2.,x:11.,y:10.}).unwrap();
+        assert!(paid.used_item&&paid.took_turn);assert_eq!(r.tick,tick+1.);
         assert_eq!(r.inventory[1].amulet_state.as_ref().unwrap().energy,35.);
     }
     #[test] fn saved_item_energy_and_poison_rate_replay_identically(){

@@ -46,6 +46,8 @@ pub enum CustomIndicator {
     Nightmares { count: u64, until: u64 },
     Reactions(u64),
     Rescue(bool),
+    /// Raw cost bits retain equality for HUD damage tracking without truncating energy.
+    RagelightCost(u64),
     Future(bool),
     FutureFloors { used: u32 },
     Blood { count: u64, progress: u64 },
@@ -77,13 +79,19 @@ pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
     result
 }
 /// O(1) presentation-only override: never changes catalog text used by offer tags.
-pub const EXECUTE_DESCRIPTION:&str="When active, you kill enemies in one hit if they have less than 25% of their HP remaining. Every time you do so, spend 10 energy.";
-pub const RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
+pub const EXECUTE_DESCRIPTION:&str="When active, if a weapon hit would leave an enemy alive but drop it from at least 25% of its maximum HP to below 25%, spend 10 energy to kill it.";
+const LEGACY_EXECUTE_DESCRIPTION:&str="When active, you kill enemies in one hit if they have less than 25% of their HP remaining. Every time you do so, spend 10 energy.";
+pub const RAGELIGHT_DESCRIPTION:&str="Whenever you would die, if you can pay the energy cost, you survive with 1 HP. The first rescue is free, the second costs 1 energy, and the cost doubles after each paid rescue. Leveling up resets the cost to 0.";
+const LEGACY_RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
 pub const FUTURE_FLOOR_DESCRIPTION:&str="Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
     if id=="morae-see-the-future" && corpse_core::future_floor::enabled(run) {return FUTURE_FLOOR_DESCRIPTION;}
-    if id=="shrail-execute"&&run.simulation_revision.value_or(29.)>=52. {return EXECUTE_DESCRIPTION;}
-    if id=="shrail-rage-at-the-dying-of-the-light" {return RAGELIGHT_DESCRIPTION;}
+    if id=="shrail-execute" && run.simulation_revision.value_or(29.)>=52. {
+        return if corpse_core::execute_rules::current(run) {EXECUTE_DESCRIPTION} else {LEGACY_EXECUTE_DESCRIPTION};
+    }
+    if id==corpse_core::divine_rescues::RAGE {
+        return if corpse_core::ragelight_rules::current(run) {RAGELIGHT_DESCRIPTION} else {LEGACY_RAGELIGHT_DESCRIPTION};
+    }
     if run.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender" {
         return "Increase your DR for the first source of damage every turn.";
     }
@@ -318,8 +326,6 @@ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::Upkeep
         let until=if r.simulation_revision.value_or(29.)>=52. {corpse_core::fortune_schedule::turns_until(&r.player,r.tick)} else {(20.-r.tick.rem_euclid(20.)).ceil() as u8};
         row.fortunes=Some((count,until));
     }
-    if id=="shrail-execute"&&r.simulation_revision.value_or(29.)>=52. {row.description=EXECUTE_DESCRIPTION.into();}
-    if id=="shrail-rage-at-the-dying-of-the-light" {row.description=RAGELIGHT_DESCRIPTION.into();}
     if id=="morae-all-seeing-eyes" {row.description="Spend 30 energy to reveal the entire current floor, including enemies and contents, until your next turn.".into();}
     // Serialized ability order is acquisition order; only the first reaction
     // power owns the shared pool display. Never confuse modern Hanged with it.
@@ -328,6 +334,8 @@ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::Upkeep
             || (a.as_str()=="isheilah-missed-me" && !corpse_core::hanged::enabled(r.simulation_revision.value_or(29.)))
     });
     row.indicator = match id {
+        corpse_core::divine_rescues::RAGE if corpse_core::ragelight_rules::current(r) =>
+            Some(CustomIndicator::RagelightCost(corpse_core::engine::condition(&r.player, "rageCost").to_bits())),
         "morae-see-the-future" => Some(CustomIndicator::Future(r.future.is_some())),
         "ursa-waking-nightmares" => Some(CustomIndicator::Nightmares {
             count:r.player.nightmares.value_or(0.).max(0.) as u64,
@@ -402,14 +410,15 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
     let n = a.name.as_str();
     let c = |k: &str| p.conditions.get(k).copied().unwrap_or(0.);
     let flag = |f: &str| a.flags.iter().any(|v| v == f);
-    let toggle = flag("toggle");
+    let passive_ragelight = id == corpse_core::divine_rescues::RAGE && corpse_core::ragelight_rules::current(r);
+    let toggle = !passive_ragelight && flag("toggle");
     let craft = flag("craft") && !toggle && !flag("activate");
-    let callable = toggle
+    let callable = !passive_ragelight && (toggle
         || flag("activate")
         || flag("target")
         || flag("action")
-        || matches!(n, "Revert" | "Blood Letting");
-    let active = if n == "Hanged" { false } else if n == "See The Future" {
+        || matches!(n, "Revert" | "Blood Letting"));
+    let active = if passive_ragelight || n == "Hanged" { false } else if n == "See The Future" {
         r.future.as_ref().is_some()
     } else {
         p.active.iter().any(|i| i == id)
@@ -446,7 +455,7 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
     let suppression = matches!(n, "Entropy" | "Shine" | "Star Power");
     let mut cost = match n {
         "Execute" => format!("{} NRG/execute",corpse_core::revision50_combat::execute_cost(r.simulation_revision.value_or(29.))),
-        "Commandment" => "20 NRG/attack".into(),
+        "Commandment" => "20 NRG/hit".into(),
         "Waking Nightmares" => "1 nightmare".into(),
         "Cogworks" => match corpse_core::revision50_terrain::mode(r) {
             2=>"Mode 2 · 20 NRG · 200 shared HP".into(),3=>"Mode 3 · free removal".into(),_=>"Mode 1 · 20 NRG".into(),
@@ -960,6 +969,7 @@ mod authored_copy_r38_tests;
 /// O(ID bytes); only the new passive has no command binding. Older passive rows
 /// retain their historical click/key behavior; offer selection/details are separate.
 pub fn command_binding_allowed(r: &Run, id: &str) -> bool {
+    if id == corpse_core::divine_rescues::RAGE && corpse_core::ragelight_rules::current(r) { return false; }
     if r50(r) {
         if !runtime_supported(r, id) { return false; }
         if progression::definition_for_revision(r.simulation_revision.value_or(29.), id).is_some_and(|a| a.flags.iter().all(|flag| flag == "passive") && a.name != "Blood Letting") { return false; }
@@ -1236,7 +1246,7 @@ mod revision50_ui_tests {
             // Keep the frozen catalog intact while pinning the two authorized
             // display-unit amendments independently of display_description.
             let expected=match a.id.as_str() {
-                "shrail-rage-at-the-dying-of-the-light"=>RAGELIGHT_DESCRIPTION,
+                "shrail-rage-at-the-dying-of-the-light"=>LEGACY_RAGELIGHT_DESCRIPTION,
                 "pelian-never-surrender"=>"Spend 8 energy and add one sixth of your HP bonus to your DR the first time you take damage every turn.",
                 "lichor-bleed-them"=>"Your attacks inflict bleed proportional to your Damage bonus.",
                 _=>a.description.as_str(),
@@ -1470,7 +1480,7 @@ mod never_surrender_detail_followup_tests {
     #[test] fn rename_is_display_only_and_preserves_proc_cost_and_save(){
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         r.simulation_revision=52.0.into();let id="shrail-rage-at-the-dying-of-the-light";
-        r.player.abilities.push(id.into());r.player.conditions.insert("rageCost".into(),17.);
+        r.player.abilities=vec![id.into()];r.player.conditions.insert("rageCost".into(),17.);
         let before=serde_json::to_string(&r).unwrap();let row=observe(&r,id);
         assert_eq!(row.name,"Ragelight");assert_eq!(row.id,id);assert!(row.cost.contains("17 NRG/rescue"));
         assert_eq!(corpse_core::progression::definition_for_revision(52.,id).unwrap().name,"Rage at the Dying of the Light");
@@ -1478,6 +1488,9 @@ mod never_surrender_detail_followup_tests {
         let (short,details)=crate::creature_abilities_ui::describe(&r,&r.player);
         assert!(!short.contains("Rage at the Dying of the Light"));assert!(!details.contains("Rage at the Dying of the Light"));
         assert!(details.contains("Ragelight"));
+        for copy in [short, details] {
+            assert!(!copy.contains("When active") && !copy.contains("(inactive)") && copy.contains("Next rescue: 17 NRG."));
+        }
         let item=corpse_core::Item{kind:"ring".into(),granted_ability:id.to_string().into(),..Default::default()};
         assert!(crate::pack::describe_item(&r,&item).contains("Grants Ragelight."));
         assert_eq!(serde_json::to_string(&r).unwrap(),before);
@@ -1503,6 +1516,32 @@ mod never_surrender_detail_followup_tests {
 
 #[cfg(test)] mod ragelight_final_copy_tests {
     use super::*;
+    #[test] fn passive_ragelight_keeps_cost_and_reserve_but_no_toggle() {
+        let mut r: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        let id=corpse_core::divine_rescues::RAGE;
+        r.player.abilities=vec![id.into()];
+        r.player.active=vec![id.into()];
+        r.player.conditions.insert("rageCost".into(),17.);
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
+        let row=observe(&r,id);
+        assert_eq!(row.mode,"Passive");
+        assert!(row.state.is_empty());
+        assert!(!row.active);
+        assert!(!command_binding_allowed(&r,id));
+        assert!(row.cost.contains("17 NRG/rescue"));
+        assert!(row.reserve.is_some());
+        assert_eq!(row.indicator,Some(CustomIndicator::RagelightCost(17.0f64.to_bits())));
+        assert_eq!(row.description,RAGELIGHT_DESCRIPTION);
+
+        r.ragelight_rules_from=corpse_core::Field::Null;
+        let row=observe(&r,id);
+        assert_eq!(row.mode,"Toggle");
+        assert!(row.active);
+        assert!(command_binding_allowed(&r,id));
+        assert_eq!(row.description,LEGACY_RAGELIGHT_DESCRIPTION);
+    }
+
     #[test] fn exact_copy_has_no_appended_reserve_explanation_or_mechanics_mutation(){
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         let id="shrail-rage-at-the-dying-of-the-light";r.simulation_revision=52.0.into();r.player.abilities=vec![id.into()];
@@ -1517,6 +1556,8 @@ mod never_surrender_detail_followup_tests {
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=52.0.into();
         let id="shrail-execute";r.player.abilities=vec![id.into()];corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
         let row=observe(&r,id);assert_eq!(row.description,EXECUTE_DESCRIPTION);assert!(row.cost.contains("10 NRG/execute"));assert!(!row.cost.contains("20 NRG/execute"));
+        r.execute_rules_from=corpse_core::Field::Null;
+        assert_eq!(observe(&r,id).description,LEGACY_EXECUTE_DESCRIPTION);
     }
 }
 

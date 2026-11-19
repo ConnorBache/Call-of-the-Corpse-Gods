@@ -347,7 +347,9 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
             .map(|a| a.id);
         let hit=if let Some(victim)=target {
             if shard { crate::engine::attack_shard_resolved(r,victim,range)? }
-            else { crate::engine::attack_ranged_resolved(r, player, victim, base, range, 1.0, false)? }
+            else if item.kind=="weapon" && crate::execute_rules::current(r) {
+                crate::engine::attack_thrown_weapon_resolved(r,victim,base,range)?
+            } else { crate::engine::attack_ranged_resolved(r, player, victim, base, range, 1.0, false)? }
         } else {false};
         if shard && hit {crate::borge::consume_weapon(r,id)?; return Ok(Some(true));}
         // A missed unique Shard remains recoverable on this floor, including

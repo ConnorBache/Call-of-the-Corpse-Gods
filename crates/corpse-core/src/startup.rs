@@ -451,6 +451,12 @@ pub fn new_run_shell_revision(
     dev: bool,
     revision: f64,
 ) -> Result<Run, String> {
+    new_run_shell_revision_policy(seed, mode, dev, revision, &crate::Field::Missing)
+}
+pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, revision: f64, starter_policy: &crate::Field<u8>) -> Result<Run,String> {
+    if !starter_policy.is_missing() && (!matches!(starter_policy,crate::Field::Value(1)) || mode!="Avatar" || revision!=52.) {
+        return Err("Invalid Avatar starter policy".into());
+    }
     if ![29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 50.0, 51.0, 52.0].contains(&revision) {
         return Err("Unsupported simulation revision".into());
     }
@@ -525,6 +531,15 @@ pub fn new_run_shell_revision(
         potion_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         ring_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         gas_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        screamer_schedule: None,
+        commandment_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
+        screamer_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
+        ember_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
+        ragelight_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        steam_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
+        execute_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        beckoning_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        ichor_fire_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         future_floor_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         future_floor: None,
         firebolt_travel_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
@@ -570,6 +585,12 @@ pub fn new_run_shell_revision(
         let pool = crate::progression::starter_abilities_for_revision(god as u32, revision)?;
         let index = (crate::rng::random(&mut r) * pool.len() as f64).floor() as usize;
         r.player.abilities.push(pool[index].clone());
+    }
+    if matches!(starter_policy,crate::Field::Value(1)) {
+        // Preserve the legacy three global draws; isolated selection cannot shift
+        // procedural generation solely because its rejection count differs.
+        r.player.abilities=crate::avatar_starters::choose(&r.seed,&r.gods)?;
+        r.avatar_starter_policy=starter_policy.clone();
     }
     crate::revision50_ability_energy::reconcile_acquired(&mut r)
         .map_err(|e| format!("Starter blessing reserve: {e:?}"))?;
@@ -742,10 +763,10 @@ fn finish_new_run(mut r: Run, revision: f64) -> Result<Run, String> {
 /// Authored content coordinates remain internal; route and rewards are explicit.
 /// Historical replays must use their explicit revision/mode constructor instead.
 pub fn create_avatar_run(seed: &str) -> Result<Run, String> {
-    create_avatar_run_replay_policies(seed, &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into())
+    create_avatar_run_replay_policies(seed, &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &crate::Field::Value(crate::avatar_starters::POLICY))
 }
-pub(crate) fn create_avatar_run_replay_policies(seed: &str, policy: &crate::Field<usize>, potion_policy: &crate::Field<usize>, ring_policy: &crate::Field<usize>, gas_policy: &crate::Field<usize>, future_policy: &crate::Field<usize>) -> Result<Run, String> {
-    let mut r = new_run_shell_revision(seed, "Avatar", false, 52.)?;
+pub(crate) fn create_avatar_run_replay_policies(seed: &str, policy: &crate::Field<usize>, potion_policy: &crate::Field<usize>, ring_policy: &crate::Field<usize>, gas_policy: &crate::Field<usize>, future_policy: &crate::Field<usize>, starter_policy: &crate::Field<u8>) -> Result<Run, String> {
+    let mut r = new_run_shell_revision_policy(seed, "Avatar", false, 52., starter_policy)?;
     crate::amulet_rules::apply_replay_policy(&mut r, policy, 0);
     crate::potion_rules::apply_replay_policy(&mut r, potion_policy, 0);
     crate::ring_rules::apply_replay_policy(&mut r, ring_policy, 0);
@@ -759,10 +780,10 @@ pub(crate) fn create_avatar_run_replay_policies(seed: &str, policy: &crate::Fiel
 }
 /// Historical Fast startup is retained only for old seed replays.
 pub fn create_avatar_run_fast(seed: &str) -> Result<Run, String> {
-    create_avatar_run_fast_replay_policies(seed, &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into())
+    create_avatar_run_fast_replay_policies(seed, &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &crate::Field::Missing)
 }
-pub(crate) fn create_avatar_run_fast_replay_policies(seed: &str, policy: &crate::Field<usize>, potion_policy: &crate::Field<usize>, ring_policy: &crate::Field<usize>, gas_policy: &crate::Field<usize>, future_policy: &crate::Field<usize>) -> Result<Run, String> {
-    let mut r = new_run_shell_revision(seed, "Avatar", false, 52.)?;
+pub(crate) fn create_avatar_run_fast_replay_policies(seed: &str, policy: &crate::Field<usize>, potion_policy: &crate::Field<usize>, ring_policy: &crate::Field<usize>, gas_policy: &crate::Field<usize>, future_policy: &crate::Field<usize>, starter_policy: &crate::Field<u8>) -> Result<Run, String> {
+    let mut r = new_run_shell_revision_policy(seed, "Avatar", false, 52., starter_policy)?;
     crate::amulet_rules::apply_replay_policy(&mut r, policy, 0);
     crate::potion_rules::apply_replay_policy(&mut r, potion_policy, 0);
     crate::ring_rules::apply_replay_policy(&mut r, ring_policy, 0);
@@ -786,10 +807,10 @@ pub fn create_run_revision(
     dev: bool,
     revision: f64,
 ) -> Result<Run, String> {
-    create_run_revision_replay_policies(seed, mode, dev, revision, &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into())
+    create_run_revision_replay_policies(seed, mode, dev, revision, &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &0usize.into(), &crate::Field::Missing)
 }
-pub(crate) fn create_run_revision_replay_policies(seed: &str, mode: &str, dev: bool, revision: f64, policy: &crate::Field<usize>, potion_policy: &crate::Field<usize>, ring_policy: &crate::Field<usize>, gas_policy: &crate::Field<usize>, future_policy: &crate::Field<usize>) -> Result<Run, String> {
-    let mut r = new_run_shell_revision(seed, mode, dev, revision)?;
+pub(crate) fn create_run_revision_replay_policies(seed: &str, mode: &str, dev: bool, revision: f64, policy: &crate::Field<usize>, potion_policy: &crate::Field<usize>, ring_policy: &crate::Field<usize>, gas_policy: &crate::Field<usize>, future_policy: &crate::Field<usize>, starter_policy: &crate::Field<u8>) -> Result<Run, String> {
+    let mut r = new_run_shell_revision_policy(seed, mode, dev, revision, starter_policy)?;
     crate::amulet_rules::apply_replay_policy(&mut r, policy, 0);
     crate::potion_rules::apply_replay_policy(&mut r, potion_policy, 0);
     crate::ring_rules::apply_replay_policy(&mut r, ring_policy, 0);

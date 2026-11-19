@@ -306,3 +306,54 @@ fn r52_projected_identity_hides_raw_chill_from_routes_and_warnings_in_both_plane
         assert_eq!(crate::hazards_ui::waiting(&r),warning);assert_eq!(action_world_ticks(&r,false),0);
     }}
 }
+
+#[test]
+fn steam_warns_when_visible_and_deliberate_not_for_forced_moves_or_embers() {
+    let mut r=room();
+    let from=4*W+1; let to=4*W+2;
+    let command=Command::Move{dx:1.,dy:0.};
+    corpse_core::environment::add_gas(r.floor_mut().unwrap(),to,"steam",30.,-1.).unwrap();
+    assert!(crate::hazards_ui::intentional(&r,&command).unwrap().contains("steam"));
+    corpse_core::environment::add_gas(r.floor_mut().unwrap(),from,"caustic",30.,-1.).unwrap();
+    let before=r.clone();
+    let prompt=crate::hazards_ui::intentional(&r,&command).unwrap();
+    assert!(prompt.contains("Step in steam?") && prompt.contains("scald"));
+    let Start::Direct(clicked) = start(&r,2,4) else { panic!("adjacent steam click was not a direct move"); };
+    assert_eq!(clicked,command);
+    assert_eq!(crate::hazards_ui::intentional(&r,&clicked).as_deref(),Some(prompt.as_str()));
+    assert!(observed_knowledge(&r).hazards[to]);
+    assert_eq!(r,before);
+
+    corpse_core::environment::add_gas(r.floor_mut().unwrap(),from,"steam",30.,-1.).unwrap();
+    assert!(crate::hazards_ui::intentional(&r,&command).is_none());
+    assert!(crate::hazards_ui::waiting(&r).unwrap().contains("steam"));
+    r.player.x=3.;
+    assert!(crate::hazards_ui::intentional(&r,&Command::Move {dx:-1.,dy:0.}).unwrap().contains("steam"));
+    r.player.x=1.;
+    corpse_core::environment::add_gas(r.floor_mut().unwrap(),from,"caustic",30.,-1.).unwrap();
+
+    r.player.conditions.insert("forcedMove".into(),1.);
+    assert!(crate::hazards_ui::intentional(&r,&command).is_none());
+    r.player.conditions.shift_remove("forcedMove");
+    r.steam_rules_from=Field::Null;
+    assert!(crate::hazards_ui::intentional(&r,&command).is_none());
+    r.steam_rules_from=0usize.into();
+    r.player.abilities.push("enemy:beast:fire-immunity".into());
+    assert!(crate::hazards_ui::intentional(&r,&command).is_none());
+    r.player.abilities.clear();
+
+    let mut dark=r.clone();
+    dark.player.conditions.shift_remove("allSeeingReveal");dark.player.conditions.shift_remove("allSeeingDepth");
+    dark.player.stats.perception=0.;
+    dark.floor_mut().unwrap().lights[to]=-100.;
+    assert!(!vision::visible(&dark,2,4));
+    assert!(crate::hazards_ui::intentional(&dark,&command).is_none());
+    assert!(!observed_knowledge(&dark).hazards[to]);
+
+    let e=corpse_core::environment::initialize(r.floor_mut().unwrap()).unwrap();
+    e.gas_type.as_mut().unwrap()[to]=None;
+    e.gas_volume.as_mut().unwrap()[to]=0.;
+    e.fire_kind.as_mut().unwrap()[to]=Some("embers".into());
+    assert!(crate::hazards_ui::intentional(&r,&command).is_none());
+    assert!(!observed_knowledge(&r).hazards[to]);
+}

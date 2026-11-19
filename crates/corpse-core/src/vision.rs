@@ -192,7 +192,9 @@ pub fn optical_route(r:&Run,a:&Actor,target:Point)->Option<crate::portals::Route
  else{floor_ray(f,point(a),target).then(||crate::portals::Route{distance:distance(point(a),target),points:vec![point(a),target]})}
 }
 pub fn line_of_sight(r: &Run, a: &Actor, b: &Actor) -> bool { optical_route(r,a,point(b)).is_some() }
-fn origins(r: &Run) -> Vec<&Actor> {
+/// Player sensing origins, shared with read-only range presentation.
+/// O(A) Half Here identity lookup; at most two borrowed actor references.
+pub fn origins(r: &Run) -> Vec<&Actor> {
     let mut out = vec![&r.player];
     if has(&r.player, "etill-half-here") && active(&r.player, "etill-half-here") {
         if let Some(a) = r.actors_at(r.depth).iter().find(|a| {

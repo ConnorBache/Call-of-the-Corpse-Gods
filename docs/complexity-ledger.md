@@ -2172,7 +2172,7 @@ and presentation checkpoint memory remain separate from geometry construction.
 The desktop renderer consumes only visibility-filtered receipt cells C; no gameplay RNG or simulation time is used. Deterministic nova cellular waves evaluate at most 12 generations of eight-neighbor propagation: O(12 C log C) time and O(C) scratch per cue/frame. Box, line and moving glyph projection are O(C log C) including the admitted-cell set, O(C) space. Event phase scheduling is O(E log E) for E<=4096 cues; each phase and separate travel step finishes before its successor. Input waits for all finite local, projectile, HUD and plane cues, not perpetual ambient motion. Persistent explosion markers are not finite animations. All-Seeing Eyes keeps eleven detached radial snapshots of C view cells: O(11 C log C) setup and O(11 C) additional memory; per-frame view selection is O(11) plus existing bounded action selection. No full runtime benchmark or Windows verification claimed.
 
 ### Authored divine presentation routes and flourishes (November 17, 2026)
-Death Swift, Erase Metaphysical, Witch Hatred, Mini-Me, Clay Army and See the Future emit bounded area receipts through `animation_shapes` on successful effects only. Radius is 2 for small effects, 6 for Future (helper caps all radii at 12). Each area costs O(r²·V) time and O(r²) scratch, where V is the existing visibility-query cost; no gameplay RNG or saved fields are added. Fortune casts and Sparkle emit O(L·V) observed-cell route receipts (L bounded by floor dimensions); Cogworks uses the existing 7,200-step-capped straight-cell helper before normal visibility filtering. Commandment emits two endpoints per actual displacement step and thus adds O(P·V) receipt work for P already-resolved pushes, bounded by floor tile count. All-Seeing Eyes emits an O(T·V) floor reveal receipt with O(T) temporary points at paid activation, not per frame; renderer must remain player-knowledge-aware. These are asymptotic estimates, not measured frame costs.
+Death Swift, Erase Metaphysical, Witch Hatred, Mini-Me, Clay Army and See the Future emit bounded area receipts through `animation_shapes` on successful effects only. Radius is 2 for small effects, 6 for Future (helper caps all radii at 12). Each area costs O(r²·V) time and O(r²) scratch, where V is the existing visibility-query cost; no gameplay RNG or saved fields are added. Fortune casts and Sparkle emit O(L·V) observed-cell route receipts (L bounded by floor dimensions); Cogworks uses the existing 7,200-step-capped straight-cell helper before normal visibility filtering. Commandment emits two endpoints per actual displacement step and thus adds O(P·V) receipt work for P already-resolved pushes, bounded by floor tile count. The landed-hit gate checks an already-resolved attack result and replay policy in O(1) time and O(1) extra memory per attack; the policy adds one constant-sized marker per run and constant checks per replay command. All-Seeing Eyes emits an O(T·V) floor reveal receipt with O(T) temporary points at paid activation, not per frame; renderer must remain player-knowledge-aware. These are asymptotic estimates, not measured frame costs.
 
 ## Blood Mist (November 17, 2026)
 Overflowing emits an inert gas on each spent-blood rescue. A dose is provisionally
@@ -2285,3 +2285,146 @@ No runtime algorithm changed: each existing razorleaf contact computes 2% of max
 ### Floor-entry See the Future (2026-11-18)
 Let S be serializable world nodes/metadata, F floor blocks and D visited floors (bounded by the dungeon). At each real floor entry or first live admission, one immutable FutureAnchor shares COW floor/actor data, clones metadata, and performs an O(S) finite-state scan. One anchor is retained, not one full world per floor; used-floor tracking is O(D) time/space. Ordinary availability checks are O(D), with D <= 40 in legacy dungeons (20 displayed in the current route). Restore is O(S) clone/validation plus O(D) ledger transfer; first save encoding of an anchor is O(S) and cached, subsequent save output still O(S). Core turn cloning shares the anchor in O(1); nested anchors are stripped during capture. Native tracker rendering visits exactly twenty numbers. No runtime measurements are claimed; exercise new `future_floor` unit/integration tests and the native tracker screenshot regression.
 The HUD converts the spent-floor list to a fixed u32 mask in O(D+20), with O(1) row storage. Native paint is bounded to twenty glyphs/X marks and one state dot; existing font cache miss/rasterization costs remain. The retained HUD signature includes both indicator and active state so a rewind invalidates this row.
+
+### Quiet doors and nonblocking corpse feedback (November 2026)
+
+Superseded visually by the later plain-highlight removal below: corpse collapse
+receipts are now dropped before scheduling instead of painted without a lock.
+Door-open receipt admission is an O(1) label check per actor event; mechanics,
+visibility and logging are unchanged. Ordinary non-player-owner death collapse
+receipts are tagged after admission (owner lookup retains its existing cost).
+The desktop still paints their 100ms feedback but excludes their duration from
+phase scheduling, held-line lifetimes, scene checkpoints and input/replay gates.
+For E receipts (cap 4096), scheduling remains O(E log E) time/O(E) scratch;
+blocking checks are O(E), and the scene sequence adds O(E) filtered references.
+Existing scene observation and raster costs are unchanged; no simulation clock,
+RNG, or gameplay state depends on this classification. Timings are authored,
+not measured frame-rate guarantees. Focused receipt/scheduler tests cover quiet
+doors alongside other effects, player-vs-enemy death, motion modes, and mixed
+ability/death action windows.
+
+### Plain tile-highlight removal
+See [quiet-tile-highlights.md](quiet-tile-highlights.md): O(E) allocation-free
+presentation admission before the existing O(E log E) scheduler, with unchanged
+specialized rendering costs and no simulation-state or RNG changes.
+## Screamer one-shot lockout (2026-11-19)
+
+`S` = pending successful screamers, `D` = deadlines due this world tick, `A` =
+existing scream-recipient count. Scheduler space O(S), at most one keyed entry
+per actor. Scream eligibility uses an O(1) per-actor owner/deadline receipt; insertion/replacement
+is O(log S). Duration aggregation adds O(1) time per recipient and O(1) space to
+the existing recipient pass; it adds no new scan and does not change that pass's
+hostility/portal-distance/visibility helper costs. Global tick expiration performs
+one queue peek, then O(D log S) queue work and D indexed actor resolutions, never
+an actor/status sweep. Actor resolution has existing radix-index depth cost;
+structurally dirty registries may rebuild in O(A_total), and actor-page mutation
+retains existing copy-on-write costs. Dead actors' events survive only until
+their original deadline. Queue serialization, clone and snapshot materialization
+are O(S) time/space; policy admission and replay-boundary checks add O(1).
+These are source-derived bounds, not measured benchmark claims. Focused tests
+exercise actual five-phase status expiry, both variants, gates, identity,
+serialization/rewind/offscreen removal, legacy policy and journal migration.
+
+Offscreen proxy ticks expire their due queue and return it with actor mutations.
+A constant-size per-caster historical receipt survives global tag cleanup, so
+catch-up at an older tick still gates correctly without scanning or transferring
+queue scope when an actor changes floors/planes. Proxy Run clones include O(S)
+queue clone cost in addition to their pre-existing costs.
+
+## Uniform complete Avatar starters (2026-11-19)
+See [avatar-starters.md](avatar-starters.md): one O(A + 6^3*(D+E)) tuple
+construction, O(N) bounded rejection draws with N<=216, and O(A+N) reference
+scratch. Isolated RNG preserves historical global starter draw advancement.
+## Mind Read persistent outline (2026-11-19)
+
+V = floor cells, A = actors on the current floor, B = player ability/toggle
+entries, H <= 2 sensing origins, E <= 4V boundary edges. Per view observation:
+ability/toggle admission and core vision origin lookup O(B+A),
+Euclidean membership O(VH), perimeter extraction O(V), O(V+E) scratch/output.
+No portal graph, hidden terrain lookup, ray tracing, actor visibility queries or
+simulation mutation is added. Persistent painting costs O(E) logical rectangles
+plus the renderer's existing clipped raster coverage; detached overlay equality
+participates in existing full-map invalidation on movement/toggle changes.
+The same perimeter/stroke helpers retain Reverse Entropy behavior. Bounds are
+source-derived, not timing measurements; deterministic tests compare every cell
+against core telepathy for both toggle states and Half Here, hidden topology
+invariance, and pixel masks/colors matching the entropy stroke.
+
+**Spent-ember contact.** Each actor arrival, environment exposure, or creature
+hazard probe checks the existing cell kind and rule marker in O(1) time and
+O(1) additional memory, with no added passes. Over A actor arrivals/exposures
+and H hazard probes this adds O(A + H) comparisons. The save/replay boundary
+is one optional integer per run/record and is checked in O(1) time per replay
+command. No additional randomness; rejected ember contacts draw no RNG.
+
+## Stair versus fall acknowledgment (2026-11-19)
+
+Three command-local Boolean travel-cause flags add O(1) time per downward travel
+and O(1) storage to the existing presentation Batch. Only an installed observer
+records them; speculative probes already clone/restore that Batch. Desktop
+classification adds O(1) at dispatch completion, with no actor/floor scan, extra
+world snapshot, rendering pass, RNG call or serialized state. Existing outcome
+snapshot cost is avoided for stairs-only descent and retained for actual falls
+and other previously acknowledged downward transitions. Tests cover direct and
+Move-triggered stairs, forced flight-expiry fall onto water, deliberate chasm
+preflight/one acknowledgment, speculative rollback and mixed stair/fall receipts.
+## Passive Ragelight
+The toggle admission and policy checks take O(1) time and memory per command.
+A lethal event retains the existing ordered acquisition scan and reserve
+payment. Passive Ragelight adds no per-turn work; it skips its active-list
+lookup and failed-rescue toggle removal in current runs. Replay/saved-session
+admission tracks one O(1)-sized command boundary; only older journal tails are
+replayed under legacy toggle rules. HUD rendering removes a fixed-size orb
+without removing the reserve bar or cost details. The adjacent red next-cost
+box uses the same live counter, with O(D) text layout for D displayed digits.
+
+**Steam exposure.** Reuses the existing authoritative one-gas-per-cell
+world exposure and visible hazard projection. Adds one O(1) gas/rules check
+per eligible actor exposure or hazard probe; successful packets use the same
+existing damage, immunity, and inventory resistance lookup as Burning.
+No new floor scan, gas layer, timer, RNG draw, or per-actor state. The replay
+switch adds one optional integer per run/record with O(1) lookup per command.
+## Execute threshold crossing
+The landed-weapon path uses the ordinary resolved HP packet exactly once and
+checks one health-owner lookup and three scalar bounds after mitigation and
+redirection. No extra rolls, hit packets, or recovery scans. Successful
+finishes use the existing reserve-first payment and terminal death path.
+Replay adds one constant-size command index, with legacy journal tails
+replayed before the new rule is admitted.
+## Beckoning action receipt (2026-11-19)
+
+Per successful pull, O(d+B+C) worst-case indexed source/target resolution,
+existing owner/hostility checks and condition-map growth, where d is the
+creature-index radix depth, B the relevant ability checks and C target conditions.
+Each scheduled action adds O(d) receipt lookup when absent; consuming a receipt
+costs O(d+C) because IndexMap shift-removal preserves order. Existing actor-page
+COW costs apply on writes.
+No new actor scan, timer scan, queue or periodic decrement is introduced. Storage
+is one scalar owner stamp per marked actor, O(S) for S marked actors (including
+copied stamps that cannot suppress a different identity). Existing
+snapshots/serialization include these conditions; policy admission/replay checks
+add O(1). Dirty registry rebuilding retains its pre-existing O(A*d+F) costs.
+
+**Ichor flame spread cadence.** The existing scan adds one O(1) fire-kind
+and world-tick gate per established source, O(F) extra work over F sources
+and O(1) extra scratch, with no new loop or independent RNG draw. On held
+steps the usual at most four cardinal exposures are omitted; same-cell and
+direct exposure paths still run normally. Active and exact inactive-floor
+steps share the authoritative tick. The replay boundary is one optional
+integer, not per-floor or per-cell timing state.
+
+### Entropy / ichor immunity distinction
+The existing damage-packet admission guard gains a constant-time kind/revision comparison. Per packet, the unchanged bounded number of ability membership scans costs O(A) for A actor abilities, with O(1) additional scratch. No actor, tile or status scans, serialized state, scheduling or RNG were added. Ordinary liquid exposure remains unchanged.
+
+### Grouped Commandment presentation
+For V actual push steps and C independently admitted route cells, collection adds O(V) existing visibility admission calls plus O(C) amortized vector work and O(C) detached presentation memory. It emits one event rather than one per step, deduplicating only consecutive shared endpoints. Rendering is O(C log C) from the existing shape-cell set construction plus O(C) tile iteration per frame; duration is bounded at 240ms independent of route length. No interpolation, RNG, serialized state or simulation scheduling changes. Slippery removes one presentation call only.
+
+## Outcome-only short god novas
+Each committed effect emits one bounded radius-two cue, O(C) candidate cells
+plus existing plane/actor/tile visibility filters, at most 81 iterations.
+Dream entry uses the normal destination-plane observation clone, sharing COW
+floor/actor blocks and copying O(F + M) section references/metadata.
+Visible receipts carry exact authored color; desktop geometry uses existing
+O(C² + 8C log C) cellular arrival and O(C) scratch, with O(C log C) radial
+fallback for disconnected admitted cells. These receipts have no input-hold
+duration and use no simulation RNG, clocks, or serialized fields.

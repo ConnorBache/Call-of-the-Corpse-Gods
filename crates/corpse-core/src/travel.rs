@@ -794,6 +794,7 @@ fn travel_inner(r: &mut Run, next: f64, falling: bool, vertical: bool, voluntary
         g.auto_pickup_blocked = Field::Missing;
     }
     r.depth = next;
+    if next>source {crate::events::player_descent(stair_exit,falling);}
     crate::startup::ensure_floors(r, to)?;
     r.player.x = (pos % w) as f64;
     r.player.y = (pos / w) as f64;
@@ -1193,6 +1194,7 @@ pub fn fall_actors_one_level(
                 .map_err(|e| e.0)?;
         }
     }
+    if player_falls && next>source_depth {crate::events::player_descent(false,true);}
     if active {
         head.actors.adopt_epoch_from(&r.actors);
         *r = head;

@@ -161,7 +161,12 @@ fn flood_with_damage(r:&mut Run,x:f64,y:f64,policy:WaterStop,damage:f64)->Result
     // Capture membership before damage, forced arrivals, or this cast's writes.
     // O(C) capture plus bounded O(C²) membership checks below, C<=15.
     let shallow:Vec<_>=cells.iter().copied().filter(|&at|r.floor().unwrap().tiles[at]=="shallow-water").collect();
-    crate::events::cue(r,&source,"A12","wave",crate::events::Stage::Travel,&crate::animation_amulets::cell_points(r,&cells));
+    // The amulet has no patron color; use water cyan. Anchor the single cast
+    // nova at the caster, but admit only the actual visible flood footprint.
+    let effect = "nova-authored-short";
+    let serial = crate::events::emission_serial();
+    crate::events::cue(r,&source,"A12",effect,crate::events::Stage::Travel,&crate::animation_amulets::cell_points(r,&cells));
+    crate::events::decorate(serial,"A12",effect,(&source).into(),"#42d8ea",None);
     let mut targets:Vec<_>=r.actors_at(r.depth).iter().filter(|a| a.hp>0. && !a.dead.value_or(false)
         && crate::dreamwalking::same_plane(r,&source,a)
         && crate::portals::cell(r.floor().unwrap(),a.x,a.y).is_some_and(|at|cells.contains(&at)))
@@ -172,13 +177,9 @@ fn flood_with_damage(r:&mut Run,x:f64,y:f64,policy:WaterStop,damage:f64)->Result
     for (id,_) in targets {
         if engine::actor(r,id).is_none_or(|a|crate::revision50::duel_blocks(r,&source,a)) {continue}
         engine::damage_direct_with_source_snapshot(r,id,damage,&source,"water",true)?;
-        let before=engine::actor(r,id).cloned();
         push(r,id,dx,dy)?;
-        if let Some((a,b))=before.as_ref().zip(engine::actor(r,id)).filter(|(a,b)|a.x!=b.x||a.y!=b.y){crate::events::cue(r,b,"A12","speed",crate::events::Stage::Special,&[a.into(),b.into()]);}
     }
-    let mut steam=Vec::new();
-    for &at in &cells {let burning=r.floor().unwrap().environment.as_ref().is_some_and(|e|e.fire.get(at).is_some_and(|v|*v>0.));quench(r.floor_mut().unwrap(),at);if burning&&r.floor().unwrap().environment.as_ref().is_some_and(|e|e.fire.get(at)==Some(&0.)){steam.push(at);}}
-    crate::events::at(r,"A12","steam",crate::events::Stage::Special,&crate::animation_amulets::cell_points(r,&steam));
+    for &at in &cells {quench(r.floor_mut().unwrap(),at);}
     let replace:Vec<_>=cells.into_iter().filter(|at|!shallow.contains(at))
         .filter(|&at|crate::revision50_control_amulets::can_replace_terrain(r,at)).collect();
     crate::revision50_control_amulets::add_temporary_terrain(r,&replace,"shallow-water",12.);

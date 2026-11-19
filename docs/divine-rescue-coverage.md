@@ -9,3 +9,8 @@ Call `accrue_damage` after shared HP loss and before prevention. The full resolv
 Complexity: A current actors, K owned ability entries, D resolved damage. Rescue costs O(K×A) with the existing stable-ID linear lookup and O(K) cloned ordering storage, plus O(A) synchronization. Overflowing costs O(A+K+D/50) time and O(1) extra storage; repeated subtraction deliberately preserves source floating-point behavior of legacy fractional banks. Actual validated game damage is bounded by gameplay state, but this helper is not claimed constant-time for arbitrary numeric input.
 
 The ability owner supplies activation/acquisition/level reset; combat supplies exact damage/death call sites. Helper vectors alone do not certify complete command/event/history interactions. All terminal behavior and linked bodies require their integration suites.
+
+Current R52 runs attempt Ragelight automatically when owned and retain the same
+payment, level-up reset, rescue order, and bypass. Earlier revisions and
+pre-amendment command prefixes keep the historical toggle. Existing live saves
+switch to passive Ragelight after their durable command prefix.

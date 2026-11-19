@@ -163,7 +163,7 @@ pub fn stack_multiplier(r: &Run, actor: &Actor, effect: &str, per_copy: f64) -> 
 /// ownership gate; temporary acid penalties are handled by their status source.
 pub fn resist_damage(r: &Run, actor: &Actor, kind: &str, damage: f64) -> f64 {
     let effect = match kind {
-        "fire" => FIRE_RESISTANCE,
+        "fire" | "steam" => FIRE_RESISTANCE,
         "poison" | "venom" => POISON_RESISTANCE,
         "caustic" | "ichor" | "breatherGas" | "acid" => CORROSION_RESISTANCE,
         "cold" => return if has_effect(r, actor, ICE_IMMUNITY) { 0.0 } else { damage },

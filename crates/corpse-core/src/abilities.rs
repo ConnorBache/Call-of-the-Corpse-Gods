@@ -162,6 +162,9 @@ fn activate_inner(
     x: &Field<f64>,
     y: &Field<f64>,
 ) -> Result<bool, EngineError> {
+    if id == crate::divine_rescues::RAGE && crate::ragelight_rules::current(r) {
+        return Ok(false);
+    }
     // Target admission precedes revision-specific dispatch and all mutation.
     // Maintained links can always be switched off after losing their target.
     if r.simulation_revision.value_or(29.) >= 52.
@@ -333,7 +336,6 @@ fn activate_inner(
             }
             *crate::engine::actor_mut_trusted(r, tid).unwrap() = initialized;
             let acquired=!copied.is_empty();
-            let copied_animation=if crate::events::enabled(r) {copied.clone()}else{Vec::new()};
             for id in copied {
                 r.player.abilities.push(id.clone());
                 crate::progression::initialize_ability_state_for_revision(r.simulation_revision.value_or(29.), &mut r.player, &id, r.tick)
@@ -345,12 +347,7 @@ fn activate_inner(
             crate::equipment::sync_health(r, false);
             crate::half_here::sync(r);
             if acquired {
-                if let Some(target)=crate::engine::actor(r,tid).filter(|a|crate::events::actor_observed(r,a)) {
-                    for trait_id in &copied_animation {
-                        crate::events::link(r,target,&r.player,"P24",&format!("fracture-trait:{trait_id}"),crate::events::Stage::Special);
-                    }
-                    crate::animation_player::local(r,target,"P24","fold-outline",crate::events::Stage::Special);
-                } else {crate::animation_player::local(r,&r.player,"P24","fracture",crate::events::Stage::Special);}
+                crate::animation_shapes::short_nova(r,&r.player,"P24",crate::animation_shapes::NUMO);
             }
             log(r, "You use Remember.", "player");
         }
@@ -509,6 +506,7 @@ fn activate_inner(
                     );
                     return Ok(false);
                 }
+                let origin=(r.depth,r.player.x,r.player.y);
                 if depth != r.depth {
                     let (old_x, old_y) = (r.player.x, r.player.y);
                     r.player.x = x;
@@ -521,11 +519,10 @@ fn activate_inner(
                         return Ok(false);
                     }
                 }
-                crate::animation_player::local(r,&r.player,"P33","fold",crate::events::Stage::Travel);
                 r.player.x = x;
                 r.player.y = y;
                 crate::revision50::duel_actor_changed(r,r.player.id);
-                crate::animation_player::local(r,&r.player,"P33","unfold",crate::events::Stage::Travel);
+                if origin!=(r.depth,r.player.x,r.player.y) {crate::animation_shapes::short_nova(r,&r.player,"P33",crate::animation_shapes::URSA);}
                 r.player.active.retain(|s| s != id);
                 for k in ["dreamX", "dreamY", "dreamDepth"] {
                     r.player.conditions.shift_remove(k);
@@ -554,18 +551,14 @@ fn activate_inner(
                 return Ok(false);
             }
             crate::engine::damage_environment(r, r.player.id, 10.0, None, "blood-letting", false)?;
-            // Bounded player-known status names only: never source IDs, hidden
-            // actors, serialized bookkeeping keys or arbitrary condition strings.
-            const PEEL_STATUSES:&[&str]=&["hemophilia","slowed","paralyzed","magicSensitive","bleeding","burning","poisoned","weakened","emboldened","lucky","unlucky","distracted","flying","telepathic","invisible","confused","hasted","silenced","riptide","gasVulnerable","disoriented","hallucinating","stuck","grabbed","envenomed"];
-            let peel:Vec<_>=if crate::events::enabled(r) {PEEL_STATUSES.iter().copied().filter(|key|crate::engine::condition(&r.player,key)>0.).collect()}else{Vec::new()};
+            // The existing cleanse only removes condition keys. Capture its
+            // result, rather than animating health cost or exposing status IDs.
+            let before=r.player.conditions.len();
             clear_status_conditions(&mut r.player);
+            let cleansed=r.player.conditions.len()<before;
             crate::equipment::sync_health(r, false);
             crate::half_here::sync(r);
-            crate::animation_player::local(r,&r.player,"P39","ripple",crate::events::Stage::Death);
-            let removed:Vec<_>=peel.into_iter().filter(|status|!r.player.conditions.contains_key(*status)).collect();
-            if !removed.is_empty() {
-                crate::animation_player::local(r,&r.player,"P39",&format!("fracture-status:{}",removed.join("+")),crate::events::Stage::Death);
-            }
+            if cleansed {crate::animation_shapes::short_nova(r,&r.player,"P39",crate::animation_shapes::LICHOR);}
             log(r, "You use Blood Letting.", "player");
         }
         "isheilah-make-slippery" => {
@@ -670,7 +663,7 @@ fn activate_inner(
                 resources::record_loss(r, &p, "energy", 50.0);
                 r.player.energy -= 50.0;
             }
-            crate::animation_player::local(r,&r.player,"P56","rise",crate::events::Stage::Travel);
+            crate::animation_shapes::short_nova(r,&r.player,"P56",crate::animation_shapes::ANAVANI);
             log(r, "You use Ascend.", "player");
         }
         "lichor-blood-weapon" => {
@@ -760,6 +753,7 @@ fn activate_inner(
                 return Ok(false);
             }
             let a = crate::engine::actor_mut_trusted(r, tid).unwrap();
+            let became_neutral=id=="morae-sever-fate" && a.state!="neutral";
             crate::ai::wake(a, true);
             if id == "morae-sever-fate" {
                 a.state = "neutral".into();
@@ -775,7 +769,9 @@ fn activate_inner(
                 if id=="numo-mind-slave" {
                     crate::animation_shapes::line(r,&r.player,a.into(),"P22","line-hold","#a040ff");
                     crate::animation_shapes::area(r,a,"P22","box-contract",2,"#a040ff",crate::events::Stage::Special);
-                } else {crate::animation_player::local(r,a,"P70","slash",crate::events::Stage::Special);}
+                } else if became_neutral {
+                    crate::animation_shapes::short_nova(r,a,"P70",crate::animation_shapes::MORAE);
+                }
             }
             let name = &crate::progression::catalog_for_revision(r.simulation_revision.value_or(29.0))
                 .iter()
@@ -893,6 +889,9 @@ fn activate_inner(
                         .unwrap()
                         .conditions
                         .insert("distracted".into(), 1.0);
+                    if let Some(a)=crate::engine::actor(r,tid) {
+                        crate::animation_shapes::short_nova(r,a,"P20",crate::animation_shapes::NUMO);
+                    }
                 } else {
                     r.player.conditions.insert("cameTarget".into(), tid);
                     // R50+ stores a stable enabled sentinel, not a countdown.
@@ -975,7 +974,7 @@ fn activate_inner(
             r.player.hp = r.player.max_hp;
             let duration = crate::monster_statuses::status_duration(r,&r.player,51.0);
             r.player.conditions.insert("paralyzed".into(), duration);
-            crate::animation_player::local(r,&r.player,"P32","fold",crate::events::Stage::Special);
+            if duration>0. {crate::animation_shapes::short_nova(r,&r.player,"P32",crate::animation_shapes::URSA);}
             log(r, "You use Sudden Sleep.", "player");
             emit_activation(r, "Sudden Sleep", target, x, y);
             return Ok(true);

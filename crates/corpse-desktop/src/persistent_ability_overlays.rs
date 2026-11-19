@@ -1,14 +1,15 @@
-//! Detached ability geometry. White entropy edges are explicitly allowed in
-//! unknown space; they carry no terrain, actor, light, or item information.
+//! Detached persistent ability geometry. Range edges may occupy unknown space;
+//! they carry no terrain, actor, light, or item information.
 use corpse_core::{Run, vision};
 use crate::render::{Painter, View};
 use crate::perception_ui::Edge;
 #[derive(Clone,Debug,Default,PartialEq,Eq)]
-pub struct Overlays { pub entropy:Vec<Edge>, pub riptide:Vec<(usize,usize)>, pub threads:Vec<Thread> }
+pub struct Overlays { pub entropy:Vec<Edge>, pub mind_read:Vec<Edge>, pub riptide:Vec<(usize,usize)>, pub threads:Vec<Thread> }
 #[derive(Clone,Debug,PartialEq,Eq)]
 pub struct Thread { pub cells:Vec<(usize,usize)>, pub color:[u8;3] }
 /// Portal metric setup O(H*K^3), then O(V*H*K + L*movement_probe) per
 /// observation; O(V+K+L) storage. V floor area, H<=2 origins, L<=V.
+/// Mind Read independently adds O(A+V*H) time, O(V) scratch/edges, no portals.
 pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
     let Some(f)=corpse_core::dreamwalking::floor_for(run,&run.player) else{return Overlays::default()};
     let(w,h)=(f.width(),f.height());
@@ -32,12 +33,16 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
         }
         let inside=(0..w*h).map(|i|anchors.iter().any(|&(x,y,d)|
             d+((i%w)as f64-x).hypot((i/w)as f64-y)<=10.)).collect::<Vec<_>>();
-        for y in 0..h {for x in 0..w {if !inside[y*w+x]{continue;}
-            if x==0||!inside[y*w+x-1]{out.entropy.push(Edge{x,y,vertical:true});}
-            if x+1==w||!inside[y*w+x+1]{out.entropy.push(Edge{x:x+1,y,vertical:true});}
-            if y==0||!inside[(y-1)*w+x]{out.entropy.push(Edge{x,y,vertical:false});}
-            if y+1==h||!inside[(y+1)*w+x]{out.entropy.push(Edge{x,y:y+1,vertical:false});}
-        }}
+        out.entropy=perimeter(&inside,w,h);
+    }
+    if run.player.abilities.iter().any(|s|s=="numo-mind-read") {
+        let radius=if run.player.active.iter().any(|s|s=="numo-mind-read"){20.}else{5.};
+        // Match telepathic_for_owner exactly: Euclidean radius from sensing
+        // origins, not portal distance or optical terrain visibility.
+        let origins=vision::origins(run);
+        let inside=(0..w*h).map(|i|origins.iter().any(|a|
+            vision::distance(corpse_core::movement::Point{x:a.x as i32,y:a.y as i32},corpse_core::movement::Point{x:(i%w)as i32,y:(i/w)as i32})<=radius)).collect::<Vec<_>>();
+        out.mind_read=perimeter(&inside,w,h);
     }
     // Two maintained player links; recompute endpoints after every actor move.
     // O(A + L) per link plus visible_actor, with L <= max(width,height).
@@ -84,6 +89,17 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
     }
     out
 }
+/// Boundary of the union, with no internal seams. O(V) time and O(V) output.
+fn perimeter(inside:&[bool],w:usize,h:usize)->Vec<Edge> {
+    let mut out=Vec::new();
+    for y in 0..h {for x in 0..w {if !inside[y*w+x]{continue;}
+        if x==0||!inside[y*w+x-1]{out.push(Edge{x,y,vertical:true});}
+        if x+1==w||!inside[y*w+x+1]{out.push(Edge{x:x+1,y,vertical:true});}
+        if y==0||!inside[(y-1)*w+x]{out.push(Edge{x,y,vertical:false});}
+        if y+1==h||!inside[(y+1)*w+x]{out.push(Edge{x,y:y+1,vertical:false});}
+    }}
+    out
+}
 /// Ordered Bresenham connection, never a gameplay path or visibility grant.
 fn line_cells((mut x,mut y):(i32,i32),(tx,ty):(i32,i32),limit:usize)->Vec<(usize,usize)> {
     let dx=(tx-x).abs();let dy=-(ty-y).abs();
@@ -106,12 +122,13 @@ pub fn paint_thread(p:&mut Painter,layout:(i32,i32,i32,i32),cells:&[(usize,usize
 pub fn paint(p:&mut Painter,v:&View){
     let(cw,ch,ox,oy)=p.map_layout(v.width,v.height);let old=p.clip;
     p.clip=Some((ox,oy,cw*v.width as i32,ch*v.height as i32));
-    for e in &v.ability_overlays.entropy {
+    for (edges,color) in [(&v.ability_overlays.entropy,[255,255,255]),
+        (&v.ability_overlays.mind_read,crate::ability_ui::god_color(3))] {for e in edges {
         let x=ox+e.x as i32*cw-i32::from(e.x==v.width);
         let y=oy+e.y as i32*ch-i32::from(e.y==v.height);
         p.rect(x-1,y-1,if e.vertical{3}else{cw+3},if e.vertical{ch+3}else{3},[15,15,22]);
-        p.rect(x,y,if e.vertical{2}else{cw+1},if e.vertical{ch+1}else{2},[255,255,255]);
-    }
+        p.rect(x,y,if e.vertical{2}else{cw+1},if e.vertical{ch+1}else{2},color);
+    }}
     for pair in v.ability_overlays.riptide.windows(2){
         let((ax,ay),(bx,by))=(pair[0],pair[1]);
         let(x0,y0)=(ox+ax as i32*cw+cw/2,oy+ay as i32*ch+ch/2);
@@ -182,6 +199,53 @@ pub fn paint(p:&mut Painter,v:&View){
         corpse_core::divine_environment::apply_riptide(&mut r).unwrap();
         assert_eq!(observe(&r,Some(&o)).riptide,vec![(13,10),(14,10)]);
         r.player.active.clear();assert!(observe(&r,Some(&o)).riptide.is_empty());
+    }
+
+    fn mind_run()->Run {
+        let mut r=run();r.simulation_revision=52.0.into();
+        r.player.abilities=vec!["numo-mind-read".into()];r.player.active.clear();r.player.conditions.clear();
+        r.actors.clear();r
+    }
+    #[test] fn mind_read_outline_matches_actual_telepathy_in_both_states_and_half_here() {
+        let mut r=mind_run();
+        for clone in [false,true] {for active in [false,true] {
+            r.player.active.clear();if active {r.player.active.push("numo-mind-read".into());}
+            if clone {
+                r.player.abilities.push("etill-half-here".into());r.player.active.push("etill-half-here".into());
+                r.player.conditions.insert("halfHereId".into(),900.);
+                let mut a=r.player.clone();a.id=900.;a.x+=12.;
+                a.conditions.insert("halfHereClone".into(),1.);a.conditions.insert("halfHereOwner".into(),r.player.id);
+                r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(a);
+            }
+            let f=r.floor().unwrap();let(w,h)=(f.width(),f.height());
+            let inside=(0..w*h).map(|i|{
+                let target=corpse_core::Actor{id:999.,x:(i%w)as f64,y:(i/w)as f64,hp:1.,..Default::default()};
+                vision::telepathic(&r,&target)
+            }).collect::<Vec<_>>();
+            let before=r.clone();
+            assert_eq!(observe(&r,None).mind_read,perimeter(&inside,w,h));assert_eq!(r,before);
+        }}
+        r.player.abilities.retain(|s|s!="numo-mind-read");
+        assert!(observe(&r,None).mind_read.is_empty(),"active-list residue alone does not grant Mind Read");
+    }
+    #[test] fn mind_read_outline_does_not_leak_hidden_terrain_or_portals() {
+        let mut r=mind_run();let before=observe(&r,None).mind_read;
+        let f=r.floor_mut().unwrap();let w=f.width();f.tiles.fill("wall".into());f.lights.fill(-100.);f.seen.fill(false);
+        f.portals=vec![corpse_core::portals_generation::PortalPair{a:14*w+13,b:14*w+40,color_index:0}].into();
+        assert_eq!(observe(&r,None).mind_read,before);
+        let o=vision::observe_terrain(&r).unwrap();assert_eq!(observe(&r,Some(&o)).mind_read,before);
+        r.player.x+=1.;assert_ne!(observe(&r,None).mind_read,before);
+        r.player.active.push("numo-mind-read".into());assert_ne!(observe(&r,None).mind_read,before);
+    }
+    #[test] fn mind_read_outline_uses_numo_ink_and_same_entropy_stroke() {
+        let r=mind_run();let mut v=crate::observe::observe(&r);
+        let mut p=Painter::new();p.resize(1280,800);paint(&mut p,&v);
+        let green=crate::ability_ui::god_color(3);
+        let green_mask=p.pixels.chunks_exact(4).map(|c|c[..3]==green).collect::<Vec<_>>();
+        assert!(green_mask.iter().any(|&v|v));
+        v.ability_overlays.entropy=std::mem::take(&mut v.ability_overlays.mind_read);
+        let mut white=Painter::new();white.resize(1280,800);paint(&mut white,&v);
+        assert_eq!(green_mask,white.pixels.chunks_exact(4).map(|c|c[..3]==[255,255,255]).collect::<Vec<_>>());
     }
 
 }

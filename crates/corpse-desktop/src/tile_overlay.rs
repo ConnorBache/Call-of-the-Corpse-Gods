@@ -2,7 +2,7 @@
 //! framebuffer copy or rectangle bounding-box coalescer is constructed here.
 use crate::{render::{Painter,View,damage::Rect},pack::PackPaintState};
 #[derive(Clone,PartialEq)]
-pub struct Hover{pub report:crate::inspection_ui::Report,pub tile:(i32,i32,i32,i32),pub bounds:Rect}
+pub struct Hover{pub report:crate::inspection_ui::Report,pub bounds:Rect}
 #[derive(Clone,PartialEq)]
 pub struct Effect{pub x:i32,pub y:i32,pub color:[u8;3],pub light:u64,pub glyph:Option<String>,pub mark:Option<crate::action_marks::Mark>,pub bounds:Rect}
 #[derive(Clone,PartialEq)]
@@ -57,9 +57,9 @@ pub fn effects(p:&Painter,v:&View,cues:&[crate::effects::Cue],now:f64,reduced:bo
  p.logical_damage_rect(ox+t.x*cw-pad,oy+t.y*ch-pad,cw+2*pad,ch+2*pad).map(|mut bounds|{if let Some(c)=actors[i]{if let Some(r)=p.cell_damage_rect(c,v.width,v.height){bounds=bounds.union(r);}}Effect{x:t.x,y:t.y,color:t.color,light:t.light.to_bits(),glyph:t.glyph,mark:t.mark,bounds}})
  }).collect()
 }
-pub fn hover(p:&Painter,report:&crate::inspection_ui::Report,tile:(i32,i32,i32,i32))->Option<Hover>{
- if !crate::inspection_ui::hover_available(report){return None;}let r=crate::modal_ui::hover_bounds_painter(p,tile,i32::MAX/4);
- p.logical_damage_rect(r.0,8,r.2,p.logical_height()-16).map(|bounds|Hover{report:report.clone(),tile,bounds})
+pub fn hover(p:&Painter,report:&crate::inspection_ui::Report)->Option<Hover>{
+ if !crate::inspection_ui::hover_available(report){return None;}let r=crate::modal_ui::hover_bounds_painter(p,i32::MAX/4);
+ p.logical_damage_rect(r.0,r.1,r.2,r.3).map(|bounds|Hover{report:report.clone(),bounds})
 }
 #[cfg(test)]mod tests{
  use super::*;
@@ -146,14 +146,14 @@ pub fn upload_source(p:&Painter,r:Rect)->Result<(&[u8],usize),String>{
   let before=serde_json::to_vec(&run).unwrap();let view=crate::observe::observe(&run);let report=crate::inspection_ui::observe_tile(&run,11,10);
   assert!(report.creature.is_none());assert!(crate::inspection_ui::hover_available(&report));
   let mut p=Painter::new();let mut full=Painter::new();let mut plan=crate::render::tile_damage::TilePlanner::default();let mut track=Tracker::default();
-  plan.replace_view(None,&view,&p);let(cw,ch,ox,oy)=p.map_layout(view.width,view.height);let tile=(ox+11*cw,oy+10*ch,ox+12*cw,oy+11*ch);
-  assert!(crate::overlay_damage::hover(&p,&report,tile).is_some(),"retained admission matches tile admission");
+  plan.replace_view(None,&view,&p);
+  assert!(crate::overlay_damage::hover(&p,&report).is_some(),"retained admission matches tile admission");
   for step in 0..7 {
    let open=matches!(step,1|2|3|5);let mut shown=report.clone();if step==3 {shown.item_hover=vec!["Potion of Energy\nRestores 50 energy.".into()];}
-   let state=Frame{hover:if open{hover(&p,&shown,tile)}else{None},..Default::default()};
+   let state=Frame{hover:if open{hover(&p,&shown)}else{None},..Default::default()};
    for rect in track.changes(&p,&state){plan.mark_native_rect(rect);}finish_dependencies(&mut p,&mut plan,&state);plan.paint_base(&mut p,&view,"",0.);
-   if !p.tile_mask.is_empty(){if let Some(h)=&state.hover{crate::inspection_ui::paint_hover_at(&h.report,&mut p,h.tile);}}
-   p.tile_clip_enabled=false;full.game_at(&view,"",false,0.);if open{crate::inspection_ui::paint_hover_at(&shown,&mut full,tile);}
+   if !p.tile_mask.is_empty(){if let Some(h)=&state.hover{crate::inspection_ui::paint_hover(&h.report,&mut p);}}
+   p.tile_clip_enabled=false;full.game_at(&view,"",false,0.);if open{crate::inspection_ui::paint_hover(&shown,&mut full);}
    pixels(&p,&full,&format!("item hover step {step}"));assert_eq!(p.clip,None);track.commit(state);plan.clear_frame();
   }
   assert_eq!(serde_json::to_vec(&run).unwrap(),before);

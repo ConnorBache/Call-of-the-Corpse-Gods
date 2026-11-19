@@ -6,6 +6,16 @@ fn centered(p:&mut Painter,text:&str,x:i32,y:i32,width:i32,size:u16,color:[u8;3]
     let width_text=resource_ui::text_width(p,text,size);
     p.text(text,x+(width-width_text)/2,y,size,color);
 }
+pub(super) const RAGELIGHT_FILL: [u8; 3] = [150, 26, 47];
+pub(super) const RAGELIGHT_OUTLINE: [u8; 3] = [255, 92, 105];
+
+fn ragelight_label(cost_bits:u64)->String {
+    let cost=f64::from_bits(cost_bits);
+    if cost>=1e9 {format!("{cost:.2e}")} else {crate::stat_presentation::whole_number(cost)}
+}
+pub(super) fn ragelight_width(p:&Painter,cost_bits:u64)->i32 {
+    (resource_ui::text_width(p,&ragelight_label(cost_bits),12)+12).max(25)
+}
 pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
     match value {
         CustomIndicator::Nightmares{count,until}=>{
@@ -49,6 +59,11 @@ pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
                     p.rect(px,py,2,2,[192,168,255]);
                 }
             }
+        }
+        CustomIndicator::RagelightCost(cost_bits)=>{
+            p.rect(x,y,width,19,RAGELIGHT_FILL);
+            p.border(x,y,width,19,RAGELIGHT_OUTLINE);
+            centered(p,&ragelight_label(cost_bits),x,y+2,width,12,INK);
         }
         CustomIndicator::Rescue(ready)=>{
             if ready {p.rect(x,y,21,21,[59,150,255]);}
@@ -196,6 +211,76 @@ mod floor_future_tests {
                     }
                 }
                 if spent {r.future_floor.as_mut().unwrap().used_floors.retain(|d|*d!=r.depth);}
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod ragelight_tests {
+    use super::*;
+    use crate::render::{RetainedGame,tile_damage::TilePlanner};
+
+    #[test]
+    fn ragelight_red_cost_box_and_reserve_render_without_a_toggle_at_each_size() {
+        use corpse_core::{Run, divine_rescues::{self, RAGE}};
+        for (w,h) in [(960,1200),(1280,800),(1920,1080)] {
+            let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+            r.simulation_revision=52.0.into();
+            r.player.abilities=vec![RAGE.into()];
+            // Even stale selection and old enabled bits cannot bring back its toggle.
+            r.player.active=vec![RAGE.into()];
+            r.player.conditions.shift_remove("rageCost");
+            corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
+            let (mut full,mut retained_p,mut tile)=(Painter::new(),Painter::new(),Painter::new());
+            for p in [&mut full,&mut retained_p,&mut tile] {p.try_resize(w,h).unwrap();p.set_responsive_canvas(true);}
+            let mut retained=RetainedGame::default();
+            let mut plan=TilePlanner::default();
+            let mut old=None;
+            let mut zero_pixels=None;
+            for expected in [0.0f64,1.,2.,0.] {
+                if expected==0. && old.is_some() {
+                    r.exp=corpse_core::progression::level_up_cost(&r);
+                    corpse_core::progression::level_up(&mut r);
+                    r.offers.clear();
+                }
+                r.player.hp=1.;
+                let mut v=crate::observe::observe(&r);
+                v.selected_ability=Some(RAGE.into());
+                let cost=v.abilities[0].indicator.unwrap();
+                assert_eq!(cost,CustomIndicator::RagelightCost(expected.to_bits()));
+                assert!(v.abilities[0].reserve.is_some());
+                full.game_at(&v,"",false,0.);
+                retained.update(&mut retained_p,&v,"",0.,true,false).unwrap();
+                plan.replace_view(old.as_ref(),&v,&tile);plan.finish_damage(&mut tile);
+                plan.paint_base(&mut tile,&v,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();
+                assert_eq!(full.pixels,retained_p.pixels);
+                assert_eq!(full.pixels,tile.pixels);
+
+                let left=full.hud_left();
+                let y=crate::ability_ui::top(&full.profile);
+                let rail=full.logical_width()-left-24;
+                let bar_x=left+12+rail-rail/3;
+                let box_w=ragelight_width(&full,expected.to_bits());
+                let box_x=bar_x-box_w-6;
+                let row_color=|x:i32,y:i32| {
+                    let at=(full.native_y(y as f64)as usize*full.width+full.native_x(x as f64)as usize)*4;
+                    &full.pixels[at..at+3]
+                };
+                assert_eq!(row_color(box_x+2,y+2),RAGELIGHT_FILL);
+                assert_eq!(row_color(bar_x+3,y+7),super::super::game_color(&full.profile,"ui.colors.energy"));
+                for dy in -5..=5 {for dx in -5..=5 {
+                    assert!(![[100,255,114],[255,155,56],[110,110,125]].iter()
+                        .any(|rgb|row_color(left+23+dx,y+11+dy)==rgb));
+                }}
+                let glyph:Vec<_>=(3..17).flat_map(|dy|(3..box_w-3).map(move |dx|(dx,dy)))
+                    .map(|(dx,dy)|row_color(box_x+dx,y+dy)!=RAGELIGHT_FILL).collect();
+                if let Some(zero)=&zero_pixels {assert_eq!(&glyph==zero,expected==0.);}
+                else {zero_pixels=Some(glyph);}
+                old=Some(v);
+                let player=r.player.id;
+                r.player.hp=0.;
+                assert!(divine_rescues::try_rescue(&mut r,player,false));
             }
         }
     }

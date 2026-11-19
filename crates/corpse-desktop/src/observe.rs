@@ -760,6 +760,11 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 }
             }
         }
+        // The counter belongs to the real running Avatar only. No clone,
+        // sleeping body, corpse, or portal alias receives a duplicate.
+        if !run.player.dead.value_or(false) && run.player.hp > 0. {
+            cell.number_of_blood=corpse_core::engine::number_of_blood_phase(run,&run.player);
+        }
         // Linked topology does not leave a second player image at the departure
         // endpoint. Actor/item aliases and ordinary portal presentation are unchanged.
         cells.push(cell);
@@ -1262,6 +1267,25 @@ mod tests {
         (run, observation)
     }
     #[test]
+    fn ichor_surface_dimming_preserves_hue_and_leaves_other_materials_unchanged() {
+        let p=crate::appearance_profile::Profile::defaults();
+        for key in ["feature:ichor", "feature:fire", "feature:slime", "feature:mud", "feature:razorleaves"] {
+            let (raw_fg,raw_bg)=crate::appearance_material::feature_colors(p,key,3,4,17,None);
+            let (fg,bg)=crate::world_features::feature_surface(p,key,3,4,17);
+            if key=="feature:ichor" {
+                for (raw,dim) in [(raw_fg,fg),(raw_bg,bg)] {
+                    for (raw,dim) in raw.into_iter().zip(dim) {
+                        let ratio=crate::color::to_linear(dim as f64)/crate::color::to_linear(raw as f64);
+                        assert!((0.80..=0.84).contains(&ratio),"{ratio}");
+                    }
+                }
+            } else {
+                assert_eq!((fg,bg),(raw_fg,raw_bg),"{key}");
+            }
+        }
+    }
+
+    #[test]
     fn native_blood_river_remains_water_and_ichor_stays_distinct() {
         let (run, mut observation) = visual_scene();
         let before = serde_json::to_string(&run).unwrap();
@@ -1652,8 +1676,8 @@ fn terrain_frame_palette(
                     );
                     bg = crate::color::composite(bg, c, alpha);
                     if flesh && key == "feature:ichor" {
-                        let (ichor, _) = crate::appearance_material::feature_colors(
-                            profile, key, x, y, seed, None);
+                        let (ichor, _) = crate::world_features::feature_surface(
+                            profile, key, x, y, seed);
                         fg = crate::world_features::tone(profile, ichor, source_material_background,
                             bg, ctx, o.chance, observation.all_seeing, response, false, false, false);
                     }
@@ -1662,8 +1686,8 @@ fn terrain_frame_palette(
                         != crate::appearance_profile::Profile::defaults().value(&keypath)
                     {
                         let overlay_glyph = profile.text(&keypath).to_string();
-                        let (c, _) = crate::appearance_material::feature_colors(
-                            profile, key, x, y, seed, None,
+                        let (c, _) = crate::world_features::feature_surface(
+                            profile, key, x, y, seed,
                         );
                         let overlay_color = crate::world_features::tone(
                             profile,
@@ -2719,8 +2743,8 @@ fn terrain_frame_palette_json_reference(
                     );
                     bg = crate::color::composite(bg, c, alpha);
                     if flesh && key == "feature:ichor" {
-                        let (ichor, _) = crate::appearance_material::feature_colors(
-                            profile, key, x, y, seed, None);
+                        let (ichor, _) = crate::world_features::feature_surface(
+                            profile, key, x, y, seed);
                         fg = crate::world_features::tone(profile, ichor, source_material_background,
                             bg, ctx, o.chance, observation.all_seeing, response, false, false, false);
                     }
@@ -2729,8 +2753,8 @@ fn terrain_frame_palette_json_reference(
                         != crate::appearance_profile::Profile::defaults().value(&keypath)
                     {
                         let overlay_glyph = profile.text(&keypath).to_string();
-                        let (c, _) = crate::appearance_material::feature_colors(
-                            profile, key, x, y, seed, None,
+                        let (c, _) = crate::world_features::feature_surface(
+                            profile, key, x, y, seed,
                         );
                         let overlay_color = crate::world_features::tone(
                             profile,

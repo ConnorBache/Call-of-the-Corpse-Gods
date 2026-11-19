@@ -43,7 +43,11 @@ fn room()->Run{let mut r:Run=serde_json::from_str(include_str!("../../../fixture
  let mut r=room();let w=r.floor().unwrap().width();r.floor_mut().unwrap().tiles[10*w+13]="water".into();
  let expected=crate::revision50_wave_teleport::preview(&r,false,15.,10.);assert!(expected.len()<15);
  events::begin();crate::revision50_wave_teleport::execute(&mut r,false,15.,10.).unwrap();let cues=events::finish();
- let cells=&cues.iter().find_map(|e|e.animation.as_ref().filter(|c|c.proposal=="A12"&&c.stage==Stage::Travel)).unwrap().cells;
+ let flood:Vec<_>=cues.iter().filter_map(|e|e.animation.as_ref().filter(|c|c.proposal=="A12").map(|c|(e,c))).collect();
+ assert_eq!(flood.len(),1,"only the cast animates");
+ let (event,cue)=flood[0];assert_eq!(cue.stage,Stage::Travel);assert_eq!(cue.style,"nova-authored-short");
+ assert_eq!(event.to,(&r.player).into());assert_eq!(event.color.as_deref(),Some("#42d8ea"));
+ let cells=&cue.cells;
  assert_eq!(cells, &expected.iter().map(|&(x,y)|EventPoint{x:x as f64,y:y as f64}).collect::<Vec<_>>());
  assert!(!cells.contains(&EventPoint{x:13.,y:10.}));assert_eq!(r.floor().unwrap().tiles[10*w+13],"water");
 }

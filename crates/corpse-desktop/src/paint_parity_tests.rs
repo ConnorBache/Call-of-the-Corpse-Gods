@@ -29,7 +29,7 @@ fn exhaustive_paint_evidence() {
         pack.configure(&p,p.map_layout(view.width,view.height)); pack.paint(&mut p); record(&p,"pack");
         let report=crate::inspection_ui::observe_tile(&engine.run,engine.run.player.x as usize,engine.run.player.y as usize);
         p.game_at(&view,"",false,420.); crate::inspection_ui::paint(&report,&mut p,0);record(&p,"inspection");
-        p.game_at(&view,"",false,420.); crate::inspection_ui::paint_hover(&report,&mut p,300,300);record(&p,"hover");
+        p.game_at(&view,"",false,420.); crate::inspection_ui::paint_hover(&report,&mut p);record(&p,"hover");
         p.profile=p.profile.set("typography.chronicle.fontWeight",serde_json::json!(700)).unwrap();
         p.profile=p.profile.set("typography.map.fontFamily",serde_json::json!("IBM Plex Mono")).unwrap();
         p.profile=p.profile.set("typography.map.letterSpacing",serde_json::json!(0.7)).unwrap();

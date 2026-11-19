@@ -54,7 +54,7 @@ fn gameplay_gpu_command_capture_preserves_cpu_pixels_and_simulation(){
         p.game_at(&view,"GPU verification",false,420.);
         let mut pack=crate::pack::PackView::observe(&engine.run);pack.configure(&p,p.frame().map.tuple());pack.paint(&mut p);
         let report=crate::inspection_ui::observe_tile(&engine.run,engine.run.player.x as usize,engine.run.player.y as usize);
-        crate::inspection_ui::paint_hover(&report,&mut p,300,300);
+        crate::inspection_ui::paint_hover(&report,&mut p);
         assert!(p.pixels.iter().all(|&b|b==17),"GPU path CPU-painted at {w}x{h}");
         assert!(!p.gpu.as_ref().unwrap().quads.is_empty());
     }
@@ -111,7 +111,7 @@ fn gpu_sdl_gameplay_visual_matrix(){
                 p.game_at(view,"GPU scene verification",false,420.);
                 match scene {
                     "pack"=>{let mut pack=crate::pack::PackView::observe(run);pack.configure(p,p.frame().map.tuple());pack.paint(p);},
-                    "hover"=>crate::inspection_ui::paint_hover(report,p,300,300),
+                    "hover"=>crate::inspection_ui::paint_hover(report,p),
                     "shutter"=>{let mut shutter=crate::chronicle_overlay::Shutter::default();shutter.open(0.,false);crate::chronicle_overlay::paint(p,&vec!["A remembered event. Ω 123".into();25],&shutter,110.,false);},
                     _=>{}
                 }

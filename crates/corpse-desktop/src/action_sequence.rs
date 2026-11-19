@@ -14,11 +14,12 @@ pub struct Sequence {
 impl Sequence {
     pub fn clear(&mut self) { *self = Self::default(); }
     pub fn capture_run(&mut self, before: corpse_core::Run, frames: Vec<PresentationFrame>, cues: &[Cue], profile: &crate::appearance_profile::Profile) {
-        if cues.is_empty() { self.clear(); return; }
+        if !cues.iter().any(|c| crate::effects::blocks(&c.event)) { self.clear(); return; }
         self.capture(observe(&before,profile), frames, cues, profile);
     }
     pub fn capture(&mut self, before: View, frames: Vec<PresentationFrame>, cues: &[Cue], profile: &crate::appearance_profile::Profile) {
         self.clear();
+        let cues: Vec<_> = cues.iter().filter(|c| crate::effects::blocks(&c.event)).collect();
         if cues.is_empty() { return; }
         self.before = Some(Rc::new(before));
         // Select the last completed boundary preceding each visible action.
@@ -30,7 +31,7 @@ impl Sequence {
         for action in actions {
             if let Some(index) = frames.iter().rposition(|f| f.action < action) { selected.insert(index); }
         }
-        for cue in cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")) {
+        for cue in &cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")) {
             let action=cue.event.animation.as_ref().unwrap().action;
             if let Some(index)=frames.iter().position(|f|f.action==action){selected.insert(index);}
         }}
@@ -42,7 +43,7 @@ impl Sequence {
                 self.frames.push((frame.action,view));
             }
         }
-        for cue in cues {
+        for cue in &cues {
             if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")) {
                 if let Some((_,after))=self.frames.iter().find(|(id,_)|*id==a.action) {
                     let base=self.frames.iter().rev().find(|(id,_)|*id<a.action).map(|(_,v)|v).or(self.before.as_ref()).unwrap();
@@ -73,7 +74,7 @@ impl Sequence {
                 }
             }
         }
-        for cue in cues {
+        for cue in &cues {
             let end = cue.started + duration(&cue.event);
             self.finish = self.finish.max(end);
             if let Some(a) = &cue.event.animation {

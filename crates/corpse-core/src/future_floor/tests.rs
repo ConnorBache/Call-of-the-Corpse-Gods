@@ -11,3 +11,31 @@ fn activate()->Command {Command::Ability{id:ID.into(),target:Field::Missing,x:Fi
 #[test] fn save_load_preserves_original_entry_not_loaded_position(){let mut e=Engine::new(room()).unwrap();let hp=e.run.player.hp;let energy=e.run.player.energy;e.run.player.hp=17.;e.run.player.energy=2.;let mut e=Engine::load(&e.save().unwrap()).unwrap();e.dispatch(&activate()).unwrap();assert_eq!(e.run.player.hp,hp);assert_eq!(e.run.player.energy,energy);}
 #[test] fn legacy_replay_keeps_old_paid_anchor(){let mut r=room();r.future_floor_rules_from=Field::Null;let mut e=Engine::new(r).unwrap();e.dispatch(&activate()).unwrap();assert!(e.run.future.is_some());assert!(e.run.future_floor.is_none());assert_eq!(e.run.player.energy,0.);}
 #[test] fn actual_floor_travel_replaces_entry_and_revisit_stays_spent(){let mut e=Engine::new(room()).unwrap();e.dispatch(&activate()).unwrap();assert!(crate::travel::travel(&mut e.run,1.,false,false).unwrap());assert_eq!(e.run.depth,2.);let entry=e.run.future_floor.as_ref().unwrap().anchor.as_ref().unwrap().native_state().unwrap().player.clone();e.run.player.hp=2.;e.dispatch(&activate()).unwrap();assert_eq!(e.run.player.hp,entry.hp);assert!(used(&e.run,1.)&&used(&e.run,2.));assert!(crate::travel::travel(&mut e.run,-1.,false,false).unwrap());assert!(!available(&e.run));}
+
+#[test] fn floor_rewind_preserves_screamer_policy() {
+ for policy in [Field::Null,Field::Value(0)] {
+  let mut r=room();r.screamer_rules_from=policy.clone();
+  let mut e=Engine::new(r).unwrap();e.dispatch(&activate()).unwrap();
+  assert!(used(&e.run,1.));assert_eq!(e.run.screamer_rules_from,policy);
+ }
+}
+
+#[test]
+fn floor_future_rewinds_world_without_rewinding_ember_steam_or_ichor_fire_rules() {
+    for policy in [Field::Null, Field::Value(1)] {
+        let mut r = room();
+        r.ember_rules_from = Field::Null;
+        r.steam_rules_from = Field::Null;
+        r.ichor_fire_rules_from = Field::Null;
+        let mut e = Engine::new(r).unwrap();
+        e.run.replay.push(Command::Wait);
+        e.run.ember_rules_from = policy.clone();
+        e.run.steam_rules_from = policy.clone();
+        e.run.ichor_fire_rules_from = policy.clone();
+        e.dispatch(&activate()).unwrap();
+        assert_eq!(e.run.ember_rules_from, policy);
+        assert_eq!(e.run.steam_rules_from, policy);
+        assert_eq!(e.run.ichor_fire_rules_from, policy);
+        assert!(used(&e.run, 1.));
+    }
+}

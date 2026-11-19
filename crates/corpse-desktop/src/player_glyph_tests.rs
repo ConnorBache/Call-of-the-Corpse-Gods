@@ -21,6 +21,7 @@ fn assert_player(cell: &Cell) {
     assert_eq!(cell.glyph, "@");
     assert!(cell.superscript.is_empty(), "player superscript: {:?}", cell.superscript);
     assert!(cell.subscript.is_empty());
+    assert!(cell.number_of_blood.is_none());
 }
 
 fn player(view: &View) -> &Cell {
@@ -251,4 +252,65 @@ fn player_invisibility_native_raster_is_blue_and_reversible() {
     run.player.conditions.remove("invisible");
     painter.game_at(&observe(&run), "", false, 0.);
     assert_eq!(painter.pixels, pixels);
+}
+
+#[test]
+fn number_of_blood_counts_real_rounds_without_pulsing_or_marking_other_actors() {
+    let mut run=room();
+    run.inventory.clear();
+    assert_eq!(corpse_core::engine::number_of_blood_phase(&run,&run.player),None);
+    run.player.abilities.push("lichor-the-number-of-blood".into());
+    let mut other=run.player.clone();other.id=950.;other.x+=1.;other.hp=100.;other.max_hp=100.;
+    run.actors_at_mut(run.depth).push(other);
+    for round in 1..=6 {
+        run.tick=(round-1) as f64;
+        let phase=if round==6{1}else{round as u8};
+        let view=observe(&run);
+        assert_eq!(player(&view).glyph,"@");
+        assert_eq!(player(&view).number_of_blood,Some(phase));
+        assert_eq!(view.cells.iter().filter(|cell|cell.number_of_blood.is_some()).count(),1);
+    }
+    run.tick=5.;run.resolving_tick=true.into();
+    run.player.conditions.insert("angelUsedRound".into(),5.);
+    assert_eq!(player(&observe(&run)).number_of_blood,Some(5));
+    run.resolving_tick=Field::Missing;run.tick=3.;
+    run.actors_at_mut(run.depth).clear();
+    for depth in run.floors.iter().map(|floor|floor.depth).collect::<Vec<_>>() {
+        run.actors_at_mut(depth);run.ground_at_mut(depth);
+    }
+    let mut engine=crate::temporal::Engine::new(run).unwrap();
+    // Entering the fifth count does not schedule a HUD cue or an input lock.
+    let mut effects=crate::effects::Effects::default();
+    crate::dispatch(&mut engine,&mut effects,0.,&corpse_core::Command::Wait).unwrap();
+    assert_eq!(player(&observe(&engine.run)).number_of_blood,Some(5));
+    assert!(effects.cues.iter().all(|cue|cue.event.animation.as_ref().is_none_or(|a|a.proposal!="P42")));
+    assert!(!effects.presentation_pending(0.));
+}
+
+#[test]
+fn number_of_blood_fifth_stays_red_after_spend_and_tile_repaint_matches_full() {
+    let mut run=room();
+    run.player.abilities.push("lichor-the-number-of-blood".into());
+    let mut tile=Painter::new();let mut full=Painter::new();
+    let mut plan=crate::render::tile_damage::TilePlanner::default();
+    let mut previous=None;
+    for (tick,spent,expected) in [(3.,false,4),(4.,false,5),(4.,true,5),(5.,false,1)] {
+        run.tick=tick;
+        if spent {run.player.conditions.insert("angelUsedRound".into(),5.);}
+        else {run.player.conditions.shift_remove("angelUsedRound");}
+        let view=observe(&run);let avatar=player(&view);
+        assert_eq!(avatar.number_of_blood,Some(expected));
+        plan.replace_view(previous.as_ref(),&view,&tile);plan.finish_damage(&mut tile);
+        plan.paint_base(&mut tile,&view,"",0.);tile.tile_clip_enabled=false;
+        full.game_at(&view,"",false,0.);assert!(tile.pixels==full.pixels,"count {expected}, spent={spent}");
+        let (cw,ch,ox,oy)=full.map_layout(view.width,view.height);
+        let x=ox+(avatar.x+1)as i32*cw-1;let y=oy+avatar.y as i32*ch;
+        let bounds=full.logical_damage_rect(x,y,3*(ch/12).max(1),5*(ch/12).max(1)).unwrap();
+        let red=(bounds.y..bounds.bottom()).any(|y|(bounds.x..bounds.right()).any(|x|{
+            let i=(y*full.width+x)*4;let pixel=&full.pixels[i..i+3];
+            pixel[0]>190&&pixel[1]<65&&pixel[2]<90
+        }));
+        assert_eq!(red,expected==5,"fifth is neon red whether spent or not");
+        previous=Some(view);plan.clear_frame();
+    }
 }

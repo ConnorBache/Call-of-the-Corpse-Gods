@@ -23,8 +23,9 @@ pub(crate) fn room() -> Run {
     let w=f.width();for x in [12,15,20] {f.tiles[10*w+x]="grass".into();}f.tiles[10*w+25]="wall".into();
     r
 }
-fn cast()->(temporal::Engine,effects::Effects,View) {
-    let mut engine=temporal::Engine::new(room()).unwrap();
+fn cast()->(temporal::Engine,effects::Effects,View) { cast_in(room()) }
+fn cast_in(run:Run)->(temporal::Engine,effects::Effects,View) {
+    let mut engine=temporal::Engine::new(run).unwrap();
     let mut effects=effects::Effects::default();
     crate::dispatch(&mut engine,&mut effects,0.,&Command::UseAt{id:900.,x:11.,y:10.}).unwrap();
     effects.begin_frame(1000.);
@@ -32,10 +33,10 @@ fn cast()->(temporal::Engine,effects::Effects,View) {
     (engine,effects,view)
 }
 fn fire(cells:&[Cell],x:usize)->bool {cells.iter().any(|cell|cell.x==x&&cell.y==10&&cell.fire)}
-fn arrival(effects:&effects::Effects,x:usize)->f64 {
+fn departure(effects:&effects::Effects,x:usize)->f64 {
     let cue=effects.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|a.proposal=="A02"&&a.stage==Stage::Travel)).unwrap();
     let position=cue.event.animation.as_ref().unwrap().cells.iter().position(|p|p.x==x as f64&&p.y==10.).unwrap();
-    cue.started+effects::arrival_ms(&cue.event,position)
+    cue.started+effects::departure_ms(&cue.event,position)
 }
 
 #[test]
@@ -57,12 +58,46 @@ fn firebolt_advances_terrain_without_reverting_current_actors_or_knowledge() {
     let cells=first.cells.clone();
     assert!(!effects.firebolt_terrain.prepare(&view,&effects.cues,1001.,false,&mut stage));
     assert!(Arc::ptr_eq(&cells,&stage.as_ref().unwrap().cells),"unchanged display frame reuses detached paint cache");
-    assert!(effects.firebolt_terrain.prepare(&view,&effects.cues,arrival(&effects,12),false,&mut stage));
+    // The traversing head has reached the grass, but the committed fire
+    // should only replace its old terrain as the head steps off.
+    let first_departure=departure(&effects,12);
+    effects.firebolt_terrain.prepare(&view,&effects.cues,first_departure-1.,false,&mut stage);
+    assert!(!fire(&stage.as_ref().unwrap().cells,12));
+    assert!(effects.firebolt_terrain.prepare(&view,&effects.cues,first_departure,false,&mut stage));
     assert!(fire(&stage.as_ref().unwrap().cells,12));assert!(!fire(&stage.as_ref().unwrap().cells,20));
-    effects.firebolt_terrain.prepare(&view,&effects.cues,arrival(&effects,20),false,&mut stage);
+    effects.firebolt_terrain.prepare(&view,&effects.cues,departure(&effects,20),false,&mut stage);
     assert!(fire(stage.as_ref().map(|s|s.cells.as_slice()).unwrap_or(&view.cells),20));
     assert!(effects.firebolt_terrain.prepare(&view,&effects.cues,10000.,false,&mut stage));
     assert!(stage.is_none());assert_eq!(view.cells,canonical);assert_eq!(engine.save().unwrap(),saved);
+}
+
+#[test]
+fn firebolt_reveals_fire_under_an_intercepting_enemy_on_the_final_step_only() {
+    let mut run=room();
+    let mut actor=corpse_core::Actor{id:950.,x:15.,y:10.,name:"Target".into(),glyph:"e".into(),color:"#ffffff".into(),
+        hp:500.,max_hp:500.,base_max_hp:500.0.into(),energy:100.,state:"hunting".into(),
+        stats:Stats{max_energy:100.,..Default::default()},..Default::default()};
+    actor.conditions.insert("paralyzed".into(),100.);
+    run.actors_at_mut(run.depth).push(actor);
+    let (_engine,effects,view)=cast_in(run);
+    let travel=effects.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|a.proposal=="A02"&&a.stage==Stage::Travel)).unwrap();
+    let last=travel.event.animation.as_ref().unwrap().cells.last().unwrap();
+    assert_eq!((last.x,last.y),(15.,10.));
+    // A living actor owns the glyph layer, so use the terrain observation
+    // to check the fire underneath it.
+    let burning=|snapshot:&TerrainObservation,x:usize|snapshot.cells[10*view.width+x]
+        .hazards.as_ref().is_some_and(|h|h.fire.as_ref().is_some_and(|kind|kind!="embers"));
+    let canonical=view.terrain_snapshot.as_ref().unwrap();
+    assert!(burning(canonical,15));assert!(!burning(canonical,13));assert!(!burning(canonical,20));
+    let end=departure(&effects,15);
+    let mut stage=None;
+    effects.firebolt_terrain.prepare(&view,&effects.cues,end-1.,false,&mut stage);
+    let stage_before=stage.as_ref().unwrap();
+    assert!(fire(&stage_before.cells,12));assert!(!burning(&stage_before.snapshot,15));
+    assert!(stage_before.cells.iter().any(|c|c.actor_id==Some(950.)));
+    assert!(effects.firebolt_terrain.prepare(&view,&effects.cues,end,false,&mut stage));
+    assert!(stage.is_none(),"final cell departs before the cosmetic tail finishes");
+    assert!(effects.animate(end));
 }
 
 #[test]
@@ -102,7 +137,7 @@ fn capture(p:&Painter,name:&str) {
     }
 }
 #[test]
-fn staged_native_arrival_frames_match_full_and_keep_final_view_immutable() {
+fn staged_native_departure_frames_match_full_and_keep_final_view_immutable() {
     let (engine,effects,view)=cast();let saved=engine.save().unwrap();let canonical=view.cells.clone();
     for animated in [false,true] {
         let mut tile=Painter::new();let mut full=Painter::new();let mut retained=Painter::new();let mut retained_game=crate::render::RetainedGame::default();
@@ -113,7 +148,7 @@ fn staged_native_arrival_frames_match_full_and_keep_final_view_immutable() {
         let mut stage=Staging::default();stage.capture(observe::observe_with_profile(&room(),&tile.profile),&effects.cues);
         for painter in [&mut tile,&mut full,&mut retained] {painter.resize(960,600);painter.set_responsive_canvas(true);}
         let mut plan=TilePlanner::default();plan.replace_view(None,&view,&tile);
-        for (frame,now) in [1000.,1001.,arrival(&effects,12),arrival(&effects,15),arrival(&effects,20),10000.].into_iter().enumerate() {
+        for (frame,now) in [1000.,1001.,departure(&effects,12),departure(&effects,15),departure(&effects,20),10000.].into_iter().enumerate() {
             if stage.prepare(&view,&effects.cues,now,false,&mut tile.firebolt_terrain) {plan.invalidate();plan.replace_view(None,&view,&tile);}
             stage.prepare(&view,&effects.cues,now,false,&mut full.firebolt_terrain);
             if let Some(stage)=tile.firebolt_terrain.as_ref() {for rect in stage.damage(&tile,&view) {plan.mark_native_rect(rect);}}

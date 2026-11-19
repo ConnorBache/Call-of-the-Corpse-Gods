@@ -10,6 +10,11 @@ fn condition(a: &Actor, k: &str) -> f64 {
 fn has(a: &Actor, id: &str) -> bool {
     a.abilities.iter().any(|s| s == id)
 }
+fn standing_in_steam(f: &corpse_core::Floor, a: &Actor) -> bool {
+    corpse_core::portals::cell(f,a.x,a.y).is_some_and(|at| {
+        f.environment.as_ref().and_then(|e| corpse_core::environment::gas_kind_at(e,at)) == Some("steam")
+    })
+}
 fn exposure(r: &Run, x: f64, y: f64, verb: &str, entering: bool) -> Option<String> {
     let f = r.floor()?;
     if x < 0.
@@ -31,13 +36,18 @@ fn exposure(r: &Run, x: f64, y: f64, verb: &str, entering: bool) -> Option<Strin
         let rounding = if corpse_core::combat::nearest_damage_enabled(r) { "rounded to the nearest whole number" } else { "rounded up" };
         return Some(format!("{verb} amid razorleaves? Ending your turn there costs 2% of your maximum health ({rounding})."));
     }
-    if (h.fire.as_ref().is_some() || h.permanent_fire.value_or(false))
+    if (h.fire.as_ref().is_some_and(|kind| kind != "embers") || h.permanent_fire.value_or(false))
         && !has(p, "anavani-star-power")
         && !has(p, "enemy:beast:fire-immunity")
     {
         return Some(format!(
             "{verb} in the fire? It can burn you and cause damage."
         ));
+    }
+    if h.gas.as_ref().is_some_and(|gas| gas.r#type == "steam") {
+        let already_in_steam = entering && standing_in_steam(f,p);
+        return (corpse_core::environment::steam_can_scald(r, p) && !already_in_steam)
+            .then(|| format!("{verb} in steam? It can scald you while you are in it."));
     }
     // Reuse simulation occupancy at the player's own cell. O(1) with the fixed
     // gas catalog; no extra floor/visibility query or concentration threshold.
@@ -99,8 +109,16 @@ pub fn waiting(r: &Run) -> Option<String> {
     let dream_view = crate::dream_ui::observation_run(r);
     let r = dream_view.as_ref();
     if crate::travel_ui::action_skips_world(r, false) { return None; }
-    exposure(r, r.player.x, r.player.y, "Wait", false)
-        .or_else(|| current_exposure(r, r.player.x, r.player.y, false))
+    let local = exposure(r, r.player.x, r.player.y, "Wait", false);
+    let downstream = || current_exposure(r, r.player.x, r.player.y, false);
+    if corpse_core::environment::steam_can_scald(r, &r.player)
+        && r.floor().is_some_and(|f| standing_in_steam(f,&r.player)) {
+        // Currents move before environmental exposure. Keep the specific
+        // destination warning if a visible current will carry us into danger.
+        downstream().or(local)
+    } else {
+        local.or_else(downstream)
+    }
 }
 fn fall_warning(r: &Run, x: f64, y: f64) -> Option<String> {
     if r.depth >= 40. {

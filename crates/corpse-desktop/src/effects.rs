@@ -151,6 +151,24 @@ pub fn tiles(cue: &Cue, now: f64, reduced: bool) -> Vec<Tile> {
     }
     out
 }
+/// Admit real spatial animations and UI receipts, not the generic tile-flash
+/// fallback. O(1) per receipt; classify renderer semantics, not cell count.
+/// Specialized patterns can legitimately start on one cell.
+pub(crate) fn admitted(e: &PresentationEvent) -> bool {
+    let Some(a) = e.animation.as_ref() else { return (e.kind == "projectile" && e.from.is_some()) || explosion(e); };
+    a.surface.is_some()
+        || crate::divine_animation_shapes::duration(e).is_some()
+        || (a.stage == Stage::Travel && a.delivery != Delivery::Local)
+        // Authored explosions are distinct from the reviewed attached flashes.
+        || (matches!(a.proposal.as_str(), "P57" | "E37") && a.style == "burst-ember")
+}
+/// Defensive legacy classification: even an independently supplied cosmetic
+/// collapse must not own an input/scene lock. Normal admission now drops it.
+pub(crate) fn blocks(e: &PresentationEvent) -> bool {
+    e.kind != "cosmetic-death"
+        && !e.animation.as_ref().is_some_and(|a| a.style == corpse_core::animation_shapes::SHORT_NOVA)
+}
+fn lock_duration(e: &PresentationEvent) -> f64 { if blocks(e) { duration(e) } else { 0. } }
 pub struct PlaneTransition {pub before:crate::render::View,pub started:f64,pub ascend:bool}
 #[derive(Default)]
 pub struct Effects {
@@ -167,7 +185,7 @@ pub struct Effects {
 }
 impl Effects {
     pub fn configure_motion(&mut self,reduced:bool,instant:bool){self.reduced=reduced;self.instant=instant;for c in &mut self.cues{c.static_marks=reduced||instant;}if reduced||instant{self.plane_transition=None;}}
-    pub fn plane_changed(&mut self,before:crate::render::View,now:f64){if !self.reduced&&!self.instant{self.plane_transition=Some(PlaneTransition{before,started:now,ascend:false});}}
+    pub fn plane_changed(&mut self,_before:crate::render::View,_now:f64){self.plane_transition=None;}
     pub fn clear(&mut self) {
         self.gameplay_pause.reset();
         self.sequence.clear();
@@ -195,6 +213,8 @@ impl Effects {
         }
         self.key = Some(key);
         let mut events=events;
+        // Remove flashes before phase lengths, scene capture, or input locks.
+        events.retain(admitted);
         // A shared strike gets feedback only when it actually traveled. Ability
         // procs have their own receipts; ordinary walking/melee adds no flourish.
         // O(E log E) time / O(E) scratch, bounded by the existing cue cap.
@@ -214,15 +234,15 @@ impl Effects {
         events.sort_by_key(|e|e.animation.as_ref().map(|a|(a.action,a.stage)));
         // O(E log E) schedule: each phase completes before the next phase.
         let mut phase_lengths=std::collections::BTreeMap::new();
-        for e in &events {if let Some(a)=&e.animation {let d=phase_lengths.entry((a.action,a.stage)).or_insert(0f64);if a.stage==Stage::Travel {*d+=duration(e)}else{*d=d.max(duration(e));}}}
+        for e in &events {if let Some(a)=&e.animation {let d=phase_lengths.entry((a.action,a.stage)).or_insert(0f64);if a.stage==Stage::Travel {*d+=lock_duration(e)}else{*d=d.max(lock_duration(e));}}}
         let mut starts=std::collections::BTreeMap::new();let mut cursor=now;
         for (key,len) in phase_lengths {starts.insert(key,cursor);cursor+=len;}
         let mut travel_offsets=std::collections::BTreeMap::<u32,f64>::new();
         let mut action_end=now;
         for mut event in events {
             if self.instant {if let Some(a)=event.animation.as_mut(){if a.stage==corpse_core::events::Stage::Travel && !a.style.starts_with("wave") && !a.style.starts_with("fan"){if let Some(last)=a.cells.last().cloned(){a.cells=vec![last];}}}}
-            let started=if self.instant {now} else if let Some(a)=&event.animation {let offset=if a.stage==Stage::Travel {let offset=travel_offsets.entry(a.action).or_default();let old=*offset;*offset+=duration(&event);old}else{0.};starts[&(a.action,a.stage)]+offset}else{action_end};
-            action_end = action_end.max(started + duration(&event));
+            let started=if self.instant {now} else if let Some(a)=&event.animation {let offset=if a.stage==Stage::Travel {let offset=travel_offsets.entry(a.action).or_default();let old=*offset;*offset+=lock_duration(&event);old}else{0.};starts[&(a.action,a.stage)]+offset}else{action_end};
+            action_end = action_end.max(started + lock_duration(&event));
             let held = explosion(&event);
             if held {
                 self.cues.retain(|c| !c.held || c.event.to != event.to);
@@ -236,7 +256,7 @@ impl Effects {
         }
         // Held lines remain visible through every later phase of their action.
         let mut ends=std::collections::BTreeMap::<u32,f64>::new();
-        for c in &self.cues {if let Some(a)=&c.event.animation {let end=ends.entry(a.action).or_default();*end=end.max(c.started+duration(&c.event));}}
+        for c in &self.cues {if let Some(a)=&c.event.animation {let end=ends.entry(a.action).or_default();*end=end.max(c.started+lock_duration(&c.event));}}
         for c in &mut self.cues {if let Some(a)=&mut c.event.animation {if a.style=="line-hold"||a.style=="moving-actor" {a.style=format!("{}:{}",a.style,ends[&a.action]-c.started);}}}
         if self.cues.len() > 4096 {
             self.cues.drain(..self.cues.len() - 4096);
@@ -244,7 +264,7 @@ impl Effects {
     }
     /// Dispatch may take longer than the animation. Start at the first rendered
     /// frame, after simulation finishes; this clock never feeds back into Run.
-    pub fn defer_until_frame(&mut self, queued_at:f64){self.pending_frame=Some(queued_at);}
+    pub fn defer_until_frame(&mut self, queued_at:f64){self.pending_frame=(!self.cues.is_empty()).then_some(queued_at);}
     pub fn begin_frame(&mut self, now:f64){
         if let Some(queued)=self.pending_frame.take(){
             let shift=(now-queued).max(0.);
@@ -253,7 +273,7 @@ impl Effects {
             if let Some(t)=&mut self.plane_transition{t.started+=shift;}
         }
     }
-    pub fn presentation_pending(&self,now:f64)->bool { self.sequence.pending(now) || self.pending_frame.is_some() || self.animate(now) }
+    pub fn presentation_pending(&self,now:f64)->bool { self.sequence.pending(now) || (self.pending_frame.is_some() && self.cues.iter().any(|c| blocks(&c.event))) || self.plane_transition.as_ref().is_some_and(|p|now-p.started<250.) || self.cues.iter().any(|c| blocks(&c.event) && !c.held && now-c.started<duration(&c.event)) }
     pub fn travel_pending(&self,now:f64)->bool{ self.presentation_pending(now) }
     pub fn redraw_panels(&self,now:f64)->bool {self.plane_transition.as_ref().is_some_and(|p|now-p.started<250.)||!inventory_marks(&self.cues,now).is_empty()}
     pub fn animate(&self, now: f64) -> bool {
@@ -299,18 +319,22 @@ mod tests {
     }
 }
 
-/// Brogue requests 16ms per visible bolt cell. These deliberately slower steps
-/// keep physical shots visible for multiple display frames; route length is not
-/// compressed into a fixed total. Only admitted cells affect visual duration.
-pub const MAGIC_CELL_MS:f64=32.;
+/// Brogue's 16 ms per visible bolt cell. Physical shots retain their slower
+/// step so their glyph is readable. Only admitted cells affect visual duration.
+pub const MAGIC_CELL_MS:f64=16.;
 pub const PROJECTILE_CELL_MS:f64=40.;
-const MAGIC_TAIL_MS:f64=128.;
+const MAGIC_TAIL_MS:f64=64.;
 pub fn arrival_ms(e:&PresentationEvent,index:usize)->f64{
     match e.animation.as_ref().map(|a|a.delivery){
         Some(Delivery::Magic)=>index as f64*MAGIC_CELL_MS,
         Some(Delivery::Projectile)=>index as f64*PROJECTILE_CELL_MS,
         _=>0.,
     }
+}
+/// The beam head leaves a cell when it advances to the next one. Its final
+/// cell gets a full step too; the fading light tail is not the moving head.
+pub fn departure_ms(e:&PresentationEvent,index:usize)->f64{
+    arrival_ms(e,index+1)
 }
 fn travel_end(e:&PresentationEvent)->f64{
     e.animation.as_ref().map_or(140.,|a|if a.delivery==Delivery::Local{140.}else{arrival_ms(e,a.cells.len().max(1))})
@@ -397,7 +421,7 @@ pub fn inventory_hud_anchor(p:&crate::render::Painter,mark:&crate::action_marks:
     if mark.style=="health-slash" {(p.hud_left()+12,84,24,24)}else if mark.style=="pack-capacity" {
         let (x,w)=crate::render::toolbar_rect_for_width(0,p.logical_width());
         (x+w/2-12,p.toolbar_y()+4,24,28)
-    } else if mark.style=="charge-spark"||mark.style=="unlock-diamond"||mark.style=="five-notch" {
+    } else if mark.style=="charge-spark"||mark.style=="unlock-diamond" {
         (p.hud_left()+12,crate::ability_ui::top(&p.profile)-26,24,24)
     } else {(p.hud_left()+12,110,24,24)}
 }

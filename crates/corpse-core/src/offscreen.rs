@@ -516,6 +516,7 @@ fn catch_up(
         }
         let tick = r.floors[index].last_tick + 1.;
         let mut head = proxy(r, depth, tick);
+        crate::screamer_schedule::expire(&mut head);
         if crate::creature_feeding::enabled(&head) { head.resolving_tick = true.into(); }
         let living_before: Vec<_> = head
             .actors_at(depth)
@@ -580,6 +581,7 @@ fn catch_up(
         r.metrics = head.metrics;
         r.run_stats = head.run_stats;
         r.collapse = head.collapse;
+        r.screamer_schedule = head.screamer_schedule;
         // JS proxies share these whole collections: death/item callbacks can mutate a deeper floor.
         // Moving Arc collections preserves all untouched block identities without deep copying.
         r.actors.replace_from(head.actors);
@@ -891,6 +893,7 @@ fn precise_actor_phase(head: &mut Run, pending: &mut Vec<Transfer>) -> Result<()
         if actor(head, id).is_none_or(|a| a.dead.value_or(false)) {
             continue;
         }
+        if crate::beckoning_skip::consume(head,id){continue;}
         let before_action=actor(head,id).unwrap().clone();
         let (result,receipt)=crate::revision52_speed::measure(id,false,|| -> Result<(),String> {
         if !was_paralyzed && crate::revision50_control_amulets::discord_turn(head,id,false).map_err(|e|e.to_string())? {
@@ -1334,6 +1337,7 @@ fn apply_transfer(r: &mut Run, t: Transfer) -> Result<(), String> {
     r.metrics = head.metrics;
     r.run_stats = head.run_stats;
     r.collapse = head.collapse;
+        r.screamer_schedule = head.screamer_schedule;
     r.floors = head.floors;
     r.actors.replace_from(head.actors);
     r.ground = head.ground;

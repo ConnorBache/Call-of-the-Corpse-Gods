@@ -14,27 +14,40 @@ fn assert_avatar(run: &Run, seed: &str) {
     assert_eq!(run.gods, [0.0, 5.0, 11.0]);
     assert_eq!(run.player.abilities.len(), 3);
     for (god, ability) in run.gods.iter().zip(&run.player.abilities) {
-        assert!(corpse_core::progression::starter_abilities_for_revision(*god as u32, 52.0)
-            .unwrap().contains(ability));
+        assert!(corpse_core::progression::catalog_for_revision(52.).iter().any(|a|a.god_id==*god && a.id==*ability));
     }
 }
 
 #[test]
-fn new_avatar_start_preserves_the_exact_existing_revision52_run() {
-    // Leading zeroes and a colon in the suffix are valid existing seed bytes.
+fn new_avatar_start_uses_uniform_policy_and_replays_exactly() {
     let seed = "00-05-11:avatar-boundary-r52:exact";
     let run = startup::create_avatar_run(seed).unwrap();
-    let expected = startup::create_run_revision(seed, "Avatar", false, 52.0).unwrap();
     assert_avatar(&run, seed);
     assert!(run.playtest.is_missing());
-    assert_eq!(run, expected, "The new entry point must not add RNG draws or rewrite seeds");
+    assert_eq!(run.avatar_starter_policy,corpse_core::Field::Value(1));
+    let t=&run.player.abilities;assert!(corpse_core::avatar_starters::valid(&[&t[0],&t[1],&t[2]]));
+    let record=ReplayRecord::from_run(&run);
+    let mut replay=ReplaySession::create(record.clone(),true).unwrap();
+    let initial=storage::canonical_value(&replay.engine.run).unwrap();
+    assert_eq!(replay.engine.run.player.abilities,run.player.abilities);
+    assert_eq!(replay.engine.run.rng,run.rng);
+    replay.restart().unwrap();assert_eq!(storage::canonical_value(&replay.engine.run).unwrap(),initial);
+    // Removing policy from a seed record selects the exact old curated starter path.
+    let mut old_record=record;old_record.avatar_starter_policy=corpse_core::Field::Missing;
+    let historical=ReplaySession::create(old_record,true).unwrap();
+    let shell=startup::new_run_shell_revision(seed,"Avatar",false,52.).unwrap();
+    assert_eq!(historical.engine.run.player.abilities,shell.player.abilities);
+    assert!(historical.engine.run.avatar_starter_policy.is_missing());
 }
 
 #[test]
 fn new_avatar_debug_start_preserves_the_exact_existing_reconstruction() {
     let seed = "0-5-11:avatar-debug-boundary-r52";
     let run = debug_floor::create_avatar_run(seed, 1).unwrap();
-    let expected = debug_floor::create_run_revision(seed, "Avatar", 1, 52.0).unwrap();
+    let expected = debug_floor::create_avatar_run(seed, 1).unwrap();
+    let historical_shell=startup::new_run_shell_revision(seed,"Avatar",false,52.).unwrap();
+    assert_eq!(run.player.abilities,historical_shell.player.abilities);
+    assert!(run.avatar_starter_policy.is_missing());
     assert_avatar(&run, seed);
     let profile = run.playtest.as_ref().unwrap();
     assert_eq!(profile.version, 2);

@@ -140,10 +140,18 @@ pub struct Cell {
     /// Detached death marker; living sleeping bodies remain unmarked.
     pub corpse: bool,
     pub superscript: String,
+    /// Detached phase number on the real Avatar.
+    pub number_of_blood: Option<u8>,
     pub subscript: String,
     pub arrow: String,
     pub fg: Rgb,
     pub bg: Rgb,
+}
+impl Cell {
+    pub(crate) fn marker_spill(&self) -> usize {
+        (self.superscript.chars().count()+usize::from(self.number_of_blood.is_some()))
+            .max(self.subscript.chars().count()).max(self.arrow.chars().count())
+    }
 }
 #[derive(Clone)]
 #[cfg_attr(test, derive(Debug))]
@@ -570,7 +578,7 @@ impl Painter {
     /// clipped to its tile: include the entire contrast-dependent line footprint.
     pub fn cell_damage_rect(&self,c:&Cell,w:usize,h:usize)->Option<damage::Rect>{
         let(cw,ch,ox,oy)=self.map_layout(w,h);let x=ox+c.x as i32*cw;let y=oy+c.y as i32*ch;
-        let spill=c.superscript.chars().count().max(c.subscript.chars().count()).max(c.arrow.chars().count());
+        let spill=c.marker_spill();
         let extra=(spill as i32).saturating_mul(ch.max(7));
         let emphasis=c.emphasis.max(1.);
         let gx=((cw as f64*(emphasis-1.)/2.).ceil() as i32).max(0)
@@ -761,6 +769,31 @@ impl Painter {
             let width: i32 = value.chars().map(|c| self.font.metrics(c, size).advance_width.round() as i32).sum();
             x + (cw - width).max(0)
         } else { x + cw * 2 / 3 }
+    }
+    fn number_of_blood_superscript(&mut self, cell: &Cell, x: i32, y: i32, cw: i32, ch: i32, avatar_ink: Rgb) {
+        let Some(phase)=cell.number_of_blood else {return};
+        if !(1..=5).contains(&phase) {return;}
+        let size=(ch/2).max(7) as u16;
+        let mut offset=x+cw-1;
+        if !cell.superscript.is_empty() {
+            let width:i32=cell.superscript.chars().map(|c|self.font.metrics(c,size as f32).advance_width.round() as i32).sum();
+            offset=offset.max(self.superscript_x(&cell.superscript,x,cw,ch)+width+1);
+        }
+        // A tiny pixel digit stays legible at the smaller native map sizes
+        // where an anti-aliased font can lose the entire small glyph.
+        let pixels:[[u8;5];5]=[
+            [2,6,2,2,7], [7,1,7,4,7], [7,1,7,1,7],
+            [5,5,7,1,1], [7,4,7,1,7],
+        ];
+        let unit=(ch/12).max(1);
+        let color=if phase==5 {[255,30,59]}else{avatar_ink};
+        for (row,bits) in pixels[phase as usize-1].into_iter().enumerate() {
+            for col in 0..3 {
+                if bits & (4>>col) != 0 {
+                    self.rect(offset+col*unit,y+row as i32*unit,unit,unit,color);
+                }
+            }
+        }
     }
     pub fn text(&mut self, s: &str, x: i32, y: i32, size: u16, c: Rgb) {
         let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
@@ -1808,19 +1841,9 @@ impl Painter {
             );
         }
     }
-    /// Transition feedback is one lit player tile, not a whole-map crossfade.
-    /// O(C) detached-player lookup plus O(tile pixels), O(1) scratch. The old
-    /// observed snapshot never redraws terrain, entities, outlines, or UI.
-    pub fn plane_crossfade(&mut self,before:&View,age:f64){self.scene_crossfade(before,age,false);}
-    pub fn scene_crossfade(&mut self,before:&View,age:f64,ascend:bool){
-        if !(0.0..250.0).contains(&age) { return; }
-        let Some(c)=before.cells.iter().find(|c|c.actor_id==Some(before.player_id)) else {return};
-        // Observation stores knowledge on terrain layers, not actor overlays.
-        if !before.cells.iter().any(|t|t.x==c.x&&t.y==c.y&&t.current) { return; }
-        let (cw,ch,ox,oy)=self.map_layout(before.width,before.height);
-        let color=if ascend {[255,225,144]}else{[188,179,242]};
-        self.blend_rect(ox+c.x as i32*cw,oy+c.y as i32*ch,cw,ch,color,((1.-age/250.)*54.).round()as u8);
-    }
+    // H198: floor/plane mechanics remain immediate; no departure-tile tint.
+    pub fn plane_crossfade(&mut self,_before:&View,_age:f64){}
+    pub fn scene_crossfade(&mut self,_before:&View,_age:f64,_ascend:bool){}
     /// Existing O(map cells + effect tiles log effect tiles) projection; raster O(painted pixels).
     pub fn effects(&mut self, v: &View, cues: &[crate::effects::Cue], now: f64, reduced: bool) {
         if cues.is_empty() {
@@ -1918,6 +1941,7 @@ impl Painter {
                     (ch / 2).max(7) as u16,
                     crate::illumination_ui::paint_color([255, 224, 160], display),
                 );
+                self.number_of_blood_superscript(c,x,y,cw,ch,c.fg);
             }
             // A traveling glyph is the only foreground animation primitive.
             // Local feedback preserves the entity's canonical identity above light.
@@ -2290,7 +2314,7 @@ impl Painter {
         let map_damage=self.paint_cell_indices.as_ref().is_some_and(|v|!v.is_empty()) || self.intersects_damage(ox-4,oy-4,cw*v.width as i32+8,ch*v.height as i32+ch+8);
         #[cfg(test)]
         let _paint_terrain = paint_profile_bench::span(paint_profile_bench::Kind::TerrainPreparation);
-        // The staged cache changes only at head arrivals or a new observation.
+        // The staged cache changes only at fire departures, item arrivals, or a new observation.
         // Arc clones keep per-frame preparation O(1); actor layers stay current.
         let staged_cells=self.firebolt_terrain.as_ref().map(|stage|stage.cells.clone());
         let source_cells=staged_cells.as_deref().unwrap_or(&v.cells);
@@ -2391,6 +2415,7 @@ impl Painter {
             && self.profile.value("global") == crate::appearance_profile::Profile::defaults().value("global");
         let indices=self.paint_cell_indices.take();
         let cell_indices:Box<dyn Iterator<Item=usize>>=if let Some(indices)=indices{Box::new(indices.into_iter())}else{Box::new(0..painted_cells.len())};
+        let mut blood_counter=None;
         for index in cell_indices {
             let Some(cell)=painted_cells.get(index) else{continue;};
             if self.raster_stats.enabled{self.raster_stats.cells_considered+=1;}
@@ -2554,6 +2579,7 @@ impl Painter {
                     if v.dreamwalking && !cell.dream_entity { cell.fg } else { crate::illumination_ui::paint_color([255, 224, 160], cell.display_light) },
                 );
             }
+            if cell.number_of_blood.is_some() {blood_counter=Some((cell,x,y,ink));}
             if !cell.subscript.is_empty() {
                 let size = (ch / 2).max(7) as u16;
                 let width: i32 = cell.subscript.chars()
@@ -2572,6 +2598,11 @@ impl Painter {
                     cell.fg,
                 );
             }
+        }
+        // The right edge can extend over another cell. Paint after every
+        // map layer so a neighboring tile background never erases the digit.
+        if let Some((cell,x,y,ink))=blood_counter {
+            self.number_of_blood_superscript(cell,x,y,cw,ch,ink);
         }
         #[cfg(test)]
         drop(_paint_map);
@@ -2657,20 +2688,33 @@ impl Painter {
                 self.border(left + 12, y, rail_width, crate::ability_ui::row(&self.profile), [174,158,107]);
             }
             let selecting=v.selected_ability.as_deref()==Some(a.id.as_str());
-            let passive=a.mode.eq_ignore_ascii_case("passive")&&!selecting;
-            let reserve=if passive {None}else{a.reserve};
+            let ragelight_cost=match a.indicator {
+                Some(crate::ability_ui::CustomIndicator::RagelightCost(cost))=>Some(cost),
+                _=>None,
+            };
+            let passive=ragelight_cost.is_some()||(a.mode.eq_ignore_ascii_case("passive")&&!selecting);
+            // Ragelight has no activation orb, but still spends its own reserve.
+            let reserve=if passive && ragelight_cost.is_none() {None}else{a.reserve};
             let cogworks=a.id=="kative-cogworks";
             let orb_width=if passive{0}else if cogworks{50}else{18};
             let name_x=left+18+orb_width;
             let bar_width=if matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::FutureFloors{..})){140.min(rail_width/2)}else{rail_width/3};
             let bar_x=left+12+rail_width-bar_width;
-            let name_width=if reserve.is_some()||a.fortunes.is_some()||a.indicator.is_some(){bar_x-name_x-8}else{rail_width-12-orb_width};
+            let ragelight_box=ragelight_cost.map(|cost| {
+                let width=ability_indicator_ui::ragelight_width(self,cost);
+                (bar_x-width-6,width)
+            });
+            let name_width=if let Some((box_x,_))=ragelight_box {box_x-name_x-8}
+                else if reserve.is_some()||a.fortunes.is_some()||a.indicator.is_some(){bar_x-name_x-8}else{rail_width-12-orb_width};
             let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);
             self.clip=Some((left+12,y,rail_width,crate::ability_ui::row(&self.profile)));
             for(line,name)in names.iter().enumerate(){
                 self.text(name,name_x,y+3+line as i32*15,13,a.color);
             }
-            if let Some(indicator)=a.indicator {
+            if let Some((box_x,box_width))=ragelight_box {
+                ability_indicator_ui::paint(self,a.indicator.unwrap(),box_x,y,box_width);
+            }
+            if let Some(indicator)=a.indicator.filter(|_|ragelight_box.is_none()) {
                 ability_indicator_ui::paint(self,indicator,bar_x,y,bar_width);
             } else if let Some((count,until))=a.fortunes {
                 let box_w=((bar_width-6)/3).max(18);

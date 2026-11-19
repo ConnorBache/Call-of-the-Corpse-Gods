@@ -308,7 +308,8 @@ pub fn enemy_action_options(
         }
         return Ok(true);
     }
-    if a.abilities.iter().any(|id| id == "enemy:pale:scream") && enemy_spend(r, id, 15.0) {
+    if a.abilities.iter().any(|id| id == "enemy:pale:scream")
+        && !crate::screamer_schedule::blocked(r, &a) && enemy_spend(r, id, 15.0) {
         crate::animation_enemy::wave(r,&a,"E65",true,Some(10.),false,false);
         let wave_action=crate::events::current_action();
         let multiplier = if a.name.starts_with("Greater ") {
@@ -324,6 +325,7 @@ pub fn enemy_action_options(
             .collect();
         let player = r.player.id;
         let disorient = crate::water_blood::enabled(r);
+        let mut scream_duration: f64 = 0.;
         for other in ids {
             let recipient=actor(r,other).unwrap();
             if crate::revision50_nightmares::is_decoy(recipient)
@@ -334,6 +336,7 @@ pub fn enemy_action_options(
             let duration = crate::monster_statuses::status_duration(r,recipient,5.0);
             let b = actor_mut_trusted(r, other).unwrap();
             if nearby {
+                scream_duration = scream_duration.max(duration);
                 if same {
                     b.conditions.insert("screamEmboldened".into(), duration);
                     b.conditions.insert("screamBonus".into(), 5.0 * multiplier);
@@ -359,6 +362,7 @@ pub fn enemy_action_options(
             }
             let b=b.clone(); if show { crate::animation_enemy::mark(r,&b,"E65",if same {"diamond-warm"}else{"crossed-ring-violet"},crate::events::Stage::Special); }
         }
+        crate::screamer_schedule::after_scream(r,id,scream_duration);
         if !crate::events::enabled(r) {crate::events::actor_event(r, &a, "pulse", "Scream", None, None);}
         crate::events::checkpoint_for_action(r,wave_action);
         if vision::visible_actor(r, &a) {

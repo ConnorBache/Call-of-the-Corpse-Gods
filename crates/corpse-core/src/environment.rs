@@ -39,6 +39,13 @@ pub fn breather_gas(r: &Run, a: &crate::Actor) -> &'static str {
 pub fn fire_active(kind: Option<&str>) -> bool {
     kind.is_some_and(|k| k != "embers")
 }
+/// The numeric view normally agrees with the kind, but can lag the source
+/// layer on arrival/import. A recorded historical prefix retains its old view.
+fn burns_on_contact(r: &Run, e: &EnvironmentalState, i: usize) -> bool {
+    e.fire.get(i).copied().unwrap_or(0.) > 0.
+        && !(crate::ember_rules::current(r)
+            && e.fire_kind.as_ref().and_then(|v| v.get(i)).and_then(Option::as_deref) == Some("embers"))
+}
 pub fn normalize(e: &mut EnvironmentalState) -> Result<(), String> {
     // Pilot cannot express whole-column hydration as an indexed cell write.
     if e.gas_type.as_ref().is_none() || e.gas_volume.as_ref().is_none()
@@ -753,6 +760,24 @@ pub fn gas_present(e: &EnvironmentalState, i: usize) -> bool {
             .any(|gas| channel(e, gas).get(i).copied().unwrap_or(0.) > 0.)
     }
 }
+/// Existing single active gas, including typed zero-volume lingering gas.
+/// Legacy admission chooses the greatest concentration in the configured order.
+pub fn gas_kind_at(e: &EnvironmentalState, i: usize) -> Option<&str> {
+    if let (Some(types), Some(_)) = (e.gas_type.as_ref(), e.gas_volume.as_ref()) {
+        types.get(i).and_then(|v| v.as_deref())
+    } else {
+        let mut best = None;
+        let mut max = 0.;
+        for kind in GAS_TYPES {
+            let v = channel(e, kind).get(i).copied().unwrap_or(0.).max(0.);
+            if v > max {
+                max = v;
+                best = Some(kind)
+            }
+        }
+        best
+    }
+}
 /// Frozen cells deliberately do not stop vent countdowns (v48 custom contract).
 /// Returns erupted vent cells for the caller's visibility-gated log/events.
 pub fn tick_vents(f: &mut Floor) -> Result<Vec<usize>, String> {
@@ -1015,6 +1040,11 @@ fn fire_immune(r: &Run, a: &crate::Actor) -> bool {
         .iter()
         .any(|s| s == "enemy:beast:fire-immunity" || s == "anavani-star-power")
 }
+const BURNING_TICK_DAMAGE: f64 = 4.;
+/// Steam transfers heat, not a gas status; use the same protection as fire.
+pub fn steam_can_scald(r: &Run, a: &crate::Actor) -> bool {
+    crate::steam_rules::current(r) && !fire_immune(r, a)
+}
 fn gas_immune(a: &crate::Actor) -> bool {
     a.abilities.iter().any(|s| s == "enemy:beast:gas-immunity")
 }
@@ -1135,7 +1165,7 @@ pub fn refresh_burning_from_fire(r: &mut Run, id: f64) -> Result<(), String> {
     let Some(e) = f.environment.as_ref() else {
         return Ok(());
     };
-    if e.fire.get(i).copied().unwrap_or(0.) <= 0.
+    if !burns_on_contact(r, e, i)
         || fire_immune(r, a)
         || cond(a, "underwater") > 0.
         || ((f.tiles[i] == "water" || f.tiles[i] == "shallow-water")
@@ -1520,7 +1550,7 @@ pub fn tick_environment_options_with_falls(
                     a.conditions.get("burningOwner").copied().unwrap_or(-1.),
                     cond(&a, "burningPlayer"),
                 );
-                crate::engine::damage_environment(r, id, 4., source, "fire", true)
+                crate::engine::damage_environment(r, id, BURNING_TICK_DAMAGE, source, "fire", true)
                     .map_err(|e| e.to_string())?;
             }
             if !a.abilities.iter().any(|s| s == "enemy:beast:everburn") {
@@ -1530,6 +1560,11 @@ pub fn tick_environment_options_with_falls(
                     *v -= 1.;
                 }
             }
+        } else if gas.as_deref() == Some("steam") && steam_can_scald(r, &a) {
+            // One heat packet per world tick. Existing Burning keeps its own
+            // attribution and expiration; steam never adds a persistent status.
+            crate::engine::damage_environment(r, id, BURNING_TICK_DAMAGE, source, "steam", true)
+                .map_err(|e| e.to_string())?;
         }
     }
     drop(_timing_environment_stage);
@@ -1720,7 +1755,7 @@ pub fn creature_hazard_at(r: &Run, a: &crate::Actor, i: usize) -> bool {
         return true;
     }
     let env = f.environment.as_ref();
-    let fire = env.and_then(|e| e.fire.get(i)).copied().unwrap_or(0.) > 0.
+    let fire = env.is_some_and(|e| burns_on_contact(r, e, i))
         || (crate::terrain_runtime::enabled(r) && crate::terrain_runtime::hellfire_at(f,i))
         || f.permanent_fire
             .as_ref()
@@ -1753,20 +1788,10 @@ pub fn creature_hazard_at(r: &Run, a: &crate::Actor, i: usize) -> bool {
         return true;
     }
     let Some(e) = env else { return false };
-    let gas = if let (Some(types), Some(_)) = (e.gas_type.as_ref(), e.gas_volume.as_ref()) {
-        types.get(i).and_then(|v| v.as_deref())
-    } else {
-        let mut best = None;
-        let mut max = 0.;
-        for kind in GAS_TYPES {
-            let v = channel(e, kind).get(i).copied().unwrap_or(0.).max(0.);
-            if v > max {
-                max = v;
-                best = Some(kind)
-            }
-        }
-        best
-    };
+    let gas = gas_kind_at(e, i);
+    if gas == Some("steam") {
+        return steam_can_scald(r, a);
+    }
     if gas_immune(a) {
         return false;
     }

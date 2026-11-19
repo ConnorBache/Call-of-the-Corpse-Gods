@@ -57,13 +57,12 @@ pub fn blood_weapon_ready(r: &Run, a: &Actor) -> bool {
     has(owner, BLOOD_WEAPON) && engine::condition(owner, "bloodWeaponReady") > 0.0
 }
 /// Call only after the source attack has passed pre-roll blocks; misses consume it too.
-pub fn consume_blood_weapon(r: &mut Run, a: &Actor) {consume_blood_weapon_at(r,a,a)}
-pub fn consume_blood_weapon_at(r: &mut Run, a: &Actor,target:&Actor) {
+pub fn consume_blood_weapon(r: &mut Run, a: &Actor) -> bool {
     let owner = half_here::owner_id(r, a);
-    if let Some(owner) = engine::actor_mut_trusted(r, owner) {
-        let consumed=owner.conditions.shift_remove("bloodWeaponReady").is_some();
-        if consumed {crate::animation_player::local(r,target,"P41","slash",crate::events::Stage::Impact);}
-    }
+    engine::actor_mut_trusted(r,owner).is_some_and(|a|a.conditions.shift_remove("bloodWeaponReady").is_some())
+}
+pub fn consume_blood_weapon_at(r: &mut Run, a: &Actor,target:&Actor) {
+    if consume_blood_weapon(r,a) {crate::animation_shapes::short_nova(r,target,"P41",crate::animation_shapes::LICHOR);}
 }
 /// A zero-damage landed strike still debuffs a living target; actual death clears it.
 pub fn beat_after_landed_hit(r: &mut Run, a: &Actor, target_id: f64) {

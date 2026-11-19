@@ -15,6 +15,24 @@ pub fn area(r:&Run,a:&Actor,key:&str,style:&str,radius:i32,color:&str,stage:Stag
 }
 pub fn nova(r:&Run,a:&Actor,key:&str,style:&str,radius:i32) {
     let color=if style.contains("red"){"#ff3030"}else if style.contains("blue"){"#4080ff"}else if style.contains("green"){"#40ff60"}else if style.contains("black"){"#000000"}else if style.contains("orange"){"#ff9a20"}else if style.contains("yellow"){"#ffff40"}else{"#ff60c8"};
+    nova_colored(r,a,key,style,radius,color);
+}
+
+/// Shared authored blessing waveform; color comes from the chosen god, not a
+/// renderer style heuristic. Keep actor/plane/tile admission at the common cue.
+pub fn short_nova(r:&Run,a:&Actor,key:&str,color:&str) {
+    if events::enabled(r) {nova_colored(r,a,key,SHORT_NOVA,2,color);}
+}
+/// Authored colors match the native god palette in ability_ui::god_color.
+pub const SHORT_NOVA:&str="nova-authored-short";
+pub const ISHEILAH:&str="#b877ff";
+pub const NUMO:&str="#64ff72";
+pub const URSA:&str="#72a0ff";
+pub const LICHOR:&str="#ff3f8e";
+pub const ANAVANI:&str="#fff0a3";
+pub const MORAE:&str="#f36cff";
+
+fn nova_colored(r:&Run,a:&Actor,key:&str,style:&str,radius:i32,color:&str) {
     // Lobed radial envelope: the old square was an unintended visible boundary.
     // The extra two cells leave room for wisps beyond the nominal radius, but
     // admission still goes through the ordinary visibility-filtered cue path.

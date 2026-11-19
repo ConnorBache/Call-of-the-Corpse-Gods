@@ -7,6 +7,19 @@ fn fingerprint(r:&Run)->String {
     assert!(!crate::future_floor::enabled(r));
     assert!(r.future_floor.is_none());
     v.as_object_mut().unwrap().shift_remove("futureFloorRulesFrom");
+    v.as_object_mut().unwrap().shift_remove("commandmentRulesFrom");
+    v.as_object_mut().unwrap().shift_remove("screamerRulesFrom");
+    assert!(!crate::ember_rules::current(r));
+    assert!(!crate::steam_rules::current(r));
+    v.as_object_mut().unwrap().shift_remove("emberRulesFrom");
+    assert!(!crate::ragelight_rules::current(r));
+    assert!(!crate::execute_rules::current(r));
+    v.as_object_mut().unwrap().shift_remove("ragelightRulesFrom");
+    v.as_object_mut().unwrap().shift_remove("steamRulesFrom");
+    v.as_object_mut().unwrap().shift_remove("executeRulesFrom");
+    v.as_object_mut().unwrap().shift_remove("beckoningRulesFrom");
+    assert!(!crate::ichor_fire_rules::current(r));
+    v.as_object_mut().unwrap().shift_remove("ichorFireRulesFrom");
     v.as_object_mut().unwrap().shift_remove("gasRulesFrom");
     format!("{:016x}",serde_json::to_vec(&v).unwrap().iter().fold(0xcbf29ce484222325u64,|h,b|(h ^ *b as u64).wrapping_mul(0x100000001b3)))
 }

@@ -667,8 +667,8 @@
     "id": "anavani-commandment",
     "godId": 9,
     "name": "Commandment",
-    "description": "Passive: When you attack an enemy, they are pushed back one tile. Active: Spend 20 energy when you attack, and enemies are instead pushed back as far as possible.",
-    "effectSummary": "Passive: When you attack an enemy, they are pushed back one tile. Active: Spend 20 energy when you attack, and enemies are instead pushed back as far as possible.",
+    "description": "Passive: When you hit an enemy, push them back one tile. Active: Spend 20 energy on a hit to push the enemy back as far as possible instead.",
+    "effectSummary": "Passive: When you hit an enemy, push them back one tile. Active: Spend 20 energy on a hit to push the enemy back as far as possible instead.",
     "flags": [
       "passive",
       "toggle"
