@@ -71,7 +71,7 @@ fn pull_one(r: &mut Run, a: &Actor, b: &Actor) -> Result<bool, String> {
         .conditions
         .insert("forcedMove".into(), 1.0);
     let result = engine::move_actor(r, b.id, d.x as f64, d.y as f64, false).map_err(|e| e.0);
-    if let Some(target) = actor_mut_trusted(r, b.id) {
+    if let Some(target) = engine::actor_any_mut(r, b.id) {
         if let Some(previous) = previous {
             target.conditions.insert("forcedMove".into(), previous);
         } else {
@@ -125,32 +125,42 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
     }
     if has(&a, "bloodmancy") {
         if phase % 2.0 == 0.0 {
+            let cast_depth = r.depth;
+            let source_seen = crate::vision::visible_actor(r, &a);
             let pulled = pull_one(r, &a, &b)?;
-            if let Some(after)=actor(r,target) {
-                if after.x!=b.x || after.y!=b.y {crate::events::cue(r,after,"E04","root-crimson",crate::events::Stage::Special,&[(&b).into(),after.into()]);}
-                else if !pulled {crate::animation_enemy::mark(r,after,"E04","rejected-crimson",crate::events::Stage::Special);}
+            let message = if pulled {
+                "wrests its prey one square closer with blood magic."
+            } else {
+                "casts Blood Wrest, but there is no room to pull its prey closer."
+            };
+            if r.depth == cast_depth {
+                if let Some(after)=actor(r,target) {
+                    if after.x!=b.x || after.y!=b.y {crate::events::cue(r,after,"E04","root-crimson",crate::events::Stage::Special,&[(&b).into(),after.into()]);}
+                    else if !pulled {crate::animation_enemy::mark(r,after,"E04","rejected-crimson",crate::events::Stage::Special);}
+                }
+                let b = actor(r, target).unwrap_or(&b).clone();
+                report(r, &a, &b, message);
+                crate::events::actor_event(r, &a, "projectile", "Blood wrest", Some((&b).into()), None);
+            } else if a.id == r.player.id || b.id == r.player.id || source_seen {
+                // The forced fall was already presented by travel. Use the cast's
+                // origin-floor knowledge for the log, never its map coordinates.
+                let name = if a.id == r.player.id { "You" } else if source_seen { &a.name } else { "Something unseen" };
+                engine::log(r,format!("{name} {message}"),if a.id==r.player.id {"player"} else {"enemy"});
             }
-            let b = actor(r, target).unwrap_or(&b).clone();
-            report(
-                r,
-                &a,
-                &b,
-                if pulled {
-                    "wrests its prey one square closer with blood magic."
-                } else {
-                    "casts Blood Wrest, but there is no room to pull its prey closer."
-                },
-            );
-            crate::events::actor_event(r, &a, "projectile", "Blood wrest", Some((&b).into()), None);
         } else {
             crate::monster_statuses::apply_curse(r, target, "hemophilia", 20.0, id);
             report(r, &a, &b, "curses its prey with hemophilia.");
             if crate::events::enabled(r) {crate::events::actor_event(r,&a,"projectile","Hemophilia",Some((&b).into()),None);}
         }
-        actor_mut_trusted(r, id)
-            .unwrap()
-            .conditions
-            .insert("monsterSpellPhase".into(), phase + 1.0);
+        // Arrival may change the active floor before this paid spell settles.
+        // Use the caster's indexed identity even if it remained on the origin floor.
+        let tick = r.tick;
+        if let Some(caster) = engine::actor_any_mut(r,id) {
+            caster.conditions.insert("monsterSpellPhase".into(),phase+1.);
+            caster.conditions.insert("monsterSpellReadyAt".into(),tick+3.);
+            caster.conditions.insert("rangedRecovery".into(),1.);
+        }
+        return Ok(true);
     } else {
         let phase = phase % 3.0;
         let (key, label, duration) = if phase == 0.0 {
