@@ -1730,6 +1730,8 @@ pub struct Run {
     pub screamer_rules_from: Field<usize>,
     #[serde(rename = "ragelightRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub ragelight_rules_from: Field<usize>,
+    #[serde(rename = "balanceRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub balance_rules_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

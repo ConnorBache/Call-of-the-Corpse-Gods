@@ -443,6 +443,7 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
                     "unlucky",
                     "distracted",
                     "rageCost",
+                    "overflowingSaves",
                     "revertCharges",
                     "allSeeingReveal",
                     "allSeeingDepth",
@@ -574,6 +575,7 @@ pub fn dispatch(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineError
         Ok(out)
     }) {
         Ok(mut out) => {
+            crate::divine_rescues::refresh_player_if_full(&mut candidate);
             if let Some(snapshot)=animation_snapshot {let player=candidate.player.id;crate::dreamwalking::with_actor(&mut candidate,player,|r|snapshot.finish(r));}
             if let Some(snapshot)=observation_animation {let player=candidate.player.id;crate::dreamwalking::with_actor(&mut candidate,player,|r|snapshot.finish(r));}
             crate::events::checkpoint(&candidate);
@@ -1370,7 +1372,7 @@ fn move_actor_step(
         if animation_depth==r.depth {
             if after.active.iter().any(|s|s=="etill-phase-through")&&(phase_wall_before||r.floor().is_some_and(|f|f.tiles[after.y as usize*f.width()+after.x as usize]=="wall")){crate::animation_player::moved(r,&before_move,after,"P25","ripple");}
             if after.active.iter().any(|s|s=="etill-rushing-torrent"){crate::animation_player::moved(r,&before_move,after,"P26","speed");}
-            if after.abilities.iter().any(|s|s=="ursa-sleep-walk")&&after.energy==0.{crate::animation_player::moved(r,&before_move,after,"P34","speed");}
+            if crate::balance_rules::sleep_walk_active(r, after){crate::animation_player::moved(r,&before_move,after,"P34","speed");}
             if crate::animation_player::shadow_active(r,after){crate::animation_player::moved(r,&before_move,after,"P43","speed");}
             if after.abilities.iter().any(|s|s=="etill-drown")&&crate::divine_environment::water_at(r,after)&&!crate::divine_environment::water_at(r,&before_move){crate::animation_player::local(r,after,"P27","ripple",crate::events::Stage::Special);}
         }
@@ -4716,6 +4718,7 @@ fn apply_hp_loss(r: &mut Run, victim: f64, n: f64, redirect: bool) -> f64 {
     crate::dreamwalking::damage_notice(r, &body, n);
     if crate::dreamwalking::physical(r, &body) { crate::water_blood::deposit_damage(r, &body, actual); }
     if n > 0. { crate::creature_feeding::damage_interrupt(r, victim); }
+    crate::divine_rescues::refresh_if_full(r, id);
     actor_mut_trusted(r, id).unwrap().hp -= loss.hp;
     if victim != id {
         let endpoint = actor_mut_trusted(r, victim).unwrap();

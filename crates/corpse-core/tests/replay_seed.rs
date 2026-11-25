@@ -19,6 +19,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         commandment_rules_from: Field::Missing,
         screamer_rules_from: Field::Missing,
         ragelight_rules_from: Field::Missing,
+        balance_rules_from: Field::Missing,
         execute_rules_from: Field::Missing,
         beckoning_rules_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,

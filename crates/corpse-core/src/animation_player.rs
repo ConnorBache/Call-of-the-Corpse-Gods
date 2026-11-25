@@ -63,11 +63,11 @@ const TOGGLES:&[(&str,&str,&str)]=&[
 /// S is existing effective-stat/health derivation for Hardened Blood owners only;
 /// K is bounded actor metadata. No floor clone, RNG, clock, or saved field.
 /// Only actors actually observed before AND after can generate delta effects.
-pub struct Snapshot { depth:f64, actors:Vec<(Actor,f64)>, dream:bool }
+pub struct Snapshot { depth:f64, actors:Vec<(Actor,f64,bool)>, dream:bool }
 impl Snapshot {
  pub fn capture(r:&Run)->Option<Self> {
   events::enabled(r).then(||Self{depth:r.depth,dream:crate::dreamwalking::active(r),actors:std::iter::once(&r.player)
-   .chain(r.actors_at(r.depth)).filter(|a|visible(r,a)).map(|a|(a.clone(),protection_band(r,a))).collect()})
+   .chain(r.actors_at(r.depth)).filter(|a|visible(r,a)).map(|a|(a.clone(),protection_band(r,a),crate::balance_rules::sleep_walk_active(r,a))).collect()})
  }
  pub fn finish(self,r:&Run) {
   if !events::enabled(r) {return}
@@ -79,7 +79,7 @@ impl Snapshot {
    } else {crate::animation_shapes::short_nova(r,&r.player,"P73",crate::animation_shapes::URSA);}
   }
   if self.depth!=r.depth {return}
-  for (before,protection_before) in &self.actors {
+  for (before,protection_before,sleep_walk_before) in &self.actors {
    let Some(a)=engine::actor(r,before.id).filter(|a|visible(r,a)) else {continue};
    let _command_action=(a.id==r.player.id).then(||events::at_action(r,events::player_action()));
    if a.id==r.player.id {
@@ -132,7 +132,10 @@ impl Snapshot {
    if has(a,"lichor-hardened-blood") && *protection_before!=protection_after {
     local(r,a,"P40",if protection_after>*protection_before {"shield-harden"}else{"shield-soften"},Stage::Special);
    }
-   if has(a,"ursa-sleep-walk") && before.energy>0. && a.energy<=0. {local(r,a,"P34","speed",Stage::Special);}
+   let sleep_trigger = if crate::balance_rules::current(r) {
+    !sleep_walk_before && crate::balance_rules::sleep_walk_active(r,a)
+   } else { has(a,"ursa-sleep-walk") && before.energy>0. && a.energy<=0. };
+   if sleep_trigger {local(r,a,"P34","speed",Stage::Special);}
    if a.id==r.player.id && before.conditions.get("r50PursuitTarget")!=a.conditions.get("r50PursuitTarget") && a.conditions.contains_key("r50PursuitTarget") {
     let cells:Vec<_>=crate::revision50_pursuit::route_for_run(r).into_iter().map(|(x,y)|EventPoint{x,y}).collect();
     events::cue(r,a,"P12","speed",Stage::Travel,&cells);

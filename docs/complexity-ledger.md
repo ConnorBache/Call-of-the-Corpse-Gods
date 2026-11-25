@@ -2428,3 +2428,20 @@ Visible receipts carry exact authored color; desktop geometry uses existing
 O(C² + 8C log C) cellular arrival and O(C) scratch, with O(C log C) radial
 fallback for disconnected admitted cells. These receipts have no input-hold
 duration and use no simulation RNG, clocks, or serialized fields.
+
+### Live R52 divine balance
+
+A replay-policy marker adds O(1) serialized space and O(1) checks at startup,
+journal/replay admission and command boundaries. Overflowing adds one bounded
+stock condition per actor after a save is spent. Acquisition defaults to five
+without a write. Each current damage packet checks the resolved owner's HP and
+fixed key (expected O(A) actor lookup and O(1) condition lookup; only an eligible
+full actor scans its K owned skills and performs the existing COW-owned write).
+The player's command-end check and level-up use at most O(K) on that single
+actor; no floor scan, RNG, or clock work. The old per-50-damage bank loop remains
+only for historical rules. Lifesteal rate, sleep duration and dream price use
+fixed arithmetic and no extra stored state. Low-energy Sleep Walk adds an
+existing effective-stat lookup for a capped owner away from zero (cost depends
+on equipment and conditions); AI, movement and observed animation checks share
+the threshold. The animation snapshot adds one runtime boolean per observed
+actor, not persisted state.

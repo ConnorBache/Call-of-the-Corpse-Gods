@@ -28,7 +28,7 @@ pub fn is_hasted_in(r: &crate::Run, a: &Actor) -> bool {
         condition(a, "hasted") > 0. || a.active.iter().any(|id| id == "etill-rushing-torrent")
     } else { is_hasted(a) })
         || crate::revision52_swimming::grants_haste(r, a)
-        || (a.abilities.iter().any(|id| id == "ursa-sleep-walk") && a.energy == 0.0)
+        || crate::balance_rules::sleep_walk_active(r, a)
         || (a
             .abilities
             .iter()

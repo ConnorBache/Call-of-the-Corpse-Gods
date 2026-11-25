@@ -609,10 +609,10 @@ fn price(r: &Run, a: &Actor, d: &Divine) -> (String, bool) {
     } else {
         d.upkeep
     };
-    let activation = if name == "See The Future" {
-        a.energy
-    } else {
-        d.activation
+    let activation = match name {
+        "See The Future" => a.energy,
+        "Dream of Time Gone By" => corpse_core::balance_rules::dream_anchor_cost(r),
+        _ => d.activation,
     };
     let suppression = ["Entropy", "Shine", "Star Power"].contains(&name);
     let mut price = match name {
@@ -658,6 +658,7 @@ fn price(r: &Run, a: &Actor, d: &Divine) -> (String, bool) {
         }
         "Are You Sure About That?" => "1 reaction per redirected miss".into(),
         "Waking Nightmare" => "1 nightmare per prevented damage event".into(),
+        "Overflowing" if corpse_core::balance_rules::current(r) => "1 save per rescue".into(),
         "Overflowing" => "1 blood per rescue".into(),
         "Erase Metaphysical" => "10 energy per hit with a removable ability".into(),
         "Nova" => format!("{} energy per attack explosion",
@@ -750,6 +751,8 @@ fn divine(r: &Run, a: &Actor, d: &Divine, compact: bool) -> String {
     }
     if own.abilities.contains(&d.id) {
         let resource = match d.name.as_str() {
+            "Overflowing" if corpse_core::balance_rules::current(r) =>
+                Some(format!("saves: {} / 5", corpse_core::divine_rescues::saves(own))),
             "Overflowing" => Some(format!("blood: {} / 55", own.blood.value_or(0.))),
             "Waking Nightmare" => Some(format!("nightmares: {}", own.nightmares.value_or(0.))),
             "Revert" => Some(format!(
@@ -815,7 +818,13 @@ fn divine(r: &Run, a: &Actor, d: &Divine, compact: bool) -> String {
     }
     let independent = own.id != r.player.id;
     let player_only = independent && (d.controlled || (!flag(d, "passive") && !flag(d, "toggle")));
-    let mut effect = d.effect.clone();
+    let mut effect = match (corpse_core::balance_rules::current(r), d.id.as_str()) {
+        (true, "lichor-overflowing") => "has five death saves that replenish at full HP or upon leveling up".into(),
+        (true, "shrail-fight-long") => "heals for 3% of actual melee damage dealt".into(),
+        (true, "ursa-sudden-sleep") => "can restore full health at the cost of 25 turns of Paralysis".into(),
+        (true, "ursa-sleep-walk") => "gains Haste below 10% of maximum energy, or at zero energy if uncapped".into(),
+        _ => d.effect.clone(),
+    };
     if independent && d.name == "Reverse Entropy" {
         effect = "can halt nearby environmental growth and spread".into();
     }
@@ -969,7 +978,10 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
             let state=if floor_future {if corpse_core::future_floor::active(r) {" (active)"} else {" (used)"}} else if toggle {if source.active.contains(id) {" (active)"} else {" (inactive)"}} else {""};
             let reserve=if d.name == "Hanged" || floor_future { String::new() } else { crate::ability_ui::actor_reserve_summary_for_revision(source,id,r.simulation_revision.value_or(29.))
                 .map(|s|format!(" {s}." )).unwrap_or_default() };
-            let description = if floor_future || passive_ragelight || id == corpse_core::revision50_combat::EXECUTE || (r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender") {
+            let description = if floor_future || passive_ragelight || id == corpse_core::revision50_combat::EXECUTE || (r.simulation_revision.value_or(29.) >= 52. && id == "pelian-never-surrender")
+                || (corpse_core::balance_rules::current(r) && matches!(id.as_str(),
+                    "lichor-overflowing" | "shrail-fight-long" | "ursa-sudden-sleep"
+                    | "ursa-dream-of-time-gone-by" | "ursa-sleep-walk")) {
                 crate::ability_ui::display_description(r, id, &d.description)
             } else { d.description.as_str() };
             let name=if floor_future {"Futuresight"}else{d.name.as_str()};

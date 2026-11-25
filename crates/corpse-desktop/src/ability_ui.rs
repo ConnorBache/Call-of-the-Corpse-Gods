@@ -51,6 +51,7 @@ pub enum CustomIndicator {
     Future(bool),
     FutureFloors { used: u32 },
     Blood { count: u64, progress: u64 },
+    OverflowingSaves(u64),
 }
 #[derive(Clone)]
 #[cfg_attr(test, derive(Debug))]
@@ -85,6 +86,16 @@ pub const RAGELIGHT_DESCRIPTION:&str="Whenever you would die, if you can pay the
 const LEGACY_RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
 pub const FUTURE_FLOOR_DESCRIPTION:&str="Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+    if corpse_core::balance_rules::current(run) {
+        match id {
+            "lichor-overflowing" => return "You have five saves. Each time you would die, spend one and survive at 1 HP. Reaching full HP or leveling up restores all five.",
+            "shrail-fight-long" => return "Heal for 3% of actual HP damage dealt by your melee attacks.",
+            "ursa-sudden-sleep" => return "Spend 20 energy to fully heal, then become paralyzed for 25 turns.",
+            "ursa-dream-of-time-gone-by" => return "Spend 20 energy to set an anchor at your current location. Activate again to return to that location for free.",
+            "ursa-sleep-walk" => return "You have Haste below 10% of maximum energy. With no energy cap, Haste still requires zero energy.",
+            _ => {}
+        }
+    }
     if id=="morae-see-the-future" && corpse_core::future_floor::enabled(run) {return FUTURE_FLOOR_DESCRIPTION;}
     if id=="shrail-execute" && run.simulation_revision.value_or(29.)>=52. {
         return if corpse_core::execute_rules::current(run) {EXECUTE_DESCRIPTION} else {LEGACY_EXECUTE_DESCRIPTION};
@@ -343,6 +354,8 @@ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::Upkeep
         }),
         "pelian-you-shall-never-be-rid-of-me" => Some(CustomIndicator::Rescue(
             r.player.conditions.get("pelianUsed").copied().unwrap_or(0.)==0.)),
+        "lichor-overflowing" if corpse_core::balance_rules::current(r) =>
+            Some(CustomIndicator::OverflowingSaves(corpse_core::divine_rescues::saves(&r.player) as u64)),
         "lichor-overflowing" => Some(CustomIndicator::Blood {
             count:r.player.blood.value_or(0.).max(0.) as u64,
             progress:r.player.damage_bank.value_or(0.).max(0.).round() as u64,
@@ -447,7 +460,8 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
         "Revert" => 2.,
         "Remember" => 5.,
         "Sudden Sleep" | "Sparkle" | "Bulwark of Mind" | "Make Kneel" => 20.,
-        "Dream of Time Gone By" | "Ascend" => 50.,
+        "Dream of Time Gone By" => corpse_core::balance_rules::dream_anchor_cost(r),
+        "Ascend" => 50.,
         "Riptide" | "Bonded By Unseen Threads" => 15.,
         "See The Future" => p.energy,
         _ => 0.,
@@ -471,6 +485,7 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
         "Quick Hand" => "1 reaction/hit".into(),
         "Are You Sure About That?" => "1 reaction/miss".into(),
         "Waking Nightmare" => "1 nightmare/hit".into(),
+        "Overflowing" if corpse_core::balance_rules::current(r) => "1 save/rescue".into(),
         "Overflowing" => "1 blood/rescue".into(),
         "Erase Metaphysical" => "10 NRG/hit".into(),
         "Nova" => format!("{} NRG/blast", corpse_core::abilities::nova_attack_cost(r.simulation_revision.value_or(29.))),
@@ -521,6 +536,8 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
     }
     // All counters are player-owned; none consult a hidden linked target.
     let counter = match n {
+        "Overflowing" if corpse_core::balance_rules::current(r) =>
+            Some(format!("{}/5 saves", corpse_core::divine_rescues::saves(p))),
         "Overflowing" => Some(format!(
             "{}/55 blood · {}/50 dmg",
             p.blood.value_or(0.),
@@ -1620,5 +1637,30 @@ mod never_be_rid_name_tests {
         assert_eq!(super::observe(&r,id).name,"Never Be Rid of Me");
         assert_eq!(super::display_text("You Shall Never Be Rid of Me activates."),"Never Be Rid of Me activates.");
         assert_eq!(serde_json::to_string(&r).unwrap(),before);
+    }
+}
+
+#[cfg(test)]
+mod divine_balance_presentation_tests {
+    use super::*;
+
+    #[test]
+    fn shows_five_saves_instead_of_legacy_blood_and_the_new_ursa_prices() {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        r.balance_rules_from=0usize.into();
+        r.player.abilities=["lichor-overflowing","shrail-fight-long","ursa-sudden-sleep",
+            "ursa-dream-of-time-gone-by","ursa-sleep-walk"].map(str::to_owned).to_vec();
+        let row=observe(&r,"lichor-overflowing");
+        assert_eq!(row.indicator,Some(CustomIndicator::OverflowingSaves(5)));
+        assert!(row.description.contains("full HP or leveling up"));
+        assert!(observe(&r,"shrail-fight-long").description.contains("3%"));
+        assert!(observe(&r,"ursa-sudden-sleep").description.contains("25 turns"));
+        let dream=observe(&r,"ursa-dream-of-time-gone-by");
+        assert!(dream.description.contains("20 energy"));
+        assert!(!dream.cost.contains("50"));
+        assert!(observe(&r,"ursa-sleep-walk").description.contains("below 10%"));
+        r.balance_rules_from=corpse_core::Field::Missing;
+        assert!(matches!(observe(&r,"lichor-overflowing").indicator,Some(CustomIndicator::Blood{..})));
     }
 }

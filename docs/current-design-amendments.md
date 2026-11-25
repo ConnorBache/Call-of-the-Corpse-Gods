@@ -1020,3 +1020,20 @@ Remember, Distract, Blood Weapon hit, Blood Letting cleanse, Sudden Sleep,
 and Overflowing rescue. Anchors, upkeep, charges, blocked casts and blood
 refills do not emit these novas. Erase Metaphysical's actual removal emits
 a purple nova around the enemy. The cue reveals no hidden endpoints.
+
+### Live R52 divine balance
+
+- **Overflowing:** Start with five death saves. Survive a rescuable lethal event at
+  1 HP and spend one save; damage itself never adds saves. Reaching maximum HP or
+  gaining a level replenishes all five. Blood Mist, acquisition-order priority,
+  and unblockable deaths stay unchanged.
+- **Fight Long:** Heal for 3% of actual HP removed by a melee hit, not overkill,
+  ranged damage or misses. Rings of Vampirism still contribute 5% each.
+- **Sudden Sleep:** 25 paralysis turns after activation instead of 50.
+- **Dream of Time Gone By:** Anchor for 20 energy; return remains free.
+- **Sleep Walk:** Haste below 10% of effective maximum energy. If energy is
+  uncapped, require zero energy as before.
+
+New runs use these rules immediately. Existing live saves and recovered journals
+adopt them at their next command boundary; old recorded prefixes retain their
+original rules.

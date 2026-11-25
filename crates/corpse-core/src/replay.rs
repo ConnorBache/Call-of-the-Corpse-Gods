@@ -27,6 +27,8 @@ pub struct ReplayRecord {
     pub screamer_rules_from: Field<usize>,
     #[serde(rename = "ragelightRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub ragelight_rules_from: Field<usize>,
+    #[serde(rename = "balanceRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub balance_rules_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]
@@ -79,6 +81,7 @@ impl ReplayRecord {
             screamer_rules_from: match run.screamer_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             ember_rules_from: match run.ember_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             ragelight_rules_from: match run.ragelight_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            balance_rules_from: match run.balance_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             steam_rules_from: match run.steam_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             execute_rules_from: match run.execute_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             beckoning_rules_from: match run.beckoning_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
@@ -150,6 +153,10 @@ impl ReplayRecord {
             && matches!(self.ragelight_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Ragelight rules replay boundary".into()));
         }
+        if !self.balance_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.balance_rules_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Unsupported divine balance replay boundary".into()));
+        }
         if !self.execute_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
             && matches!(self.execute_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Execute rules replay boundary".into()));
@@ -184,6 +191,7 @@ impl ReplayRecord {
         crate::screamer_rules::apply_replay_policy(&mut engine.run, &self.screamer_rules_from, cursor);
         crate::ember_rules::apply_replay_policy(&mut engine.run, &self.ember_rules_from, cursor);
         crate::ragelight_rules::apply_replay_policy(&mut engine.run, &self.ragelight_rules_from, cursor);
+        crate::balance_rules::apply_replay_policy(&mut engine.run, &self.balance_rules_from, cursor);
         crate::steam_rules::apply_replay_policy(&mut engine.run, &self.steam_rules_from, cursor);
         crate::execute_rules::apply_replay_policy(&mut engine.run, &self.execute_rules_from, cursor);
         crate::beckoning_rules::apply_replay_policy(&mut engine.run, &self.beckoning_rules_from, cursor);
@@ -227,12 +235,13 @@ impl ReplaySession {
         crate::screamer_rules::apply_replay_policy(&mut initial, &record.screamer_rules_from, 0);
         crate::ember_rules::apply_replay_policy(&mut initial, &record.ember_rules_from, 0);
         crate::ragelight_rules::apply_replay_policy(&mut initial, &record.ragelight_rules_from, 0);
+        crate::balance_rules::apply_replay_policy(&mut initial, &record.balance_rules_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
         crate::ichor_fire_rules::apply_replay_policy(&mut initial, &record.ichor_fire_rules_from, 0);
         crate::future_floor::apply_replay_policy(&mut initial, &record.future_floor_rules_from, 0);
-        let mut engine=Engine::new(initial.clone())?;
+        let mut engine=Engine::new_for_replay(initial.clone())?;
         record.apply_policy(&mut engine,0).map_err(StorageError)?;
         Ok(Self {
             engine,
@@ -269,12 +278,13 @@ impl ReplaySession {
         crate::screamer_rules::apply_replay_policy(&mut initial, &record.screamer_rules_from, 0);
         crate::ember_rules::apply_replay_policy(&mut initial, &record.ember_rules_from, 0);
         crate::ragelight_rules::apply_replay_policy(&mut initial, &record.ragelight_rules_from, 0);
+        crate::balance_rules::apply_replay_policy(&mut initial, &record.balance_rules_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
         crate::ichor_fire_rules::apply_replay_policy(&mut initial, &record.ichor_fire_rules_from, 0);
         crate::future_floor::apply_replay_policy(&mut initial, &record.future_floor_rules_from, 0);
-        let mut engine=Engine::new(initial.clone())?;
+        let mut engine=Engine::new_for_replay(initial.clone())?;
         record.apply_policy(&mut engine,0).map_err(StorageError)?;
         Ok(Self {
             engine,
@@ -299,7 +309,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
+        if self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -323,12 +333,13 @@ impl ReplaySession {
         crate::screamer_rules::apply_replay_policy(&mut initial, &self.record.screamer_rules_from, 0);
         crate::ember_rules::apply_replay_policy(&mut initial, &self.record.ember_rules_from, 0);
         crate::ragelight_rules::apply_replay_policy(&mut initial, &self.record.ragelight_rules_from, 0);
+        crate::balance_rules::apply_replay_policy(&mut initial, &self.record.balance_rules_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &self.record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &self.record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &self.record.beckoning_rules_from, 0);
         crate::ichor_fire_rules::apply_replay_policy(&mut initial, &self.record.ichor_fire_rules_from, 0);
         crate::future_floor::apply_replay_policy(&mut initial, &self.record.future_floor_rules_from, 0);
-        self.engine = Engine::new(initial)?;
+        self.engine = Engine::new_for_replay(initial)?;
         self.record.apply_policy(&mut self.engine,0).map_err(StorageError)?;
         self.cursor = 0;
         Ok(())

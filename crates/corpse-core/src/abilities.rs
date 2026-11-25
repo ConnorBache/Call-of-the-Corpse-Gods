@@ -376,7 +376,7 @@ fn activate_inner(
                 }
                 let cost = if crate::revision50::enabled(r) {
                     let mut preview = crate::engine::actor(r, tid).unwrap().clone();
-                    let cost = highest_energy_cost_for(&mut preview, r.simulation_revision.value_or(29.));
+                    let cost = highest_energy_cost_for(&mut preview, r.simulation_revision.value_or(29.), crate::balance_rules::current(r));
                     if (cost > 0.0 && energy_activation_silenced(r, &r.player))
                         || !crate::revision50_ability_energy::can_pay(r, r.player.id, id, (cost-prepaid_upkeep(r,&r.player,id)).max(0.0)) {
                         return Ok(false);
@@ -528,7 +528,7 @@ fn activate_inner(
                     r.player.conditions.shift_remove(k);
                 }
             } else {
-                if !pay(r, id, 50.0) {
+                if !pay(r, id, crate::balance_rules::dream_anchor_cost(r)) {
                     return Ok(false);
                 }
                 r.player.conditions.insert("dreamX".into(), r.player.x);
@@ -972,7 +972,8 @@ fn activate_inner(
                 return Ok(false);
             }
             r.player.hp = r.player.max_hp;
-            let duration = crate::monster_statuses::status_duration(r,&r.player,51.0);
+            crate::divine_rescues::refresh_player_if_full(r);
+            let duration = crate::monster_statuses::status_duration(r,&r.player,crate::balance_rules::sudden_sleep_ticks(r));
             r.player.conditions.insert("paralyzed".into(), duration);
             if duration>0. {crate::animation_shapes::short_nova(r,&r.player,"P32",crate::animation_shapes::URSA);}
             log(r, "You use Sudden Sleep.", "player");
@@ -1208,11 +1209,12 @@ fn declared_energy_cost(description: &str) -> f64 {
 }
 pub fn highest_energy_cost(r: &mut Run, target_id: f64) -> Result<f64, EngineError> {
     let revision=r.simulation_revision.value_or(29.);
+    let balanced=crate::balance_rules::current(r);
     let target = crate::engine::actor_mut_trusted(r, target_id)
         .ok_or_else(|| EngineError("Unspeak target missing".into()))?;
-    Ok(highest_energy_cost_for(target, revision))
+    Ok(highest_energy_cost_for(target, revision, balanced))
 }
-fn highest_energy_cost_for(target: &mut Actor, revision: f64) -> f64 {
+fn highest_energy_cost_for(target: &mut Actor, revision: f64, balanced: bool) -> f64 {
     crate::enemy_traits::initialize_enemy_traits_revision(target,revision);
     let mut cost = crate::engine::condition(target, "maxAbilityCost").max(0.0);
     if revision>=33. && target.abilities.iter().any(|s|s=="enemy:beast:witch") { cost=cost.max(10.); }
@@ -1223,6 +1225,8 @@ fn highest_energy_cost_for(target: &mut Actor, revision: f64) -> f64 {
         if let Some(ability) = crate::progression::catalog_for_revision(revision).iter().find(|a| &a.id == id) {
             let declared = if revision >= 45.0 && id == "anavani-nova" {
                 nova_attack_cost(revision)
+            } else if balanced && id == "ursa-dream-of-time-gone-by" {
+                crate::balance_rules::DREAM_ANCHOR_COST
             } else {
                 declared_energy_cost(&ability.description)
             };
@@ -1337,7 +1341,7 @@ pub fn projected_upkeep(r:&Run)->UpkeepProjection {
         if id=="pelian-fated-duel" && !crate::revision50::duel_upkeep_valid(r,actor) {continue;}
         let cost=if id=="dawel-unspeak" {
             actor.conditions.get("unspeakTarget").and_then(|id|r.actors_at(r.depth).iter().find(|a|a.id==*id&&!a.dead.value_or(false)&&crate::dreamwalking::same_plane(r,actor,a)))
-                .map(|a|highest_energy_cost_for(&mut a.clone(),revision)).unwrap_or(0.)
+                .map(|a|highest_energy_cost_for(&mut a.clone(),revision,crate::balance_rules::current(r))).unwrap_or(0.)
         } else {upkeep_cost_in(r,actor,id)};
         let prepaid=if crate::revision50::enabled(r)&&actor.conditions.get(&format!("upkeepPaidThrough:{id}")).is_some_and(|until|*until>=next_tick&&*until<=next_tick+1.) {
             actor.conditions.get(&format!("upkeepPaidAmount:{id}")).copied().unwrap_or(0.).max(0.)

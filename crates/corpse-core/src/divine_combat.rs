@@ -95,6 +95,7 @@ pub fn heal_melee_damage_from(r:&mut Run,a:&Actor,victim:Option<&Actor>,actual_h
     // Preserve historical division exactly: multiplying by 0.2 changes saved
     // floating-point traces even though the two expressions are mathematically equal.
     let healing = match (fight_long, vampirism) {
+        (true, copies) if crate::balance_rules::current(r) => actual_hp_damage * (0.03 + 0.05 * copies as f64),
         (true, 0) => actual_hp_damage / 5.0,
         (true, copies) => actual_hp_damage * (0.2 + 0.05 * copies as f64),
         (false, 0) => return,

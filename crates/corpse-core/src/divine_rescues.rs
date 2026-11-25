@@ -3,6 +3,46 @@
 use crate::{Run, engine, half_here};
 pub const RAGE: &str = "shrail-rage-at-the-dying-of-the-light";
 pub const OVERFLOWING: &str = "lichor-overflowing";
+pub const MAX_SAVES: f64 = 5.0;
+const SAVES: &str = "overflowingSaves";
+
+/// Default stock on acquisition, including when a temporary ability is granted.
+pub fn saves(actor: &crate::Actor) -> f64 {
+    actor.conditions.get(SAVES).copied().unwrap_or(MAX_SAVES)
+}
+
+fn refill(actor: &mut crate::Actor) {
+    // Missing is the canonical full value; never write on an untouched actor.
+    actor.conditions.shift_remove(SAVES);
+}
+
+pub fn refill_on_level_up(r: &mut Run) {
+    if crate::balance_rules::current(r) && r.player.abilities.iter().any(|s| s == OVERFLOWING) {
+        refill(&mut r.player);
+    }
+}
+
+/// Full HP may be reached before an enemy retaliates in the same command.
+/// The >1 guard prevents the 1 HP rescue itself refilling a 1-max-HP actor.
+pub fn refresh_if_full(r: &mut Run, id: f64) {
+    if !crate::balance_rules::current(r) { return; }
+    if engine::actor(r, id).is_some_and(can_refill) {
+        refill(engine::actor_mut_trusted(r, id).unwrap());
+    }
+}
+
+fn can_refill(a: &crate::Actor) -> bool {
+    a.hp >= a.max_hp && a.hp > 1.0 && a.conditions.contains_key(SAVES)
+        && a.abilities.iter().any(|s| s == OVERFLOWING)
+}
+
+/// O(K) only at health settlement, with a fixed-key O(1) expected fast path.
+pub fn refresh_player_if_full(r: &mut Run) {
+    if crate::balance_rules::current(r) && can_refill(&r.player) {
+        refill(&mut r.player);
+    }
+}
+
 pub const PELIAN: &str = "pelian-you-shall-never-be-rid-of-me";
 /// Called before terminal cleanup. Ability collection order is acquisition order.
 pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
@@ -25,6 +65,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
         return false;
     }
     let passive_ragelight = crate::ragelight_rules::current(r);
+    let balanced = crate::balance_rules::current(r);
     for ability in abilities {
         if ability == RAGE && (passive_ragelight || engine::actor(r, id).unwrap().active.contains(&ability)) {
             let cost = engine::condition(engine::actor(r, id).unwrap(), "rageCost");
@@ -46,9 +87,16 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
                     .retain(|s| s != &ability);
             }
         }
-        if ability == OVERFLOWING && engine::actor(r, id).unwrap().blood.value_or(0.0) > 0.0 {
+        if ability == OVERFLOWING {
+            let a = engine::actor(r, id).unwrap();
+            let stock = if balanced { saves(a) } else { a.blood.value_or(0.0) };
+            if stock <= 0.0 { continue; }
             let a = engine::actor_mut_trusted(r, id).unwrap();
-            a.blood = (a.blood.value_or(0.0) - 1.0).into();
+            if balanced {
+                a.conditions.insert(SAVES.into(), stock - 1.0);
+            } else {
+                a.blood = (stock - 1.0).into();
+            }
             a.hp = 1.0;
             crate::blood_mist::emit(r, id);
             half_here::sync(r);
@@ -61,6 +109,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
         {
             let a = engine::actor_mut_trusted(r, id).unwrap();
             a.hp = a.max_hp;
+            if balanced && a.abilities.iter().any(|s| s == OVERFLOWING) { refill(a); }
             a.conditions.insert("pelianUsed".into(), 1.0);
             a.active.retain(|s| s != &ability);
             half_here::sync(r);
@@ -73,7 +122,7 @@ pub fn try_rescue(r: &mut Run, id: f64, bypass: bool) -> bool {
 /// Accrues the resolved packet, including overkill, after HP loss and before rescue.
 /// Repeated subtraction preserves source floating-point behavior for legacy banks.
 pub fn accrue_damage(r: &mut Run, victim: f64, n: f64) {
-    if n <= 0.0 {
+    if n <= 0.0 || crate::balance_rules::current(r) {
         return;
     }
     let Some(body) = engine::actor(r, victim) else {

@@ -274,7 +274,8 @@ pub fn ally_stair_movement_speed(r: &Run, a: &Actor) -> f64 {
         || has(a, "fast")
         || (has(a, "vampire") && condition(a, "monsterVampireBat") > 0.0)
         || ability(a, "Rushing Torrent", true)
-        || (ability(a, "Sleep Walk", false) && a.energy == 0.0)
+        || (if crate::balance_rules::current(r) { crate::balance_rules::sleep_walk_active(r, a) }
+            else { ability(a, "Sleep Walk", false) && a.energy == 0.0 })
         || (ability(a, "Step Through Shadows", false)
             && !r.actors_at(r.depth).iter().any(|b| {
                 !b.dead.value_or(false)

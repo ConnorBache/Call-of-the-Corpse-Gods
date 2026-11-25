@@ -69,6 +69,11 @@ pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
             if ready {p.rect(x,y,21,21,[59,150,255]);}
             p.border(x,y,21,21,[99,177,255]);
         }
+        CustomIndicator::OverflowingSaves(count)=>{
+            p.rect(x,y,42,21,[177,33,66]);
+            p.border(x,y,42,21,[221,65,100]);
+            centered(p,&format!("{count}/5"),x,y+3,42,12,INK);
+        }
         CustomIndicator::Blood{count,progress}=>{
             // Rasterize a pointed droplet with a rounded bottom, bounded 29x30.
             for dy in 0i32..30 {

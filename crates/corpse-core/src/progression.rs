@@ -160,6 +160,7 @@ pub fn level_up(r: &mut Run) {
     resources::record_loss(r, &p, "blessings", cost);
     r.exp -= cost;
     r.level += 1.0;
+    crate::divine_rescues::refill_on_level_up(r);
     if crate::revision50::enabled(r) {
         // Already validated above. Player energy is intentionally not refilled.
         crate::revision50_ability_energy::refill_on_level_up_for_revision(&mut r.player, r.simulation_revision.value_or(29.)).unwrap();
