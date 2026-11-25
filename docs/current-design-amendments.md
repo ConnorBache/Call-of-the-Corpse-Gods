@@ -1037,3 +1037,19 @@ a purple nova around the enemy. The cue reveals no hidden endpoints.
 New runs use these rules immediately. Existing live saves and recovered journals
 adopt them at their next command boundary; old recorded prefixes retain their
 original rules.
+
+### R52 escape collapse and trailing hellfire
+
+The collapse still opens chasms and travels up through the staircase
+connections, but leaves both stair tiles and the blue exit intact. Its
+permanent Hellfire trail seeds the boss death cell after four world turns,
+then follows the same alternating cardinal and diagonal layers every four
+turns, half the collapse's speed. Each upper floor ignites when the flame
+reaches the stairs below, not when the chasm front does. Hellfire can
+cover intact stairs and burns targets that can fly; the ordinary fire
+immunity and secondary fire rules still apply. The stair and exit symbols
+remain visible through the flames.
+
+Existing live saves adopt this policy for the next collapse they start.
+A collapse already underway when the save is upgraded keeps its original
+rules, and previously recorded commands are not reinterpreted.

@@ -14,7 +14,7 @@ fn raw_material<'a>(p:&'a Profile,o:&ObservedCell)->MaterialView<'a>{
         m.edge_nonempty=true;m.glyph=Some(".");m.animation_speed=0.;
         m.color_default=true;m.background_default=true;m.edge_default=true;return m
     }
-    if o.door_open.is_none()&&!o.grate&&!o.bridge&&(o.ice||o.puddles||o.hellfire){
+    if !matches!(tile,"up"|"down") && o.door_open.is_none()&&!o.grate&&!o.bridge&&(o.ice||o.puddles||o.hellfire){
         let mut m=p.resolved_material("floor",Parent::None).unwrap_or_default();
         let(f,b,g)=if o.hellfire{([227,56,36],[9,3,7],".")}else if o.ice{([168,220,233],[24,60,82],"_")}else{([117,155,165],[26,48,59],"~")};
         m.color=Some(f);m.background=Some(b);m.edge=Some(f);m.edge_nonempty=true;m.glyph=Some(g);m.animation_speed=0.;m.color_default=true;m.background_default=true;m.edge_default=true;return m

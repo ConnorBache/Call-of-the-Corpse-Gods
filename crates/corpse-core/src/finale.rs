@@ -1,7 +1,7 @@
 //! Revision-31 Administrator and deterministic staircase-propagating escape collapse.
 //! No simulation RNG is used by placement or collapse. The original stairs are captured
 //! before their tiles disappear; each pulse uses only the previous frontier.
-use crate::{Actor, Floor, Run, Stats};
+use crate::{Actor, Field, Floor, Run, Stats};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, sync::Arc};
 
@@ -21,6 +21,29 @@ pub struct CollapseFloor {
     /// R52 alternates cardinal-only and diagonal-inclusive pulses per reached floor.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub diagonal_next: bool,
+    /// Missing for a collapse already started under the original rules.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fire: Option<FireWave>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct FireWave {
+    origin: usize,
+    down: Option<usize>,
+    cells: Vec<bool>,
+    frontier: Vec<usize>,
+    upper_seeded: bool,
+    diagonal_next: bool,
+}
+
+impl CollapseFloor {
+    fn protected_stair(&self, at: usize) -> bool {
+        self.fire.as_ref().is_some_and(|fire| Some(at) == self.up || Some(at) == fire.down)
+    }
+    fn gap(&self, at: usize) -> bool {
+        self.cells.get(at) == Some(&true) && !self.protected_stair(at)
+    }
 }
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -33,13 +56,39 @@ pub struct Collapse {
 }
 
 pub fn enabled(r: &Run) -> bool { r.simulation_revision.value_or(29.) >= 31. }
+fn current(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && matches!(r.collapse_rules_from, Field::Value(_))
+}
+fn validate_policy(r: &Run) -> Result<(), String> {
+    if !r.collapse_rules_from.is_missing() && (r.simulation_revision.value_or(29.) < 52.
+        || r.collapse_rules_from.as_ref().is_some_and(|&n| n > r.replay.len())) {
+        return Err("Invalid collapse rules command boundary".into());
+    }
+    Ok(())
+}
+pub fn admit_current(r: &mut Run) -> Result<(), String> {
+    validate_policy(r)?;
+    if r.simulation_revision.value_or(29.) >= 52. && r.collapse_rules_from.is_missing() {
+        r.collapse_rules_from = r.replay.len().into();
+    }
+    Ok(())
+}
+pub(crate) fn apply_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    if r.simulation_revision.value_or(29.) < 52. { return; }
+    if from.as_ref() == Some(&cursor) {
+        r.collapse_rules_from = cursor.into();
+    } else if cursor == 0 {
+        r.collapse_rules_from = Field::Missing;
+    }
+}
+
 pub fn is_boss(a: &Actor) -> bool { a.creature_kind.as_ref().is_some_and(|k| k == BOSS_KIND) }
 pub fn ending(r: &Run) -> Option<&'static str> {
     (r.status == "won" && r.collapse.as_ref().is_some_and(|c| c.escaped)).then_some(WIN_MESSAGE)
 }
 pub fn collapsed(r: &Run, depth: f64, at: usize) -> bool {
     r.collapse.as_ref().and_then(|c| c.waves.iter().find(|w| w.depth as f64 == depth))
-        .and_then(|w| w.cells.get(at)).copied().unwrap_or(false)
+        .is_some_and(|w| w.gap(at))
 }
 fn at(f: &Floor, a: &Actor) -> Option<usize> {
     (a.x >= 0. && a.y >= 0. && a.x < f.width() as f64 && a.y < f.height() as f64)
@@ -123,7 +172,7 @@ pub fn actual_death(r: &mut Run, a: &Actor) -> Result<bool, String> {
     let depth = r.depth as u32;
     r.collapse = Arc::new(Collapse { boss_id: a.id, started_tick: r.tick,
         next_pulse_tick: r.tick + 2., escaped: false, waves: vec![] }).into();
-    seed(r, depth, origin)?;
+    seed(r, depth, origin, current(r))?;
     let newly_reached = propagate_stairs(r)?;
     announce_start(r);
     settle_floor(r, depth)?;
@@ -135,13 +184,14 @@ pub fn announce_start(r: &mut Run) {
     crate::engine::log(r, "The Flesh Administrator dies. She falls into the opening flesh. Escape to the blue door!", "environment");
 }
 
-fn seed(r: &mut Run, depth: u32, cell: usize) -> Result<(), String> {
+fn seed(r: &mut Run, depth: u32, cell: usize, with_fire: bool) -> Result<(), String> {
     if r.collapse.as_ref().unwrap().waves.iter().any(|w| w.depth == depth) { return Ok(()); }
     if !r.floors.iter().any(|f| f.depth == depth as f64) { crate::startup::ensure_floors(r, depth)?; }
     let f = r.floors.iter().find(|f| f.depth == depth as f64).ok_or("Collapse floor missing")?;
     if cell >= f.tiles.len() { return Err("Collapse stair seed is outside floor".into()); }
     let wave = CollapseFloor { depth, up: stair(f, "up"), upper_seeded: false,
-        cells: vec![false; f.tiles.len()], frontier: vec![cell], diagonal_next: false };
+        cells: vec![false; f.tiles.len()], frontier: vec![cell], diagonal_next: false,
+        fire: with_fire.then(|| FireWave { origin: cell, down: stair(f,"down"), ..Default::default() }) };
     let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
     c.waves.push(wave);
     c.waves.last_mut().unwrap().cells[cell] = true;
@@ -163,10 +213,11 @@ fn propagate_stairs(r: &mut Run) -> Result<Vec<u32>, String> {
         wave.upper_seeded = true;
         let depth = upper as u32;
         let origin = wave.up.unwrap();
+        let with_fire = wave.fire.is_some();
         if !r.floors.iter().any(|f| f.depth == depth as f64) { crate::startup::ensure_floors(r,depth)?; }
         let f = r.floors.iter().find(|f| f.depth == depth as f64).ok_or("Collapse upper floor missing")?;
         let cell = stair(f,"down").unwrap_or(origin);
-        seed(r,depth,cell)?;
+        seed(r,depth,cell,with_fire)?;
         reached.push(depth);
     }
     Ok(reached)
@@ -186,28 +237,20 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
         let alternating = r.simulation_revision.value_or(29.) >= 52.;
         let mut changes = Vec::new();
         let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
+        let fire_pulse = (c.next_pulse_tick - c.started_tick) % 4. == 0.;
         c.next_pulse_tick += 2.;
         for wave in &mut c.waves {
             let f = r.floors.iter().find(|f| f.depth == wave.depth as f64).ok_or("Reached collapse floor missing")?;
             let w = f.width();
             let h = f.height();
-            let mut next = Vec::new();
-            for &cell in &wave.frontier {
-                let (x,y) = ((cell % w) as i32, (cell / w) as i32);
-                for d in crate::movement::DIRECTIONS {
-                    if alternating && !wave.diagonal_next && d.x != 0 && d.y != 0 { continue; }
-                    let (nx,ny) = (x+d.x,y+d.y);
-                    if nx < 0 || ny < 0 || nx >= w as i32 || ny >= h as i32 { continue; }
-                    let i = ny as usize*w+nx as usize;
-                    if !wave.cells[i] { wave.cells[i] = true; next.push(i); }
-                }
-            }
+            let next = expand(&mut wave.cells, &wave.frontier, w, h, !alternating || wave.diagonal_next);
             if alternating { wave.diagonal_next = !wave.diagonal_next; }
             wave.frontier = next.clone();
             changes.push((wave.depth,next));
         }
         for (depth,cells) in &changes { erode(r,*depth,cells); }
         let seeded = propagate_stairs(r)?;
+        if fire_pulse { advance_fire(r)?; }
         for depth in changes.iter().map(|(d,_)| *d).chain(seeded) {
             settle_floor(r,depth)?;
         }
@@ -216,10 +259,87 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
     Ok(())
 }
 
+/// Bounded-degree expansion shared by both waves. Stairs are graph cells even
+/// when they are physically preserved, so neither wave stalls at a staircase.
+fn expand(cells: &mut [bool], frontier: &[usize], w: usize, h: usize, diagonal: bool) -> Vec<usize> {
+    let mut next = Vec::new();
+    for &cell in frontier {
+        let (x, y) = ((cell % w) as i32, (cell / w) as i32);
+        for d in crate::movement::DIRECTIONS {
+            if !diagonal && d.x != 0 && d.y != 0 { continue; }
+            let (nx, ny) = (x + d.x, y + d.y);
+            if nx < 0 || ny < 0 || nx >= w as i32 || ny >= h as i32 { continue; }
+            let i = ny as usize * w + nx as usize;
+            if !cells[i] {
+                cells[i] = true;
+                next.push(i);
+            }
+        }
+    }
+    next
+}
+
+fn ignite_seed(fire: &mut FireWave, size: usize) -> Vec<usize> {
+    fire.cells = vec![false; size];
+    fire.cells[fire.origin] = true;
+    fire.frontier = vec![fire.origin];
+    fire.frontier.clone()
+}
+
+/// Fire starts behind the first collapse layer and expands once every four
+/// turns. It follows the same route; upstairs fire starts only when the fire
+/// reaches the lower stairs, not when collapse first reaches those stairs.
+fn advance_fire(r: &mut Run) -> Result<(), String> {
+    let mut changes = Vec::new();
+    let upper_depths: Vec<_> = r.collapse.as_ref().unwrap().waves.iter()
+        .map(|w| crate::fast_mode::above(r, w.depth as f64) as u32).collect();
+    let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
+    for (index, wave) in c.waves.iter_mut().enumerate() {
+        let Some(fire) = &mut wave.fire else { continue };
+        let f = r.floors.iter().find(|f| f.depth == wave.depth as f64).ok_or("Hellfire floor missing")?;
+        let next = if fire.cells.is_empty() {
+            if index != 0 { continue; }
+            ignite_seed(fire, f.tiles.len())
+        } else {
+            let next = expand(&mut fire.cells, &fire.frontier, f.width(), f.height(), fire.diagonal_next);
+            if !fire.frontier.is_empty() { fire.diagonal_next = !fire.diagonal_next; }
+            fire.frontier = next.clone();
+            next
+        };
+        if !next.is_empty() { changes.push((wave.depth, next)); }
+    }
+    // Waves are ordered from the boss floor upward. Seed any freshly reached
+    // floors, but give each new seed its first spatial expansion next pulse.
+    for (i, upper) in upper_depths.into_iter().enumerate() {
+        let (depth, up) = (c.waves[i].depth, c.waves[i].up);
+        let Some(fire) = &mut c.waves[i].fire else { continue };
+        if depth <= 1 || fire.upper_seeded || !up.is_some_and(|at| fire.cells.get(at) == Some(&true)) { continue; }
+        fire.upper_seeded = true;
+        let w = c.waves.iter_mut().find(|w| w.depth == upper).ok_or("Hellfire overtook collapse")?;
+        let next = ignite_seed(w.fire.as_mut().ok_or("Hellfire upper wave missing")?, w.cells.len());
+        changes.push((upper, next));
+    }
+    for (depth, cells) in changes {
+        let f = crate::mutation_journal::make_mut(r.floors.iter_mut()
+            .find(|f| f.depth == depth as f64).ok_or("Hellfire floor missing")?);
+        let layer = f.hellfire.get_or_insert_with(|| vec![false; f.tiles.len()]);
+        for i in cells { layer[i] = true; }
+        f.dirty = true;
+    }
+    Ok(())
+}
+
 /// Permanently remove solid terrain and physical fixtures, never remembered knowledge.
 fn erode(r: &mut Run, depth: u32, cells: &[usize]) {
     if cells.is_empty() { return; }
     let direct_roots = r.simulation_revision.value_or(29.) >= 51.;
+    let wave = r.collapse.as_ref().unwrap().waves.iter().find(|w| w.depth == depth).unwrap();
+    let preserved: Vec<_>;
+    let cells = if wave.fire.is_some() {
+        preserved = cells.iter().copied().filter(|&i| !wave.protected_stair(i)).collect();
+        preserved.as_slice()
+    } else { cells };
+    if cells.is_empty() { return; }
     if r.depth == depth as f64 {
         let f = r.floor().unwrap();
         if stair(f, "up").is_some_and(|up| cells.contains(&up)) {
@@ -270,8 +390,9 @@ fn settle_floor(r: &mut Run, depth: u32) -> Result<(), String> {
     if lost.iter().any(|id| r.actors_at(depth as f64).iter().any(|a| a.id == *id && crate::half_here::is_clone(a))) { crate::half_here::dismiss(r); }
     let lost: HashSet<_> = lost.iter().map(|i| i.to_bits()).collect();
     r.actors_at_mut(depth as f64).retain(|a| !lost.contains(&a.id.to_bits()));
-    let mask = r.collapse.as_ref().unwrap().waves.iter().find(|c| c.depth == depth).unwrap().cells.clone();
-    r.ground_at_mut(depth as f64).retain(|g| crate::dreamwalking::dream_ground_item(&g.item) || !mask[g.y as usize*w+g.x as usize]);
+    let collapse = Arc::clone(r.collapse.as_ref().unwrap());
+    let wave = collapse.waves.iter().find(|c| c.depth == depth).unwrap();
+    r.ground_at_mut(depth as f64).retain(|g| crate::dreamwalking::dream_ground_item(&g.item) || !wave.gap(g.y as usize*w+g.x as usize));
     if lose_player { fall_player(r)?; }
     Ok(())
 }
@@ -316,6 +437,7 @@ pub fn try_escape(r: &mut Run) -> bool {
 }
 
 pub fn validate(r: &Run) -> Result<(), String> {
+    validate_policy(r)?;
     let bosses: Vec<_> = r.actors.values().flat_map(|v| v.iter()).filter(|a| is_boss(a)).collect();
     if bosses.len() > 1 || (!bosses.is_empty() && !enabled(r))
         || (r.collapse.as_ref().is_some() && !bosses.is_empty()) {
@@ -335,7 +457,7 @@ pub fn validate(r: &Run) -> Result<(), String> {
             || wave.up.is_some_and(|i| i>=n) || wave.frontier.len()>n
             || wave.frontier.iter().any(|i| *i>=n || !wave.cells[*i])
             || wave.frontier.iter().copied().collect::<HashSet<_>>().len()!=wave.frontier.len()
-            || wave.cells.iter().enumerate().any(|(i,b)| *b && f.tiles[i]!="chasm") {
+            || wave.cells.iter().enumerate().any(|(i,b)| *b && !wave.protected_stair(i) && f.tiles[i]!="chasm") {
             return Err("Invalid collapse frontier or terrain".into());
         }
     }

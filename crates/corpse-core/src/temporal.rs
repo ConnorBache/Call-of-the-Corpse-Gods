@@ -52,7 +52,7 @@ impl Snapshot {
     pub fn value(&self) -> Result<Value> {
         let mut v = serde_json::to_value(&*self.state)?;
         let o = v.as_object_mut().unwrap();
-        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
+        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
             o.shift_remove(k);
         }
         if let Some(c) = self.cursor {
@@ -113,6 +113,7 @@ impl Snapshot {
         o.shift_remove("emberRulesFrom");
         o.shift_remove("ragelightRulesFrom");
         o.shift_remove("balanceRulesFrom");
+        o.shift_remove("collapseRulesFrom");
         o.shift_remove("steamRulesFrom");
         o.shift_remove("executeRulesFrom");
         o.shift_remove("beckoningRulesFrom");
@@ -140,6 +141,7 @@ impl Snapshot {
         restored.screamer_rules_from = run.screamer_rules_from.clone();
         restored.ragelight_rules_from = run.ragelight_rules_from.clone();
         restored.balance_rules_from = run.balance_rules_from.clone();
+        restored.collapse_rules_from = run.collapse_rules_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -559,6 +561,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.screamer_rules_from = Field::Missing;
     copy.ragelight_rules_from = Field::Missing;
     copy.balance_rules_from = Field::Missing;
+    copy.collapse_rules_from = Field::Missing;
     copy.execute_rules_from = Field::Missing;
     copy.beckoning_rules_from = Field::Missing;
     copy.ichor_fire_rules_from = Field::Missing;
@@ -596,6 +599,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.screamer_rules_from=run.screamer_rules_from.clone();
     restored.ragelight_rules_from=run.ragelight_rules_from.clone();
     restored.balance_rules_from=run.balance_rules_from.clone();
+    restored.collapse_rules_from=run.collapse_rules_from.clone();
     restored.execute_rules_from=run.execute_rules_from.clone();
     restored.beckoning_rules_from=run.beckoning_rules_from.clone();
     restored.ichor_fire_rules_from=run.ichor_fire_rules_from.clone();
@@ -629,6 +633,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.screamer_rules_from = run.screamer_rules_from.clone();
         restored.ragelight_rules_from = run.ragelight_rules_from.clone();
         restored.balance_rules_from = run.balance_rules_from.clone();
+        restored.collapse_rules_from = run.collapse_rules_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -795,7 +800,7 @@ fn snapshot_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Run {
 fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
     let _timing = crate::timing::span("history.journal_header");
     let mut value = serde_json::to_value(snapshot_header(snapshot, mask_dream_floors))?;
-    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
+    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
         value.as_object_mut().unwrap().shift_remove(key);
     }
     Ok(value)
@@ -1066,6 +1071,7 @@ impl Engine {
     /// O(world validation + history import); replay provenance checks/addition O(1).
     pub fn new(mut run: Run) -> Result<Self> {
         crate::balance_rules::admit_current(&mut run).map_err(StorageError)?;
+        crate::finale::admit_current(&mut run).map_err(StorageError)?;
         Self::new_for_replay(run)
     }
 
@@ -1133,6 +1139,7 @@ impl Engine {
         if matches!(run.ember_rules_from, Field::Null) { run.ember_rules_from = Field::Missing; }
         if matches!(run.ragelight_rules_from, Field::Null) { run.ragelight_rules_from = Field::Missing; }
         if matches!(run.balance_rules_from, Field::Null) { run.balance_rules_from = Field::Missing; }
+        if matches!(run.collapse_rules_from, Field::Null) { run.collapse_rules_from = Field::Missing; }
         if matches!(run.steam_rules_from, Field::Null) { run.steam_rules_from = Field::Missing; }
         if matches!(run.execute_rules_from, Field::Null) { run.execute_rules_from = Field::Missing; }
         if matches!(run.beckoning_rules_from, Field::Null) { run.beckoning_rules_from = Field::Missing; }

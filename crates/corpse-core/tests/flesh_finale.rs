@@ -283,3 +283,146 @@ fn revision52_new_stair_seed_starts_cardinal_even_on_global_diagonal_pulse() {
     pulse(&mut r,6.); assert_eq!(count(&r,39),5);
     pulse(&mut r,8.); assert_eq!(count(&r,39),21);
 }
+
+fn ring_flight(r: &mut Run) {
+    r.inventory.clear();
+    r.inventory.push(corpse_core::Item {
+        id: 7., name: "Ring of Flight".into(), kind: "ring".into(),
+        effect: "flight".to_owned().into(), ..Default::default()
+    });
+    r.next_id = 10.;
+}
+
+#[test]
+fn collapse_fire_follows_at_half_speed_and_preserves_stairs_on_both_floors() {
+    let mut r = world();
+    r.simulation_revision = 52.0.into();
+    r.collapse_rules_from = 0usize.into();
+    kill(&mut r);
+    let burning = |r: &Run, depth: u32, at| {
+        corpse_core::terrain_runtime::hellfire_at(&r.floors[(depth - 1) as usize], at)
+    };
+    let mut grounded = corpse_core::population::create_actor("rat", 5., 5., 4., false).unwrap();
+    let mut flying = grounded.clone();
+    grounded.id = 6.;
+    flying.x = 3.;
+    flying.conditions.insert("flying".into(), 100.);
+    r.actors_at_mut(40.).extend([grounded, flying]);
+
+    pulse(&mut r, 2.);
+    assert_eq!(count(&r, 40), 5);
+    assert!(!burning(&r, 40, 320));
+    assert_eq!(r.actors_at(40.).iter().map(|a| a.id).collect::<Vec<_>>(), vec![5.]);
+    pulse(&mut r, 4.);
+    assert_eq!(count(&r, 40), 21);
+    assert!(burning(&r, 40, 320));
+    assert!(!burning(&r, 40, 319));
+    pulse(&mut r, 6.);
+    assert_eq!(count(&r, 39), 0);
+    pulse(&mut r, 8.);
+    assert_eq!(count(&r, 39), 1);
+    assert!(burning(&r, 40, 319));
+    assert!(!burning(&r, 40, 240));
+    assert!(!burning(&r, 39, 560));
+    assert_eq!(r.floors[39].tiles[80], "up");
+    assert_eq!(r.floors[38].tiles[560], "down");
+    assert!(!finale::collapsed(&r, 40., 80));
+    assert!(!finale::collapsed(&r, 39., 560));
+
+    let saved = storage::serialize(&r).unwrap();
+    let mut loaded = storage::deserialize(&saved).unwrap();
+    pulse(&mut r, 20.);
+    pulse(&mut loaded, 20.);
+    assert_eq!(r.collapse, loaded.collapse);
+    assert_eq!(r.floors[38].hellfire, loaded.floors[38].hellfire);
+    assert!(burning(&r, 40, 80));
+    assert!(burning(&r, 39, 560));
+    assert!(!burning(&r, 39, 561));
+    assert_eq!(r.floors[39].tiles[80], "up");
+    assert_eq!(r.floors[38].tiles[560], "down");
+}
+
+#[test]
+fn ring_flight_survives_chasm_but_takes_hellfire_damage_and_can_ascend() {
+    let mut r = world();
+    r.simulation_revision = 52.0.into();
+    r.collapse_rules_from = 0usize.into();
+    ring_flight(&mut r);
+    kill(&mut r);
+    r.player.x = 4.;
+    r.player.y = 4.;
+    pulse(&mut r, 2.);
+    assert_eq!(r.status, "playing");
+    assert!(corpse_core::travel::flying(&r, &r.player));
+    let hp = r.player.hp;
+    let mut e = Engine::new(r).unwrap();
+    for _ in 0..6 { e.dispatch(&Command::Wait).unwrap(); }
+    assert!(e.run.player.hp < hp, "airborne avatar must burn");
+    assert!(corpse_core::terrain_runtime::hellfire_at(e.run.floor().unwrap(), 320));
+    let mut wet = e.run.floor().unwrap().clone();
+    wet.tiles[320] = "shallow-water".into();
+    assert!(!corpse_core::revision51_fire_water::extinguish_cell(&mut wet, 320, 52.));
+    assert!(corpse_core::terrain_runtime::hellfire_at(&wet, 320));
+
+    // A delayed escape can still use the exact stair landing after both
+    // stair tiles are surrounded and burning.
+    pulse(&mut e.run, 25.);
+    e.run.player.x = 2.;
+    e.run.player.y = 1.;
+    e.dispatch(&Command::Move{dx:-1.,dy:0.}).unwrap();
+    assert_eq!(e.run.depth, 39.);
+    assert_eq!((e.run.player.x, e.run.player.y), (7., 7.));
+    assert_eq!(e.run.floor().unwrap().tiles[560], "down");
+}
+
+#[test]
+fn collapse_started_under_legacy_rules_keeps_its_terrain_policy() {
+    let mut r = world();
+    r.simulation_revision = 52.0.into();
+    r.collapse_rules_from = Field::Missing;
+    kill(&mut r);
+    finale::admit_current(&mut r).unwrap();
+    pulse(&mut r, 20.);
+    assert_eq!(r.floors[39].tiles[80], "chasm");
+    assert_eq!(r.floors[38].tiles[560], "chasm");
+    assert!(!corpse_core::terrain_runtime::hellfire_at(&r.floors[39], 320));
+}
+
+#[test]
+fn burning_blue_exit_still_wins_by_normal_movement() {
+    let mut r = world();
+    r.simulation_revision = 52.0.into();
+    r.collapse_rules_from = 0usize.into();
+    ring_flight(&mut r);
+    let b = r.actors_at_mut(40.).pop().unwrap();
+    r.actors_at_mut(2.).push(b);
+    r.depth = 2.;
+    kill(&mut r);
+    pulse(&mut r, 300.);
+    r.depth = 1.;
+    (r.player.x,r.player.y) = (39.,26.);
+    assert_eq!(r.floor().unwrap().tiles[2172], "up");
+    assert!(corpse_core::terrain_runtime::hellfire_at(r.floor().unwrap(), 2172));
+    let mut e = Engine::new(r).unwrap();
+    e.dispatch(&Command::Move {dx:0.,dy:1.}).unwrap();
+    assert_eq!(e.run.status, "won");
+}
+
+#[test]
+fn replay_policy_adopts_at_end_of_a_legacy_command_prefix() {
+    use corpse_core::replay::{ReplayRecord, ReplaySession};
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/gas-prechange-r52.json")).unwrap();
+    let record: ReplayRecord = serde_json::from_value(fixture["record"].clone()).unwrap();
+    let mut replay = ReplaySession::create(record, true).unwrap();
+    while replay.step().unwrap() {}
+    assert!(replay.engine.run.collapse_rules_from.is_missing());
+    let live = Engine::load(&replay.engine.save().unwrap()).unwrap();
+    let boundary = live.run.replay.len();
+    assert_eq!(live.run.collapse_rules_from, boundary.into());
+    let exported = ReplayRecord::try_from_run(&live.run).unwrap();
+    let mut mixed = ReplaySession::create(exported, true).unwrap();
+    assert!(mixed.engine.run.collapse_rules_from.is_missing());
+    while mixed.step().unwrap() {}
+    assert_eq!(mixed.engine.run.collapse_rules_from, boundary.into());
+}

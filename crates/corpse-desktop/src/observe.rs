@@ -96,7 +96,7 @@ fn material_settings(
     }
     // New terrain keeps the existing editable floor material, with a distinct
     // default palette. No new appearance keys change historical profiles.
-    if o.door_open.is_none() && !o.grate && !o.bridge && (o.ice || o.puddles || o.hellfire) {
+    if !matches!(tile, "up" | "down") && o.door_open.is_none() && !o.grate && !o.bridge && (o.ice || o.puddles || o.hellfire) {
         let mut material = profile.material("floor", None).unwrap_or_default();
         let (fg,bg,glyph) = if o.hellfire { ("#e33824","#090307",".") }
             else if o.ice { ("#a8dce9","#183c52","_") }
@@ -2206,6 +2206,24 @@ pub fn fire_cell(
         } else {
             p.number("fog.rememberedOpacity")
         };
+    // Keep usable transitions readable when the collapse's trailing hellfire
+    // reaches them. Flame-colored ground and an ember underlay frame the intact
+    // stair glyph instead of replacing it with the regular fire glyph.
+    if o.hellfire && matches!(tile, "up" | "down") {
+        let stair = ground_compiled::prepare(p, o, false);
+        let hot_bg = crate::color::composite(bg, [115, 22, 12], opacity * 0.78);
+        let fg = crate::color::composite(hot_bg, stair.fg, if o.current { 1. } else { opacity });
+        return Cell {
+            x, y, glyph: stair.glyph, emphasis,
+            underlays: vec![(glyph, color, opacity * 0.55)],
+            fire: true, current: o.current, direct: o.direct, fg, bg,
+            background_overlay: Some(([115, 22, 12], opacity * 0.78)),
+            label: if o.entrance { "Blue entrance in hellfire" }
+                else if tile == "up" { "Upstairs in hellfire" }
+                else { "Downstairs in hellfire" }.into(),
+            ..Cell::default()
+        };
+    }
     // O(1): four detached, already knowledge/light-graded palette anchors per known fire.
     // Idle painting interpolates these only; it never re-observes terrain or rebuilds light fields.
     let animations=if o.current && speed!=0.{

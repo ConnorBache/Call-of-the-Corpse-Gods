@@ -2445,3 +2445,14 @@ existing effective-stat lookup for a capped owner away from zero (cost depends
 on equipment and conditions); AI, movement and observed animation checks share
 the threshold. The animation snapshot adds one runtime boolean per observed
 actor, not persisted state.
+
+## R52 trailing Hellfire
+
+The second staircase-linked frontier advances every other collapse pulse.
+Per fire pulse, expansion is O(K) for K cells in its bounded-degree frontier,
+plus the existing floor lookups and copy-on-write overhead. Each cell joins
+each frontier at most once. The persisted per-floor mask is O(V) for V cells
+when the fire arrives; the frontier and changed-cell scratch are O(V)
+worst-case. Flame contact, ordinary secondary fire, and rendering reuse the
+existing Hellfire terrain path. There is no new per-frame simulation or RNG
+draw for frontier growth.

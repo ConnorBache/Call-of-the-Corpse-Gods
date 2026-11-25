@@ -71,6 +71,46 @@ mod tests {
         }
         assert!(different);assert_eq!(r,before);
     }
+    #[test]
+    fn collapse_hellfire_keeps_stairs_entrance_and_chasm_readable() {
+        let mut r=scene();
+        r.simulation_revision=52.0.into();
+        let f=r.floor_mut().unwrap();
+        let (w,y)=(f.width(),f.height()-2);
+        let door=w/2;
+        f.depth=1.;
+        f.entrance=corpse_core::entrance::Entrance{x:door as f64,y:y as f64}.into();
+        for (x,tile) in [(door-2,"up"),(door-1,"down"),(door,"up"),(door+1,"chasm")] {
+            f.tiles[y*w+x]=tile.into();
+            f.hellfire.as_mut().unwrap()[y*w+x]=true;
+        }
+        r.depth=1.;
+        r.player.x=door as f64;
+        r.player.y=(y-1) as f64;
+        let view=crate::observe::observe(&r);
+        for (x,glyph,name,scene) in [
+            (door-2,"<","Upstairs in hellfire","A stairway leads up."),
+            (door-1,">","Downstairs in hellfire","A stairway leads deeper"),
+            (door,"Ω","Blue entrance in hellfire","The blue entrance leads out"),
+        ] {
+            let c=view.cells.iter().find(|c|c.x==x&&c.y==y&&c.fire).expect("fire overlay on stair");
+            assert_eq!(c.glyph,glyph);
+            assert_eq!(c.label,name);
+            assert!(c.background_overlay.is_some());
+            if x==door {assert!(c.fg[2]>c.fg[0]);}
+            let inspection=crate::inspection_ui::observe_tile(&r,x,y).scene;
+            assert!(inspection.contains(scene),"{inspection}");
+            assert!(inspection.contains("Unextinguishable hellfire"),"{inspection}");
+        }
+        let chasm=crate::inspection_ui::observe_tile(&r,door+1,y).scene;
+        assert!(chasm.contains("The ground falls away")&&chasm.contains("Unextinguishable hellfire"),"{chasm}");
+        let mut painter=crate::render::Painter::new();
+        painter.game_at(&view,"",false,600.);
+        let burning=painter.pixels.clone();
+        r.floor_mut().unwrap().hellfire.as_mut().unwrap().fill(false);
+        painter.game_at(&crate::observe::observe(&r),"",false,600.);
+        assert_ne!(painter.pixels,burning);
+    }
     fn save(p: &crate::render::Painter, path: &std::path::Path) {
         let f=std::fs::File::create(path).unwrap(); let mut encoder=png::Encoder::new(f,p.width as u32,p.height as u32);
         encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);

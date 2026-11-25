@@ -324,11 +324,15 @@ fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
     } else {
         tile.unwrap()
     };
-    let key = if o.hellfire { "hellfire" } else if o.ice { "ice" } else if o.puddles { "puddle" } else { key };
+    let enduring_feature = o.hellfire && matches!(key, "up" | "down" | "chasm");
+    let key = if enduring_feature && o.entrance { "hellfire-entrance" }
+        else if enduring_feature { key }
+        else if o.hellfire { "hellfire" } else if o.ice { "ice" } else if o.puddles { "puddle" } else { key };
     let (name, scene, memory) = match key {
         "ice" => ("Ice", "When a creature attempts to move off an ice tile, there is a 1/3 chance that it slips.", "ice"),
         "puddle" => ("Puddle", "a puddle sits on the ground.", "a puddle"),
         "hellfire" => ("Hellfire", "Hellfire is fire that never stops burning.", "Hellfire"),
+        "hellfire-entrance" => ("Blue entrance", "The blue entrance leads out of the Flesh.", "the blue entrance"),
         "bloody-wall" => ("Bloody wall", "Blood coats this solid wall. Hungry creatures can feed from beside it.", "a blood-coated wall"),
         "natural-wall" => (
             "Rock wall",
@@ -430,6 +434,10 @@ fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
     } else {
         format!("You remember {memory}.")
     };
+    if enduring_feature {
+        details.push(if o.current { "Unextinguishable hellfire burns here." }
+            else { "You remember hellfire burning here." }.into());
+    }
     if tile.is_some() {
         if let Some(theme)=o.biome.as_deref() {
             details.push(match theme {
