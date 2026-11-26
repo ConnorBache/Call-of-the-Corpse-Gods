@@ -2564,3 +2564,16 @@ placement scan.
   O(1) on a unique vector. The same O(F) current-floor lookup bound as
   other floor accessors applies where they search F stored floors. Stepping
   onto the satisfied altar uses the unchanged ground pickup pipeline.
+
+### Banshee shriek (R52)
+- On a scheduled shriek, the existing victim scan is O(A*L + A log A) time
+  and O(A) scratch before damage settlement (A active-floor actors, L optical
+  route query cost, including portal paths). Per-victim damage arithmetic is
+  O(1) once the current actor is resolved.
+- If a local presentation recorder is active, the white geometry and shared
+  arrival bands cost O(V) time and scratch for V floor cells (normally 2,291).
+  The purple layer adds O(V*(Q + L)) time and O(V) worst-case receipt space,
+  where Q is direct optical cell admission. No RNG or changes to map knowledge.
+  Each rendered frame projects both sets in O(V) time and scratch before the
+  existing O(V log V) overlay merge and raster work. The white cue reuses the
+  existing 11-scene radial reveal; the purple cue does not duplicate it.

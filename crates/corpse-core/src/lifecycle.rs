@@ -113,16 +113,25 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
         );
         let a = actor(r, id).unwrap().clone();
         if crate::events::enabled(r) {
-            crate::animation_enemy::wave(r,&a,"E11",false,None,true,true);
-        let wave_action=crate::events::current_action();
+            let current = crate::banshee_rules::current(r);
+            let _wave_scope = current.then(|| crate::events::action_scope(r));
+            if current { crate::events::banshee_wave(r, &a); }
+            else { crate::animation_enemy::wave(r,&a,"E11",false,None,true,true); }
+            let wave_action=crate::events::current_action();
             let mut victims:Vec<_>=std::iter::once(&r.player).chain(r.actors_at(r.depth))
                 .filter(|b|b.id!=id&&!b.dead.value_or(false)&&b.hp>0.
                     &&crate::dreamwalking::same_plane(r,&a,b)&&crate::vision::line_of_sight(r,&a,b))
                 .map(|b|(b.id,(b.x-a.x).hypot(b.y-a.y))).collect();
             // Match the presentation's geometric outward radius, stable actor-ID ties.
             victims.sort_by(|(ia,da),(ib,db)|da.total_cmp(db).then_with(||ia.total_cmp(ib)));
-            let damage=crate::balance52::local_amount(r,&a,"monsterSpecialDamage",100.);
-            for (victim,_) in victims {crate::engine::damage_environment(r,victim,damage,Some(id),"banshee",true).map_err(|e|e.to_string())?;}
+            let legacy_damage=crate::balance52::local_amount(r,&a,"monsterSpecialDamage",100.);
+            for (victim,_) in victims {
+                let damage = if current {
+                    let Some(witness) = actor(r, victim).filter(|a| !a.dead.value_or(false) && a.hp > 0.) else { continue };
+                    crate::banshee_rules::damage(witness.hp)
+                } else { legacy_damage };
+                crate::engine::damage_environment(r,victim,damage,Some(id),"banshee",true).map_err(|e|e.to_string())?;
+            }
             crate::events::checkpoint_for_action(r,wave_action);
         } else if crate::vision::line_of_sight(r, &a, &r.player) {
             crate::engine::damage_environment(r, r.player.id, crate::balance52::local_amount(r, &a, "monsterSpecialDamage", 100.), Some(id), "banshee", true)

@@ -70,6 +70,7 @@ fn clone_snapshot_state(run:&Run)->Run {
             death_gas_rules_from: Default::default(),
             minotaur_bump_from: Default::default(),
             borge_throw_from: Default::default(),
+            banshee_shriek_from: Default::default(),
             execute_rules_from: Default::default(),
             beckoning_rules_from: Default::default(),
             ichor_fire_rules_from: Default::default(),

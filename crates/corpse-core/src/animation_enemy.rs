@@ -364,6 +364,51 @@ pub fn expired_statuses(r:&Run,before:&Actor) {
   events::begin();events::next_action(&r);crate::lifecycle::world_turn(&mut r).unwrap();let e=events::finish();assert!(r.player.hp<1000.);assert!(crate::engine::actor(&r,901.).unwrap().hp<1000.);let wave=e.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.style=="wave-reveal-purple")).unwrap();assert_eq!(wave.to,EventPoint{x:4.,y:2.});
   let near=r.log.iter().position(|s|s.starts_with("Banshee shriek deals")&&s.ends_with("Near target.")).unwrap();let player=r.log.iter().position(|s|s.starts_with("Banshee shriek deals")&&s.ends_with("you.")).unwrap();assert!(near<player,"near monster resolves before farther player");
  }
+ #[test] fn banshee_shriek_marks_the_whole_floor_but_only_damages_witnesses() {
+  use crate::banshee_rules::{PURPLE_WAVE, WHITE_WAVE};
+  let mut r=room();
+  r.banshee_shriek_from=0usize.into();
+  r.tick=30.;
+  r.player.hp=800.;
+  r.player.stats.dr=300.;
+  let (w,h)={let f=r.floor_mut().unwrap();let w=f.width();f.tiles[3*w+4]="wall".into();
+   f.monster_entry_tick=0.0.into();(w,f.height())};
+  r.actors_at_mut(r.depth).push(crate::population::create_actor_revision("banshee",900.,4.,2.,false,52.).unwrap());
+  for (id,x,y) in [(901.,5.,2.),(902.,4.,4.)] {
+   r.actors_at_mut(r.depth).push(Actor{id,x,y,hp:421.,max_hp:1000.,name:"Witness".into(),state:"hunting".into(),
+    stats:crate::Stats{dr:300.,..Default::default()},..Default::default()});
+  }
+  events::begin();
+  crate::lifecycle::world_turn(&mut r).unwrap();
+  let out=events::finish();
+  assert_eq!(r.player.hp,300.);
+  assert_eq!(crate::engine::actor(&r,901.).unwrap().hp,110.);
+  assert_eq!(crate::engine::actor(&r,902.).unwrap().hp,421.);
+  let wave=|s| out.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.style==s)).unwrap();
+  let white=wave(WHITE_WAVE);let purple=wave(PURPLE_WAVE);
+  assert_eq!(white.to,EventPoint{x:4.,y:2.});
+  assert!(white.glyph.is_none() && white.label.is_none() && white.from.is_none());
+  let (white,purple)=(white.animation.as_ref().unwrap(),purple.animation.as_ref().unwrap());
+  assert_eq!(white.action,purple.action);
+  assert_eq!(white.cells.len(),w*h);
+  assert_eq!(white.arrival_steps.as_ref().unwrap().iter().copied().max(),Some(10));
+  assert!(white.cells.contains(&EventPoint{x:4.,y:4.}));
+  assert!(!purple.cells.contains(&EventPoint{x:4.,y:4.}));
+  for (point,band) in purple.cells.iter().zip(purple.arrival_steps.as_ref().unwrap()) {
+   assert_eq!(white.arrival_steps.as_ref().unwrap()[point.y as usize*w+point.x as usize],*band);
+  }
+ }
+ #[test] fn banshee_shriek_still_visible_when_its_source_is_hidden() {
+  let mut r=room();r.banshee_shriek_from=0usize.into();r.tick=30.;
+  let f=r.floor_mut().unwrap();f.monster_entry_tick=0.0.into();
+  let w=f.width();for row in f.tiles.chunks_mut(w){row[3]="wall".into();}
+  r.actors_at_mut(r.depth).push(crate::population::create_actor_revision("banshee",900.,4.,2.,false,52.).unwrap());
+  assert!(!crate::vision::directly_visible_actor(&r,crate::engine::actor(&r,900.).unwrap()));
+  events::begin();crate::lifecycle::world_turn(&mut r).unwrap();
+  let out=events::finish();assert_eq!(r.player.hp,1000.);
+  let sound=out.iter().find(|e|e.animation.as_ref().is_some_and(|a|a.style==crate::banshee_rules::WHITE_WAVE)).unwrap();
+  assert!(sound.animation.as_ref().unwrap().cells.contains(&EventPoint{x:2.,y:2.}));
+ }
  #[test] fn phoenix_has_redorange_nova(){let r=room();let mut a=r.player.clone();a.abilities=vec!["enemy:beast:phoenix".into()];events::begin();revived(&r,&a);assert!(events::finish().iter().any(|e|e.animation.as_ref().is_some_and(|a|a.style=="nova-redorange-small")));}
  #[test] fn borge_mark_reveals_fungus_identity_without_global_telepathy(){
   let mut r=room();let mut a=crate::population::create_actor_revision("bastidion",900.,40.,20.,false,52.).unwrap_or_else(|_|Actor{id:900.,x:40.,y:20.,hp:100.,max_hp:100.,creature_kind:"bastidion".to_string().into(),..Default::default()});a.conditions.insert("invisible".into(),20.);r.player.conditions.insert("hallucinating".into(),20.);r.floor_mut().unwrap().godbeast_event=crate::GodbeastEvent{kind:"Borge".into(),sacrifice_actor_id:900.0.into(),..Default::default()}.into();

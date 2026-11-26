@@ -1106,3 +1106,13 @@ tile, independent of ground clutter or pack space. The satisfied altar can
 be walked onto to collect it. Bumping an unsatisfied altar with the marked heart
 in the pack still awards the shard directly. An interrupted throw is not an
 offering.
+
+### R52 Banshee shriek
+
+Every 30 turns (clock resets on revival), the shriek sends a white Screamer-style
+wave across the entire current floor, through walls and fog. The same front is
+purple on optically observed squares in the Banshee's line of sight, without
+exposing hidden terrain. Only living creatures in its line of sight on its plane
+take damage: half of their current HP plus 100, rounded by normal damage rules
+and ignoring armor. The Banshee itself is excluded. Historical replay commands
+retain the previous flat damage and animation.

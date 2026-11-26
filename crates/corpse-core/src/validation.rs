@@ -120,6 +120,7 @@ pub fn validate(run: &Run) -> Result<()> {
     crate::death_gas_rules::validate(run).map_err(StorageError)?;
     crate::minotaur_rules::validate(run).map_err(StorageError)?;
     crate::borge::validate(run).map_err(StorageError)?;
+    crate::banshee_rules::validate(run).map_err(StorageError)?;
     for f in &run.floors {
         req(crate::pocket_biomes::validate(f), "pocket biome metadata")?;
         req(crate::entrance::validate(f) || crate::entrance::metadata_cell(f)

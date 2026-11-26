@@ -119,6 +119,7 @@ impl Snapshot {
         o.shift_remove("halfHereEnergyFrom");
         o.shift_remove("screamerRangeFrom");
         o.shift_remove("borgeThrowFrom");
+        o.shift_remove("bansheeShriekFrom");
         o.shift_remove("steamRulesFrom");
         o.shift_remove("executeRulesFrom");
         o.shift_remove("beckoningRulesFrom");
@@ -154,6 +155,7 @@ impl Snapshot {
         restored.death_gas_rules_from = run.death_gas_rules_from.clone();
         restored.minotaur_bump_from = run.minotaur_bump_from.clone();
         restored.borge_throw_from = run.borge_throw_from.clone();
+        restored.banshee_shriek_from = run.banshee_shriek_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -581,6 +583,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.death_gas_rules_from = Field::Missing;
     copy.minotaur_bump_from = Field::Missing;
     copy.borge_throw_from = Field::Missing;
+    copy.banshee_shriek_from = Field::Missing;
     copy.execute_rules_from = Field::Missing;
     copy.beckoning_rules_from = Field::Missing;
     copy.ichor_fire_rules_from = Field::Missing;
@@ -626,6 +629,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.death_gas_rules_from=run.death_gas_rules_from.clone();
     restored.minotaur_bump_from=run.minotaur_bump_from.clone();
     restored.borge_throw_from=run.borge_throw_from.clone();
+    restored.banshee_shriek_from=run.banshee_shriek_from.clone();
     restored.execute_rules_from=run.execute_rules_from.clone();
     restored.beckoning_rules_from=run.beckoning_rules_from.clone();
     restored.ichor_fire_rules_from=run.ichor_fire_rules_from.clone();
@@ -667,6 +671,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.death_gas_rules_from = run.death_gas_rules_from.clone();
         restored.minotaur_bump_from = run.minotaur_bump_from.clone();
         restored.borge_throw_from = run.borge_throw_from.clone();
+        restored.banshee_shriek_from = run.banshee_shriek_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -1111,6 +1116,7 @@ impl Engine {
         crate::death_gas_rules::admit(&mut run).map_err(StorageError)?;
         crate::minotaur_rules::admit(&mut run).map_err(StorageError)?;
         crate::borge::admit(&mut run).map_err(StorageError)?;
+        crate::banshee_rules::admit(&mut run).map_err(StorageError)?;
         Self::new_for_replay(run)
     }
 
@@ -1186,6 +1192,7 @@ impl Engine {
         if matches!(run.death_gas_rules_from, Field::Null) { run.death_gas_rules_from = Field::Missing; }
         if matches!(run.minotaur_bump_from, Field::Null) { run.minotaur_bump_from = Field::Missing; }
         if matches!(run.borge_throw_from, Field::Null) { run.borge_throw_from = Field::Missing; }
+        if matches!(run.banshee_shriek_from, Field::Null) { run.banshee_shriek_from = Field::Missing; }
         if matches!(run.steam_rules_from, Field::Null) { run.steam_rules_from = Field::Missing; }
         if matches!(run.execute_rules_from, Field::Null) { run.execute_rules_from = Field::Missing; }
         if matches!(run.beckoning_rules_from, Field::Null) { run.beckoning_rules_from = Field::Missing; }

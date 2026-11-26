@@ -479,6 +479,10 @@ fn detailed_enemy(r: &Run, a: &Actor, e: &Enemy) -> String {
             }
         }
         "enemy:beast:banshee" => {
+            if corpse_core::banshee_rules::current(r) {
+                effect = "shriek is visible across the floor and deals 100 plus half of each witness’s current HP through armor".into();
+                limits.push("damages only creatures in its line of sight".into());
+            }
             limits.push("every 30 turns".into());
             if let Some(n) = lifecycle::banshee_turns_until(r, a) {
                 limits.push(format!("next shriek in {}", turns(n)));
@@ -1017,7 +1021,11 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
                 } else { "" };
                 format!("Disorients foes within 10 tiles for 5 turns: -{} Accuracy. Costs 15 Energy.{gate}", if source.name.starts_with("Greater ") {10} else {5})
             } else if compact {
-                compact_enemy(source, e)
+                if id == "enemy:beast:banshee" && corpse_core::banshee_rules::current(r) {
+                    "Shrieks across the floor. In line of sight: 100 + half current HP, ignoring armor.".into()
+                } else {
+                    compact_enemy(source, e)
+                }
             } else {
                 detailed_enemy(r, source, e)
             });

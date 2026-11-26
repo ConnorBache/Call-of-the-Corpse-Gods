@@ -341,14 +341,14 @@ pub struct AnimationCue {
     pub style: String,
     pub stage: Stage,
     pub action: u32,
-    /// Independently observed exact cells. Never interpolate between them: gaps
-    /// can be unseen geometry, a portal jump, or an intentionally clipped area.
+    /// Exact admitted cells. Never interpolate between them: gaps can be unseen
+    /// geometry, a portal jump, or a clipped area. Abstract sound may include fog.
     pub cells: Vec<EventPoint>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub surface: Option<String>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub item_id: Option<f64>,
-    /// Parallel beam arrivals, indexed by the exact visibility-filtered cells.
+    /// Parallel beam or wave arrival bands, indexed by the exact admitted cells.
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub arrival_steps: Option<Vec<u8>>,
 }
@@ -503,6 +503,54 @@ pub fn audible_banshee(r:&Run,a:&Actor){
     let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action));
     let event=PresentationEvent{kind:"animation".into(),from:None,to:to.clone(),glyph:None,color:None,label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:"E11".into(),style:"sound-violet".into(),stage:Stage::Special,action,cells:vec![to],surface:Some("audible".into()),item_id:None,arrival_steps:None})};
     PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){b.serial=b.serial.wrapping_add(1);b.events.push(event);if b.events.len()>4096{b.events.remove(0);}});
+}
+
+/// One terrain-agnostic sound front reaches all tiles, even in fog. Its purple
+/// overlay is limited to known optical cells, never emitting hidden terrain or
+/// witness identities. O(V * (visibility + LOS)) time and O(V) detached space.
+pub fn banshee_wave(r: &Run, a: &Actor) {
+    use crate::banshee_rules::{PURPLE_WAVE, WHITE_WAVE};
+    if !enabled(r) || r.player.x < 0. || !crate::dreamwalking::same_plane(r, &r.player, a)
+        || !PENDING.with(|p| p.borrow().is_some()) { return; }
+    let Some(f) = crate::dreamwalking::floor_for(r, a) else { return };
+    let w = f.width();
+    if w == 0 || f.height() == 0 { return; }
+    let center = EventPoint::from(a);
+    let far = a.x.max(w as f64 - 1. - a.x).hypot(a.y.max(f.height() as f64 - 1. - a.y)).max(1.);
+    let band = |x: f64, y: f64| (((x-a.x).hypot(y-a.y)/far*10. - 1e-9).ceil().clamp(0.,10.)) as u8;
+    let mut white = Vec::with_capacity(f.tiles.len());
+    let mut white_bands = Vec::with_capacity(f.tiles.len());
+    let mut purple = Vec::new();
+    let mut purple_bands = Vec::new();
+    let mut point = a.clone();
+    for i in 0..f.tiles.len() {
+        (point.x, point.y) = ((i % w) as f64, (i / w) as f64);
+        let wave_band = band(point.x, point.y);
+        white.push(EventPoint::from(&point));
+        white_bands.push(wave_band);
+        if vision::directly_visible_tile(r, i % w, i / w) && vision::line_of_sight(r, a, &point) {
+            purple.push(EventPoint::from(&point));
+            purple_bands.push(wave_band);
+        }
+    }
+    PENDING.with(|p| if let Some(b) = p.borrow_mut().as_mut() {
+        for (style, cells, bands, surface) in [
+            (WHITE_WAVE, white, white_bands, Some("audible".into())),
+            (PURPLE_WAVE, purple, purple_bands, None),
+        ] {
+            if cells.is_empty() { continue; }
+            b.serial = b.serial.wrapping_add(1);
+            b.events.push(PresentationEvent {
+                kind: "animation".into(), from: None, to: center.clone(), glyph: None, color: None,
+                label: None, depth: r.depth, animation: Some(AnimationCue {
+                    delivery: Delivery::Local, proposal: "E11".into(), style: style.into(),
+                    stage: Stage::Special, action: b.action, cells, surface, item_id: None,
+                    arrival_steps: Some(bands),
+                }),
+            });
+            if b.events.len() > 4096 { b.events.remove(0); }
+        }
+    });
 }
 
 /// A symbolic transfer records only its two already observed endpoints. It is

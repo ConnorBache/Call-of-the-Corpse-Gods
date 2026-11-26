@@ -12,7 +12,7 @@ pub fn duration(e:&PresentationEvent)->Option<f64>{
  else if s.starts_with("box-"){Some(500.)}
  else if s=="line-grow"||s=="line-hold"{Some(a.cells.len().max(1) as f64*MAGIC_CELL_MS+50.)}
  else if s=="thread-grow"{Some(a.cells.len().max(1) as f64*32.+100.)}
- else if (s=="map-reveal"||s.starts_with("wave-reveal")){Some(900.)}
+ else if s=="map-reveal"||s.starts_with("wave-reveal")||s==corpse_core::banshee_rules::PURPLE_WAVE{Some(900.)}
  else if s=="wave-gasser"{Some(230.)}
  else if s=="light100"{Some(a.cells.len().max(1) as f64*30.+50.)}
  else if s.starts_with("moving-actor"){Some(a.cells.len().max(1) as f64*60.+100.)}
@@ -22,6 +22,20 @@ fn nova_color(s:&str,default:Rgb)->Rgb{if s.contains("redorange"){return [255,75
 pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<Tile>>{
  let a=e.animation.as_ref()?;let total=duration(e)?;let s=a.style.as_str();
  if age<0.||age>=total{return Some(vec![])}
+ let white=s==corpse_core::banshee_rules::WHITE_WAVE;
+ if white || s==corpse_core::banshee_rules::PURPLE_WAVE {
+  let color=if white{[255,255,255]}else{[185,75,255]};
+  let bands=a.arrival_steps.as_deref()?;
+  // Same outward bands as the Screamer, with the purple optical cells
+  // riding the exact same front. Full-strength ink allows sound in fog.
+  return Some(a.cells.iter().zip(bands).filter_map(|(p,&band)|{
+   let t=age-f64::from(band)*65.;
+   let light=if reduced{if white{0.16}else{0.5}}
+       else if (0. ..250.).contains(&t){(if white{0.68}else{0.95})*(1.-t/250.)}
+       else{return None};
+   Some(Tile{x:p.x as i32,y:p.y as i32,color,light,field_strength:1.,glyph:None,mark:None})
+  }).collect())
+ }
  let center=(e.to.x.round() as i32,e.to.y.round() as i32);
  let mut color=if s=="wave-reveal-telepathy"{[45,140,255]}else if s=="wave-reveal-fire"{[255,90,20]}else if s=="wave-reveal-darkness"{[0,0,0]}else if s=="wave-reveal-shattering"{[90,210,255]}else if s=="wave-reveal-yellow"{[255,235,45]}else if s=="wave-reveal-white"{[255,255,255]}else if s=="wave-reveal-purple"{[185,75,255]}else if s.starts_with("nova-") && s!=corpse_core::animation_shapes::SHORT_NOVA {nova_color(s,default)}else{default};
  if s=="light100"||s.starts_with("moving-actor"){color=[255,255,255];}
@@ -98,6 +112,23 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
 #[cfg(test)]mod tests{
  use super::*;use corpse_core::events::{AnimationCue,Delivery,EventPoint,Stage};
  fn event(style:&str)->PresentationEvent{let cells=(-2..=2).flat_map(|y|(-2..=2).map(move|x|EventPoint{x:x as f64,y:y as f64})).collect();PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P01".into(),style:style.into(),stage:Stage::Special,action:1,cells,delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})}}
+ #[test]fn banshee_white_and_purple_use_the_same_outward_bands(){
+  use corpse_core::banshee_rules::{PURPLE_WAVE,WHITE_WAVE};
+  let mut white=event(WHITE_WAVE);
+  let cue=white.animation.as_mut().unwrap();cue.cells=vec![EventPoint{x:2.,y:0.},EventPoint{x:8.,y:0.}];
+  cue.arrival_steps=Some(vec![3,10]);cue.surface=Some("audible".into());
+  let mut purple=white.clone();let cue=purple.animation.as_mut().unwrap();
+  cue.cells.pop();cue.arrival_steps.as_mut().unwrap().pop();cue.style=PURPLE_WAVE.into();cue.surface=None;
+  assert!(tiles(&white,194.,false,[0;3]).unwrap().is_empty());
+  assert!(tiles(&purple,194.,false,[0;3]).unwrap().is_empty());
+  let shared_white=tiles(&white,195.,false,[0;3]).unwrap();
+  let shared_purple=tiles(&purple,195.,false,[0;3]).unwrap();
+  assert_eq!((shared_white[0].x,shared_white[0].color),(2,[255,255,255]));
+  assert_eq!((shared_purple[0].x,shared_purple[0].color),(2,[185,75,255]));
+  assert!(shared_purple[0].light>shared_white[0].light);
+  assert!(tiles(&white,650.,false,[0;3]).unwrap().iter().any(|t|t.x==8));
+  assert!(tiles(&purple,650.,false,[0;3]).unwrap().is_empty());
+ }
  #[test]fn commandment_group_is_short_and_never_interpolates_portal_gap(){
   let mut e=event("moving-actor-commandment");e.glyph=Some("g".into());
   e.animation.as_mut().unwrap().cells=vec![EventPoint{x:1.,y:1.},EventPoint{x:2.,y:1.},EventPoint{x:20.,y:8.}];

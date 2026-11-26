@@ -17,7 +17,7 @@ pub(super) fn page_text<'a>(entry: &Entry, mechanic: &'a Mechanic) -> &'a str {
         ("pale:Greater Screamer", "Scream") => "Within 10 straight-line tiles, including spatial shortcuts: foes lose 10 Accuracy to Disoriented for 5 turns; allies gain Damage and Perception for 5 turns. Same plane; walls do not block it. Calls same-side monsters across the whole floor.",
         ("samara", "Razorleaves") => "Razorleaves cover squares up to 5 straight-line tiles away with line of sight; no spatial shortcuts. At normal turn end, exposed creatures on that plane lose 2% maximum HP. Creatures with Razorleaves are immune.",
         ("yeti", "Winter's Trail") => "Slows you if either body starts a turn within the 8 adjacent squares (diagonals included), also counting spatial shortcuts. Same plane; walls do not block it. Ice immunity protects that body.",
-        ("banshee", "Banshee Shriek") => "Every 30 world turns, reveals its location and damages you through armor if you are on the same plane with line of sight. No distance cap; moving farther away alone does not protect you.",
+        ("banshee", "Banshee Shriek") => "Every 30 world turns, the white shriek crosses the whole floor, even through walls. Purple marks its line of sight. Creatures on the same plane in that line of sight take 100 damage plus half their current HP, ignoring armor. No distance cap.",
         _ => &mechanic.text,
     }
 }
