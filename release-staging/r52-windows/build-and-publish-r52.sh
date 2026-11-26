@@ -120,6 +120,13 @@ LINKER
   evidence="target/r52-release-evidence/$commit"
   mkdir -p "$evidence"
   packer=tools/package-r52-windows.py
+  # The tracked parts are canonical. Materialize the combined fixture before
+  # freezing source, so the core build's own verified restoration is a no-op.
+  fixture=fixtures/mini-me-starter-combinations-v48.json
+  if [[ ! -e "$fixture" ]]; then
+    cat "$fixture.part1" "$fixture.part2" > "$fixture"
+  fi
+  cmp "$fixture" <(cat "$fixture.part1" "$fixture.part2")
   python3 "$packer" snapshot --output "$evidence/source.json"
   build_args=(build --release --offline --locked --target x86_64-pc-windows-gnu -p corpse-desktop)
   if cargo "${build_args[@]}" > "$evidence/windows-build.log" 2>&1; then
