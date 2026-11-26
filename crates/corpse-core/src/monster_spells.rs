@@ -36,6 +36,32 @@ fn report(r: &mut Run, a: &Actor, b: &Actor, message: &str) {
         );
     }
 }
+
+/// Attribute a real heal without giving away an endpoint the player cannot see.
+fn report_heal(r: &mut Run, caster: &Actor, target: &Actor) {
+    if r.player.x < 0. { return; }
+    let caster_is_player = caster.id == r.player.id;
+    let target_is_player = target.id == r.player.id;
+    let sees_caster = caster_is_player || crate::vision::visible_actor(r, caster);
+    let sees_target = target_is_player || crate::vision::visible_actor(r, target);
+    if !sees_caster && !sees_target { return; }
+    let source = if caster_is_player { "You" } else if sees_caster {
+        crate::actor_presentation::name(r, caster)
+    } else { "Something unseen" };
+    let message = if target_is_player {
+        format!("{source} healed you.")
+    } else if sees_target {
+        let name = crate::actor_presentation::name(r, target);
+        if crate::half_here::is_clone(target) {
+            format!("{source} healed {name}.")
+        } else {
+            format!("{source} healed the {name}.")
+        }
+    } else {
+        format!("{source} {} a healing spell.", if caster_is_player { "cast" } else { "casts" })
+    };
+    engine::log(r, message, if caster_is_player { "player" } else { "enemy" });
+}
 fn pull_one(r: &mut Run, a: &Actor, b: &Actor) -> Result<bool, String> {
     if crate::revision50_combat::oblivious_blocks(r,b,Some(a)) {return Ok(false);}
     let mut chosen = None;
@@ -261,7 +287,11 @@ pub fn heal_others(r: &mut Run, id: f64) -> Result<bool, String> {
         .conditions
         .insert("monsterHealReadyAt".into(), tick + 2.0);
     let b = actor(r, b.id).unwrap_or(&b).clone();
-    report(r, &a, &b, "restores an injured companion.");
+    if r.simulation_revision.value_or(29.) < 52. {
+        report(r, &a, &b, "restores an injured companion.");
+    } else if healed {
+        report_heal(r, &a, &b);
+    }
     if crate::events::enabled(r) {
         if healed {
             crate::animation_enemy::mark(r,&b,"E17","stitch-green",crate::events::Stage::Health);
