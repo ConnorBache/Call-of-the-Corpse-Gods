@@ -1,0 +1,111 @@
+name: Build and publish R52 Menu Fire
+on:
+  push:
+    branches:
+      - release-publishing/r52-followup
+    paths:
+      - .github/workflows/publish-r52-menu-fire.yml
+      - release-staging/r52-windows/build-and-publish-r52-menu-fire.sh
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: r52-windows-release
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'ConnorBache/Call-of-the-Corpse-Gods' && github.ref == 'refs/heads/release-publishing/r52-followup'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          sparse-checkout: release-staging/r52-windows
+          path: publication
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          ref: bf789b958793655792898c35b4cb37c56ed97303
+          path: game-source
+      - name: Install Linux SDL test library
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libsdl2-dev
+      - name: Build, test, and verify package
+        run: bash publication/release-staging/r52-windows/build-and-publish-r52-menu-fire.sh build
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: r52-menu-fire-package
+          path: ${{ runner.temp }}/corpse-r52-release/
+          if-no-files-found: error
+          retention-days: 3
+          compression-level: 0
+  windows-smoke:
+    needs: build
+    runs-on: windows-2022
+    timeout-minutes: 8
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: r52-menu-fire-package
+          path: ${{ runner.temp }}/release
+      - name: Open the packaged title screen directly on Windows
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'release/Call-of-the-Corpse-Gods-R52-Menu-Fire-Windows-x64.zip'
+          $hashfile = Join-Path $env:RUNNER_TEMP 'release/SHA256SUMS.txt'
+          if ((Get-FileHash $archive).Hash -ine ((Get-Content $hashfile -Raw).Split(' ')[0])) { throw 'Unexpected ZIP checksum' }
+          $folder = Join-Path $env:RUNNER_TEMP 'game'
+          Expand-Archive -LiteralPath $archive -DestinationPath $folder
+          $exe = Join-Path $folder 'corpse-desktop.exe'
+          $bin = [System.IO.File]::ReadAllBytes($exe)
+          $pe = [BitConverter]::ToInt32($bin, 0x3c)
+          if ([BitConverter]::ToUInt16($bin, $pe + 24 + 68) -ne 2) { throw 'Packaged executable is not a Windows GUI application' }
+          $script = Get-ChildItem $folder -Recurse -File | Where-Object { $_.Extension -in '.bat','.cmd','.ps1','.vbs','.lnk' }
+          if ($script) { throw 'Unexpected launcher in the player ZIP' }
+          $start = [System.Diagnostics.ProcessStartInfo]::new($exe)
+          $start.UseShellExecute = $true
+          $start.WorkingDirectory = $folder
+          $process = [System.Diagnostics.Process]::Start($start)
+          try {
+            $end = [DateTime]::UtcNow.AddSeconds(40)
+            do {
+              Start-Sleep -Milliseconds 300
+              $process.Refresh()
+              if ($process.HasExited) { throw "Game exited before its title window: $($process.ExitCode)" }
+              $title = $process.MainWindowTitle
+              $ready = $process.MainWindowHandle -ne 0 -and $title -ceq 'CALL OF THE CORPSE GODS'
+            } until ($ready -or [DateTime]::UtcNow -ge $end)
+            if (!$ready) { throw "Did not find the title window. Observed title: $title" }
+            Start-Sleep -Seconds 2
+            $process.Refresh()
+            if ($process.HasExited -or !$process.Responding) { throw 'Title window did not remain responsive' }
+            'Opened responsive game window via Windows shell. ZIP has GUI-subsystem executable and no terminal launcher.' >> $env:GITHUB_STEP_SUMMARY
+          } finally {
+            if (!$process.HasExited) {
+              if (!$process.CloseMainWindow() -or !$process.WaitForExit(3500)) { $process.Kill() }
+            }
+            $process.Dispose()
+          }
+  publish:
+    needs: windows-smoke
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          sparse-checkout: release-staging/r52-windows
+          path: publication
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: r52-menu-fire-package
+          path: ${{ runner.temp }}/corpse-r52-release
+      - name: Verify uploaded bytes and publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: bash publication/release-staging/r52-windows/build-and-publish-r52-menu-fire.sh publish
