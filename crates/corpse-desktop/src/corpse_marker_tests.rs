@@ -99,21 +99,53 @@ fn corpse_covers_its_heart_and_gets_circle_only_after_stomp_and_pickup() {
     let view = crate::observe::observe(&loaded);
     let corpse = shown_actor(&view,80.);
     assert!(corpse.corpse && corpse.heartless);
+    let mut p = Painter::new();
+    p.resize(2560,1600);
+    p.game_at(&view,"",false,0.);
+    let (cw,ch,ox,oy)=p.map_layout(view.width,view.height);
+    let (x,y)=(ox+corpse.x as i32*cw,oy+corpse.y as i32*ch);
+    let crop = (p.native_x(x as f64),p.native_y(y as f64),
+        p.native_x((x+cw) as f64),p.native_y((y+ch) as f64));
+    let is_rim = |c: &[u8]| c[0] > 150 && c[1] > 130 && c[2] > 100;
+    let mut dark_hole = false;
+    for yy in crop.1..crop.3 {
+        let pixel = |xx| &p.pixels[((yy as usize*p.width + xx as usize)*4)..][..3];
+        let rim: Vec<_> = (crop.0..crop.2).filter(|&xx| is_rim(pixel(xx))).collect();
+        dark_hole |= rim.first().zip(rim.last()).is_some_and(|(&a,&b)|
+            (a+1..b).any(|xx| pixel(xx)[0] < 65));
+    }
+    assert!(dark_hole, "the ring hole remains legible in the normal map layout");
+    if std::env::var_os("CORPSE_COLOR_OUTPUT").is_some() {
+        write_corpse_capture("Heartless_Corpse", &p);
+        println!("HEARTLESS_CORPSE_CROP={},{},{},{}", crop.0,crop.1,crop.2,crop.3);
+    }
 }
 
 #[test]
-fn corpse_heartless_circle_draws_above_the_cross_center() {
+fn corpse_heartless_circle_overlays_the_cross_at_its_native_center() {
     let mut p = Painter::new();
-    p.clear([10,20,30]);
-    let bounds = marker_test_bounds(&mut p);
-    p.corpse_marker(bounds,40,50,15,24,None);
-    let before = p.pixels.clone();
-    p.corpse_heartless_marker(bounds,40,50,15,24,None);
-    let (_, center_y) = bounds.unwrap().center();
-    let changed: Vec<_> = before.chunks_exact(4).zip(p.pixels.chunks_exact(4)).enumerate()
-        .filter(|(_, (a,b))| a != b).map(|(i,_)|i/p.width).collect();
-    assert!(!changed.is_empty());
-    assert!(changed.iter().all(|&y| (y as f64) < center_y));
+    for (width, height) in [(1280,800), (1537,911), (1920,1200), (2560,1600)] {
+        p.resize(width,height);
+        for glyph in ["r", "^", "Ω", "^^", " "] {
+            p.clear([0;3]);
+            let bounds = p.map_identity_aligned(glyph,100,100,30,48,[255;3],false);
+            p.clear([0;3]);
+            let center = p.corpse_marker(bounds,100,100,30,48,None);
+            let rect = native_test_rect(&p);
+            let cross = pixel_ink_bounds(&p,rect,true).unwrap();
+            p.corpse_heartless_marker(center,100,100,30,48,None);
+            assert_eq!(pixel_ink_bounds(&p,rect,true),Some(cross),"ring leaves all four red arms");
+            let marked = p.pixels.clone();
+            p.clear([0;3]);
+            p.corpse_heartless_marker(center,100,100,30,48,None);
+            let ring = pixel_ink_bounds(&p,rect,false).unwrap();
+            assert!(cross.left < ring.left && ring.right < cross.right);
+            assert!(cross.top < ring.top && ring.bottom < cross.bottom);
+            assert!((ring.center().0-center.0).abs()<=0.5 && (ring.center().1-center.1).abs()<=0.5);
+            let at = (center.1 as usize*p.width+center.0 as usize)*4;
+            assert_eq!(&marked[at..at+3],&[24,23,21],"dark center covers the X intersection");
+        }
+    }
 }
 fn write_corpse_capture(name: &str, p: &Painter) {
     let Ok(dir)=std::env::var("CORPSE_COLOR_OUTPUT") else {return;};

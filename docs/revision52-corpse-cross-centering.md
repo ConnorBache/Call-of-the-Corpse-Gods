@@ -10,6 +10,8 @@ The underlying creature glyph paint returns its geometry to its caller. Both map
 
 Bounds ignore RGB and opacity. A black Dire Bear glyph still has the same attachment center. Its existing identity outline is painted unchanged and does not expand or move the attachment bounds. Underlays, backgrounds, rank/superscript/subscript marks, selection, and heartless rings never contribute to the glyph bounds. Actual compound characters remain one authored glyph string. The metadata is computed before viewport, damage and tile clipping; clipping a fragment must not pull the X toward the surviving part. The X itself remains clipped to the cell and existing raster/damage bounds. If a saved custom glyph is genuinely blank or inkless, the previous tile-centered X is retained so death indication is not silently removed.
 
+On a harvested corpse the heartless ring paints over the X at the exact same native center, including the blank-glyph fallback. Its outer diameter stays unchanged, with a wider dark center so the ring reads as an o even on narrow map tiles. All four red arms stay visible. Living heartless markers and eligibility are unchanged. That shared coordinate adds O(1) placement work and no storage; the ring retains its existing O(P_ring × 16) time and O(1) scratch for P_ring clipped native pixels.
+
 X endpoint span, red source color `#f53640`, antialias samples, stroke and outline width, local light/dream treatment and opacity are unchanged. Glyph mask bytes and positions are unchanged. Existing saved appearance settings, creature color/glyph identity, privacy, hallucination projection, observation knowledge, simulation, RNG and save format are unchanged.
 
 ## Complexity and storage

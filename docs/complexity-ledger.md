@@ -2733,3 +2733,15 @@ The title has a fixed number of controls; God cards scan three current
 selections over a fixed 12-entry catalog. Painting remains O(G + P) for
 cached glyph work G and covered drawable pixels P. Seed clipping is O(S)
 for seed length S (bounded by 180 bytes). No new simulation work.
+
+### Star Power opt-in burning (R52)
+Star Power no longer ignites before it is enabled. On activation the normal
+Burning helper applies the status immediately for free, while world ticks keep
+it lit and handle spread. Deactivation extinguishes it; passive fire immunity is
+unchanged. The rules boundary preserves RNG and toggle semantics when replaying
+prior commands. Continuing an older save starts with the ability off; anchored
+restores do not reinterpret legacy suppression as ignition. Historical ability
+catalog wording is retained for historical replays and overridden in the current
+UI. The per-actor world check and toggle/restore work are O(A + C) worst case
+for actor abilities, active effects and conditions; added space is O(1) per run
+and per toggled actor. No floor scans or new per-turn scheduler work.

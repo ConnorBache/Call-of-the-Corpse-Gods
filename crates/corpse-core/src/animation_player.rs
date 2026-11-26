@@ -94,7 +94,7 @@ impl Snapshot {
      let style=match id {
       "grisha-entropy"=>if on {"collapse"}else{"spiral"},
       "anavani-shine"=>if on {"collapse"}else{"rise"},
-      "anavani-star-power"=>if on {"ember-out"}else{"ember-in"},
+      "anavani-star-power"=>if on == crate::star_power::current(r) {"ember-in"}else{"ember-out"},
       _=>if on {style}else{"dissolve"},
      };
      if id=="dawel-reverse-entropy" && on && a.id==r.player.id {

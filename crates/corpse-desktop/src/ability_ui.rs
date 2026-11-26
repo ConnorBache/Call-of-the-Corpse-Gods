@@ -86,6 +86,9 @@ pub const RAGELIGHT_DESCRIPTION:&str="Whenever you would die, if you can pay the
 const LEGACY_RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
 pub const FUTURE_FLOOR_DESCRIPTION:&str="Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+    if id == corpse_core::star_power::ID && corpse_core::star_power::current(run) {
+        return corpse_core::star_power::DESCRIPTION;
+    }
     if id == "etill-riptide" && corpse_core::riptide_rally::current(run) {
         return "Select a visible enemy. While active, pull it toward your current rally point and prevent its voluntary movement. Right-click a map tile to move the rally point and redirect the pull.";
     }
@@ -476,7 +479,7 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
         "See The Future" => p.energy,
         _ => 0.,
     };
-    let suppression = matches!(n, "Entropy" | "Shine" | "Star Power");
+    let suppression = matches!(n, "Entropy" | "Shine") || (n == "Star Power" && !corpse_core::star_power::current(r));
     let mut cost = match n {
         "Execute" => format!("{} NRG/execute",corpse_core::revision50_combat::execute_cost(r.simulation_revision.value_or(29.))),
         "Commandment" => "20 NRG/hit".into(),
@@ -1716,4 +1719,24 @@ mod divine_balance_presentation_tests {
         r.balance_rules_from=corpse_core::Field::Missing;
         assert!(matches!(observe(&r,"lichor-overflowing").indicator,Some(CustomIndicator::Blood{..})));
     }
+}
+
+#[cfg(test)]
+#[test]
+fn star_power_card_and_status_follow_the_positive_toggle() {
+    let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+    r.simulation_revision = 52.0.into();
+    r.star_power_from = 0usize.into();
+    let id = corpse_core::star_power::ID;
+    r.player.abilities = vec![id.into()];
+    r.player.active.clear();
+    r.player.conditions.clear();
+    let off = observe(&r, id);
+    assert_eq!(off.description, corpse_core::star_power::DESCRIPTION);
+    assert_eq!(off.cost, "Free");
+    assert!(!off.active);
+    assert!(!crate::statuses_ui::observe(&r, &r.player).iter().any(|s| s.name == "Burning"));
+    r.player.active.push(id.into());
+    assert!(observe(&r, id).active);
+    assert!(crate::statuses_ui::observe(&r, &r.player).iter().any(|s| s.name == "Burning"));
 }

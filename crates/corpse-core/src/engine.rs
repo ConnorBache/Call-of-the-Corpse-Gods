@@ -311,6 +311,7 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
                     "slipperyTarget",
                     "riptide",
                     "riptideTarget",
+                    crate::star_power::LIT,
                     "bondedTarget",
                     "riptideX",
                     "riptideY",

@@ -181,6 +181,7 @@ pub fn validate(run: &Run) -> Result<()> {
     crate::steam_rules::validate(run).map_err(StorageError)?;
     crate::execute_rules::validate(run).map_err(StorageError)?;
     crate::beckoning_rules::validate(run).map_err(StorageError)?;
+    crate::star_power::validate(run).map_err(StorageError)?;
     crate::ichor_fire_rules::validate(run).map_err(StorageError)?;
     crate::future_floor::validate(run).map_err(StorageError)?;
     crate::firebolt_travel::validate(run).map_err(StorageError)?;

@@ -342,9 +342,7 @@ pub fn observe(run: &Run, actor: &Actor) -> Vec<Status> {
             if remaining>0. {push(label,Some(remaining));}
         }
     }
-    let passive_burning = !actor.dead.value_or(false)
-        && named(actor, "Star Power", false)
-        && !named(actor, "Star Power", true);
+    let passive_burning = corpse_core::star_power::burning(run, actor);
     let burning = condition(actor, "burning");
     if burning > 0. || passive_burning {
         push(

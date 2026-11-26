@@ -1627,25 +1627,22 @@ impl Painter {
         let cx = x as f64 + w as f64 / 2.;
         let cy = y as f64 + h as f64 / 2. + dy * h as f64 / 15.;
         let r = (radius * w as f64 / 15.).max(0.65);
-        self.heartless_ring(x,y,w,h,cx,cy,r,ink);
+        let center = (self.origin.0 as f64 + cx * self.scale,
+            self.origin.1 as f64 + cy * self.scale);
+        self.heartless_ring(x,y,w,h,center,r+0.8,(r-0.55).max(0.),ink);
     }
-    fn corpse_heartless_marker(&mut self, bounds: Option<glyph_ink::Bounds>, x: i32, y: i32, w: i32, h: i32, ink: Option<(Rgb,Rgb)>) {
-        let (cx, cy) = bounds.map_or((x as f64 + w as f64 / 2., y as f64 + h as f64 / 2.), |b| {
-            let (nx, ny) = b.center();
-            ((nx - self.origin.0 as f64) / self.scale, (ny - self.origin.1 as f64) / self.scale)
-        });
-        let r = (1.3 * w as f64 / 15.).max(0.65);
-        let cy = (cy - w.min(h) as f64 * 0.30 - r - 1.4).max(y as f64 + r + 0.8);
-        self.heartless_ring(x,y,w,h,cx,cy,r,ink);
+    fn corpse_heartless_marker(&mut self, center: (f64, f64), x: i32, y: i32, w: i32, h: i32, ink: Option<(Rgb,Rgb)>) {
+        let outer = (1.3 * w as f64 / 15.).max(0.65) + 0.8;
+        // Keep a readable hole even on the narrowest map tiles; a solid
+        // center would read as a dot instead of the requested little o.
+        self.heartless_ring(x,y,w,h,center,outer,outer*0.58,ink);
     }
-    fn heartless_ring(&mut self, x: i32, y: i32, w: i32, h: i32, cx: f64, cy: f64, r: f64, ink: Option<(Rgb,Rgb)>) {
+    fn heartless_ring(&mut self, x: i32, y: i32, w: i32, h: i32, (nx, ny): (f64, f64), outer: f64, inner: f64, ink: Option<(Rgb,Rgb)>) {
         // Sample the authored ring at drawable resolution, not logical pixel
         // blocks. Fixed 4x4 area coverage keeps tiny holes readable at fractional DPI.
         let (rim, hole) = ink.unwrap_or(([240, 223, 190], [24, 23, 21]));
-        let nx = self.origin.0 as f64 + cx * self.scale;
-        let ny = self.origin.1 as f64 + cy * self.scale;
-        let outer = (r + 0.8) * self.scale;
-        let inner = (r - 0.55).max(0.) * self.scale;
+        let outer = outer * self.scale;
+        let inner = inner * self.scale;
         let left = ((nx-outer).floor() as i32).max(self.native_x(x as f64));
         let right = ((nx+outer).ceil() as i32).min(self.native_x((x+w) as f64));
         let top = ((ny-outer).floor() as i32).max(self.native_y(y as f64));
@@ -1668,7 +1665,7 @@ impl Painter {
     /// O(tile native pixels * 16 fixed coverage samples), O(1) scratch.
     /// The X overlays the retained creature glyph, like the heartless ring.
     /// Both renderers consume the same clipped native-pixel commands.
-    fn corpse_marker(&mut self, glyph_bounds:Option<glyph_ink::Bounds>, x:i32, y:i32, w:i32, h:i32, ink:Option<(Rgb,Rgb)>) {
+    fn corpse_marker(&mut self, glyph_bounds:Option<glyph_ink::Bounds>, x:i32, y:i32, w:i32, h:i32, ink:Option<(Rgb,Rgb)>) -> (f64, f64) {
         let (cross,outline)=ink.unwrap_or((CORPSE_CROSS,[24,23,21]));
         // Actual ink, after typography and device-pixel rounding. Do not re-center
         // a clipped fragment or include outlines, badges, shadows or terrain.
@@ -1696,6 +1693,8 @@ impl Painter {
                 if covered>0 {let c=std::array::from_fn(|k|((cross[k]as u32*light+outline[k]as u32*(covered-light)+covered/2)/covered)as u8);self.native_pixel(xx,yy,c,((covered*255+8)/16)as u8);}
             }
         }
+        // The optional heartless ring overlays the very same native center.
+        (cx, cy)
     }
     // Composite onto the already painted background, before glyphs/edges/overlays.
     // No dark backing, replacement background, or simulation/visibility reads.
@@ -1986,11 +1985,11 @@ impl Painter {
                 let marker = if v.dreamwalking && !c.dream_entity { Some((c.fg,c.bg)) }
                     else { display.map(|light| (light.foreground(if c.corpse {CORPSE_CROSS} else {[240,223,190]},true),light.apply([24,23,21]))) };
                 if c.corpse {
-                    self.corpse_marker(glyph_bounds,x,y,cw,ch,marker);
+                    let center = self.corpse_marker(glyph_bounds,x,y,cw,ch,marker);
                     if c.heartless {
                         let ring = if v.dreamwalking && !c.dream_entity { Some((c.fg,c.bg)) }
                             else { display.map(|light| (light.foreground([240,223,190],true),light.apply([24,23,21]))) };
-                        self.corpse_heartless_marker(glyph_bounds,x,y,cw,ch,ring);
+                        self.corpse_heartless_marker(center,x,y,cw,ch,ring);
                     }
                 } else if c.heartless {
                     self.heartless_marker(&c.glyph, x, y, cw, ch,marker);
@@ -2633,11 +2632,11 @@ impl Painter {
             let marker_ink = if v.dreamwalking && !cell.dream_entity { Some((cell.fg,cell.bg)) }
                 else { cell.display_light.map(|light| (light.foreground(if cell.corpse {CORPSE_CROSS} else {[240,223,190]},true),light.apply([24,23,21]))) };
             if cell.corpse {
-                self.corpse_marker(glyph_bounds,x,y,cw,ch,marker_ink);
+                let center = self.corpse_marker(glyph_bounds,x,y,cw,ch,marker_ink);
                 if cell.heartless {
                     let ring = if v.dreamwalking && !cell.dream_entity { Some((cell.fg,cell.bg)) }
                         else { cell.display_light.map(|light| (light.foreground([240,223,190],true),light.apply([24,23,21]))) };
-                    self.corpse_heartless_marker(glyph_bounds,x,y,cw,ch,ring);
+                    self.corpse_heartless_marker(center,x,y,cw,ch,ring);
                 }
             } else if cell.heartless {
                 self.heartless_marker(&cell.glyph, x, y, cw, ch,marker_ink);

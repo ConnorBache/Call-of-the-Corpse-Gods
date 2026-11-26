@@ -38,6 +38,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         execute_rules_from: Field::Missing,
         beckoning_rules_from: Field::Missing,
         riptide_rally_from: Field::Missing,
+        star_power_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,
         avatar_starter_policy: Field::Missing,
         ember_rules_from: Field::Missing,

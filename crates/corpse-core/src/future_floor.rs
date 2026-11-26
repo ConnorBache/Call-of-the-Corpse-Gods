@@ -88,6 +88,8 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.execute_rules_from=r.execute_rules_from.clone();
     next.beckoning_rules_from=r.beckoning_rules_from.clone();
     next.riptide_rally_from=r.riptide_rally_from.clone();
+    next.star_power_from=r.star_power_from.clone();
+    crate::star_power::reconcile(&mut next);
     next.ichor_fire_rules_from=r.ichor_fire_rules_from.clone();
     next.avatar_starter_policy=r.avatar_starter_policy.clone();
     next.ember_rules_from=r.ember_rules_from.clone();

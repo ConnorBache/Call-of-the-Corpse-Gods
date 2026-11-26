@@ -240,6 +240,7 @@ pub mod steam_rules;
 pub mod execute_rules;
 pub mod beckoning_rules;
 pub mod riptide_rally;
+pub mod star_power;
 pub mod ichor_fire_rules;
 mod beckoning_skip;
 pub mod screamer_schedule;

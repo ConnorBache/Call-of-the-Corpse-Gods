@@ -1344,26 +1344,16 @@ pub fn tick_environment_options_with_falls(
             let after=adapter.run.floor().unwrap().environment.as_ref().and_then(|e|e.gas_volume.as_ref()).map_or(0.,|v|v[at]);
             if after>before {crate::animation_enemy::mark(adapter.run,&a,"E56",if matches!(gas, "hallucinogenic" | DEATH_GAS) {"puff-violet"}else{"puff-green"},crate::events::Stage::Special);}
         }
-        if !crate::dreamwalking::is_body(&a) && a.abilities.iter().any(|id| id == "anavani-star-power") {
-            if a.active.iter().any(|id| id == "anavani-star-power") {
-                if !a.abilities.iter().any(|id| id == "enemy:beast:everburn")
-                    || cond(&a, "burning") <= 0.
-                {
-                    crate::engine::actor_mut_trusted(adapter.run, id)
-                        .unwrap()
-                        .conditions
-                        .insert("burning".into(), 0.);
-                }
-            } else {
-                let random = crate::rng::random(adapter.run);
-                crate::corpses::apply_burning_run(adapter.run, id,
-                    revision,
-                    random,
-                    None,
-                    None,
-                    None,
-                );
-            }
+        if crate::star_power::burning(adapter.run, &a) {
+            let random = crate::rng::random(adapter.run);
+            crate::corpses::apply_burning_run(adapter.run, id, revision, random, None, None, None);
+        } else if !crate::star_power::current(adapter.run)
+            && !crate::dreamwalking::is_body(&a)
+            && a.abilities.iter().any(|id| id == crate::star_power::ID)
+            && (!a.abilities.iter().any(|id| id == "enemy:beast:everburn") || cond(&a, "burning") <= 0.)
+        {
+            crate::engine::actor_mut_trusted(adapter.run, id).unwrap()
+                .conditions.insert("burning".into(), 0.);
         }
         let f = adapter.run.floor().unwrap();
         let i = a.y as usize * f.width() + a.x as usize;

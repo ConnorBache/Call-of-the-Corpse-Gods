@@ -847,6 +847,9 @@ fn activate_inner(
                 if !prepay_activation_upkeep(r, id, upkeep_cost_in(r, &r.player, id)) { return Ok(false); }
                 r.player.active.push(id.into());
             }
+            if id == crate::star_power::ID {
+                crate::star_power::toggled(r, !active);
+            }
             let name = &crate::progression::catalog_for_revision(r.simulation_revision.value_or(29.0))
                 .iter()
                 .find(|a| a.id == id)

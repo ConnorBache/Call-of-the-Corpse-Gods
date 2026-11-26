@@ -648,7 +648,7 @@ fn price(r: &Run, a: &Actor, d: &Divine) -> (String, bool) {
         "Dream of Time Gone By" => corpse_core::balance_rules::dream_anchor_cost(r),
         _ => d.activation,
     };
-    let suppression = ["Entropy", "Shine", "Star Power"].contains(&name);
+    let suppression = ["Entropy", "Shine"].contains(&name) || (name == "Star Power" && !corpse_core::star_power::current(r));
     let mut price = match name {
         "Rage at the Dying of the Light" => format!(
             "{} energy for the next rescue; cost escalates; level-up resets",

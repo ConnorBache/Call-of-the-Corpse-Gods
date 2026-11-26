@@ -86,7 +86,7 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
         let operations=parse_operations(payload,metadata)?;commands=commands.checked_add(operations.len()).ok_or("Recording command count overflow")?;
         if commands>maximum_commands {return Err("Recording exceeds admitted command bound".into());}Ok(())
     })?;
-    let (mut engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,riptide_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated,blood_mist_fire_migrated,half_here_energy_migrated,screamer_range_migrated)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
+    let (mut engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,riptide_migrated,star_power_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated,blood_mist_fire_migrated,half_here_energy_migrated,screamer_range_migrated)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
     if engine.run.simulation_revision.as_ref().copied()!=Some(header.simulation_revision as f64) {
         return Err("Save journal requires its original simulation revision".into());
     }
@@ -171,6 +171,10 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
         engine.run.riptide_rally_from=corpse_core::Field::Missing;
         corpse_core::riptide_rally::admit_current(&mut engine.run)?;
     }
+    if star_power_migrated {
+        engine.run.star_power_from=corpse_core::Field::Missing;
+        corpse_core::star_power::admit_current(&mut engine.run)?;
+    }
     if ichor_fire_migrated {
         engine.run.ichor_fire_rules_from=corpse_core::Field::Missing;
         corpse_core::ichor_fire_rules::admit_current(&mut engine.run)?;
@@ -201,7 +205,7 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
     let had_shard_discount = corpse_core::phantasmii_blessing_rules::uses_three_blessing_discount(&engine.run);
     corpse_core::phantasmii_blessing_rules::admit_discount(&mut engine.run)?;
     let shard_discount_migrated = !had_shard_discount && corpse_core::phantasmii_blessing_rules::uses_three_blessing_discount(&engine.run);
-    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || riptide_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated || mercuria_amulet_migrated || phantasmii_blessings_migrated || shard_discount_migrated))
+    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || riptide_migrated || star_power_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated || mercuria_amulet_migrated || phantasmii_blessings_migrated || shard_discount_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]
