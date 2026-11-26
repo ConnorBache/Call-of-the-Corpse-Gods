@@ -339,6 +339,32 @@ fn commandment_markerless_journal_adopts_after_recorded_commands() {
 }
 
 #[test]
+fn adjacent_attack_sight_markerless_journal_adopts_after_recorded_commands() {
+    for metadata in [false, true] {
+        let mut initial = room();
+        initial.firebolt_travel_from = 0usize.into();
+        initial.adjacent_attack_sight_from = Field::Null;
+        let mut old = Core::new(initial.clone()).unwrap();
+        let mut checkpoint: serde_json::Value = serde_json::from_str(&session_store::encode(&old, Kind::Fixture).unwrap()).unwrap();
+        checkpoint["run"].as_object_mut().unwrap().remove("adjacentAttackSightFrom");
+        let header = if metadata { log::Header::for_metadata_revision(Some(52.)) } else { log::Header::for_revision(Some(52.)) }.unwrap();
+        let mut file = log::encode_initial(&checkpoint.to_string(), &header).unwrap();
+        let command = Command::Wait;
+        old.dispatch(&command).unwrap();
+        append(&mut file, vec![Operation::Command { command, after: Stamp::capture(&old) }], metadata);
+        let (decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+        assert_eq!(decoded.run.adjacent_attack_sight_from, Field::Value(1));
+        old.run.adjacent_attack_sight_from = 1usize.into();
+        assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+        export_twice(&initial, &decoded);
+        let dir = Sandbox::new(); let path = dir.path(); std::fs::write(&path, &file.bytes).unwrap();
+        let (loaded, _) = load(&path).unwrap();
+        assert!(loaded.pending_batch().checkpoint_required);
+        assert!(loaded.pending_batch().base_token.is_none());
+    }
+}
+
+#[test]
 fn screamer_markerless_journal_adopts_after_recorded_commands() {
     for metadata in [false, true] {
         let mut initial = room();
