@@ -2625,3 +2625,11 @@ O(I) carried entries and uses O(1) extra space. A shard pickup opens at most
 one level-up choice, and each normal choice checks the next threshold using
 the existing offer workflow. No extra RNG runs if the next level cannot be
 earned. Historical replay prefixes use the former cost and generation rules.
+
+### Player release desktop entry points
+The non-developer CLI validates its bounded argument vocabulary in O(N) time
+for N arguments and allocates only an error message on rejection. Debug-session
+admission checks provenance in O(1), then scans the decoded command history
+in O(C) time and O(1) extra space for C commands. Title
+Help hover is a fixed hit test and repaints only on state change, using the
+existing frame path. The Windows GUI subsystem is a link-time setting.

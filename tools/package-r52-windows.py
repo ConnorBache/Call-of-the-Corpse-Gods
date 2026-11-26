@@ -158,7 +158,7 @@ def record_evidence(args):
         if not re.search(r'Finished\s+[`\']?release\b[^\n]*target', text):
             raise ValueError('Build log has no completed Cargo release target line')
         original = args.binary.read_bytes()
-        pe_sections(original)
+        require_gui_executable(original)
         report.update({'target': TARGET, 'profile': 'release', 'host': args.host,
                        'binary': {'bytes': len(original), 'sha256': digest(original)},
                        'rust_toolchain': '1.99.1', 'environment': args.environment,
@@ -248,6 +248,13 @@ def pe_sections(data):
                'subsystem': struct.unpack_from('<H', data, op + 68)[0],
                'dll_characteristics': struct.unpack_from('<H', data, op + 70)[0],
                'directories': tuple(d for i, d in enumerate(directories) if i not in (4, 6))}
+    return headers, sections
+
+
+def require_gui_executable(data):
+    headers, sections = pe_sections(data)
+    if headers['subsystem'] != 2:
+        raise ValueError('Player release requires the Windows GUI subsystem (2), not a console executable')
     return headers, sections
 
 
@@ -355,7 +362,7 @@ If supplied as two ZIP attachments, extract BOTH into that same folder first.
 Keep SDL2.dll beside corpse-desktop.exe and retain the notices/provenance folders.
 Do not launch from inside the ZIP. No installer, compiler, SDK, terminal commands,
 or separate artwork download is required. This is an SDL graphical-window game,
-not a text-terminal game. Play in the game window if a console also appears.
+not a text-terminal game.
 
 This is an unsigned Windows x64 cross-build. It has NOT been runtime-tested on
 Windows. Static PE/import/archive checks and recorded source tests do not prove
@@ -372,19 +379,11 @@ BASIC CONTROLS (context-sensitive; dialogs consume their own input)
 - I opens Pack. M opens Bestiary. ? opens the menu/basic display settings.
 - Alt+Enter cycles windowed, borderless, and exclusive fullscreen modes.
 - F5 saves a normal run. F9 reloads the saved run, discarding unsaved progress.
-  On the title menu, Continue resumes the available run. DEBUG saves are separate.
+  On the title menu, Continue resumes the available run.
 - Choose powers and item actions from their displayed controls; unavailable
   actions explain their blockers. Escape cancels/closes the current modal.
 - While aiming, movement keys move the target cursor and Enter confirms it.
   Gold shows delivery; coral shows impact or affected area. Escape cancels.
-
-DEBUG FLOOR TESTING
-Title menu: PLAY FROM X'TH FLOOR. Choose floor 1-40 and three distinct gods for
-your Avatar, keep or enter the seed, then make the earned power choices and select carried loot.
-Space confirms loadout. F4 reopens the DEBUG stash during play. F2 rerolls the
-setup seed; Ctrl+C/Ctrl+V copies/pastes it in DEBUG setup. These are reconstructed
-prior-floor choices, not a played-through run. DEBUG does not replace normal
-Continue/autosaves or enter high scores. F7 explicitly exports a .debug.json state.
 
 INVENTORY
 Pack has five sections: Trinkets, Amulets, Rings, Potions, and Hearts. Rings,
@@ -508,7 +507,7 @@ def package(args):
     if 'channel = "1.99.1"' not in (ROOT / 'rust-toolchain.toml').read_text():
         raise ValueError('Expected pinned Rust 1.99.1')
     original = args.binary.read_bytes()
-    before = pe_sections(original)
+    before = require_gui_executable(original)
     tests = validate_evidence(args.test_report, 'r52-test-report', snapshot_sha)
     build = validate_evidence(args.build_report, 'r52-build-report', snapshot_sha, original)
     art = art_evidence(original)

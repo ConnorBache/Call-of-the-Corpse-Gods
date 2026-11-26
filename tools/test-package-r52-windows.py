@@ -14,7 +14,7 @@ pkg = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pkg)
 
 
-def fake_pe(raw=b'CODE', *, machine=0x8664, rva=0x1000, signed=False, delayed=False, debug=False):
+def fake_pe(raw=b'CODE', *, machine=0x8664, rva=0x1000, signed=False, delayed=False, debug=False, subsystem=3):
     data = bytearray(1536)
     data[:2] = b'MZ'
     struct.pack_into('<I', data, 60, 128)
@@ -27,7 +27,7 @@ def fake_pe(raw=b'CODE', *, machine=0x8664, rva=0x1000, signed=False, delayed=Fa
     struct.pack_into('<Q', data, op + 24, 0x140000000)
     struct.pack_into('<I', data, op + 32, 4096)
     struct.pack_into('<I', data, op + 56, 0x3000 if debug else 0x2000)
-    struct.pack_into('<H', data, op + 68, 3)
+    struct.pack_into('<H', data, op + 68, subsystem)
     struct.pack_into('<I', data, op + 108, 16)
     if signed:
         struct.pack_into('<II', data, op + 112 + 4 * 8, 1100, 100)
@@ -61,6 +61,13 @@ class PackagingTests(unittest.TestCase):
         header_changed = bytearray(fake_pe())
         struct.pack_into('<I', header_changed, 152 + 16, 0x1010)
         self.assertNotEqual(baseline, pkg.pe_sections(header_changed))
+
+    def test_player_package_requires_gui_not_console_executable(self):
+        with self.assertRaisesRegex(ValueError, 'Windows GUI subsystem'):
+            pkg.require_gui_executable(fake_pe())
+        self.assertEqual(pkg.require_gui_executable(fake_pe(subsystem=2))[0]['subsystem'], 2)
+        self.assertNotIn('PLAY FROM', pkg.START_HERE)
+        self.assertNotIn('DEBUG FLOOR TESTING', pkg.START_HERE)
 
     def test_removing_only_debug_sections_and_trailing_image_space_is_allowed(self):
         self.assertEqual(pkg.pe_sections(fake_pe(debug=True)), pkg.pe_sections(fake_pe()))

@@ -220,3 +220,19 @@ fn help_native_scaled_captures() {
         encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
     }
 }
+
+#[test]
+fn title_help_hover_changes_pixels_only_inside_the_click_target() {
+    let mut p = Painter::new();
+    paint_menu_button(&mut p, false);
+    let before = p.pixels.clone();
+    paint_menu_button(&mut p, true);
+    let mut changed = 0;
+    for (index, (a, b)) in before.chunks_exact(4).zip(p.pixels.chunks_exact(4)).enumerate() {
+        if a != b {
+            assert!(menu_button_at((index % p.width) as i32, (index / p.width) as i32));
+            changed += 1;
+        }
+    }
+    assert!(changed > 100);
+}

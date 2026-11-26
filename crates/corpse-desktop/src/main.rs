@@ -1,3 +1,5 @@
+#![cfg_attr(all(target_os = "windows", not(debug_assertions), not(feature = "dev-tools")), windows_subsystem = "windows")]
+
 mod gameplay_pause;
 mod health_warning;
 mod death_pause;
@@ -59,6 +61,7 @@ mod replays;
 mod session_store;
 mod startup_ui;
 mod debug_floor_ui;
+mod release_policy;
 mod statuses_ui;
 mod monster_status_ui;
 mod stat_presentation;
@@ -213,14 +216,28 @@ fn load_with_kind(path: &str) -> Result<(temporal::Engine, session_store::Kind),
     {
         return Err("Cannot load save larger than 32 MiB.".into());
     }
-    session_store::load_tracked(std::path::Path::new(path))
+    let (engine, kind) = session_store::load_tracked(std::path::Path::new(path))?;
+    release_policy::check_session(engine.run.dev, kind != session_store::Kind::Genuine
+        || !engine.run.playtest.is_missing(), &engine.run.replay)?;
+    Ok((engine, kind))
 }
 fn load(path: &str) -> Result<temporal::Engine, String> {
     load_with_kind(path).map(|(run, _)| run)
 }
 
-fn main() -> Result<(), String> { run_app(std::env::args().collect()) }
+fn main() -> Result<(), String> {
+    let result = run_app(std::env::args().collect());
+    #[cfg(all(target_os = "windows", not(debug_assertions), not(feature = "dev-tools")))]
+    if let Err(message) = &result {
+        // A player opening the GUI executable has no stderr console.
+        let _ = sdl2::messagebox::show_simple_message_box(
+            sdl2::messagebox::MessageBoxFlag::ERROR, "Call of the Corpse Gods", message, None::<&sdl2::video::Window>,
+        );
+    }
+    result
+}
 fn run_app(args: Vec<String>) -> Result<(), String> {
+    release_policy::check_args(&args)?;
     #[cfg(feature = "runtime-timing")]
     if args.iter().any(|s| s == "--timing-test") {
         return timing_test::run(&args);
@@ -229,7 +246,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     if args.iter().any(|s| s == "--timing-test") {
         return Err("Timing tests require a build with --features runtime-timing".into());
     }
-    let fixture_session = args.iter().any(|s| s == "--fixture");
+    let fixture_session = release_policy::DEV_TOOLS && args.iter().any(|s| s == "--fixture");
     let mut seed = args
         .iter()
         .position(|s| s == "--seed")
@@ -250,7 +267,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut seed_focus = true;
     let mut floor_focus = false;
     let mut pending_start = startup_ui::Loader::<temporal::Engine>::default();
-    let mut playtest_floor = args.iter().position(|s| s == "--playtest-floor" || s == "--debug-floor")
+    let mut playtest_floor = args.iter().position(|s| release_policy::DEV_TOOLS && (s == "--playtest-floor" || s == "--debug-floor"))
         .map(|i| args.get(i + 1).cloned().ok_or("--playtest-floor requires a floor from 1 to 20"))
         .transpose()?;
     if let Some(floor) = &playtest_floor {
@@ -309,6 +326,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         settings.notice = error;
     }
     let mut painter = Painter::new();
+    #[cfg(feature = "dev-tools")]
     if let Some(i) = args.iter().position(|s| s == "--render-size") {
         let value = args
             .get(i + 1)
@@ -328,8 +346,10 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     painter.profile = settings.profile().clone();
     let mut manual = manual::Manual::new();
     manual.progress=bestiary_progress::Progress::load(bestiary_progress::Progress::path_for_profile(std::path::Path::new(&profile_path)));
+    #[cfg(feature = "dev-tools")]
     if args.iter().any(|s|s=="--bestiary-preview-all") {manual.preview_all();}
     let mut bestiary_notices=bestiary_progress::Notices::default();
+    #[cfg(feature = "dev-tools")]
     if let Some(id) = args
         .iter()
         .position(|s| s == "--manual-entry")
@@ -339,18 +359,21 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             return Err(format!("Unknown bestiary entry: {id}"));
         }
     }
+    #[cfg(feature = "dev-tools")]
     let manual_depth = if let Some(i) = args.iter().position(|s| s == "--manual-depth") {
         let depth: f64 = args.get(i + 1).ok_or("--manual-depth requires 1..40")?
             .parse().map_err(|_| "--manual-depth requires 1..40")?;
         if !depth.is_finite() || !(1.0..=40.0).contains(&depth) { return Err("--manual-depth requires 1..40".into()); }
         Some(depth - 1.)
     } else { None };
+    #[cfg(feature = "dev-tools")]
     let animation_frame: f64 = if let Some(i) = args.iter().position(|s| s == "--animation-frame") {
         let value: f64 = args.get(i + 1).ok_or("--animation-frame requires milliseconds")?
             .parse().map_err(|_| "invalid animation frame")?;
         if !value.is_finite() || value < 0. { return Err("animation frame must be finite and nonnegative".into()); }
         value
     } else { 0. };
+    #[cfg(feature = "dev-tools")]
     if let Some(i) = args.iter().position(|s| s == "--render-test") {
         let path = args.get(i + 1).ok_or("--render-test requires PNG path")?;
         if args.iter().any(|s| s == "--render-help") {
@@ -404,6 +427,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 .to_string_lossy()
                 .into_owned()
         });
+    #[cfg(feature = "dev-tools")]
     if let Some(i) = args.iter().position(|s| s == "--render-game") {
         let path = args
             .get(i + 1)
@@ -473,6 +497,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             .map_err(|e| e.to_string())?;
         return Ok(());
     }
+    #[cfg(feature = "dev-tools")]
     if let Some(i) = args.iter().position(|s| s == "--dump-observation") {
         let path = args
             .get(i + 1)
@@ -489,6 +514,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             .map_err(|e| e.to_string())?;
         return Ok(());
     }
+    #[cfg(feature = "dev-tools")]
     if args.iter().any(|s| s == "--check-fixture") {
         let r = if args.iter().any(|a| a == "--generated") {
             new_selected_run(&avatar_selection.prepared_seed(&seed,fresh_seed)?, &mode, playtest_floor.as_deref())?
@@ -643,9 +669,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut cached_view: Option<render::View> = None;
     let mut hallucination_phase=0usize;
     // Separate opt-in prototype. Unset/0 remains the frozen full-paint policy.
-    let tile_requested=std::env::var("CORPSE_TILE_PAINT").as_deref()==Ok("1");
+    let tile_requested=release_policy::DEV_TOOLS && std::env::var("CORPSE_TILE_PAINT").as_deref()==Ok("1");
     let mut tile_plan=render::tile_damage::TilePlanner::default();
-    tile_plan.eligibility.enabled=std::env::var("CORPSE_TILE_COUNTS").as_deref()==Ok("1");
+    tile_plan.eligibility.enabled=release_policy::DEV_TOOLS && std::env::var("CORPSE_TILE_COUNTS").as_deref()==Ok("1");
     let mut tile_overlays=tile_overlay::Tracker::default();
     let mut tile_panels=None;
     let mut tile_notice=String::new();
@@ -655,6 +681,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut rejected_drawable=None;
     let mut resize_refusal_notice=None;
     let mut minimized=false;
+    let mut menu_help_hover = false;
     'running: loop {
         if let Some(error)=pending_gpu_failure.take(){
             eprintln!("GPU drawing failed; recreating a software renderer: {error}");
@@ -787,6 +814,19 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 || (screen == Screen::Game && !inventory && !inspecting && history.is_none()
                     && ability_detail.is_none() && tile_report.is_none() && hazard_prompt.is_none()
                     && run.as_ref().is_some_and(|r| r.run.offers.is_empty() && !debug_loadout.active(&r.run)));
+            if matches!(event, Event::Window { win_event: sdl2::event::WindowEvent::Leave | sdl2::event::WindowEvent::FocusLost, .. })
+                && painter.toolbar_focus == Some(help_ui::ACTION) {
+                painter.toolbar_focus = None;
+                cosmetic_dirty = true;
+            }
+            let next_help_hover = match &event {
+                Event::MouseMotion { x, y, .. } => screen == Screen::Menu && help_available
+                    && help_ui::menu_button_at(*x, *y),
+                Event::Window { win_event: sdl2::event::WindowEvent::Leave | sdl2::event::WindowEvent::FocusLost, .. } => false,
+                _ => menu_help_hover && screen == Screen::Menu && help_available,
+            };
+            cosmetic_dirty |= menu_help_hover != next_help_hover;
+            menu_help_hover = next_help_hover;
             let help_button = match &event {
                 Event::MouseButtonDown { x, y, .. } => match screen {
                     Screen::Menu => help_ui::menu_button_at(*x, *y),
@@ -984,7 +1024,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         continue;
                     }
                     if screen == Screen::Game {
-                        if let Some(r) = run.as_mut().filter(|r| corpse_core::debug_floor::state(&r.run).is_some()) {
+                        if let Some(r) = run.as_mut().filter(|r| release_policy::DEV_TOOLS && corpse_core::debug_floor::state(&r.run).is_some()) {
                             if key == Keycode::F7 {
                                 let path=format!("{save_path}.debug.json");
                                 notice=r.save().map_err(|e|e.to_string()).and_then(|raw|session_store::atomic_write(std::path::Path::new(&path),raw.as_bytes())).map(|_|format!("Exported separate DEBUG state to {path}")).unwrap_or_else(|e|e);
@@ -1329,7 +1369,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     Screen::Manual
                                 }
                                 5 => Screen::Settings,
-                                6 => { if let Ok(next)=avatar_selection.prepared_seed(&seed,fresh_seed){seed=next;} playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; Screen::Start },
+                                6 if release_policy::DEV_TOOLS => { if let Ok(next)=avatar_selection.prepared_seed(&seed,fresh_seed){seed=next;} playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; Screen::Start },
                                 _ => Screen::Menu
                             };
                             continue;
@@ -1811,7 +1851,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             }
                             5 => screen = Screen::Settings,
                             i if (avatar_menu::GOD_START..avatar_menu::GOD_START+3).contains(&i) => {avatar_selection.sync_seed(&seed);avatar_selection.open(i-avatar_menu::GOD_START);},
-                            6 => { if let Ok(next)=avatar_selection.prepared_seed(&seed,fresh_seed){seed=next;} playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; screen = Screen::Start; },
+                            6 if release_policy::DEV_TOOLS => { if let Ok(next)=avatar_selection.prepared_seed(&seed,fresh_seed){seed=next;} playtest_floor = Some("1".into()); seed_focus = true; floor_focus = false; screen = Screen::Start; },
                             _ => {}
                         }
                     } else if screen == Screen::Start {
@@ -2724,7 +2764,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         painter.text_role(typography_ui::Role::Secondary,&label,110,420,12,[240,170,145]);
                     }
                     avatar_selection.paint_picker(&mut painter);
-                    help_ui::paint_menu_button(&mut painter);
+                    help_ui::paint_menu_button(&mut painter, menu_help_hover && !help.active());
                 }
                 Screen::Summary => {
                     if let Some(s) = &summary {

@@ -1162,3 +1162,12 @@ Existing saves use the discount and get a one-time waking shard placement
 on each existing floor when played or revisited under the new rules.
 Collected shards never respawn on revisit. A fully destroyed old floor with
 no reachable dry tile can be left unseeded.
+
+### Native release entry points
+The default release exposes normal Descend, Continue, replays, high scores,
+Bestiary, Help and settings. Start-from-floor, fixture playback, forced
+unlocks, capture and timing tools are not available in a player release. Local
+developers can explicitly build with `--features dev-tools` to use QA tools;
+that feature is not for distribution. Windows player release executables use
+the GUI subsystem, without a companion console. The title-screen Help button
+highlights on pointer hover without changing its click target.

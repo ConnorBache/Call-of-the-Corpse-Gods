@@ -3,7 +3,7 @@
 import argparse, hashlib, json, pathlib, zipfile, subprocess, sys
 p=argparse.ArgumentParser();p.add_argument('--platform',choices=['linux','windows'],required=True);p.add_argument('--binary',type=pathlib.Path,required=True);p.add_argument('--output',type=pathlib.Path,required=True);p.add_argument('--label',required=True);a=p.parse_args()
 root=pathlib.Path(__file__).resolve().parents[1];sdk=root.parent/'native-windows-sdk'/'SDL2-2.32.10';assets=root/'crates/corpse-desktop/assets'
-files=[(a.binary,'corpse-desktop.exe' if a.platform=='windows' else 'corpse-desktop'),(root/'NATIVE-VERIFICATION.md','NATIVE-VERIFICATION.md'),(root/'docs/native-performance-report.md','PERFORMANCE.md'),(root/'docs/debug-floor-testing-v33.md','DEBUG-FLOOR-TESTING.md')]
+files=[(a.binary,'corpse-desktop.exe' if a.platform=='windows' else 'corpse-desktop'),(root/'NATIVE-VERIFICATION.md','NATIVE-VERIFICATION.md'),(root/'docs/native-performance-report.md','PERFORMANCE.md')]
 # Every current distribution plate is embedded; validate the same ID set as build.rs.
 files += [(f,'notices/'+f.name) for f in sorted(assets.glob('*OFL.txt'))]
 files += [(assets/'NOTICE.md','notices/assets-NOTICE.md'), (assets/'art-distribution.json','notices/legacy-art-distribution.json'), (assets/'creature-alpha-manifest.json','notices/creature-alpha-manifest.json'), (root/'docs/creature-alpha.md','CREATURE-ALPHA.md'), (root/'docs/native-embedded-art.md','ARTWORK.md')]
@@ -34,17 +34,7 @@ Extract the whole ZIP into a folder, keep SDL2.dll beside corpse-desktop.exe, th
 LINUX
 Extract, install your distribution SDL2 runtime if absent, then run ./corpse-desktop. Exact Linux build/test and native-renderer coverage is recorded in NATIVE-VERIFICATION.md; headless rendering is not interactive-window verification.
 
-DEBUG FLOOR TESTING
-On the title menu choose PLAY FROM X'TH FLOOR. Enter a floor from 1 to 40, select Unblessed/Blessed/Avatar, and keep the random seed or enter an exact seed. F2 rerolls; Ctrl+C copies the seed and Ctrl+V pastes it in setup. Choose the real earned level offers, then select/equip recovered loot. Nothing automatically chooses powers for you. Space confirms loadout and enters the target floor. F4 reopens the DEBUG stash in play.
-DEBUG sessions do not overwrite normal autosaves or enter high scores. F7 explicitly exports a separate .debug.json state. Reconstruction is a stated all-prior-hearts/ordinary-loot debug assumption, not a played-through run. See DEBUG-FLOOR-TESTING.md for controls, exclusions, and exact behavior.
-
-Optional command-line setup from this extracted folder (replace floor/seed):
-  Windows PowerShell: .\\corpse-desktop.exe --debug-floor 12 --seed "0-5-11:my-test"
-  Windows Command Prompt: corpse-desktop.exe --debug-floor 12 --seed "0-5-11:my-test"
-  Linux: ./corpse-desktop --debug-floor 12 --seed "0-5-11:my-test"
-These commands prefill DEBUG setup; they do not choose abilities or skip loadout confirmation. The title-menu option needs no command line.
-
 GENERAL CONTROLS
-Arrows or roguelike movement keys; click known ground to walk; I opens Pack; M opens Bestiary; ? opens the menu and basic display settings; Alt+Enter cycles display modes. F5 saves and F9 resumes normal sessions; DEBUG persistence is separate as described above. New runs use a fresh seed.
+Arrows or roguelike movement keys; click known ground to walk; I opens Pack; M opens Bestiary; ? opens the menu and basic display settings; Alt+Enter cycles display modes. F5 saves and F9 resumes normal sessions. New runs use a fresh seed.
 ''')
 print(json.dumps({'path':str(a.output),'bytes':a.output.stat().st_size,'sha256':hashlib.sha256(a.output.read_bytes()).hexdigest()},indent=2))

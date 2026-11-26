@@ -38,7 +38,7 @@ pub fn seed_at(x:i32,y:i32)->bool{let(a,b,w,h)=SEED_RECT;x>=a&&x<a+w&&y>=b&&y<b+
 pub fn edit_seed(seed:&mut String,text:&str,replace:bool)->bool{if text.chars().any(char::is_control)||text.len()+(if replace{0}else{seed.len()})>180{return false;}if replace{seed.clear();}seed.push_str(text);true}
 /// O(seed bytes), unchanged trimming/blank-random semantics, one random call only for blank.
 pub fn selected_seed(seed:&str,random:impl FnOnce()->String)->String{if seed.trim().is_empty(){random()}else{seed.trim().into()}}
-pub const ITEMS: [Item; 7] = [
+const ALL_ITEMS: [Item; 7] = [
     Item { label: "DESCEND", x: 103, y: 443, w: 375, h: 66, size: 32 },
     Item { label: "CONTINUE", x: 174, y: 515, w: 434, h: 54, size: 31 },
     Item { label: "VIEW REPLAY", x: 266, y: 581, w: 342, h: 39, size: 24 },
@@ -48,13 +48,19 @@ pub const ITEMS: [Item; 7] = [
     Item { label: "PLAY FROM X'TH FLOOR", x: 174, y: 753, w: 434, h: 39, size: 22 },
 ];
 
-/// O(1), fixed twelve-control traversal; unavailable Continue is skipped.
+pub const ITEMS: &[Item] = if crate::release_policy::DEV_TOOLS { &ALL_ITEMS } else {
+    // The last row launches developer-only synthetic floor play.
+    let (player, _) = ALL_ITEMS.split_at(6);
+    player
+};
+
+/// O(1), fixed control traversal; unavailable Continue is skipped.
 pub fn next_item(selected: usize, forward: bool, can_continue: bool) -> usize {
     const ORDER: [usize; 11] = [0, 8, 9, 10, SEED_INDEX, 1, 2, 3, 4, 5, 6];
     let mut i = ORDER.iter().position(|v| *v == selected).unwrap_or(0);
     loop {
         i = (i + if forward { 1 } else { ORDER.len() - 1 }) % ORDER.len();
-        if ORDER[i] != 1 || can_continue { return ORDER[i]; }
+        if (ORDER[i] != 1 || can_continue) && (ORDER[i] != 6 || crate::release_policy::DEV_TOOLS) { return ORDER[i]; }
     }
 }
 
@@ -119,7 +125,7 @@ mod tests {
             loop {assert!(!visited.contains(&selected));visited.push(selected);
                 selected=next_item(selected,true,can_continue);if selected==0 {break;}}
             assert!(!visited.contains(&FAST_INDEX));
-            assert_eq!(visited.len(),if can_continue {11}else{10});
+            assert_eq!(visited.len(),if can_continue {10}else{9} + usize::from(crate::release_policy::DEV_TOOLS));
         }
         let mut p=Painter::new();p.menu(18,0,false,"Avatar");let before=p.pixels.clone();
         p.menu_fast_mode(true,true);assert_eq!(before,p.pixels);
@@ -137,7 +143,8 @@ mod tests {
     }
     #[test]
     fn settings_is_accessible_from_the_main_menu() {
-        assert_eq!(ITEMS.len(), 7);
+        assert_eq!(ITEMS.len(), 6 + usize::from(crate::release_policy::DEV_TOOLS));
+        assert_eq!(item_at(250, 765), crate::release_policy::DEV_TOOLS.then_some(6));
         assert_eq!(item_at(300, 730), Some(5));
     }
     #[test]
@@ -164,7 +171,7 @@ mod tests {
             let scale = (width as f64 / 1280.).min(height as f64 / 800.);
             let ox = (width as f64 - 1280. * scale) / 2.;
             let oy = (height as f64 - 800. * scale) / 2.;
-            for r in &ITEMS {
+            for r in ITEMS {
                 assert!(ox + r.x as f64 * scale >= 0.);
                 assert!(oy + r.y as f64 * scale >= 0.);
                 assert!(ox + (r.x + r.w) as f64 * scale <= width as f64);
@@ -181,8 +188,8 @@ mod tests {
         assert_eq!(next_item(SEED_INDEX, true, false), 2);
         assert_eq!(next_item(SEED_INDEX, true, true), 1);
         assert_eq!(next_item(2, false, false), SEED_INDEX);
-        assert_eq!(next_item(0, false, false), 6);
-        assert_eq!(next_item(6, true, true), 0);
+        assert_eq!(next_item(0, false, false), if crate::release_policy::DEV_TOOLS {6} else {5});
+        assert_eq!(next_item(5, true, true), if crate::release_policy::DEV_TOOLS {6} else {0});
     }
     /// O(control count), input and first row never overlap each other or anatomical art.
     #[test]

@@ -56,6 +56,7 @@ impl Replays {
         }
         let raw = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
         let record: ReplayRecord = serde_json::from_str(&raw).map_err(|e| e.to_string())?;
+        crate::release_policy::check_session(record.dev, !record.playtest.is_missing(), &record.commands)?;
         let session = ReplaySession::create(record, true).map_err(|e| e.to_string())?;
         if session.record.fast_mode.value_or(false) && !session.engine.run.compressed_depths.value_or(false) { self.fast_files.insert(path.to_owned()); }
         else { self.fast_files.remove(path); }

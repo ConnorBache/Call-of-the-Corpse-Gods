@@ -3456,7 +3456,7 @@ fn resource_max_label(max: f64) -> String {
 }
 
 /// Native UI palette defaults; explicitly authored appearance values still win.
-fn game_color(p: &crate::appearance_profile::Profile, path: &str) -> Rgb {
+pub(crate) fn game_color(p: &crate::appearance_profile::Profile, path: &str) -> Rgb {
     if p.value(path) != crate::appearance_profile::Profile::defaults().value(path) { return p.rgb(path); }
     match path {
         "ui.colors.primary" => INK,

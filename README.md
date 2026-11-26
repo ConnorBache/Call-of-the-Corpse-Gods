@@ -32,7 +32,7 @@ Windows cross-build instructions are in `docs/windows-cross-build.md`. Cross-com
 - Bestiary discoveries and unread pages persist beside profile.json independently of individual runs.
 - Click divine abilities to use them; right-click for their effects.
 - While aiming, movement keys move the target cursor and Enter confirms it. Escape cancels. Physical delivery paths, impacts and affected areas are shown separately.
-- ? opens the menu; Settings contains resolution and display mode. Alt+Enter cycles display modes. Ordinary-run accepted actions save automatically; F5 retries a save and F9 resumes. DEBUG floor tests never overwrite ordinary autosave/Continue or high scores; see the [DEBUG v2 guide](docs/debug-floor-testing-v33.md). Ordinary death removes the resumable save. Save, appearance, profile.json and replays/ defaults use the per-user configuration directory; --save, --profile and --replay-dir preserve explicit path overrides.
+- ? opens the menu; Settings contains resolution and display mode. Alt+Enter cycles display modes. Ordinary-run accepted actions save automatically; F5 retries a save and F9 resumes. Ordinary death removes the resumable save. Save, appearance, profile.json and replays/ defaults use the per-user configuration directory; --save, --profile and --replay-dir preserve explicit path overrides.
 - Choose Unblessed, Blessed or Avatar with the mode button beside DESCEND on the main menu. Click it or focus it with Tab/arrow keys and use Enter, Space, Left or Right. DESCEND keeps that choice and opens the seed form. New descents receive a fresh seed; the start form permits an explicit seed.
 - The title emblem’s isolated heart layer beats while blood pulses travel along the separate veins behind stationary ribs. Original pixels are preserved; reduced motion keeps it still. No animation advances gameplay.
 
@@ -52,19 +52,12 @@ This is a playable native preview. The current integrated test results, native-r
 
 The owner intends an open-source game; a project-wide license has not yet been selected. Existing third-party licenses and notices remain applicable. This workspace does not authorize publication.
 
-## Floor playtesting
+## Developer builds
 
-Choose **Play from x'th floor** for the revision-38 **DEBUG** setup: select floor
-1–40, vessel and gods; reroll or reuse the exact seed. Actual preceding-floor
-hearts are reconstructed and **you choose each real earned level-up offer**.
-Every ordinary prior ground/carried item is retained in a separate loadout stash;
-the normal twenty-slot Pack and starter equipment remain unchanged unless you
-choose a loadout. Full health/energy at entry is explicit; combat consumption,
-optional quest prizes and event/summon extras are not assumed. DEBUG does not
-write autosave/Continue or high scores. See [the workflow, headless commands and
-verification notes](docs/debug-floor-testing-v33.md). Legacy v1 replay compatibility
-is retained, but new floor starts no longer auto-pick abilities or discard loot.
-
+Player releases do not have floor testing, fixture launch, renderer capture,
+or timing controls. Build the desktop executable from source with
+`--features dev-tools` for the [floor testing workflow](docs/debug-floor-testing-v33.md).
+Keep developer executables separate from release packages.
 
 ## Opt-in timing test
 Run `tools/run-timing.sh` or `tools/run-timing.ps1` with the pinned toolchain to measure command phases, observations, software rendering and saving. See `docs/timing-profiling.md`. Normal builds have no timing feature; the timing feature itself does not change gameplay rules.

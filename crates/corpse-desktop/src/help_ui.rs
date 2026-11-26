@@ -256,7 +256,16 @@ fn button(p: &mut Painter, rect: Rect, text: &str, enabled: bool) {
         if enabled { DESCRIPTION_COLOR } else { [126, 126, 136] });
 }
 pub fn menu_button_at(x: i32, y: i32) -> bool { MENU_BUTTON.contains(x, y) }
-pub fn paint_menu_button(p: &mut Painter) { button(p, MENU_BUTTON, "?", true); }
+pub fn paint_menu_button(p: &mut Painter, hovered: bool) {
+    if !hovered { button(p, MENU_BUTTON, "?", true); return; }
+    let Rect(x, y, w, h) = MENU_BUTTON;
+    p.rect(x, y, w, h, crate::render::game_color(&p.profile, "ui.colors.hover"));
+    p.border(x, y, w, h, BORDER);
+    p.rect(x + 7, y + h - 4, w - 14, 2, crate::render::game_color(&p.profile, "ui.colors.blessing"));
+    let width = p.measure_text_role(Role::Primary, "?", 16).ceil() as i32;
+    p.text_role(Role::Primary, "?", x + (w - width) / 2, y + 9, 16,
+        crate::render::game_color(&p.profile, "ui.colors.primary"));
+}
 
 #[cfg(test)]
 #[path = "help_ui_tests.rs"]
