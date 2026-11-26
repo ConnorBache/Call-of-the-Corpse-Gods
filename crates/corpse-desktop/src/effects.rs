@@ -214,13 +214,14 @@ impl Effects {
         self.key = Some(key);
         let mut events=events;
         // Remove flashes before phase lengths, scene capture, or input locks.
-        events.retain(admitted);
+        events.retain(|e| admitted(e) && (!(self.reduced || self.instant)
+            || e.animation.as_ref().is_none_or(|a|a.style!=corpse_core::events::COMMANDMENT_SLIDE)));
         // A shared strike gets feedback only when it actually traveled. Ability
         // procs have their own receipts; ordinary walking/melee adds no flourish.
         // O(E log E) time / O(E) scratch, bounded by the existing cue cap.
         let ranged: std::collections::BTreeSet<_> = events.iter().filter_map(|e| {
             let a = e.animation.as_ref()?;
-            (a.stage == corpse_core::events::Stage::Travel && !a.cells.is_empty()
+            (a.stage == corpse_core::events::Stage::Travel && a.style!=corpse_core::events::COMMANDMENT_SLIDE && !a.cells.is_empty()
                 && a.delivery!=Delivery::Local).then_some(a.action)
         }).collect();
         events.retain(|e| e.animation.as_ref().is_none_or(|a| {

@@ -652,6 +652,8 @@ pub fn chill_applied(id:f64)->bool{PENDING.with(|p|p.borrow().as_ref().is_some_a
  }
 }
 
+pub const COMMANDMENT_SLIDE: &str = "moving-actor-commandment";
+
 /// Collect independently admitted travel receipts while forced movement resolves.
 /// No final-state visibility recheck: each cell was observed at its actual step.
 /// One ordered route, no interpolation across invisible gaps/portal jumps.
@@ -660,10 +662,15 @@ pub(crate) struct TravelRoute { event: Option<PresentationEvent> }
 impl TravelRoute {
     pub(crate) fn capture(&mut self,r:&Run,a:&Actor,cells:&[EventPoint],glyph:&str) {
         let serial=emission_serial();
-        travel(r,a,"P60","moving-actor-commandment",cells,Delivery::Projectile,Some(glyph));
+        travel(r,a,"P60",COMMANDMENT_SLIDE,cells,Delivery::Projectile,Some(glyph));
+        hide_actor_during(serial,a);
         if emission_serial()==serial{return;}
         let event=PENDING.with(|p|p.borrow_mut().as_mut().and_then(|b|b.events.pop()));
-        let Some(event)=event else{return};
+        let Some(mut event)=event else{return};
+        // Use the admitted apparent identity, not the true color of a disguise.
+        let apparent=crate::actor_presentation::apparent_kind(r,a)
+            .and_then(|kind|crate::population::catalog().actors.get(kind));
+        event.color=Some(apparent.map_or(&a.color, |body| &body.color).clone());
         if let Some(route)=self.event.as_mut() {
             let cue=route.animation.as_mut().unwrap();
             for cell in &event.animation.as_ref().unwrap().cells {
@@ -673,6 +680,6 @@ impl TravelRoute {
         } else {self.event=Some(event);}
     }
     pub(crate) fn finish(self) {
-        if let Some(event)=self.event {PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){b.events.push(event)});}
+        if let Some(event)=self.event.filter(|e|e.animation.as_ref().is_some_and(|a|a.cells.len()>1)) {PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){b.events.push(event)});}
     }
 }

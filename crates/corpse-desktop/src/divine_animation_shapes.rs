@@ -1,14 +1,16 @@
 //! Detached tile-only animation patterns. Geometry is restricted to admitted receipt cells.
 //! No gameplay RNG or simulation mutation. Nova is a small deterministic cellular wave.
 use crate::{effects::{Tile, MAGIC_CELL_MS},render::Rgb};
-use corpse_core::{animation_shapes::BULWARK_NOVA, events::PresentationEvent};
+use corpse_core::{animation_shapes::BULWARK_NOVA, events::{COMMANDMENT_SLIDE, PresentationEvent}};
+const COMMANDMENT_TRAVEL_MS:f64=180.;
+const COMMANDMENT_TOTAL_MS:f64=260.;
 const WARD_LEAD_MS: f64 = 110.;
 const WARD_WAVE_MS: f64 = 470.;
 use std::collections::{BTreeMap,BTreeSet};
 pub fn duration(e:&PresentationEvent)->Option<f64>{
  let a=e.animation.as_ref()?;let s=a.style.as_str();
  if let Some(d)=s.strip_prefix("line-hold:").or_else(||s.strip_prefix("moving-actor:")).and_then(|d|d.parse().ok()){return Some(d)}
- if s=="moving-actor-commandment"{Some(240.)}
+ if s==COMMANDMENT_SLIDE{Some(COMMANDMENT_TOTAL_MS)}
  else if s==corpse_core::animation_shapes::SHORT_NOVA {Some(360.)}
  else if s==BULWARK_NOVA {Some(WARD_LEAD_MS+WARD_WAVE_MS)}
  else if s.starts_with("nova-"){Some(if s.ends_with("large"){1800.}else{1200.})}
@@ -22,9 +24,25 @@ pub fn duration(e:&PresentationEvent)->Option<f64>{
  else if s.starts_with("moving-actor"){Some(a.cells.len().max(1) as f64*60.+100.)}
  else {None}
 }
+/// One glyph, interpolated only between neighboring admitted route points.
+pub fn commandment_pose(e:&PresentationEvent, age:f64)->Option<(f64,f64)> {
+    let a=e.animation.as_ref().filter(|a|a.style==COMMANDMENT_SLIDE)?;
+    if !(0. ..COMMANDMENT_TOTAL_MS).contains(&age) || a.cells.len()<2 { return None; }
+    let progress=(age/COMMANDMENT_TRAVEL_MS).min(1.)*(a.cells.len()-1) as f64;
+    let index=progress.floor() as usize;
+    let from=&a.cells[index];
+    if let Some(to)=a.cells.get(index+1) {
+        let (dx,dy)=(to.x-from.x,to.y-from.y);
+        if dx.abs().max(dy.abs())<=1. {
+            return Some((from.x+dx*progress.fract(),from.y+dy*progress.fract()));
+        }
+    }
+    Some((from.x,from.y))
+}
 fn nova_color(s:&str,default:Rgb)->Rgb{if s.contains("redorange"){return [255,75,30]}for(word,c)in[("red",[255,35,55]),("blue",[50,130,255]),("green",[65,255,90]),("black",[0,0,0]),("orange",[255,145,30]),("yellow",[255,240,45]),("pink",[255,105,210])]{if s.contains(word){return c}}default}
 pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<Tile>>{
  let a=e.animation.as_ref()?;let total=duration(e)?;let s=a.style.as_str();
+ if s==COMMANDMENT_SLIDE {return Some(vec![])}
  let ward=s==BULWARK_NOVA;
  if age<0.||age>=total || (ward && age<WARD_LEAD_MS) {return Some(vec![])}
  // The live ward has already been painted. Start the decorative wake after
@@ -120,7 +138,7 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
   let max=allowed.iter().map(|&(x,y)|((x-center.0).pow(2)+(y-center.1).pow(2))as f64).fold(1.,f64::max).sqrt();
   return Some(allowed.into_iter().filter_map(|(x,y)|{let dist=(((x-center.0).pow(2)+(y-center.1).pow(2))as f64).sqrt();let t=age-(dist/max*10.-1e-9).ceil().max(0.)*65.;(t>=0.&&t<250.).then(||make(x,y,0.95*(1.-t/250.),None))}).collect())
  }
- let step=if s=="moving-actor-commandment"{200./a.cells.len().max(1) as f64}else if s=="light100"{30.}else{60.};
+ let step=if s=="light100"{30.}else{60.};
  let head=((age/step).floor() as usize).min(a.cells.len().saturating_sub(1));
  Some(a.cells.iter().enumerate().filter_map(|(i,p)|{if i>head||head-i>2{return None}Some(make(p.x as i32,p.y as i32,if i==head{1.}else{0.5/(head-i)as f64},if i==head&&s.starts_with("moving-actor"){e.glyph.clone()}else{None}))}).collect())
 }
@@ -156,12 +174,17 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
   assert!(tiles(&purple,650.,false,[0;3]).unwrap().is_empty());
  }
  #[test]fn commandment_group_is_short_and_never_interpolates_portal_gap(){
-  let mut e=event("moving-actor-commandment");e.glyph=Some("g".into());
+  let mut e=event(COMMANDMENT_SLIDE);e.glyph=Some("g".into());
   e.animation.as_mut().unwrap().cells=vec![EventPoint{x:1.,y:1.},EventPoint{x:2.,y:1.},EventPoint{x:20.,y:8.}];
-  assert_eq!(duration(&e),Some(240.));
-  for age in [0.,80.,160.,220.] {let frame=tiles(&e,age,false,[0,0,0]).unwrap();assert!(frame.iter().all(|t|[(1,1),(2,1),(20,8)].contains(&(t.x,t.y))));assert_eq!(frame.iter().filter(|t|t.glyph.is_some()).count(),1);}
-  let last=tiles(&e,220.,false,[0,0,0]).unwrap();assert_eq!(last.iter().find(|t|t.glyph.is_some()).map(|t|(t.x,t.y)),Some((20,8)));
-  assert!(tiles(&e,240.,false,[0,0,0]).unwrap().is_empty());
+  assert_eq!(duration(&e),Some(260.));
+  assert_eq!(commandment_pose(&e,45.),Some((1.5,1.)));
+  assert_eq!(commandment_pose(&e,135.),Some((2.,1.)));
+  assert_eq!(commandment_pose(&e,180.),Some((20.,8.)));
+  assert_eq!(commandment_pose(&e,259.),Some((20.,8.)));
+  assert_eq!(commandment_pose(&e,260.),None);
+  for age in [0.,45.,135.,180.,259.] {
+   for reduced in [false,true] { assert!(tiles(&e,age,reduced,[0;3]).unwrap().is_empty()); }
+  }
  }
  #[test]fn nova_is_deterministic_neighbor_growth_and_never_invents_cells(){let e=event("nova-red-small");let first=tiles(&e,0.,false,[0,0,0]).unwrap();assert_eq!(first.len(),1);assert_eq!((first[0].x,first[0].y),(0,0));let later=tiles(&e,500.,false,[0,0,0]).unwrap();assert!(later.len()>1);assert!(later.iter().all(|t|(-2..=2).contains(&t.x)&&(-2..=2).contains(&t.y)&&t.color==[255,35,55]));assert!(tiles(&e,1200.,false,[0,0,0]).unwrap().is_empty());}
  #[test]fn tier_nova_is_short_nonblocking_and_paints_every_admitted_island(){

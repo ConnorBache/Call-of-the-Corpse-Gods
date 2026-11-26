@@ -2777,3 +2777,6 @@ The desktop death screen presents its notification and waits for fresh Space bef
 
 ### Clay Army tile glyph
 A projected Clay Soldier wall draws the existing full-size wall glyph in darker orange and one smaller orange @ centered on it. Both are fixed-size clipped glyph masks, using existing terrain layer invalidation and restoration; no actor, light source, pathfinding work, or additional map traversal is added.
+
+### Commandment actor-only displacement
+The existing observed route is grouped once after the paid push. The desktop masks only the displaced actor in the detached action scene (O(V) in observed layers, already used for other actor masks), then draws one glyph per frame at an O(1) sampled position between adjacent route cells. It never paints a tile highlight or interpolates across a portal jump. The final position stays visible briefly before the committed enemy response can be revealed. No new simulation work, saved fields, or additional RNG; Reduced and Instant skip the sequence rather than replacing it with a highlight.

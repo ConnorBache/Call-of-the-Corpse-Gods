@@ -1919,7 +1919,7 @@ impl Painter {
             if cue.event.depth != v.depth {
                 continue;
             }
-            if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style.starts_with("moving-actor")) {
+            if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style.starts_with("moving-actor")&&a.style!=corpse_core::events::COMMANDMENT_SLIDE) {
                 if cues.iter().any(|next|next.started>cue.started&&next.started<=now&&next.event.animation.as_ref().is_some_and(|b|b.action==a.action&&b.style.starts_with("moving-actor"))){continue;}
             }
             for tile in crate::effects::tiles(cue, now, reduced) {
@@ -1959,9 +1959,9 @@ impl Painter {
         // Suppress every previous step's snapshot glyph until the push completes.
         let moving_actions:std::collections::BTreeSet<_>=cues.iter().filter_map(|c|{
             let a=c.event.animation.as_ref()?;
-            (a.style.starts_with("moving-actor")&&now>=c.started&&now<c.started+crate::effects::duration(&c.event)).then_some(a.action)
+            (a.style.starts_with("moving-actor")&&a.style!=corpse_core::events::COMMANDMENT_SLIDE&&now>=c.started&&now<c.started+crate::effects::duration(&c.event)).then_some(a.action)
         }).collect();
-        for cue in cues {if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style.starts_with("moving-actor")&&moving_actions.contains(&a.action)) {
+        for cue in cues {if let Some(a)=cue.event.animation.as_ref().filter(|a|a.style.starts_with("moving-actor")&&a.style!=corpse_core::events::COMMANDMENT_SLIDE&&moving_actions.contains(&a.action)) {
             if let Some(origin)=a.cells.first() {if origin.x>=0.&&origin.y>=0.&&origin.x<v.width as f64&&origin.y<v.height as f64 {
                 let i=origin.y as usize*v.width+origin.x as usize;
                 if let Some(Some(cell))=actors.get(i) {self.rect(ox+origin.x as i32*cw,oy+origin.y as i32*ch,cw,ch,cell.bg);actors[i]=None;}
@@ -2010,6 +2010,19 @@ impl Painter {
                 let color = if tile.field_strength>=1. {tile.color} else if direct { crate::illumination_ui::paint_color(tile.color, display) }
                     else { crate::color::telepathic(tile.color, false) };
                 self.map_identity_alpha(g, x, y, cw, ch, color, tile.light);
+            }
+        }
+        // Sequence has already removed this actor's original layer; unlike
+        // tile-based effects, drawing the glyph never repaints its background.
+        if !reduced {
+            for cue in cues.iter().filter(|c| !c.static_marks && c.event.depth==v.depth) {
+                let Some((x,y))=crate::divine_animation_shapes::commandment_pose(&cue.event,now-cue.started) else {continue};
+                if x<0. || y<0. || x>=v.width as f64 || y>=v.height as f64 {continue;}
+                let Some(glyph)=cue.event.glyph.as_deref() else {continue};
+                let ink=cue.event.color.as_deref().map_or(INK,crate::color::hex);
+                let index=y.round() as usize*v.width+x.round() as usize;
+                let ink=display_lights.get(index).copied().flatten().map_or(ink,|light|light.foreground(ink,true));
+                self.map_identity(glyph,ox+(x*cw as f64).round() as i32,oy+(y*ch as f64).round() as i32,cw,ch,ink);
             }
         }
     }

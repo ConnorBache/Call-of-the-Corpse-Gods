@@ -67,7 +67,7 @@ Automated tests in animation_player.rs passed in verification/r52-animations/cor
 | P57 | Nova | engine real Nova footprint; Snapshot toggle |
 | P58 | Sparkle | abilities Sparkle real target, water puff |
 | P59 | Star Power | Snapshot Star Power suppression/resume toggle only |
-| P60 | Commandment | revision50_combat::after_attack each actual push step |
+| P60 | Commandment | revision50_combat::after_attack groups the visible paid push steps into one actor-only slide |
 | P61 | Cogworks | revision50_terrain admitted construction/removal exact footprint |
 | P62 | Mini-Me | mini_me::commit/dismiss actual clone assembly/disassembly |
 | P63 | Clay Army | revision50_terrain::activate_clay committed departure footprint; normal actual strikes |

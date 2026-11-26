@@ -607,3 +607,57 @@ fn capture_bulwark_green_nova() {
     }
     drop(sink);assert!(encoder.wait().unwrap().success());
 }
+
+#[test]
+fn commandment_slide_precedes_the_enemys_same_turn_return_without_tile_light() {
+    let mut r=room();
+    let id=corpse_core::revision50_combat::COMMANDMENT;
+    r.player.abilities=vec![id.into()];
+    r.player.active=vec![id.into()];
+    r.player.ability_reserves=Field::Missing;
+    corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player,id,10.,10.).unwrap();
+    r.player.stats.accuracy=1000.;
+    r.player.stats.offense=0.;
+    let victim=&mut r.actors_at_mut(r.depth)[0];
+    victim.x=11.;
+    victim.state="hunting".into();
+    victim.hp=500.;
+    victim.max_hp=500.;
+    victim.stats.perception=100.;
+    let width=r.floor().unwrap().width();
+    r.floor_mut().unwrap().tiles[10*width+13]="wall".into();
+    let before=r.clone();
+    let mut engine=temporal::Engine::new(r).unwrap();
+    let mut fx=effects::Effects::default();
+    dispatch(&mut engine,&mut fx,0.,&Command::Move{dx:1.,dy:0.}).unwrap();
+    let cue=fx.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|
+        a.style==corpse_core::events::COMMANDMENT_SLIDE)).unwrap_or_else(||panic!("no slide: player=({},{}) energy={} rat={:?} logs={:?}",engine.run.player.x,engine.run.player.y,engine.run.player.energy,corpse_core::engine::actor(&engine.run,123.).map(|a|(a.x,a.y,a.hp,a.state.as_str())),engine.run.log));
+    let animation=cue.event.animation.as_ref().unwrap();
+    assert_eq!(animation.hide_actor,Some(123.));
+    assert_eq!(animation.cells.iter().map(|p|p.x).collect::<Vec<_>>(),[11.,12.]);
+    assert_eq!(corpse_core::engine::actor(&engine.run,123.).unwrap().x,11.,"enemy already moved back in the simulation");
+    assert!(!fx.cues.iter().any(|c|c.event.animation.as_ref().is_some_and(|a|
+        a.proposal=="shared" && matches!(a.style.as_str(),"slash"|"puncture"|"miss"))));
+    let mut painter=Painter::new();
+    painter.set_responsive_canvas(true);
+    for (age, expected, name) in [(0.,11.,"origin"),(90.,11.5,"middle"),(220.,12.,"held-away")] {
+        let time=cue.started+age;
+        let frame=fx.sequence.view(time).expect("the result is held for the push");
+        assert!(!frame.cells.iter().any(|c|c.actor_id==Some(123.)));
+        assert!(frame.cells.iter().any(|c|c.x==11&&c.y==10&&c.actor_id.is_none()));
+        assert_eq!(crate::divine_animation_shapes::commandment_pose(&cue.event,age),Some((expected,10.)));
+        assert!(effects::tiles(cue,time,false).is_empty());
+        painter.game_at(frame,"",false,0.);
+        let unpainted=crc32fast::hash(&painter.pixels);
+        painter.effects(frame,&fx.cues,time,false);
+        assert_ne!(crc32fast::hash(&painter.pixels),unpainted,"a single moving glyph is painted");
+        capture(&painter,&format!("commandment-{name}"));
+    }
+    assert!(fx.sequence.view(cue.started+effects::duration(&cue.event)).is_none());
+    let after=observe::observe(&engine.run);
+    assert!(after.cells.iter().any(|c|c.actor_id==Some(123.) && c.x==11));
+    let mut reduced=effects::Effects::default();
+    reduced.configure_motion(true,false);
+    reduced.add(vec![cue.event.clone()],before.tick,before.depth,0.,false);
+    assert!(reduced.cues.is_empty()&&!reduced.presentation_pending(0.));
+}
