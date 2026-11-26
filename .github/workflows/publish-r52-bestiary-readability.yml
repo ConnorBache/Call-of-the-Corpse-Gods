@@ -1,0 +1,41 @@
+name: Build and publish R52 Bestiary Readability
+on:
+  push:
+    branches:
+      - release-publishing/r52-followup
+    paths:
+      - .github/workflows/publish-r52-bestiary-readability.yml
+      - release-staging/r52-windows/build-and-publish-r52-bestiary.sh
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: r52-windows-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'ConnorBache/Call-of-the-Corpse-Gods' && github.ref == 'refs/heads/release-publishing/r52-followup'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          sparse-checkout: release-staging/r52-windows
+          path: publication
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          ref: 8c1653566509f18efe40876753f1bc8ac5127545
+          path: game-source
+      - name: Install Linux SDL test library
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libsdl2-dev
+      - name: Build, test, and verify package
+        run: bash publication/release-staging/r52-windows/build-and-publish-r52-bestiary.sh build
+      - name: Verify uploaded bytes and publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: bash publication/release-staging/r52-windows/build-and-publish-r52-bestiary.sh publish
