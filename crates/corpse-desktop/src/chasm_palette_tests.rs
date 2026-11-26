@@ -151,7 +151,7 @@ fn chasm_ordinary_illumination_preserves_entity_fire_and_other_terrain_readabili
             "creature" => c.actor_id = Some(900.),
             "item" => c.entity_ink = Some(crate::render::EntityInk { color:base.fg,
                 player:false, telepathic:false, important:true, remembered:false,
-                detected:false, identity_outline:None }),
+                detected:false, identity_outline:None, plain_black:false }),
             "fire" => c.fire = true,
             _ => c.label = role.into(),
         }
@@ -287,7 +287,7 @@ fn remembered_chasm_exemption_preserves_entities_fire_other_terrain_and_custom_p
     for remembered in [false, true] {
         for player in [false, true] {
             let entity = crate::render::EntityInk { color:[23,23,48], player,
-                telepathic:false, important:true, remembered, detected:false, identity_outline:None };
+                telepathic:false, important:true, remembered, detected:false, identity_outline:None, plain_black:false };
             for actor in [false, true] {
                 let mut cell = base.clone(); cell.fg = [23,23,48];
                 cell.entity_ink = Some(entity); cell.actor_id = actor.then_some(901.);

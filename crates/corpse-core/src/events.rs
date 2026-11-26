@@ -348,6 +348,9 @@ pub struct AnimationCue {
     pub surface: Option<String>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub item_id: Option<f64>,
+    /// Parallel beam arrivals, indexed by the exact visibility-filtered cells.
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub arrival_steps: Option<Vec<u8>>,
 }
 pub fn enabled(r: &Run) -> bool { r.simulation_revision.value_or(29.) >= 52. }
 pub fn next_action(r: &Run) {
@@ -387,7 +390,7 @@ pub fn at(r:&Run, proposal:&str, style:&str, stage:Stage, cells:&[EventPoint]) {
     let Some(to)=cells.last().cloned() else{return};
     let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action));
     emit(r, PresentationEvent { kind:"animation".into(),from:None,to,glyph:None,color:None,
-        label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage,action,cells,surface:None,item_id:None}) });
+        label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage,action,cells,surface:None,item_id:None,arrival_steps:None}) });
 }
 /// Actor identity and plane admission precede all actor-related visual output.
 /// Terrain-only at() must not be used to bypass this guard for hidden actors.
@@ -419,6 +422,16 @@ pub fn travel(r:&Run,a:&Actor,proposal:&str,style:&str,cells:&[EventPoint],deliv
     PENDING.with(|p|if let Some(e)=p.borrow_mut().as_mut().and_then(|b|b.events.last_mut()){
         if let Some(cue)=e.animation.as_mut(){cue.delivery=delivery;}
         if delivery==Delivery::Projectile{e.glyph=glyph.map(str::to_owned);}
+    });
+}
+/// Assign travel bands only to the receipt just admitted, using its filtered
+/// cells. Same-band cells advance in parallel rather than in row order.
+pub(crate) fn travel_bands(r:&Run,a:&Actor,proposal:&str,style:&str,cells:&[EventPoint],band:impl Fn(&EventPoint)->u8) {
+    let serial=emission_serial();
+    travel(r,a,proposal,style,cells,Delivery::Magic,None);
+    if emission_serial()==serial {return;}
+    PENDING.with(|p|if let Some(cue)=p.borrow_mut().as_mut().and_then(|b|b.events.last_mut()).and_then(|e|e.animation.as_mut()){
+        cue.arrival_steps=Some(cue.cells.iter().map(band).collect());
     });
 }
 /// Decorate an admitted cue without inventing cells or changing simulation state.
@@ -469,7 +482,7 @@ pub fn inventory(r:&Run,proposal:&str,style:&str,item_id:Option<f64>){
     if !enabled(r)||r.player.x<0.{return}
     let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action));
     let event=PresentationEvent{kind:"animation".into(),from:None,to:(&r.player).into(),glyph:None,color:None,label:None,depth:r.depth,
-        animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage:if proposal=="P65"&&style=="gear"{Stage::Travel}else{Stage::Special},action,cells:vec![],surface:Some("inventory".into()),item_id})};
+        animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage:if proposal=="P65"&&style=="gear"{Stage::Travel}else{Stage::Special},action,cells:vec![],surface:Some("inventory".into()),item_id,arrival_steps:None})};
     PENDING.with(|p|{if let Some(b)=p.borrow_mut().as_mut(){b.serial=b.serial.wrapping_add(1);b.events.push(event);if b.events.len()>4096{b.events.remove(0);}}});
 }
 
@@ -488,7 +501,7 @@ pub fn audible_banshee(r:&Run,a:&Actor){
     if !enabled(r)||r.player.x<0.||!crate::dreamwalking::same_plane(r,&r.player,a)||!crate::lifecycle::audible_banshee(r,a){return}
     let to=EventPoint{x:crate::engine::condition(a,"monsterAudibleX"),y:crate::engine::condition(a,"monsterAudibleY")};
     let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action));
-    let event=PresentationEvent{kind:"animation".into(),from:None,to:to.clone(),glyph:None,color:None,label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:"E11".into(),style:"sound-violet".into(),stage:Stage::Special,action,cells:vec![to],surface:Some("audible".into()),item_id:None})};
+    let event=PresentationEvent{kind:"animation".into(),from:None,to:to.clone(),glyph:None,color:None,label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:"E11".into(),style:"sound-violet".into(),stage:Stage::Special,action,cells:vec![to],surface:Some("audible".into()),item_id:None,arrival_steps:None})};
     PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){b.serial=b.serial.wrapping_add(1);b.events.push(event);if b.events.len()>4096{b.events.remove(0);}});
 }
 

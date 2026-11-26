@@ -6,7 +6,7 @@ use corpse_core::events::{AnimationCue,Delivery,EventPoint,PresentationEvent,Sta
 fn event(key:&str,style:&str,stage:Stage,action:u32,cells:&[(f64,f64)])->PresentationEvent{
  let cells:Vec<_>=cells.iter().map(|&(x,y)|EventPoint{x,y}).collect();
  PresentationEvent{kind:"animation".into(),from:None,to:cells.last().cloned().unwrap_or(EventPoint{x:10.,y:10.}),glyph:None,color:None,label:None,depth:1.,
- animation:Some(AnimationCue{delivery:if stage==Stage::Travel&&(style.starts_with("bolt")||matches!(style,"ember"|"dart"|"glob")){if key=="shared"||key=="E61"{Delivery::Projectile}else{Delivery::Magic}}else{Delivery::Local},proposal:key.into(),style:style.into(),stage,action,cells,surface:None,item_id:None})}
+ animation:Some(AnimationCue{delivery:if stage==Stage::Travel&&(style.starts_with("bolt")||matches!(style,"ember"|"dart"|"glob")){if key=="shared"||key=="E61"{Delivery::Projectile}else{Delivery::Magic}}else{Delivery::Local},proposal:key.into(),style:style.into(),stage,action,cells,surface:None,item_id:None,arrival_steps:None})}
 }
 fn capture(p:&Painter,name:&str){if let Ok(dir)=std::env::var("CORPSE_ACTION_REVIEW"){std::fs::create_dir_all(&dir).unwrap();let f=std::fs::File::create(format!("{dir}/{name}.png")).unwrap();let mut enc=png::Encoder::new(f,p.width as u32,p.height as u32);enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);enc.write_header().unwrap().write_image_data(&p.pixels).unwrap();}}
 #[test]fn action_animation_exact_cells_order_and_instant(){
@@ -463,4 +463,69 @@ fn potion_wave_actual_telepathy_and_review_fixtures(){
  let mut e=event("shared","bolt",Stage::Travel,0,&[(2.,3.)]);e.animation=None;e.kind="projectile".into();
  assert!(!effects::admitted(&e));e.from=Some(EventPoint{x:1.,y:3.});assert!(effects::admitted(&e));
  e.kind="burst".into();e.glyph=Some("人".into());assert!(effects::admitted(&e));
+}
+
+#[test]
+fn enemy_fire_breath_reveals_grass_fire_after_the_beam_head_departure() {
+    for kind in ["dragon","hemogoblin-mech"] {
+        let mut r=crate::staged_firebolt::tests::room();
+        r.inventory.clear();
+        r.player.x=16.;
+        r.player.hp=5000.;r.player.max_hp=5000.;r.player.base_max_hp=5000.0.into();
+        let mut a=corpse_core::population::create_actor_revision(kind,901.,11.,10.,false,52.).unwrap();
+        a.state="hunting".into();a.stats.perception=300.;a.energy=50.;
+        if kind=="hemogoblin-mech" {
+            let pilot=corpse_core::population::create_actor_revision("hemogoblin-inventor",902.,11.,10.,false,52.).unwrap();
+            a.monster_state.get_or_insert_with(Default::default).pilot=Box::new(pilot).into();
+        }
+        r.actors_at_mut(r.depth).push(a);
+        let f=r.floor_mut().unwrap();let w=f.width();
+        for x in [12,14,15] { f.tiles[10*w+x]="grass".into(); }
+        let mut engine=temporal::Engine::new(r).unwrap();
+        let mut fx=effects::Effects::default();
+        assert!(crate::dispatch(&mut engine,&mut fx,100.,&Command::Wait).unwrap().took_turn);
+        let travel=fx.cues.iter().find(|cue|cue.event.animation.as_ref().is_some_and(|a|a.proposal=="E03"))
+            .unwrap_or_else(||panic!("actual {kind} turn did not breathe: {:?}",engine.run.log));
+        let cue=travel.event.animation.as_ref().unwrap();
+        assert_eq!((cue.delivery,cue.stage),(Delivery::Magic,Stage::Travel));
+        assert_eq!(cue.arrival_steps.as_ref().unwrap().len(),cue.cells.len());
+        let departure=|x:f64| {
+            let index=cue.cells.iter().position(|p|p.x==x&&p.y==10.).unwrap();
+            travel.started+effects::departure_ms(&travel.event,index)
+        };
+        let near=departure(12.);let far=departure(15.);
+        assert!(near<far);
+        let fire=|view:&View,x|view.cells.iter().any(|c|c.x==x&&c.y==10&&c.fire);
+        assert!(!fire(fx.sequence.view(near-1.).unwrap(),12));
+        let middle=fx.sequence.view(near).unwrap();
+        assert!(fire(middle,12));assert!(!fire(middle,15));
+        assert!(fire(fx.sequence.view(far).unwrap(),15));
+        let mut painter=Painter::new();
+        let saved=engine.save().unwrap();
+        painter.game_at(middle,"",false,near);
+        painter.effects(middle,&fx.cues,near,false);
+        assert_eq!(engine.save().unwrap(),saved,"presentation must not change gameplay");
+    }
+}
+
+#[test]
+fn enemy_gasser_scream_only_marks_the_paid_exhalation() {
+    for (kind,ready) in [("pale:Breather",true),("pale:Greater Breather",true),("pale:Breather",false)] {
+        let mut r=crate::staged_firebolt::tests::room();
+        let mut a=corpse_core::population::create_actor_revision(kind,901.,13.,10.,false,52.).unwrap();
+        a.state="hunting".into();a.stats.perception=300.;a.energy=if ready{50.}else{0.};
+        if !ready {a.conditions.insert("paralyzed".into(),6.);}
+        r.actors_at_mut(r.depth).push(a);
+        let mut engine=temporal::Engine::new(r).unwrap();
+        let mut fx=effects::Effects::default();
+        assert!(crate::dispatch(&mut engine,&mut fx,100.,&Command::Wait).unwrap().took_turn);
+        let waves:Vec<_>=fx.cues.iter().filter(|c|c.event.animation.as_ref().is_some_and(|a|a.proposal=="E57")).collect();
+        assert_eq!(waves.len(),usize::from(ready),"{kind}: {:?}",engine.run.log);
+        if let Some(wave)=waves.first(){
+            assert_eq!(wave.event.animation.as_ref().unwrap().style,"wave-gasser");
+            assert_eq!(effects::tiles(wave,wave.started,false).len(),1);
+            assert!(effects::tiles(wave,wave.started+80.,false).len()>1);
+        }
+        assert!(fx.cues.iter().all(|c|!c.event.animation.as_ref().is_some_and(|a|a.proposal=="E56")));
+    }
 }

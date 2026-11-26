@@ -407,7 +407,11 @@ pub fn enemy_action_options(
     crate::events::tag_path(&a,"E61","glob");
         let range=crate::projectiles::traveled_distance(r,&a,b.x,b.y,&landing);
         if landing.actor_id.is_none() && crate::events::enabled(r) {crate::events::actor_event(r,&a,"projectile","Distant spit",Some(crate::events::EventPoint{x:landing.x,y:landing.y}),None);}
-        if let Some(actual)=landing.actor_id.filter(|_|range<=12.){crate::engine::attack_ranged_resolved(r,id,actual,base,range,1.,false)?;}
+        if let Some(actual)=landing.actor_id.filter(|_|range<=12.) {
+            crate::engine::attack_ranged_resolved(r,id,actual,base,range,1.,false)?;
+        } else {
+            crate::monster_horn::report_cast(r,&a,&b,"Distant Spit");
+        }
         actor_mut_trusted(r, id)
             .unwrap()
             .conditions
@@ -423,6 +427,7 @@ pub fn enemy_action_options(
                 id,
             )
             .map_err(crate::engine::EngineError)?;
+            crate::monster_horn::report_cast(r,&a,&b,"Caustic Spit");
             let w=r.floor().unwrap().width();
             crate::events::cue(r,&a,"E62","puff-green",crate::events::Stage::Special,&[crate::events::EventPoint{x:(i%w) as f64,y:(i/w) as f64}]);
         }

@@ -21,7 +21,7 @@ pub(crate) fn begin(r:&Run,effect:&str,x:f64,y:f64,target:Option<f64>)->Option<u
  if cells.is_empty(){return None}
  let action=events::current_action();
  events::emit(r,PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x,y},glyph:None,color:None,label:None,depth:r.depth,
-  animation:Some(AnimationCue{proposal:"potion-wave".into(),style:style.into(),stage:Stage::Special,action,cells,delivery:Delivery::Local,surface:None,item_id:None})});
+  animation:Some(AnimationCue{proposal:"potion-wave".into(),style:style.into(),stage:Stage::Special,action,cells,delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})});
  Some(action)
 }
 

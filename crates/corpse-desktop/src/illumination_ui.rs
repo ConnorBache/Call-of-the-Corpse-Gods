@@ -27,17 +27,18 @@ pub fn finish_cell(cell: &mut Cell, light: Light, profile: &Profile) {
     if profile.is_default("fog") && profile.is_default("global") {
         (cell.fg, cell.bg) = crate::render::readable_cell_colors(cell);
     }
-    if visible { cell.fg = display.foreground(cell.fg,cell.actor_id.is_some()); }
+    let plain_black=cell.entity_ink.is_some_and(|ink|ink.plain_black);
+    if visible && !plain_black { cell.fg = display.foreground(cell.fg,cell.actor_id.is_some()); }
     cell.bg = display.apply(cell.bg);
     // Authored dark base colors, including chasms, use the same illumination
     // treatment as other terrain. Knowledge filtering above still owns memory.
-    if visible && display.illumination < 0. {
+    if visible && !plain_black && display.illumination < 0. {
         // Lift only existing foreground ink. No outline, halo, background floor,
         // extra light source, or visibility/range change is introduced.
         let rescued=crate::color::light_ui::foreground_contrast(cell.fg,cell.bg,if cell.actor_id.is_some(){4.5}else{3.});
         let t=(-display.illumination/25.).clamp(0.,1.);let blend=t*t*(3.-2.*t);
         cell.fg=crate::color::composite(cell.fg,rescued,blend);
-    } else if profile.is_default("fog") && profile.is_default("global")
+    } else if !plain_black && profile.is_default("fog") && profile.is_default("global")
         && (cell.entity_ink.is_some_and(|ink| ink.important && !ink.telepathic && !ink.remembered && ink.identity_outline.is_none())
             || matches!(cell.label.as_str(), "up" | "down"))
     {

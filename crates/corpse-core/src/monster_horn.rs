@@ -141,6 +141,18 @@ pub(crate) fn report(r: &mut Run, a: &Actor, b: &Actor, message: &str) {
         );
     }
 }
+/// Announce a committed cast separately from its damage or miss. Preserve
+/// historical log traces and never name an unobserved caster.
+pub(crate) fn report_cast(r: &mut Run, a: &Actor, target: &Actor, ability: &str) {
+    if r.simulation_revision.value_or(29.)<52. || r.player.x<0. {return;}
+    if a.id==r.player.id {
+        engine::log(r,format!("You use {ability}."),"player");
+    } else if crate::vision::visible_actor(r,a) {
+        engine::log(r,format!("{} uses {ability}.",crate::actor_presentation::name(r,a)),"enemy");
+    } else if target.id==r.player.id || crate::vision::visible_actor(r,target) {
+        engine::log(r,format!("Something unseen uses {ability}."),"enemy");
+    }
+}
 pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String> {
     let a = actor(r, id).ok_or("Horn actor missing")?.clone();
     let b = actor(r, target).ok_or("Horn target missing")?.clone();
@@ -259,6 +271,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
     if has(&a, "horn-bolt") && range > std::f64::consts::SQRT_2 && range <= 10.0 && allowed {
         let possible=crate::projectiles::possible_shot_range(r,&a,&b,10.);
         if let Some(range)=possible.filter(|_|spell_spend(r,id,8.)) {
+            report_cast(r,&a,&b,"Hornlight");
             let (fixed, coefficient) = if crate::combat::raw_attack_damage_enabled(r.simulation_revision.value_or(29.)) { (10., 0.75) } else { (20., 1.5) };
             let base = fixed + crate::combat::effective_stats(r, &a).offense * coefficient;
             if r.simulation_revision.value_or(29.)>=36. {

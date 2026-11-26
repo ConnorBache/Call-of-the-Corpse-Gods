@@ -325,6 +325,9 @@ pub const MAGIC_CELL_MS:f64=16.;
 pub const PROJECTILE_CELL_MS:f64=40.;
 const MAGIC_TAIL_MS:f64=64.;
 pub fn arrival_ms(e:&PresentationEvent,index:usize)->f64{
+    if let Some(bands)=e.animation.as_ref().and_then(|a|a.arrival_steps.as_ref()).filter(|b|!b.is_empty()) {
+        return bands.get(index).copied().map_or_else(||f64::from(bands.iter().copied().max().unwrap())+1.,f64::from)*MAGIC_CELL_MS;
+    }
     match e.animation.as_ref().map(|a|a.delivery){
         Some(Delivery::Magic)=>index as f64*MAGIC_CELL_MS,
         Some(Delivery::Projectile)=>index as f64*PROJECTILE_CELL_MS,
@@ -334,7 +337,11 @@ pub fn arrival_ms(e:&PresentationEvent,index:usize)->f64{
 /// The beam head leaves a cell when it advances to the next one. Its final
 /// cell gets a full step too; the fading light tail is not the moving head.
 pub fn departure_ms(e:&PresentationEvent,index:usize)->f64{
-    arrival_ms(e,index+1)
+    if e.animation.as_ref().is_some_and(|a|a.arrival_steps.is_some()) {
+        arrival_ms(e,index)+MAGIC_CELL_MS
+    } else {
+        arrival_ms(e,index+1)
+    }
 }
 fn travel_end(e:&PresentationEvent)->f64{
     e.animation.as_ref().map_or(140.,|a|if a.delivery==Delivery::Local{140.}else{arrival_ms(e,a.cells.len().max(1))})
@@ -363,6 +370,7 @@ fn action_tiles(cue: &Cue, age: f64, reduced: bool) -> Vec<Tile> {
     if age < 0. || age >= duration || a.cells.is_empty() { return vec![]; }
     let color = e.color.as_ref().map_or_else(|| {
         if a.delivery==Delivery::Projectile && a.proposal=="shared" {return [195,199,208];}
+        if a.proposal=="E03" && a.arrival_steps.is_some() {return proposal_color("A02");}
         if a.proposal.starts_with('E') {
             for (word, color) in [("warm", [237,190,112]), ("green", [149,211,105]),
                 ("red", [231,116,123]), ("crimson", [231,116,123]),
@@ -387,7 +395,8 @@ fn action_tiles(cue: &Cue, age: f64, reduced: bool) -> Vec<Tile> {
     };
     if projectile || magic {
         if reduced {
-            return vec![tile(a.cells.last().unwrap(), 0.55, None)];
+            return if a.arrival_steps.is_some() { a.cells.iter().map(|p|tile(p,0.55,None)).collect() }
+                else { vec![tile(a.cells.last().unwrap(), 0.55, None)] };
         }
         if projectile {
             let head=(age/PROJECTILE_CELL_MS) as usize;

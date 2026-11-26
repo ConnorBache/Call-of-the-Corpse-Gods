@@ -386,14 +386,13 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
     // Invisibility is a player status cue, independent of custom identity ink.
     // Retain the same illumination response and all other appearance settings.
     if !invisible_player { fg = entity.color; }
-    let identity_outline = (!player && !telepathic && kind == "dire-bear"
+    let plain_black = !player && !telepathic && kind == "dire-bear"
         && run.simulation_revision.value_or(29.) >= 50. && glyph == "B" && fg == [0,0,0]
         && entity.background.is_none()
         && profile.value("entities.creatures.dire-bear.inherited").and_then(serde_json::Value::as_bool) == Some(true)
         && ["brightness","saturation"].iter().all(|field|profile.number(&format!("entities.creatures.dire-bear.{field}"))==1.)
         && profile.value("entities.defaults") == crate::appearance_profile::Profile::defaults().value("entities.defaults")
-        && profile.value("global") == crate::appearance_profile::Profile::defaults().value("global"))
-        .then_some([190,190,190]);
+        && profile.value("global") == crate::appearance_profile::Profile::defaults().value("global");
     let bg = backgrounds.get(i).copied().unwrap_or([5, 4, 12]);
     Cell {
         dream_entity: corpse_core::dreamwalking::dream_actor(run, a),
@@ -414,7 +413,8 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         fg,
         bg,
         entity_ink: Some(crate::render::EntityInk {
-            identity_outline,
+            identity_outline:None,
+            plain_black,
             color: fg,
             player,
             telepathic,
@@ -638,6 +638,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             );
             let ink = crate::render::EntityInk {
                 identity_outline: None,
+                plain_black:false,
                 color: style.color,
                 player: false,
                 telepathic: false,
@@ -2108,7 +2109,7 @@ pub fn entity_ink(
             true,
         );
     }
-    if ink.identity_outline.is_some() { return ink.color; }
+    if ink.plain_black || ink.identity_outline.is_some() { return ink.color; }
     let mut base = ink.color;
     if ink.detected {
         if p.text("fog.revealColor") != "#87b7f3" {

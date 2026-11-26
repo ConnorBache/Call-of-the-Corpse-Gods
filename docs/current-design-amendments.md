@@ -1076,3 +1076,14 @@ cloud. It applies the ordinary caustic damage and hallucinogenic exposure
 rules together, preserving each component's immunities. Ordinary Gassers
 still emit caustic gas. Existing saves adopt these changes on the next
 recorded command; old replay prefixes retain their original behavior.
+
+### R52 committed abilities and Dire Bear glyphs
+
+Keep Chronicle entries for committed active abilities and visible enemy casts,
+even when their animation is absent, the action is free, or their effect
+misses. Failed admission must not appear as a successful cast; unobserved
+creatures are not identified. Routine AI waits and recoveries stay quiet.
+
+The inherited Dire Bear map, sidebar, and bestiary glyph is a plain black
+`B` without a neutral outline. Existing telepathy and explicit appearance
+overrides still apply.

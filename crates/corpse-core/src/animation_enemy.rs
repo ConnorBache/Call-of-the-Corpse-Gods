@@ -58,8 +58,14 @@ pub fn gas_deposited(r:&Run,a:&Actor,cell:usize,before:(bool,f64),gas:&str,key:&
     let (after_type,after_volume)=gas_cell(r,cell);
     if after_type!=Some(gas) || after_volume<=0. || (before.0 && before.1==after_volume) {return;}
     let Some(f)=r.floor() else{return};
-    events::cue(r,a,key,if matches!(gas, "hallucinogenic" | crate::death_gas_rules::GAS){"ripple-exhale-violet"}else{"ripple-exhale-green"},Stage::Special,
-        &[EventPoint{x:(cell%f.width())as f64,y:(cell/f.width())as f64}]);
+    let (x,y)=((cell%f.width()) as i32,(cell/f.width()) as i32);
+    // Short one-tile-radius scream; visual only, not a gas/status footprint.
+    let cells:Vec<_>=((-1i32)..=1).flat_map(|dy|((-1i32)..=1).filter_map(move |dx|
+        (dx.abs()+dy.abs()<=1 && x+dx>=0 && y+dy>=0).then_some(EventPoint{x:(x+dx) as f64,y:(y+dy) as f64}))).collect();
+    let color=if matches!(gas,"hallucinogenic"|crate::death_gas_rules::GAS) {"#ce9cff"}else{"#d1ffc3"};
+    let serial=events::emission_serial();
+    events::cue(r,a,key,"wave-gasser",Stage::Special,&cells);
+    events::decorate(serial,key,"wave-gasser",EventPoint{x:x as f64,y:y as f64},color,None);
 }
 /// Optional rejection glints/static classifications deliberately have no idle emitter.
 pub const STATIC_ONLY: &[&str] = &["E15","E21","E24","E25","E26","E27","E28","E29","E30","E32","E36","E41","E43","E44","E54","E55","E68","E69"];
@@ -221,15 +227,17 @@ pub fn wave(r:&Run,a:&Actor,key:&str,white:bool,radius:Option<f64>,los:bool,audi
     }
 
     #[test] fn paid_exhalation_marks_only_committed_deposit_for_both_gas_types() {
-        for (kind,gas,style) in [("pale:Breather","caustic","ripple-exhale-green"),("pale:Greater Breather","hallucinogenic","ripple-exhale-violet")] {
+        for (kind,gas,current) in [("pale:Breather","caustic",true),("pale:Greater Breather","hallucinogenic",false),("pale:Greater Breather",crate::death_gas_rules::GAS,true)] {
             let mut r=room();r.actors_at_mut(r.depth).clear();
+            r.death_gas_rules_from=if current {0usize.into()}else{crate::Field::Missing};
             let mut a=crate::population::create_actor_revision(kind,900.,4.,2.,false,52.).unwrap();
             a.state="hunting".into();a.energy=100.;r.actors_at_mut(r.depth).push(a.clone());
             let player=r.player.id;let w=r.floor().unwrap().width();let cell=2*w+4;
             events::begin();assert!(crate::ai::enemy_action_options(&mut r,900.,player,false).unwrap());
             let out=events::finish();let cues:Vec<_>=out.iter().filter_map(|e|e.animation.as_ref()).filter(|a|a.proposal=="E57").collect();
-            assert_eq!(cues.len(),1);assert_eq!(cues[0].style,style);
-            assert_eq!(cues[0].cells,vec![EventPoint{x:4.,y:2.}]);
+            assert_eq!(cues.len(),1);assert_eq!(cues[0].style,"wave-gasser");
+            assert!(cues[0].cells.contains(&EventPoint{x:4.,y:2.}));
+            assert!(cues[0].cells.len()>1 && cues[0].cells.iter().all(|p|(p.x-4.).abs()+(p.y-2.).abs()<=1.));
             assert_eq!(gas_cell(&r,cell).0,Some(gas));assert!(gas_cell(&r,cell).1>0.);
             for neighbor in [cell-1,cell+1,cell-w,cell+w] {assert_eq!(gas_cell(&r,neighbor).1,0.);}
         }

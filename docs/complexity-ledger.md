@@ -2512,3 +2512,9 @@ exposed actors. UI presentation reuses the existing gas blend per observed
 cell and hazard-inspection paths. Replay admission and temporal preservation
 add one scalar command-boundary stamp; no new world copy or event log is
 required. These are analytical bounds, not benchmark results.
+
+## R52 enemy breath animation
+
+See [enemy breath presentation](revision52-enemy-breath-animation.md) for
+the exact footprint, visibility and action checkpoints, and the bounded
+travel-band and compositor costs. No environment or damage rule is changed.

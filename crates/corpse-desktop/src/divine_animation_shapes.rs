@@ -13,6 +13,7 @@ pub fn duration(e:&PresentationEvent)->Option<f64>{
  else if s=="line-grow"||s=="line-hold"{Some(a.cells.len().max(1) as f64*MAGIC_CELL_MS+50.)}
  else if s=="thread-grow"{Some(a.cells.len().max(1) as f64*32.+100.)}
  else if (s=="map-reveal"||s.starts_with("wave-reveal")){Some(900.)}
+ else if s=="wave-gasser"{Some(230.)}
  else if s=="light100"{Some(a.cells.len().max(1) as f64*30.+50.)}
  else if s.starts_with("moving-actor"){Some(a.cells.len().max(1) as f64*60.+100.)}
  else {None}
@@ -29,6 +30,13 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
  if reduced{return Some(a.cells.iter().map(|p|make(p.x as i32,p.y as i32,0.55,None)).collect())}
  let phase=(age/total).clamp(0.,1.);
  let allowed:BTreeSet<_>=a.cells.iter().map(|p|(p.x as i32,p.y as i32)).collect();
+ if s=="wave-gasser" {
+  return Some(allowed.into_iter().filter_map(|(x,y)| {
+   let offset=if (x,y)==center {0.}else{70.};
+   let t=age-offset;
+   (t>=0.&&t<150.).then(||make(x,y,0.85*(1.-t/150.),None))
+  }).collect());
+ }
  if s.starts_with("nova-"){
   // Deterministic cellular arrival field, no simulation RNG. Weighted neighbor
   // growth avoids the old eight-neighbor Chebyshev (perfect square) front.
@@ -89,7 +97,7 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
 
 #[cfg(test)]mod tests{
  use super::*;use corpse_core::events::{AnimationCue,Delivery,EventPoint,Stage};
- fn event(style:&str)->PresentationEvent{let cells=(-2..=2).flat_map(|y|(-2..=2).map(move|x|EventPoint{x:x as f64,y:y as f64})).collect();PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P01".into(),style:style.into(),stage:Stage::Special,action:1,cells,delivery:Delivery::Local,surface:None,item_id:None})}}
+ fn event(style:&str)->PresentationEvent{let cells=(-2..=2).flat_map(|y|(-2..=2).map(move|x|EventPoint{x:x as f64,y:y as f64})).collect();PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P01".into(),style:style.into(),stage:Stage::Special,action:1,cells,delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})}}
  #[test]fn commandment_group_is_short_and_never_interpolates_portal_gap(){
   let mut e=event("moving-actor-commandment");e.glyph=Some("g".into());
   e.animation.as_mut().unwrap().cells=vec![EventPoint{x:1.,y:1.},EventPoint{x:2.,y:1.},EventPoint{x:20.,y:8.}];

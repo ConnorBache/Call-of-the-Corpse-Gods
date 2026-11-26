@@ -192,6 +192,7 @@ pub fn water_jet(r: &mut Run, id: f64, target: f64) -> Result<bool, String> {
         return Ok(false);
     }
     if crate::projectiles::possible_shot_range(r,&a,&b,6.).is_none()||!engine::enemy_spend(r,id,8.){return Ok(false)}
+    crate::monster_horn::report_cast(r,&a,&b,"Water Jet");
     let p=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
     crate::events::tag_path(&a,"E47","bolt-blue");
     let range=crate::projectiles::traveled_distance(r,&a,b.x,b.y,&p);

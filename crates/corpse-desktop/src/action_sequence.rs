@@ -31,7 +31,7 @@ impl Sequence {
         for action in actions {
             if let Some(index) = frames.iter().rposition(|f| f.action < action) { selected.insert(index); }
         }
-        for cue in &cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")) {
+        for cue in &cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")||a.arrival_steps.is_some()) {
             let action=cue.event.animation.as_ref().unwrap().action;
             if let Some(index)=frames.iter().position(|f|f.action==action){selected.insert(index);}
         }}
@@ -75,6 +75,22 @@ impl Sequence {
             }
         }
         for cue in &cues {
+            let Some(a)=cue.event.animation.as_ref().filter(|a|a.proposal=="E03" && !cue.static_marks) else{continue};
+            let Some(bands)=a.arrival_steps.as_ref() else{continue};
+            let Some((_,after))=self.frames.iter().find(|(id,_)|*id==a.action) else{continue};
+            let base=self.frames.iter().rev().find(|(id,_)|*id<a.action)
+                .map(|(_,v)|v).or(self.before.as_ref()).unwrap();
+            for band in 0..=bands.iter().copied().max().unwrap_or(0).min(5) {
+                let reached:std::collections::BTreeSet<_>=a.cells.iter().zip(bands).filter(|(_,i)|**i<=band)
+                    .map(|(p,_)|(p.x as usize,p.y as usize)).collect();
+                if let Some(view)=breath_ignitions(base,after,&reached) {
+                    let start=cue.started+(band as f64+1.)*crate::effects::MAGIC_CELL_MS;
+                    self.reveals.push((start,cue.started+duration(&cue.event),Rc::new(view)));
+                }
+            }
+        }
+        self.reveals.sort_by(|a,b|a.0.total_cmp(&b.0));
+        for cue in &cues {
             let end = cue.started + duration(&cue.event);
             self.finish = self.finish.max(end);
             if let Some(a) = &cue.event.animation {
@@ -96,6 +112,37 @@ impl Sequence {
     }
 }
 
+/// O(V log R) per displayed band for V view layers and R reached coordinates.
+/// Only swap terrain/fire at tiles observed by both boundaries; actor state and
+/// the HUD wait for the normal action boundary.
+fn breath_ignitions(base:&View,after:&View,reached:&std::collections::BTreeSet<(usize,usize)>)->Option<View> {
+    if base.depth!=after.depth||base.dreamwalking!=after.dreamwalking||base.width!=after.width||base.height!=after.height {return None;}
+    let pre=base.terrain_snapshot.as_ref()?;
+    let post=after.terrain_snapshot.as_ref()?;
+    let allowed:std::collections::BTreeSet<_>=reached.iter().copied().filter(|&(x,y)| {
+        let at=y*base.width+x;
+        let (Some(was),Some(is))=(pre.cells.get(at),post.cells.get(at)) else{return false;};
+        if !(was.current&&was.direct&&is.current&&is.direct) {return false;}
+        let old=was.hazards.as_ref().and_then(|h|h.fire.as_ref());
+        let new=is.hazards.as_ref().and_then(|h|h.fire.as_ref());
+        new.is_some() && (old!=new || was.tile!=is.tile)
+    }).collect();
+    if allowed.is_empty(){return None;}
+    let mut view=base.clone();
+    view.cells.clear();
+    let selected=|c:&crate::render::Cell|allowed.contains(&(c.x,c.y));
+    view.cells.extend(base.cells.iter().take(base.terrain_count).filter(|c|!selected(c)).cloned());
+    view.cells.extend(after.cells.iter().take(after.terrain_count).filter(|c|selected(c)).cloned());
+    view.terrain_count=view.cells.len();
+    view.cells.extend(after.cells.iter().skip(after.terrain_count).filter(|c|c.fire&&selected(c)).cloned());
+    view.cells.extend(base.cells.iter().skip(base.terrain_count).filter(|c|!c.fire||!selected(c)).cloned());
+    // Retain the original scene's knowledge rather than exposing the outcome's
+    // light sources; the precomputed cells above already contain the new fire.
+    view.terrain_snapshot=None;
+    view.hallucination_cells=view.cells.iter().enumerate().filter_map(|(i,c)|c.hallucination.is_some().then_some(i)).collect();
+    Some(view)
+}
+
 /// An enemy may be resolving in the other plane. Never paint that working
 /// context as the player's knowledge; normalize only a detached Run clone.
 pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Profile) -> View {
@@ -112,7 +159,7 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
   let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let profile=crate::appearance_profile::Profile::defaults();
   let mut before=observe(&run,profile);before.cells.clear();let mut after=before.clone();
   for x in [0,5,10] {after.cells.push(crate::render::Cell{x,y:0,glyph:".".into(),label:"revealed".into(),..Default::default()});}
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P72".into(),style:"map-reveal".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.},EventPoint{x:10.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P72".into(),style:"map-reveal".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.},EventPoint{x:10.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
   let cue=Cue{event,started:0.,held:false,static_marks:false};let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[cue],profile);
   assert_eq!(sequence.view(0.).unwrap().cells.len(),1);assert_eq!(sequence.view(400.).unwrap().cells.len(),1);assert_eq!(sequence.view(700.).unwrap().cells.len(),2);assert!(!sequence.view(700.).unwrap().cells.iter().any(|c|c.x==5));assert!(sequence.view(900.).is_none());
  }
@@ -128,7 +175,7 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
   before.creatures=vec![crate::render::Creature { perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,id:2.,name:"Victim".into(),glyph:"v".into(),color:[255,255,255],state:"Hunting".into(),distance:5.,hp:10.,max_hp:10.,energy:0.,max_energy:0.,uses_energy:false,statuses:vec![],meters:vec![] }];
   before.cells=vec![crate::render::Cell {x:5,y:0,actor_id:Some(2.),glyph:"v".into(),..Default::default()},crate::render::Cell {x:10,y:0,actor_id:Some(1.),glyph:"@".into(),..Default::default()}];
   let mut after=before.clone();after.creatures.clear();after.cells[0].actor_id=None;after.cells[0].glyph="x".into();after.hp=0.;after.dead=true;after.player_statuses.push(crate::statuses_ui::Status{name:"Stunned".into(),duration:Some(2.)});
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"E18".into(),style:"wave-reveal-purple".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"E18".into(),style:"wave-reveal-purple".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
   let cue=Cue{event:event.clone(),started:0.,held:false,static_marks:false};let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[cue],profile);
   let early=sequence.view(324.).unwrap();assert_eq!(early.creatures[0].hp,10.);assert_eq!(early.cells.iter().find(|c|c.x==5).unwrap().glyph,"v");assert_eq!(early.hp,50.);assert!(!early.dead);assert!(early.player_statuses.is_empty());
   let middle=sequence.view(325.).unwrap();assert!(middle.creatures.is_empty());assert_eq!(middle.cells.iter().find(|c|c.x==5).unwrap().glyph,"x");assert_eq!(middle.hp,50.);assert!(!middle.dead);assert!(middle.player_statuses.is_empty());
@@ -151,7 +198,7 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
   let mut after=before.clone();after.log=vec!["Future".into()];
   after.cells=vec![crate::render::Cell{x:5,y:0,glyph:".".into(),..Default::default()},crate::render::Cell{x:5,y:0,glyph:"B".into(),actor_id:Some(2.),..Default::default()}];
   after.creatures=vec![crate::render::Creature { perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,id:2.,name:"Bear".into(),glyph:"B".into(),color:[255,255,255],state:"Sleeping".into(),distance:5.,hp:10.,max_hp:10.,energy:0.,max_energy:0.,uses_energy:false,statuses:vec![],meters:vec![] }];
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-telepathy".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-telepathy".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
   let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[Cue{event:event.clone(),started:0.,held:false,static_marks:false}],profile);
   assert!(sequence.view(324.).unwrap().creatures.is_empty());assert!(sequence.view(324.).unwrap().cells.is_empty());
   let reached=sequence.view(325.).unwrap();assert_eq!(reached.creatures[0].name,"Bear");assert_eq!(reached.cells.len(),2);assert_eq!(reached.log,vec!["Before"]);assert!(reached.terrain_snapshot.is_none());
@@ -161,7 +208,7 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
  #[test] fn shattering_wall_remains_during_crystal_flash(){
   let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let profile=crate::appearance_profile::Profile::defaults();
   let mut before=observe(&run,profile);before.cells=vec![crate::render::Cell{x:0,y:0,glyph:"#".into(),..Default::default()}];let mut after=before.clone();after.cells[0].glyph=".".into();
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-shattering".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-shattering".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
   let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[Cue{event,started:0.,held:false,static_marks:false}],profile);
   assert_eq!(sequence.view(119.).unwrap().cells[0].glyph,"#");assert_eq!(sequence.view(120.).unwrap().cells[0].glyph,".");
  }

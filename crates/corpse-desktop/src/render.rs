@@ -87,6 +87,8 @@ pub enum Animation {
 pub struct EntityInk {
     /// Exact default identity ink with a small neutral readability outline.
     pub identity_outline: Option<Rgb>,
+    /// Designer-authored black Dire Bear ink never lifts for contrast.
+    pub plain_black: bool,
     pub color: Rgb,
     pub player: bool,
     pub telepathic: bool,
@@ -3473,7 +3475,7 @@ fn game_color(p: &crate::appearance_profile::Profile, path: &str) -> Rgb {
 pub(crate) fn readable_cell_colors(cell: &Cell) -> (Rgb, Rgb) {
     if cell.display_light.is_some() { return (cell.fg, cell.bg); }
     if let Some(entity) = cell.entity_ink {
-        let fg = if entity.important && !entity.remembered && !entity.telepathic && entity.identity_outline.is_none() {
+        let fg = if entity.important && !entity.remembered && !entity.telepathic && !entity.plain_black && entity.identity_outline.is_none() {
             crate::color::distinguish(cell.fg, cell.bg, if entity.player { 5. } else { 3.8 })
         } else { cell.fg };
         return (fg, cell.bg);

@@ -186,7 +186,14 @@ pub fn activate(r:&mut Run,id:&str,target:&Field<f64>,x:&Field<f64>,y:&Field<f64
         return Ok(Some(target.as_ref().is_some_and(|target|crate::revision50_pursuit::activate(r,*target))));
     }
     if toggle(id) {
-        if r.player.active.iter().any(|s|s==id) {r.player.active.retain(|s|s!=id);return Ok(Some(false))}
+        if r.player.active.iter().any(|s|s==id) {
+            r.player.active.retain(|s|s!=id);
+            if r.simulation_revision.value_or(29.)>=52. {
+                let name=crate::progression::definition_for_revision(52.,id).map_or(id,|a|a.name.as_str());
+                engine::log(r,format!("You deactivate {name}."),"player");
+            }
+            return Ok(Some(false));
+        }
         if id==DUEL {
             let Some(a)=target.as_ref().and_then(|id|engine::actor(r,*id)).cloned() else{return Ok(Some(false))};
             if a.id==r.player.id || a.state=="ally" || a.state=="neutral" || a.hp<=0. || a.dead.value_or(false)

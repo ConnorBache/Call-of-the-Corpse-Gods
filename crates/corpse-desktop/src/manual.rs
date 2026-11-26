@@ -317,7 +317,6 @@ impl Manual {
         p.rect(ax,sy,aw,2,ink);
         p.bestiary_prose("BASE STATS",ax,sy+12,12,theme.secondary,false,theme.keyline);
         p.rect(ax+aw-32,sy+9,30,28,[16,14,18]);
-        if entry.id == "dire-bear" { p.map_identity_outline(&entry.glyph,ax+aw-30,sy+10,26,26,[190,190,190]); }
         p.map_identity(&entry.glyph,ax+aw-30,sy+10,26,26,crate::color::hex(&entry.color));
         for (i,(label,value)) in stat_rows(&entry,self.simulation_revision).iter().enumerate() {
             let cell=aw/if row {8}else{4};

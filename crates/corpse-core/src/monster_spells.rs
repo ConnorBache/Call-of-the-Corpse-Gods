@@ -129,12 +129,18 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
     }
     let actual=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
     let phase = condition(&a, "monsterSpellPhase");
+    let name = if has(&a,"bloodmancy") {
+        if phase%2.==0. {"Blood Wrest"}else{"Hemophilia"}
+    } else {
+        match phase%3. {0.=>"Slowness",1.=>"Hemophilia",_=>"Poison"}
+    };
     let actual_range=crate::projectiles::traveled_distance(r,&a,b.x,b.y,&actual);
     let Some((target,b))=actual.actor_id.filter(|_|actual_range<=7.).and_then(|id|actor(r,id).cloned().map(|b|(id,b)))else{
         let tick=r.tick;let caster=actor_mut_trusted(r,id).unwrap();
         caster.conditions.insert("monsterSpellPhase".into(),if has(&a,"bloodmancy"){phase+1.}else{phase%3.+1.});
         caster.conditions.insert("monsterSpellReadyAt".into(),tick+3.);
         caster.conditions.insert("rangedRecovery".into(),1.);
+        crate::monster_horn::report_cast(r,&a,&b,name);
         crate::events::actor_event(r,&a,"projectile","Spell dissipates",Some(crate::events::EventPoint{x:actual.x,y:actual.y}),None);
         return Ok(true)
     };
@@ -146,6 +152,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         caster.conditions.insert("monsterSpellPhase".into(), if has(&a,"bloodmancy") { phase + 1. } else { phase % 3. + 1. });
         caster.conditions.insert("monsterSpellReadyAt".into(), tick + 3.);
         caster.conditions.insert("rangedRecovery".into(), 1.);
+        crate::monster_horn::report_cast(r,&a,&b,name);
         crate::events::actor_event(r,&a,"projectile","Hallucination dissolves",Some((&b).into()),None);
         return Ok(true);
     }

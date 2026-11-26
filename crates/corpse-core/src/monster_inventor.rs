@@ -389,14 +389,21 @@ fn breathe_fire_inner(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
             crate::environment::ignite(r, x as f64, y as f64, None, Some(id))?;
         }
     }
-    if crate::events::enabled(r) {
-        // Detached presentation order only: O(C*portal metric + C log C), O(C).
-        // The authoritative ignition loop/RNG order above remains unchanged.
-        let mut cells:Vec<_>=affected.iter().copied().map(|i|(i,crate::portals::point_distance(r,&source,(i%w)as f64,(i/w)as f64))).collect();
-        cells.sort_by(|(i,a),(j,b)|a.total_cmp(b).then(i.cmp(j)));
-        let cells:Vec<_>=cells.into_iter().map(|(i,_)|crate::events::EventPoint{x:(i%w) as f64,y:(i/w) as f64}).collect();
-        crate::events::cue(r,&source,"E03","fan-orange",crate::events::Stage::Travel,&cells);
+    let breath_action=crate::events::current_action();
+    let breath_receipt=crate::events::emission_serial();
+    if crate::events::enabled(r) && crate::events::actor_observed(r,&source) {
+        // Sight and distance are evaluated at the committed footprint only.
+        // Portal/pocket jumps never interpolate an unobserved stretch.
+        let band=|r:&Run,cell:&crate::events::EventPoint| {
+            (crate::portals::point_distance(r,&source,cell.x,cell.y).ceil() as u8)
+                .clamp(1,6)-1
+        };
+        let mut cells:Vec<_>=affected.iter().copied().collect();
+        cells.sort_unstable();
+        let cells=crate::animation_amulets::cell_points(r,&cells);
+        crate::events::travel_bands(r,&source,"E03","ember",&cells,|cell|band(r,cell));
     }
+    let breath_visible=crate::events::emission_serial()!=breath_receipt;
     let victims: Vec<_> = std::iter::once(&r.player)
         .chain(r.actors_at(r.depth))
         .filter(|a| {
@@ -438,6 +445,9 @@ fn breathe_fire_inner(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
         "breathes a spreading cone of fire!",
         Some(&target),
     );
+    if breath_visible {
+        crate::events::checkpoint_for_action(r,breath_action);
+    }
     if !crate::events::enabled(r) { crate::events::actor_event(
         r,
         &updated,
@@ -452,6 +462,35 @@ fn breathe_fire_inner(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn enemy_breath_beam_has_no_cells_in_portal_gap() {
+        let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        r.player.x=33.;r.player.y=10.;r.player.stats.perception=300.;
+        r.player.hp=5000.;r.player.max_hp=5000.;
+        r.player.conditions.clear();r.player.active.clear();r.actors_at_mut(r.depth).clear();
+        let f=r.floor_mut().unwrap();let w=f.width();
+        f.tiles.fill("floor".into());f.lights.fill(100.);
+        f.doors=crate::Field::Missing;f.environment=crate::Field::Missing;
+        f.non_euclidean=crate::Field::Missing;f.speed_up=crate::Field::Missing;
+        for y in 0..f.height() {f.tiles[y*w+20]="wall".into();}
+        f.portals=vec![crate::portals_generation::PortalPair{a:10*w+12,b:10*w+30,color_index:0}].into();
+        let a=crate::population::create_actor_revision("dragon",900.,10.,10.,false,52.).unwrap();
+        r.actors_at_mut(r.depth).push(a);
+        let p=r.player.id;
+        crate::events::begin();
+        assert!(breathe_fire(&mut r,900.,p).unwrap());
+        let events=crate::events::finish();
+        let cue=events.iter().filter_map(|e|e.animation.as_ref()).find(|a|a.proposal=="E03").unwrap();
+        assert_eq!(cue.delivery,crate::events::Delivery::Magic);
+        assert!(cue.cells.iter().any(|p|p.x<20.));
+        assert!(cue.cells.iter().any(|p|p.x>30.));
+        assert!(!cue.cells.iter().any(|p|p.x>16.&&p.x<28.));
+        let bands=cue.arrival_steps.as_ref().unwrap();
+        let step=|x:f64|bands[cue.cells.iter().position(|p|p.x==x&&p.y==10.).unwrap()];
+        assert_eq!(step(12.),step(30.));
+        assert!(step(31.)>step(30.));
+    }
     #[test]
     fn dream_plane_fire_cone_never_applies_burning_or_rng_to_other_plane_victims() {
         let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();

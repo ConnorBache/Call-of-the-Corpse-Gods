@@ -81,13 +81,13 @@ fn revision50_creature_identity_observation_manual_and_custom_preferences() {
         assert_eq!(view.creatures.iter().find(|a|a.id==id).unwrap().name,name);
         assert_eq!(crate::inspection_ui::observe_tile(&r,c.x,c.y).title,name);
     }
-    let black=cell(&view,202.);assert_eq!(black.fg,[0,0,0]);assert_eq!(black.entity_ink.unwrap().identity_outline,Some([190,190,190]));
+    let black=cell(&view,202.);assert_eq!(black.fg,[0,0,0]);assert_eq!(black.entity_ink.unwrap().identity_outline,None);assert!(black.entity_ink.unwrap().plain_black);
     let old_inherited=Profile::default().set("entities.creatures.dire-bear.glyph","U".into()).unwrap().set("entities.creatures.dire-bear.color","#e0a368".into()).unwrap().set("entities.creatures.dire-bear.inherited",true.into()).unwrap();
-    assert!(cell(&crate::observe::observe_with_profile(&r,&old_inherited),202.).entity_ink.unwrap().identity_outline.is_some());
+    assert!(cell(&crate::observe::observe_with_profile(&r,&old_inherited),202.).entity_ink.unwrap().plain_black);
     let custom=Profile::default().set("entities.creatures.dire-bear.inherited",false.into()).unwrap()
         .set("entities.creatures.dire-bear.glyph","D".into()).unwrap().set("entities.creatures.dire-bear.color","#ff00ff".into()).unwrap();
     let custom_view=crate::observe::observe_with_profile(&r,&custom);let c=cell(&custom_view,202.);
-    assert_eq!(c.glyph,"D");assert_eq!(c.entity_ink.unwrap().identity_outline,None);
+    assert_eq!(c.glyph,"D");assert_eq!(c.entity_ink.unwrap().identity_outline,None);assert!(!c.entity_ink.unwrap().plain_black);
     assert_eq!(custom_view.creatures.iter().find(|a|a.id==202.).unwrap().color,[255,0,255]);
     let custom=custom.set("entities.creatures.pale:Biter.inherited",false.into()).unwrap().set("entities.creatures.pale:Biter.glyph","J".into()).unwrap();
     assert_eq!(cell(&crate::observe::observe_with_profile(&r,&custom),204.).glyph,"J");
@@ -101,29 +101,28 @@ fn revision50_creature_identity_observation_manual_and_custom_preferences() {
     assert_eq!(r,before);
 }
 #[test]
-fn revision50_creature_identity_black_outline_native_pixels_varied_floors() {
+fn revision50_creature_identity_plain_black_native_pixels_varied_floors() {
     for tile in ["floor","water","slime"] {
         let mut r=room();let w=r.floor().unwrap().width();r.floor_mut().unwrap().tiles[10*w+9]=tile.into();
         let view=crate::observe::observe(&r);assert_eq!(cell(&view,202.).fg,[0,0,0]);
-        assert_eq!(cell(&view,202.).entity_ink.unwrap().identity_outline,Some([190,190,190]));
+        assert_eq!(cell(&view,202.).entity_ink.unwrap().identity_outline,None);
         for (width,height) in [(1280,800),(1920,1200),(2560,1600)] {
             let mut p=Painter::new();p.resize(width,height);p.game_at(&view,"",false,0.);
             let (cw,ch,ox,oy)=p.map_layout(view.width,view.height);let c=cell(&view,202.);
             let (x,y)=(ox+c.x as i32*cw,oy+c.y as i32*ch);
-            let outline=crate::illumination_ui::paint_color([190;3],c.display_light);
-            let mut black=0;let mut neutral=0;let mut darkest=[255u8;3];
+            let mut black=0;let mut darkest=[255u8;3];
             for yy in p.native_y(y as f64)..p.native_y((y+ch) as f64) {for xx in p.native_x(x as f64)..p.native_x((x+cw) as f64) {
                 let rgb=&p.pixels[(yy as usize*p.width+xx as usize)*4..][..3];
-                // The native 8×15 atlas max is 253/255 coverage at 1×: exact
-                // black/neutral inks blend with the terrain. Compare against the
-                // illumination-graded outline, not its unlit source constant.
-                if rgb.iter().all(|&v|v<=3) {black+=1;}if rgb.iter().zip(outline).all(|(&v,e)|v.abs_diff(e)<=3) {neutral+=1;}if rgb.iter().copied().max().unwrap()<*darkest.iter().max().unwrap(){darkest.copy_from_slice(rgb);}
+                // Native resampling can leave every pixel partially covered.
+                // Black ink blends with the terrain at antialiased edges.
+                if rgb.iter().all(|&v|v<=18) {black+=1;}if rgb.iter().copied().max().unwrap()<*darkest.iter().max().unwrap(){darkest.copy_from_slice(rgb);}
             }}
             capture(&p,&format!("creature-defaults-{tile}-{width}x{height}"));
-            assert!(black>0,"black ink exceeds native antialias tolerance for {tile} {width}; darkest native pixel {darkest:?}");assert!(neutral>0,"thin neutral outline vanished for {tile} {width}");
-            let mut without_outline=crate::observe::observe(&r);for c in &mut without_outline.cells {if c.actor_id==Some(202.) {c.entity_ink.as_mut().unwrap().identity_outline=None;}}
-            let mut normal=Painter::new();normal.resize(width,height);normal.game_at(&without_outline,"",false,0.);
-            // The outline never fills the tile's corners or changes its terrain.
+            assert!(black>0,"black ink exceeds native antialias tolerance for {tile} {width}; darkest native pixel {darkest:?}");
+            let mut with_outline=view.clone();for c in &mut with_outline.cells {if c.actor_id==Some(202.) {c.entity_ink.as_mut().unwrap().identity_outline=Some([190;3]);}}
+            let mut normal=Painter::new();normal.resize(width,height);normal.game_at(&with_outline,"",false,0.);
+            assert_ne!(p.pixels,normal.pixels,"the removed outline changes the native pixels");
+            // The bare glyph leaves the terrain beyond its mask untouched.
             for (xx,yy) in [(x,y),(x+cw-1,y),(x,y+ch-1),(x+cw-1,y+ch-1)] {
                 let at=(p.native_y(yy as f64) as usize*p.width+p.native_x(xx as f64) as usize)*4;
                 assert_eq!(&p.pixels[at..at+4],&normal.pixels[at..at+4]);

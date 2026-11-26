@@ -44,7 +44,7 @@ impl Layout {
             let step=(style.font_size*style.line_height).ceil().max(15.) as i32;
             let mut y=5;
             for line in p.wrap_text_role(Role::Secondary,&format!("{} {}",row.glyph,row.name),(self.rows.2-16-if row.reserve.is_some(){80}else{0}).max(1),13) {
-                card.lines.push(Line{hover_only:false,text:line,y,size:13,color:row.color,outline:None});y+=step;
+                card.lines.push(Line{hover_only:false,text:line,y,size:13,color:row.color,outline:None,black_initial:false});y+=step;
             }
             card.height=y+9;content.height+=card.height;content.cards.push(card);
         }
@@ -55,7 +55,7 @@ impl Layout {
     }
 }
 #[derive(Clone,Debug)]
-struct Line { hover_only:bool, text:String, y:i32, size:u16, color:super::Rgb, outline:Option<super::Rgb> }
+struct Line { hover_only:bool, text:String, y:i32, size:u16, color:super::Rgb, outline:Option<super::Rgb>, black_initial:bool }
 #[derive(Clone,Debug)]
 struct Bar { y:i32, label:String, value:String, fraction:f64, color:super::Rgb }
 #[derive(Clone,Debug)]
@@ -82,10 +82,13 @@ impl Content {
                 let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(size as f64));
                 let line=(style.font_size*style.line_height).ceil().max(size as f64+2.) as i32;
                 for s in p.wrap_text_role(Role::Secondary,s,width,size) {
-                    card.lines.push(Line{hover_only:false,text:s,y:*y,size,color,outline:None});*y+=line;
+                    card.lines.push(Line{hover_only:false,text:s,y:*y,size,color,outline:None,black_initial:false});*y+=line;
                 }
             }
-            text(p,&mut card,&mut y,width,&format!("{} {}",a.glyph,a.name),13,a.color);
+            let black_b=a.glyph=="B" && a.color==[0;3] && a.identity_outline.is_none();
+            let color=if black_b {p.profile.rgb("ui.colors.primary")} else {a.color};
+            text(p,&mut card,&mut y,width,&format!("{} {}",a.glyph,a.name),13,color);
+            if black_b {if let Some(line)=card.lines.first_mut(){line.black_initial=true;}}
             for line in &mut card.lines {line.outline=a.identity_outline;}
             y+=1;
             if !a.shared_resources {
@@ -158,7 +161,14 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         for line in &card.lines {
             if line.hover_only&&!selected{continue;}
             if let Some(outline)=line.outline {for (dx,dy) in [(-1,0),(1,0),(0,-1),(0,1)] {p.text_role(Role::Secondary,&line.text,layout.rows.0+4+dx,y+line.y+dy,line.size,outline);}}
-            p.text_role(Role::Secondary,&line.text,layout.rows.0+4,y+line.y,line.size,line.color);
+            let x=layout.rows.0+4;
+            if let Some(name)=line.black_initial.then(||line.text.strip_prefix("B")).flatten() {
+                let advance=p.measure_text_role(Role::Secondary,"B",line.size).round() as i32;
+                p.text_role(Role::Secondary,"B",x,y+line.y,line.size,[0;3]);
+                p.text_role(Role::Secondary,name,x+advance,y+line.y,line.size,line.color);
+            } else {
+                p.text_role(Role::Secondary,&line.text,x,y+line.y,line.size,line.color);
+            }
         }
         if let Some((energy,capacity))=card.reserve {
             super::resource_ui::paint_bar(p,"",&format!("{energy:.0}/{capacity:.0}"),
