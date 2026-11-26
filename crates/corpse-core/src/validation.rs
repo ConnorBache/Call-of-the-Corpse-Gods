@@ -121,6 +121,7 @@ pub fn validate(run: &Run) -> Result<()> {
     crate::minotaur_rules::validate(run).map_err(StorageError)?;
     crate::borge::validate(run).map_err(StorageError)?;
     crate::banshee_rules::validate(run).map_err(StorageError)?;
+    crate::phantasmii_blessing_rules::validate_discount(run).map_err(StorageError)?;
     crate::local_floor_rules::validate(run).map_err(StorageError)?;
     crate::minotaur_straight::validate(run).map_err(StorageError)?;
     crate::mercuria_rules::validate(run).map_err(StorageError)?;

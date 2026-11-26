@@ -29,6 +29,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         minotaur_bump_from: Field::Missing,
         borge_throw_from: Field::Missing,
         banshee_shriek_from: Field::Missing,
+        phantasmii_discount_from: Field::Missing,
         local_floor_ticks_from: Field::Missing,
         minotaur_straight_from: Field::Missing,
         mercuria_amulet_from: Field::Missing,

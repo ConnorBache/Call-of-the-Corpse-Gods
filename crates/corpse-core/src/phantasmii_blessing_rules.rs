@@ -1,6 +1,28 @@
 //! Shard generation and Blessing discount command boundary.
 use crate::{Field, Run};
 
+pub fn uses_three_blessing_discount(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && matches!(r.phantasmii_discount_from, Field::Value(_))
+}
+pub(crate) fn validate_discount(r: &Run) -> Result<(), String> {
+    if !r.phantasmii_discount_from.is_missing() && (r.simulation_revision.value_or(29.) < 52.
+        || !matches!(r.phantasmii_discount_from, Field::Value(n) if n <= r.replay.len())) {
+        return Err("Invalid Phantasmii discount command boundary".into());
+    }
+    Ok(())
+}
+pub fn admit_discount(r: &mut Run) -> Result<(), String> {
+    validate_discount(r)?;
+    if r.simulation_revision.value_or(29.) >= 52. && r.phantasmii_discount_from.is_missing() {
+        r.phantasmii_discount_from = r.replay.len().into();
+    }
+    Ok(())
+}
+pub(crate) fn apply_discount_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    if from.as_ref() == Some(&cursor) { r.phantasmii_discount_from = cursor.into(); }
+    else if cursor == 0 { r.phantasmii_discount_from = Field::Missing; }
+}
+
 pub fn current(r: &Run) -> bool {
     r.simulation_revision.value_or(29.) >= 52. && matches!(r.phantasmii_blessings_from, Field::Value(_))
 }
@@ -130,21 +152,37 @@ mod tests {
         while let Some(id) = r.offers.first().cloned() {
             engine::dispatch(&mut r, &Command::Choose { id }).unwrap();
         }
-        // Compressed 1, 2, 4, 8 are free; the next threshold is 16-10.
-        assert_eq!((r.level, r.exp, progression::level_up_cost(&r)), (5., 0., 6.));
+        // Compressed 1 and 2 are free; the next threshold is 4-3.
+        assert_eq!((r.level, r.exp, progression::level_up_cost(&r)), (3., 0., 1.));
         assert!(!crate::dreamwalking::unlocked(&r));
 
         let mut second = shards::floor_shard(r.next_id); r.next_id += 1.;
         second.quantity = 2.0.into();
         r.ground_at_mut(depth).push(GroundItem { x, y, item: second, ..Default::default() });
         engine::dispatch(&mut r, &Command::Pickup).unwrap();
-        assert_eq!(r.level, 6.);
+        assert_eq!(r.level, 4.);
+        while let Some(id) = r.offers.first().cloned() {
+            engine::dispatch(&mut r, &Command::Choose { id }).unwrap();
+        }
+        assert_eq!(r.level, 5.);
         let stack = r.inventory.iter().position(shards::is_floor_shard).unwrap();
-        assert_eq!((inventory::quantity(&r.inventory[stack]), progression::level_up_cost(&r)), (3., 2.));
+        assert_eq!((inventory::quantity(&r.inventory[stack]), progression::level_up_cost(&r)), (3., 7.));
         let raw = crate::storage::serialize(&r).unwrap();
         let saved = crate::storage::deserialize(&raw).unwrap();
-        assert_eq!(progression::level_up_cost(&saved), 2.);
+        assert_eq!(progression::level_up_cost(&saved), 7.);
         inventory::take_one(&mut r, stack);
-        assert_eq!((r.level, progression::level_up_cost(&r)), (6., 12.));
+        assert_eq!((r.level, progression::level_up_cost(&r)), (5., 10.));
+    }
+
+    #[test]
+    fn phantasmii_original_discount_is_preserved_before_replay_boundary() {
+        let mut r = startup::create_avatar_run("0-1-2:shard-discount-history").unwrap();
+        r.level = 5.;
+        r.inventory.push(shards::floor_shard(r.next_id));
+        let boundary = crate::Field::Value(1);
+        super::apply_discount_replay_policy(&mut r, &boundary, 0);
+        assert_eq!(progression::level_up_cost(&r), 6.);
+        super::apply_discount_replay_policy(&mut r, &boundary, 1);
+        assert_eq!(progression::level_up_cost(&r), 13.);
     }
 }

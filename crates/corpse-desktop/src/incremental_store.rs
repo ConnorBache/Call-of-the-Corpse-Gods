@@ -194,7 +194,10 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
     corpse_core::mercuria_rules::admit(&mut engine.run)?;
     let mercuria_amulet_migrated = !had_mercuria_amulet && corpse_core::mercuria_rules::current(&engine.run);
     let phantasmii_blessings_migrated = !had_phantasmii_blessings && corpse_core::phantasmii_blessing_rules::current(&engine.run);
-    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated || mercuria_amulet_migrated || phantasmii_blessings_migrated))
+    let had_shard_discount = corpse_core::phantasmii_blessing_rules::uses_three_blessing_discount(&engine.run);
+    corpse_core::phantasmii_blessing_rules::admit_discount(&mut engine.run)?;
+    let shard_discount_migrated = !had_shard_discount && corpse_core::phantasmii_blessing_rules::uses_three_blessing_discount(&engine.run);
+    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated || mercuria_amulet_migrated || phantasmii_blessings_migrated || shard_discount_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]

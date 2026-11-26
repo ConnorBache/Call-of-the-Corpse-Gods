@@ -71,6 +71,7 @@ fn clone_snapshot_state(run:&Run)->Run {
             minotaur_bump_from: Default::default(),
             borge_throw_from: Default::default(),
             banshee_shriek_from: Default::default(),
+            phantasmii_discount_from: Default::default(),
             local_floor_ticks_from: Default::default(),
             minotaur_straight_from: Default::default(),
             mercuria_amulet_from: Default::default(),

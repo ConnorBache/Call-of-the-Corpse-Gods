@@ -1160,7 +1160,8 @@ not while waiting for a clear shot or when releasing the beam.
 Each newly generated physical floor contains one reachable Shard of the
 Phantasmii in the waking world. This is separate from the three dream shards
 used for the existing Phantasmii ritual. Each carried shard of either kind
-reduces the Blessing cost of each next level by 10, never below zero.
+reduces the Blessing cost of each next level by 3, never below zero. Older
+recorded commands retain the discount they were played with.
 A pickup immediately checks for a level-up, and each earned choice is followed
 by another check. Shards are not spent and earned levels are not reversed.
 Existing saves use the discount and get a one-time waking shard placement

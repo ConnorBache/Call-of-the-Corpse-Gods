@@ -150,7 +150,7 @@ pub fn level_up_cost(r: &Run) -> f64 {
     if !crate::phantasmii_blessing_rules::current(r) { return base; }
     let shards: f64 = r.inventory.iter().filter(|item| crate::phantasmii_generation::is_shard(item))
         .map(crate::inventory::quantity).sum();
-    (base - crate::phantasmii_generation::BLESSING_DISCOUNT * shards).max(0.)
+    (base - crate::phantasmii_generation::blessing_discount(r) * shards).max(0.)
 }
 /// O(A²) with fixed authored A=72; deterministic god/pool and RNG order.
 pub fn level_up(r: &mut Run) {

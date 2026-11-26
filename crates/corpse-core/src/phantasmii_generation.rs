@@ -6,8 +6,14 @@ use std::collections::HashSet;
 pub const DAGGER_NAME: &str = "Dagger of the Phantasmii";
 pub const SHARD_NAME: &str = "Shards of the Phantasmii";
 pub const FLOOR_SHARD_NAME: &str = "Shard of the Phantasmii";
-pub const BLESSING_DISCOUNT: f64 = 10.;
-pub const BLESSING_DESCRIPTION: &str = "Each carried shard lowers the Blessings needed for the next level by 10, to a minimum of zero.";
+pub fn blessing_discount(r: &crate::Run) -> f64 {
+    if crate::phantasmii_blessing_rules::uses_three_blessing_discount(r) { 3. } else { 10. }
+}
+pub fn blessing_description(r: &crate::Run) -> String {
+    format!("Each carried shard lowers the Blessings needed for the next level by {}, to a minimum of zero.", blessing_discount(r))
+}
+// Stable item payload for save/replay parity. Display copy follows the live rules.
+const FLOOR_SHARD_EFFECT: &str = "Each carried shard lowers the Blessings needed for the next level by 10, to a minimum of zero.";
 pub const DAGGER_DESCRIPTION: &str = "Apply while standing on the Altar of the Phantasmii to enter Dreamwalking.";
 pub const NIGHTMARE_COUNT: usize = 4;
 pub const SHARD_COUNT: usize = 3;
@@ -23,7 +29,7 @@ pub fn is_floor_shard(i: &Item) -> bool { i.kind == "quest" && i.name == FLOOR_S
 pub fn is_shard(i: &Item) -> bool { is_dream_shard(i) || is_floor_shard(i) }
 pub fn floor_shard(id: f64) -> Item {
     Item { id, name: FLOOR_SHARD_NAME.into(), kind: "quest".into(), glyph: "*".into(),
-        identified: true.into(), quantity: 1.0.into(), effect: BLESSING_DESCRIPTION.to_string().into(), ..Default::default() }
+        identified: true.into(), quantity: 1.0.into(), effect: FLOOR_SHARD_EFFECT.to_string().into(), ..Default::default() }
 }
 pub fn dagger(id: f64) -> Item {
     Item { id, name: DAGGER_NAME.into(), kind: "tool".into(), glyph: "/".into(),

@@ -47,6 +47,8 @@ pub struct ReplayRecord {
     pub borge_throw_from: Field<usize>,
     #[serde(rename = "bansheeShriekFrom", default, skip_serializing_if = "Field::is_missing")]
     pub banshee_shriek_from: Field<usize>,
+    #[serde(rename = "phantasmiiDiscountFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub phantasmii_discount_from: Field<usize>,
     #[serde(rename = "localFloorTicksFrom", default, skip_serializing_if = "Field::is_missing")]
     pub local_floor_ticks_from: Field<usize>,
     #[serde(rename = "minotaurStraightFrom", default, skip_serializing_if = "Field::is_missing")]
@@ -119,6 +121,7 @@ impl ReplayRecord {
             minotaur_bump_from: match run.minotaur_bump_from { Field::Value(n) => n.into(), _ => Field::Missing },
             borge_throw_from: match run.borge_throw_from { Field::Value(n) => n.into(), _ => Field::Missing },
             banshee_shriek_from: match run.banshee_shriek_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            phantasmii_discount_from: match run.phantasmii_discount_from { Field::Value(n) => n.into(), _ => Field::Missing },
             local_floor_ticks_from: match run.local_floor_ticks_from { Field::Value(n) => n.into(), _ => Field::Missing },
             minotaur_straight_from: match run.minotaur_straight_from { Field::Value(n) => n.into(), _ => Field::Missing },
             mercuria_amulet_from: match run.mercuria_amulet_from { Field::Value(n) => n.into(), _ => Field::Missing },
@@ -231,6 +234,10 @@ impl ReplayRecord {
             && matches!(self.banshee_shriek_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Banshee shriek replay boundary".into()));
         }
+        if !self.phantasmii_discount_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.phantasmii_discount_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Invalid Phantasmii discount replay boundary".into()));
+        }
         if !self.local_floor_ticks_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
             && matches!(self.local_floor_ticks_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Local floor ticks replay boundary".into()));
@@ -298,6 +305,7 @@ impl ReplayRecord {
         crate::minotaur_rules::apply_replay_policy(&mut engine.run, &self.minotaur_bump_from, cursor);
         crate::borge::apply_replay_policy(&mut engine.run, &self.borge_throw_from, cursor);
         crate::banshee_rules::apply_replay_policy(&mut engine.run, &self.banshee_shriek_from, cursor);
+        crate::phantasmii_blessing_rules::apply_discount_replay_policy(&mut engine.run, &self.phantasmii_discount_from, cursor);
         crate::local_floor_rules::apply_replay_policy(&mut engine.run, &self.local_floor_ticks_from, cursor);
         crate::minotaur_straight::apply_replay_policy(&mut engine.run, &self.minotaur_straight_from, cursor);
         crate::mercuria_rules::apply_replay_policy(&mut engine.run, &self.mercuria_amulet_from, cursor);
@@ -355,6 +363,7 @@ impl ReplaySession {
         crate::minotaur_rules::apply_replay_policy(&mut initial, &record.minotaur_bump_from, 0);
         crate::borge::apply_replay_policy(&mut initial, &record.borge_throw_from, 0);
         crate::banshee_rules::apply_replay_policy(&mut initial, &record.banshee_shriek_from, 0);
+        crate::phantasmii_blessing_rules::apply_discount_replay_policy(&mut initial, &record.phantasmii_discount_from, 0);
         crate::local_floor_rules::apply_replay_policy(&mut initial, &record.local_floor_ticks_from, 0);
         crate::minotaur_straight::apply_replay_policy(&mut initial, &record.minotaur_straight_from, 0);
         crate::mercuria_rules::apply_replay_policy(&mut initial, &record.mercuria_amulet_from, 0);
@@ -412,6 +421,7 @@ impl ReplaySession {
         crate::minotaur_rules::apply_replay_policy(&mut initial, &record.minotaur_bump_from, 0);
         crate::borge::apply_replay_policy(&mut initial, &record.borge_throw_from, 0);
         crate::banshee_rules::apply_replay_policy(&mut initial, &record.banshee_shriek_from, 0);
+        crate::phantasmii_blessing_rules::apply_discount_replay_policy(&mut initial, &record.phantasmii_discount_from, 0);
         crate::local_floor_rules::apply_replay_policy(&mut initial, &record.local_floor_ticks_from, 0);
         crate::minotaur_straight::apply_replay_policy(&mut initial, &record.minotaur_straight_from, 0);
         crate::mercuria_rules::apply_replay_policy(&mut initial, &record.mercuria_amulet_from, 0);
@@ -446,7 +456,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.phantasmii_blessings_from.as_ref()==Some(&self.cursor) || self.record.mercuria_amulet_from.as_ref()==Some(&self.cursor) || self.record.local_floor_ticks_from.as_ref()==Some(&self.cursor) || self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
+        if self.record.phantasmii_blessings_from.as_ref()==Some(&self.cursor) || self.record.mercuria_amulet_from.as_ref()==Some(&self.cursor) || self.record.local_floor_ticks_from.as_ref()==Some(&self.cursor) || self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.phantasmii_discount_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -480,6 +490,7 @@ impl ReplaySession {
         crate::minotaur_rules::apply_replay_policy(&mut initial, &self.record.minotaur_bump_from, 0);
         crate::borge::apply_replay_policy(&mut initial, &self.record.borge_throw_from, 0);
         crate::banshee_rules::apply_replay_policy(&mut initial, &self.record.banshee_shriek_from, 0);
+        crate::phantasmii_blessing_rules::apply_discount_replay_policy(&mut initial, &self.record.phantasmii_discount_from, 0);
         crate::local_floor_rules::apply_replay_policy(&mut initial, &self.record.local_floor_ticks_from, 0);
         crate::minotaur_straight::apply_replay_policy(&mut initial, &self.record.minotaur_straight_from, 0);
         crate::mercuria_rules::apply_replay_policy(&mut initial, &self.record.mercuria_amulet_from, 0);

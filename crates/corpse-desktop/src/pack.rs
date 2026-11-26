@@ -1700,7 +1700,7 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
         }
         if corpse_core::phantasmii_blessing_rules::current(run) {
             text.push('\n');
-            text.push_str(corpse_core::phantasmii_generation::BLESSING_DESCRIPTION);
+            text.push_str(&corpse_core::phantasmii_generation::blessing_description(run));
         }
         return text;
     }

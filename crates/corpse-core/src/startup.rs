@@ -553,6 +553,7 @@ pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, r
         minotaur_bump_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         borge_throw_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         banshee_shriek_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        phantasmii_discount_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         local_floor_ticks_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         minotaur_straight_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         mercuria_amulet_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
