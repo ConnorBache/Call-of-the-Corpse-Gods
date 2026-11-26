@@ -1910,6 +1910,13 @@ impl Painter {
                 let cells=a.cells.iter().take(count).filter(|c|c.x>=0.&&c.y>=0.&&c.x<v.width as f64&&c.y<v.height as f64&&known[c.y as usize*v.width+c.x as usize]).map(|c|(c.x as usize,c.y as usize)).collect::<Vec<_>>();
                 let color=if a.proposal=="P08"{[255,211,64]}else{[255,48,64]};
                 crate::persistent_ability_overlays::paint_thread(self,(cw,ch,ox,oy),&cells,color,110);
+                // The new end is visible immediately at a portal exit, even
+                // before the next cell gives the thread a line segment there.
+                if !reduced {
+                    if let Some(&(x,y))=cells.last() {
+                        self.blend_rect(ox+x as i32*cw+cw/2-1,oy+y as i32*ch+ch/2-1,2,2,color,110);
+                    }
+                }
             }
         }}}
         // Suppress every previous step's snapshot glyph until the push completes.

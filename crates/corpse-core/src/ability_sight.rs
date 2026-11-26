@@ -5,9 +5,13 @@ use crate::{Actor, Run, movement::Point};
 /// observation mutation. O(F + K²R) time and O(K + R) scratch for K portal endpoints
 /// and maximum ray length R; F is floor lookup. Creature occupancy is not a wall.
 pub fn line_of_effect(r: &Run, x: f64, y: f64) -> bool {
-    let Some(f) = crate::dreamwalking::floor_for(r, &r.player) else { return false; };
-    let Some(at) = crate::portals::cell(f, x, y) else { return false; };
-    let from = Point { x: r.player.x as i32, y: r.player.y as i32 };
+    effect_route(r, &r.player, x, y).is_some()
+}
+
+pub(crate) fn effect_route(r: &Run, origin: &Actor, x: f64, y: f64) -> Option<crate::portals::Route> {
+    let f = crate::dreamwalking::floor_for(r, origin)?;
+    let at = crate::portals::cell(f, x, y)?;
+    let from = Point { x: origin.x as i32, y: origin.y as i32 };
     let to = crate::portals::point(f, at);
     let pass = |p| crate::projectiles::terrain_pass(r.simulation_revision.value_or(29.), f, p);
     // An opaque destination may itself be selected (for example Sparkle on a
@@ -17,7 +21,7 @@ pub fn line_of_effect(r: &Run, x: f64, y: f64) -> bool {
         let cells = crate::portals::linear_cells(a, b);
         cells.iter().skip(1).take(cells.len().saturating_sub(2)).all(|p| pass(*p))
     };
-    crate::portals::route_filtered(f, from, to, false, clear, |a, b| pass(a) && pass(b)).is_some()
+    crate::portals::route_filtered(f, from, to, false, clear, |a, b| pass(a) && pass(b))
 }
 
 /// Telepathy supplies creature knowledge, never permission to affect through a

@@ -1075,7 +1075,7 @@ fn activate_inner(
             if !pay(r, id, 20.0) {
                 return Ok(false);
             }
-            crate::animation_shapes::line(r,&r.player,crate::events::EventPoint{x,y},"P58","light100","#ffffff");
+            crate::animation_shapes::effect_line(r,&r.player,crate::events::EventPoint{x,y},"P58","light100","#ffffff");
             crate::environment::place_sparkle(r, x, y).map_err(EngineError)?;
             let wet=r.floor().is_some_and(|f|if r.simulation_revision.value_or(29.)>=52. {
                 crate::revision51_fire_water::quenches(f,y as usize*f.width()+x as usize,r.simulation_revision.value_or(29.))

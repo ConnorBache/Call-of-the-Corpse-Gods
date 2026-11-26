@@ -2477,3 +2477,12 @@ draw for frontier growth.
 R52 Blood Mist fire exclusion is O(1) at each existing fuel-layer query, with
 no additional allocation, RNG draw, or map scan. Its save/replay provenance
 is one optional command offset, checked in O(1) at admission or playback.
+
+### Portal-routed sight animations
+Sight-based visual links reuse the optical or physical line-of-effect portal
+route; committed projectile routes are unchanged. With K portal endpoints and
+maximum segment raster length R, route lookup is O(F + K²R) time and O(K + R)
+scratch (F is floor lookup); flattening S route cells adds O(S) time and space.
+Only admitted observed cells paint, and the renderer does not fill a portal's
+screen-space gap. Persistent threads do the same query on their existing
+observation pass; no new simulation, randomness, or per-frame route search.

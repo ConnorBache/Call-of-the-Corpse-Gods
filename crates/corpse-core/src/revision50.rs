@@ -152,7 +152,7 @@ fn implant_thought(r:&mut Run,target:&Field<f64>,x:&Field<f64>,y:&Field<f64>)->R
         && crate::portals::actor_chebyshev(r,&attacker,a)<=1.).cloned() else {return Ok(false)};
     if engine::attack_blocker(r,&attacker,&victim,0.,false).is_some() {return Ok(false)}
     if crate::abilities::energy_activation_silenced(r,&r.player) || !crate::revision50_ability_energy::spend(r,r.player.id,"numo-implant-thought",15.) {return Ok(false)}
-    crate::animation_shapes::line(r,&r.player,(&attacker).into(),"P19","line-hold","#a040ff");
+    crate::animation_shapes::effect_line(r,&r.player,(&attacker).into(),"P19","line-hold","#a040ff");
     engine::attack(r,tid,victim.id,1.)?;
     engine::log(r,"You use Implant Thought.","player");
     Ok(true)

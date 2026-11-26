@@ -239,7 +239,7 @@ pub fn create(r: &mut Run, x: f64, y: f64) -> Result<f64, String> {
     if crate::dreamwalking::enabled(r) {a.conditions.insert("phantasmiiPlane".into(), if crate::dreamwalking::active(r) {1.} else {0.});}
     a.conditions.insert("halfHereClone".into(), 1.0);
     a.conditions.insert("halfHereOwner".into(), p.id);
-    crate::animation_shapes::line(r,&r.player,(&a).into(),"P29","line-grow","#40ffff");
+    crate::animation_shapes::effect_line(r,&r.player,(&a).into(),"P29","line-grow","#40ffff");
     r.actors_at_mut(r.depth).push(a);
     r.player.conditions.insert("halfHereId".into(), id);
     if lock_enabled(r) {

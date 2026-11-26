@@ -113,6 +113,16 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
  }
  #[test]fn box_expands_point_circle_square_and_contracts(){let e=event("box-expand");assert_eq!(tiles(&e,0.,false,[1,2,3]).unwrap().len(),1);assert_eq!(tiles(&e,100.,false,[1,2,3]).unwrap().len(),4);assert_eq!(tiles(&e,200.,false,[1,2,3]).unwrap().len(),8);assert_eq!(tiles(&e,400.,false,[1,2,3]).unwrap().len(),16);let e=event("box-contract");assert_eq!(tiles(&e,0.,false,[1,2,3]).unwrap().len(),16);assert_eq!(tiles(&e,400.,false,[1,2,3]).unwrap().len(),1);}
  #[test]fn growing_line_keeps_completed_prefix(){let mut e=event("line-grow");e.animation.as_mut().unwrap().cells=(0..5).map(|x|EventPoint{x:x as f64,y:0.}).collect();assert_eq!(tiles(&e,0.,false,[1,2,3]).unwrap().len(),1);assert_eq!(tiles(&e,32.,false,[1,2,3]).unwrap().len(),3);assert_eq!(tiles(&e,80.,false,[1,2,3]).unwrap().len(),5);}
+ #[test]
+ fn portal_animation_growing_line_shows_the_exit_after_the_entrance_without_a_bridge() {
+    let mut e=event("line-grow");
+    e.animation.as_mut().unwrap().cells=[4,5,6,20,21,22].into_iter()
+        .map(|x|EventPoint{x:x as f64,y:4.}).collect();
+    let frame=|age|tiles(&e,age,false,[1,2,3]).unwrap().iter().map(|t|t.x).collect::<Vec<_>>();
+    assert_eq!(frame(32.),[4,5,6]);
+    assert_eq!(frame(48.),[4,5,6,20]);
+    assert_eq!(frame(80.),[4,5,6,20,21,22]);
+ }
  #[test]fn authored_beams_double_speed_without_accelerating_waves_or_actors(){
   for (style,step,tail) in [("line-hold",16.,50.),("line-grow",16.,50.),("light100",30.,50.),("moving-actor",60.,100.)] {
    let mut e=event(style);

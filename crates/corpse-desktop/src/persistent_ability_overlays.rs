@@ -45,7 +45,7 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
         out.mind_read=perimeter(&inside,w,h);
     }
     // Two maintained player links; recompute endpoints after every actor move.
-    // O(A + L) per link plus visible_actor, with L <= max(width,height).
+    // O(A + L) per link plus visible_actor and the optical route when portals exist.
     for (id,key,timer,color) in [
         ("morae-bonded-by-unseen-threads","bondedTarget",None,[255,48,64]),
         ("pelian-i-came-for-you","cameTarget",Some("cameTurns"),[255,211,64]),
@@ -53,7 +53,8 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
         if timer.map_or_else(||!run.player.active.iter().any(|s|s==id),|k|corpse_core::engine::condition(&run.player,k)<=0.) {continue;}
         let Some(a)=run.actors_at(run.depth).iter().find(|a|a.id==corpse_core::engine::condition(&run.player,key)&&a.hp>0.&&!a.dead.value_or(false)&&corpse_core::dreamwalking::same_plane(run,&run.player,a)) else {continue;};
         if !vision::visible_actor(run,a){continue;}
-        let cells=line_cells((run.player.x as i32,run.player.y as i32),(a.x as i32,a.y as i32),w.max(h)+1).into_iter().filter(|&(x,y)|
+        let cells=corpse_core::animation_shapes::connection_cells(run,&run.player,a.into(),false)
+            .into_iter().map(|p|(p.x as usize,p.y as usize)).filter(|&(x,y)|
             x<w&&y<h&&o.and_then(|o|o.cells.get(y*w+x)).is_some_and(|c|c.current&&c.tile.is_some())).collect();
         out.threads.push(Thread{cells,color});
     }
@@ -99,15 +100,6 @@ fn perimeter(inside:&[bool],w:usize,h:usize)->Vec<Edge> {
         if y+1==h||!inside[(y+1)*w+x]{out.push(Edge{x,y:y+1,vertical:false});}
     }}
     out
-}
-/// Ordered Bresenham connection, never a gameplay path or visibility grant.
-fn line_cells((mut x,mut y):(i32,i32),(tx,ty):(i32,i32),limit:usize)->Vec<(usize,usize)> {
-    let dx=(tx-x).abs();let dy=-(ty-y).abs();
-    if dx.max(-dy) as usize>limit{return vec![];}
-    let sx=if x<tx{1}else{-1};let sy=if y<ty{1}else{-1};let mut error=dx+dy;let mut cells=Vec::new();
-    loop {if x>=0&&y>=0{cells.push((x as usize,y as usize));}if x==tx&&y==ty{break;}
-        let e=2*error;if e>=dy{error+=dy;x+=sx;}if e<=dx{error+=dx;y+=sy;}}
-    cells
 }
 /// Draw only neighboring admitted cells, never bridge a hidden gap.
 pub fn paint_thread(p:&mut Painter,layout:(i32,i32,i32,i32),cells:&[(usize,usize)],color:[u8;3],alpha:u8){
