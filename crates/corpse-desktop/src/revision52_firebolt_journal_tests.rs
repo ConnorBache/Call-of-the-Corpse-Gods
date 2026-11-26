@@ -71,13 +71,15 @@ fn export_twice(initial:&Run,source:&Core) {
     }
 }
 #[test]
-fn half_here_legacy_journal_tail_replays_before_enabling_the_lock() {
+fn half_here_locked_journal_tail_replays_before_enabling_paid_placement() {
     use corpse_core::half_here;
     for metadata in [false, true] {
         let mut initial = room();
         initial.player.abilities.push(half_here::ID.into());
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut initial).unwrap();
         let mut old = Core::new(initial.clone()).unwrap();
-        old.run.half_here_lock_from = Field::Missing;
+        old.run.half_here_energy_from = Field::Missing;
+        old.run.half_here_lock_from = 0usize.into();
         let checkpoint = session_store::encode(&old, Kind::Fixture).unwrap();
         let header = if metadata {log::Header::for_metadata_revision(Some(52.))}
             else {log::Header::for_revision(Some(52.))}.unwrap();
@@ -91,11 +93,14 @@ fn half_here_legacy_journal_tail_replays_before_enabling_the_lock() {
         }
         let (mut upgraded, _, migrated) = super::super::incremental_store::decode_with_migration(&file.bytes).unwrap();
         assert!(migrated);
+        assert!(half_here::clone_id(&upgraded.run).is_some());
+        assert_eq!(upgraded.run.half_here_energy_from, 2usize.into());
+        assert_eq!(half_here::turns_until_dismissal(&upgraded.run), 0);
+        upgraded.dispatch(&dismiss).unwrap();
         assert!(half_here::clone_id(&upgraded.run).is_none());
-        assert_eq!(upgraded.run.half_here_lock_from, 2usize.into());
         upgraded.dispatch(&place).unwrap();
         upgraded.dispatch(&dismiss).unwrap();
-        assert_eq!(half_here::turns_until_dismissal(&upgraded.run), 4);
+        assert_eq!(upgraded.run.player.ability_reserves.as_ref().unwrap()[half_here::ID].energy, 5.);
         export_twice(&initial, &upgraded);
     }
 }

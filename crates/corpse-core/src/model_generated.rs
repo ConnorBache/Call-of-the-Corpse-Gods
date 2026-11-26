@@ -1738,6 +1738,8 @@ pub struct Run {
     pub blood_mist_fire_rules_from: Field<usize>,
     #[serde(rename = "halfHereLockFrom", default, skip_serializing_if = "Field::is_missing")]
     pub half_here_lock_from: Field<usize>,
+    #[serde(rename = "halfHereEnergyFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub half_here_energy_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

@@ -376,7 +376,7 @@ fn activate_inner(
                 }
                 let cost = if crate::revision50::enabled(r) {
                     let mut preview = crate::engine::actor(r, tid).unwrap().clone();
-                    let cost = highest_energy_cost_for(&mut preview, r.simulation_revision.value_or(29.), crate::balance_rules::current(r));
+                    let cost = highest_energy_cost_for(&mut preview, r.simulation_revision.value_or(29.), crate::balance_rules::current(r), crate::half_here::paid_placement(r));
                     if (cost > 0.0 && energy_activation_silenced(r, &r.player))
                         || !crate::revision50_ability_energy::can_pay(r, r.player.id, id, (cost-prepaid_upkeep(r,&r.player,id)).max(0.0)) {
                         return Ok(false);
@@ -711,6 +711,10 @@ fn activate_inner(
                         "player",
                     );
                     return Ok(false);
+                }
+                if crate::half_here::paid_placement(r) {
+                    crate::creature_index::check_next_creature_id(r).map_err(EngineError)?;
+                    if !pay(r, id, crate::half_here::PLACEMENT_ENERGY) { return Ok(false); }
                 }
                 crate::half_here::create(r, *x.as_ref().unwrap(), *y.as_ref().unwrap()).map_err(EngineError)?;
             }
@@ -1216,11 +1220,12 @@ fn declared_energy_cost(description: &str) -> f64 {
 pub fn highest_energy_cost(r: &mut Run, target_id: f64) -> Result<f64, EngineError> {
     let revision=r.simulation_revision.value_or(29.);
     let balanced=crate::balance_rules::current(r);
+    let paid_half_here=crate::half_here::paid_placement(r);
     let target = crate::engine::actor_mut_trusted(r, target_id)
         .ok_or_else(|| EngineError("Unspeak target missing".into()))?;
-    Ok(highest_energy_cost_for(target, revision, balanced))
+    Ok(highest_energy_cost_for(target, revision, balanced, paid_half_here))
 }
-fn highest_energy_cost_for(target: &mut Actor, revision: f64, balanced: bool) -> f64 {
+fn highest_energy_cost_for(target: &mut Actor, revision: f64, balanced: bool, paid_half_here: bool) -> f64 {
     crate::enemy_traits::initialize_enemy_traits_revision(target,revision);
     let mut cost = crate::engine::condition(target, "maxAbilityCost").max(0.0);
     if revision>=33. && target.abilities.iter().any(|s|s=="enemy:beast:witch") { cost=cost.max(10.); }
@@ -1231,6 +1236,8 @@ fn highest_energy_cost_for(target: &mut Actor, revision: f64, balanced: bool) ->
         if let Some(ability) = crate::progression::catalog_for_revision(revision).iter().find(|a| &a.id == id) {
             let declared = if revision >= 45.0 && id == "anavani-nova" {
                 nova_attack_cost(revision)
+            } else if paid_half_here && id == crate::half_here::ID {
+                crate::half_here::PLACEMENT_ENERGY
             } else if balanced && id == "ursa-dream-of-time-gone-by" {
                 crate::balance_rules::DREAM_ANCHOR_COST
             } else {
@@ -1347,7 +1354,7 @@ pub fn projected_upkeep(r:&Run)->UpkeepProjection {
         if id=="pelian-fated-duel" && !crate::revision50::duel_upkeep_valid(r,actor) {continue;}
         let cost=if id=="dawel-unspeak" {
             actor.conditions.get("unspeakTarget").and_then(|id|r.actors_at(r.depth).iter().find(|a|a.id==*id&&!a.dead.value_or(false)&&crate::dreamwalking::same_plane(r,actor,a)))
-                .map(|a|highest_energy_cost_for(&mut a.clone(),revision,crate::balance_rules::current(r))).unwrap_or(0.)
+                .map(|a|highest_energy_cost_for(&mut a.clone(),revision,crate::balance_rules::current(r),crate::half_here::paid_placement(r))).unwrap_or(0.)
         } else {upkeep_cost_in(r,actor,id)};
         let prepaid=if crate::revision50::enabled(r)&&actor.conditions.get(&format!("upkeepPaidThrough:{id}")).is_some_and(|until|*until>=next_tick&&*until<=next_tick+1.) {
             actor.conditions.get(&format!("upkeepPaidAmount:{id}")).copied().unwrap_or(0.).max(0.)

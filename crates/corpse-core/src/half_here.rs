@@ -3,11 +3,17 @@ use crate::{Actor, Field, Run};
 pub const ID: &str = "etill-half-here";
 pub const COLOR: &str = "#c4b1e8";
 pub const MARKER: &str = "h";
+pub const PLACEMENT_ENERGY: f64 = 5.;
 const LOCK_UNTIL: &str = "halfHereLockedUntil";
 const MINIMUM_TURNS: f64 = 5.;
 
 pub fn lock_enabled(r: &Run) -> bool {
-    r.simulation_revision.value_or(29.) >= 52. && matches!(r.half_here_lock_from, Field::Value(_))
+    !paid_placement(r) && r.simulation_revision.value_or(29.) >= 52.
+        && matches!(r.half_here_lock_from, Field::Value(_))
+}
+
+pub fn paid_placement(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && matches!(r.half_here_energy_from, Field::Value(_))
 }
 
 pub(crate) fn validate_lock_policy(r: &Run) -> Result<(), String> {
@@ -17,23 +23,38 @@ pub(crate) fn validate_lock_policy(r: &Run) -> Result<(), String> {
     {
         return Err("Invalid Half Here lock command boundary".into());
     }
+    if !r.half_here_energy_from.is_missing()
+        && (r.simulation_revision.value_or(29.) < 52.
+            || !matches!(r.half_here_energy_from, Field::Value(n) if n <= r.replay.len()))
+    {
+        return Err("Invalid Half Here energy command boundary".into());
+    }
     Ok(())
 }
 
-/// Live saves adopt the lock for new placements; do not re-time an existing clone.
+/// Adopt paid placement at the command boundary without moving or charging for
+/// a clone that is already present. The retained deadline no longer applies.
 pub fn admit_current(r: &mut Run) -> Result<(), String> {
     validate_lock_policy(r)?;
-    if r.simulation_revision.value_or(29.) >= 52. && r.half_here_lock_from.is_missing() {
-        r.half_here_lock_from = r.replay.len().into();
+    if r.simulation_revision.value_or(29.) >= 52. && r.half_here_energy_from.is_missing() {
+        r.half_here_energy_from = r.replay.len().into();
     }
     Ok(())
 }
 
 pub(crate) fn apply_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    apply_boundary(&mut r.half_here_lock_from, from, cursor);
+}
+
+pub(crate) fn apply_energy_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    apply_boundary(&mut r.half_here_energy_from, from, cursor);
+}
+
+fn apply_boundary(to: &mut Field<usize>, from: &Field<usize>, cursor: usize) {
     if from.as_ref() == Some(&cursor) {
-        r.half_here_lock_from = cursor.into();
+        *to = cursor.into();
     } else if cursor == 0 {
-        r.half_here_lock_from = Field::Missing;
+        *to = Field::Missing;
     }
 }
 

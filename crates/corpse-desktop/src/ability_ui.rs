@@ -86,6 +86,9 @@ pub const RAGELIGHT_DESCRIPTION:&str="Whenever you would die, if you can pay the
 const LEGACY_RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
 pub const FUTURE_FLOOR_DESCRIPTION:&str="Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+    if id == corpse_core::half_here::ID && corpse_core::half_here::paid_placement(run) {
+        return "Spend 5 energy to place a stationary half clone on a visible, unoccupied tile. It shares your health and grants sight from its tile. Activate again at any time to dismiss it for free.";
+    }
     if id == corpse_core::half_here::ID && corpse_core::half_here::lock_enabled(run) {
         return "Place a stationary half clone on a visible, unoccupied tile. It shares your health and grants sight from its tile. It must stay there for at least 5 turns before you can dismiss it.";
     }
@@ -368,7 +371,7 @@ fn observe_with_forecast(r:&Run,id:&str,forecast:&corpse_core::abilities::Upkeep
     };
     row.name=display_text(&row.name).into_owned();
     row.description=display_text(&row.description).into_owned();
-    if r50(r) && r50_uses_energy(id) && id != "morae-see-the-future" {
+    if r50(r) && uses_energy_in(r, id) && id != "morae-see-the-future" {
         row.reserve=r.player.ability_reserves.as_ref().and_then(|m|m.get(id))
             .filter(|s|corpse_core::revision50_ability_energy::valid_reserve(s))
             .map(|s|{let s=corpse_core::revision52_reserves::project_reserve(*s,r.simulation_revision.value_or(29.));(s.energy,s.capacity)});
@@ -453,6 +456,7 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
         _ => 0.,
     }};
     let activation = match n {
+        "Half Here" if corpse_core::half_here::paid_placement(r) => corpse_core::half_here::PLACEMENT_ENERGY,
         "Implant Thought" if r50(r) => 15.,
         "Relentless Pursuit" => 10.,
         "Cogworks" if corpse_core::revision50_terrain::mode(r)==3 => 0.,
@@ -532,6 +536,9 @@ fn observe_inner(r: &Run, id: &str) -> AbilityView {
     };
     if active && n == "Dream of Time Gone By" {
         cost = "Free return".into();
+    }
+    if active && n == "Half Here" && corpse_core::half_here::paid_placement(r) {
+        cost = "Free dismissal".into();
     }
     let passive = !callable && !craft;
     if passive {
@@ -758,10 +765,13 @@ pub fn r50_uses_energy(id:&str)->bool {
         "kative-cogworks" | "kative-mini-me" | "kative-clay-army" | "kative-tinker" |
         "morae-turning-the-wheel" | "morae-sever-fate" | "morae-see-the-future" | "morae-all-seeing-eyes")
 }
+fn uses_energy_in(r: &Run, id: &str) -> bool {
+    r50_uses_energy(id) || (id == corpse_core::half_here::ID && corpse_core::half_here::paid_placement(r))
+}
 /// Expected O(ID bytes), O(text bytes) output; no resource mutation or defaults.
 pub fn reserve_summary(r: &Run, id: &str) -> Option<String> {
-    if !r50(r) {return None;}
-    let mut summary = actor_reserve_summary_for_revision(&r.player,id,r.simulation_revision.value_or(29.))?;
+    if !r50(r) || !uses_energy_in(r, id) {return None;}
+    let mut summary = format_reserve(&r.player,id,r.simulation_revision.value_or(29.))?;
     if let Some(reserve) = r.player.ability_reserves.as_ref().and_then(|m|m.get(id)) {
         if corpse_core::revision50_ability_energy::valid_reserve(reserve) {
             let reserve = corpse_core::revision52_reserves::project_reserve(*reserve,r.simulation_revision.value_or(29.));
@@ -776,6 +786,9 @@ pub fn actor_reserve_summary(actor: &corpse_core::Actor, id: &str) -> Option<Str
 }
 pub fn actor_reserve_summary_for_revision(actor: &corpse_core::Actor, id: &str, revision:f64) -> Option<String> {
     if !r50_uses_energy(id) {return None;}
+    format_reserve(actor, id, revision)
+}
+fn format_reserve(actor: &corpse_core::Actor, id: &str, revision:f64) -> Option<String> {
     let reserve=actor.ability_reserves.as_ref()?.get(id)?;
     Some(if corpse_core::revision50_ability_energy::valid_reserve(reserve) {
         let reserve=corpse_core::revision52_reserves::project_reserve(*reserve,revision);
@@ -1654,8 +1667,25 @@ mod divine_balance_presentation_tests {
         let id = corpse_core::half_here::ID;
         r.player.abilities.push(id.into());
         assert!(!observe(&r, id).description.contains("5 turns"));
-        corpse_core::half_here::admit_current(&mut r).unwrap();
+        r.half_here_lock_from = 0usize.into();
         assert!(observe(&r, id).description.contains("at least 5 turns before you can dismiss it"));
+    }
+
+    #[test]
+    fn half_here_paid_placement_updates_copy_and_reserve_but_dismissal_is_free() {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into();
+        let id = corpse_core::half_here::ID;
+        r.player.abilities.push(id.into());
+        corpse_core::half_here::admit_current(&mut r).unwrap();
+        corpse_core::revision50_ability_energy::initialize_reserve(&mut r.player, id, 10., 10.).unwrap();
+        let row = observe(&r, id);
+        assert!(row.description.contains("Spend 5 energy"));
+        assert!(row.description.contains("at any time"));
+        assert!(row.cost.contains("5 NRG"));
+        assert_eq!(row.reserve, Some((10., 10.)));
+        r.player.active.push(id.into());
+        assert!(observe(&r, id).cost.contains("Free dismissal"));
     }
 
     #[test]

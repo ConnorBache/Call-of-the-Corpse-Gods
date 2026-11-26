@@ -231,7 +231,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
     let mut balance_migrated=false;
     let mut collapse_migrated=false;
     let mut blood_mist_fire_migrated=false;
-    let mut half_here_lock_migrated=false;
+    let mut half_here_energy_migrated=false;
     let mut steam_migrated=false;
     let mut execute_migrated=false;
     let mut beckoning_migrated=false;
@@ -277,9 +277,9 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         blood_mist_fire_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
             && object.get("bloodMistFireRulesFrom").is_none_or(serde_json::Value::is_null);
         if blood_mist_fire_migrated {object.shift_remove("bloodMistFireRulesFrom");}
-        half_here_lock_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
-            && object.get("halfHereLockFrom").is_none_or(serde_json::Value::is_null);
-        if half_here_lock_migrated {object.shift_remove("halfHereLockFrom");}
+        half_here_energy_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("halfHereEnergyFrom").is_none_or(serde_json::Value::is_null);
+        if half_here_energy_migrated {object.shift_remove("halfHereEnergyFrom");}
         steam_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64).is_some_and(|r|r>=50.)
             && object.get("steamRulesFrom").is_none_or(serde_json::Value::is_null);
         if steam_migrated {object.insert("steamRulesFrom".into(),serde_json::Value::Null);}
@@ -311,7 +311,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         else {corpse_core::temporal::Engine::load(&raw)}.map_err(|e|e.to_string())?;
     if let Some(legacy)=legacy{engine.set_legacy_revert(legacy);}
     corpse_core::engine::validate_supported(&engine.run).map_err(|e|e.to_string())?;
-    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated,blood_mist_fire_migrated,half_here_lock_migrated))
+    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated,blood_mist_fire_migrated,half_here_energy_migrated))
 }
 
 pub fn utc_now() -> String {
