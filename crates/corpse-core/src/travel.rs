@@ -898,15 +898,19 @@ pub fn nearest_fall_landing(
     if !x.is_finite() || !y.is_finite() {
         return None;
     }
+    let w = f.width();
+    // An exact hit cannot be beaten. Otherwise visit potential improvements
+    // in row-major order so equal distances retain the original tie-break.
+    if let Some(at) = crate::portals::cell(f, x, y) {
+        if at < f.tiles.len() && !occupied.contains(&at) && eligible(at) {
+            return Some(Point { x: x as i32, y: y as i32 });
+        }
+    }
     let mut selected = None;
     let mut nearest = f64::INFINITY;
     for at in 0..f.tiles.len() {
-        if occupied.contains(&at) || !eligible(at) {
-            continue;
-        }
-        let distance =
-            ((at % f.width()) as f64 - x).powi(2) + ((at / f.width()) as f64 - y).powi(2);
-        if distance < nearest {
+        let distance = ((at % w) as f64 - x).powi(2) + ((at / w) as f64 - y).powi(2);
+        if distance < nearest && !occupied.contains(&at) && eligible(at) {
             selected = Some(at);
             nearest = distance
         }
@@ -949,6 +953,21 @@ fn copy_depth_changes(r: &mut Run, head: Run) {
     r.collapse = head.collapse;
     crate::revision50::settle_duel_targets(r);
 }
+/// A generated R52 destination needs allocator validation but not a cloned
+/// generation transaction. Keep the source perception caches warm for fall logs.
+fn prepare_fall_destination(r: &mut Run, next: f64) -> Result<(), String> {
+    let revision = r.simulation_revision.value_or(29.);
+    if revision >= 52. && r.floors.iter().any(|f| f.depth == next) {
+        crate::creature_index::check_player(r)?;
+        r.actors.validate_allocator(r.player.id, r.depth, r.next_id)?;
+    } else {
+        let to = if revision >= 52. { next as u32 }
+            else { crate::startup::arrival_generation_target(revision, next as u32) };
+        crate::startup::ensure_floors(r, to)?;
+    }
+    crate::offscreen::catch_up_floor(r, next)
+}
+
 /// Forced cohorts reserve all landings before transfer; IDs order the cohort.
 /// Shared endpoints take impact on the source owner before being dismissed.
 pub fn fall_actors_one_level(
@@ -963,7 +982,11 @@ pub fn fall_actors_one_level(
     let Some(source) = r.floors.iter().find(|f| f.depth == source_depth) else {
         return Ok(());
     };
-    let source_view = depth_view(r, source_depth);
+    // Normal (active-depth) falls already have the correct flight context.
+    // Only off-screen flight checks require the existing playerless proxy.
+    let source_proxy = (r.depth != source_depth && !candidates.is_empty())
+        .then(|| depth_view(r, source_depth));
+    let source_view = source_proxy.as_ref().unwrap_or(r);
     let w = source.width();
     let mut seen = HashSet::new();
     let mut cohort = Vec::new();
@@ -979,13 +1002,14 @@ pub fn fall_actors_one_level(
         if let Some(a) = a {
             if !crate::revision50_nightmares::is_decoy(a) && !a.dead.value_or(false)
                 && a.hp > 0.0
-                && !flying(&source_view, a)
+                && !flying(source_view, a)
                 && in_bounds(source, a.x, a.y)
             {
                 cohort.push(a.clone());
             }
         }
     }
+    drop(source_proxy);
     let player = cohort.iter().any(|a| a.id == r.player.id);
     let player_pit = cohort
         .iter()
@@ -1015,13 +1039,12 @@ pub fn fall_actors_one_level(
     }
     // A nonplayer fall only needs its physical destination, not a new player
     // prefetch horizon. Successful player transfer extends the horizon below.
-    let to = if r.simulation_revision.value_or(29.) >= 52. { next as u32 }
-        else { crate::startup::arrival_generation_target(r.simulation_revision.value_or(29.), next as u32) };
-    crate::startup::ensure_floors(r, to)?;
-    crate::offscreen::catch_up_floor(r, next)?;
+    prepare_fall_destination(r, next)?;
     let destination = r.floors.iter().find(|f| f.depth == next).unwrap();
     let w = destination.width();
-    let destination_view = depth_view(r, next);
+    // Mirror the active or playerless view's bulwark eligibility without
+    // cloning the whole run just to read a map layer.
+    let destination_player_id = if r.depth == next { r.player.id } else { -1. };
     let mut occupied: HashSet<_> = r
         .actors_at(next)
         .iter()
@@ -1035,10 +1058,11 @@ pub fn fall_actors_one_level(
     let mut failed = Vec::new();
     for a in falling {
         let landing = nearest_fall_landing(destination, a.x, a.y, &occupied, |at| {
-            !occupied_cell(destination,crate::portals::enabled(r),&occupied,at)
-                && !crate::revision51_stairs::blocked_cell(r,&a,destination,at)
-                && !["wall", "tree", "chasm"].contains(&destination.tiles[at].as_str())
-                && (destination.tiles[at] != "pit" || a.id == r.player.id)
+            let tile = destination.tiles[at].as_str();
+            !matches!(tile, "wall" | "tree" | "chasm")
+                && (tile != "pit" || a.id == r.player.id)
+                && !occupied_cell(destination, crate::portals::enabled(r), &occupied, at)
+                && !crate::revision51_stairs::blocked_cell(r, &a, destination, at)
                 && !destination
                     .grates
                     .as_ref()
@@ -1048,7 +1072,10 @@ pub fn fall_actors_one_level(
                     .as_ref()
                     .and_then(|d| d.get(&at.to_string()))
                     .is_some_and(|d| !d.open)
-                && !engine::bulwark_blocks(&destination_view, &a, (at % w) as f64, (at / w) as f64)
+                && !(a.id != destination_player_id && a.state != "ally" && a.state != "neutral"
+                    && destination.bulwarks.as_ref()
+                        .and_then(|b| b.get(&at.to_string()))
+                        .is_some_and(|expiry| *expiry >= r.tick))
         });
         if let Some(p) = landing {
             if !crate::half_here::is_clone(&a) {
@@ -1216,9 +1243,9 @@ pub fn fall_actors_one_level(
         copy_depth_changes(r, head);
     }
     for depth in [source_depth, next] {
-        let actors = r.actors_at(depth).to_vec();
+        let actors = r.actors.get(&depth.to_string()).map_or(&[][..], |a| a.as_slice());
         if let Some(f) = r.floors.iter_mut().find(|f| f.depth == depth) {
-            crate::startup::refresh_razorleaves(crate::mutation_journal::make_mut(f), &actors);
+            crate::startup::refresh_razorleaves(crate::mutation_journal::make_mut(f), actors);
         }
     }
     if player_falls {
@@ -1327,10 +1354,7 @@ pub fn collapse_descent(r: &mut Run, x: f64, y: f64, diluted: bool) -> Result<bo
         return Ok(false);
     }
     let next = crate::fast_mode::below(r, source_depth);
-    let to = if r.simulation_revision.value_or(29.) >= 52. { next as u32 }
-        else { crate::startup::arrival_generation_target(r.simulation_revision.value_or(29.), next as u32) };
-    crate::startup::ensure_floors(r, to)?;
-    crate::offscreen::catch_up_floor(r, next)?;
+    prepare_fall_destination(r, next)?;
     let w = r.floor().unwrap().width();
     let changed: HashSet<_> = cells.iter().copied().collect();
     let victims: Vec<_> = std::iter::once(&r.player)

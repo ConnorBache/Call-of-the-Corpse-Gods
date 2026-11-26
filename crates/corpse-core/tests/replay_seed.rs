@@ -26,6 +26,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         half_here_energy_from: Field::Missing,
         screamer_range_from: Field::Missing,
         death_gas_rules_from: Field::Missing,
+        minotaur_bump_from: Field::Missing,
         execute_rules_from: Field::Missing,
         beckoning_rules_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,

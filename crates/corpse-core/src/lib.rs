@@ -226,6 +226,7 @@ pub mod gas_rules;
 pub mod commandment_rules;
 pub mod screamer_rules;
 pub mod death_gas_rules;
+pub mod minotaur_rules;
 pub mod ember_rules;
 /// Ragelight passive rescue amendment and legacy replay boundary.
 pub mod ragelight_rules;

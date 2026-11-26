@@ -2504,8 +2504,9 @@ pub fn attack_blocker(
     b: &Actor,
     range: f64,
     secondary: bool,
-) -> Option<&'static str> { attack_blocker_impl(r,a,b,range,secondary,false) }
-fn attack_blocker_impl(r:&Run,a:&Actor,b:&Actor,range:f64,secondary:bool,projectile_resolved:bool)->Option<&'static str>{
+) -> Option<&'static str> { attack_blocker_impl(r,a,b,range,secondary,false,false) }
+fn attack_blocker_impl(r:&Run,a:&Actor,b:&Actor,range:f64,secondary:bool,projectile_resolved:bool,charge_bump:bool)->Option<&'static str>{
+    if !charge_bump && crate::minotaur_rules::only_bump(r,a) {return Some("minotaur-only-bumps");}
     if crate::revision50_terrain::is_soldier(b) {return Some("unbreakable-clay-soldier");}
     if crate::revision50::duel_blocks(r,a,b) { return Some("fated-duel"); }
     if crate::revision50_combat::oblivious_blocks(r,b,Some(a)) { return Some("oblivious"); }
@@ -2609,7 +2610,7 @@ fn attack_base_with_fury(
     shard: bool,
     wording: Option<crate::attack_text::Verb>,
 ) -> Result<bool, EngineError> {
-    attack_base_with_accuracy(r, aid, bid, multiplier, explicit_base, secondary, range, miss_chance_multiplier, arrow, fury, landed, melee, projectile_resolved, shard, wording, false, 1.0, false)
+    attack_base_with_accuracy(r, aid, bid, multiplier, explicit_base, secondary, range, miss_chance_multiplier, arrow, fury, landed, melee, projectile_resolved, shard, wording, false, 1.0, false, false)
 }
 fn attack_base_with_accuracy(
     r: &mut Run,
@@ -2630,15 +2631,18 @@ fn attack_base_with_accuracy(
     normal_accuracy: bool,
     damage_multiplier: f64,
     thrown_weapon: bool,
+    charge_bump: bool,
 ) -> Result<bool, EngineError> {
-    if r.simulation_revision.value_or(29.)>=52. {crate::revision52_speed::record_attack(aid);}
-
     let _timing_function = crate::timing::span("combat.attack");
-    let (Some(a), Some(b)) = (actor(r, aid).cloned(), actor(r, bid).cloned()) else {
+    let attacker=actor(r,aid).cloned();
+    // A non-bump Minotaur strike is rejected before attack counters or RNG.
+    if !charge_bump && attacker.as_ref().is_some_and(|a|crate::minotaur_rules::only_bump(r,a)) {
         return Ok(false);
-    };
+    }
+    if r.simulation_revision.value_or(29.)>=52. {crate::revision52_speed::record_attack(aid);}
+    let (Some(a), Some(b)) = (attacker, actor(r, bid).cloned()) else {return Ok(false);};
     if surprise_response_blocked(r,&a) && crate::half_here::owner_id(r,&b)==r.player.id {return Ok(false);}
-    if attack_blocker_impl(r, &a, &b, range, secondary, projectile_resolved).is_some() {
+    if attack_blocker_impl(r, &a, &b, range, secondary, projectile_resolved, charge_bump).is_some() {
         return Ok(false);
     }
     if crate::ahvamitt::is_actor(&b) {return if aid==r.player.id {crate::ahvamitt::attack(r,bid)} else {Ok(false)};}
@@ -2799,6 +2803,7 @@ fn attack_base_with_accuracy(
                 normal_accuracy,
                 damage_multiplier,
                 thrown_weapon,
+                charge_bump,
             )?;
         }
         nova_after_attack(r, &a, &b)?;
@@ -4365,22 +4370,33 @@ fn monster_ai_turn_target_inner(
         condition(&a, "monsterChargeDy"),
     );
     let allied = a.state == "ally";
+    let bump_only=crate::minotaur_rules::only_bump(r,&a);
+    let (x,y)=(a.x+dx,a.y+dy);
+    let can_bump=!bump_only || (!movement_only && condition(&a,"forcedMove")==0.
+        && can_traverse(r,&a,x,y));
     let victim = std::iter::once(&r.player)
         .chain(r.actors_at(r.depth))
         .find(|b| {
-            b.id != id
+            can_bump && b.id != id
                 && !b.dead.value_or(false)
                 && b.hp > 0.0
                 && crate::dreamwalking::same_plane(r,&a,b)
-                && ((b.id == r.player.id || b.state == "ally") != allied)
-                && crate::portals::same_position(r,b,a.x+dx,a.y+dy)
+                && (((b.id == r.player.id || b.state == "ally") != allied)
+                    || (bump_only && crate::revision50_control_amulets::discord_hostility(r,&a,b)))
+                && crate::portals::same_position(r,b,x,y)
         })
         .map(|b| b.id);
     if let Some(v) = victim {
         if !movement_only
             && !crate::monster_statuses::try_hemophilia_episode(r, id).map_err(EngineError)?
         {
-            attack(r, id, v, 1.0)?;
+            if bump_only {
+                let landed=std::cell::Cell::new(false);
+                attack_base_with_accuracy(r,id,v,1.,None,false,0.,1.,false,
+                    None,&landed,true,false,false,None,false,1.,false,true)?;
+            } else {
+                attack(r, id, v, 1.0)?;
+            }
         }
     } else {
         let accepted=move_actor(r, id, dx, dy, movement_only)?;
@@ -4405,7 +4421,7 @@ pub fn attack_ranged(
 ) -> Result<bool, EngineError> {
     if r.simulation_revision.value_or(29.)>=36. && r.floor().is_some_and(crate::non_euclidean_generation::has_links) {
         let (Some(a),Some(b))=(actor(r,attacker).cloned(),actor(r,victim).cloned())else{return Ok(false)};
-        if attack_blocker_impl(r,&a,&b,range,false,true).is_some(){return Ok(false)}
+        if attack_blocker_impl(r,&a,&b,range,false,true,false).is_some(){return Ok(false)}
         if attacker!=r.player.id{actor_mut_trusted(r,attacker).unwrap().conditions.insert("rangedRecovery".into(),1.);}
         let landing=crate::projectiles::trace_committed_from_actor(r,&a,b.x,b.y);
         let Some(actual)=landing.actor_id else{return Ok(false)};
@@ -4474,7 +4490,7 @@ pub(crate) fn attack_thrown_weapon_resolved(r:&mut Run,victim:f64,base:f64,range
     let landed=std::cell::Cell::new(false);
     let resolved=r.floor().is_some_and(crate::non_euclidean_generation::has_links);
     attack_base_with_accuracy(r,r.player.id,victim,1.,Some(base),false,range,1.,false,
-        None,&landed,false,resolved,false,None,false,1.,true)?;
+        None,&landed,false,resolved,false,None,false,1.,true,false)?;
     Ok(landed.get())
 }
 /// Bow accuracy is distance-independent without changing projectile semantics.
@@ -4486,7 +4502,7 @@ fn attack_bow_scaled_accuracy_resolved(r: &mut Run, victim: f64, base: f64, rang
     let landed = std::cell::Cell::new(false);
     let resolved = r.floor().is_some_and(crate::non_euclidean_generation::has_links);
     attack_base_with_accuracy(r, r.player.id, victim, 1.0, Some(base), false,
-        range, 1.0, true, None, &landed, false, resolved, false, None, true, scale, false)?;
+        range, 1.0, true, None, &landed, false, resolved, false, None, true, scale, false, false)?;
     Ok(landed.get())
 }
 pub fn bow_damage_multiplier(revision: f64, item: &Item) -> f64 {
@@ -4562,7 +4578,7 @@ fn mark_angel(r: &mut Run, id: f64) {
 fn counter_attack(r: &mut Run, aid: f64, bid: f64, secondary: bool) -> Result<(), EngineError> {
     if !secondary
         && actor(r, aid).is_some_and(|a| a.hp > 0.0)
-        && actor(r, bid).is_some_and(|a| a.hp > 0.0)
+        && actor(r, bid).is_some_and(|a| a.hp > 0.0 && !crate::minotaur_rules::only_bump(r,a))
         && actor(r, bid)
             .unwrap()
             .active

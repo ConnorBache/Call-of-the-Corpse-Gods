@@ -73,3 +73,90 @@ fn player_can_kill_minotaur_before_deferred_charge() {
     assert!(r.actors_at(r.depth).iter().all(|a|a.dead.value_or(false)||a.hp<=0.));
     assert_eq!(r.player.x,10.);
 }
+
+#[test]
+fn only_a_real_charge_bump_can_attack() {
+    let mut r=room(52.);
+    r.minotaur_bump_from=0usize.into();
+    r.player.x=13.;
+    r.player.stats.dodge=-1000.;
+    let victim=r.player.id;
+    let id=r.actors_at(r.depth)[0].id;
+    let hp=r.player.hp;
+    let rng=r.rng.clone();
+    // Even a direct attack aimed down the arrow is not a movement bump.
+    engine::attack(&mut r,id,victim,1.).unwrap();
+    assert_eq!(r.player.hp,hp);
+    assert_eq!(r.rng,rng);
+    assert_eq!(engine::attack_blocker(&r,engine::actor(&r,id).unwrap(),&r.player,0.,false),
+        Some("minotaur-only-bumps"));
+    engine::dispatch(&mut r,&Command::Wait).unwrap();
+    assert_eq!(r.actors_at(r.depth)[0].x,12.);
+    assert!(r.player.hp<hp,"a move followed by a real bump still lands");
+}
+
+#[test]
+fn minotaur_cannot_bump_through_a_closed_diagonal_corner() {
+    let mut r=room(52.);
+    r.minotaur_bump_from=0usize.into();
+    r.player.x=12.;r.player.y=11.;
+    r.player.stats.dodge=-1000.;
+    r.actors_at_mut(r.depth)[0].conditions.insert("monsterChargeDy".into(),1.);
+    let f=r.floor_mut().unwrap();let w=f.width();
+    f.tiles[10*w+12]="wall".into(); f.tiles[11*w+11]="wall".into();
+    let hp=r.player.hp;
+    engine::dispatch(&mut r,&Command::Wait).unwrap();
+    assert_eq!(r.player.hp,hp);
+    let a=&r.actors_at(r.depth)[0];
+    assert_eq!((a.x,a.y),(11.,10.));
+    assert_eq!(a.conditions["monsterChargeRemaining"],1.);
+}
+
+#[test]
+fn discord_allows_the_cued_bump_but_not_a_side_attack() {
+    for x in [10.,12.] {
+        let mut r=room(52.);
+        r.minotaur_bump_from=0usize.into();
+        r.player.x=x;r.player.stats.dodge=-1000.;
+        let depth=r.depth;
+        let a=&mut r.actors_at_mut(depth)[0];
+        a.conditions.insert(corpse_core::revision50_control_amulets::DISCORD.into(),5.);
+        a.stats.perception=300.;
+        let hp=r.player.hp;
+        engine::dispatch(&mut r,&Command::Wait).unwrap();
+        assert_eq!(r.player.hp<hp,x==12.);
+    }
+}
+
+#[test]
+fn live_adoption_persists_only_at_the_replay_boundary() {
+    let mut old=corpse_core::startup::create_avatar_run("minotaur-bump-replay").unwrap();
+    old.minotaur_bump_from=Field::Missing;
+    engine::dispatch(&mut old,&Command::Wait).unwrap();
+    let boundary=old.replay.len();
+    let live=corpse_core::temporal::Engine::new(old).unwrap();
+    assert_eq!(live.run.minotaur_bump_from.as_ref(),Some(&boundary));
+    let saved=corpse_core::storage::serialize(&live.run).unwrap();
+    assert_eq!(corpse_core::storage::deserialize(&saved).unwrap().minotaur_bump_from.as_ref(),Some(&boundary));
+    let record=corpse_core::replay::ReplayRecord::from_run(&live.run);
+    let mut replay=corpse_core::replay::ReplaySession::create(record,true).unwrap();
+    assert!(!corpse_core::minotaur_rules::current(&replay.engine.run));
+    while replay.step().unwrap() {}
+    assert!(corpse_core::minotaur_rules::current(&replay.engine.run));
+}
+
+#[test]
+fn blocked_counterattack_does_not_spend_energy() {
+    let mut r=room(52.);
+    r.minotaur_bump_from=0usize.into();
+    let player=r.player.id;let depth=r.depth;
+    let a=&mut r.actors_at_mut(depth)[0];
+    let id=a.id;
+    a.active.push("pelian-never-without-a-fight".into());
+    a.abilities.push("pelian-never-without-a-fight".into());
+    a.energy=100.;
+    let hp=r.player.hp;
+    engine::attack(&mut r,player,id,1.).unwrap();
+    assert_eq!(r.player.hp,hp);
+    assert_eq!(engine::actor(&r,id).unwrap().energy,100.);
+}

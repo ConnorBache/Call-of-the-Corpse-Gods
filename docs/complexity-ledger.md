@@ -2518,3 +2518,37 @@ required. These are analytical bounds, not benchmark results.
 See [enemy breath presentation](revision52-enemy-breath-animation.md) for
 the exact footprint, visibility and action checkpoints, and the bounded
 travel-band and compositor costs. No environment or damage rule is changed.
+
+## R52 Minotaur attack admission
+
+The shared strike gate reads the optional replay boundary and scans the
+attacker's existing trait list, O(B) for B traits and O(1) extra memory.
+A committed charge adds one traversal-admission check before its existing
+actor scan (O(A) contact checks with the existing topology lookup for A
+floor actors). Those helpers reuse the existing terrain, topology, and
+protection queries. No second path field, turn, or random draw is added.
+
+## Forced chasm landings (native)
+
+A forced fall reserves landings in creature-ID order; equal distances still favor
+row-major order. With C candidates, V destination cells, As source actors,
+Ad destination actors, and F generated floors, candidate collection costs
+O(C*As + C log C) and occupancy initialization O(Ad). An unobstructed exactly
+aligned destination takes one eligibility query. Otherwise the scan is
+O(V + Q*E) per falling creature, where at most Q <= V queries can improve the
+current best distance, each with cost E. Eligibility still includes portal
+alias occupancy, barred terrain and structures, and active bulwarks. Portal
+and linked-area lookup visits up to the saved link/pocket counts and any group
+on the queried cell; temporary stair and altar checks retain their own
+modification/object scans. Reservations and cohort snapshots take O(C + Ad)
+scratch. The active source and landing eligibility no longer need whole-run
+clones; a different source depth still needs a playerless rule view, and
+final impact still uses its normal transactional view.
+
+Generated revision-52 destinations skip the generation transaction clone
+while retaining allocator validation (clean constant-time after the O(F)
+floor lookup, full index reconciliation if dirty). An ungenerated destination
+still synchronously pays generation; an involved destination still pays exact
+catch-up and starts receiving offscreen turns once activated. Impact,
+visibility, floor copy-on-write, and catch-up costs are additional to the
+placement scan.

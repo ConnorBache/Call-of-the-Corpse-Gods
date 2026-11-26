@@ -263,3 +263,33 @@ fn flight_immunity_and_expiry_over_chasm_keep_ordinary_fall_rules() {
     let a=r.actors_at(2.).iter().find(|a|a.id==ID).unwrap();assert!(a.hp<100.);
     assert!(!a.conditions.contains_key("chaseChasm"));
 }
+
+#[test]
+fn enemy_flight_expiry_wait_reserves_row_major_landings_and_applies_impact() {
+    let mut r = room(52.);
+    r.player.x = 17.;
+    let w = r.floor().unwrap().width();
+    r.floor_mut().unwrap().tiles[10 * w + 10] = "chasm".into();
+    let source = source_mut(&mut r);
+    source.abilities.clear();
+    source.conditions.insert("flying".into(), 1.);
+    source.conditions.insert("paralyzed".into(), 2.);
+    source.state = "sleeping".into();
+    let destination = crate::mutation_journal::make_mut(&mut r.floors[1]);
+    // All four are one tile from the directly aligned (ineligible) wall.
+    for (x, y) in [(10, 9), (9, 10), (11, 10), (10, 11)] {
+        destination.tiles[y * w + x] = "floor".into();
+    }
+    r.actors_at_mut(2.).push(Actor {
+        id: ID + 1., name: "Blocker".into(), x: 10., y: 9., hp: 100., max_hp: 100.,
+        state: "sleeping".into(), ..Default::default()
+    });
+    let outcome = engine::dispatch(&mut r, &crate::Command::Wait).unwrap();
+    assert!(outcome.took_turn);
+    assert_eq!(r.depth, 1.);
+    assert!(r.actors_at(1.).iter().all(|a| a.id != ID));
+    let landed = r.actors_at(2.).iter().find(|a| a.id == ID).unwrap();
+    assert_eq!((landed.x, landed.y, landed.hp), (9., 10., 94.));
+    assert_eq!(landed.conditions.get("offscreenActionTick"), Some(&r.tick));
+    assert!(!r.log.iter().any(|line| line == "You descend."));
+}

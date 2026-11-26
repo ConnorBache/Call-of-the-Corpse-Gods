@@ -151,6 +151,7 @@ impl Snapshot {
         restored.half_here_energy_from = run.half_here_energy_from.clone();
         restored.screamer_range_from = run.screamer_range_from.clone();
         restored.death_gas_rules_from = run.death_gas_rules_from.clone();
+        restored.minotaur_bump_from = run.minotaur_bump_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -576,6 +577,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.half_here_energy_from = Field::Missing;
     copy.screamer_range_from = Field::Missing;
     copy.death_gas_rules_from = Field::Missing;
+    copy.minotaur_bump_from = Field::Missing;
     copy.execute_rules_from = Field::Missing;
     copy.beckoning_rules_from = Field::Missing;
     copy.ichor_fire_rules_from = Field::Missing;
@@ -619,6 +621,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.half_here_energy_from=run.half_here_energy_from.clone();
     restored.screamer_range_from=run.screamer_range_from.clone();
     restored.death_gas_rules_from=run.death_gas_rules_from.clone();
+    restored.minotaur_bump_from=run.minotaur_bump_from.clone();
     restored.execute_rules_from=run.execute_rules_from.clone();
     restored.beckoning_rules_from=run.beckoning_rules_from.clone();
     restored.ichor_fire_rules_from=run.ichor_fire_rules_from.clone();
@@ -658,6 +661,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.half_here_energy_from = run.half_here_energy_from.clone();
         restored.screamer_range_from = run.screamer_range_from.clone();
         restored.death_gas_rules_from = run.death_gas_rules_from.clone();
+        restored.minotaur_bump_from = run.minotaur_bump_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -1100,6 +1104,7 @@ impl Engine {
         crate::half_here::admit_current(&mut run).map_err(StorageError)?;
         crate::screamer_rules::admit_range(&mut run).map_err(StorageError)?;
         crate::death_gas_rules::admit(&mut run).map_err(StorageError)?;
+        crate::minotaur_rules::admit(&mut run).map_err(StorageError)?;
         Self::new_for_replay(run)
     }
 
@@ -1173,6 +1178,7 @@ impl Engine {
         if matches!(run.half_here_energy_from, Field::Null) { run.half_here_energy_from = Field::Missing; }
         if matches!(run.screamer_range_from, Field::Null) { run.screamer_range_from = Field::Missing; }
         if matches!(run.death_gas_rules_from, Field::Null) { run.death_gas_rules_from = Field::Missing; }
+        if matches!(run.minotaur_bump_from, Field::Null) { run.minotaur_bump_from = Field::Missing; }
         if matches!(run.steam_rules_from, Field::Null) { run.steam_rules_from = Field::Missing; }
         if matches!(run.execute_rules_from, Field::Null) { run.execute_rules_from = Field::Missing; }
         if matches!(run.beckoning_rules_from, Field::Null) { run.beckoning_rules_from = Field::Missing; }

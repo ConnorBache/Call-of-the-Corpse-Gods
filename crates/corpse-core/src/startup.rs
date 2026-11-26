@@ -543,6 +543,7 @@ pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, r
         half_here_energy_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         screamer_range_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         death_gas_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        minotaur_bump_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         steam_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
         execute_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         beckoning_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },

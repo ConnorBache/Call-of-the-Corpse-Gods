@@ -1087,3 +1087,12 @@ creatures are not identified. Routine AI waits and recoveries stay quiet.
 The inherited Dire Bear map, sidebar, and bestiary glyph is a plain black
 `B` without a neutral outline. Existing telepathy and explicit appearance
 overrides still apply.
+
+### R52 Minotaur attacks
+
+A Minotaur can strike only when an eligible foe occupies the legal next
+square of its committed charge, including the second step in a Fast action.
+Adjacent targets off its arrow, direct attacks ordered by Implant Thought,
+and automatic counterattacks do not qualify. Discord still changes whom
+the Minotaur can hit, not where it can attack. Existing replays retain their
+original behavior up to the recorded rules boundary.

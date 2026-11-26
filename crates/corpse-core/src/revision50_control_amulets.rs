@@ -359,6 +359,9 @@ fn discord_action(r:&mut Run,id:f64,haste:bool,fast:bool)->Result<bool,EngineErr
         if !own&&!discordant(r,&b) {return Ok(false)}
         if engine::condition(&a,"paralyzed")>0.||crate::ichor::stranded(r,&a)||(!haste&&crate::monster_statuses::slow_skips_action(r,&a)) {return Ok(true)}
         if crate::ai::sleeping(&a) {crate::ai::wake(engine::actor_mut_trusted(r,id).unwrap(),true);return Ok(true)}
+        if crate::minotaur_rules::only_bump(r,&a) {
+            return engine::monster_ai_turn(r,id,false);
+        }
         if !haste || r.simulation_revision.value_or(29.)>=52. {
             if !fast && crate::ai::recover_ranged(r,id) {return Ok(true)}
             if !fast && crate::ai::enemy_action(r,id,b.id)? {return Ok(true)}

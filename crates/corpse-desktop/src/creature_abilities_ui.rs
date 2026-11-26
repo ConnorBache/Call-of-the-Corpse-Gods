@@ -433,6 +433,9 @@ fn detailed_enemy(r: &Run, a: &Actor, e: &Enemy) -> String {
             effect = "is currently piloted and able to move and attack".into()
         }
         "enemy:beast:minotaur" => {
+            if corpse_core::minotaur_rules::current(r) {
+                limits.push("only attacks by bumping into a foe along its committed direction".into());
+            }
             let arrow = if a.conditions.contains_key("monsterChargeDx")
                 && a.conditions.contains_key("monsterChargeDy")
             {

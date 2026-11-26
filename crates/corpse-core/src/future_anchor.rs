@@ -74,7 +74,7 @@ impl FutureAnchor {
             || !{let _span=crate::timing::span("future.import.finite_scan");finite::all_finite(&state)} {return;}
         // Imported nested Future/replay are discarded by actual restore anyway.
         // No recursive native anchor graph is retained in the second game.
-        state.future=None;state.history.clear();state.replay.clear();state.replay_snapshot_from=Field::Missing;state.firebolt_travel_from=Field::Missing;state.ragelight_rules_from=Field::Missing;state.balance_rules_from=Field::Missing;state.collapse_rules_from=Field::Missing;state.blood_mist_fire_rules_from=Field::Missing;state.half_here_lock_from=Field::Missing;state.half_here_energy_from=Field::Missing;state.screamer_range_from=Field::Missing;state.death_gas_rules_from=Field::Missing;state.execute_rules_from=Field::Missing;state.beckoning_rules_from=Field::Missing;
+        state.future=None;state.history.clear();state.replay.clear();state.replay_snapshot_from=Field::Missing;state.firebolt_travel_from=Field::Missing;state.ragelight_rules_from=Field::Missing;state.balance_rules_from=Field::Missing;state.collapse_rules_from=Field::Missing;state.blood_mist_fire_rules_from=Field::Missing;state.half_here_lock_from=Field::Missing;state.half_here_energy_from=Field::Missing;state.screamer_range_from=Field::Missing;state.death_gas_rules_from=Field::Missing;state.minotaur_bump_from=Field::Missing;state.execute_rules_from=Field::Missing;state.beckoning_rules_from=Field::Missing;
         reset_derived(&mut state);
         let encoded=OnceLock::new();let _=encoded.set(raw.clone());
         // deserialize already validated the normalized image. The above checks
