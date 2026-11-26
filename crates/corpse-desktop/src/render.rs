@@ -79,6 +79,7 @@ pub enum Animation {
     Water { phase: f64, speed: f64 },
     Gas { phase: f64, color: Rgb },
     Reflection { phase: f64, color: Rgb },
+    Razorleaves { phase: f64, speed: f64, color: Rgb, opacity: f64 },
     Torch,
 }
 #[derive(Clone, Copy, PartialEq)]
@@ -1235,6 +1236,28 @@ impl Painter {
     /// Unit opacity: O(clipped rows + tile segments * log(row runs) + clipped runs
     /// + nonzero pixels). Other opacity stays O(clipped mask area). Cold adds atlas
     /// resampling, O(mask area) run construction and O(height + runs) metadata.
+    /// Draw at the comma's actual ink baseline, not the bottom of its atlas box.
+    /// The clip keeps both streams inside this tile even while entering/exiting.
+    fn falling_razorleaves(&mut self, (x,y,w,h): (i32,i32,i32,i32), phase: f64, time: f64, color: Rgb, opacity: f64) {
+        let previous = self.clip;
+        let (l,t,r,b) = previous.map_or((x,y,x+w,y+h), |(cx,cy,cw,ch)| {
+            (x.max(cx), y.max(cy), (x+w).min(cx+cw), (y+h).min(cy+ch))
+        });
+        if l>=r || t>=b {return;}
+        self.clip=Some((l,t,r-l,b-t));
+        let gw=(w*4/5).max(1);
+        let gh=(h*9/10).max(1);
+        for (lane, offset) in [(0.28,0.), (0.72,0.50)] {
+            let p=(time/1180. + phase + offset).rem_euclid(1.);
+            let drift=(p*std::f64::consts::TAU+lane*4.).sin();
+            let gx=x+((lane+drift*0.16)*w as f64).round() as i32-gw/2;
+            let baseline=y-1+(p*(h+4) as f64).round() as i32;
+            let italic=(p*std::f64::consts::TAU*2.+lane).sin()>0.;
+            self.map_glyph_placed(',',gx,y,gw,gh,color,opacity.clamp(0.,1.),italic,
+                Some(self.native_y(baseline as f64)));
+        }
+        self.clip=previous;
+    }
     fn map_glyph_styled(&mut self, ch: char, x: i32, y: i32, w: i32, h: i32, c: Rgb, alpha: f64, italic: bool) {
         self.map_glyph_placed(ch, x, y, w, h, c, alpha, italic, None);
     }
@@ -2440,6 +2463,7 @@ impl Painter {
         let indices=self.paint_cell_indices.take();
         let cell_indices:Box<dyn Iterator<Item=usize>>=if let Some(indices)=indices{Box::new(indices.into_iter())}else{Box::new(0..painted_cells.len())};
         let mut blood_counter=None;
+        let mut razorleaves=Vec::new();
         for index in cell_indices {
             let Some(cell)=painted_cells.get(index) else{continue;};
             if self.raster_stats.enabled{self.raster_stats.cells_considered+=1;}
@@ -2561,10 +2585,15 @@ impl Painter {
                     y + (ch - gh) / 2, gw, gh, ink,
                     cell.bottom_aligned && cell.glyph == "\"")
             };
+            for animation in &cell.animations {
+                if let Animation::Razorleaves { phase, speed, color, opacity } = *animation {
+                    razorleaves.push(((x,y,cw,ch),phase,now*speed,color,opacity));
+                }
+            }
             if now > 0. {
                 for animation in &cell.animations {
                     match *animation {
-                        Animation::Water { .. } => {}
+                        Animation::Water { .. } | Animation::Razorleaves { .. } => {}
                         Animation::Gas { phase, color } => {
                             let pulse = 0.5 + 0.5 * (now / 1900. + phase).sin();
                             self.blend_rect(x,y,cw,ch,color,((0.012+pulse*0.018)*255.) as u8);
@@ -2627,6 +2656,10 @@ impl Painter {
                     cell.fg,
                 );
             }
+        }
+        // Airborne leaves stay visible over occupants without replacing their glyphs.
+        for (rect, phase, time, color, opacity) in razorleaves {
+            self.falling_razorleaves(rect,phase,time,color,opacity);
         }
         // The right edge can extend over another cell. Paint after every
         // map layer so a neighboring tile background never erases the digit.

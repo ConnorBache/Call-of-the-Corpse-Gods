@@ -79,7 +79,7 @@ impl Index{
  }
 }
 fn bits(a:f64,b:f64)->bool{a.to_bits()==b.to_bits()}
-fn animation_eq(a:&Animation,b:&Animation)->bool{match(a,b){(Animation::Fire{phase:a,speed:as_,colors:ac},Animation::Fire{phase:b,speed:bs,colors:bc})=>bits(*a,*b)&&bits(*as_,*bs)&&ac==bc,(Animation::Water{phase:a,speed:as_},Animation::Water{phase:b,speed:bs})=>bits(*a,*b)&&bits(*as_,*bs),(Animation::Gas{phase:a,color:ac},Animation::Gas{phase:b,color:bc})|(Animation::Reflection{phase:a,color:ac},Animation::Reflection{phase:b,color:bc})=>bits(*a,*b)&&ac==bc,(Animation::Torch,Animation::Torch)=>true,_=>false}}
+fn animation_eq(a:&Animation,b:&Animation)->bool{match(a,b){(Animation::Fire{phase:a,speed:as_,colors:ac},Animation::Fire{phase:b,speed:bs,colors:bc})=>bits(*a,*b)&&bits(*as_,*bs)&&ac==bc,(Animation::Water{phase:a,speed:as_},Animation::Water{phase:b,speed:bs})=>bits(*a,*b)&&bits(*as_,*bs),(Animation::Gas{phase:a,color:ac},Animation::Gas{phase:b,color:bc})|(Animation::Reflection{phase:a,color:ac},Animation::Reflection{phase:b,color:bc})=>bits(*a,*b)&&ac==bc,(Animation::Razorleaves{phase:a,speed:as_,color:ac,opacity:ao},Animation::Razorleaves{phase:b,speed:bs,color:bc,opacity:bo})=>bits(*a,*b)&&bits(*as_,*bs)&&ac==bc&&bits(*ao,*bo),(Animation::Torch,Animation::Torch)=>true,_=>false}}
 /// Exact already-observed paint values. No hashes, live state or float normalization.
 fn paint_eq(a:&Cell,b:&Cell)->bool{
  if a.cogworks!=b.cogworks || a.bottom_aligned!=b.bottom_aligned { return false; }

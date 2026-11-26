@@ -24,7 +24,6 @@ fn terrain(tile: &str) -> (char, Rgb, Rgb) {
         "wall" => ('#', [119, 121, 135], [23, 25, 35]),
         "water" => ('~', [24, 125, 197], [8, 44, 77]),
         "shallow-water" => ('~', [24, 125, 197], [18, 69, 106]),
-        "speed-up" => ('.', [95, 211, 211], [12, 49, 51]),
         "grass" => ('"', [120, 199, 107], [13, 38, 28]),
         "tree" => ('♣', [70, 169, 120], [7, 25, 22]),
         "chasm" => ('⛶', [101, 85, 141], [0, 1, 2]),
@@ -35,8 +34,14 @@ fn terrain(tile: &str) -> (char, Rgb, Rgb) {
     }
 }
 
+// Speed-up is a distinct simulation tile, but shares ordinary floor material.
+// The common spatial marker is applied separately to known group endpoints.
+pub(super) fn visual_tile(tile: &str) -> &str {
+    if tile == "speed-up" { "floor" } else { tile }
+}
+
 fn ground(o: &corpse_core::vision::ObservedCell) -> (String, Rgb, Rgb, bool, bool) {
-    let tile = o.tile.as_deref().unwrap_or("floor");
+    let tile = visual_tile(o.tile.as_deref().unwrap_or("floor"));
     let (g, mut fg, mut bg) = terrain(tile);
     let mut glyph = g.to_string();
     let mut fixture = false;
@@ -86,14 +91,7 @@ fn material_settings(
     profile: &crate::appearance_profile::Profile,
     o: &corpse_core::vision::ObservedCell,
 ) -> serde_json::Value {
-    let tile = o.tile.as_deref().unwrap_or("floor");
-    if tile == "speed-up" {
-        let mut material = profile.material("floor", None).unwrap_or_default();
-        material["color"] = "#5fd3d3".into(); material["background"] = "#0c3133".into();
-        material["edgeColor"] = "#5fd3d3".into(); material["glyph"] = ".".into();
-        material["animationSpeed"] = 0.0.into();
-        return material;
-    }
+    let tile = visual_tile(o.tile.as_deref().unwrap_or("floor"));
     // New terrain keeps the existing editable floor material, with a distinct
     // default palette. No new appearance keys change historical profiles.
     if !matches!(tile, "up" | "down") && o.door_open.is_none() && !o.grate && !o.bridge && (o.ice || o.puddles || o.hellfire) {
@@ -756,7 +754,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         for cell in &mut cells {
             let i = cell.y * width + cell.x;
             if active.contains(&i) || (item_cells.contains(&i) && cell.label != "Fire") {
-                cell.animations.clear();
+                cell.animations.retain(|anim| matches!(anim, crate::render::Animation::Razorleaves { .. }));
             }
         }
         crate::illumination_ui::finish_cells(&mut cells, &light, width, profile);
@@ -1436,6 +1434,29 @@ pub fn ability_needs_target(id: &str) -> bool {
         })
 }
 
+fn razorleaf_appearance(
+    profile: &crate::appearance_profile::Profile, o: &corpse_core::vision::ObservedCell,
+    x:usize, y:usize, seed:u32, source:Rgb, bg:&mut Rgb, ctx:crate::color::Context<'_>,
+    all_seeing:bool, animations:&mut Vec<crate::render::Animation>,
+) {
+    const KEY:&str="feature:razorleaves";
+    if o.current {
+        let (color, _) = crate::world_features::feature_surface(profile,KEY,x,y,seed);
+        let speed=profile.number("terrain.feature:razorleaves.animationSpeed");
+        let opacity=profile.number("terrain.feature:razorleaves.opacity");
+        animations.push(crate::render::Animation::Razorleaves {
+            phase:crate::color::cosmetic_hash(x as i32,y as i32,seed),speed,
+            color:crate::color_profile::world(profile,color,false),opacity,
+        });
+    } else {
+        // Only last-seen terrain retains a stationary hint.
+        let (color,alpha)=crate::world_features::overlay(profile,KEY,x,y,seed,0.,0.22);
+        let color=crate::world_features::tone(profile,color,source,*bg,ctx,o.chance,all_seeing,
+            Some(profile.number("terrain.feature:razorleaves.lightingResponse")),true,false,false);
+        *bg=crate::color::composite(*bg,color,alpha);
+    }
+}
+
 /// Repaints detached known terrain for cosmetic lighting; no Run or RNG access.
 pub fn terrain_frame(
     observation: &corpse_core::vision::TerrainObservation,
@@ -1487,7 +1508,7 @@ fn terrain_frame_palette(
     let mut cells = Vec::new();
     let mut backgrounds = vec![if flesh {crate::illumination_ui::unexplored(profile)} else {profile.rgb("fog.unexplored")}; width * height];
     for o in &observation.cells {
-        let Some(tile) = o.tile.as_ref() else {
+        let Some(tile) = o.tile.as_deref().map(visual_tile) else {
             continue;
         };
         corpse_core::timing::count(corpse_core::timing::Count::KnownCells,1);
@@ -1499,7 +1520,7 @@ fn terrain_frame_palette(
         let ground=prepared[o.index].as_ref().expect("known cell prepared");
         let (mut glyph,fg,mut bg,fixture,stone)=(ground.glyph.clone(),ground.fg,ground.bg,ground.fixture,ground.stone);
         drop(ground_span);
-        let mut important = matches!(tile.as_str(), "up" | "down" | "pit" | "chasm") || fixture;
+        let mut important = matches!(tile, "up" | "down" | "pit" | "chasm") || fixture;
         let ctx = crate::color::Context {
             knowledge,
             tile,
@@ -1513,7 +1534,7 @@ fn terrain_frame_palette(
         if !fixture
             && !o.snow
             && matches!(
-                tile.as_str(),
+                tile,
                 "floor" | "grass" | "tree" | "water" | "shallow-water"
             )
         {
@@ -1528,9 +1549,9 @@ fn terrain_frame_palette(
                 if !o.current && other.current {
                     continue;
                 }
-                if other.tile.as_ref().is_some_and(|t| {
+                if other.tile.as_deref().map(visual_tile).is_some_and(|t| {
                     matches!(
-                        t.as_str(),
+                        t,
                         "floor" | "grass" | "tree" | "water" | "shallow-water"
                     )
                 }) && !other.snow
@@ -1538,7 +1559,7 @@ fn terrain_frame_palette(
                     let other_ground=prepared[other.index].as_ref().expect("known neighbor prepared");
                     let(c,f)=(other_ground.bg,other_ground.fixture);
                     if !f && c != bg {
-                        neighbors.push((other.tile.as_ref().unwrap().as_str(), c));
+                        neighbors.push((visual_tile(other.tile.as_deref().unwrap()), c));
                     }
                 }
             }
@@ -1546,7 +1567,7 @@ fn terrain_frame_palette(
                 let weight = (neighbors.len() as f64
                     * (0.1 + crate::color::noise(x as f64, y as f64, seed, 6.) * 0.02))
                     .min(0.18);
-                let bank = matches!(tile.as_str(), "water" | "shallow-water")
+                let bank = matches!(tile, "water" | "shallow-water")
                     && neighbors
                         .iter()
                         .any(|(t, _)| !matches!(*t, "water" | "shallow-water"));
@@ -1583,7 +1604,7 @@ fn terrain_frame_palette(
             material,
             o.chance,
             observation.all_seeing,
-            (flesh && o.direct && !fixture && matches!(tile.as_str(), "water" | "shallow-water"))
+            (flesh && o.direct && !fixture && matches!(tile, "water" | "shallow-water"))
                 .then(|| flesh_palette::water_illumination(profile, fg, bg, tile, ctx.light)),
         );
         let pulse = crate::entity_profile::material_pulse(
@@ -1640,7 +1661,7 @@ fn terrain_frame_palette(
         }
         let mut arrow = String::new();
         let mut animations = Vec::new();
-        let energy = if matches!(tile.as_str(), "wall" | "tree") {
+        let energy = if matches!(tile, "wall" | "tree") {
             ctx.light.wall_energy
         } else {
             ctx.light.energy
@@ -1650,26 +1671,29 @@ fn terrain_frame_palette(
             .hazards
             .as_ref()
             .is_some_and(|h| h.fire.as_ref().is_some() || h.permanent_fire.value_or(false));
-        if o.direct && ctx.light.display.is_none() && peak > 0.08 && !matches!(tile.as_str(), "chasm" | "pit") && !burning {
+        if o.direct && ctx.light.display.is_none() && peak > 0.08 && !matches!(tile, "chasm" | "pit") && !burning {
             animations.push(crate::render::Animation::Reflection {
                 phase: crate::color::noise(x as f64, y as f64, seed, 10.) * std::f64::consts::PI,
                 color: energy.map(|v| crate::color::from_linear(v / peak * 0.35).round() as u8),
             });
         }
 
-        if o.direct && matches!(tile.as_str(), "water" | "shallow-water")
-            && crate::appearance_material::idle_overlay_enabled(profile,&tile) {
+        if o.direct && matches!(tile, "water" | "shallow-water")
+            && crate::appearance_material::idle_overlay_enabled(profile,tile) {
             animations.push(crate::render::Animation::Water {
                 phase: crate::color::noise(x as f64, y as f64, seed, 8.) * std::f64::consts::PI,
                 speed: profile.number(&format!("terrain.{tile}.animationSpeed")),
             });
         }
         if let Some(h) = &o.hazards {
+            if h.razorleaves.value_or(false) {
+                razorleaf_appearance(profile,o,x,y,seed,source_material_background,&mut bg,ctx,observation.all_seeing,&mut animations);
+            }
             if tile == "wall" && h.bloody_wall.value_or(false) {
                 let stain=crate::world_features::tone(profile,[206,34,61],source_material_background,bg,ctx,o.chance,observation.all_seeing,None,true,false,false);
                 fg=crate::color::composite(fg,stain,0.75);
             }
-            if matches!(tile.as_str(),"water"|"shallow-water") && !h.ichor.value_or(false) {
+            if matches!(tile,"water"|"shallow-water") && !h.ichor.value_or(false) {
                 if let Some(amount)=h.water_blood.as_ref().filter(|v|**v>0.) {
                     let alpha=(0.20+0.65*(amount/100.).sqrt()).clamp(0.,0.85);
                     let stain=crate::world_features::tone(profile,[206,34,61],source_material_background,bg,ctx,o.chance,observation.all_seeing,None,true,false,false);
@@ -1682,7 +1706,6 @@ fn terrain_frame_palette(
                 (h.slime.value_or(false), "feature:slime", 0.22),
                 (h.mud.value_or(false), "feature:mud", 0.24),
                 (h.ichor.value_or(false), "feature:ichor", if flesh { 0.78 } else { 0.28 }),
-                (h.razorleaves.value_or(false), "feature:razorleaves", 0.22),
             ] {
                 if enabled {
                     let (c, alpha) =
@@ -1950,7 +1973,7 @@ fn terrain_frame_palette(
             if !o.current && other.current {
                 continue;
             }
-            let Some(nt) = other.tile.as_ref() else {
+            let Some(nt) = other.tile.as_deref().map(visual_tile) else {
                 continue;
             };
             let mut brogue_chasm_edge = false;
@@ -1961,9 +1984,9 @@ fn terrain_frame_palette(
                     material.edge.filter(|_|material.edge_nonempty).unwrap_or([197,195,211]),
                     if o.current { 0.4 } else { 0.21 },
                 ))
-            } else if matches!(tile.as_str(), "water" | "shallow-water")
+            } else if matches!(tile, "water" | "shallow-water")
                 && !matches!(
-                    nt.as_str(),
+                    nt,
                     "wall" | "chasm" | "pit" | "water" | "shallow-water"
                 )
             {
@@ -1971,11 +1994,11 @@ fn terrain_frame_palette(
                     material.edge.unwrap_or([239,137,145])
                 } else { [115, 239, 255] };
                 Some((edge, if o.current { 0.21 } else { 0.14 }))
-            } else if tile == "chasm" && !matches!(nt.as_str(), "chasm" | "pit") {
+            } else if tile == "chasm" && !matches!(nt, "chasm" | "pit") {
                 brogue_chasm_edge = flesh;
                 Some((if flesh {flesh_palette::brogue_chasm(x,y,seed)}else{[170,145,220]}, if o.current { 0.62 } else { 0.46 }))
-            } else if !matches!(tile.as_str(), "wall" | "chasm" | "pit")
-                && matches!(nt.as_str(), "chasm" | "pit")
+            } else if !matches!(tile, "wall" | "chasm" | "pit")
+                && matches!(nt, "chasm" | "pit")
             {
                 brogue_chasm_edge = flesh && nt == "chasm";
                 Some((if flesh && nt == "chasm" {flesh_palette::brogue_chasm(nx as usize,ny as usize,seed)}else{[170,145,220]}, 0.28))
@@ -2004,7 +2027,7 @@ fn terrain_frame_palette(
                         2.8
                     } else if tile == "floor" {
                         1.4
-                    } else if matches!(tile.as_str(), "water" | "shallow-water") {
+                    } else if matches!(tile, "water" | "shallow-water") {
                         1.55
                     } else {
                         1.85
@@ -2042,7 +2065,7 @@ fn terrain_frame_palette(
             bottom_aligned: tile == "grass" && glyph == "\"" && !fixture && !o.snow
                 && !o.ice && !o.puddles && !o.hellfire && !o.flowers,
             glyph,
-            label: if o.hellfire { "Hellfire".into() } else if o.ice { "Ice".into() } else if o.puddles { "Puddle".into() } else if tile == "wall" && o.hazards.as_ref().is_some_and(|h|h.bloody_wall.value_or(false)) { "Bloody wall".into() } else { tile.clone() },
+            label: if o.hellfire { "Hellfire".into() } else if o.ice { "Ice".into() } else if o.puddles { "Puddle".into() } else if tile == "wall" && o.hazards.as_ref().is_some_and(|h|h.bloody_wall.value_or(false)) { "Bloody wall".into() } else { o.tile.clone().unwrap_or_default() },
             emphasis: glyph_emphasis,
             underlays,
             material_background: Some(source_material_background),
@@ -2572,7 +2595,7 @@ fn terrain_frame_palette_json_reference(
     let mut cells = Vec::new();
     let mut backgrounds = vec![if flesh {crate::illumination_ui::unexplored(profile)} else {profile.rgb("fog.unexplored")}; width * height];
     for o in &observation.cells {
-        let Some(tile) = o.tile.as_ref() else {
+        let Some(tile) = o.tile.as_deref().map(visual_tile) else {
             continue;
         };
         corpse_core::timing::count(corpse_core::timing::Count::KnownCells,1);
@@ -2583,7 +2606,7 @@ fn terrain_frame_palette_json_reference(
         let ground_span=corpse_core::timing::sampled_span("desktop.style_sample.ground",style_sample);
         let (mut glyph, fg, mut bg, fixture, stone) = ground_profile(profile, o, flesh);
         drop(ground_span);
-        let mut important = matches!(tile.as_str(), "up" | "down" | "pit" | "chasm") || fixture;
+        let mut important = matches!(tile, "up" | "down" | "pit" | "chasm") || fixture;
         let ctx = crate::color::Context {
             knowledge,
             tile,
@@ -2597,7 +2620,7 @@ fn terrain_frame_palette_json_reference(
         if !fixture
             && !o.snow
             && matches!(
-                tile.as_str(),
+                tile,
                 "floor" | "grass" | "tree" | "water" | "shallow-water"
             )
         {
@@ -2612,16 +2635,16 @@ fn terrain_frame_palette_json_reference(
                 if !o.current && other.current {
                     continue;
                 }
-                if other.tile.as_ref().is_some_and(|t| {
+                if other.tile.as_deref().map(visual_tile).is_some_and(|t| {
                     matches!(
-                        t.as_str(),
+                        t,
                         "floor" | "grass" | "tree" | "water" | "shallow-water"
                     )
                 }) && !other.snow
                 {
                     let (_, _, c, f, _) = ground_profile(profile, other, flesh);
                     if !f && c != bg {
-                        neighbors.push((other.tile.as_ref().unwrap().as_str(), c));
+                        neighbors.push((visual_tile(other.tile.as_deref().unwrap()), c));
                     }
                 }
             }
@@ -2629,7 +2652,7 @@ fn terrain_frame_palette_json_reference(
                 let weight = (neighbors.len() as f64
                     * (0.1 + crate::color::noise(x as f64, y as f64, seed, 6.) * 0.02))
                     .min(0.18);
-                let bank = matches!(tile.as_str(), "water" | "shallow-water")
+                let bank = matches!(tile, "water" | "shallow-water")
                     && neighbors
                         .iter()
                         .any(|(t, _)| !matches!(*t, "water" | "shallow-water"));
@@ -2668,7 +2691,7 @@ fn terrain_frame_palette_json_reference(
             &material,
             o.chance,
             observation.all_seeing,
-            (flesh && o.direct && !fixture && matches!(tile.as_str(), "water" | "shallow-water"))
+            (flesh && o.direct && !fixture && matches!(tile, "water" | "shallow-water"))
                 .then(|| flesh_palette::water_illumination(profile, fg, bg, tile, ctx.light)),
         );
         let pulse = crate::entity_profile::material_pulse(
@@ -2725,7 +2748,7 @@ fn terrain_frame_palette_json_reference(
         }
         let mut arrow = String::new();
         let mut animations = Vec::new();
-        let energy = if matches!(tile.as_str(), "wall" | "tree") {
+        let energy = if matches!(tile, "wall" | "tree") {
             ctx.light.wall_energy
         } else {
             ctx.light.energy
@@ -2735,26 +2758,29 @@ fn terrain_frame_palette_json_reference(
             .hazards
             .as_ref()
             .is_some_and(|h| h.fire.as_ref().is_some() || h.permanent_fire.value_or(false));
-        if o.direct && ctx.light.display.is_none() && peak > 0.08 && !matches!(tile.as_str(), "chasm" | "pit") && !burning {
+        if o.direct && ctx.light.display.is_none() && peak > 0.08 && !matches!(tile, "chasm" | "pit") && !burning {
             animations.push(crate::render::Animation::Reflection {
                 phase: crate::color::noise(x as f64, y as f64, seed, 10.) * std::f64::consts::PI,
                 color: energy.map(|v| crate::color::from_linear(v / peak * 0.35).round() as u8),
             });
         }
 
-        if o.direct && matches!(tile.as_str(), "water" | "shallow-water")
-            && crate::appearance_material::idle_overlay_enabled(profile,&tile) {
+        if o.direct && matches!(tile, "water" | "shallow-water")
+            && crate::appearance_material::idle_overlay_enabled(profile,tile) {
             animations.push(crate::render::Animation::Water {
                 phase: crate::color::noise(x as f64, y as f64, seed, 8.) * std::f64::consts::PI,
                 speed: profile.number(&format!("terrain.{tile}.animationSpeed")),
             });
         }
         if let Some(h) = &o.hazards {
+            if h.razorleaves.value_or(false) {
+                razorleaf_appearance(profile,o,x,y,seed,source_material_background,&mut bg,ctx,observation.all_seeing,&mut animations);
+            }
             if tile == "wall" && h.bloody_wall.value_or(false) {
                 let stain=crate::world_features::tone(profile,[206,34,61],source_material_background,bg,ctx,o.chance,observation.all_seeing,None,true,false,false);
                 fg=crate::color::composite(fg,stain,0.75);
             }
-            if matches!(tile.as_str(),"water"|"shallow-water") && !h.ichor.value_or(false) {
+            if matches!(tile,"water"|"shallow-water") && !h.ichor.value_or(false) {
                 if let Some(amount)=h.water_blood.as_ref().filter(|v|**v>0.) {
                     let alpha=(0.20+0.65*(amount/100.).sqrt()).clamp(0.,0.85);
                     let stain=crate::world_features::tone(profile,[206,34,61],source_material_background,bg,ctx,o.chance,observation.all_seeing,None,true,false,false);
@@ -2767,7 +2793,6 @@ fn terrain_frame_palette_json_reference(
                 (h.slime.value_or(false), "feature:slime", 0.22),
                 (h.mud.value_or(false), "feature:mud", 0.24),
                 (h.ichor.value_or(false), "feature:ichor", if flesh { 0.78 } else { 0.28 }),
-                (h.razorleaves.value_or(false), "feature:razorleaves", 0.22),
             ] {
                 if enabled {
                     let (c, alpha) =
@@ -3035,7 +3060,7 @@ fn terrain_frame_palette_json_reference(
             if !o.current && other.current {
                 continue;
             }
-            let Some(nt) = other.tile.as_ref() else {
+            let Some(nt) = other.tile.as_deref().map(visual_tile) else {
                 continue;
             };
             let mut brogue_chasm_edge = false;
@@ -3050,9 +3075,9 @@ fn terrain_frame_palette_json_reference(
                         .unwrap_or([197, 195, 211]),
                     if o.current { 0.4 } else { 0.21 },
                 ))
-            } else if matches!(tile.as_str(), "water" | "shallow-water")
+            } else if matches!(tile, "water" | "shallow-water")
                 && !matches!(
-                    nt.as_str(),
+                    nt,
                     "wall" | "chasm" | "pit" | "water" | "shallow-water"
                 )
             {
@@ -3060,11 +3085,11 @@ fn terrain_frame_palette_json_reference(
                     material["edgeColor"].as_str().map(hex).unwrap_or([239, 137, 145])
                 } else { [115, 239, 255] };
                 Some((edge, if o.current { 0.21 } else { 0.14 }))
-            } else if tile == "chasm" && !matches!(nt.as_str(), "chasm" | "pit") {
+            } else if tile == "chasm" && !matches!(nt, "chasm" | "pit") {
                 brogue_chasm_edge = flesh;
                 Some((if flesh {flesh_palette::brogue_chasm(x,y,seed)}else{[170,145,220]}, if o.current { 0.62 } else { 0.46 }))
-            } else if !matches!(tile.as_str(), "wall" | "chasm" | "pit")
-                && matches!(nt.as_str(), "chasm" | "pit")
+            } else if !matches!(tile, "wall" | "chasm" | "pit")
+                && matches!(nt, "chasm" | "pit")
             {
                 brogue_chasm_edge = flesh && nt == "chasm";
                 Some((if flesh && nt == "chasm" {flesh_palette::brogue_chasm(nx as usize,ny as usize,seed)}else{[170,145,220]}, 0.28))
@@ -3093,7 +3118,7 @@ fn terrain_frame_palette_json_reference(
                         2.8
                     } else if tile == "floor" {
                         1.4
-                    } else if matches!(tile.as_str(), "water" | "shallow-water") {
+                    } else if matches!(tile, "water" | "shallow-water") {
                         1.55
                     } else {
                         1.85
@@ -3131,7 +3156,7 @@ fn terrain_frame_palette_json_reference(
             bottom_aligned: tile == "grass" && glyph == "\"" && !fixture && !o.snow
                 && !o.ice && !o.puddles && !o.hellfire && !o.flowers,
             glyph,
-            label: if o.hellfire { "Hellfire".into() } else if o.ice { "Ice".into() } else if o.puddles { "Puddle".into() } else if tile == "wall" && o.hazards.as_ref().is_some_and(|h|h.bloody_wall.value_or(false)) { "Bloody wall".into() } else { tile.clone() },
+            label: if o.hellfire { "Hellfire".into() } else if o.ice { "Ice".into() } else if o.puddles { "Puddle".into() } else if tile == "wall" && o.hazards.as_ref().is_some_and(|h|h.bloody_wall.value_or(false)) { "Bloody wall".into() } else { o.tile.clone().unwrap_or_default() },
             emphasis: glyph_emphasis,
             underlays,
             material_background: Some(source_material_background),

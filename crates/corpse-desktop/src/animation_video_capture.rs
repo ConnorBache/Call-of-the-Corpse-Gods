@@ -32,3 +32,61 @@ fn render_animation_review_videos() {
  }
  std::fs::write(format!("{output}/index.json"),serde_json::to_vec_pretty(&index).unwrap()).unwrap();
 }
+
+fn razorleaves_scene() -> Run {
+    let mut run=crate::non_euclidean_ui::tests::scene();
+    run.simulation_revision=52.0.into();
+    run.player.x=9.;
+    run.player.y=10.;
+    run.player.stats.perception=100.;
+    let floor=run.floor_mut().unwrap();
+    floor.non_euclidean=corpse_core::Field::Missing;
+    floor.godbeast_event=corpse_core::Field::Missing;
+    floor.light_sources=corpse_core::Field::Missing;
+    let samara=corpse_core::population::create_actor_revision("samara",901.,13.,10.,false,52.).unwrap();
+    run.actors_at_mut(run.depth).push(samara);
+    corpse_core::environment::refresh_razorleaves(&mut run,&[901.]);
+    run
+}
+
+#[test]
+fn razorleaves_animate_only_observed_tiles_without_mutating_gameplay() {
+    let run=razorleaves_scene();let before=run.clone();
+    let view=observe::observe(&run);
+    let visible:Vec<_>=view.cells.iter().filter(|c|c.animations.iter()
+        .any(|a|matches!(a,crate::render::Animation::Razorleaves{..}))).collect();
+    assert!(visible.len()>50);
+    assert!(visible.iter().any(|c|(c.x,c.y)==(9,10)),"effect remains over occupied tiles");
+    assert!(visible.iter().all(|c|c.current&&(c.x as i32-13).pow(2)+(c.y as i32-10).pow(2)<=25));
+    let mut painter=Painter::new();
+    painter.game_at(&view,"",false,130.);
+    let first=crc32fast::hash(&painter.pixels);
+    painter.game_at(&view,"",false,730.);
+    assert_ne!(first,crc32fast::hash(&painter.pixels));
+    painter.game_at(&view,"",false,130.);
+    assert_eq!(first,crc32fast::hash(&painter.pixels));
+    assert_eq!(before,run);
+}
+
+#[test]
+#[ignore = "explicit native gameplay capture; requires ffmpeg"]
+fn capture_razorleaves() {
+    let output=std::env::var("CORPSE_RAZORLEAVES_VIDEO").expect("output path");
+    let run=razorleaves_scene();
+    let mut painter=Painter::new();
+    painter.resize(1280,800);
+    painter.set_responsive_canvas(true);
+    let view=observe::observe_with_profile(&run,&painter.profile);
+    let (w,h,ox,oy)=painter.map_layout(view.width,view.height);
+    let crop=format!("crop={}:{}:{}:{},scale=720:-2:flags=neighbor",w*14,h*13,ox+w*6,oy+h*4);
+    let mut encoder=Process::new("ffmpeg").args(["-hide_banner","-loglevel","error","-y",
+        "-f","rawvideo","-pix_fmt","rgba","-s","1280x800","-r","30","-i","-",
+        "-vf",&crop,"-an","-c:v","libx264","-crf","17","-pix_fmt","yuv420p",
+        "-movflags","+faststart",&output]).stdin(Stdio::piped()).spawn().unwrap();
+    let mut sink=encoder.stdin.take().unwrap();
+    for frame in 0..120 {
+        painter.game_at(&view,"Falling razorleaves fill the air.",false,frame as f64*1000./30.);
+        sink.write_all(&painter.pixels).unwrap();
+    }
+    drop(sink);assert!(encoder.wait().unwrap().success());
+}

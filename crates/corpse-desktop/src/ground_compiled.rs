@@ -7,13 +7,7 @@ use corpse_core::vision::ObservedCell;
 #[derive(Debug)]
 pub(super) struct Ground<'a>{pub glyph:String,pub fg:Rgb,pub bg:Rgb,pub fixture:bool,pub stone:bool,pub original:MaterialView<'a>,pub displayed:MaterialView<'a>}
 fn raw_material<'a>(p:&'a Profile,o:&ObservedCell)->MaterialView<'a>{
-    let tile=o.tile.as_deref().unwrap_or("floor");
-    if tile == "speed-up" {
-        let mut m=p.resolved_material("floor",Parent::None).unwrap_or_default();
-        m.color=Some([95,211,211]);m.background=Some([12,49,51]);m.edge=Some([95,211,211]);
-        m.edge_nonempty=true;m.glyph=Some(".");m.animation_speed=0.;
-        m.color_default=true;m.background_default=true;m.edge_default=true;return m
-    }
+    let tile=super::visual_tile(o.tile.as_deref().unwrap_or("floor"));
     if !matches!(tile,"up"|"down") && o.door_open.is_none()&&!o.grate&&!o.bridge&&(o.ice||o.puddles||o.hellfire){
         let mut m=p.resolved_material("floor",Parent::None).unwrap_or_default();
         let(f,b,g)=if o.hellfire{([227,56,36],[9,3,7],".")}else if o.ice{([168,220,233],[24,60,82],"_")}else{([117,155,165],[26,48,59],"~")};
@@ -34,7 +28,7 @@ fn flesh_colors(tile:&str,substrate:Option<&str>)->Option<[Rgb;3]>{Some(match ti
 })}
 pub(super) fn prepare<'a>(profile:&'a Profile,o:&ObservedCell,flesh:bool)->Ground<'a>{
     let original=raw_material(profile,o);let mut displayed=original;
-    let tile=o.tile.as_deref().unwrap_or("floor");
+    let tile=super::visual_tile(o.tile.as_deref().unwrap_or("floor"));
     if flesh {
         let fixture=o.door_open.is_some()||o.grate||o.bridge||o.snow||o.ice||o.puddles||o.hellfire;
         if !fixture {if let Some([f,b,e])=flesh_colors(tile,o.substrate.as_deref()){

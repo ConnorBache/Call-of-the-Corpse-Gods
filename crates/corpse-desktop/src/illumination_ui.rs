@@ -50,6 +50,7 @@ pub fn finish_cell(cell: &mut Cell, light: Light, profile: &Profile) {
     for animation in &mut cell.animations {
         match animation {
             Animation::Gas { color, .. } | Animation::Reflection { color, .. } => *color = display.apply(*color),
+            Animation::Razorleaves { color, .. } => *color = display.foreground(*color,false),
             Animation::Fire { colors, .. } => *colors = colors.map(|color| display.foreground(color,false)),
             _ => {}
         }

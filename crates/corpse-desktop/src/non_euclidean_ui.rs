@@ -6,7 +6,7 @@ pub const INK: Rgb = [95, 211, 211];
 pub fn enabled(run: &Run) -> bool { run.simulation_revision.value_or(29.) >= 36. }
 
 /// O(C*G*S), bounded saved groups (G<=384, S<=2). r51 uses matching
-/// integer glyphs, never portal glyph 0, and teal ground for Speed-up terrain.
+/// integer glyphs, never portal glyph 0, with the same cyan overlay for both pocket types.
 /// Both knowledge and material come from this observation, not hidden live tiles.
 pub fn terrain(run: &Run, observation: &vision::TerrainObservation, cells: &mut [Cell]) {
     if !enabled(run) { return; }
@@ -20,19 +20,12 @@ pub fn terrain(run: &Run, observation: &vision::TerrainObservation, cells: &mut 
         if run.simulation_revision.value_or(29.) >= 51. {
             cell.glyph = pockets::group_number(f, at).unwrap().to_string();
             cell.fg = crate::color::composite(cell.bg, INK, if o.current { 0.95 } else { 0.38 });
-            cell.bottom_aligned = !fast;
-            if fast {
-                // This is the material itself, not an overlay of grass/water.
-                cell.background_overlay = None;
-                cell.label = "Speed-up area".into();
-            } else {
-                cell.background_overlay = Some((INK, if o.current { 0.22 } else { 0.09 }));
-                cell.label = "Non-Euclidean space".into();
-            }
+            cell.bottom_aligned = true;
+            cell.label = if fast { "Speed-up area" } else { "Non-Euclidean space" }.into();
         } else {
-            cell.background_overlay = Some((if fast { [139, 224, 147] } else { INK }, if o.current { 0.22 } else { 0.09 }));
             cell.label = format!("{} {}", if fast { "Speed-up" } else { "Non-Euclidean" }, cell.label);
         }
+        cell.background_overlay = Some((INK, if o.current { 0.22 } else { 0.09 }));
     }
 }
 /// Restore detached topology ink after animated material reconstruction. The
@@ -444,14 +437,14 @@ mod revision51_tests {
         pockets::install_speedup_terrain(f);f.remembered_tiles=f.tiles.clone().into();r
     }
     #[test]
-    fn revision51_speed_up_is_teal_material_not_a_modifier() {
+    fn revision51_speed_up_keeps_distinct_terrain_and_shares_the_spatial_marker() {
         let r=scene();let before=r.clone();let v=crate::observe::observe(&r);
         let at=12*v.width+11;let o=&v.terrain_snapshot.as_ref().unwrap().cells[at];
         assert_eq!(o.tile.as_deref(),Some("speed-up"));
         let c=v.cells.iter().find(|c|c.x==11&&c.y==12).unwrap();
         assert_eq!(c.label,"Speed-up area");assert!(c.non_euclidean);assert!(!c.italic);
-        assert!(c.background_overlay.is_none());assert!(c.fg[1]>c.fg[0]&&c.fg[2]>c.fg[0]);
-        assert!(!c.bottom_aligned);assert_eq!(r,before);
+        assert_eq!(c.background_overlay.map(|(_,alpha)|alpha),Some(0.22));assert!(c.fg[1]>c.fg[0]&&c.fg[2]>c.fg[0]);
+        assert!(c.bottom_aligned);assert_eq!(r,before);
         assert_eq!(crate::inspection_ui::observe_tile(&r,11,12).title,"Speed-up area");
     }
     #[test]
@@ -468,7 +461,7 @@ mod revision51_tests {
         assert!(description(&r,&own_changed,11,12).is_none());
     }
     #[test]
-    fn revision51_speed_up_item_and_actor_layers_keep_one_identity_and_teal_ground() {
+    fn revision51_speed_up_item_and_actor_layers_keep_one_identity_and_shared_ground() {
         let mut r=scene();let item=corpse_core::equipment::make_equipment("Ring",901.).unwrap();
         r.ground_at_mut(r.depth).push(corpse_core::GroundItem{x:13.,y:12.,item,..Default::default()});
         r.actors_at_mut(r.depth).push(corpse_core::population::create_actor_revision("rat",902.,15.,12.,false,51.).unwrap());
@@ -506,6 +499,35 @@ mod revision52_tests {
 
     fn scene() -> Run {
         let mut r=super::revision51_tests::scene();r.simulation_revision=52.0.into();r
+    }
+
+    #[test]
+    fn revision52_speed_up_and_non_euclidean_pockets_render_identically() {
+        let speed=scene();
+        let mut ordinary=speed.clone();
+        let f=ordinary.floor_mut().unwrap();
+        for pocket in f.speed_up.as_ref().unwrap() {
+            for &at in &pocket.cells {
+                f.tiles[at]="floor".into();
+                f.remembered_tiles.as_mut().unwrap()[at]="floor".into();
+            }
+        }
+        let mut groups=f.non_euclidean.as_ref().unwrap().clone();
+        groups.extend(f.speed_up.as_ref().unwrap().iter().cloned());
+        f.non_euclidean=groups.into();
+        f.speed_up=corpse_core::Field::Missing;
+        f.speed_up_terrain=corpse_core::Field::Missing;
+        let mut a=crate::observe::observe(&speed);
+        let mut b=crate::observe::observe(&ordinary);
+        a.hover=Some((11,12));b.hover=a.hover;
+        a.possible_exits=possible_exit_marks(&speed,11,12);
+        b.possible_exits=possible_exit_marks(&ordinary,11,12);
+        assert_eq!(a.possible_exits,b.possible_exits);
+        let mut p=crate::render::Painter::new();
+        p.game_at(&a,"",false,824.);
+        let pixels=p.pixels.clone();
+        p.game_at(&b,"",false,824.);
+        assert_eq!(pixels,p.pixels,"only the inspector name may differ");
     }
 
     #[test]
