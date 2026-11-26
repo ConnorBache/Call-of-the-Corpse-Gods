@@ -235,6 +235,11 @@ impl Replays {
                 );
             }
         }
+        if !reduced {
+            if let Some((color,alpha))=crate::effects::rewind_tint(&self.effects.cues,now) {
+                p.ending_fade(color,alpha);
+            }
+        }
         // Painter is shared with live play and menus; replay never retains its
         // detached mask beyond its own composition call.
         self.paint_stage=p.firebolt_terrain.take();

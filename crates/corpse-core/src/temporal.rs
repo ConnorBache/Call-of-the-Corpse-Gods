@@ -1310,7 +1310,7 @@ impl Engine {
             let mut candidate=self.run.clone();candidate.replay.push(command.clone());
             crate::events::begin();
             let restored=crate::future_floor::restore(&mut candidate).map_err(crate::engine::EngineError)?;
-            if restored {let id=candidate.player.id;crate::dreamwalking::with_actor(&mut candidate,id,|r|crate::animation_shapes::nova(r,&r.player,"P71","nova-pink-large",6));}
+            if restored {crate::future_floor::present_restore(&mut candidate);}
             let events=crate::events::finish();self.run=candidate;
             return Ok(crate::engine::DispatchOutcome{changed:restored,events,..Default::default()});
         }
@@ -1495,7 +1495,7 @@ impl Engine {
             if crate::future_floor::enabled(&self.run) && self.run.status=="dead" && crate::future_floor::available(&self.run) {
                 crate::events::begin();
                 crate::future_floor::restore(&mut self.run).map_err(crate::engine::EngineError)?;
-                let id=self.run.player.id;crate::dreamwalking::with_actor(&mut self.run,id,|r|crate::animation_shapes::nova(r,&r.player,"P71","nova-pink-large",6));
+                crate::future_floor::present_restore(&mut self.run);
                 out.events=crate::events::finish();out.pending_snapshot=None;out.changed=true;
             }
             crate::future_floor::ensure_entry(&mut self.run).map_err(crate::engine::EngineError)?;

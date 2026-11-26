@@ -78,7 +78,7 @@ Automated tests in animation_player.rs passed in verification/r52-animations/cor
 | P68 | Bonded By Unseen Threads | Snapshot bond toggle; engine actual bond damage |
 | P69 | Turning the Wheel | Snapshot wheel toggle only |
 | P70 | Sever Fate | abilities successful neutralization at actual target |
-| P71 | See The Future | temporal future-presence transition: capture fold / restore ripple, acting-plane context |
+| P71 | See The Future | Current Unseen floor rewind: purple fade with scene swap at full opacity; prior revisions retain the legacy cue |
 | P72 | All-Seeing Eyes | abilities paid All-Seeing Eyes |
 | P73 | Dreamwalk / Wake Up | Snapshot actual Dreamwalk/wake state change |
 | P74 | Teleport from the Masque of the Trickster (Ahvamitt’s reward) | ahvamitt actual Masque teleport (enemy/integration owner) |

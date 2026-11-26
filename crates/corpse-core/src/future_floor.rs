@@ -3,6 +3,14 @@
 use crate::{Field, Run, future_anchor::FutureAnchor};
 use serde::{Serialize, Deserialize};
 pub const ID: &str = "morae-see-the-future";
+pub const FADE: &str = "floor-rewind-fade";
+/// Called only by dispatch after a successful rewind in its presentation batch.
+pub(crate) fn present_restore(r: &mut Run) {
+    crate::dreamwalking::with_actor(r,r.player.id,|r| {
+        crate::events::cue(r,&r.player,"P71",FADE,crate::events::Stage::Special,&[(&r.player).into()]);
+    });
+    crate::events::checkpoint(r);
+}
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all="camelCase", deny_unknown_fields)]
 pub struct State {

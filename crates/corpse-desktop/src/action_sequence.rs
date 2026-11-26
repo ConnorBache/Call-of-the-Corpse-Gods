@@ -31,7 +31,7 @@ impl Sequence {
         for action in actions {
             if let Some(index) = frames.iter().rposition(|f| f.action < action) { selected.insert(index); }
         }
-        for cue in &cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")||a.arrival_steps.is_some()||a.hide_actor.is_some()) {
+        for cue in &cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")||a.arrival_steps.is_some()||a.hide_actor.is_some()||a.style==corpse_core::future_floor::FADE) {
             let action=cue.event.animation.as_ref().unwrap().action;
             if let Some(index)=frames.iter().position(|f|f.action==action){selected.insert(index);}
         }}
@@ -95,6 +95,15 @@ impl Sequence {
             if let Some(a) = &cue.event.animation {
                 if let Some((_, until)) = self.ends.iter_mut().find(|(id,_)| *id == a.action) { *until = until.max(end); }
                 else { self.ends.push((a.action,end)); }
+            }
+        }
+        for cue in &cues {
+            let Some(a)=cue.event.animation.as_ref().filter(|a|a.style==corpse_core::future_floor::FADE) else {continue};
+            // The scene switches only under opaque purple; its restored map
+            // and HUD are both present throughout the fade back in.
+            if let Some((_,after))=self.frames.iter().find(|(id,_)|*id==a.action) {
+                self.reveals.push((cue.started+crate::effects::REWIND_MIDPOINT_MS,
+                    cue.started+duration(&cue.event),after.clone()));
             }
         }
         for cue in &cues {

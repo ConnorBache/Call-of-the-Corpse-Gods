@@ -2,6 +2,22 @@
 //! No simulation access or clocks live here; receipts own geometry and outcomes.
 use crate::render::Rgb;
 use corpse_core::events::{PresentationEvent, Delivery, Stage};
+use corpse_core::future_floor::FADE as FLOOR_REWIND;
+pub const REWIND_MIDPOINT_MS: f64 = 350.;
+const REWIND_DURATION_MS: f64 = REWIND_MIDPOINT_MS * 2.;
+const REWIND_PURPLE: Rgb = [105, 38, 160];
+
+pub fn rewind_tint(cues: &[Cue], now: f64) -> Option<(Rgb, u8)> {
+    cues.iter().rev().find_map(|c| {
+        if c.static_marks || !c.event.animation.as_ref().is_some_and(|a|a.style==FLOOR_REWIND) {
+            return None;
+        }
+        let age = now - c.started;
+        if !(0. ..REWIND_DURATION_MS).contains(&age) {return None;}
+        let t = (1. - (age / REWIND_MIDPOINT_MS - 1.).abs()).clamp(0., 1.);
+        Some((REWIND_PURPLE, (255. * t * t * (3. - 2. * t)).round() as u8))
+    })
+}
 #[derive(Clone)]
 pub struct Cue {
     pub event: PresentationEvent,
@@ -157,6 +173,7 @@ pub fn tiles(cue: &Cue, now: f64, reduced: bool) -> Vec<Tile> {
 pub(crate) fn admitted(e: &PresentationEvent) -> bool {
     let Some(a) = e.animation.as_ref() else { return (e.kind == "projectile" && e.from.is_some()) || explosion(e); };
     a.surface.is_some()
+        || a.style==FLOOR_REWIND
         || crate::divine_animation_shapes::duration(e).is_some()
         || (a.stage == Stage::Travel && a.delivery != Delivery::Local)
         // Authored explosions are distinct from the reviewed attached flashes.
@@ -208,14 +225,16 @@ impl Effects {
         self.firebolt_terrain.clear();
         self.pending_frame=None;
         let key = (tick.to_bits(), depth.to_bits());
-        if self.key != Some(key) || rewind {
+        if self.key != Some(key) || rewind || events.iter().any(|e|
+            e.animation.as_ref().is_some_and(|a|a.style==FLOOR_REWIND))
+        {
             self.cues.clear();
         }
         self.key = Some(key);
         let mut events=events;
         // Remove flashes before phase lengths, scene capture, or input locks.
         events.retain(|e| admitted(e) && (!(self.reduced || self.instant)
-            || e.animation.as_ref().is_none_or(|a|a.style!=corpse_core::events::COMMANDMENT_SLIDE)));
+            || e.animation.as_ref().is_none_or(|a|!matches!(a.style.as_str(),corpse_core::events::COMMANDMENT_SLIDE | FLOOR_REWIND))));
         // A shared strike gets feedback only when it actually traveled. Ability
         // procs have their own receipts; ordinary walking/melee adds no flourish.
         // O(E log E) time / O(E) scratch, bounded by the existing cue cap.
@@ -348,6 +367,7 @@ fn travel_end(e:&PresentationEvent)->f64{
     e.animation.as_ref().map_or(140.,|a|if a.delivery==Delivery::Local{140.}else{arrival_ms(e,a.cells.len().max(1))})
 }
 pub(crate) fn duration(e:&PresentationEvent)->f64 {
+    if e.animation.as_ref().is_some_and(|a|a.style==FLOOR_REWIND) {return REWIND_DURATION_MS;}
     if let Some(d)=crate::divine_animation_shapes::duration(e){return d;}
     e.animation.as_ref().map_or(240.,|a|match a.stage {
         Stage::Travel=>travel_end(e)+if a.delivery==Delivery::Magic{MAGIC_TAIL_MS}else{0.},
@@ -368,7 +388,7 @@ fn action_tiles(cue: &Cue, age: f64, reduced: bool) -> Vec<Tile> {
     let e = &cue.event;
     let a = e.animation.as_ref().unwrap();
     let duration = duration(e);
-    if age < 0. || age >= duration || a.cells.is_empty() { return vec![]; }
+    if age < 0. || age >= duration || a.cells.is_empty() || a.style==FLOOR_REWIND { return vec![]; }
     let color = e.color.as_ref().map_or_else(|| {
         if a.delivery==Delivery::Projectile && a.proposal=="shared" {return [195,199,208];}
         if a.proposal=="E03" && a.arrival_steps.is_some() {return proposal_color("A02");}

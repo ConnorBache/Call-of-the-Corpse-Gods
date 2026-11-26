@@ -2780,3 +2780,7 @@ A projected Clay Soldier wall draws the existing full-size wall glyph in darker 
 
 ### Commandment actor-only displacement
 The existing observed route is grouped once after the paid push. The desktop masks only the displaced actor in the detached action scene (O(V) in observed layers, already used for other actor masks), then draws one glyph per frame at an O(1) sampled position between adjacent route cells. It never paints a tile highlight or interpolates across a portal jump. The final position stays visible briefly before the committed enemy response can be revealed. No new simulation work, saved fields, or additional RNG; Reduced and Instant skip the sequence rather than replacing it with a highlight.
+
+
+### Unseen floor-entry fade
+A successful current floor rewind emits one screen cue and at most one optional observed destination snapshot. The desktop holds the pre-rewind view until the purple midpoint, then fades into the actual restored entry view. There is no new gameplay state, time, or RNG. Per-frame easing is O(1) after scanning the existing bounded cue list; CPU fill is O(P) drawable pixels, GPU fill one full-frame quad (O(P) fragments), O(1) scratch. Reduced and Instant motion skip the cue without blocking input.

@@ -661,3 +661,60 @@ fn commandment_slide_precedes_the_enemys_same_turn_return_without_tile_light() {
     reduced.add(vec![cue.event.clone()],before.tick,before.depth,0.,false);
     assert!(reduced.cues.is_empty()&&!reduced.presentation_pending(0.));
 }
+
+#[test]
+fn unseen_floor_rewind_fades_between_the_actual_gameplay_scenes() {
+    for lethal in [false,true] {
+        let mut r=room();
+        let id=corpse_core::future_floor::ID;
+        r.player.abilities=vec![id.into()];
+        r.future_floor_rules_from=0usize.into();
+        r.future_floor=None;
+        corpse_core::future_floor::capture_entry(&mut r).unwrap();
+        let mut engine=temporal::Engine::new(r).unwrap();
+        engine.dispatch(&Command::Move{dx:0.,dy:1.}).unwrap();
+        assert_eq!(engine.run.player.y,11.);
+        let command=Command::Ability{id:id.into(),target:Field::Missing,x:Field::Missing,y:Field::Missing};
+        let mut fx=effects::Effects::default();
+        let action=if lethal {
+            engine.run.player.hp=1.;
+            engine.run.player.conditions.insert("poisoned".into(),5.);
+            &Command::Wait
+        } else {&command};
+        let out=dispatch(&mut engine,&mut fx,10.,action).unwrap();
+        assert!(out.changed);
+        assert_eq!(engine.run.player.y,10.);
+        assert!(corpse_core::future_floor::used(&engine.run,engine.run.depth));
+        assert_eq!(fx.cues.len(),1,"the fade replaces the old nova");
+        fx.begin_frame(200.);
+        let midpoint=200.+effects::REWIND_MIDPOINT_MS;
+        let avatar=|t:f64| {
+            let view=fx.sequence.view(t).unwrap();
+            view.cells.iter().rev().find(|c|c.actor_id==Some(view.player_id)).unwrap().y
+        };
+        assert_eq!(avatar(midpoint-1.),11);
+        assert_eq!(avatar(midpoint),10);
+        assert_eq!(avatar(midpoint+1.),10);
+        let (color,alpha)=effects::rewind_tint(&fx.cues,midpoint).unwrap();
+        assert_eq!(alpha,255);
+        assert_eq!(effects::rewind_tint(&fx.cues,375.).unwrap().1,128);
+        assert_eq!(effects::rewind_tint(&fx.cues,725.).unwrap().1,128);
+        assert!(effects::tiles(&fx.cues[0],midpoint,false).is_empty());
+        let mut painter=Painter::new();
+        painter.game_at(fx.sequence.view(midpoint).unwrap(),"",false,0.);
+        painter.ending_fade(color,alpha);
+        assert!(painter.pixels.chunks_exact(4).all(|p| p[..3]==color));
+        assert!(fx.sequence.view(900.).is_none());
+        assert!(effects::rewind_tint(&fx.cues,900.).is_none());
+        for instant in [false,true] {
+            let mut reduced=effects::Effects::default();
+            reduced.configure_motion(true,instant);
+            reduced.add(vec![fx.cues[0].event.clone()],0.,engine.run.depth,0.,true);
+            assert!(!reduced.presentation_pending(0.) && reduced.cues.is_empty());
+        }
+        // No animation on a second attempt on the same floor.
+        let out=dispatch(&mut engine,&mut fx,1000.,&command).unwrap();
+        assert!(!out.changed);
+        assert!(fx.cues.is_empty());
+    }
+}

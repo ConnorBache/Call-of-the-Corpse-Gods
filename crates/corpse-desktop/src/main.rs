@@ -3069,6 +3069,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 gameplay_pause::paint(&mut painter,if terminal_status=="dead" {gameplay_pause::DEATH} else {gameplay_pause::CONTINUE});
             }
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
+            if screen==Screen::Game && !action_reduced {
+                if let Some((color,alpha))=effects::rewind_tint(&effects.cues,now) {
+                    painter.ending_fade(color,alpha);
+                }
+            }
             if let Some((color, alpha)) = results_tint { painter.ending_fade(color, alpha); }
             if let Some(frame)=painter.gpu.as_ref(){
                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
