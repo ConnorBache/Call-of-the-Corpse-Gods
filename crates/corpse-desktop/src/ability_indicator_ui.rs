@@ -16,6 +16,20 @@ fn ragelight_label(cost_bits:u64)->String {
 pub(super) fn ragelight_width(p:&Painter,cost_bits:u64)->i32 {
     (resource_ui::text_width(p,&ragelight_label(cost_bits),12)+12).max(25)
 }
+
+fn paint_blood_drop(p: &mut Painter, count: u64, x: i32, y: i32) {
+    // Rasterize a pointed droplet with a rounded bottom, bounded 29x30.
+    for dy in 0i32..30 {
+        let half = if dy < 14 {
+            dy * 13 / 14
+        } else {
+            ((1. - ((dy - 17) as f64 / 13.).powi(2)).max(0.).sqrt() * 13.) as i32
+        };
+        p.rect(x + 14 - half, y + dy, half * 2 + 1, 1, [177, 33, 66]);
+    }
+    centered(p, &count.to_string(), x, y + 12, 29, 12, INK);
+}
+
 pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
     match value {
         CustomIndicator::Nightmares{count,until}=>{
@@ -69,18 +83,9 @@ pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
             if ready {p.rect(x,y,21,21,[59,150,255]);}
             p.border(x,y,21,21,[99,177,255]);
         }
-        CustomIndicator::OverflowingSaves(count)=>{
-            p.rect(x,y,42,21,[177,33,66]);
-            p.border(x,y,42,21,[221,65,100]);
-            centered(p,&format!("{count}/5"),x,y+3,42,12,INK);
-        }
+        CustomIndicator::OverflowingSaves(count) => paint_blood_drop(p, count, x, y),
         CustomIndicator::Blood{count,progress}=>{
-            // Rasterize a pointed droplet with a rounded bottom, bounded 29x30.
-            for dy in 0i32..30 {
-                let half=if dy<14 {dy*13/14} else {((1.-((dy-17)as f64/13.).powi(2)).max(0.).sqrt()*13.)as i32};
-                p.rect(x+14-half,y+dy,half*2+1,1,[177,33,66]);
-            }
-            centered(p,&count.to_string(),x,y+12,29,12,INK);
+            paint_blood_drop(p, count, x, y);
             let bx=x+35;let bw=(width-35).max(12);
             p.rect(bx,y+5,bw,7,[49,28,39]);
             p.rect(bx,y+5,(bw as f64*(progress as f64/50.).clamp(0.,1.)).round()as i32,7,[221,65,100]);
@@ -137,6 +142,30 @@ mod tests {
         r.player.abilities.insert(0,"isheilah-missed-me".into());
         assert_eq!(crate::ability_ui::observe(&r,"isheilah-missed-me").indicator,None);
     }
+
+    #[test]
+    fn overflowing_uses_the_classic_drop_without_the_legacy_progress_bar() {
+        let (mut current, mut legacy) = (Painter::new(), Painter::new());
+        let untouched = current.pixels.clone();
+        for (p, indicator) in [
+            (&mut current, CustomIndicator::OverflowingSaves(3)),
+            (&mut legacy, CustomIndicator::Blood { count: 3, progress: 27 }),
+        ] {
+            paint(p, indicator, 0, 0, 80);
+        }
+        for y in 0..30 {
+            let row = y * current.width * 4;
+            let drop = row..row + 29 * 4;
+            assert_eq!(&current.pixels[drop.clone()], &legacy.pixels[drop]);
+            let beside_drop = row + 29 * 4..row + 80 * 4;
+            assert_eq!(&current.pixels[beside_drop.clone()], &untouched[beside_drop]);
+        }
+        assert_ne!(&current.pixels[..29 * 4], &untouched[..29 * 4]);
+        let mut empty = Painter::new();
+        paint(&mut empty, CustomIndicator::OverflowingSaves(0), 0, 0, 80);
+        assert!(empty.pixels != current.pixels);
+    }
+
     #[test]
     fn custom_indicators_native_captures_and_incremental_repaint() {
         for(w,h)in[(1280,800),(1920,1080),(960,1200)] {
@@ -144,9 +173,11 @@ mod tests {
             let(mut full,mut retained_p,mut tile)=(Painter::new(),Painter::new(),Painter::new());
             for p in [&mut full,&mut retained_p,&mut tile]{p.try_resize(w,h).unwrap();p.set_responsive_canvas(true);}
             let mut retained=RetainedGame::default();let mut plan=TilePlanner::default();
-            for step in 0..3 {
+            for step in 0..5 {
                 if step==1 {r.player.nightmares=0.0.into();r.player.reactions=0.0.into();r.player.blood=0.0.into();r.player.damage_bank=0.0.into();r.player.conditions.insert("pelianUsed".into(),1.);r.player.active.clear();}
                 if step==2 {r.player.nightmares=1.0.into();r.player.reactions=1.0.into();r.player.blood=55.0.into();r.player.damage_bank=49.0.into();r.player.conditions.remove("pelianUsed");r.player.conditions.insert("nightmareAt".into(),r.tick+1.);}
+                if step==3 {r.balance_rules_from=0usize.into();r.player.conditions.insert("overflowingSaves".into(),0.);}
+                if step==4 {corpse_core::divine_rescues::refill_on_level_up(&mut r);}
                 let v=crate::observe::observe(&r);full.game_at(&v,"",false,0.);
                 retained.update(&mut retained_p,&v,"",0.,true,false).unwrap();
                 plan.replace_view(if step==0{None}else{Some(&old)},&v,&tile);plan.finish_damage(&mut tile);plan.paint_base(&mut tile,&v,"",0.);tile.tile_clip_enabled=false;plan.clear_frame();

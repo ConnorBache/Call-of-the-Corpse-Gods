@@ -1654,6 +1654,12 @@ mod divine_balance_presentation_tests {
         let row=observe(&r,"lichor-overflowing");
         assert_eq!(row.indicator,Some(CustomIndicator::OverflowingSaves(5)));
         assert!(row.description.contains("full HP or leveling up"));
+        r.player.conditions.insert("overflowingSaves".into(), 2.);
+        assert_eq!(observe(&r,"lichor-overflowing").indicator,Some(CustomIndicator::OverflowingSaves(2)));
+        r.player.conditions.insert("overflowingSaves".into(), 0.);
+        assert_eq!(observe(&r,"lichor-overflowing").indicator,Some(CustomIndicator::OverflowingSaves(0)));
+        corpse_core::divine_rescues::refill_on_level_up(&mut r);
+        assert_eq!(observe(&r,"lichor-overflowing").indicator,Some(CustomIndicator::OverflowingSaves(5)));
         assert!(observe(&r,"shrail-fight-long").description.contains("3%"));
         assert!(observe(&r,"ursa-sudden-sleep").description.contains("25 turns"));
         let dream=observe(&r,"ursa-dream-of-time-gone-by");
