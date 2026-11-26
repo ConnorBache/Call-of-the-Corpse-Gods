@@ -61,6 +61,52 @@ mod tests {
     }
     fn scream(r:&mut Run)->bool {crate::ai::enemy_action(r,900.,r.player.id).unwrap()}
     #[test]
+    fn scream_requires_player_in_effect_range_before_spending_or_scheduling() {
+        for greater in [false,true] {
+            let mut r = room(greater);
+            r.screamer_range_from = 0usize.into();
+            r.player.x = 3.; // 11 tiles from the screamer.
+            crate::events::begin();
+            assert!(!scream(&mut r));
+            assert!(crate::events::finish().is_empty());
+            assert_eq!(engine::actor(&r,900.).unwrap().energy,100.);
+            assert!(r.screamer_schedule.is_none());
+            assert_eq!(engine::condition(&r.player,"disoriented"),0.);
+
+            r.player.x = 4.; // Exactly 10 tiles.
+            assert!(scream(&mut r));
+            assert_eq!(engine::actor(&r,900.).unwrap().energy,85.);
+            assert_eq!(engine::condition(&r.player,"disoriented"),5.);
+            assert!(!scream(&mut r));
+
+            let mut legacy = room(greater);
+            legacy.player.x = 3.;
+            assert!(scream(&mut legacy));
+            assert_eq!(engine::condition(&legacy.player,"disoriented"),0.);
+        }
+    }
+
+    #[test]
+    fn range_gate_checks_the_player_not_a_nearer_target() {
+        let mut r = room(false);
+        r.screamer_range_from = 0usize.into();
+        r.player.x = 3.;
+        let caster = engine::actor_mut_trusted(&mut r,900.).unwrap();
+        caster.conditions.insert(crate::revision50_control_amulets::DISCORD.into(), 100.);
+        let mut target = caster.clone();
+        target.conditions.clear();
+        target.abilities.clear();
+        target.id = 901.;
+        target.x = 16.;
+        r.actors_at_mut(r.depth).push(target);
+        assert!(!crate::ai::enemy_action(&mut r,900.,901.).unwrap());
+        assert_eq!(engine::actor(&r,900.).unwrap().energy,100.);
+        assert!(r.screamer_schedule.is_none());
+        r.player.x = 4.;
+        assert!(crate::ai::enemy_action(&mut r,900.,901.).unwrap());
+    }
+
+    #[test]
     fn screamer_success_blocks_both_variants_for_actual_five_turns() {
         for greater in [false,true] {
             let mut r=room(greater);let tick=r.tick;

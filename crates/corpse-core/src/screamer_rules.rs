@@ -1,5 +1,43 @@
 //! Screamer scheduled scream lockout amendment with deterministic old command prefixes.
 use crate::{Field, Run};
+
+pub const RADIUS: f64 = 10.;
+
+pub fn range_required(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && matches!(r.screamer_range_from, Field::Value(_))
+}
+
+/// A player placeholder in offscreen simulation is not a target. Use the
+/// same plane and portal-aware distance as the scream's actual effects.
+pub(crate) fn can_reach_player(r: &Run, screamer: &crate::Actor) -> bool {
+    !range_required(r) || (r.player.x >= 0. && r.player.hp > 0.
+        && !r.player.dead.value_or(false) && crate::dreamwalking::same_plane(r, screamer, &r.player)
+        && crate::portals::actor_distance(r, screamer, &r.player) <= RADIUS)
+}
+
+pub(crate) fn validate_range(r: &Run) -> Result<(), String> {
+    if !r.screamer_range_from.is_missing() && (r.simulation_revision.value_or(29.) < 52.
+        || !matches!(r.screamer_range_from, Field::Value(n) if n <= r.replay.len())) {
+        return Err("Invalid Screamer range command boundary".into());
+    }
+    Ok(())
+}
+
+pub fn admit_range(r: &mut Run) -> Result<(), String> {
+    validate_range(r)?;
+    if r.simulation_revision.value_or(29.) >= 52. && r.screamer_range_from.is_missing() {
+        r.screamer_range_from = r.replay.len().into();
+    }
+    Ok(())
+}
+
+pub(crate) fn apply_range_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    if from.as_ref() == Some(&cursor) {
+        r.screamer_range_from = cursor.into();
+    } else if cursor == 0 {
+        r.screamer_range_from = Field::Missing;
+    }
+}
 pub fn current(r: &Run) -> bool {
     r.simulation_revision.value_or(29.) >= 50. && !matches!(r.screamer_rules_from, Field::Null)
 }

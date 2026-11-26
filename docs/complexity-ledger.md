@@ -2335,6 +2335,11 @@ catch-up at an older tick still gates correctly without scanning or transferring
 queue scope when an actor changes floors/planes. Proxy Run clones include O(S)
 queue clone cost in addition to their pre-existing costs.
 
+Current R52 admission checks the Avatar's plane and existing portal-aware
+distance once per ready Screamer before payment, cooldown, or recipient
+enumeration. This adds one distance query and no new traversal or storage
+beyond the command-index compatibility marker.
+
 ## Uniform complete Avatar starters (2026-11-19)
 See [avatar-starters.md](avatar-starters.md): one O(A + 6^3*(D+E)) tuple
 construction, O(N) bounded rejection draws with N<=216, and O(A+N) reference

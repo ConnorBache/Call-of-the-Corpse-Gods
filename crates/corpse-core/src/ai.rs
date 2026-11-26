@@ -308,9 +308,12 @@ pub fn enemy_action_options(
         }
         return Ok(true);
     }
+    let scream_radius = crate::screamer_rules::RADIUS;
     if a.abilities.iter().any(|id| id == "enemy:pale:scream")
-        && !crate::screamer_schedule::blocked(r, &a) && enemy_spend(r, id, 15.0) {
-        crate::animation_enemy::wave(r,&a,"E65",true,Some(10.),false,false);
+        && !crate::screamer_schedule::blocked(r, &a)
+        && crate::screamer_rules::can_reach_player(r, &a)
+        && enemy_spend(r, id, 15.0) {
+        crate::animation_enemy::wave(r,&a,"E65",true,Some(scream_radius),false,false);
         let wave_action=crate::events::current_action();
         let multiplier = if a.name.starts_with("Greater ") {
             2.0
@@ -330,7 +333,7 @@ pub fn enemy_action_options(
             let recipient=actor(r,other).unwrap();
             if crate::revision50_nightmares::is_decoy(recipient)
                 || crate::revision50_combat::oblivious_blocks(r,recipient,Some(&a)) {continue;}
-            let nearby = crate::portals::actor_distance(r, &a, recipient) <= 10.0;
+            let nearby = crate::portals::actor_distance(r, &a, recipient) <= scream_radius;
             let same = if crate::revision50::enabled(r) {!crate::revision50_control_amulets::hostile(r,&a,recipient)}
                 else {(other==player||recipient.state=="ally")== (a.state=="ally")};
             let duration = crate::monster_statuses::status_duration(r,recipient,5.0);
@@ -374,7 +377,7 @@ pub fn enemy_action_options(
                 ),
                 "enemy",
             );
-        } else if crate::portals::actor_distance(r, &a, &r.player) <= 10.0 {
+        } else if crate::portals::actor_distance(r, &a, &r.player) <= scream_radius {
             log(r, if disorient { "An unseen creature screams; you feel disoriented." } else { "An unseen creature screams; you feel weakened." }, "enemy");
         }
         return Ok(true);

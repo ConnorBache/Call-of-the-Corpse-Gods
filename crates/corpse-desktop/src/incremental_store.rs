@@ -86,7 +86,7 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
         let operations=parse_operations(payload,metadata)?;commands=commands.checked_add(operations.len()).ok_or("Recording command count overflow")?;
         if commands>maximum_commands {return Err("Recording exceeds admitted command bound".into());}Ok(())
     })?;
-    let (mut engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated,blood_mist_fire_migrated,half_here_energy_migrated)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
+    let (mut engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated,blood_mist_fire_migrated,half_here_energy_migrated,screamer_range_migrated)=super::decode_checkpoint_policy(parsed.checkpoint,Some(legacy))?;
     if engine.run.simulation_revision.as_ref().copied()!=Some(header.simulation_revision as f64) {
         return Err("Save journal requires its original simulation revision".into());
     }
@@ -151,6 +151,9 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
     if half_here_energy_migrated {
         corpse_core::half_here::admit_current(&mut engine.run)?;
     }
+    if screamer_range_migrated {
+        corpse_core::screamer_rules::admit_range(&mut engine.run)?;
+    }
     if steam_migrated {
         engine.run.steam_rules_from=corpse_core::Field::Missing;
         corpse_core::steam_rules::admit_current(&mut engine.run)?;
@@ -173,7 +176,7 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
         corpse_core::future_floor::admit_current(&mut engine.run)?;
         corpse_core::future_floor::ensure_entry(&mut engine.run)?;
     }
-    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated))
+    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]

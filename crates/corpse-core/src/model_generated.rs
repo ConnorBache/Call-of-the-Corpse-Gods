@@ -1740,6 +1740,8 @@ pub struct Run {
     pub half_here_lock_from: Field<usize>,
     #[serde(rename = "halfHereEnergyFrom", default, skip_serializing_if = "Field::is_missing")]
     pub half_here_energy_from: Field<usize>,
+    #[serde(rename = "screamerRangeFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub screamer_range_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]
