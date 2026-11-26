@@ -1,12 +1,35 @@
 //! Revision33 God-Obelisk: one selected actor, one exact heart, one single-use weapon.
 //! All state lives in the ordinary Floor/Item snapshots; no external quest cache or RNG.
-use crate::{Actor, Floor, GodbeastEvent, GodbeastEventRoom, GodbeastEventTap, Item, Run};
+use crate::{Actor, Field, Floor, GodbeastEvent, GodbeastEventRoom, GodbeastEventTap, GroundItem, Item, Run};
 use crate::engine::{self, EngineError};
 
 pub const SHARD_NAME: &str = "Shard of the Borge";
 pub const SHARD_DESCRIPTION: &str = "A shard of the dark obelisk. Any creature which it bleeds will fall into an endless nightmare. It can only be used once.";
 pub const DEMAND: &str = "The Borge demands a sacrifice...";
 pub const RADIUS: i32 = 2;
+
+pub fn throw_offering_enabled(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && matches!(r.borge_throw_from, Field::Value(_))
+}
+pub(crate) fn validate(r: &Run) -> Result<(), String> {
+    if !r.borge_throw_from.is_missing() && (r.simulation_revision.value_or(29.) < 52.
+        || !matches!(r.borge_throw_from, Field::Value(n) if n <= r.replay.len())) {
+        return Err("Invalid Borge throw command boundary".into());
+    }
+    Ok(())
+}
+/// Adopt after the historical command prefix, not while replaying a save journal.
+pub fn admit(r: &mut Run) -> Result<(), String> {
+    validate(r)?;
+    if r.simulation_revision.value_or(29.) >= 52. && r.borge_throw_from.is_missing() {
+        r.borge_throw_from = r.replay.len().into();
+    }
+    Ok(())
+}
+pub(crate) fn apply_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    if from.as_ref() == Some(&cursor) { r.borge_throw_from = cursor.into(); }
+    else if cursor == 0 { r.borge_throw_from = Field::Missing; }
+}
 
 pub fn weapon_enabled(r: &Run) -> bool { r.simulation_revision.value_or(29.) >= 39. }
 pub fn is_shard(item: &Item) -> bool { item.kind == "weapon" && item.name == SHARD_NAME }
@@ -88,6 +111,46 @@ pub fn matching_heart(e: &GodbeastEvent, depth: f64, item: &Item) -> bool {
     item.kind=="heart" && e.sacrifice_actor_id.as_ref().is_some()
         && e.sacrifice_actor_id==item.source_actor_id && item.borge_depth.as_ref()==Some(&depth)
 }
+fn altar_at(f: &Floor, e: &GodbeastEvent, x: f64, y: f64) -> bool {
+    e.kind == "Borge" && e.altar.as_ref().is_some_and(|p| p.x == x && p.y == y)
+        && crate::portals::cell(f, x, y).is_some_and(|at| f.tiles[at] != "chasm")
+}
+pub(crate) fn walk_over_satisfied_altar(r: &Run, x: f64, y: f64) -> bool {
+    throw_offering_enabled(r) && r.floor().is_some_and(|f| f.godbeast_event.as_ref().is_some_and(|e|
+        e.reward_created.value_or(false) && !contains(e, x, y) && altar_at(f, e, x, y)))
+}
+pub(crate) fn accept_thrown_heart(r: &mut Run, index: usize, item: &Item, landing: crate::projectiles::Landing) -> bool {
+    let (x, y) = (landing.x, landing.y);
+    if item.kind != "heart" || !throw_offering_enabled(r) || crate::dreamwalking::active(r)
+        || landing.actor_id.is_some() || (x, y) == (r.player.x, r.player.y)
+        || !r.floor().is_some_and(|f| f.godbeast_event.as_ref().is_some_and(|e|
+            e.activated.value_or(false) && !e.reward_created.value_or(false)
+                && altar_at(f, e, x, y) && matching_heart(e, r.depth, item))) {
+        return false;
+    }
+    let heart = crate::inventory::take_one(r, index);
+    crate::events::projectile_item(r, heart.id);
+    complete_offering(r, x, y, true);
+    true
+}
+
+fn complete_offering(r: &mut Run, x: f64, y: f64, on_altar: bool) {
+    let reward = shard(r.next_id);
+    let reward_id = reward.id;
+    r.next_id += 1.;
+    if on_altar {
+        // A completed ritual puts its reward on the exact altar tile, even if
+        // another item is already there. Normal scattered-drop rules don't apply.
+        r.ground_at_mut(r.depth).push(GroundItem {x, y, item: reward, auto_pickup_blocked: Field::Missing});
+        r.floor_mut().unwrap().dirty = true;
+    } else {
+        r.inventory.push(reward);
+    }
+    r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().reward_created=true.into();
+    engine::log(r,"The offered heart transforms into a Shard of the Borge.","player");
+    crate::events::actor_event(r,&r.player,"pulse","Shard of the Borge",Some(crate::events::EventPoint{x,y}),None);
+    if !on_altar { crate::events::inventory(r,"E74","diamond",Some(reward_id)); }
+}
 pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
     if !interaction_at(r,x,y) || (x-r.player.x).abs().max((y-r.player.y).abs())>1. {return Ok(false);}
     let e=r.floor().unwrap().godbeast_event.as_ref().unwrap().clone();
@@ -118,11 +181,7 @@ pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
         engine::log(r,"The altar accepts only the exact heart marked by the Borge.","environment");return Ok(false);
     };
     crate::inventory::take_one(r,index);
-    let reward=shard(r.next_id);let reward_id=reward.id;r.next_id+=1.;r.inventory.push(reward);
-    r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().reward_created=true.into();
-    engine::log(r,"The offered heart transforms into a Shard of the Borge.","player");
-    crate::events::actor_event(r,&r.player,"pulse","Shard of the Borge",Some(crate::events::EventPoint{x,y}),None);
-    crate::events::inventory(r,"E74","diamond",Some(reward_id));
+    complete_offering(r, x, y, false);
     Ok(true)
 }
 /// Ordinary adjacent melee geometry, but no accuracy roll or creature immunity.

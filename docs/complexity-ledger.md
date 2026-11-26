@@ -2552,3 +2552,15 @@ still synchronously pays generation; an involved destination still pays exact
 catch-up and starts receiving offscreen turns once activated. Impact,
 visibility, floor copy-on-write, and catch-up costs are additional to the
 placement scan.
+
+### Borge altar projectile offering (R52)
+- After an ordinary committed Throw traces the ray and reports its landing,
+  the new check is O(1) time and scratch per throw: one current-floor event,
+  exact landing coordinates, and actor/depth provenance. No extra ray,
+  visibility query, random draw, or environmental tick.
+- On acceptance, taking one heart is O(I) worst-case for inventory Vec
+  removal (I carried entries). Appending the shard is O(G) worst case
+  if the depth's G ground items must copy on write or reallocate; amortized
+  O(1) on a unique vector. The same O(F) current-floor lookup bound as
+  other floor accessors applies where they search F stored floors. Stepping
+  onto the satisfied altar uses the unchanged ground pickup pipeline.

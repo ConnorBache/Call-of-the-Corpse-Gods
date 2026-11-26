@@ -1748,6 +1748,8 @@ pub struct Run {
     pub death_gas_rules_from: Field<usize>,
     #[serde(rename = "minotaurBumpFrom", default, skip_serializing_if = "Field::is_missing")]
     pub minotaur_bump_from: Field<usize>,
+    #[serde(rename = "borgeThrowFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub borge_throw_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

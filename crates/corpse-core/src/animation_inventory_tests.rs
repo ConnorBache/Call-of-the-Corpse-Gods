@@ -366,6 +366,63 @@ fn inventory_borge_reward_matches_new_item_and_rejected_offering_is_quiet() {
     assert!(!crate::borge::interact(&mut r, 10., 10.).unwrap());
     assert!(events::finish().is_empty());
 }
+fn borge_throw_room() -> Run {
+    let mut r = room();
+    r.next_id = 1000.;
+    r.borge_throw_from = 0usize.into();
+    r.floor_mut().unwrap().godbeast_event = crate::GodbeastEvent {
+        kind: "Borge".into(), x: 13., y: 7.,
+        altar: crate::GodbeastEventTap { x: 13., y: 10. }.into(),
+        activated: true.into(), sacrifice_actor_id: 999.0.into(), ..Default::default()
+    }.into();
+    let a = crate::population::create_actor_revision("rat", 999., 10., 12., false, 52.).unwrap();
+    let mut heart = crate::inventory::heart_for_revision(&a, 900., 52.).unwrap();
+    crate::borge::mark_heart(&r, &a, &mut heart);
+    r.inventory.push(heart);
+    r
+}
+
+#[test]
+fn borge_throw_consumes_exact_heart_leaves_shard_on_altar_and_allows_pickup() {
+    let mut r = borge_throw_room();
+    let depth = r.depth;
+    r.ground_at_mut(depth).push(crate::GroundItem {
+        x: 13., y: 10., item: potion(901.), auto_pickup_blocked: Field::Missing
+    });
+    crate::engine::dispatch(&mut r, &Command::Throw { id: 900., x: 13., y: 10. }).unwrap();
+    assert!(r.floor().unwrap().godbeast_event.as_ref().unwrap().reward_created.value_or(false));
+    assert!(!r.inventory.iter().any(|i| i.id == 900. || crate::borge::is_shard(i)));
+    let ground = &r.ground[&depth.to_string()];
+    assert!(!ground.iter().any(|g| g.item.id == 900.));
+    assert_eq!(ground.iter().filter(|g| (g.x, g.y) == (13., 10.)).count(), 2);
+    assert!(ground.iter().any(|g| (g.x, g.y) == (13., 10.) && crate::borge::is_shard(&g.item)));
+    for _ in 0..3 { crate::engine::dispatch(&mut r, &Command::Move { dx: 1., dy: 0. }).unwrap(); }
+    assert_eq!((r.player.x, r.player.y), (13., 10.));
+    assert!(r.inventory.iter().any(crate::borge::is_shard));
+}
+
+#[test]
+fn borge_throw_rejects_wrong_provenance_misses_and_duplicate_offerings() {
+    for case in ["wrong actor", "wrong depth", "wrong tile", "blocked", "satisfied", "inactive", "legacy"] {
+        let mut r = borge_throw_room();
+        let (mut x, y) = (13., 10.);
+        match case {
+            "wrong actor" => r.inventory[0].source_actor_id = 998.0.into(),
+            "wrong depth" => r.inventory[0].borge_depth = (r.depth + 1.).into(),
+            "wrong tile" => x = 12.,
+            "blocked" => { let f = r.floor_mut().unwrap(); let at = 10*f.width()+12; f.tiles[at] = "wall".into(); }
+            "satisfied" => r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().reward_created = true.into(),
+            "inactive" => r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().activated = false.into(),
+            "legacy" => r.borge_throw_from = Field::Missing,
+            _ => unreachable!(),
+        }
+        crate::engine::dispatch(&mut r, &Command::Throw { id: 900., x, y }).unwrap();
+        let e = r.floor().unwrap().godbeast_event.as_ref().unwrap();
+        assert_eq!(e.reward_created.value_or(false), case == "satisfied", "{case}");
+        assert!(r.ground[&r.depth.to_string()].iter().any(|g| g.item.id == 900.), "{case}");
+        assert!(!r.ground[&r.depth.to_string()].iter().any(|g| crate::borge::is_shard(&g.item)), "{case}");
+    }
+}
 #[test]
 fn inventory_verdanias_actual_gift_and_tap_break_have_no_false_heal() {
     for scenario in ["success", "far", "full", "repeat"] {

@@ -340,6 +340,9 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
             }),
             Some(glyph(&item)),
         );
+        if crate::borge::accept_thrown_heart(r, index, &item, landing) {
+            return Ok(Some(true));
+        }
         let base = player_throw_base(r, &item);
         let shard=crate::borge::weapon_enabled(r) && crate::borge::is_shard(&item);
         let target = r.actors_at(depth).iter()

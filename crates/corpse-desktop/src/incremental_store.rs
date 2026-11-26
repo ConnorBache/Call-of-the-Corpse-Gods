@@ -176,7 +176,10 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
         corpse_core::future_floor::admit_current(&mut engine.run)?;
         corpse_core::future_floor::ensure_entry(&mut engine.run)?;
     }
-    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated))
+    let had_borge_throw = corpse_core::borge::throw_offering_enabled(&engine.run);
+    corpse_core::borge::admit(&mut engine.run)?;
+    let borge_throw_migrated = !had_borge_throw && corpse_core::borge::throw_offering_enabled(&engine.run);
+    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]

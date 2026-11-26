@@ -1096,3 +1096,13 @@ Adjacent targets off its arrow, direct attacks ordered by Implant Thought,
 and automatic counterattacks do not qualify. Discord still changes whom
 the Minotaur can hit, not where it can attack. Existing replays retain their
 original behavior up to the recorded rules boundary.
+
+### R52 thrown Borge offerings
+
+A thrown heart counts as an offering if its projectile reaches the active
+Borge altar and its actor and floor provenance match the demanded sacrifice.
+The altar consumes the thrown heart and places the one-use shard on that exact
+tile, independent of ground clutter or pack space. The satisfied altar can
+be walked onto to collect it. Bumping an unsatisfied altar with the marked heart
+in the pack still awards the shard directly. An interrupted throw is not an
+offering.

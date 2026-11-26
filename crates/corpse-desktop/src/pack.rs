@@ -1740,6 +1740,9 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
         );
         if marked_heart(i) {
             text.push_str(&format!("\nBorge-marked sacrifice: offer this exact heart at the Borge altar on depth {}.", i.borge_depth.value_or(0.)));
+            if corpse_core::borge::throw_offering_enabled(run) {
+                text.push_str(" You can throw it onto the altar to leave the shard there.");
+            }
         }
         if run
             .player

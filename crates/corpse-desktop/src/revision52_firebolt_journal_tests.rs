@@ -365,6 +365,29 @@ fn screamer_markerless_journal_adopts_after_recorded_commands() {
 }
 
 #[test]
+fn borge_throw_markerless_journal_adopts_after_durable_commands() {
+    let initial = room();
+    let mut old = Core::new(initial.clone()).unwrap();
+    old.run.borge_throw_from = Field::Missing;
+    let checkpoint = session_store::encode(&old, Kind::Fixture).unwrap();
+    let header = log::Header::for_metadata_revision(Some(52.)).unwrap();
+    let mut file = log::encode_initial(&checkpoint, &header).unwrap();
+    let command = Command::Wait;
+    old.dispatch(&command).unwrap();
+    append(&mut file, vec![Operation::Command { command, after: Stamp::capture(&old) }], true);
+    let (decoded, _) = session_store::decode_bytes(&file.bytes).unwrap();
+    assert_eq!(decoded.run.borge_throw_from, Field::Value(1));
+    old.run.borge_throw_from = 1usize.into();
+    assert_eq!(decoded.save().unwrap(), old.save().unwrap());
+    export_twice(&initial, &decoded);
+    let dir = Sandbox::new();
+    let path = dir.path();
+    std::fs::write(&path, &file.bytes).unwrap();
+    let (loaded, _) = load(&path).unwrap();
+    assert!(loaded.pending_batch().checkpoint_required);
+}
+
+#[test]
 fn ember_markerless_journal_adopts_after_durable_commands() {
     let mut initial = room();
     initial.ember_rules_from = Field::Null;

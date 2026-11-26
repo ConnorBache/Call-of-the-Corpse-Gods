@@ -1238,7 +1238,8 @@ fn move_actor_step(
         return Ok(false);
     }
     // Solid obelisk cells are interactions, never ordinary attack targets or movement.
-    if id == r.player.id && !crate::dreamwalking::active(r) && crate::borge::interaction_at(r, x, y) {
+    if id == r.player.id && !crate::dreamwalking::active(r) && crate::borge::interaction_at(r, x, y)
+        && !crate::borge::walk_over_satisfied_altar(r, x, y) {
         if movement_only { return Ok(false); }
         return crate::borge::interact(r, x, y);
     }

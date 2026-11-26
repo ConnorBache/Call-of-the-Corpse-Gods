@@ -77,6 +77,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.screamer_range_from=r.screamer_range_from.clone();
     next.death_gas_rules_from=r.death_gas_rules_from.clone();
     next.minotaur_bump_from=r.minotaur_bump_from.clone();
+    next.borge_throw_from=r.borge_throw_from.clone();
     next.execute_rules_from=r.execute_rules_from.clone();
     next.beckoning_rules_from=r.beckoning_rules_from.clone();
     next.ichor_fire_rules_from=r.ichor_fire_rules_from.clone();
