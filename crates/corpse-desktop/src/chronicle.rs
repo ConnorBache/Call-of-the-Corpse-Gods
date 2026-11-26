@@ -7,13 +7,22 @@ pub struct Group {
     pub count: usize,
     pub index: usize,
 }
-/// O(min(M,30)*C*V*L) display grouping/grammar; immutable canonical inputs.
+/// The stored line may also appear in old recordings. Keep it in simulation
+/// history, but never show an actor waiting beside a doorway in the Chronicle.
+pub fn visible(message: &str) -> bool {
+    !message.ends_with(" waits silently beside the doorway.")
+}
+
+/// O(M*L + min(M,30)*C*V*L), M bounded to the recent log; inputs immutable.
 pub fn compact(messages: &[String], kinds: &[String]) -> Vec<Group> {
     let mut groups: Vec<Group> = Vec::new();
+    let start = messages.iter().enumerate().rev().filter(|(_, message)| visible(message))
+        .take(30).last().map_or(messages.len(), |(index, _)| index);
     for (index, message) in messages
         .iter()
         .enumerate()
-        .skip(messages.len().saturating_sub(30))
+        .skip(start)
+        .filter(|(_, message)| visible(message))
     {
         let kind = kinds.get(index).map(String::as_str).unwrap_or("unknown");
         if let Some(prior) = groups
@@ -133,6 +142,17 @@ mod tests {
         let g = compact(&m, &[]);
         assert_eq!(g[0].count, 30);
         assert_eq!(g[0].index, 79);
+    }
+    #[test]
+    fn doorway_waits_do_not_displace_visible_recent_entries() {
+        let mut messages = vec!["You wait.".into(); 29];
+        messages.extend(vec!["Tiger waits silently beside the doorway.".into(); 40]);
+        messages.push("Tiger bites you for 3 damage.".into());
+        let groups = compact(&messages, &[]);
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups[0].count, 29);
+        assert_eq!(groups[1].index, 69);
+        assert!(groups[1].message.ends_with("bites you for 3 damage."));
     }
 }
 

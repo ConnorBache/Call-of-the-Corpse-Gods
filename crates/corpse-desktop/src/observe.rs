@@ -1368,14 +1368,49 @@ mod tests {
 /// O(E*C*V*L) display-text work for E archived events (or recent log entries);
 /// catalog C and combat verbs V are fixed, L is message length. No Run mutation.
 pub fn history(run: &Run) -> Vec<String> {
+    history_with_notices(run, &[])
+}
+
+/// Merge sorted discovery notices at their raw log positions before filtering.
+pub fn history_with_notices(run: &Run, positions: &[usize]) -> Vec<String> {
+    use crate::chronicle::{present, visible};
+    let mut lines = Vec::new();
+    let mut positions = positions.iter().copied().peekable();
+    let mut add = |index, message: Option<&String>| {
+        while positions.next_if(|&at| at <= index).is_some() {
+            lines.push(crate::bestiary_progress::ADDED.into());
+        }
+        if let Some(m) = message.filter(|m| visible(m)) {
+            lines.push(present(m));
+        }
+    };
     if let Some(a) = run.log_archive.as_ref() {
-        a.events
-            .iter()
-            .filter_map(|v| a.messages.get((*v as usize) / 4).map(|m| crate::chronicle::present(m)))
-            .collect()
+        for (i, v) in a.events.iter().enumerate() {
+            add(i, a.messages.get((*v as usize) / 4));
+        }
     } else {
-        run.log.iter().map(|m|crate::chronicle::present(m)).collect()
+        for (i, m) in run.log.iter().enumerate() {
+            add(i, Some(m));
+        }
     }
+    add(usize::MAX, None);
+    lines
+}
+
+#[cfg(test)]
+#[test]
+fn chronicle_history_omits_doorway_waits_with_or_without_archive() {
+    let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+    run.log.clear();
+    run.log_archive = corpse_core::Field::Missing;
+    corpse_core::engine::log(&mut run, "Tiger waits silently beside the doorway.", "enemy");
+    corpse_core::engine::log(&mut run, "You take 3 damage from fire.", "environment");
+    let before = run.clone();
+    assert_eq!(history(&run), vec!["You take 3 damage from fire."]);
+    assert_eq!(history_with_notices(&run, &[1]), vec!["Bestiary Pages Added!", "You take 3 damage from fire."]);
+    assert!(before == run);
+    run.log_archive = corpse_core::Field::Missing;
+    assert_eq!(history(&run), vec!["You take 3 damage from fire."]);
 }
 
 pub fn ability_needs_target_for_run(run: &Run, id: &str) -> bool {

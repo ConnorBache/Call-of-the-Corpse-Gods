@@ -86,7 +86,7 @@ impl Notices {
         view.log_groups=crate::chronicle::compact(&view.log,&kinds);
     }
     pub fn history(&self,run:&corpse_core::Run)->Vec<String> {
-        let mut lines=crate::observe::history(run);for &at in self.events.iter().rev() {lines.insert(at.min(lines.len()),ADDED.into());}lines
+        crate::observe::history_with_notices(run,&self.events)
     }
 }
 #[cfg(test)]

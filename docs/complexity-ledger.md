@@ -616,6 +616,9 @@ guarantee. Old records keep original header/revision;40 uses its own admitted
 recording build+revision pair and seed replay records40 explicitly.
 
 ### Display-only Chronicle articles and native Heartlessness coverage
+Doorway-wait narration is filtered before recent Chronicle grouping and archive
+display. The recent window examines at most the bounded 80-entry run log to
+retain up to 30 visible messages; save, replay, and event data are unchanged.
 `chronicle::present` adds articles only to recognized simple combat phrases and
 catalog species names. Canonical messages and archive/replay bytes are unchanged;
 compaction groups original strings before decorating detached display text.
