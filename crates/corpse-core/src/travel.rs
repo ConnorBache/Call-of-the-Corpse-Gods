@@ -873,9 +873,19 @@ fn travel_inner(r: &mut Run, next: f64, falling: bool, vertical: bool, voluntary
     }
     engine::monster_floor_entered(r);
     engine::monster_prepare_player_turn(r).map_err(|e| e.0)?;
-    let domain = r.floor().unwrap().domain.clone();
-    engine::log(r, format!("Floor {}: {domain}.", crate::fast_mode::display_depth(r, next)), "environment");
+    log_floor_transition(r, source, next);
     Ok(true)
+}
+
+fn log_floor_transition(r: &mut Run, source: f64, destination: f64) {
+    if r.simulation_revision.value_or(29.) < 52. {
+        let domain = &r.floor().unwrap().domain;
+        engine::log(r, format!("Floor {}: {domain}.", crate::fast_mode::display_depth(r, destination)), "environment");
+    } else if destination > source {
+        engine::log(r, "You descend.", "environment");
+    } else if destination < source {
+        engine::log(r, "You ascend.", "environment");
+    }
 }
 
 pub fn nearest_fall_landing(
@@ -1213,9 +1223,8 @@ pub fn fall_actors_one_level(
     }
     if player_falls {
         let f = r.floor().unwrap();
-        let domain = f.domain.clone();
         let pit = f.tiles[r.player.y as usize * f.width() + r.player.x as usize] == "pit";
-        engine::log(r, format!("Floor {}: {domain}.", crate::fast_mode::display_depth(r, next)), "environment");
+        log_floor_transition(r, source_depth, next);
         if r.status == "playing" && pit {
             r.status = "won".into();
             engine::log(r, "You fall into the bottomless pit. Victory.", "player");

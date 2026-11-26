@@ -41,8 +41,11 @@ fn fast_stairs_and_explicit_teleports_use_real_destination_once() {
     let mut r=room(&[1,3,5,7],true);r.depth=3.;r.player.x=12.;
     let rng=r.rng;
     assert!(crate::travel::travel(&mut r,1.,false,false).unwrap());assert_eq!(r.depth,5.);
+    assert_eq!(r.log.last().unwrap(), "You descend.");
     assert!(crate::travel::travel(&mut r,-1.,false,false).unwrap());assert_eq!(r.depth,3.);
+    assert_eq!(r.log.last().unwrap(), "You ascend.");
     assert!(crate::travel::travel_to(&mut r,5.,false,true).unwrap());assert_eq!(r.depth,5.);
+    assert_eq!(r.log.last().unwrap(), "You descend.");
     assert_eq!(r.floors.len(),4);assert_eq!(r.rng,rng);
 }
 #[test]
@@ -78,6 +81,24 @@ fn fast_player_fall_and_flying_chase_record_effective_destination() {
     let hunter=&r.actors_at(3.)[0];assert_eq!(hunter.conditions.get("chaseDepth"),Some(&5.));
     let mut source=r.clone();source.depth=3.;assert!(crate::travel::flying_chasm_chase(&source,hunter));
     assert!(!r.actors.contains_key("4"));
+}
+#[test]
+fn player_falls_record_descent_but_enemy_falls_do_not_announce_it() {
+    let mut r = room(&[1,3,5,7], true);
+    r.depth = 3.;
+    let at = r.player.y as usize * 79 + r.player.x as usize;
+    r.floor_mut().unwrap().tiles[at] = "chasm".into();
+    let player = r.player.id;
+    crate::travel::fall_actors_one_level(&mut r, 3., &[player], None).unwrap();
+    assert_eq!(r.depth, 5.);
+    assert_eq!(r.log.iter().filter(|line| *line == "You descend.").count(), 1);
+    let a = Actor { id: 400., x: 11., y: 10., hp: 100., max_hp: 100., ..Default::default() };
+    r.floor_mut().unwrap().tiles[10 * 79 + 11] = "chasm".into();
+    r.actors_at_mut(5.).push(a);
+    crate::travel::fall_actors_one_level(&mut r, 5., &[400.], None).unwrap();
+    assert!(r.actors_at(7.).iter().any(|actor| actor.id == 400.));
+    assert_eq!(r.depth, 5.);
+    assert_eq!(r.log.iter().filter(|line| *line == "You descend.").count(), 1);
 }
 #[test]
 fn fast_snapshot_future_and_wire_round_trip_keep_mode_and_sparse_identity() {

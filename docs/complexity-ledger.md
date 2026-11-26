@@ -2486,3 +2486,11 @@ scratch (F is floor lookup); flattening S route cells adds O(S) time and space.
 Only admitted observed cells paint, and the renderer does not fill a portal's
 screen-space gap. Persistent threads do the same query on their existing
 observation pass; no new simulation, randomness, or per-frame route search.
+
+### Chronicle and hover copy
+The Chronicle visibility predicate scans at most O(L) bytes in a log line of
+length L with O(1) scratch. It runs during the existing recent-window and
+full-history passes, preserving raw archive indices for bestiary notices.
+Directional copy adds O(1) work per completed current-rules floor transition,
+before the existing log append. Hover no longer adds a biome-description line.
+Wendigo titles use the stored name; no change to actor growth or rendering state.

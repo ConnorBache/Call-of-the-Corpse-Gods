@@ -7,10 +7,19 @@ pub struct Group {
     pub count: usize,
     pub index: usize,
 }
-/// The stored line may also appear in old recordings. Keep it in simulation
-/// history, but never show an actor waiting beside a doorway in the Chronicle.
+/// Hide routine recovery and descriptive-only lines in both Chronicle views.
 pub fn visible(message: &str) -> bool {
-    !message.ends_with(" waits silently beside the doorway.")
+    let text = message.trim().trim_end_matches('.');
+    !text.ends_with(" waits silently beside the doorway")
+        && !text.ends_with(" recovers after its ranged attack")
+        && !["Ranged enemy recovers", "Mountainous area", "Corn Dimension",
+            "This chamber belongs to the connected Saidribee Nest",
+            "Permafrost spreads through these connected chambers",
+            "A flower-rich grove fills this pocket of the Flesh"]
+            .iter().any(|line| text.eq_ignore_ascii_case(line))
+        && !text.strip_prefix("Floor ").and_then(|tail| tail.split_once(": "))
+            .is_some_and(|(depth, biome)| !depth.is_empty()
+                && depth.bytes().all(|b| b.is_ascii_digit()) && !biome.is_empty())
 }
 
 /// O(M*L + min(M,30)*C*V*L), M bounded to the recent log; inputs immutable.
@@ -142,6 +151,23 @@ mod tests {
         let g = compact(&m, &[]);
         assert_eq!(g[0].count, 30);
         assert_eq!(g[0].index, 79);
+    }
+    #[test]
+    fn routine_recovery_and_area_labels_are_not_chronicle_events() {
+        let raw = [
+            "Pale Spitter recovers after its ranged attack.",
+            "Ranged enemy recovers",
+            "Mountainous Area",
+            "Corn Dimension.",
+            "Floor 12: Mountain.",
+            "You descend.",
+            "You ascend.",
+            "You recover from paralysis.",
+            "The Pale Spitter shoots at you.",
+        ].map(String::from);
+        let lines: Vec<_> = compact(&raw, &[]).into_iter().map(|group| group.message).collect();
+        assert_eq!(lines, ["You descend.", "You ascend.", "You recover from paralysis.",
+            "The Pale Spitter shoots at you."]);
     }
     #[test]
     fn doorway_waits_do_not_displace_visible_recent_entries() {

@@ -187,16 +187,6 @@ fn creature_title_base(a: &Actor) -> String {
     if corpse_core::monster_vampire::flying(a) {
         return "Vampire Bat".into();
     }
-    if a.creature_kind.as_ref().is_some_and(|s| s == "wendigo") || has(a, "enemy:beast:wendigo") {
-        return format!(
-            "Wendigo level {}",
-            a.conditions
-                .get("monsterWendigoLevel")
-                .copied()
-                .unwrap_or(1.)
-                .clamp(1., 5.)
-        );
-    }
     a.name.clone()
 }
 fn flavor(a: &Actor) -> String {
@@ -438,18 +428,8 @@ fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
         details.push(if o.current { "Unextinguishable hellfire burns here." }
             else { "You remember hellfire burning here." }.into());
     }
-    if tile.is_some() {
-        if let Some(theme)=o.biome.as_deref() {
-            details.push(match theme {
-                "saidribee-nest"=>"This chamber belongs to the connected Saidribee Nest.",
-                "permafrost"=>"Permafrost spreads through these connected chambers.",
-                "flower-grove"=>"A flower-rich grove fills this pocket of the Flesh.",
-                "mountainous"=>"Mountainous area",
-                "corn-dimension"=>"Corn Dimension",
-                _=>"",
-            }.into());
-        }
-        if o.flowers {details.push("Colorful flowers grow here. They are decorative.".into());}
+    if tile.is_some() && o.flowers {
+        details.push("Colorful flowers grow here. They are decorative.".into());
     }
     if tile.is_some() && o.puddles && (o.ice || o.hellfire) {
         details.push(if o.current { "a puddle sits on the ground." } else { "You remember a puddle." }.into());
@@ -1894,6 +1874,29 @@ mod tests {
         }
     }
     #[test]
+    fn hover_copy_omits_biome_labels_but_keeps_terrain_details() {
+        let r = base();
+        let f = r.floor().unwrap();
+        for current in [true, false] {
+            let mut o = cell(f, 0, current, r.tick);
+            o.tile = Some("floor".into());
+            o.hellfire = true;
+            let plain = terrain_copy(f, &o);
+            assert_eq!(plain.0, "Hellfire");
+            assert!(plain.1.contains("Hellfire"));
+            for biome in ["mountainous", "corn-dimension", "permafrost", "flower-grove", "saidribee-nest"] {
+                o.biome = Some(biome.into());
+                assert_eq!(terrain_copy(f, &o), plain, "{biome}");
+            }
+        }
+    }
+    #[test]
+    fn wendigo_inspector_title_omits_growth_level() {
+        let mut a = Actor { name: "Wendigo".into(), creature_kind: "wendigo".to_string().into(), ..Default::default() };
+        a.conditions.insert("monsterWendigoLevel".into(), 4.);
+        assert_eq!(creature_title_base(&a), "Wendigo");
+    }
+    #[test]
     fn source_58_terrain_reports() {
         let fixtures: serde_json::Value =
             serde_json::from_str(include_str!("../../../fixtures/inspection-ui-v48.json")).unwrap();
@@ -1963,6 +1966,10 @@ mod tests {
                 let expected=if key=="description" {
                     // Preserve the frozen fixture; apply only approved grammar corrections.
                     expected.replace("whom has", "who has").replace("It's head", "Its head")
+                }else if matches!(key, "title" | "scene") && a.creature_kind.as_ref().is_some_and(|kind| kind == "wendigo") {
+                    let level = a.conditions.get("monsterWendigoLevel").copied().unwrap_or(1.);
+                    expected.replace(&format!("Wendigo level {level}"), "Wendigo")
+                        .replace(&format!("wendigo level {level}"), "wendigo")
                 }else if key=="conditions" {
                     expected.replace("Slow: acts every other turn","Slow")
                         .replace("Slowed: acts every other turn","Slowed")

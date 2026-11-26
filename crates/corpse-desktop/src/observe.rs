@@ -403,15 +403,6 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         glyph,
         label: { let label = if body { "Your sleeping body".into() } else if corpse_core::monster_vampire::flying(a) {
             "Vampire Bat".into()
-        } else if kind == "wendigo" || a.abilities.iter().any(|v| v == "enemy:beast:wendigo") {
-            format!(
-                "Wendigo level {}",
-                a.conditions
-                    .get("monsterWendigoLevel")
-                    .copied()
-                    .unwrap_or(1.)
-                    .clamp(1., 5.)
-            )
         } else {
             a.name.clone()
         }; if marked { format!("{label} · Borge-marked") } else { label } },
@@ -1095,6 +1086,13 @@ mod tests {
         assert!(c.superscript.is_empty());
     }
     #[test]
+    fn wendigo_map_label_omits_growth_level() {
+        let run = Run::default();
+        let mut a = Actor { name: "Wendigo".into(), creature_kind: "wendigo".to_string().into(), ..Default::default() };
+        a.conditions.insert("monsterWendigoLevel".into(), 5.);
+        assert_eq!(actor_cell(&run, &a, 79, &[], false).label, "Wendigo");
+    }
+    #[test]
     fn source_renderer_avatar_scene_projection() {
         let run = corpse_core::storage::deserialize(include_str!(
             "../../../fixtures/avatar-room-v1.json"
@@ -1401,11 +1399,13 @@ pub fn history_with_notices(run: &Run, positions: &[usize]) -> Vec<String> {
 
 #[cfg(test)]
 #[test]
-fn chronicle_history_omits_doorway_waits_with_or_without_archive() {
+fn chronicle_history_omits_routine_and_area_lines_with_or_without_archive() {
     let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
     run.log.clear();
     run.log_archive = corpse_core::Field::Missing;
     corpse_core::engine::log(&mut run, "Tiger waits silently beside the doorway.", "enemy");
+    corpse_core::engine::log(&mut run, "Pale Spitter recovers after its ranged attack.", "enemy");
+    corpse_core::engine::log(&mut run, "Floor 2: Mountain.", "environment");
     corpse_core::engine::log(&mut run, "You take 3 damage from fire.", "environment");
     let before = run.clone();
     assert_eq!(history(&run), vec!["You take 3 damage from fire."]);
