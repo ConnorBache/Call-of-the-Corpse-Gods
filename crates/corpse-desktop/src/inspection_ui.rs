@@ -1765,7 +1765,7 @@ fn gas_exposure(r: &Run, a: &Actor, g: &corpse_core::GasPresence) -> String {
         "hallucinogenic" => format!("{prefix}: refreshes hallucinations to 2 turns while present; perceived creature identities change, not their true statistics."),
         kind => format!(
             "{prefix}: harmless on contact{}.",
-            if kind == "steam" {
+            if kind == "steam" || (kind == "bloodMist" && corpse_core::blood_mist::nonflammable(r)) {
                 " and nonflammable"
             } else {
                 "; dangerous if ignited"

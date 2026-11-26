@@ -1734,6 +1734,8 @@ pub struct Run {
     pub balance_rules_from: Field<usize>,
     #[serde(rename = "collapseRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub collapse_rules_from: Field<usize>,
+    #[serde(rename = "bloodMistFireRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub blood_mist_fire_rules_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

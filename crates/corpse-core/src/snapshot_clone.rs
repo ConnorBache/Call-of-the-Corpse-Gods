@@ -63,6 +63,7 @@ fn clone_snapshot_state(run:&Run)->Run {
             ragelight_rules_from: Default::default(),
             balance_rules_from: Default::default(),
             collapse_rules_from: Default::default(),
+            blood_mist_fire_rules_from: Default::default(),
             execute_rules_from: Default::default(),
             beckoning_rules_from: Default::default(),
             ichor_fire_rules_from: Default::default(),

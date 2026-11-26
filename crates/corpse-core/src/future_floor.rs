@@ -71,6 +71,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.ragelight_rules_from=r.ragelight_rules_from.clone();
     next.balance_rules_from=r.balance_rules_from.clone();
     next.collapse_rules_from=r.collapse_rules_from.clone();
+    next.blood_mist_fire_rules_from=r.blood_mist_fire_rules_from.clone();
     next.execute_rules_from=r.execute_rules_from.clone();
     next.beckoning_rules_from=r.beckoning_rules_from.clone();
     next.ichor_fire_rules_from=r.ichor_fire_rules_from.clone();

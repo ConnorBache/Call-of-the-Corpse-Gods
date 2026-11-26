@@ -2456,3 +2456,7 @@ when the fire arrives; the frontier and changed-cell scratch are O(V)
 worst-case. Flame contact, ordinary secondary fire, and rendering reuse the
 existing Hellfire terrain path. There is no new per-frame simulation or RNG
 draw for frontier growth.
+
+R52 Blood Mist fire exclusion is O(1) at each existing fuel-layer query, with
+no additional allocation, RNG draw, or map scan. Its save/replay provenance
+is one optional command offset, checked in O(1) at admission or playback.

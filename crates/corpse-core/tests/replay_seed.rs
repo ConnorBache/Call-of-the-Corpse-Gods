@@ -21,6 +21,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         ragelight_rules_from: Field::Missing,
         balance_rules_from: Field::Missing,
         collapse_rules_from: Field::Missing,
+        blood_mist_fire_rules_from: Field::Missing,
         execute_rules_from: Field::Missing,
         beckoning_rules_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,

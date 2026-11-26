@@ -1,5 +1,35 @@
 //! Inert, single-channel gas from an Overflowing rescue.
-use crate::{Floor, Run, environment, engine};
+use crate::{Field, Floor, Run, environment, engine};
+
+pub fn nonflammable(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && matches!(r.blood_mist_fire_rules_from, Field::Value(_))
+}
+
+pub(crate) fn validate_fire_rules(r: &Run) -> Result<(), String> {
+    if !r.blood_mist_fire_rules_from.is_missing() && (r.simulation_revision.value_or(29.) < 52.
+        || r.blood_mist_fire_rules_from.as_ref().is_some_and(|&n| n > r.replay.len())) {
+        return Err("Invalid Blood Mist fire rules command boundary".into());
+    }
+    Ok(())
+}
+
+pub fn admit_current(r: &mut Run) -> Result<(), String> {
+    validate_fire_rules(r)?;
+    if r.simulation_revision.value_or(29.) >= 52. && r.blood_mist_fire_rules_from.is_missing() {
+        r.blood_mist_fire_rules_from = r.replay.len().into();
+    }
+    Ok(())
+}
+
+pub(crate) fn apply_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    if r.simulation_revision.value_or(29.) < 52. { return; }
+    if from.as_ref() == Some(&cursor) {
+        r.blood_mist_fire_rules_from = cursor.into();
+    } else if cursor == 0 {
+        r.blood_mist_fire_rules_from = Field::Missing;
+    }
+}
+
 /// Provisional volume tuning; each spent blood contributes equally.
 pub const VOLUME_PER_USE:f64=100.;
 /// O(1) candidate cells, plus existing O(N) environment hydration on first use.
@@ -109,7 +139,7 @@ mod tests {
         assert_eq!(e.blood_mist.as_ref().unwrap().iter().sum::<f64>(),100.);
     }
 
-    #[test] fn blood_mist_retains_normal_gas_flammability_without_explosion() {
+    #[test] fn old_replay_blood_mist_still_burns_without_explosion() {
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         r.simulation_revision=52.0.into();
         let i=r.player.y as usize*r.floor().unwrap().width()+r.player.x as usize;
@@ -121,6 +151,30 @@ mod tests {
         let e=r.floor().unwrap().environment.as_ref().unwrap();
         assert_eq!(e.gas_volume.as_ref().unwrap()[i],0.);
         assert!(environment::fire_active(e.fire_kind.as_ref().unwrap()[i].as_deref()));
+    }
+
+    #[test] fn current_blood_mist_is_not_fuel_but_grass_still_burns() {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into();
+        admit_current(&mut r).unwrap();
+        let i = r.player.y as usize * r.floor().unwrap().width() + r.player.x as usize;
+        for tile in ["floor", "grass"] {
+            let mut r = r.clone();
+            let f = r.floor_mut().unwrap();
+            f.tiles[i] = tile.into();
+            environment::add_gas(f, i, "bloodMist", 100., -2.).unwrap();
+            let mut fire = crate::fire_adapter::FireAdapter::new(&mut r, vec![]).unwrap();
+            fire.ignite_creature(i, -1., 0.);
+            assert!(fire.resolve().unwrap().is_empty());
+            drop(fire);
+            let f = r.floor().unwrap();
+            let e = f.environment.as_ref().unwrap();
+            assert_eq!(e.gas_type.as_ref().unwrap()[i].as_deref(), Some("bloodMist"));
+            assert_eq!(e.gas_volume.as_ref().unwrap()[i], 100.);
+            assert_eq!(e.blood_mist_turns.as_ref().unwrap()[i], 5.);
+            assert_eq!(environment::fire_active(e.fire_kind.as_ref().unwrap()[i].as_deref()), tile == "grass");
+            assert_eq!(f.tiles[i], "floor");
+        }
     }
 
 }

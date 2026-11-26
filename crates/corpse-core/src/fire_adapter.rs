@@ -175,6 +175,7 @@ impl<'a> FireAdapter<'a> {
                 "gas",
                 gas.is_some()
                     && gas != Some("steam")
+                    && !(gas == Some("bloodMist") && crate::blood_mist::nonflammable(self.run))
                     && (!creature || e.gas_volume.as_ref().unwrap()[i] > 0.),
                 100.,
                 35.,

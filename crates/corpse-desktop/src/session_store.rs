@@ -209,14 +209,14 @@ pub fn decode_bytes(raw: &[u8]) -> Result<(corpse_core::temporal::Engine, Kind),
 pub fn decode(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> { decode_bytes(raw.as_bytes()) }
 /// Legacy JSON input path; O(bytes + validation/history import), unchanged format.
 fn decode_legacy(raw: &str) -> Result<(corpse_core::temporal::Engine, Kind), String> {
-    decode_checkpoint_policy(raw,None).map(|(engine,kind,_,_,_,_,_,_,_,_,_,_,_,_,_, _,_,_)|(engine,kind))
+    decode_checkpoint_policy(raw,None).map(|(engine,kind,_,_,_,_,_,_,_,_,_,_,_,_,_, _,_,_,_)|(engine,kind))
 }
 /// O(checkpoint bytes + import), once at loading/attachment. Recording policy is
 /// supplied by its authenticated header, never inferred from turn/tick counts.
 /// An old experimental snapshot checkpoint without provenance remains unknown;
 /// it can load/save but cannot falsely claim a reproducible seed-only export.
 /// The flags report markerless journal policies for EOF adoption.
-fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool, bool,bool,bool),String>{
+fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::temporal::Engine,Kind,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool, bool,bool,bool,bool),String>{
     let v:serde_json::Value=serde_json::from_str(raw).map_err(|e|e.to_string())?;
     let(mut run,kind)=if v.get("nativeSaveVersion").is_some(){let envelope:SaveEnvelope=serde_json::from_value(v).map_err(|e|e.to_string())?;if envelope.native_save_version!=1{return Err("Unsupported native save version.".into())}(envelope.run,envelope.session)}else{(v,Kind::Genuine)};
     let mut firebolt_migrated=false;
@@ -230,6 +230,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
     let mut ragelight_migrated=false;
     let mut balance_migrated=false;
     let mut collapse_migrated=false;
+    let mut blood_mist_fire_migrated=false;
     let mut steam_migrated=false;
     let mut execute_migrated=false;
     let mut beckoning_migrated=false;
@@ -272,6 +273,9 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         collapse_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
             && object.get("collapseRulesFrom").is_none_or(serde_json::Value::is_null);
         if collapse_migrated {object.shift_remove("collapseRulesFrom");}
+        blood_mist_fire_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("bloodMistFireRulesFrom").is_none_or(serde_json::Value::is_null);
+        if blood_mist_fire_migrated {object.shift_remove("bloodMistFireRulesFrom");}
         steam_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64).is_some_and(|r|r>=50.)
             && object.get("steamRulesFrom").is_none_or(serde_json::Value::is_null);
         if steam_migrated {object.insert("steamRulesFrom".into(),serde_json::Value::Null);}
@@ -303,7 +307,7 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         else {corpse_core::temporal::Engine::load(&raw)}.map_err(|e|e.to_string())?;
     if let Some(legacy)=legacy{engine.set_legacy_revert(legacy);}
     corpse_core::engine::validate_supported(&engine.run).map_err(|e|e.to_string())?;
-    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated))
+    Ok((engine,kind,firebolt_migrated,amulet_migrated,potion_migrated,ring_migrated,gas_migrated,future_migrated,commandment_migrated,screamer_migrated,ember_migrated,ragelight_migrated,steam_migrated,execute_migrated,beckoning_migrated,ichor_fire_migrated,balance_migrated,collapse_migrated,blood_mist_fire_migrated))
 }
 
 pub fn utc_now() -> String {

@@ -417,12 +417,16 @@ fn replay_policy_adopts_at_end_of_a_legacy_command_prefix() {
     let mut replay = ReplaySession::create(record, true).unwrap();
     while replay.step().unwrap() {}
     assert!(replay.engine.run.collapse_rules_from.is_missing());
+    assert!(replay.engine.run.blood_mist_fire_rules_from.is_missing());
     let live = Engine::load(&replay.engine.save().unwrap()).unwrap();
     let boundary = live.run.replay.len();
     assert_eq!(live.run.collapse_rules_from, boundary.into());
+    assert_eq!(live.run.blood_mist_fire_rules_from, boundary.into());
     let exported = ReplayRecord::try_from_run(&live.run).unwrap();
     let mut mixed = ReplaySession::create(exported, true).unwrap();
     assert!(mixed.engine.run.collapse_rules_from.is_missing());
+    assert!(mixed.engine.run.blood_mist_fire_rules_from.is_missing());
     while mixed.step().unwrap() {}
     assert_eq!(mixed.engine.run.collapse_rules_from, boundary.into());
+    assert_eq!(mixed.engine.run.blood_mist_fire_rules_from, boundary.into());
 }

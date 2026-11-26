@@ -1053,3 +1053,14 @@ remain visible through the flames.
 Existing live saves adopt this policy for the next collapse they start.
 A collapse already underway when the save is upgraded keeps its original
 rules, and previously recorded commands are not reinterpreted.
+
+### R52 Blood Mist and creature backgrounds
+
+Blood Mist from Overflowing is harmless and nonflammable. It does not fuel or
+spread fire; other flammable material on the same square still behaves normally.
+Existing replay commands retain their original gas/fire behavior. New R52
+commands use the nonflammable rule after live save admission.
+
+Creature glyphs no longer apply the default dark or blue inset over terrain.
+Telepathy still changes the glyph ink, and explicitly authored appearance
+backgrounds still override the default.

@@ -538,6 +538,7 @@ pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, r
         ragelight_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         balance_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         collapse_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        blood_mist_fire_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         steam_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
         execute_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         beckoning_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },

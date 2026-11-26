@@ -263,7 +263,7 @@ pub mod fortune_schedule;
 
 pub mod ability_sight;
 
-mod blood_mist;
+pub mod blood_mist;
 
 mod verdania_guard;
 
