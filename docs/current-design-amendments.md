@@ -1177,3 +1177,11 @@ developers can explicitly build with `--features dev-tools` to use QA tools;
 that feature is not for distribution. Windows player release executables use
 the GUI subsystem, without a companion console. The title-screen Help button
 highlights on pointer hover without changing its click target.
+
+### Ending fades
+
+After the last gameplay presentation resolves, death fades the whole game view
+to black and escape fades it to white. The existing fresh-Space continuation
+prompt appears on the fully faded frame and opens the same run summary. Reduced
+Motion, Reduced action animation, and Instant action animation skip the fade.
+This is desktop presentation only; saves and simulation are unchanged.

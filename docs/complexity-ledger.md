@@ -2635,3 +2635,13 @@ admission checks provenance in O(1), then scans the decoded command history
 in O(C) time and O(1) extra space for C commands. Title
 Help hover is a fixed hit test and repaints only on state change, using the
 existing frame path. The Windows GUI subsystem is a link-time setting.
+
+### Desktop ending fades
+
+The death/escape presentation samples one elapsed timestamp in O(1) time and
+space per frame during a single 960 ms ease. To avoid tint feedback and missed
+dirty rectangles the terminal scene uses its ordinary full-frame paint and
+upload. The additional overlay costs O(P) on the CPU renderer for P native
+drawable pixels and O(1) submission plus O(P) GPU blend work on the GPU path,
+with no additional frame buffer or simulation work. Reduced/Instant motion
+skips the overlay. This is an implementation bound, not a measured speedup.

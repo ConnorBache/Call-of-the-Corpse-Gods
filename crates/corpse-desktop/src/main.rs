@@ -3,6 +3,7 @@
 mod gameplay_pause;
 mod health_warning;
 mod death_pause;
+#[cfg(test)] mod ending_video_capture;
 mod gpu_render;
 #[cfg(feature = "runtime-timing")]
 mod timing_test;
@@ -643,6 +644,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut summary: Option<corpse_core::profile::RunSummary> = None;
     let mut summary_scroll = 0usize;
     let mut death_pause=death_pause::DeathPause::default();
+    let mut ending_fade=death_pause::Fade::default();
     let mut health_warning=health_warning::Warning::default();
     let mut tile_report: Option<inspection_ui::Report> = None;
     let mut tile_report_scroll = 0usize;
@@ -729,6 +731,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         // Use committed geometry even if this requested resize was rejected.
         let mut tile_enabled=!help.active()&&!gpu_available&&!gpu_failed&&tile_requested&&(painter.width as u64*HEIGHT as u64==painter.height as u64*WIDTH as u64);
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
+        #[cfg(test)] ending_video_capture::inject(&sdl,&canvas)?;
         #[cfg(test)] input_loop_tests::inject(&sdl,&mut canvas,&painter)?;
         for mut event in events.poll_iter() {
             effects.gameplay_pause.release(&event);health_warning.release(&event);
@@ -2728,7 +2731,20 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         let old_cues = (effects.cues.len(),effects.plane_transition.is_some(),effects.sequence.active());
         if !minimized&&drawable_w>0&&drawable_h>0 {effects.prune(now);}
         dirty |= (effects.cues.len(),effects.plane_transition.is_some(),effects.sequence.active()) != old_cues;
-        let transient = effects.animate(now) || (screen==Screen::ReplayGame&&replays.animating(now));
+        let terminal_status = match run.as_ref().filter(|_| screen==Screen::Game).map(|r|r.run.status.as_str()) {
+            Some("dead") => "dead", Some("won") => "won", _ => "playing",
+        };
+        let terminal = death_pause::terminal(terminal_status);
+        let terminal_ready = terminal && !effects.presentation_pending(now) && !effects.gameplay_pause.active();
+        // A full repaint prevents feedback from blending against the previous
+        // faded frame and bypasses tile damage/upload clipping.
+        if terminal { tile_enabled = false; }
+        let fade = ending_fade.sample(if terminal_ready { terminal_status } else { "playing" }, now,
+            action_reduced || minimized || drawable_w==0 || drawable_h==0);
+        let ending_prompt = terminal_ready && fade.is_none_or(|(_, alpha)| alpha==255);
+        let fade_animating = fade.is_some_and(|(_, alpha)| alpha<255);
+        dirty |= terminal_ready && !death_pause.is_presented() && !fade_animating;
+        let transient = fade_animating || effects.animate(now) || (screen==Screen::ReplayGame&&replays.animating(now));
         let frame = if reduced {
             18
         } else {
@@ -3005,10 +3021,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     }
                 }
             }
+            if let Some((color,alpha))=fade {painter.ending_fade(color,alpha);}
             help.paint(&mut painter);
             if screen==Screen::Game && !effects.sequence.pending(now) && !effects.gameplay_pause.fall_active(){if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
             if screen==Screen::Game && !effects.presentation_pending(now) && effects.gameplay_pause.active() && (!health_warning.active()||effects.gameplay_pause.fall_active()){painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,effects.gameplay_pause.text());}
-            if screen==Screen::Game && !effects.presentation_pending(now) && !effects.gameplay_pause.active() && run.as_ref().is_some_and(|r|death_pause::terminal(&r.run.status)){painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,gameplay_pause::CONTINUE);}
+            if ending_prompt {painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,gameplay_pause::CONTINUE);}
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
             if let Some(frame)=painter.gpu.as_ref(){
                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
@@ -3029,12 +3046,13 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             if full_upload||!upload_rects.is_empty()||force_present{let _present_timing=corpse_core::timing::span("desktop.texture.present");canvas.clear();canvas.copy(&texture,None,None)?;canvas.present();}
             }
             if !effects.presentation_pending(now) { if effects.gameplay_pause.active()&&(!health_warning.active()||effects.gameplay_pause.fall_active()){effects.gameplay_pause.presented();}else{health_warning.presented();} }
-            death_pause.presented(!effects.gameplay_pause.active()&&!effects.presentation_pending(now)&&screen==Screen::Game&&run.as_ref().is_some_and(|r|death_pause::terminal(&r.run.status)));
+            death_pause.presented(ending_prompt);
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
             dirty = false;
             cosmetic_dirty = false;
             last_frame = frame;
         }
+        #[cfg(test)] if ending_video_capture::observe(&mut canvas,&painter,screen,terminal_status,ending_prompt)? {break 'running;}
         #[cfg(test)] if input_loop_tests::observe(&mut canvas,&painter,input_loop_tests::State {
             screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
             help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),

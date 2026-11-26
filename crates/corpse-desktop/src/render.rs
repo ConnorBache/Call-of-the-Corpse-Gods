@@ -680,6 +680,16 @@ impl Painter {
             }
         }
     }
+    /// Ending tint covers the full drawable, including side panels and letterbox.
+    pub fn ending_fade(&mut self, color: Rgb, alpha: u8) {
+        if alpha == 0 { return; }
+        let clips = (self.tile_clip_enabled, self.clip, self.damage_clip);
+        self.tile_clip_enabled = false;
+        self.clip = None;
+        self.damage_clip = None;
+        self.native_fill(0, 0, self.width as i32, self.height as i32, color, alpha);
+        (self.tile_clip_enabled, self.clip, self.damage_clip) = clips;
+    }
     /// O(native tile area) time and O(1) scratch for three straight strokes.
     /// Equal screen-space axes keep diagonals at 45 degrees, irrespective of tile aspect.
     fn timeweave_arrow(&mut self, x:i32, y:i32, cw:i32, ch:i32, direction:(i8,i8)) {
