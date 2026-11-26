@@ -136,7 +136,7 @@ pub fn after_attack(r: &mut Run, attacker: &Actor, target: &Actor, landed: bool)
     if abilities::endpoint_active(r, &a, FORCE) && cell_open(r, &a, target.x, target.y, Some(target.id)) {
         let living = engine::actor(r, target.id).cloned().filter(|b| b.hp > 0. && !b.dead.value_or(false));
         let standing = living.as_ref().filter(|b| b.x == target.x && b.y == target.y);
-        let displacement = standing.and_then(|b| push_destination(r, b, dx, dy)
+        let displacement = standing.filter(|b| !crate::half_here::position_locked(r, b.id)).and_then(|b| push_destination(r, b, dx, dy)
             .or_else(|| cell_open(r, b, a.x, a.y, Some(a.id)).then_some((a.x,a.y))));
         if standing.is_none() || displacement.is_some() {
             let grapple = crate::revision50_grappler::snapshot(r);

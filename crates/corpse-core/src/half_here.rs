@@ -3,6 +3,51 @@ use crate::{Actor, Field, Run};
 pub const ID: &str = "etill-half-here";
 pub const COLOR: &str = "#c4b1e8";
 pub const MARKER: &str = "h";
+const LOCK_UNTIL: &str = "halfHereLockedUntil";
+const MINIMUM_TURNS: f64 = 5.;
+
+pub fn lock_enabled(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && matches!(r.half_here_lock_from, Field::Value(_))
+}
+
+pub(crate) fn validate_lock_policy(r: &Run) -> Result<(), String> {
+    if !r.half_here_lock_from.is_missing()
+        && (r.simulation_revision.value_or(29.) < 52.
+            || !matches!(r.half_here_lock_from, Field::Value(n) if n <= r.replay.len()))
+    {
+        return Err("Invalid Half Here lock command boundary".into());
+    }
+    Ok(())
+}
+
+/// Live saves adopt the lock for new placements; do not re-time an existing clone.
+pub fn admit_current(r: &mut Run) -> Result<(), String> {
+    validate_lock_policy(r)?;
+    if r.simulation_revision.value_or(29.) >= 52. && r.half_here_lock_from.is_missing() {
+        r.half_here_lock_from = r.replay.len().into();
+    }
+    Ok(())
+}
+
+pub(crate) fn apply_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usize) {
+    if from.as_ref() == Some(&cursor) {
+        r.half_here_lock_from = cursor.into();
+    } else if cursor == 0 {
+        r.half_here_lock_from = Field::Missing;
+    }
+}
+
+/// Only elapsed world turns count; free toggles and bonus actions do not.
+pub fn turns_until_dismissal(r: &Run) -> u8 {
+    if !lock_enabled(r) { return 0; }
+    r.player.conditions.get(LOCK_UNTIL)
+        .map_or(0, |until| (until - r.tick).clamp(0., MINIMUM_TURNS).ceil() as u8)
+}
+
+pub(crate) fn position_locked(r: &Run, id: f64) -> bool {
+    r.player.conditions.get("halfHereId") == Some(&id) && turns_until_dismissal(r) > 0
+}
+
 pub fn is_clone(a: &Actor) -> bool {
     a.conditions.get("halfHereClone") == Some(&1.0) || crate::dreamwalking::is_body(a)
 }
@@ -70,6 +115,7 @@ pub fn dismiss(r: &mut Run) {
         }
     }
     r.player.conditions.shift_remove("halfHereId");
+    r.player.conditions.shift_remove(LOCK_UNTIL);
     r.player.active.retain(|s| s != ID);
     crate::revision50::settle_duel_targets(r);
 }
@@ -144,6 +190,9 @@ pub fn sync(r: &mut Run) {
 /// Destination validation and activation cost/events belong to the caller.
 /// Birth admission is O(d) clean, O(A*d + F + H) dirty; it precedes dismissal.
 pub fn create(r: &mut Run, x: f64, y: f64) -> Result<f64, String> {
+    if turns_until_dismissal(r) > 0 {
+        return Err("Half Here cannot be moved yet.".into());
+    }
     crate::creature_index::check_next_creature_id(r)?;
     dismiss(r);
     let p = &r.player;
@@ -172,6 +221,9 @@ pub fn create(r: &mut Run, x: f64, y: f64) -> Result<f64, String> {
     crate::animation_shapes::line(r,&r.player,(&a).into(),"P29","line-grow","#40ffff");
     r.actors_at_mut(r.depth).push(a);
     r.player.conditions.insert("halfHereId".into(), id);
+    if lock_enabled(r) {
+        r.player.conditions.insert(LOCK_UNTIL.into(), r.tick + MINIMUM_TURNS);
+    }
     r.player.active.push(ID.into());
     sync(r);
     Ok(id)

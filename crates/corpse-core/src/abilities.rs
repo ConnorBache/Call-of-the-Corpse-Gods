@@ -682,6 +682,12 @@ fn activate_inner(
         "etill-half-here" => {
             let active = r.player.active.iter().any(|s| s == id);
             if active {
+                let left = crate::half_here::turns_until_dismissal(r);
+                if left > 0 {
+                    let unit = if left == 1 { "turn" } else { "turns" };
+                    log(r, format!("Half Here must stay in place for {left} more {unit}."), "player");
+                    return Ok(false);
+                }
                 crate::half_here::dismiss(r);
             } else {
                 let valid = match (x.as_ref(), y.as_ref()) {

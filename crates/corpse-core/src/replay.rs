@@ -33,6 +33,8 @@ pub struct ReplayRecord {
     pub collapse_rules_from: Field<usize>,
     #[serde(rename = "bloodMistFireRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub blood_mist_fire_rules_from: Field<usize>,
+    #[serde(rename = "halfHereLockFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub half_here_lock_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]
@@ -88,6 +90,7 @@ impl ReplayRecord {
             balance_rules_from: match run.balance_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             collapse_rules_from: match run.collapse_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             blood_mist_fire_rules_from: match run.blood_mist_fire_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            half_here_lock_from: match run.half_here_lock_from { Field::Value(n) => n.into(), _ => Field::Missing },
             steam_rules_from: match run.steam_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             execute_rules_from: match run.execute_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             beckoning_rules_from: match run.beckoning_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
@@ -171,6 +174,10 @@ impl ReplayRecord {
             && matches!(self.blood_mist_fire_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Unsupported Blood Mist fire rules replay boundary".into()));
         }
+        if !self.half_here_lock_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.half_here_lock_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Unsupported Half Here lock replay boundary".into()));
+        }
         if !self.execute_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
             && matches!(self.execute_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Execute rules replay boundary".into()));
@@ -208,6 +215,7 @@ impl ReplayRecord {
         crate::balance_rules::apply_replay_policy(&mut engine.run, &self.balance_rules_from, cursor);
         crate::finale::apply_replay_policy(&mut engine.run, &self.collapse_rules_from, cursor);
         crate::blood_mist::apply_replay_policy(&mut engine.run, &self.blood_mist_fire_rules_from, cursor);
+        crate::half_here::apply_replay_policy(&mut engine.run, &self.half_here_lock_from, cursor);
         crate::steam_rules::apply_replay_policy(&mut engine.run, &self.steam_rules_from, cursor);
         crate::execute_rules::apply_replay_policy(&mut engine.run, &self.execute_rules_from, cursor);
         crate::beckoning_rules::apply_replay_policy(&mut engine.run, &self.beckoning_rules_from, cursor);
@@ -254,6 +262,7 @@ impl ReplaySession {
         crate::balance_rules::apply_replay_policy(&mut initial, &record.balance_rules_from, 0);
         crate::finale::apply_replay_policy(&mut initial, &record.collapse_rules_from, 0);
         crate::blood_mist::apply_replay_policy(&mut initial, &record.blood_mist_fire_rules_from, 0);
+        crate::half_here::apply_replay_policy(&mut initial, &record.half_here_lock_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
@@ -299,6 +308,7 @@ impl ReplaySession {
         crate::balance_rules::apply_replay_policy(&mut initial, &record.balance_rules_from, 0);
         crate::finale::apply_replay_policy(&mut initial, &record.collapse_rules_from, 0);
         crate::blood_mist::apply_replay_policy(&mut initial, &record.blood_mist_fire_rules_from, 0);
+        crate::half_here::apply_replay_policy(&mut initial, &record.half_here_lock_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
@@ -329,7 +339,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
+        if self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -356,6 +366,7 @@ impl ReplaySession {
         crate::balance_rules::apply_replay_policy(&mut initial, &self.record.balance_rules_from, 0);
         crate::finale::apply_replay_policy(&mut initial, &self.record.collapse_rules_from, 0);
         crate::blood_mist::apply_replay_policy(&mut initial, &self.record.blood_mist_fire_rules_from, 0);
+        crate::half_here::apply_replay_policy(&mut initial, &self.record.half_here_lock_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &self.record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &self.record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &self.record.beckoning_rules_from, 0);

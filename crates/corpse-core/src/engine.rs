@@ -329,6 +329,7 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
                     "halfHereClone",
                     "halfHereOwner",
                     "halfHereId",
+                    "halfHereLockedUntil",
                     "fungalGasType",
                     "stuck",
                     "weakened",
@@ -1095,7 +1096,9 @@ fn move_actor_inner(
     let a = actor(r, id)
         .ok_or_else(|| EngineError("actor missing".into()))?
         .clone();
-    if crate::revision50_terrain::is_soldier(&a) || crate::revision50_nightmares::is_decoy(&a) || crate::ahvamitt::is_actor(&a) || crate::dreamwalking::is_body(&a) || (crate::half_here::is_clone(&a) && condition(&a, "forcedMove") == 0.0) {
+    if crate::revision50_terrain::is_soldier(&a) || crate::revision50_nightmares::is_decoy(&a) || crate::ahvamitt::is_actor(&a) || crate::dreamwalking::is_body(&a)
+        || (crate::half_here::is_clone(&a) && (condition(&a, "forcedMove") == 0.0
+            || crate::half_here::position_locked(r,id))) {
         return Ok(false);
     }
     let mut confused = false;
@@ -1162,6 +1165,15 @@ fn move_actor_step(
     // retain ordinary fall scaling even when they enter the same chasm tile.
     let (entry_x, entry_y) = (a.x + dx, a.y + dy);
     let options=crate::portals::step_options(r,&a,entry_x,entry_y);
+    // The ordinary allied swap must not relocate a freshly placed endpoint,
+    // including through a portal exit chosen later by the movement lottery.
+    if id == r.player.id && crate::half_here::turns_until_dismissal(r) > 0
+        && r.player.conditions.get("halfHereId").and_then(|&id| actor(r, id)).is_some_and(|clone|
+            crate::dreamwalking::same_plane(r, &a, clone)
+            && options.iter().any(|&(x, y)| crate::portals::same_position(r, clone, x, y)))
+    {
+        return Ok(false);
+    }
     let (mut x,mut y)=options[0];
     let voluntary_chasm = trace.is_some() && condition(&a,"forcedMove")==0.0
         && options.len()==1 && (x,y)==(entry_x,entry_y);

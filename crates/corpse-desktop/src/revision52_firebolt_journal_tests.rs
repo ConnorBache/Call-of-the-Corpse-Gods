@@ -71,6 +71,35 @@ fn export_twice(initial:&Run,source:&Core) {
     }
 }
 #[test]
+fn half_here_legacy_journal_tail_replays_before_enabling_the_lock() {
+    use corpse_core::half_here;
+    for metadata in [false, true] {
+        let mut initial = room();
+        initial.player.abilities.push(half_here::ID.into());
+        let mut old = Core::new(initial.clone()).unwrap();
+        old.run.half_here_lock_from = Field::Missing;
+        let checkpoint = session_store::encode(&old, Kind::Fixture).unwrap();
+        let header = if metadata {log::Header::for_metadata_revision(Some(52.))}
+            else {log::Header::for_revision(Some(52.))}.unwrap();
+        let mut file = log::encode_initial(&checkpoint, &header).unwrap();
+        let at = |x, y| Command::Ability {id:half_here::ID.into(),target:Field::Missing,x,y};
+        let place = at(11.0.into(), 10.0.into());
+        let dismiss = at(Field::Missing, Field::Missing);
+        for command in [place.clone(), dismiss.clone()] {
+            old.dispatch(&command).unwrap();
+            append(&mut file, vec![Operation::Command{command, after:Stamp::capture(&old)}], metadata);
+        }
+        let (mut upgraded, _, migrated) = super::super::incremental_store::decode_with_migration(&file.bytes).unwrap();
+        assert!(migrated);
+        assert!(half_here::clone_id(&upgraded.run).is_none());
+        assert_eq!(upgraded.run.half_here_lock_from, 2usize.into());
+        upgraded.dispatch(&place).unwrap();
+        upgraded.dispatch(&dismiss).unwrap();
+        assert_eq!(half_here::turns_until_dismissal(&upgraded.run), 4);
+        export_twice(&initial, &upgraded);
+    }
+}
+#[test]
 fn firebolt_markerless_journal_replays_old_tail_then_checkpoints_new_boundary() {
     for metadata in [false,true] {
         let (initial,mut expected,bytes)=journal(Field::Missing,metadata,true);

@@ -52,7 +52,7 @@ impl Snapshot {
     pub fn value(&self) -> Result<Value> {
         let mut v = serde_json::to_value(&*self.state)?;
         let o = v.as_object_mut().unwrap();
-        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
+        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "halfHereLockFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
             o.shift_remove(k);
         }
         if let Some(c) = self.cursor {
@@ -115,6 +115,7 @@ impl Snapshot {
         o.shift_remove("balanceRulesFrom");
         o.shift_remove("collapseRulesFrom");
         o.shift_remove("bloodMistFireRulesFrom");
+        o.shift_remove("halfHereLockFrom");
         o.shift_remove("steamRulesFrom");
         o.shift_remove("executeRulesFrom");
         o.shift_remove("beckoningRulesFrom");
@@ -144,6 +145,7 @@ impl Snapshot {
         restored.balance_rules_from = run.balance_rules_from.clone();
         restored.collapse_rules_from = run.collapse_rules_from.clone();
         restored.blood_mist_fire_rules_from = run.blood_mist_fire_rules_from.clone();
+        restored.half_here_lock_from = run.half_here_lock_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -565,6 +567,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.balance_rules_from = Field::Missing;
     copy.collapse_rules_from = Field::Missing;
     copy.blood_mist_fire_rules_from = Field::Missing;
+    copy.half_here_lock_from = Field::Missing;
     copy.execute_rules_from = Field::Missing;
     copy.beckoning_rules_from = Field::Missing;
     copy.ichor_fire_rules_from = Field::Missing;
@@ -604,6 +607,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.balance_rules_from=run.balance_rules_from.clone();
     restored.collapse_rules_from=run.collapse_rules_from.clone();
     restored.blood_mist_fire_rules_from=run.blood_mist_fire_rules_from.clone();
+    restored.half_here_lock_from=run.half_here_lock_from.clone();
     restored.execute_rules_from=run.execute_rules_from.clone();
     restored.beckoning_rules_from=run.beckoning_rules_from.clone();
     restored.ichor_fire_rules_from=run.ichor_fire_rules_from.clone();
@@ -639,6 +643,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.balance_rules_from = run.balance_rules_from.clone();
         restored.collapse_rules_from = run.collapse_rules_from.clone();
         restored.blood_mist_fire_rules_from = run.blood_mist_fire_rules_from.clone();
+        restored.half_here_lock_from = run.half_here_lock_from.clone();
         restored.execute_rules_from = run.execute_rules_from.clone();
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
@@ -805,7 +810,7 @@ fn snapshot_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Run {
 fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
     let _timing = crate::timing::span("history.journal_header");
     let mut value = serde_json::to_value(snapshot_header(snapshot, mask_dream_floors))?;
-    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
+    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "halfHereLockFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
         value.as_object_mut().unwrap().shift_remove(key);
     }
     Ok(value)
@@ -1078,6 +1083,7 @@ impl Engine {
         crate::balance_rules::admit_current(&mut run).map_err(StorageError)?;
         crate::finale::admit_current(&mut run).map_err(StorageError)?;
         crate::blood_mist::admit_current(&mut run).map_err(StorageError)?;
+        crate::half_here::admit_current(&mut run).map_err(StorageError)?;
         Self::new_for_replay(run)
     }
 
@@ -1147,6 +1153,7 @@ impl Engine {
         if matches!(run.balance_rules_from, Field::Null) { run.balance_rules_from = Field::Missing; }
         if matches!(run.collapse_rules_from, Field::Null) { run.collapse_rules_from = Field::Missing; }
         if matches!(run.blood_mist_fire_rules_from, Field::Null) { run.blood_mist_fire_rules_from = Field::Missing; }
+        if matches!(run.half_here_lock_from, Field::Null) { run.half_here_lock_from = Field::Missing; }
         if matches!(run.steam_rules_from, Field::Null) { run.steam_rules_from = Field::Missing; }
         if matches!(run.execute_rules_from, Field::Null) { run.execute_rules_from = Field::Missing; }
         if matches!(run.beckoning_rules_from, Field::Null) { run.beckoning_rules_from = Field::Missing; }

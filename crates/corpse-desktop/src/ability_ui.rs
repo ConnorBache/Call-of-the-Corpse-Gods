@@ -86,6 +86,9 @@ pub const RAGELIGHT_DESCRIPTION:&str="Whenever you would die, if you can pay the
 const LEGACY_RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
 pub const FUTURE_FLOOR_DESCRIPTION:&str="Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+    if id == corpse_core::half_here::ID && corpse_core::half_here::lock_enabled(run) {
+        return "Place a stationary half clone on a visible, unoccupied tile. It shares your health and grants sight from its tile. It must stay there for at least 5 turns before you can dismiss it.";
+    }
     if corpse_core::balance_rules::current(run) {
         match id {
             "lichor-overflowing" => return "You have five saves. Each time you would die, spend one and survive at 1 HP. Reaching full HP or leveling up restores all five.",
@@ -1643,6 +1646,17 @@ mod never_be_rid_name_tests {
 #[cfg(test)]
 mod divine_balance_presentation_tests {
     use super::*;
+
+    #[test]
+    fn half_here_description_explains_the_five_turn_lock() {
+        let mut r: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision = 52.0.into();
+        let id = corpse_core::half_here::ID;
+        r.player.abilities.push(id.into());
+        assert!(!observe(&r, id).description.contains("5 turns"));
+        corpse_core::half_here::admit_current(&mut r).unwrap();
+        assert!(observe(&r, id).description.contains("at least 5 turns before you can dismiss it"));
+    }
 
     #[test]
     fn shows_five_saves_instead_of_legacy_blood_and_the_new_ursa_prices() {
