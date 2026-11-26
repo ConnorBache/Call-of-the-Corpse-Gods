@@ -26,32 +26,24 @@ pub fn project_kind(r:&Run,a:&Actor,kind:&str)->Option<Actor> {
     shown.conditions.retain(|k,_| !k.starts_with("skinWalker") && !k.starts_with("witchSummoned"));
     Some(shown)
 }
-/// Detached per-observation heart lookup. Build the ID set only if an observed
-/// corpse has a linked, uncollected heart; the heart may have fallen a floor.
+/// Detached, lazy lookup of actual heart tiles on the observed floor. Marks
+/// depend on physical co-location, not pickup history or the heart's source.
 pub struct CorpseHearts<'a> {
     run: &'a Run,
-    ground: std::cell::OnceCell<std::collections::HashSet<u64>>,
+    tiles: std::cell::OnceCell<std::collections::HashSet<(usize, usize, bool)>>,
 }
 impl<'a> CorpseHearts<'a> {
     pub fn new(run: &'a Run) -> Self {
-        Self { run, ground: std::cell::OnceCell::new() }
+        Self { run, tiles: std::cell::OnceCell::new() }
     }
 
     pub fn heartless(&self, a: &Actor) -> bool {
-        use corpse_core::corpses;
-        // Earlier versions set Actor::heartless at death but did not track
-        // the dropped heart ID. Keep their prior display instead of guessing.
-        if self.run.simulation_revision.value_or(29.) < 52. {
-            return corpses::heart_harvested(a);
-        }
-        if corpses::heart_taken(a) { return true; }
-        if let Some(id) = corpses::linked_heart(a) {
-            return !self.ground.get_or_init(|| self.run.ground.values().flat_map(|items| items.iter())
-                .filter(|entry| entry.item.kind == "heart").map(|entry| entry.item.id.to_bits()).collect())
-                .contains(&id.to_bits());
-        }
-        // Born/remade without a heart and corpses placed without a drop.
-        a.heartless.value_or(false)
+        let tiles = self.tiles.get_or_init(|| self.run.ground.get(&self.run.depth.to_string())
+            .into_iter().flat_map(|items| items.iter())
+            .filter(|entry| entry.item.kind == "heart" && crate::dream_ui::item_visible(self.run, &entry.item))
+            .map(|entry| (entry.x as usize, entry.y as usize, corpse_core::dreamwalking::dream_item(self.run, &entry.item)))
+            .collect());
+        !tiles.contains(&(a.x as usize, a.y as usize, corpse_core::dreamwalking::dream_actor(self.run, a)))
     }
 }
 

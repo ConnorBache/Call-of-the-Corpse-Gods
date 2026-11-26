@@ -46,7 +46,7 @@ fn revision50_corpse_markers_blood_preferences_and_renderer_parity() {
         let view = crate::observe::observe_with_profile(&run, &profile);
         let dry = crate::observe::observe_with_profile(&dry_run, &profile);
         let corpse = view.cells.iter().find(|c| c.actor_id == Some(original.id)).unwrap();
-        assert!(corpse.corpse); assert!(!corpse.heartless); assert_eq!(corpse.glyph, original.glyph);
+        assert!(corpse.corpse); assert!(corpse.heartless); assert_eq!(corpse.glyph, original.glyph);
         for (id, ring) in [(5., false), (6., true), (7., false)] {
             let cell = view.cells.iter().find(|c| c.actor_id == Some(id)).unwrap();
             assert!(!cell.corpse, "living/sleeping bodies never gain an X");

@@ -757,6 +757,11 @@ fn compact_condition(s: &statuses_ui::Status) -> String {
     }
 }
 fn heart(r: &Run, a: &Actor) -> String {
+    // The observed ground stack describes hearts around corpses. The reward
+    // preview below is for a living creature, not the corpse's tile.
+    if a.dead.value_or(false) || a.hp <= 0. {
+        return String::new();
+    }
     if a.heartless.value_or(false) {
         return "Heart: none".into();
     }

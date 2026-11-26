@@ -16,7 +16,7 @@ fn corpse_cross_preserves_glyph_and_observed_death_semantics() {
     a.dead=true.into();a.hp=0.;a.heartless=true.into();
     v=crate::observe::observe(&r);
     let corpse=v.cells.iter().find(|c|c.actor_id==Some(id)).expect("visible corpse");
-    assert!(corpse.corpse);assert!(!corpse.heartless);assert!(!corpse.glyph.is_empty());
+    assert!(corpse.corpse);assert!(corpse.heartless);assert!(!corpse.glyph.is_empty());
     assert!(!v.creatures.iter().any(|a|a.id==id),"dead creatures do not become live previews");
     let frozen=serde_json::to_string(&r).unwrap();let mut p=Painter::new();p.game_at(&v,"",false,0.);
     assert_eq!(serde_json::to_string(&r).unwrap(),frozen);assert_ne!(before,frozen);
@@ -91,34 +91,36 @@ fn jackal_death_displays_immediate_heartless_corpse_on_map_and_inspector() {
 }
 
 #[test]
-fn corpse_stays_regular_while_its_heart_exists_and_marks_pickup_without_a_stomp() {
+fn corpse_marker_follows_any_heart_on_the_exact_tile() {
     let mut r = color_room(52.);
     let mut a = corpse_core::population::create_actor_revision("rat", 80., 13., 10., false, 52.).unwrap();
     a.hp = 0.;
     r.actors_at_mut(1.).push(a);
     corpse_core::engine::death_if_nonpositive(&mut r, 80.).unwrap();
-    let mut heart = r.ground_at_mut(1.).pop().unwrap();
-    let other_heart = corpse_core::inventory::heart_for_revision(&r.actors_at(1.)[0], 999., 52.).unwrap();
-    r.ground_at_mut(1.).push(corpse_core::GroundItem { item: other_heart, ..heart.clone() });
-    heart.x = 12.;
-    r.ground_at_mut(2.).push(heart.clone());
-    assert!(!shown_actor(&crate::observe::observe(&r), 80.).heartless);
-    assert!(!crate::inspection_ui::observe_tile(&r, 13, 10).scene.contains("heartless"));
-    // Destruction, rather than collection, also removes the linked heart.
-    let mut erased = r.clone();
-    erased.ground_at_mut(2.).clear();
-    assert!(shown_actor(&crate::observe::observe(&erased), 80.).heartless);
-    // Pick it up away from the corpse, with no stomp. Another same-species
-    // heart on the body does not count as this body's heart.
-    r.ground_at_mut(2.).clear();
-    r.ground_at_mut(1.).push(heart);
+    let own = r.ground_at_mut(1.).pop().unwrap();
+    let other = corpse_core::population::create_actor_revision("bear", 81., 13., 10., false, 52.).unwrap();
+    let unrelated = corpse_core::inventory::heart_for_revision(&other, 999., 52.).unwrap();
+    let assert_marker = |r: &corpse_core::Run, expected| {
+        let view = crate::observe::observe(r);
+        assert_eq!(shown_actor(&view, 80.).heartless, expected);
+        let name = &view.ground_entities.iter().find(|e| e.id==80_f64.to_bits()).unwrap().name;
+        assert_eq!(name.starts_with("heartless "), expected);
+        let scene = crate::inspection_ui::observe_tile(r, 13, 10).scene;
+        assert_eq!(scene.contains("heartless giant rat corpse"), expected, "{scene}");
+    };
+    r.ground_at_mut(2.).push(own.clone());
+    assert_marker(&r, true); // Even one's own heart doesn't count on another floor.
+    let mut item = r.ground_at_mut(2.).pop().unwrap();
+    item.x = 12.;
+    r.ground_at_mut(1.).push(item);
+    assert_marker(&r, true); // Nor on the adjacent square.
+    r.ground_at_mut(1.).push(corpse_core::GroundItem { item: unrelated, ..own });
+    assert_marker(&r, false);
     r.player.x = 12.;
     assert_eq!(corpse_core::inventory::collect_underfoot(&mut r, 10.).unwrap(), 1);
-    assert!(!corpse_core::corpses::heart_harvested(&r.actors_at(1.)[0]));
-    let view = crate::observe::observe(&r);
-    assert!(shown_actor(&view, 80.).heartless);
-    assert!(view.ground_entities.iter().any(|e| e.id == 80_f64.to_bits() && e.name.starts_with("heartless ")));
-    assert!(crate::inspection_ui::observe_tile(&r, 13, 10).scene.contains("heartless"));
+    assert_marker(&r, false); // Picking up its own heart does not undo the substitute.
+    r.ground_at_mut(1.).clear();
+    assert_marker(&r, true);
 }
 
 #[test]
@@ -223,7 +225,7 @@ fn corpse_color_survives_actual_death_save_and_revival_without_new_fields() {
         assert_eq!(loaded.actors_at(1.)[0].color,"#3bcda6");
         let before=corpse_core::storage::serialize(&loaded).unwrap();
         let view=crate::observe::observe(&loaded);let corpse=shown_actor(&view,80.);
-        assert!(corpse.corpse);assert_eq!(corpse.heartless,revision>=52.);
+        assert!(corpse.corpse && corpse.heartless);
         assert_eq!(corpse.entity_ink.unwrap().color,shown_actor(&live,80.).entity_ink.unwrap().color);
         assert_eq!(corpse.glyph,shown_actor(&live,80.).glyph);
         assert_eq!(corpse_core::storage::serialize(&loaded).unwrap(),before,"observation never rewrites a legacy save");
