@@ -26,6 +26,9 @@ fn resource_ui_formats_capped_positive_negative_zero_and_small_changes(){
     let r=room();assert_eq!(player_changes(&r)[0],"+5%");assert_eq!(player_changes(&r)[1],"-20%");
     assert_eq!(value_text("Health",202.,202.,"+5%"),"202/202 - +5%");
     assert_eq!(value_text("Health",0.,202.,"-100%"),"0/202 - -100%");
+    assert_eq!(value_text("Health",-12.,202.,""),"-12 / 202");
+    assert_eq!(value_text("Health",-0.25,202.,""),"-1 / 202");
+    assert_eq!(bar_fractions(-12.,202.,0.),(0.,0.));
     assert_eq!(percent_text(Some(0.)),"");assert_eq!(percent_text(None),"");
     assert_eq!(percent_text(Some(0.04)),"+0%");assert_eq!(percent_text(Some(-0.5)),"-1%");
     assert_eq!(percent_text(Some(1e-12)),"+0%");

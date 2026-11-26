@@ -122,6 +122,23 @@ pub(crate) fn finish() -> Vec<PresentationEvent> {
             .unwrap_or_default()
     })
 }
+/// The terminal HUD can show overkill without changing recorded simulation HP.
+pub(crate) fn terminal_health(r: &Run, hp: f64) {
+    if !enabled(r) || !hp.is_finite() || hp >= 0. { return; }
+    PENDING.with(|p| if let Some(batch)=p.borrow_mut().as_mut() {
+        batch.events.push(PresentationEvent {
+            kind: "terminal-health".into(), from: None, to: (&r.player).into(),
+            glyph: None, color: None, label: Some(hp.to_string()),
+            depth: r.depth, animation: None,
+        });
+        if batch.events.len()>4096 {batch.events.remove(0);}
+    });
+}
+
+pub fn terminal_health_value(event: &PresentationEvent) -> Option<f64> {
+    if event.kind!="terminal-health" {return None;}
+    event.label.as_ref()?.parse::<f64>().ok().filter(|hp|hp.is_finite() && *hp<0.)
+}
 pub fn emit(r: &Run, mut event: PresentationEvent) {
     if r.player.x < 0.0 || !vision::visible(r, event.to.x as usize, event.to.y as usize) {
         return;

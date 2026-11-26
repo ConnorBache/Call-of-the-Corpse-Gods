@@ -21,7 +21,9 @@ pub fn player_changes(run: &Run) -> [String; 3] {
             percent_text(corpse_core::resources::player_change_percent(run,key,value,max)))
 }
 pub fn value_text(label: &str, value: f64, maximum: f64, change: &str) -> String {
-    let value = if label=="Health" { crate::stat_presentation::current_health(value) } else {value};
+    let value = if label=="Health" {
+        if value<0. {value.floor()} else {crate::stat_presentation::current_health(value)}
+    } else {value};
     if change.is_empty() { format!("{value:.0} / {}",super::resource_max_label(maximum)) }
     else { format!("{value:.0}/{} - {change}",super::resource_max_label(maximum)) }
 }

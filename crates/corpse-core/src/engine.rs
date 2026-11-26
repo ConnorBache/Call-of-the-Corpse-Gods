@@ -3306,6 +3306,7 @@ fn death_core_with_source(
         "environment"
     };
     if id == r.player.id {
+        crate::events::terminal_health(r, a.hp);
         r.player.hp = 0.0;
         r.status = "dead".into();
         let tick = r.tick;

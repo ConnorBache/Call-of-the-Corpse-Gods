@@ -75,6 +75,9 @@ impl Replays {
             }
             self.last_tick = s.engine.run.tick;
             let mut v = observe::observe_with_profile(&s.engine.run, &self.profile);
+            if s.engine.run.status=="dead" {
+                if let Some(hp)=self.effects.terminal_hp {v.hp=hp;}
+            }
             v.measure_conditions(&mut self.meters);
             v.provenance = if s.engine.run.playtest.is_missing() {
                 "Native replay / unranked / port coverage incomplete"

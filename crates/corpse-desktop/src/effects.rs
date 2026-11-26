@@ -196,6 +196,7 @@ pub struct Effects {
     pub cues: Vec<Cue>,
     pub firebolt_terrain: crate::staged_firebolt::Staging,
     pending_frame: Option<f64>,
+    pub terminal_hp: Option<f64>,
     key: Option<(u64, u64)>,
     reduced: bool,
     instant: bool,
@@ -211,6 +212,7 @@ impl Effects {
         self.firebolt_terrain.clear();
         self.pending_frame=None;
         self.key = None;
+        self.terminal_hp = None;
     }
     pub fn add(
         &mut self,
@@ -232,6 +234,7 @@ impl Effects {
         }
         self.key = Some(key);
         let mut events=events;
+        self.terminal_hp = events.iter().rev().find_map(corpse_core::events::terminal_health_value);
         // Remove flashes before phase lengths, scene capture, or input locks.
         events.retain(|e| admitted(e) && (!(self.reduced || self.instant)
             || e.animation.as_ref().is_none_or(|a|!matches!(a.style.as_str(),corpse_core::events::COMMANDMENT_SLIDE | FLOOR_REWIND))));
@@ -294,6 +297,12 @@ impl Effects {
         }
     }
     pub fn presentation_pending(&self,now:f64)->bool { self.sequence.pending(now) || (self.pending_frame.is_some() && self.cues.iter().any(|c| blocks(&c.event))) || self.plane_transition.as_ref().is_some_and(|p|now-p.started<250.) || self.cues.iter().any(|c| blocks(&c.event) && !c.held && now-c.started<duration(&c.event)) }
+    /// The ending must also wait for animations that never lock ordinary input.
+    /// Held explosion frames are a static final tableau, not a running animation.
+    pub fn terminal_pending(&self, now: f64) -> bool {
+        self.presentation_pending(now) || self.animate(now)
+            || (self.pending_frame.is_some() && self.cues.iter().any(|c|!c.held))
+    }
     pub fn travel_pending(&self,now:f64)->bool{ self.presentation_pending(now) }
     pub fn redraw_panels(&self,now:f64)->bool {self.plane_transition.as_ref().is_some_and(|p|now-p.started<250.)||!inventory_marks(&self.cues,now).is_empty()}
     pub fn animate(&self, now: f64) -> bool {

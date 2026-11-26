@@ -645,6 +645,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut summary_scroll = 0usize;
     let mut death_pause=death_pause::DeathPause::default();
     let mut ending_fade=death_pause::Fade::default();
+    let mut dead_world_presented=false;
     let mut results_fade: Option<death_pause::ResultsFade> = None;
     let mut health_warning=health_warning::Warning::default();
     let mut tile_report: Option<inspection_ui::Report> = None;
@@ -2757,18 +2758,23 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             Some("dead") => "dead", Some("won") => "won", _ => "playing",
         };
         let terminal = death_pause::terminal(terminal_status);
-        let terminal_ready = terminal && !effects.presentation_pending(now) && !effects.gameplay_pause.active();
+        let terminal_effects_pending = if terminal_status=="dead" {effects.terminal_pending(now)}
+            else {effects.presentation_pending(now)};
+        let terminal_ready = terminal && !terminal_effects_pending && !effects.gameplay_pause.active();
+        if terminal_status!="dead" {dead_world_presented=false;}
         // A full repaint prevents feedback from blending against the previous
         // faded frame and bypasses tile damage/upload clipping.
         if terminal { tile_enabled = false; }
         let skip_ending_motion = action_reduced || minimized || drawable_w==0 || drawable_h==0;
         let ready_status = if terminal_ready { terminal_status } else { "playing" };
         let fade = ending_fade.sample(ready_status, now, skip_ending_motion);
-        let ending_prompt = ending_fade.prompt(ready_status, fade);
+        let ending_prompt = ending_fade.prompt(ready_status, fade)
+            && (terminal_status!="dead" || dead_world_presented);
         let death_fade_complete = ending_fade.death_complete(ready_status, fade);
         let mut enter_death_results = false;
         let fade_animating = fade.is_some_and(|(_, alpha)| alpha<255);
-        dirty |= (ending_prompt && !death_pause.is_presented()) || death_fade_complete;
+        dirty |= (ending_prompt && !death_pause.is_presented()) || death_fade_complete
+            || (terminal_ready && terminal_status=="dead" && !dead_world_presented);
         let results_tint = if !minimized && drawable_w > 0 && drawable_h > 0 {
             results_fade.as_mut().map(|fade| fade.sample(now))
         } else { None };
@@ -2862,6 +2868,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             if dirty || cached_view.is_none() {
                                 let _observe_timing=corpse_core::timing::span("desktop.ui.observe_world");
                                 let mut view=observe::observe_with_profile(&r.run,&painter.profile);
+                                if terminal_status=="dead" {
+                                    if let Some(hp)=effects.terminal_hp {view.hp=hp;}
+                                }
                                 let discovered=bestiary_progress::observed_ids(&r.run,&view,manual.ids());
                                 let added=manual.progress.discover(discovered.iter().map(String::as_str));
                                 manual.progress.report_error(&mut notice);
@@ -3095,6 +3104,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             if !effects.presentation_pending(now) { if effects.gameplay_pause.active()&&(!health_warning.active()||effects.gameplay_pause.fall_active()){effects.gameplay_pause.presented();}else{health_warning.presented();} }
             death_pause.presented(ending_prompt);
+            dead_world_presented |= terminal_ready && terminal_status=="dead";
             enter_death_results = death_fade_complete;
             if results_tint.is_some_and(|(_, alpha)| alpha == 0) { results_fade = None; }
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
@@ -3102,7 +3112,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             cosmetic_dirty = false;
             last_frame = frame;
         }
-        #[cfg(test)] if ending_video_capture::observe(&mut canvas,&painter,screen,terminal_status,ending_prompt,fade,results_tint)? {break 'running;}
+        #[cfg(test)] if ending_video_capture::observe(&mut canvas,&painter,screen,terminal_status,ending_prompt,terminal_effects_pending,
+            cached_view.as_ref().map(|v|v.hp),fade,results_tint)? {break 'running;}
         #[cfg(test)] if input_loop_tests::observe(&mut canvas,&painter,input_loop_tests::State {
             screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
             help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),
@@ -4195,6 +4206,21 @@ mod revision52_floods_ui_tests;
 
 #[cfg(test)] mod death_dispatch_tests {
  use super::*;
+ #[test] fn death_waits_for_admitted_nonblocking_enemy_animation(){
+  use corpse_core::events::{AnimationCue,Delivery,EventPoint,PresentationEvent,Stage};
+  let p=EventPoint{x:4.,y:4.};
+  let cue=PresentationEvent{kind:"animation".into(),from:None,to:p.clone(),glyph:None,color:None,label:None,depth:1.,
+   animation:Some(AnimationCue{proposal:"E01".into(),style:corpse_core::animation_shapes::SHORT_NOVA.into(),
+    stage:Stage::Special,action:0,cells:vec![p],delivery:Delivery::Local,surface:None,item_id:None,hide_actor:None,arrival_steps:None})};
+  let mut fx=effects::Effects::default();
+  fx.add(vec![cue],1.,1.,100.,false);
+  fx.defer_until_frame(100.);
+  assert!(!fx.presentation_pending(100.),"ordinary input is not locked");
+  assert!(fx.terminal_pending(900.),"delay until the first shown frame, even without normal input lock");
+  fx.begin_frame(900.);
+  assert!(fx.terminal_pending(1259.));
+  assert!(!fx.terminal_pending(1260.));
+ }
  #[test] fn dead_run_commands_cannot_advance_or_modify_archive_input(){
   let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
   let mut engine=temporal::Engine::new(run).unwrap();engine.run.status="dead".into();engine.run.player.hp=0.;

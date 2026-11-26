@@ -20,6 +20,7 @@ struct Capture {
     previous_corner: Option<u8>,
     changing_frames: usize,
     summary_alpha: Option<u8>,
+    saw_negative_hp_before_prompt: bool,
     summary_fading_frames: usize,
 }
 thread_local! { static CAPTURE: RefCell<Option<Capture>> = const { RefCell::new(None) }; }
@@ -40,7 +41,7 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &Canvas<Window>) -> Result<(), String> {
     })
 }
 
-pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &str, prompt: bool, world_tint: Option<([u8; 3], u8)>, result_tint: Option<([u8; 3], u8)>) -> Result<bool, String> {
+pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &str, prompt: bool, terminal_pending: bool, displayed_hp: Option<f64>, world_tint: Option<([u8; 3], u8)>, result_tint: Option<([u8; 3], u8)>) -> Result<bool, String> {
     CAPTURE.with(|capture| {
         let mut capture=capture.borrow_mut();
         let Some(c)=capture.as_mut() else{return Ok(false);};
@@ -57,6 +58,13 @@ pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &
         if condition==c.expected {
             if !c.space_sent && condition=="dead" {
                 assert!(world_tint.is_none(), "death must not fade before the prompt is acknowledged");
+                if !prompt && !terminal_pending && displayed_hp.is_some_and(|hp|hp<0.) {
+                    c.saw_negative_hp_before_prompt = true;
+                }
+                if prompt {
+                    assert!(!terminal_pending, "the death prompt cannot cover unfinished animation");
+                    assert!(c.saw_negative_hp_before_prompt, "the signed terminal health must be shown before the prompt");
+                }
             }
             if prompt {
                 c.prompt_at.get_or_insert_with(Instant::now);
@@ -140,7 +148,7 @@ fn capture(directory:&Path, escape:bool) {
     CAPTURE.with(|capture| *capture.borrow_mut()=Some(Capture{
         destination:directory.join(format!("{stem}.mp4")),expected:if escape{"won"}else{"dead"},action,
         continued:false,action_sent:false,space_sent:false,started:Instant::now(),game_at:None,
-        prompt_at:None,summary_at:None,next_frame:0.,encoder:None,previous_corner:None,changing_frames:0,summary_alpha:None,summary_fading_frames:0,
+        prompt_at:None,summary_at:None,next_frame:0.,encoder:None,previous_corner:None,changing_frames:0,summary_alpha:None,saw_negative_hp_before_prompt:false,summary_fading_frames:0,
     }));
     let mut args=vec!["corpse-desktop".into(),"--software-renderer".into(),"--save".into(),save.to_string_lossy().into_owned()];
     for (flag,name) in [("--profile","profile.json"),("--appearance","appearance.json"),("--replay-dir","replays")] {

@@ -2788,3 +2788,7 @@ A successful current floor rewind emits one screen cue and at most one optional 
 ### Adjacent attacker sight
 
 After an admitted hostile strike against the player, check same-plane eight-neighbor adjacency and retain one visible-through tick on the attacker, even on a miss. Direct adjacency and ordinary visibility queries add expected O(1) scalar/condition checks. A distant candidate may query the existing physical topology metric (O(K²) time/O(K) scratch for K linked endpoints); ordinary adjacent candidates bypass it. Actor visibility does not affect terrain observation or telepathy. Expiry is a tick comparison; normal turn setup scans O(A) current-floor actor records, with O(R) temporary IDs for R matching receipts, only when a pre-clock strike was made by the command now advancing the world. Actor-block COW has its existing O(A) first-write cost; no new historical-floor scan, retained index, or RNG. Save/rewind retains world markers and preserves the rule's replay boundary outside snapshots.
+
+
+### Terminal overkill and animation drain
+The final player HP packet supplies one detached signed-value receipt; ordinary simulation and archived replay state still normalize terminal health to zero. The HUD can display the signed value with an empty bar. Before the death acknowledgment, inspect the existing bounded finite-cue list (O(E) time, O(1) scratch, E ≤ 4096) even for nonblocking effects, then present one clean terminal gameplay frame. Held static effects do not extend the wait. Victory animation and Space-to-results timing are unchanged.
