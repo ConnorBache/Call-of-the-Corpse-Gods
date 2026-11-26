@@ -1,69 +1,30 @@
 use super::*;
 
-fn colors(t:&Theme)->[[u8;3];10] {
-    [t.paper,t.ink,t.secondary,t.rule,t.accent,t.unread,t.selected_ink,t.selected_unread,t.void_paper,t.keyline]
-}
-fn outlined_contrast(foreground:[u8;3],background:[u8;3],keyline:[u8;3])->f64 {
-    theme_contrast(foreground,background).max(theme_contrast(keyline,background))
-}
-
 #[test]
-fn every_palette_color_has_only_byte_quantization_not_threshold_jumps() {
-    let mut previous=Theme::at_depth(0.);
+fn paper_and_art_backing_change_continuously_but_ink_switches_once() {
+    let mut previous = Theme::at(0);
+    let mut flips = 0;
     for sample in 1..=39_000 {
-        let next=Theme::at_depth(sample as f64/1000.);
-        for (a,b) in colors(&previous).into_iter().zip(colors(&next)) {
-            assert!(a.into_iter().zip(b).all(|(a,b)|a.abs_diff(b)<=1),"depth {sample}: {previous:?} -> {next:?}");
+        let next = Theme::at_depth(sample as f64 / 1000.);
+        for (a, b) in [(previous.paper, next.paper), (previous.void_paper, next.void_paper)] {
+            assert!(a.into_iter().zip(b).all(|(a, b)| a.abs_diff(b) <= 1));
         }
-        assert!((next.void_inset-previous.void_inset).abs()<=1);
-        previous=next;
+        assert!((next.void_inset - previous.void_inset).abs() <= 1);
+        flips += usize::from(next.ink != previous.ink);
+        previous = next;
     }
-    for anchor in [0.,4.,6.,8.,16.,18.,24.,28.,39.] {
-        let a=Theme::at_depth(anchor-0.00001);let b=Theme::at_depth(anchor+0.00001);
-        for (a,b) in colors(&a).into_iter().zip(colors(&b)) {
-            assert!(a.into_iter().zip(b).all(|(a,b)|a.abs_diff(b)<=1),"anchor {anchor}");
-        }
-    }
+    assert_eq!(flips, 1);
+    assert_eq!(Theme::at(0).ink, [0; 3]);
+    assert_eq!(Theme::at(39).ink, [255; 3]);
 }
 
 #[test]
-fn palette_anchors_and_fractional_color_interpolation_are_explicit() {
-    assert_eq!(Theme::at(0).paper,[239,232,204]);
-    assert_eq!(Theme::at(24).paper,[143,28,32]);
-    assert_eq!(Theme::at(39).paper,[0,0,0]);
-    assert_eq!(Theme::at(0).ink,[0,0,0]);
-    assert_eq!(Theme::at(0).keyline,Theme::at(0).paper);
-    assert_eq!(Theme::at(4).keyline,[0,0,0]);
-    assert_eq!(Theme::at(16).ink,[255,255,255]);
-    assert_eq!(Theme::at_depth(7.5).ink,[120,120,120]);
-    assert_eq!(Theme::at(39).secondary,[222,222,222]);
-    assert_eq!(Theme::at(0).unread,[205,137,20]);
-    assert_eq!(Theme::at(16).unread,[255,255,255]);
-    assert_eq!(Theme::at(39).unread,[255,215,65]);
-    for d in [0.5,4.5,12.5,15.5,20.5,30.5,38.5] {
-        let low=Theme::at_depth(f64::floor(d));let high=Theme::at_depth(f64::ceil(d));let middle=Theme::at_depth(d);
-        for (a,(b,m)) in colors(&low).into_iter().zip(colors(&high).into_iter().zip(colors(&middle))) {
-            for k in 0..3 {assert!((2*m[k] as i16-a[k] as i16-b[k] as i16).abs()<=2,"depth {d}");}
-        }
-    }
-    for invalid in [f64::NAN,f64::INFINITY,f64::NEG_INFINITY,-5.] {assert_eq!(colors(&Theme::at_depth(invalid)),colors(&Theme::at(0)));}
-    assert_eq!(colors(&Theme::at_depth(100.)),colors(&Theme::at(39)));
-}
-
-#[test]
-fn text_and_unread_marks_keep_a_contrasting_edge_on_actual_row_backgrounds() {
-    // A continuous black-to-white fill necessarily crosses the page luminance.
-    // The smoothly colored keyline is part of the rendered glyph, not a claim
-    // that fill-only WCAG contrast remains >=4.5 at that crossing.
+fn page_and_selected_index_fill_contrast_without_a_keyline() {
     for sample in 0..=39_000 {
-        let t=Theme::at_depth(sample as f64/1000.);
-        for color in [t.ink,t.secondary] {
-            assert!(outlined_contrast(color,t.paper,t.keyline)>=4.5,"page sample {sample}: {t:?}");
-        }
-        assert!(outlined_contrast(t.unread,t.paper,[0,0,0])>=4.5,"unread sample {sample}: {t:?}");
-        for color in [t.selected_ink,t.selected_unread] {
-            assert!(outlined_contrast(color,t.ink,[0,0,0])>=4.5,"selected sample {sample}: {t:?}");
-        }
+        let depth = sample as f64 / 1000.;
+        let theme = Theme::at_depth(depth);
+        assert!(theme_contrast(theme.ink, theme.paper) >= 4.5, "{depth}: page text");
+        assert!(theme_contrast(theme.selected_ink, theme.ink) >= 4.5, "{depth}: selected text");
     }
 }
 
@@ -78,49 +39,45 @@ fn void_field_blends_from_paper_without_a_visibility_or_size_threshold() {
 }
 
 #[test]
-fn fixed_keyline_uses_supported_glyph_commands_without_contrast_sampling() {
-    let mut p=Painter::new();p.gpu=Some(crate::gpu_render::Frame::default());p.pixels.fill(17);
-    p.bestiary_prose("BESTIARY !",20,20,14,[128,128,128],false,[0,0,0]);
-    assert!(p.pixels.iter().all(|&b|b==17));
-    assert!(!p.prose_contrast_outline);
-    let frame=p.gpu.as_ref().unwrap();assert!(frame.unsupported.is_none());assert!(!frame.quads.is_empty());
-}
-
-#[test]
-fn render_fractional_transition_pages_for_native_review() {
-    let Ok(directory)=std::env::var("CORPSE_BESTIARY_THEME_OUTPUT") else {return;};
-    std::fs::create_dir_all(&directory).unwrap();
-    for (width,height) in [(1280,800),(1920,1080),(900,1200)] {
-        let mut p=Painter::new();p.try_resize(width,height).unwrap();p.set_responsive_canvas(false);
-        let mut m=Manual::new();m.preview_all();
-        let ids=m.ids().to_vec();m.progress.discover(ids.iter().map(String::as_str));
-        for (id,depths) in [("blorb",vec![0.,5.99,6.,7.31,8.,12.,15.99,16.,16.13,18.,24.,39.]),
-            ("zillennia:timeless",vec![17.99,18.,18.01,23.99,24.,24.01,27.99,28.,28.01,39.])] {
-            assert!(m.select_id(id));
-            for depth in depths {
-                m.paint_at_visual_depth(&mut p,0.,depth);
-                let path=format!("{directory}/{}-{width}x{height}-depth-{depth:.2}.png",id.replace(':',"-"));
-                let file=std::fs::File::create(path).unwrap();let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);
-                encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);
-                encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
-            }
+fn full_names_and_stat_labels_fit_and_badges_keep_their_glyph_color() {
+    let mut manual = Manual::new();
+    let painter = Painter::new();
+    for id in manual.ids().to_vec() {
+        manual.select_id(&id);
+        manual.prepare_art();
+        let entry = manual.entry().unwrap();
+        let page = resolve_page(&painter, entry, manual.art.as_ref().map(|(_, a)| a));
+        assert!(painter.prose_width(&entry.name, INDEX_LABEL_SIZE, false)
+            <= INDEX_RIGHT - INDEX_LEFT - 2 * INDEX_LABEL_PAD, "{id}: full index name");
+        let cell = page.stats.2 / if page.stats.3 { 8 } else { 4 };
+        for (label, _) in stat_rows(entry, 52.) {
+            assert!(painter.prose_width(label, STAT_LABEL_SIZE, false) <= cell - 6, "{id}: {label}");
         }
+        let glyph = crate::color::hex(&entry.color);
+        assert!(theme_contrast(glyph, badge_paper(glyph)) >= 4.5, "{id}: glyph badge");
     }
+    assert_eq!(badge_paper([0; 3]), GLYPH_LIGHT);
 }
 
 #[test]
-fn first_floor_keyline_preserves_original_text_weight_pixel_for_pixel() {
-    let theme=Theme::at(0);
-    for (w,h) in [(1280,800),(1920,1080),(900,1200)] {
-        let mut plain=Painter::new();plain.try_resize(w,h).unwrap();
-        let mut keyed=Painter::new();keyed.try_resize(w,h).unwrap();
-        for size in [10,11,14,20,25,50] {
-            for title in [false,true] {
-                plain.clear(theme.paper);keyed.clear(theme.paper);
-                plain.prose("The Flesh: BESTIARY 123",30,30,size,theme.ink,title);
-                keyed.bestiary_prose("The Flesh: BESTIARY 123",30,30,size,theme.ink,title,theme.keyline);
-                assert_eq!(plain.pixels,keyed.pixels,"{w}x{h} size {size} title {title}");
-            }
+fn render_all_current_pages_for_readability_review() {
+    let Ok(directory) = std::env::var("CORPSE_BESTIARY_READABILITY_OUTPUT") else { return; };
+    std::fs::create_dir_all(&directory).unwrap();
+    let mut manual = Manual::new();
+    manual.preview_all();
+    let mut painter = Painter::new();
+    for (index, id) in manual.ids().to_vec().iter().enumerate() {
+        assert!(manual.select_id(id));
+        for (width, height) in [(1280, 800), (1024, 600), (1920, 1080), (900, 1200)] {
+            painter.try_resize(width, height).unwrap();
+            painter.set_responsive_canvas(false);
+            manual.paint(&mut painter);
+            let path = format!("{directory}/{index:02}-{width}x{height}.png");
+            let mut encoder = png::Encoder::new(std::fs::File::create(path).unwrap(), width as u32, height as u32);
+            encoder.set_color(png::ColorType::Rgba);
+            encoder.set_depth(png::BitDepth::Eight);
+            encoder.set_compression(png::Compression::Fast);
+            encoder.write_header().unwrap().write_image_data(&painter.pixels).unwrap();
         }
     }
 }

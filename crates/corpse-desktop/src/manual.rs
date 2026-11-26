@@ -4,6 +4,24 @@ use crate::render::{Painter, Picture};
 mod effect_ranges;
 use serde::Deserialize;
 use std::collections::BTreeMap;
+
+const INDEX_LEFT: i32 = 16;
+const INDEX_RIGHT: i32 = 216;
+const INDEX_LABEL_PAD: i32 = 8;
+const INDEX_LABEL_SIZE: u16 = 16;
+const STAT_LABEL_SIZE: u16 = 16;
+const GLYPH_DARK: [u8; 3] = [16, 14, 18];
+const GLYPH_LIGHT: [u8; 3] = [255; 3];
+
+fn badge_paper(ink: [u8; 3]) -> [u8; 3] {
+    if theme_contrast(ink, GLYPH_DARK) >= 4.5 {
+        GLYPH_DARK
+    } else if theme_contrast(ink, GLYPH_LIGHT) >= 4.5 {
+        GLYPH_LIGHT
+    } else {
+        [0; 3]
+    }
+}
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
@@ -175,10 +193,10 @@ impl Manual {
         self.catalog.entries.iter().find(|e| &e.id == id)
     }
     pub fn click(&mut self, x: i32, y: i32) {
-        if !(16..210).contains(&x) {
+        if !(INDEX_LEFT..INDEX_RIGHT).contains(&x) {
             return;
         }
-        if (80..109).contains(&y) {
+        if x < 210 && (80..109).contains(&y) {
             if x >= 184 {
                 self.page(1);
             } else if x >= 158 {
@@ -191,13 +209,13 @@ impl Manual {
                 self.selected = i;
                 self.step(0);
             }
-        } else if (708..734).contains(&y) {
+        } else if x < 210 && (708..734).contains(&y) {
             self.step(if x < 113 { -1 } else { 1 });
         }
         self.scroll = 0;
     }
-    fn paint_storage_error(&self,p:&mut Painter,keyline:[u8;3]) {
-        if let Some(error)=&self.progress.error {p.bestiary_prose(&crate::render::truncate(error,120),248,707,12,[230,110,100],false,keyline);}
+    fn paint_storage_error(&self,p:&mut Painter,ink:[u8;3]) {
+        if let Some(error)=&self.progress.error {p.prose(&crate::render::truncate(error,120),248,707,14,ink,false);}
     }
     // Decode once per selection. Artwork and authored alpha remain untouched.
     fn prepare_art(&mut self) {
@@ -237,50 +255,50 @@ impl Manual {
         // One uniform full-screen field; no scenery, noise, texture or animated backdrop.
         p.rect(16, 28, 4, 44, theme.accent);
         
-        p.bestiary_prose("BESTIARY", 28, 38, 25, ink, true,theme.keyline);
+        p.prose("BESTIARY", 28, 38, 25, ink, true);
         p.rect(224, 26, 1, 704, theme.rule);
         p.border(158, 80, 24, 28, ink);
         p.border(184, 80, 24, 28, ink);
-        p.bestiary_prose("‹", 164, 83, 18, ink, false,theme.keyline);
-        p.bestiary_prose("›", 190, 83, 18, ink, false,theme.keyline);
-        p.rect(16, 139, 194, 1, ink);
+        p.prose("‹", 164, 83, 18, ink, false);
+        p.prose("›", 190, 83, 18, ink, false);
+        p.rect(INDEX_LEFT, 139, INDEX_RIGHT - INDEX_LEFT, 1, ink);
         p.border(16, 708, 93, 26, ink);
         p.border(115, 708, 95, 26, ink);
-        p.bestiary_prose("‹", 28, 713, 13, ink, false,theme.keyline);
-        p.bestiary_prose("›", 128, 713, 13, ink, false,theme.keyline);
+        p.prose("‹", 28, 710, 18, ink, false);
+        p.prose("›", 128, 710, 18, ink, false);
         let first = self.selected.saturating_sub(10);
         for (i, id) in self.ids().iter().enumerate().skip(first).take(23) {
             if let Some(e) = self.catalog.entries.iter().find(|e| &e.id == id) {
                 let y = 153 + (i - first) as i32 * 24;
                 if i == self.selected {
-                    p.rect(16, y - 3, 194, 24, ink);
+                    p.rect(INDEX_LEFT, y - 3, INDEX_RIGHT - INDEX_LEFT, 24, ink);
                 }
-                p.bestiary_prose(
-                    &crate::render::truncate(if self.unlocked(id) {&e.name} else {""}, 20),
-                    24,
+                p.prose(
+                    if self.unlocked(id) { &e.name } else { "" },
+                    INDEX_LEFT + INDEX_LABEL_PAD,
                     y,
-                    14,
-                    if i == self.selected { theme.selected_ink } else { theme.secondary }, false,if i==self.selected {[0,0,0]}else{theme.keyline});
+                    INDEX_LABEL_SIZE,
+                    if i == self.selected { theme.selected_ink } else { ink }, false);
             }
         }
         let Some(mut entry) = self.entry().cloned() else {
-            p.bestiary_prose(
+            p.prose(
                 "No creature selected.",
                 250,
                 230,
                 19,
-                ink, false,theme.keyline);
+                ink, false);
             paint_footer(p, ink);
             p.prose_contrast_outline = false;
             return;
         };
         if !self.unlocked(&entry.id) {
             paint_footer(p,ink);
-            self.paint_storage_error(p,theme.keyline);
+            self.paint_storage_error(p,ink);
             p.prose_contrast_outline=false;
             return;
         }
-        self.paint_storage_error(p,theme.keyline);
+        self.paint_storage_error(p,ink);
         if entry.id == "bastidion" { entry.conditional_depths = birth_depths(&entry, self.simulation_revision); }
         // Detached presentation copy: never change source spawn ranges or stat lookup depths.
         let mut displayed_entry=entry.clone();
@@ -292,10 +310,10 @@ impl Manual {
         let layout=&page.content;
         let mut title_size = 50;
         while p.prose_width(&entry.name.to_uppercase(), title_size, true) > 990 { title_size -= 1; }
-        p.bestiary_prose(&format!("{} / {}", entry.family.to_uppercase(), first_depth(&displayed_entry)
+        p.prose(&format!("{} / {}", entry.family.to_uppercase(), first_depth(&displayed_entry)
             .map(|d| format!("FIRST APPEARS AT DEPTH {d:02}"))
-            .unwrap_or_else(|| "COMPANION".into())),248,28,13,theme.secondary,false,theme.keyline);
-        p.bestiary_prose(&entry.name.to_uppercase(),248,48,title_size,ink,true,theme.keyline);
+            .unwrap_or_else(|| "COMPANION".into())),248,26,16,ink,false);
+        p.prose(&entry.name.to_uppercase(),248,48,title_size,ink,true);
         p.rect(248,106,64,4,theme.accent);
         if let Some((_,art))=&self.art {
             let (x,y,aw,ah)=page.art;
@@ -315,33 +333,34 @@ impl Manual {
         }
         let (ax,sy,aw,row)=page.stats;
         p.rect(ax,sy,aw,2,ink);
-        p.bestiary_prose("BASE STATS",ax,sy+12,12,theme.secondary,false,theme.keyline);
-        p.rect(ax+aw-32,sy+9,30,28,[16,14,18]);
-        p.map_identity(&entry.glyph,ax+aw-30,sy+10,26,26,crate::color::hex(&entry.color));
+        p.prose("BASE STATS",ax,sy+12,16,ink,true);
+        let glyph_ink = crate::color::hex(&entry.color);
+        p.rect(ax+aw-32,sy+9,30,28,badge_paper(glyph_ink));
+        p.map_identity(&entry.glyph,ax+aw-30,sy+10,26,26,glyph_ink);
         for (i,(label,value)) in stat_rows(&entry,self.simulation_revision).iter().enumerate() {
             let cell=aw/if row {8}else{4};
             let x=ax+(if row {i}else{i%4}) as i32*cell;
             let y=sy+45+if row {0}else{(i/4) as i32*59};
-            p.bestiary_prose(label,x,y,11,theme.secondary,false,theme.keyline);
-            p.bestiary_prose(value,x,y+17,stat_value_size(p,value,cell-6),ink,true,theme.keyline);
+            p.prose(label,x,y,STAT_LABEL_SIZE,ink,false);
+            p.prose(value,x,y+21,stat_value_size(p,value,cell-6),ink,true);
         }
         for (i,line) in layout.lines.iter().enumerate() {
             let col=usize::from(page.text_x.len()>1 && i>=layout.split);
             let y=page.text_y+layout.offsets[i]-if col==1 {layout.offsets[layout.split]} else {0};
             if line.heading {
-                p.bestiary_prose(&line.text,page.text_x[col],y,layout.size,ink,true,theme.keyline);
+                p.prose(&line.text,page.text_x[col],y,layout.size,ink,true);
             } else {
-                paint_content_line(p,line,page.text_x[col],y,layout.size,ink,theme.keyline);
+                paint_content_line(p,line,page.text_x[col],y,layout.size,ink);
             }
         }
         for (x,y,extra) in &page.extras {
             for (i,line) in extra.lines.iter().enumerate() {
                 let ly=y+extra.offsets[i];
-                if line.heading {p.bestiary_prose(&line.text,*x,ly,extra.size,ink,true,theme.keyline);} else {paint_content_line(p,line,*x,ly,extra.size,ink,theme.keyline);}
+                if line.heading {p.prose(&line.text,*x,ly,extra.size,ink,true);} else {paint_content_line(p,line,*x,ly,extra.size,ink);}
             }
         }
         // All UI is painted after the illustration and its ink ground.
-        paint_footer(p, theme.secondary);
+        paint_footer(p, ink);
         p.prose_contrast_outline = false;
     }
 }
@@ -350,34 +369,13 @@ fn paint_footer(p: &mut Painter, ink: [u8; 3]) {
     p.rect(16, 741, 1242, 3, ink);
 }
 
-// Explicit smoothly colored keyline, never a contrast-threshold color swap.
-// It starts as page color to preserve the original black text weight, and
-// reaches black before continuous fill luminance crosses the page. Selected
-// rows retain a constant black keyline against their separate background.
-// Four warm cached-glyph passes add a fixed factor to O(glyph coverage) painting.
-trait BestiaryText {
-    fn bestiary_prose(&mut self, text: &str, x: i32, y: i32, size: u16, color: [u8; 3], title: bool, keyline:[u8;3]);
-}
-impl BestiaryText for Painter {
-    fn bestiary_prose(&mut self, text: &str, x: i32, y: i32, size: u16, color: [u8; 3], title: bool, keyline:[u8;3]) {
-        for (dx,dy) in [(-1,0),(1,0),(0,-1),(0,1)] {
-            self.prose(text,x+dx,y+dy,size,keyline,title);
-        }
-        self.prose(text,x,y,size,color,title);
-    }
-}
-
 #[derive(Debug)]
 struct Theme {
     paper: [u8; 3],
     ink: [u8; 3],
     accent: [u8; 3],
     rule: [u8; 3],
-    secondary: [u8; 3],
-    unread: [u8; 3],
-    keyline: [u8; 3],
     selected_ink: [u8; 3],
-    selected_unread: [u8; 3],
     void_paper: [u8; 3],
     void_inset: i32,
 }
@@ -393,23 +391,11 @@ impl Theme {
         let d=if depth.is_finite() {depth.clamp(0.,39.)} else {0.};
         let paper=if d<=24. {mix_color([239,232,204],[143,28,32],d/24.)}
             else {mix_color([143,28,32],[0,0,0],(d-24.)/15.)};
-        // The old polarity change was near floor 17. Approach its white endpoint
-        // evenly instead of replacing black with white in a single page step.
-        let ink=mix_color([0,0,0],[255,255,255],d/16.);
-        let keyline=mix_color([239,232,204],[0,0,0],d/4.);
-        let secondary=if d<=16. {ink}
-            else {mix_color([255,255,255],[222,222,222],(d-16.)/23.)};
-        let unread=if d<=16. {mix_color([205,137,20],[255,255,255],d/16.)}
-            else {mix_color([255,255,255],[255,215,65],(d-16.)/23.)};
-        // Selected rows have ink as their background. A white bridge keeps
-        // labels readable while that separate background passes through gray.
-        let selected_ink=if d<=6. {mix_color([239,232,204],[255,255,255],d/6.)}
-            else if d<=8. {[255,255,255]}
-            else if d<=16. {mix_color([255,255,255],[175,96,89],(d-8.)/8.)}
-            else {paper};
-        let selected_unread=if d<=6. {mix_color([255,215,65],[255,255,255],d/6.)}
-            else if d<=8. {[255,255,255]}
-            else {mix_color([255,255,255],[255,215,65],(d-8.)/31.)};
+        // The paper still blends continuously. Select the stronger solid ink:
+        // continuous black-to-white letter fill would pass through a nearly
+        // invisible midpoint, and an outline swallows the small counter shapes.
+        let ink = contrasting_ink(paper);
+        let selected_ink = contrasting_ink(ink);
         let accent=[216,234,27];
         let rule=mix_color(paper,ink,0.5);
         // The void backing starts as exactly the page color, then approaches
@@ -418,7 +404,14 @@ impl Theme {
         let void_paper=if d<=18. {paper}
             else {mix_color([167,79,75],[150,64,70],void_progress)};
         let void_inset=(12.*void_progress).round() as i32;
-        Self {paper,ink,accent,rule,secondary,unread,keyline,selected_ink,selected_unread,void_paper,void_inset}
+        Self {paper,ink,accent,rule,selected_ink,void_paper,void_inset}
+    }
+}
+fn contrasting_ink(background: [u8; 3]) -> [u8; 3] {
+    if theme_contrast([0; 3], background) >= theme_contrast([255; 3], background) {
+        [0; 3]
+    } else {
+        [255; 3]
     }
 }
 fn relative_luminance(rgb: [u8;3]) -> f64 {
@@ -662,19 +655,19 @@ fn body_lines(p: &Painter, body: &str, width: i32, size: u16) -> Vec<ContentLine
         ContentLine { text, heading: false, emphasis }
     }).collect()
 }
-fn paint_content_line(p: &mut Painter, line: &ContentLine, x: i32, y: i32, size: u16, ink: [u8; 3], keyline:[u8;3]) {
+fn paint_content_line(p: &mut Painter, line: &ContentLine, x: i32, y: i32, size: u16, ink: [u8; 3]) {
     let mut start = 0;
     let mut cursor = x;
     for range in &line.emphasis {
         let normal = &line.text[start..range.start];
-        p.bestiary_prose(normal, cursor, y, size, ink, false,keyline);
+        p.prose(normal, cursor, y, size, ink, false);
         cursor += p.prose_width(normal, size, false);
         let bold = &line.text[range.clone()];
-        p.bestiary_prose(bold, cursor, y, size, ink, true,keyline);
+        p.prose(bold, cursor, y, size, ink, true);
         cursor += p.prose_width(bold, size, true);
         start = range.end;
     }
-    p.bestiary_prose(&line.text[start..], cursor, y, size, ink, false,keyline);
+    p.prose(&line.text[start..], cursor, y, size, ink, false);
 }
 struct PageLayout {
     art:(i32,i32,i32,i32),
@@ -708,7 +701,15 @@ fn resolve_page(p:&Painter,entry:&Entry,art:Option<&Picture>)->PageLayout {
         }
     }
     if content.height>610 || content.size<18 {
-        return PageLayout {art:(248,128,380,418),stats:(248,566,380,false),text_x:vec![660,970],text_y:124,content:fit_content_in(p,entry,288,true,610),extras:vec![]};
+        let content = fit_content_in(p, entry, 288, true, 610);
+        if content.lines.get(content.split).is_some_and(|line| !line.heading) {
+            let narrative = fit_content_part(p, entry, 355, false, 610, -2);
+            let reference = fit_content_part(p, entry, 288, false, 610, -4);
+            if [&narrative, &reference].iter().all(|part| part.size >= 18 && part.height <= 610) {
+                return PageLayout {art:(248,128,325,418),stats:(248,566,325,false),text_x:vec![595],text_y:124,content:narrative,extras:vec![(970,124,reference)]};
+            }
+        }
+        return PageLayout {art:(248,128,380,418),stats:(248,566,380,false),text_x:vec![660,970],text_y:124,content,extras:vec![]};
     }
     PageLayout {art:(ax,128,aw,418),stats:(ax,566,aw,false),text_x:vec![tx],text_y:124,content,extras:vec![]}
 }
@@ -716,6 +717,7 @@ fn resolve_page(p:&Painter,entry:&Entry,art:Option<&Picture>)->PageLayout {
 fn fit_content(p: &Painter, entry: &Entry) -> ContentLayout { fit_content_in(p,entry,288,true,610) }
 fn fit_content_in(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i32)->ContentLayout {fit_content_part(p,entry,width,columns,max_height,-1)}
 fn fit_content_part(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i32,part:isize)->ContentLayout {
+    let mut fallback = None;
     for size in (16..=20).rev() {
         let mut lines = Vec::new();
         let mut section = |heading: &str, body: String| {
@@ -733,7 +735,7 @@ fn fit_content_part(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i3
         }
         }
         for (index,mechanic) in entry.mechanics.iter().enumerate() {
-            if part != -1 && part != index as isize {continue;}
+            if part != -1 && part != -4 && part != index as isize {continue;}
             let cost = if mechanic.cost.as_str() == Some("all") {
                 " · all NRG".into()
             } else if mechanic.cost.as_f64().unwrap_or(0.) > 0. {
@@ -760,7 +762,7 @@ fn fit_content_part(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i3
             ));
         }
         sources.extend(entry.sources.iter().filter(|s| !redundant_source(s)).map(|s| s.text.clone()));
-        if !sources.is_empty() && (part == -1 || part == -3) {
+        if !sources.is_empty() && (part == -1 || part == -3 || part == -4) {
             section("WHERE IT APPEARS", sources.join(" "));
         }
         let mut offsets = vec![0];
@@ -790,11 +792,17 @@ fn fit_content_part(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i3
             size,
             height,
         };
-        if height <= max_height || size == 16 {
+        if height <= max_height {
+            let starts_at_heading = layout.lines.get(layout.split).is_none_or(|line| line.heading);
+            if !columns || starts_at_heading && (size >= 18 || fallback.is_none()) {
+                return layout;
+            }
+            if fallback.is_none() { fallback = Some(layout); }
+        } else if size == 16 && fallback.is_none() {
             return layout;
         }
     }
-    unreachable!()
+    fallback.expect("at least the minimum-size layout")
 }
 
 pub fn wrap(text: &str, width: usize) -> Vec<String> {
@@ -916,6 +924,7 @@ mod tests {
                 assert!(ly>=y+h || ly+layout.size as i32<=y || lx>=x+w || lx+lw<=x,"{}: prose/art intersection",e.id);
             }
             if page.text_x.len()>1 && layout.split<layout.lines.len() {
+                assert!(layout.lines[layout.split].heading, "{}: column starts mid-section", e.id);
                 assert!(!layout.lines[layout.split-1].heading,"{}: orphan heading",e.id);
             }
             for (ex,ey,extra) in &page.extras {
@@ -1515,8 +1524,8 @@ corpse_core::population::fungus_revision(d as u32, revision).unwrap()
         let mut regular = Painter::new();
         let mut bold = Painter::new();
         let line = body_lines(&bold, "the Flesh", 288, 20).remove(0);
-        regular.bestiary_prose(&line.text, 20, 20, 20, [255,255,255], false,[0,0,0]);
-        paint_content_line(&mut bold, &line, 20, 20, 20, [255,255,255],[0,0,0]);
+        regular.prose(&line.text, 20, 20, 20, [255,255,255], false);
+        paint_content_line(&mut bold, &line, 20, 20, 20, [255,255,255]);
         assert_ne!(regular.pixels, bold.pixels);
     }
     #[test]
@@ -1527,10 +1536,7 @@ corpse_core::population::fungus_revision(d as u32, revision).unwrap()
         let mut previous=1.;
         for d in 0..40 {
             let t=Theme::at(d);let l=relative_luminance(t.paper);assert!(l<previous);previous=l;
-            for color in [t.secondary,t.ink] {
-                assert!(theme_contrast(color,t.paper).max(theme_contrast(t.keyline,t.paper))>=4.5,
-                    "depth {}: fill/keyline contrast",d+1);
-            }
+            assert!(theme_contrast(t.ink,t.paper)>=4.5, "depth {}: ink contrast",d+1);
         }
     }
     #[test]
@@ -1601,14 +1607,14 @@ corpse_core::population::fungus_revision(d as u32, revision).unwrap()
         let Ok(directory)=std::env::var("CORPSE_FLESH_REVIEW") else {return;};
         std::fs::create_dir_all(&directory).unwrap();
         let mut p=Painter::new(); p.clear([20,17,22]);
-        p.bestiary_prose("SOLID PAGE COLOR BY VISUAL FLOOR",20,14,26,[239,232,204],true,[0,0,0]);
-        p.bestiary_prose("Colors blend between floor anchors; each bestiary page itself stays solid.",20,48,18,[239,232,204],false,[0,0,0]);
+        p.prose("SOLID PAGE COLOR BY VISUAL FLOOR",20,14,26,[239,232,204],true);
+        p.prose("Colors blend between floor anchors; each bestiary page itself stays solid.",20,48,18,[239,232,204],false);
         for floor in 1..=40 {
             let theme=Theme::at(floor-1);
             let x=20+((floor-1)%8) as i32*157;
             let y=94+((floor-1)/8) as i32*134;
             p.rect(x,y,145,120,theme.paper);
-            p.bestiary_prose(&format!("FLOOR {floor:02}"),x+10,y+45,20,theme.ink,true,theme.keyline);
+            p.prose(&format!("FLOOR {floor:02}"),x+10,y+45,20,theme.ink,true);
         }
         let file=std::fs::File::create(format!("{directory}/bestiary-palette-map.png")).unwrap();
         let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);
@@ -1701,7 +1707,6 @@ mod discovery_privacy_tests {
 
 }
 
-#[cfg(test)]
 fn theme_contrast(a:[u8;3],b:[u8;3])->f64 {
     let (a,b)=(relative_luminance(a),relative_luminance(b));
     (a.max(b)+0.05)/(a.min(b)+0.05)

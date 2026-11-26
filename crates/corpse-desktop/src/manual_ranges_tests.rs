@@ -1,4 +1,4 @@
-use super::page_text;
+use super::{page_text, range_override};
 use super::super::{Manual, Painter, resolve_page};
 use corpse_core::{Field, Run, engine};
 
@@ -32,20 +32,25 @@ fn dream(r: &mut Run, id: f64) {
 fn condition(r: &Run, id: f64, key: &str) -> f64 { engine::condition(engine::actor(r,id).unwrap(),key) }
 
 #[test]
-fn bestiary_effect_ranges_inventory_covers_every_nearby_catalog_entry() {
-    let manual = Manual::new(); let mut changed = 0; let mut affected = 0;
+fn bestiary_effect_ranges_inventory_covers_all_explicit_range_overrides() {
+    let manual = Manual::new();
+    let mut overrides = 0;
+    let mut pages = 0;
     for entry in &manual.catalog.entries {
-        let mut changes = 0;
-        for m in &entry.mechanics {
-            let text = page_text(entry,m);
-            if m.text.to_ascii_lowercase().contains("nearby") {
-                assert_ne!(text,m.text,"{} / {}",entry.id,m.name);
+        let mut on_page = 0;
+        for mechanic in &entry.mechanics {
+            // Concise catalog copy can already match the override verbatim.
+            // A vague reaction such as Flee is not an explicit radius to override.
+            if let Some(text) = range_override(entry, mechanic) {
+                assert_eq!(page_text(entry, mechanic), text);
+                assert!(!text.to_ascii_lowercase().contains("nearby"));
+                on_page += 1;
             }
-            if text != m.text { changes += 1; assert!(!text.to_ascii_lowercase().contains("nearby")); }
         }
-        changed += changes; affected += usize::from(changes > 0);
+        overrides += on_page;
+        pages += usize::from(on_page > 0);
     }
-    assert_eq!((changed,affected),(40,20));
+    assert_eq!((overrides, pages), (40, 20));
 }
 
 #[test]
@@ -56,7 +61,7 @@ fn bestiary_effect_ranges_full_pages_fit_preserving_lore_art_and_preview() {
     for id in manual.ids().to_vec() {
         manual.select_id(&id); manual.prepare_art();
         let entry = manual.entry().unwrap();
-        if !entry.mechanics.iter().any(|m|page_text(entry,m)!=m.text) {continue;}
+        if !entry.mechanics.iter().any(|m|range_override(entry,m).is_some()) {continue;}
         pages += 1;
         let original = entry.mechanics.iter().map(|m|(m.name.clone(),m.text.clone())).collect::<Vec<_>>();
         for (width,height) in [(1280,800),(1920,1080),(900,1200)] {
@@ -64,7 +69,7 @@ fn bestiary_effect_ranges_full_pages_fit_preserving_lore_art_and_preview() {
         let page = resolve_page(&p,entry,manual.art.as_ref().map(|(_,art)|art));
         assert!(page.content.height <= 610,"{id}: {} at {}",page.content.height,page.content.size);
         assert!(page.content.size >= 18,"{id}: text shrank to {}",page.content.size);
-        assert!(page.extras.iter().all(|(_,_,extra)|extra.height<=140 && extra.size>=18));
+        assert!(page.extras.iter().all(|(_,y,extra)|y + extra.height <= 734 && extra.size>=18));
         let body = page.content.lines.iter().chain(page.extras.iter().flat_map(|(_,_,e)|e.lines.iter()))
             .filter(|l|!l.heading).map(|l|l.text.as_str()).collect::<Vec<_>>().join(" ");
         for m in &entry.mechanics { assert!(body.contains(page_text(entry,m)),"{id}: {}",m.name); }

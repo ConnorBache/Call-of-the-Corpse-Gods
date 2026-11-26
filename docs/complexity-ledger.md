@@ -2681,3 +2681,22 @@ per animation frame in O(C) time and O(C) scratch; timing is the existing
 exact pulled actor using one detached O(V) view copy and filter (V is the number
 of observed layers and HUD entries), plus an existing landing view reference.
 No extra copy is made per frame; reduced/instant skip the actor mask.
+
+## Bestiary text legibility
+
+The page's background and the void art backing still interpolate with depth.
+Ink and selected-row text choose a solid high-contrast color in O(1) time
+and memory; badge backings take O(1) without changing actor glyph colors.
+The same cached glyph-mask path draws each text run once instead of five
+times (formerly one fill and four offset outline passes). Warm text still
+costs O(G + P) per page for G glyphs and P covered mask pixels; cold glyphs
+also incur font rasterization. Index drawing is bounded by 23 visible rows.
+
+Page fitting still considers at most five sizes per layout. It prefers a
+section boundary to a mid-paragraph split, with at most two extra layout
+fits for a wider narrative column beside a standalone reference column.
+That is O(C) metric work and O(C) temporary storage for C characters on the
+selected authored page: line wrapping scans the text, and split selection
+scans the resulting lines. Artwork decoding and stat-template sampling are
+unchanged. The capture test uses the same native painter; it does not
+benchmark runtime or exercise a Windows graphics driver.
