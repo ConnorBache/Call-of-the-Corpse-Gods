@@ -7,6 +7,7 @@ pub const PARALYZED:&str="You are paralyzed. Press space to wait until un-paraly
 #[derive(Default)]pub struct Pause {
  pub enabled:bool,
  pending:Option<Command>,
+ confirm_jump:bool,
  pub outcome:Option<Rc<crate::render::View>>,
  paralysis:bool,
  pub waiting:bool,
@@ -18,7 +19,7 @@ pub enum Decision {Pass,Block,Continue(Option<Command>)}
 impl Pause {
  pub fn fall_active(&self)->bool{self.pending.is_some()||self.outcome.is_some()}
  pub fn active(&self)->bool{self.pending.is_some()||self.outcome.is_some()||self.paralysis&&!self.waiting}
- pub fn text(&self)->&'static str {if self.pending.is_some()||self.outcome.is_some(){CONTINUE}else{PARALYZED}}
+ pub fn text(&self)->&'static str {if self.pending.is_some()&&self.confirm_jump{crate::hazards_ui::CHASM_QUESTION}else if self.pending.is_some()||self.outcome.is_some(){CONTINUE}else{PARALYZED}}
  pub fn reset(&mut self){let enabled=self.enabled;*self=Self::default();self.enabled=enabled;}
  pub fn presented(&mut self){if self.active(){self.presented=true;}}
  pub fn observe(&mut self,r:Option<&Run>){
@@ -27,7 +28,8 @@ impl Pause {
   if r.is_none(){self.reset();}
  }
  pub fn stop_waiting(&mut self){self.waiting=false;self.presented=false;}
- pub fn defer(&mut self,c:&Command){self.pending=Some(c.clone());self.presented=false;self.waiting=false;}
+ pub fn defer(&mut self,c:&Command){self.pending=Some(c.clone());self.confirm_jump=false;self.presented=false;self.waiting=false;}
+ pub fn defer_jump(&mut self,c:&Command){self.defer(c);self.confirm_jump=true;}
  pub fn hold_outcome(&mut self,view:crate::render::View){self.outcome=Some(Rc::new(view));self.presented=false;self.waiting=false;}
  pub fn take_bypass(&mut self)->bool{std::mem::take(&mut self.bypass)}
  pub fn release(&mut self,e:&Event){if matches!(e,Event::KeyUp{keycode:Some(Keycode::Space),..}){self.space_down=false;}}
@@ -36,9 +38,12 @@ impl Pause {
   match e {Event::KeyDown{keycode:Some(Keycode::Space),..}=>self.space_down=true,Event::KeyUp{keycode:Some(Keycode::Space),..}=>self.space_down=false,_=>{}}
   if self.waiting && matches!(e,Event::KeyDown{repeat:false,..}|Event::MouseButtonDown{..}) {self.stop_waiting();return Decision::Block;}
   if !self.active(){return Decision::Pass;}
+  if self.pending.is_some()&&self.confirm_jump&&matches!(e,Event::KeyDown{keycode:Some(Keycode::Escape|Keycode::N),repeat:false,..}) {
+   self.pending=None;self.confirm_jump=false;self.presented=false;return Decision::Continue(None);
+  }
   if fresh&&self.presented {
    self.presented=false;
-   if let Some(c)=self.pending.take(){self.bypass=true;return Decision::Continue(Some(c));}
+   if let Some(c)=self.pending.take(){self.confirm_jump=false;self.bypass=true;return Decision::Continue(Some(c));}
    if self.outcome.take().is_some(){return Decision::Continue(None);}
    self.waiting=true;return Decision::Continue(None);
   }
@@ -50,6 +55,14 @@ pub fn needs_ack(r:&Run,c:&Command)->bool {
  let Some(f)=r.floor()else{return false;};
  let tile=|x:f64,y:f64|corpse_core::portals::cell(f,x,y).and_then(|i|f.tiles.get(i));
  let current=tile(r.player.x,r.player.y).is_some_and(|t|t=="chasm");
+ if r.simulation_revision.value_or(29.)>=52. {
+  return match c {
+   Command::Move{..}=>crate::hazards_ui::intentional(r,c).as_deref()==Some(crate::hazards_ui::CHASM_QUESTION),
+   Command::Descend=>current&&!corpse_core::dreamwalking::active(r)
+    && ["paralyzed","deathResolutionBlocked"].iter().all(|k|corpse_core::engine::condition(&r.player,k)==0.),
+   _=>false,
+  };
+ }
  match c {
   Command::Move{dx,dy}=>!corpse_core::travel::flying(r,&r.player)&&(
    tile(r.player.x+dx,r.player.y+dy).is_some_and(|t|t=="chasm")&&
@@ -63,6 +76,7 @@ pub fn needs_ack(r:&Run,c:&Command)->bool {
 pub fn paint(p:&mut crate::render::Painter,text:&str){p.centered_sheet(|p|{
  p.rect(280,320,720,110,[12,10,20]);p.border(280,320,720,110,[255,217,53]);
  if text==PARALYZED {p.text("You are paralyzed.",304,340,20,[255,248,232]);p.text("Press space to wait until un-paralyzed",304,378,18,[255,248,232]);}
+ else if text==crate::hazards_ui::CHASM_QUESTION {p.text(text,304,340,20,[255,248,232]);p.text("Space to jump · Esc to cancel",304,378,18,[255,248,232]);}
  else {p.text(text,304,359,20,[255,248,232]);}
 });}
 #[cfg(test)]mod tests{
@@ -101,6 +115,53 @@ pub fn paint(p:&mut crate::render::Painter,text:&str){p.centered_sheet(|p|{
    let w=f.width();f.tiles[2*w+2]="up".into();
   }
   r
+ }
+ #[test]
+ fn current_chasm_prompt_requires_a_voluntary_jump_and_can_cancel() {
+  let mut r=stairs_room();r.simulation_revision=52.0.into();
+  let w=r.floor().unwrap().width();
+  r.floor_mut().unwrap().tiles[2*w+3]="chasm".into();
+  let step=Command::Move{dx:1.,dy:0.};
+  let f=std::sync::Arc::make_mut(&mut r.floors[1]);
+  f.tiles[2*w+3]="water".into();f.seen[2*w+3]=true;
+  assert!(needs_ack(&r,&step),"a known soft landing is still a jump");
+  r.player.conditions.insert("flying".into(),2.);
+  assert!(!needs_ack(&r,&step));
+  r.player.conditions.shift_remove("flying");
+  r.player.conditions.insert("paralyzed".into(),2.);
+  assert!(!needs_ack(&r,&step));
+  r.player.conditions.shift_remove("paralyzed");
+  let mut enemy=corpse_core::population::create_actor_revision("rat",80.,3.,2.,false,52.).unwrap();
+  enemy.conditions.insert("flying".into(),2.);
+  r.actors_at_mut(r.depth).push(enemy);
+  assert!(!needs_ack(&r,&step),"a bump-attack isn't a jump");
+  r.actors_at_mut(r.depth).clear();
+  let mut e=crate::temporal::Engine::new(r).unwrap();
+  let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+  let before=e.run.clone();
+  crate::dispatch(&mut e,&mut fx,0.,&step).unwrap();
+  assert_eq!(e.run,before);
+  assert_eq!(fx.gameplay_pause.text(),"Are you sure you want to jump into the chasm?");
+  fx.gameplay_pause.presented();
+  assert!(matches!(fx.gameplay_pause.event(&key(Keycode::Escape,false)),Decision::Continue(None)));
+  assert!(!fx.gameplay_pause.active());
+  assert_eq!(e.run,before);
+  crate::dispatch(&mut e,&mut fx,1.,&step).unwrap();fx.gameplay_pause.presented();
+  assert!(matches!(fx.gameplay_pause.event(&key(Keycode::Space,false)),Decision::Continue(Some(Command::Move{..}))));
+  crate::dispatch(&mut e,&mut fx,2.,&step).unwrap();
+  assert_eq!(e.run.depth,2.);
+  assert!(!fx.gameplay_pause.active());
+ }
+ #[test]
+ fn current_involuntary_chasm_fall_never_asks_for_space() {
+  let mut r=stairs_room();r.simulation_revision=52.0.into();
+  let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+2]="chasm".into();
+  r.player.conditions.insert("flying".into(),1.);
+  let mut e=crate::temporal::Engine::new(r).unwrap();
+  let mut fx=crate::effects::Effects::default();fx.gameplay_pause.enabled=true;
+  crate::dispatch(&mut e,&mut fx,0.,&Command::Wait).unwrap();
+  assert_eq!(e.run.depth,2.);
+  assert!(!fx.gameplay_pause.fall_active());
  }
  #[test]fn stairs_pause_direct_keyboard_or_button_descent_needs_no_space(){
   let mut r=stairs_room();let f=r.floor_mut().unwrap();let w=f.width();f.tiles[2*w+2]="down".into();

@@ -120,7 +120,9 @@ pub fn waiting(r: &Run) -> Option<String> {
         local.or_else(downstream)
     }
 }
+pub const CHASM_QUESTION: &str = "Are you sure you want to jump into the chasm?";
 fn fall_warning(r: &Run, x: f64, y: f64) -> Option<String> {
+    if r.simulation_revision.value_or(29.) >= 52. { return Some(CHASM_QUESTION.into()); }
     if r.depth >= 40. {
         return None;
     }
@@ -186,6 +188,9 @@ fn portal_arrival_warning(r: &Run, x: f64, y: f64, bonus: bool) -> Option<String
         f.remembered_tiles.as_ref().and_then(|tiles|tiles.get(mate))
     } else {None};
     if tile.is_some_and(|t|t=="chasm") && !travel::flying(r,&r.player) {
+        if r.simulation_revision.value_or(29.) >= 52. {
+            return Some("Cross this portal? Its exit is over a chasm.".into());
+        }
         return fall_warning(r,xx,yy).map(|s|format!("Cross this portal? {s}"));
     }
     entry_exposure(r,xx,yy,"Emerge from the portal").or_else(||if bonus{None}else{current_exposure(r,xx,yy,true)})
@@ -203,7 +208,8 @@ fn non_euclidean_arrival_warning(r: &Run, x: f64, y: f64, bonus: bool) -> Option
         let (xx,yy)=((exit%f.width()) as f64,(exit/f.width()) as f64);
         let cell=&o.cells[exit];
         let warning=if cell.tile.as_deref()==Some("chasm") && !travel::flying(r,&r.player) {
-            fall_warning(r,xx,yy)
+            if r.simulation_revision.value_or(29.) >= 52. { Some("An exit is over a chasm.".into()) }
+            else { fall_warning(r,xx,yy) }
         } else { entry_exposure(r,xx,yy,"Arrive in Non-Euclidean space")
             .or_else(||if bonus {None} else {current_exposure(r,xx,yy,true)}) };
         if let Some(warning)=warning { if !warnings.contains(&warning) { warnings.push(warning); } }
@@ -328,7 +334,12 @@ pub fn intentional(r: &Run, command: &Command) -> Option<String> {
         return None;
     }
     if tile == "chasm" && !travel::flying(r, p) && (visible || f.seen[at]) {
-        return fall_warning(r, x, y);
+        // A known portal entry can redirect the player before they ever
+        // step into its chasm. Only a direct step is a voluntary jump.
+        if r.simulation_revision.value_or(29.) < 52.
+            || corpse_core::portals::step_options(r,p,x,y).as_slice() == [(x,y)] {
+            return fall_warning(r, x, y);
+        }
     }
     let mut bonus = fast;
     if !bonus && c("cameTurns") > 0. && c("cameFree") == 0.
@@ -572,7 +583,7 @@ mod gas_entry_tests {
 
     #[test]
     fn gas_entry_fire_razorleaves_chasm_and_confused_non_gas_warnings_survive() {
-        for (hazard, expected) in [("fire", "fire"), ("razorleaves", "razorleaves"), ("chasm", "Chasm")] {
+        for (hazard, expected) in [("fire", "fire"), ("razorleaves", "razorleaves"), ("chasm", CHASM_QUESTION)] {
             let mut r = room(); gas(&mut r, 2, 3, "steam"); gas(&mut r, 3, 3, "paralysis");
             let f = r.floor_mut().unwrap(); let at = 3 * f.width() + 3;
             match hazard {

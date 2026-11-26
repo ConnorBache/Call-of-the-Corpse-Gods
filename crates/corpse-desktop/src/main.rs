@@ -2192,6 +2192,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                                 travel_ui::Start::Direct(c) => {
                                                     if let Some(message) =
                                                         hazards_ui::intentional(&r.run, &c)
+                                                            .filter(|_| !gameplay_pause::needs_ack(&r.run, &c))
                                                     {
                                                         hazard_prompt = Some((c, message));
                                                     } else {
@@ -3223,7 +3224,9 @@ fn dispatch(
     if engine.run.status=="dead" {return Err(corpse_core::engine::EngineError("Run has ended.".into()));}
     let acknowledged=effects.gameplay_pause.take_bypass();
     if effects.gameplay_pause.enabled && !acknowledged && gameplay_pause::needs_ack(&engine.run,command) {
-        effects.gameplay_pause.defer(command);return Ok(Default::default());
+        if engine.run.simulation_revision.value_or(29.)>=52. { effects.gameplay_pause.defer_jump(command); }
+        else { effects.gameplay_pause.defer(command); }
+        return Ok(Default::default());
     }
 
     let before_depth=engine.run.depth;
@@ -3246,7 +3249,7 @@ fn dispatch(
         rewind,
     );
     if effects.gameplay_pause.enabled && !acknowledged && engine.run.depth>before_depth
-        && !descents.stairs_only() {
+        && engine.run.simulation_revision.value_or(29.)<52. && !descents.stairs_only() {
         effects.gameplay_pause.hold_outcome(action_sequence::observe(&sequence_before,&profile));
     }
     effects.sequence.capture_run(sequence_before, frames, &effects.cues, &profile);
