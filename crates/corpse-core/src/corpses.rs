@@ -1,5 +1,38 @@
 //! Exact v48 corpse and burning helper semantics. Scheduler owns revival gates.
-use crate::{Actor, Field};
+use crate::{Actor, Field, Run};
+
+const HEART_ITEM: &str = "corpseHeartItem";
+const STOMPED: &str = "corpseStomped";
+const HEART_TAKEN: &str = "corpseHeartTaken";
+
+pub(crate) fn link_dropped_heart(corpse: &mut Actor, item_id: f64) {
+    corpse.conditions.insert(HEART_ITEM.into(), item_id);
+}
+
+pub(crate) fn mark_stomped(corpse: &mut Actor) {
+    if corpse.conditions.contains_key(HEART_ITEM) {
+        corpse.conditions.insert(STOMPED.into(), 1.);
+    }
+}
+
+/// Pickup-only scan across floors: the heart and corpse can fall or drift apart.
+/// The unique item ID avoids matching a different creature of the same species.
+pub(crate) fn record_heart_pickups(r: &mut Run, ids: &std::collections::HashSet<u64>) {
+    if ids.is_empty() { return; }
+    let linked: Vec<_> = r.actors.values().flat_map(|actors| actors.iter())
+        .filter(|a| !a.conditions.contains_key(HEART_TAKEN)
+            && a.conditions.get(HEART_ITEM).is_some_and(|id| ids.contains(&id.to_bits())))
+        .map(|a| a.id).collect();
+    for id in linked {
+        if let Some(a) = crate::engine::actor_any_mut(r, id) {
+            a.conditions.insert(HEART_TAKEN.into(), 1.);
+        }
+    }
+}
+
+pub fn heart_harvested(a: &Actor) -> bool {
+    a.conditions.contains_key(STOMPED) && a.conditions.contains_key(HEART_TAKEN)
+}
 pub fn has_permanent_burning(a: &Actor) -> bool {
     a.abilities.iter().any(|x| x == "enemy:beast:everburn")
         && a.abilities.iter().any(|x| x == "enemy:beast:fire-immunity")

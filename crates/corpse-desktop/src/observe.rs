@@ -435,7 +435,7 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         // Actors inherit the lit terrain. Telepathy changes the ink, not
         // the tile; only an explicitly authored background overrides it.
         background_overlay: entity.background.map(|bg| (bg, 1.)),
-        heartless: a.heartless.value_or(false) && !dead && !body,
+        heartless: !body && if dead { corpse_core::corpses::heart_harvested(a) } else { a.heartless.value_or(false) },
         corpse: dead,
         superscript,
         subscript,
@@ -517,7 +517,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             }
         }
         cells.extend(terrain);
-        // Source z-order: corpse < item < fire < living creature < player.
+        // Ground hearts are below corpses; other items keep their priority.
         let mut observed_actors: Vec<_> = run
             .actors_at(run.depth)
             .iter()
@@ -601,6 +601,8 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 }
             }
         }
+        let nonheart_cells: std::collections::HashSet<_> = items.iter()
+            .filter(|(_, item, _, _)| item.kind != "heart").map(|(i, _, _, _)| *i).collect();
         let mut corpses = std::collections::HashSet::new();
         for a in &observed_actors {
             let i = a.y as usize * width + a.x as usize;
@@ -613,7 +615,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             if a.dead.value_or(false)
                 && !active.contains(&i)
                 && !fires.contains(&i)
-                && !item_cells.contains(&i)
+                && !nonheart_cells.contains(&i)
                 && corpses.insert(i)
             {
                 let mut cell = actor_cell_profile(profile, run, a, width, &backgrounds, false);
@@ -625,7 +627,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             }
         }
         for (i, item, remembered, detected) in items {
-            if active.contains(&i) || fires.contains(&i) {
+            if active.contains(&i) || fires.contains(&i) || corpses.contains(&i) {
                 continue;
             }
             let key = if item.kind == "potion" {

@@ -101,6 +101,7 @@ pub fn collect_underfoot(r: &mut Run, capacity: f64) -> Result<usize, EngineErro
     let mut remaining = vec![];
     let mut collected = 0;
     let mut collected_shards = false;
+    let mut collected_hearts = std::collections::HashSet::new();
     for mut e in ground {
         let shard = crate::phantasmii_generation::is_shard(&e.item);
         if !crate::dreamwalking::item_in_plane(r,&e.item) { remaining.push(e); continue; }
@@ -155,6 +156,9 @@ pub fn collect_underfoot(r: &mut Run, capacity: f64) -> Result<usize, EngineErro
             r.inventory.push(item);
         }
         if let Some(before) = before { equipment::settle_removed(r, before)?; }
+        if r.simulation_revision.value_or(29.) >= 52. && e.item.kind == "heart" && taken > 0. {
+            collected_hearts.insert(e.item.id.to_bits());
+        }
         let name = crate::revision50_item_knowledge::display_name(r, &e.item);
         if taken < available {
             e.item.quantity = (available - taken).into();
@@ -176,6 +180,7 @@ pub fn collect_underfoot(r: &mut Run, capacity: f64) -> Result<usize, EngineErro
         );
     }
     *r.ground_at_mut(r.depth) = remaining;
+    crate::corpses::record_heart_pickups(r, &collected_hearts);
     if collected_shards { crate::dreamwalking::shards_collected(r); }
     Ok(collected)
 }

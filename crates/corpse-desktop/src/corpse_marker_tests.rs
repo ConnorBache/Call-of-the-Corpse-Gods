@@ -71,6 +71,50 @@ fn color_room(revision: f64) -> corpse_core::Run {
 fn shown_actor(v: &View, id: f64) -> &Cell {
     v.cells.iter().find(|c|c.actor_id==Some(id)).unwrap_or_else(||panic!("visible actor {id}"))
 }
+
+#[test]
+fn corpse_covers_its_heart_and_gets_circle_only_after_stomp_and_pickup() {
+    let mut r = color_room(52.);
+    let mut a = corpse_core::population::create_actor_revision("rat",80.,13.,10.,false,52.).unwrap();
+    a.hp = 0.;
+    r.actors_at_mut(1.).push(a);
+    corpse_core::engine::death_if_nonpositive(&mut r,80.).unwrap();
+    let heart_id = r.ground["1"][0].item.id;
+    let before = crate::observe::observe(&r);
+    let corpse = shown_actor(&before,80.);
+    assert!(corpse.corpse && !corpse.heartless);
+    assert!(!before.cells.iter().any(|c|c.ground_item_id == Some(heart_id.to_bits())));
+    assert!(before.ground_entities.iter().any(|g|g.id == heart_id.to_bits()));
+
+    r.player.x = 12.;
+    let player = r.player.id;
+    assert!(corpse_core::engine::move_actor(&mut r,player,1.,0.,false).unwrap());
+    assert!(!corpse_core::corpses::heart_harvested(corpse_core::engine::actor(&r,80.).unwrap()));
+    assert!(r.ground["1"].iter().any(|g|g.item.id == heart_id));
+    assert_eq!(corpse_core::inventory::collect_underfoot(&mut r,10.).unwrap(),1);
+    assert!(r.inventory.iter().any(|i|i.id == heart_id));
+    assert!(corpse_core::engine::move_actor(&mut r,player,-1.,0.,false).unwrap());
+    let wire = corpse_core::storage::serialize(&r).unwrap();
+    let loaded = corpse_core::storage::deserialize(&wire).unwrap();
+    let view = crate::observe::observe(&loaded);
+    let corpse = shown_actor(&view,80.);
+    assert!(corpse.corpse && corpse.heartless);
+}
+
+#[test]
+fn corpse_heartless_circle_draws_above_the_cross_center() {
+    let mut p = Painter::new();
+    p.clear([10,20,30]);
+    let bounds = marker_test_bounds(&mut p);
+    p.corpse_marker(bounds,40,50,15,24,None);
+    let before = p.pixels.clone();
+    p.corpse_heartless_marker(bounds,40,50,15,24,None);
+    let (_, center_y) = bounds.unwrap().center();
+    let changed: Vec<_> = before.chunks_exact(4).zip(p.pixels.chunks_exact(4)).enumerate()
+        .filter(|(_, (a,b))| a != b).map(|(i,_)|i/p.width).collect();
+    assert!(!changed.is_empty());
+    assert!(changed.iter().all(|&y| (y as f64) < center_y));
+}
 fn write_corpse_capture(name: &str, p: &Painter) {
     let Ok(dir)=std::env::var("CORPSE_COLOR_OUTPUT") else {return;};
     std::fs::create_dir_all(&dir).unwrap();

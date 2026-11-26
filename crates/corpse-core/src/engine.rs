@@ -330,6 +330,9 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
                     "halfHereOwner",
                     "halfHereId",
                     "halfHereLockedUntil",
+                    "corpseHeartItem",
+                    "corpseStomped",
+                    "corpseHeartTaken",
                     "fungalGasType",
                     "stuck",
                     "weakened",
@@ -1064,16 +1067,24 @@ fn point(a: &Actor) -> Point {
 fn stomp(r: &mut Run, announce: bool) {
     let (x, y) = (r.player.x, r.player.y);
     let mut count = 0;
+    let mut harvested = 0;
+    let current = r.simulation_revision.value_or(29.) >= 52.;
     for a in r.actors_slice_mut(r.depth) {
         if a.dead.value_or(false) && a.x == x && a.y == y {
             a.corpse_age = Field::Value(0.0);
             a.conditions.shift_remove("monsterPhoenixRolls");
+            if current {
+                crate::corpses::mark_stomped(a);
+                harvested += usize::from(crate::corpses::heart_harvested(a));
+            }
             count += 1;
         }
     }
     if announce {
-        for _ in 0..count {
-            log(r, "You stomp on the heartless corpse.", "player");
+        for i in 0..count {
+            let message = if !current || i < harvested { "You stomp on the heartless corpse." }
+                else { "You stomp on the corpse." };
+            log(r, message, "player");
         }
     }
 }
@@ -3415,9 +3426,16 @@ fn death_core_with_source(
     if !a.heartless.value_or(false) {
         let mut item = crate::inventory::heart_for_revision(&a, r.next_id, r.simulation_revision.value_or(29.))?;
         crate::borge::mark_heart(r, &a, &mut item);
+        let heart_id = item.id;
         r.next_id += 1.0;
         place_item(r, a.x, a.y, item)?;
-        actor_mut_trusted(r, id).unwrap().heartless = Field::Value(true);
+        let track_heart = r.simulation_revision.value_or(29.) >= 52.
+            && !a.born_from_birther.value_or(false);
+        let corpse = actor_mut_trusted(r, id).unwrap();
+        corpse.heartless = Field::Value(true);
+        if track_heart {
+            crate::corpses::link_dropped_heart(corpse, heart_id);
+        }
     }
     if a.born_from_birther.value_or(false) {
         r.actors_at_mut(r.depth).retain(|b| b.id != id);

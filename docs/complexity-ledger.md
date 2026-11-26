@@ -616,6 +616,11 @@ guarantee. Old records keep original header/revision;40 uses its own admitted
 recording build+revision pair and seed replay records40 explicitly.
 
 ### Display-only Chronicle articles and native Heartlessness coverage
+R52 corpse badges distinguish harvest from dropping a heart. At death and
+stomp a fixed-size provenance receipt is updated; on actual heart collection a
+batched lookup scans A stored actors once and updates only matching actors.
+Corpse-priority projection adds O(I) time and scratch for I visible item
+cells; the ring reuses the existing clipped native-pixel geometry.
 Doorway-wait narration is filtered before recent Chronicle grouping and archive
 display. The recent window examines at most the bounded 80-entry run log to
 retain up to 30 visible messages; save, replay, and event data are unchanged.

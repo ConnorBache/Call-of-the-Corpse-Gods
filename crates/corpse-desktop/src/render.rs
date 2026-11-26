@@ -1592,6 +1592,18 @@ impl Painter {
         let cx = x as f64 + w as f64 / 2.;
         let cy = y as f64 + h as f64 / 2. + dy * h as f64 / 15.;
         let r = (radius * w as f64 / 15.).max(0.65);
+        self.heartless_ring(x,y,w,h,cx,cy,r,ink);
+    }
+    fn corpse_heartless_marker(&mut self, bounds: Option<glyph_ink::Bounds>, x: i32, y: i32, w: i32, h: i32, ink: Option<(Rgb,Rgb)>) {
+        let (cx, cy) = bounds.map_or((x as f64 + w as f64 / 2., y as f64 + h as f64 / 2.), |b| {
+            let (nx, ny) = b.center();
+            ((nx - self.origin.0 as f64) / self.scale, (ny - self.origin.1 as f64) / self.scale)
+        });
+        let r = (1.3 * w as f64 / 15.).max(0.65);
+        let cy = (cy - w.min(h) as f64 * 0.30 - r - 1.4).max(y as f64 + r + 0.8);
+        self.heartless_ring(x,y,w,h,cx,cy,r,ink);
+    }
+    fn heartless_ring(&mut self, x: i32, y: i32, w: i32, h: i32, cx: f64, cy: f64, r: f64, ink: Option<(Rgb,Rgb)>) {
         // Sample the authored ring at drawable resolution, not logical pixel
         // blocks. Fixed 4x4 area coverage keeps tiny holes readable at fractional DPI.
         let (rim, hole) = ink.unwrap_or(([240, 223, 190], [24, 23, 21]));
@@ -1931,6 +1943,11 @@ impl Painter {
                     else { display.map(|light| (light.foreground(if c.corpse {CORPSE_CROSS} else {[240,223,190]},true),light.apply([24,23,21]))) };
                 if c.corpse {
                     self.corpse_marker(glyph_bounds,x,y,cw,ch,marker);
+                    if c.heartless {
+                        let ring = if v.dreamwalking && !c.dream_entity { Some((c.fg,c.bg)) }
+                            else { display.map(|light| (light.foreground([240,223,190],true),light.apply([24,23,21]))) };
+                        self.corpse_heartless_marker(glyph_bounds,x,y,cw,ch,ring);
+                    }
                 } else if c.heartless {
                     self.heartless_marker(&c.glyph, x, y, cw, ch,marker);
                 }
@@ -2567,6 +2584,11 @@ impl Painter {
                 else { cell.display_light.map(|light| (light.foreground(if cell.corpse {CORPSE_CROSS} else {[240,223,190]},true),light.apply([24,23,21]))) };
             if cell.corpse {
                 self.corpse_marker(glyph_bounds,x,y,cw,ch,marker_ink);
+                if cell.heartless {
+                    let ring = if v.dreamwalking && !cell.dream_entity { Some((cell.fg,cell.bg)) }
+                        else { cell.display_light.map(|light| (light.foreground([240,223,190],true),light.apply([24,23,21]))) };
+                    self.corpse_heartless_marker(glyph_bounds,x,y,cw,ch,ring);
+                }
             } else if cell.heartless {
                 self.heartless_marker(&cell.glyph, x, y, cw, ch,marker_ink);
             }
