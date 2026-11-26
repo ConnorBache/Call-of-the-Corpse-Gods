@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
       - name: Verify the Windows archive
@@ -38,7 +38,23 @@ jobs:
           sha=8f7e0bc53310c456d2fb8c41acf8d7772ed87e83
           asset=Call-of-the-Corpse-Gods-R52-Followup-Windows-x64.zip
           digest=sha256:281a18015bc21b7b366b873b83f5416ad32679af3ad824ccc562ed8de06bd368
-          gh release create "$tag" "$asset" SHA256SUMS.txt --target "$sha" --title "R52 Follow-up: Balance and Hellfire" --notes-file RELEASE-NOTES.md --draft --prerelease
-          gh release view "$tag" --json assets | jq -e --arg name "$asset" --arg digest "$digest" '.assets[] | select(.name == $name and .size == 23021401 and .digest == $digest)' >/dev/null
-          gh release edit "$tag" --draft=false
-          gh release view "$tag" --json url,isDraft,assets
+          lookup() {
+            gh api --paginate "repos/$GH_REPO/releases?per_page=100" | jq -c --arg tag "$tag" '.[] | select(.tag_name == $tag)' |
+              jq -cs 'if length <= 1 then .[0] // empty else error("duplicate release") end'
+          }
+          release=$(lookup)
+          if [[ -z "$release" ]]; then
+            gh release create "$tag" "$asset" SHA256SUMS.txt --target "$sha" --title "R52 Follow-up: Balance and Hellfire" --notes-file RELEASE-NOTES.md --draft --prerelease
+            release=$(lookup)
+          fi
+          jq -e --arg sha "$sha" --arg name "$asset" --arg digest "$digest" '
+            .target_commitish == $sha and
+            .prerelease == true and
+            any(.assets[]; .name == $name and .state == "uploaded" and .size == 23021401 and .digest == $digest) and
+            any(.assets[]; .name == "SHA256SUMS.txt" and .state == "uploaded")
+          ' <<<"$release" >/dev/null
+          if jq -e '.draft' <<<"$release" >/dev/null; then
+            gh release edit "$tag" --draft=false
+          fi
+          gh api "repos/$GH_REPO/releases/tags/$tag" --jq 'select(.draft == false) | .html_url'
+          test "$(gh api "repos/$GH_REPO/git/ref/tags/$tag" --jq .object.sha)" = "$sha"
