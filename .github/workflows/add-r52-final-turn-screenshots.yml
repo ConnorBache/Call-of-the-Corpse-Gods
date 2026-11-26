@@ -1,0 +1,54 @@
+name: Add screenshots to the R52 Final Turn release
+on:
+  push:
+    branches:
+      - release-publishing/r52-followup
+    paths:
+      - .github/workflows/add-r52-final-turn-screenshots.yml
+      - docs/screenshots/r52-final-turn/README.md
+permissions:
+  contents: write
+concurrency:
+  group: r52-final-turn-gallery
+  cancel-in-progress: false
+jobs:
+  add-gallery:
+    if: github.repository == 'ConnorBache/Call-of-the-Corpse-Gods' && github.ref == 'refs/heads/release-publishing/r52-followup'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      GALLERY_SHA: ${{ github.sha }}
+    steps:
+      - name: Verify gallery and append it to the existing release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=r52-final-turn-20261126
+          dir=docs/screenshots/r52-final-turn
+          root="https://raw.githubusercontent.com/$GH_REPO/$GALLERY_SHA/$dir"
+          work=$(mktemp -d)
+          for image in main-menu depth-05 depth-10 depth-15 depth-20; do
+            curl -fsSL --retry 3 "$root/$image.webp" -o "$work/$image.webp"
+            file "$work/$image.webp" | grep -q 'Web/P'
+          done
+          gh api "repos/$GH_REPO/releases/tags/$tag" > "$work/before.json"
+          jq -e --arg tag "$tag" '.id == 459982159 and .tag_name == $tag and (.draft|not) and .prerelease and any(.assets[]; .name == "Call-of-the-Corpse-Gods-R52-Final-Turn-Windows-x64.zip")' "$work/before.json" >/dev/null
+          jq -r '.body' "$work/before.json" > "$work/notes.md"
+          if ! grep -q '^## Screenshot gallery$' "$work/notes.md"; then
+            {
+              printf '\n## Screenshot gallery\n\n'
+              printf '[View the full-resolution gallery](https://github.com/%s/tree/%s/%s) · 2560 × 1600 native game captures. Click any screenshot to open it full size.\n\n' "$GH_REPO" "$GALLERY_SHA" "$dir"
+              printf '[![Main menu](%s/main-menu.webp)](%s/main-menu.webp)\n\n' "$root" "$root"
+              printf '| Depth 5 | Depth 10 | Depth 15 |\n| --- | --- | --- |\n'
+              printf '| [![Depth 5](%s/depth-05.webp)](%s/depth-05.webp) | [![Depth 10](%s/depth-10.webp)](%s/depth-10.webp) | [![Depth 15](%s/depth-15.webp)](%s/depth-15.webp) |\n\n' "$root" "$root" "$root" "$root" "$root" "$root"
+              printf '<details>\n<summary>Depth 20 (final-floor spoiler)</summary>\n\n'
+              printf '[![Depth 20](%s/depth-20.webp)](%s/depth-20.webp)\n\n</details>\n' "$root" "$root"
+            } >> "$work/notes.md"
+            jq -n --rawfile body "$work/notes.md" '{body:$body}' > "$work/patch.json"
+            gh api --method PATCH "repos/$GH_REPO/releases/459982159" --input "$work/patch.json" >/dev/null
+          fi
+          gh api "repos/$GH_REPO/releases/459982159" > "$work/after.json"
+          jq -e --arg root "$root" '(.body|contains($root + "/main-menu.webp")) and (.body|contains($root + "/depth-20.webp"))' "$work/after.json" >/dev/null
+          diff -u <(jq '{id,tag_name,draft,prerelease,target_commitish,assets:(.assets | map({id,name,size,digest}) | sort_by(.name))}' "$work/before.json") <(jq '{id,tag_name,draft,prerelease,target_commitish,assets:(.assets | map({id,name,size,digest}) | sort_by(.name))}' "$work/after.json")
