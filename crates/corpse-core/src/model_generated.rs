@@ -1780,6 +1780,8 @@ pub struct Run {
     pub dream_shards_from: Field<usize>,
     #[serde(rename = "stoneSealFrom", default, skip_serializing_if = "Field::is_missing")]
     pub stone_seal_from: Field<usize>,
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub adjacent_attack_sight_from: Field<usize>,
     #[serde(rename = "ichorFireRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub ichor_fire_rules_from: Field<usize>,
     #[serde(rename = "avatarStarterPolicy", default, skip_serializing_if = "Field::is_missing")]

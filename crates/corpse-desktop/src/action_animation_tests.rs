@@ -718,3 +718,27 @@ fn unseen_floor_rewind_fades_between_the_actual_gameplay_scenes() {
         assert!(fx.cues.is_empty());
     }
 }
+
+#[test]
+fn adjacent_hidden_attacker_appears_in_the_desktop_view_for_one_turn() {
+    let mut r=room();
+    r.player.conditions.clear();
+    r.player.abilities.clear();
+    let victim=r.player.clone();
+    let rat=&mut r.actors_at_mut(r.depth)[0];
+    rat.x=11.;
+    rat.y=10.;
+    rat.state="hunting".into();
+    rat.stats.perception=100.;
+    rat.last_seen=corpse_core::ActorLastSeen{x:victim.x,y:victim.y}.into();
+    rat.conditions.insert("invisible".into(),100.);
+    let mut engine=temporal::Engine::new(r).unwrap();
+    let visible=|r:&Run|crate::observe::observe(r).cells.iter().any(|c|c.actor_id==Some(123.));
+    assert!(!visible(&engine.run));
+    engine.dispatch(&Command::Wait).unwrap();
+    assert!(visible(&engine.run),"the admitted adjacent attack reveals the previously invisible rat");
+    let depth=engine.run.depth;
+    engine.run.actors_at_mut(depth)[0].conditions.insert("paralyzed".into(),4.);
+    engine.dispatch(&Command::Wait).unwrap();
+    assert!(!visible(&engine.run),"without another attack the reveal expires");
+}

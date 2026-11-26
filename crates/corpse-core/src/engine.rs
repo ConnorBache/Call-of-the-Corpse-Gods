@@ -276,6 +276,7 @@ fn validate_supported_for(r: &Run, pending_falls: &[f64]) -> Result<(), EngineEr
                 return unsupported(format!("invalid R52 birth coefficient on {}: {k}", a.name));
             }
             if !(r.simulation_revision.value_or(29.) == 52. && crate::balance52::condition_key(k))
+                && !(r.simulation_revision.value_or(29.) >= 52. && crate::adjacent_attack_sight::condition_key(k))
                 && !(crate::revision52_enemy_followups::enabled(r) && crate::revision52_enemy_followups::condition_key(k))
                 && !(crate::revision50::enabled(r) && crate::revision50::condition_key(k))
                 && !k.starts_with("acquired:")
@@ -2077,6 +2078,7 @@ fn turn(r: &mut Run) -> Result<(), EngineError> {
     crate::corpse_currents::settle_falls(r).map_err(EngineError)?;
     // Leaving the Duel area ends it before the next upkeep charge.
     crate::revision50::settle_duel(r);
+    crate::adjacent_attack_sight::carry_pre_turn_attacks(r);
     r.tick += 1.0;
     crate::screamer_schedule::expire(r);
     r.resolving_tick = Field::Value(true);
@@ -2671,6 +2673,7 @@ fn attack_base_with_accuracy(
         return Ok(false);
     }
     if crate::ahvamitt::is_actor(&b) {return if aid==r.player.id {crate::ahvamitt::attack(r,bid)} else {Ok(false)};}
+    crate::adjacent_attack_sight::strike(r,&a,&b);
     if aid != r.player.id && range > 0.0 {
         actor_mut_trusted(r, aid)
             .unwrap()

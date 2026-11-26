@@ -71,6 +71,8 @@ pub struct ReplayRecord {
     pub dream_shards_from: Field<usize>,
     #[serde(rename = "stoneSealFrom", default, skip_serializing_if = "Field::is_missing")]
     pub stone_seal_from: Field<usize>,
+    #[serde(default, skip_serializing_if = "Field::is_missing")]
+    pub adjacent_attack_sight_from: Field<usize>,
     #[serde(rename = "ichorFireRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub ichor_fire_rules_from: Field<usize>,
     #[serde(default, skip_serializing_if = "Field::is_missing")]
@@ -142,6 +144,7 @@ impl ReplayRecord {
             star_power_from: match run.star_power_from { Field::Value(n) => n.into(), _ => Field::Missing },
             dream_shards_from: match run.dream_shards_from { Field::Value(n) => n.into(), _ => Field::Missing },
             stone_seal_from: match run.stone_seal_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            adjacent_attack_sight_from: match run.adjacent_attack_sight_from { Field::Value(n) => n.into(), _ => Field::Missing },
             ichor_fire_rules_from: match run.ichor_fire_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             future_floor_rules_from: match run.future_floor_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             firebolt_travel_from: match run.firebolt_travel_from { Field::Value(n) => n.into(), _ => Field::Missing },
@@ -297,6 +300,10 @@ impl ReplayRecord {
             && matches!(self.stone_seal_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Stone Seal replay boundary".into()));
         }
+        if !self.adjacent_attack_sight_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.adjacent_attack_sight_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Invalid adjacent attacker sight replay boundary".into()));
+        }
         if !self.ichor_fire_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
             && matches!(self.ichor_fire_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Ichor fire rules replay boundary".into()));
@@ -345,6 +352,7 @@ impl ReplayRecord {
         crate::star_power::apply_replay_policy(&mut engine.run, &self.star_power_from, cursor);
         crate::phantasmii_blessing_rules::apply_dream_shards_policy(&mut engine.run, &self.dream_shards_from, cursor);
         crate::stone_seal_rules::apply_replay_policy(&mut engine.run, &self.stone_seal_from, cursor);
+        crate::adjacent_attack_sight::apply_replay_policy(&mut engine.run, &self.adjacent_attack_sight_from, cursor);
         crate::ichor_fire_rules::apply_replay_policy(&mut engine.run, &self.ichor_fire_rules_from, cursor);
         crate::future_floor::apply_replay_policy(&mut engine.run, &self.future_floor_rules_from, cursor);
         crate::firebolt_travel::apply_replay_policy(&mut engine.run, &self.firebolt_travel_from, cursor);
@@ -407,6 +415,7 @@ impl ReplaySession {
         crate::star_power::apply_replay_policy(&mut initial, &record.star_power_from, 0);
         crate::phantasmii_blessing_rules::apply_dream_shards_policy(&mut initial, &record.dream_shards_from, 0);
         crate::stone_seal_rules::apply_replay_policy(&mut initial, &record.stone_seal_from, 0);
+        crate::adjacent_attack_sight::apply_replay_policy(&mut initial, &record.adjacent_attack_sight_from, 0);
         crate::ichor_fire_rules::apply_replay_policy(&mut initial, &record.ichor_fire_rules_from, 0);
         crate::future_floor::apply_replay_policy(&mut initial, &record.future_floor_rules_from, 0);
         let mut engine=Engine::new_for_replay(initial.clone())?;
@@ -469,6 +478,7 @@ impl ReplaySession {
         crate::star_power::apply_replay_policy(&mut initial, &record.star_power_from, 0);
         crate::phantasmii_blessing_rules::apply_dream_shards_policy(&mut initial, &record.dream_shards_from, 0);
         crate::stone_seal_rules::apply_replay_policy(&mut initial, &record.stone_seal_from, 0);
+        crate::adjacent_attack_sight::apply_replay_policy(&mut initial, &record.adjacent_attack_sight_from, 0);
         crate::ichor_fire_rules::apply_replay_policy(&mut initial, &record.ichor_fire_rules_from, 0);
         crate::future_floor::apply_replay_policy(&mut initial, &record.future_floor_rules_from, 0);
         let mut engine=Engine::new_for_replay(initial.clone())?;
@@ -496,7 +506,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.phantasmii_blessings_from.as_ref()==Some(&self.cursor) || self.record.mercuria_amulet_from.as_ref()==Some(&self.cursor) || self.record.local_floor_ticks_from.as_ref()==Some(&self.cursor) || self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.phantasmii_discount_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.riptide_rally_from.as_ref()==Some(&self.cursor) || self.record.star_power_from.as_ref()==Some(&self.cursor) || self.record.dream_shards_from.as_ref()==Some(&self.cursor) || self.record.stone_seal_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
+        if self.record.phantasmii_blessings_from.as_ref()==Some(&self.cursor) || self.record.mercuria_amulet_from.as_ref()==Some(&self.cursor) || self.record.local_floor_ticks_from.as_ref()==Some(&self.cursor) || self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.phantasmii_discount_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.riptide_rally_from.as_ref()==Some(&self.cursor) || self.record.star_power_from.as_ref()==Some(&self.cursor) || self.record.dream_shards_from.as_ref()==Some(&self.cursor) || self.record.stone_seal_from.as_ref()==Some(&self.cursor) || self.record.adjacent_attack_sight_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -542,6 +552,7 @@ impl ReplaySession {
         crate::star_power::apply_replay_policy(&mut initial, &self.record.star_power_from, 0);
         crate::phantasmii_blessing_rules::apply_dream_shards_policy(&mut initial, &self.record.dream_shards_from, 0);
         crate::stone_seal_rules::apply_replay_policy(&mut initial, &self.record.stone_seal_from, 0);
+        crate::adjacent_attack_sight::apply_replay_policy(&mut initial, &self.record.adjacent_attack_sight_from, 0);
         crate::ichor_fire_rules::apply_replay_policy(&mut initial, &self.record.ichor_fire_rules_from, 0);
         crate::future_floor::apply_replay_policy(&mut initial, &self.record.future_floor_rules_from, 0);
         self.engine = Engine::new_for_replay(initial)?;

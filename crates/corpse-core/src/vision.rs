@@ -557,7 +557,8 @@ pub fn directly_visible_actor(r: &Run, a: &Actor) -> bool {
 }
 pub fn visible_actor(r: &Run, a: &Actor) -> bool {
     if crate::dreamwalking::is_nightmare(a) {return crate::dreamwalking::dream_view(r);}
-    (all_seeing(r) && r.floor().is_some_and(|f| bounds(f, point(a))))
+    crate::adjacent_attack_sight::visible(r,a)
+        || (all_seeing(r) && r.floor().is_some_and(|f| bounds(f, point(a))))
         || telepathic(r, a)
         || telepathic_area(r, point(a))
         || directly_visible_actor(r, a)
@@ -620,7 +621,8 @@ impl<'a> VisibilityProjection<'a> {
         crate::timing::count(crate::timing::Count::ActorQueries,1);
         let r=self.run;
         if crate::dreamwalking::is_nightmare(a){return crate::dreamwalking::dream_view(r)}
-        (all_seeing(r)&&r.floor().is_some_and(|f|bounds(f,point(a))))||telepathic(r,a)
+        crate::adjacent_attack_sight::visible(r,a)
+            ||(all_seeing(r)&&r.floor().is_some_and(|f|bounds(f,point(a))))||telepathic(r,a)
             ||telepathic_area(r,point(a))||self.directly_visible_actor(a)
     }
 }

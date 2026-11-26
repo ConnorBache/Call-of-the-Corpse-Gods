@@ -309,6 +309,10 @@ fn decode_checkpoint_policy(raw:&str,legacy:Option<bool>)->Result<(corpse_core::
         stone_seal_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
             && object.get("stoneSealFrom").is_none_or(serde_json::Value::is_null);
         if stone_seal_migrated {object.insert("stoneSealFrom".into(),serde_json::Value::Null);}
+        if object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
+            && object.get("adjacentAttackSightFrom").is_none_or(serde_json::Value::is_null) {
+            object.insert("adjacentAttackSightFrom".into(),serde_json::Value::Null);
+        }
         ichor_fire_migrated=object.get("simulationRevision").and_then(serde_json::Value::as_f64)==Some(52.)
             && object.get("ichorFireRulesFrom").is_none_or(serde_json::Value::is_null);
         if ichor_fire_migrated {object.insert("ichorFireRulesFrom".into(),serde_json::Value::Null);}

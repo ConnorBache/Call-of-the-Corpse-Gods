@@ -2784,3 +2784,7 @@ The existing observed route is grouped once after the paid push. The desktop mas
 
 ### Unseen floor-entry fade
 A successful current floor rewind emits one screen cue and at most one optional observed destination snapshot. The desktop holds the pre-rewind view until the purple midpoint, then fades into the actual restored entry view. There is no new gameplay state, time, or RNG. Per-frame easing is O(1) after scanning the existing bounded cue list; CPU fill is O(P) drawable pixels, GPU fill one full-frame quad (O(P) fragments), O(1) scratch. Reduced and Instant motion skip the cue without blocking input.
+
+### Adjacent attacker sight
+
+After an admitted hostile strike against the player, check same-plane eight-neighbor adjacency and retain one visible-through tick on the attacker, even on a miss. Direct adjacency and ordinary visibility queries add expected O(1) scalar/condition checks. A distant candidate may query the existing physical topology metric (O(K²) time/O(K) scratch for K linked endpoints); ordinary adjacent candidates bypass it. Actor visibility does not affect terrain observation or telepathy. Expiry is a tick comparison; normal turn setup scans O(A) current-floor actor records, with O(R) temporary IDs for R matching receipts, only when a pre-clock strike was made by the command now advancing the world. Actor-block COW has its existing O(A) first-write cost; no new historical-floor scan, retained index, or RNG. Save/rewind retains world markers and preserves the rule's replay boundary outside snapshots.

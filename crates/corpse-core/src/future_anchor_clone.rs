@@ -85,6 +85,7 @@ fn clone_anchor_state(run:&Run)->Run {
             star_power_from: Default::default(),
             dream_shards_from: Default::default(),
             stone_seal_from: Default::default(),
+            adjacent_attack_sight_from: Default::default(),
             ichor_fire_rules_from: Default::default(),
             avatar_starter_policy: Default::default(),
             ember_rules_from: Default::default(),
