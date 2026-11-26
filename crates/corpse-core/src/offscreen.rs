@@ -156,8 +156,9 @@ fn involved(r: &Run, f: &Floor) -> bool {
 }
 pub fn validate_supported(r: &Run) -> Result<(), String> {
     let _timing_function = crate::timing::span("offscreen.validate");
+    let window = crate::local_floor_rules::window(r);
     for f in &r.floors {
-        if !involved(r, f) {
+        if !window.contains(f.depth) || !involved(r, f) {
             continue;
         }
         let actors = r.actors_at(f.depth);
@@ -477,6 +478,22 @@ fn approximate(r: &mut Run, depth: f64, elapsed: f64) -> Result<(), String> {
     Ok(())
 }
 pub fn catch_up_floor(r: &mut Run, depth: f64) -> Result<(), String> {
+    if crate::local_floor_rules::current(r) {
+        // A player transition (including an explicit teleport) opens the
+        // destination at the current time. Dormant time is never owed.
+        let tick = r.tick;
+        if let Some(f) = r.floors.iter_mut().find(|f| f.depth == depth && f.last_tick < tick) {
+            crate::mutation_journal::make_mut(f).last_tick = tick;
+        }
+        return Ok(());
+    }
+    catch_up(r, depth, None)
+}
+pub(crate) fn catch_up_for_landing(r: &mut Run, depth: f64) -> Result<(), String> {
+    if crate::local_floor_rules::current(r) && depth == r.depth {
+        // The normal turn scheduler owns the active floor.
+        return Ok(());
+    }
     catch_up(r, depth, None)
 }
 fn catch_up(
@@ -485,6 +502,12 @@ fn catch_up(
     mut deferred: Option<&mut Vec<Transfer>>,
 ) -> Result<(), String> {
     let _timing_function = crate::timing::span("offscreen.catch_up");
+    let limited = crate::local_floor_rules::current(r);
+    if limited && !crate::local_floor_rules::window(r).contains(depth) {
+        // A real falling actor can still land here, but this does not
+        // wake up or run the destination's unrelated simulation.
+        return Ok(());
+    }
     let Some(index) = r.floors.iter().position(|f| f.depth == depth) else {
         return Ok(());
     };
@@ -504,7 +527,11 @@ fn catch_up(
         }
         return Ok(());
     }
-    let mut elapsed = (r.tick - f.last_tick).max(0.);
+    if limited && f.last_tick < r.tick - 1. {
+        // On re-entry to the horizon, at most the newly due turn runs.
+        crate::mutation_journal::make_mut(&mut r.floors[index]).last_tick = r.tick - 1.;
+    }
+    let mut elapsed = (r.tick - r.floors[index].last_tick).max(0.);
     while elapsed > 0. {
         if !dynamic(r, &r.floors[index]) {
             approximate(r, depth, elapsed)?;
@@ -589,15 +616,15 @@ fn catch_up(
         r.ground = head.ground;
         r.generated_ability_grants = head.generated_ability_grants;
         crate::revision50::settle_duel_targets(r);
-        let surviving_ids: HashSet<u64> = r
-            .actors
-            .values()
-            .flat_map(|v| v.iter())
-            .filter(|a| !a.dead.value_or(false))
-            .map(|a| a.id.to_bits())
-            .collect();
+        let survivors = |a: &Actor| (!a.dead.value_or(false)).then_some(a.id.to_bits());
+        let surviving_ids: HashSet<u64> = if limited {
+            r.actors_at(depth).iter().filter_map(survivors).collect()
+        } else {
+            r.actors.values().flat_map(|v| v.iter()).filter_map(survivors).collect()
+        };
         for id in living_before {
-            if !surviving_ids.contains(&id.to_bits()) {
+            if !surviving_ids.contains(&id.to_bits()) && !(limited &&
+                crate::engine::actor_any(r, id).is_some_and(|a| !a.dead.value_or(false))) {
                 crate::maintained_links::end_maintained_links_to_dead_target(r, id);
             }
         }
@@ -649,10 +676,11 @@ fn catch_up(
 pub fn tick_inactive_floors(r: &mut Run) -> Result<(), String> {
     let _timing_function = crate::timing::span("offscreen.total");
     validate_supported(r)?;
+    let window = crate::local_floor_rules::window(r);
     let depths: Vec<_> = r
         .floors
         .iter()
-        .filter(|f| involved(r, f))
+        .filter(|f| window.contains(f.depth) && involved(r, f))
         .map(|f| f.depth)
         .collect();
     let mut pending = vec![];
@@ -665,7 +693,7 @@ pub fn tick_inactive_floors(r: &mut Run) -> Result<(), String> {
     crate::travel::tick_ally_stair_followers(r)?;
     let tick = r.tick;
     for f in &mut r.floors {
-        if f.depth == r.depth {
+        if f.depth == r.depth || !window.contains(f.depth) {
             continue;
         }
         // O(F) floor admission remains; unchanged deadline maps have O(1)

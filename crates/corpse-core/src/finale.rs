@@ -204,12 +204,15 @@ fn seed(r: &mut Run, depth: u32, cell: usize, with_fire: bool) -> Result<(), Str
 fn propagate_stairs(r: &mut Run) -> Result<Vec<u32>, String> {
     let mut reached = Vec::new();
     let mut index = 0;
+    let window = crate::local_floor_rules::window(r);
     while index < r.collapse.as_ref().unwrap().waves.len() {
-        let upper = crate::fast_mode::above(r, r.collapse.as_ref().unwrap().waves[index].depth as f64);
+        let source = r.collapse.as_ref().unwrap().waves[index].depth as f64;
+        let upper = crate::fast_mode::above(r, source);
         let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
         let wave = &mut c.waves[index];
         index += 1;
-        if wave.upper_seeded || wave.depth <= 1 || !wave.up.is_some_and(|i| wave.cells[i]) { continue; }
+        if !window.contains(source) || !window.contains(upper) || wave.upper_seeded
+            || wave.depth <= 1 || !wave.up.is_some_and(|i| wave.cells[i]) { continue; }
         wave.upper_seeded = true;
         let depth = upper as u32;
         let origin = wave.up.unwrap();
@@ -233,6 +236,7 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
     if !crate::travel::flying(r,&r.player) && r.floor().and_then(|f| at(f,&r.player)).is_some_and(|i| collapsed(r,r.depth,i)) {
         fall_player(r)?;
     }
+    let window = crate::local_floor_rules::window(r);
     while r.status == "playing" && r.collapse.as_ref().is_some_and(|c| r.tick >= c.next_pulse_tick) {
         let alternating = r.simulation_revision.value_or(29.) >= 52.;
         let mut changes = Vec::new();
@@ -240,6 +244,7 @@ pub fn world_turn(r: &mut Run) -> Result<(), String> {
         let fire_pulse = (c.next_pulse_tick - c.started_tick) % 4. == 0.;
         c.next_pulse_tick += 2.;
         for wave in &mut c.waves {
+            if !window.contains(wave.depth as f64) { continue; }
             let f = r.floors.iter().find(|f| f.depth == wave.depth as f64).ok_or("Reached collapse floor missing")?;
             let w = f.width();
             let h = f.height();
@@ -291,10 +296,14 @@ fn ignite_seed(fire: &mut FireWave, size: usize) -> Vec<usize> {
 /// reaches the lower stairs, not when collapse first reaches those stairs.
 fn advance_fire(r: &mut Run) -> Result<(), String> {
     let mut changes = Vec::new();
+    let window = crate::local_floor_rules::window(r);
     let upper_depths: Vec<_> = r.collapse.as_ref().unwrap().waves.iter()
-        .map(|w| crate::fast_mode::above(r, w.depth as f64) as u32).collect();
+        .map(|w| window.contains(w.depth as f64)
+            .then(|| crate::fast_mode::above(r, w.depth as f64))
+            .filter(|&d| window.contains(d)).map(|d| d as u32)).collect();
     let c = crate::mutation_journal::make_mut(r.collapse.as_mut().unwrap());
     for (index, wave) in c.waves.iter_mut().enumerate() {
+        if !window.contains(wave.depth as f64) { continue; }
         let Some(fire) = &mut wave.fire else { continue };
         let f = r.floors.iter().find(|f| f.depth == wave.depth as f64).ok_or("Hellfire floor missing")?;
         let next = if fire.cells.is_empty() {
@@ -311,6 +320,7 @@ fn advance_fire(r: &mut Run) -> Result<(), String> {
     // Waves are ordered from the boss floor upward. Seed any freshly reached
     // floors, but give each new seed its first spatial expansion next pulse.
     for (i, upper) in upper_depths.into_iter().enumerate() {
+        let Some(upper) = upper else { continue };
         let (depth, up) = (c.waves[i].depth, c.waves[i].up);
         let Some(fire) = &mut c.waves[i].fire else { continue };
         if depth <= 1 || fire.upper_seeded || !up.is_some_and(|at| fire.cells.get(at) == Some(&true)) { continue; }

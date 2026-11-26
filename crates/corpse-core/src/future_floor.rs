@@ -79,6 +79,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.minotaur_bump_from=r.minotaur_bump_from.clone();
     next.borge_throw_from=r.borge_throw_from.clone();
     next.banshee_shriek_from=r.banshee_shriek_from.clone();
+    next.local_floor_ticks_from=r.local_floor_ticks_from.clone();
     next.execute_rules_from=r.execute_rules_from.clone();
     next.beckoning_rules_from=r.beckoning_rules_from.clone();
     next.ichor_fire_rules_from=r.ichor_fire_rules_from.clone();

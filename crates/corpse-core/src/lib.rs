@@ -170,6 +170,7 @@ pub mod creature_feeding;
 
 pub mod borge;
 pub mod banshee_rules;
+pub mod local_floor_rules;
 
 pub mod saidribee_queen;
 pub mod pocket_biomes;

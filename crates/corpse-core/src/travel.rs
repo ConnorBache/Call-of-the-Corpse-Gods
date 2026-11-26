@@ -491,10 +491,11 @@ pub fn arrive_ally_at_stair(
     Ok(true)
 }
 pub fn tick_ally_stair_followers(r: &mut Run) -> Result<(), String> {
+    let window = crate::local_floor_rules::window(r);
     let mut depths: Vec<_> = r
         .actors
         .keys()
-        .filter_map(|k| k.parse::<u32>().ok())
+        .filter_map(|k| k.parse::<u32>().ok().filter(|d| window.contains(f64::from(*d))))
         .collect();
     depths.sort();
     for d in depths {
@@ -965,7 +966,7 @@ fn prepare_fall_destination(r: &mut Run, next: f64) -> Result<(), String> {
             else { crate::startup::arrival_generation_target(revision, next as u32) };
         crate::startup::ensure_floors(r, to)?;
     }
-    crate::offscreen::catch_up_floor(r, next)
+    crate::offscreen::catch_up_for_landing(r, next)
 }
 
 /// Forced cohorts reserve all landings before transfer; IDs order the cohort.

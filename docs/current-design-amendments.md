@@ -1116,3 +1116,14 @@ exposing hidden terrain. Only living creatures in its line of sight on its plane
 take damage: half of their current HP plus 100, rounded by normal damage rules
 and ignoring armor. The Banshee itself is excluded. Historical replay commands
 retain the previous flat damage and animation.
+
+### R52 local floor simulation
+
+Each turn simulates the active floor and at most its immediate physical
+neighbors. Other floors do not run AI, ecology, hazards, ally following, or
+collapse/hellfire pulses. Skipped turns are discarded rather than replayed
+when a floor comes back into range. Floor-to-floor transfers still resolve
+their direct landing effects without running unrelated distant ecology.
+Absolute world deadlines may already be due on return; per-turn effects
+do not tick while the floor is out of range. Historical replay commands
+retain their original catch-up behavior.

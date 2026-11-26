@@ -1752,6 +1752,8 @@ pub struct Run {
     pub borge_throw_from: Field<usize>,
     #[serde(rename = "bansheeShriekFrom", default, skip_serializing_if = "Field::is_missing")]
     pub banshee_shriek_from: Field<usize>,
+    #[serde(rename = "localFloorTicksFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub local_floor_ticks_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

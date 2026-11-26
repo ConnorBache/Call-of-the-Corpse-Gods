@@ -73,6 +73,7 @@ fn clone_anchor_state(run:&Run)->Run {
             minotaur_bump_from: Default::default(),
             borge_throw_from: Default::default(),
             banshee_shriek_from: Default::default(),
+            local_floor_ticks_from: Default::default(),
             execute_rules_from: Default::default(),
             beckoning_rules_from: Default::default(),
             ichor_fire_rules_from: Default::default(),

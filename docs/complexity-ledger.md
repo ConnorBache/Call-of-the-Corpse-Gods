@@ -2577,3 +2577,18 @@ placement scan.
   Each rendered frame projects both sets in O(V) time and scratch before the
   existing O(V log V) overlay merge and raster work. The white cue reuses the
   existing 11-scene radial reveal; the purple cue does not duplicate it.
+
+### Local floor simulation (R52)
+- Per normal world turn, route admission and metadata are O(F) for F stored
+  physical floors (at most 40); the active floor and at most two neighbors
+  get their regular simulation. There is at most one due offscreen tick per
+  admitted neighbor, regardless of how many turns it spent out of range.
+- Existing per-admitted-floor actor, navigation and environment costs
+  remain; world identity lookups and direct transfers keep their existing
+  costs. The dirty offscreen settlement first builds O(A_local) survivor
+  scratch, consulting the shared identity index only for missing local IDs.
+- Collapse and hellfire inspect wave metadata but edit cell grids only
+  within the same three-floor horizon. Cross-floor placement can still
+  generate a missing destination; this is a direct effect, not catch-up.
+  Timing impact is not inferred from asymptotics; benchmark repeated Wait
+  across increasing visited-floor counts and separate cold fall generation.

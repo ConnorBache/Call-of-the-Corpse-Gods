@@ -2351,8 +2351,9 @@ fn turn(r: &mut Run) -> Result<(), EngineError> {
     crate::travel::fall_actors_one_level(r, active_depth, &expired, None).map_err(EngineError)?;
     let tick = r.tick;
     let expired_bulwarks:Vec<_>=r.floor().and_then(|f|f.bulwarks.as_ref()).map(|b|b.iter().filter(|(_,deadline)|**deadline<=tick).filter_map(|(key,_)|key.parse::<usize>().ok()).collect()).unwrap_or_default();
+    let window = crate::local_floor_rules::window(r);
     for f in &mut r.floors {
-        if f.bulwarks
+        if window.contains(f.depth) && f.bulwarks
             .as_ref()
             .is_some_and(|b| b.has_due(tick))
         {

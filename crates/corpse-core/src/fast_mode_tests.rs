@@ -18,6 +18,86 @@ fn room(depths: &[u32], fast_mode: bool) -> Run {
     }
     r
 }
+
+#[test]
+fn local_floor_ticks_use_physical_neighbors_without_catch_up_debt() {
+    let mut r=room(&[5,7,10,11,13,15],true);
+    r.depth=10.;
+    r.compressed_depths=true.into();
+    r.local_floor_ticks_from=0usize.into();
+    r.tick=100.;
+    for (i,d) in [5.,7.,11.,13.,15.].into_iter().enumerate() {
+        let f=r.floors.iter_mut().find(|f|f.depth==d).unwrap();
+        let f=Arc::make_mut(f);
+        f.last_tick=80.;
+        f.dirty=true;
+        let mut a=crate::population::create_actor_revision("rat",400.+i as f64,17.,10.,false,52.).unwrap();
+        a.conditions.insert("paralyzed".into(),80.);
+        r.actors_at_mut(d).push(a);
+    }
+    let state=|r:&Run,d| (r.floors.iter().find(|f|f.depth==d).unwrap().last_tick,
+        crate::engine::condition(&r.actors_at(d)[0],"paralyzed"));
+    let distant=r.floors.iter().find(|f|f.depth==13.).unwrap().clone();
+    crate::offscreen::tick_inactive_floors(&mut r).unwrap();
+    for d in [7.,11.] { assert_eq!(state(&r,d),(100.,79.)); }
+    for d in [5.,13.,15.] { assert_eq!(state(&r,d),(80.,80.)); }
+    assert!(Arc::ptr_eq(&distant,r.floors.iter().find(|f|f.depth==13.).unwrap()));
+    r.depth=11.;
+    r.tick=101.;
+    crate::offscreen::tick_inactive_floors(&mut r).unwrap();
+    assert_eq!(state(&r,13.),(101.,79.));
+    assert_eq!(state(&r,7.),(100.,79.));
+    // Direct arrival also drops debt; the active scheduler owns its next tick.
+    crate::offscreen::catch_up_floor(&mut r,15.).unwrap();
+    assert_eq!(state(&r,15.),(101.,80.));
+}
+
+#[test]
+fn local_floor_ticks_allow_real_fall_into_frozen_destination_without_simulating_it() {
+    let mut r=room(&[7,10,11,13,15],true);
+    r.depth=10.;r.compressed_depths=true.into();r.local_floor_ticks_from=0usize.into();
+    r.tick=50.;
+    let source=Arc::make_mut(r.floors.iter_mut().find(|f|f.depth==11.).unwrap());
+    source.tiles[10*79+16]="chasm".into();
+    let dest=Arc::make_mut(r.floors.iter_mut().find(|f|f.depth==13.).unwrap());
+    dest.dirty=true;dest.last_tick=3.;
+    let mut sentinel=crate::population::create_actor_revision("rat",401.,17.,12.,false,52.).unwrap();
+    sentinel.conditions.insert("paralyzed".into(),100.);
+    r.actors_at_mut(13.).push(sentinel);
+    let mut falling=crate::population::create_actor_revision("rat",400.,16.,10.,false,52.).unwrap();
+    falling.state="sleeping".into();r.actors_at_mut(11.).push(falling);
+    crate::travel::fall_actors_one_level(&mut r,11.,&[400.],None).unwrap();
+    assert!(r.actors_at(11.).is_empty());
+    assert!(r.actors_at(13.).iter().any(|a|a.id==400.));
+    assert_eq!(r.floors.iter().find(|f|f.depth==13.).unwrap().last_tick,3.);
+    assert_eq!(crate::engine::condition(&r.actors_at(13.)[0],"paralyzed"),100.);
+    r.depth=11.;r.tick+=1.;
+    crate::offscreen::tick_inactive_floors(&mut r).unwrap();
+    assert_eq!(crate::engine::condition(&r.actors_at(13.)[0],"paralyzed"),99.);
+    assert_eq!(r.floors.iter().find(|f|f.depth==13.).unwrap().last_tick,51.);
+}
+
+#[test]
+fn local_floor_ticks_do_not_expand_a_distant_collapse() {
+    let mut r=room(&[7,10,11,13],true);
+    r.depth=10.;r.compressed_depths=true.into();r.local_floor_ticks_from=0usize.into();
+    let at=10*79+40;
+    let f=Arc::make_mut(r.floors.iter_mut().find(|f|f.depth==13.).unwrap());
+    f.tiles[at]="chasm".into();
+    let mut cells=vec![false;f.tiles.len()];cells[at]=true;
+    r.collapse=Arc::new(crate::finale::Collapse {
+        started_tick:0.,next_pulse_tick:2.,waves:vec![crate::finale::CollapseFloor {
+            depth:13,up:Some(10*79+10),cells,frontier:vec![at],..Default::default()
+        }],..Default::default()
+    }).into();
+    r.tick=10.;
+    crate::finale::world_turn(&mut r).unwrap();
+    assert_eq!(r.collapse.as_ref().unwrap().waves[0].frontier,vec![at]);
+    r.depth=11.;r.tick=12.;
+    crate::finale::world_turn(&mut r).unwrap();
+    assert_eq!(r.collapse.as_ref().unwrap().waves[0].frontier.len(),4);
+}
+
 #[test]
 fn fast_depth_helpers_cover_fixed_route_and_every_scheduled_godbeast() {
     let depths:Vec<_>=(1..40).step_by(2).chain([40]).collect();
@@ -264,6 +344,7 @@ fn fast_ascend_uses_previous_odd_floor_and_finale_return() {
 fn fast_finale_collapse_propagates_40_to_39_to_37_and_escapes_at_one() {
     let depths:Vec<_>=(1..40).step_by(2).chain([40]).collect();
     let mut r=room(&depths,true);r.depth=40.;r.player.x=20.;r.player.y=20.;
+    r.local_floor_ticks_from=Field::Missing; // Historical replay: collapse runs at all distances.
     let mut boss=crate::finale::administrator_revision(400.,10.,10.,52.);boss.hp=0.;boss.dead=true.into();
     r.actors_at_mut(40.).push(boss.clone());
     assert!(crate::finale::actual_death(&mut r,&boss).unwrap());

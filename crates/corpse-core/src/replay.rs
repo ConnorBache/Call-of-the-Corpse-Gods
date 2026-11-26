@@ -47,6 +47,8 @@ pub struct ReplayRecord {
     pub borge_throw_from: Field<usize>,
     #[serde(rename = "bansheeShriekFrom", default, skip_serializing_if = "Field::is_missing")]
     pub banshee_shriek_from: Field<usize>,
+    #[serde(rename = "localFloorTicksFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub local_floor_ticks_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]
@@ -109,6 +111,7 @@ impl ReplayRecord {
             minotaur_bump_from: match run.minotaur_bump_from { Field::Value(n) => n.into(), _ => Field::Missing },
             borge_throw_from: match run.borge_throw_from { Field::Value(n) => n.into(), _ => Field::Missing },
             banshee_shriek_from: match run.banshee_shriek_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            local_floor_ticks_from: match run.local_floor_ticks_from { Field::Value(n) => n.into(), _ => Field::Missing },
             steam_rules_from: match run.steam_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             execute_rules_from: match run.execute_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             beckoning_rules_from: match run.beckoning_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
@@ -216,6 +219,10 @@ impl ReplayRecord {
             && matches!(self.banshee_shriek_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Banshee shriek replay boundary".into()));
         }
+        if !self.local_floor_ticks_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.local_floor_ticks_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Invalid Local floor ticks replay boundary".into()));
+        }
         if !self.death_gas_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
             && matches!(self.death_gas_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Unsupported Death Gas rules replay boundary".into()));
@@ -264,6 +271,7 @@ impl ReplayRecord {
         crate::minotaur_rules::apply_replay_policy(&mut engine.run, &self.minotaur_bump_from, cursor);
         crate::borge::apply_replay_policy(&mut engine.run, &self.borge_throw_from, cursor);
         crate::banshee_rules::apply_replay_policy(&mut engine.run, &self.banshee_shriek_from, cursor);
+        crate::local_floor_rules::apply_replay_policy(&mut engine.run, &self.local_floor_ticks_from, cursor);
         crate::steam_rules::apply_replay_policy(&mut engine.run, &self.steam_rules_from, cursor);
         crate::execute_rules::apply_replay_policy(&mut engine.run, &self.execute_rules_from, cursor);
         crate::beckoning_rules::apply_replay_policy(&mut engine.run, &self.beckoning_rules_from, cursor);
@@ -317,6 +325,7 @@ impl ReplaySession {
         crate::minotaur_rules::apply_replay_policy(&mut initial, &record.minotaur_bump_from, 0);
         crate::borge::apply_replay_policy(&mut initial, &record.borge_throw_from, 0);
         crate::banshee_rules::apply_replay_policy(&mut initial, &record.banshee_shriek_from, 0);
+        crate::local_floor_rules::apply_replay_policy(&mut initial, &record.local_floor_ticks_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
@@ -369,6 +378,7 @@ impl ReplaySession {
         crate::minotaur_rules::apply_replay_policy(&mut initial, &record.minotaur_bump_from, 0);
         crate::borge::apply_replay_policy(&mut initial, &record.borge_throw_from, 0);
         crate::banshee_rules::apply_replay_policy(&mut initial, &record.banshee_shriek_from, 0);
+        crate::local_floor_rules::apply_replay_policy(&mut initial, &record.local_floor_ticks_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
@@ -399,7 +409,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
+        if self.record.local_floor_ticks_from.as_ref()==Some(&self.cursor) || self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -433,6 +443,7 @@ impl ReplaySession {
         crate::minotaur_rules::apply_replay_policy(&mut initial, &self.record.minotaur_bump_from, 0);
         crate::borge::apply_replay_policy(&mut initial, &self.record.borge_throw_from, 0);
         crate::banshee_rules::apply_replay_policy(&mut initial, &self.record.banshee_shriek_from, 0);
+        crate::local_floor_rules::apply_replay_policy(&mut initial, &self.record.local_floor_ticks_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &self.record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &self.record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &self.record.beckoning_rules_from, 0);
