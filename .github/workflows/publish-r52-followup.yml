@@ -1,0 +1,44 @@
+name: Publish R52 Follow-up
+on:
+  push:
+    branches:
+      - release-publishing/r52-followup
+    paths:
+      - release-staging/r52/ready
+permissions:
+  contents: write
+concurrency:
+  group: r52-followup-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify the Windows archive
+        working-directory: release-staging/r52
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat part-* > Call-of-the-Corpse-Gods-R52-Followup-Windows-x64.zip
+          sha256sum --check SHA256SUMS.txt
+          unzip -tq Call-of-the-Corpse-Gods-R52-Followup-Windows-x64.zip
+      - name: Create, verify, and publish the GitHub Release
+        working-directory: release-staging/r52
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag=r52-followup-20261126
+          sha=8f7e0bc53310c456d2fb8c41acf8d7772ed87e83
+          asset=Call-of-the-Corpse-Gods-R52-Followup-Windows-x64.zip
+          digest=sha256:281a18015bc21b7b366b873b83f5416ad32679af3ad824ccc562ed8de06bd368
+          gh release create "$tag" "$asset" SHA256SUMS.txt --target "$sha" --title "R52 Follow-up: Balance and Hellfire" --notes-file RELEASE-NOTES.md --draft --prerelease
+          gh release view "$tag" --json assets | jq -e --arg name "$asset" --arg digest "$digest" '.assets[] | select(.name == $name and .size == 23021401 and .digest == $digest)' >/dev/null
+          gh release edit "$tag" --draft=false
+          gh release view "$tag" --json url,isDraft,assets
