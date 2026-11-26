@@ -32,6 +32,8 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         local_floor_ticks_from: Field::Missing,
         minotaur_straight_from: Field::Missing,
         mercuria_amulet_from: Field::Missing,
+        phantasmii_blessings_from: Field::Missing,
+        phantasmii_birth_shards: Field::Missing,
         execute_rules_from: Field::Missing,
         beckoning_rules_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,

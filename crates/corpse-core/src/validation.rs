@@ -124,6 +124,7 @@ pub fn validate(run: &Run) -> Result<()> {
     crate::local_floor_rules::validate(run).map_err(StorageError)?;
     crate::minotaur_straight::validate(run).map_err(StorageError)?;
     crate::mercuria_rules::validate(run).map_err(StorageError)?;
+    crate::phantasmii_blessing_rules::validate(run).map_err(StorageError)?;
     for f in &run.floors {
         req(crate::pocket_biomes::validate(f), "pocket biome metadata")?;
         req(crate::entrance::validate(f) || crate::entrance::metadata_cell(f)
@@ -477,7 +478,8 @@ fn item(i: &Value, quantity: bool, revision: f64) -> Result<()> {
             let stack = i["kind"] == "heart"
                 && i["name"].as_str().is_some_and(|s| has_word(s, "Jackal"))
                 || i["kind"] == "ammo" && i["effect"] == "arrows"
-                || i["kind"] == "quest" && i["name"] == crate::phantasmii_generation::SHARD_NAME;
+                || i["kind"] == "quest" && (i["name"] == crate::phantasmii_generation::SHARD_NAME
+                    || (revision >= 52. && i["name"] == crate::phantasmii_generation::FLOOR_SHARD_NAME));
             req(
                 count(q) && num(q).unwrap() >= 1.0 && (num(q) == Some(1.0) || stack),
                 "item quantity",
@@ -520,6 +522,7 @@ fn item(i: &Value, quantity: bool, revision: f64) -> Result<()> {
     Ok(())
 }
 fn floor(f: &Value, n: usize, w: usize, h: usize) -> Result<()> {
+    req(optional(f, "phantasmiiShardSeeded", |v| v == &Value::Bool(true)), "floor shard placement marker")?;
     extra_floor(f, n, w, h)?;
     for k in [
         "currents",

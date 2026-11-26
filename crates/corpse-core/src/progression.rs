@@ -143,9 +143,14 @@ fn choose<'a>(pool: &[&'a Ability], owned: &[String], sample: f64) -> &'a Abilit
     }
     pool.last().unwrap()
 }
-/// O(1); twenty-floor level costs begin at one and double for each subsequent level.
+/// Twenty-floor base costs start at one and double. O(I) with the shard rule
+/// (I carried entries), otherwise O(1); costing never changes the inventory.
 pub fn level_up_cost(r: &Run) -> f64 {
-    2.0f64.powf(r.level - if r.compressed_depths.value_or(false) { 1. } else { 0. })
+    let base = 2.0f64.powf(r.level - if r.compressed_depths.value_or(false) { 1. } else { 0. });
+    if !crate::phantasmii_blessing_rules::current(r) { return base; }
+    let shards: f64 = r.inventory.iter().filter(|item| crate::phantasmii_generation::is_shard(item))
+        .map(crate::inventory::quantity).sum();
+    (base - crate::phantasmii_generation::BLESSING_DISCOUNT * shards).max(0.)
 }
 /// O(A²) with fixed authored A=72; deterministic god/pool and RNG order.
 pub fn level_up(r: &mut Run) {

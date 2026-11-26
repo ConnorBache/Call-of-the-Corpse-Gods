@@ -38,7 +38,10 @@ pub fn stack_key(i: &Item) -> Option<String> {
     if is_arrow(i) {
         return Some("arrows".into());
     }
-    if crate::phantasmii_generation::is_shard(i) {
+    if crate::phantasmii_generation::is_floor_shard(i) {
+        return Some("phantasmii-floor-shards".into());
+    }
+    if crate::phantasmii_generation::is_dream_shard(i) {
         return Some("phantasmii-shards".into());
     }
     if i.kind != "heart"
@@ -181,7 +184,14 @@ pub fn collect_underfoot(r: &mut Run, capacity: f64) -> Result<usize, EngineErro
     }
     *r.ground_at_mut(r.depth) = remaining;
     crate::corpses::record_heart_pickups(r, &collected_hearts);
-    if collected_shards { crate::dreamwalking::shards_collected(r); }
+    if collected_shards {
+        crate::dreamwalking::shards_collected(r);
+        if crate::phantasmii_blessing_rules::current(r) {
+            // Open the first earned choice; choose_offer rechecks the next cost
+            // after each choice so multiple earned levels never skip choices.
+            progression::level_up(r);
+        }
+    }
     Ok(collected)
 }
 pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {

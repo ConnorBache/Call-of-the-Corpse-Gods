@@ -2611,3 +2611,17 @@ placement scan.
 - The wind-up considers only an integer radius-four disc and clips it to
   visible cells. Desktop cost is O(C log C) to prepare its admitted geometry
   and O(C) tile projection per frame, with C at most 49. It adds no simulation RNG.
+
+### Phantasmii floor shard and level cost
+
+Once per newly generated physical floor (or once at first active encounter
+after upgrading an older floor), placement takes expected
+O(V + A + I + F + P) time and scratch for a reachability pass over V cells
+and occupancy for A actors, I items, F fixture positions, and P portal
+endpoints; one private RNG draw chooses among reachable dry cells without
+changing the existing generation streams. A per-floor marker prevents
+respawning. Each live level-cost read scans
+O(I) carried entries and uses O(1) extra space. A shard pickup opens at most
+one level-up choice, and each normal choice checks the next threshold using
+the existing offer workflow. No extra RNG runs if the next level cannot be
+earned. Historical replay prefixes use the former cost and generation rules.

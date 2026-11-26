@@ -173,6 +173,7 @@ pub mod banshee_rules;
 pub mod local_floor_rules;
 pub mod minotaur_straight;
 pub mod mercuria_rules;
+pub mod phantasmii_blessing_rules;
 
 pub mod saidribee_queen;
 pub mod pocket_biomes;

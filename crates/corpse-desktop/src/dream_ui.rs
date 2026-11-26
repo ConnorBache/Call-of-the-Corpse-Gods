@@ -16,7 +16,7 @@ pub fn observation_run(run: &corpse_core::Run) -> std::borrow::Cow<'_, corpse_co
 /// Quest shards and tagged dropped weapons belong to the dream plane, including
 /// a dream Half Here viewpoint. Waking items remain observable from dreams.
 pub fn item_visible(run: &corpse_core::Run, item: &corpse_core::Item) -> bool {
-    !(corpse_core::phantasmii_generation::is_shard(item) || corpse_core::dreamwalking::dream_ground_item(item))
+    !(corpse_core::phantasmii_generation::is_dream_shard(item) || corpse_core::dreamwalking::dream_ground_item(item))
         || corpse_core::dreamwalking::dream_view(run)
 }
 

@@ -1149,3 +1149,16 @@ on entry, and a chasm uses the normal creature-fall rules.
 A visible wind-up plays a brief white scream wave in reverse, converging
 on the Minotaur when it commits to its new arrow. Old replay commands
 retain their original charge policy.
+
+### Shards of the Phantasmii and Blessings
+
+Each newly generated physical floor contains one reachable Shard of the
+Phantasmii in the waking world. This is separate from the three dream shards
+used for the existing Phantasmii ritual. Each carried shard of either kind
+reduces the Blessing cost of each next level by 10, never below zero.
+A pickup immediately checks for a level-up, and each earned choice is followed
+by another check. Shards are not spent and earned levels are not reversed.
+Existing saves use the discount and get a one-time waking shard placement
+on each existing floor when played or revisited under the new rules.
+Collected shards never respawn on revisit. A fully destroyed old floor with
+no reachable dry tile can be left unseeded.

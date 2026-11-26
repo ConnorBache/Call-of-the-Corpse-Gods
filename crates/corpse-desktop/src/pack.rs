@@ -1692,8 +1692,17 @@ fn describe_item_with_offense(run: &Run, i: &Item, offense: f64) -> String {
             i.name, corpse_core::phantasmii_generation::DAGGER_DESCRIPTION);
     }
     if corpse_core::phantasmii_generation::is_shard(i) {
-        return format!("{} ×{}\nCollect three to complete the ritual.",
-            i.name, i.quantity.value_or(1.));
+        let mut text = format!("{} ×{}", i.name, i.quantity.value_or(1.));
+        if corpse_core::phantasmii_generation::is_dream_shard(i) {
+            text.push_str(if corpse_core::phantasmii_blessing_rules::current(run) {
+                "\nCollect three dream shards to complete the ritual."
+            } else { "\nCollect three to complete the ritual." });
+        }
+        if corpse_core::phantasmii_blessing_rules::current(run) {
+            text.push('\n');
+            text.push_str(corpse_core::phantasmii_generation::BLESSING_DESCRIPTION);
+        }
+        return text;
     }
     if corpse_core::borge::is_shard(i) {
         if run.simulation_revision.value_or(29.) >= 50. {

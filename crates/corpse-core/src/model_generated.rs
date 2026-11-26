@@ -1205,6 +1205,8 @@ pub struct EnvironmentalState {
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Floor {
+    #[serde(rename = "phantasmiiShardSeeded", default, skip_serializing_if = "Field::is_missing")]
+    pub phantasmii_shard_seeded: Field<bool>,
     #[serde(rename = "revision50Darkness", default, skip_serializing_if = "Field::is_missing")]
     pub revision50_darkness: Field<Vec<crate::revision50_potions::Darkness>>,
     #[serde(rename = "revision50TemporaryTerrain", default, skip_serializing_if = "Field::is_missing")]
@@ -1758,6 +1760,10 @@ pub struct Run {
     pub minotaur_straight_from: Field<usize>,
     #[serde(rename = "mercuriaAmuletFrom", default, skip_serializing_if = "Field::is_missing")]
     pub mercuria_amulet_from: Field<usize>,
+    #[serde(rename = "phantasmiiBlessingsFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub phantasmii_blessings_from: Field<usize>,
+    #[serde(rename = "phantasmiiBirthShards", default, skip_serializing_if = "Field::is_missing")]
+    pub phantasmii_birth_shards: Field<bool>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

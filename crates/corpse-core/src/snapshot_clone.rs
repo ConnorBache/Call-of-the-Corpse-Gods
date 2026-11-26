@@ -74,6 +74,8 @@ fn clone_snapshot_state(run:&Run)->Run {
             local_floor_ticks_from: Default::default(),
             minotaur_straight_from: Default::default(),
             mercuria_amulet_from: Default::default(),
+            phantasmii_blessings_from: Default::default(),
+            phantasmii_birth_shards: Default::default(),
             execute_rules_from: Default::default(),
             beckoning_rules_from: Default::default(),
             ichor_fire_rules_from: Default::default(),

@@ -5,6 +5,9 @@ use std::collections::HashSet;
 
 pub const DAGGER_NAME: &str = "Dagger of the Phantasmii";
 pub const SHARD_NAME: &str = "Shards of the Phantasmii";
+pub const FLOOR_SHARD_NAME: &str = "Shard of the Phantasmii";
+pub const BLESSING_DISCOUNT: f64 = 10.;
+pub const BLESSING_DESCRIPTION: &str = "Each carried shard lowers the Blessings needed for the next level by 10, to a minimum of zero.";
 pub const DAGGER_DESCRIPTION: &str = "Apply while standing on the Altar of the Phantasmii to enter Dreamwalking.";
 pub const NIGHTMARE_COUNT: usize = 4;
 pub const SHARD_COUNT: usize = 3;
@@ -15,7 +18,13 @@ pub const NIGHTMARE_DESCRIPTORS: [&str; 8] = ["Small", "Lesser", "Minor", "", "M
 pub const NIGHTMARE_BASELINES: [&str; 8] = ["bear", "long-saidri", "pale:Greater Biter", "dire-bear", "killspawn", "phoenix", "ursa-minor", "dragon"];
 
 pub fn is_dagger(i: &Item) -> bool { i.kind == "tool" && i.name == DAGGER_NAME }
-pub fn is_shard(i: &Item) -> bool { i.kind == "quest" && i.name == SHARD_NAME }
+pub fn is_dream_shard(i: &Item) -> bool { i.kind == "quest" && i.name == SHARD_NAME }
+pub fn is_floor_shard(i: &Item) -> bool { i.kind == "quest" && i.name == FLOOR_SHARD_NAME }
+pub fn is_shard(i: &Item) -> bool { is_dream_shard(i) || is_floor_shard(i) }
+pub fn floor_shard(id: f64) -> Item {
+    Item { id, name: FLOOR_SHARD_NAME.into(), kind: "quest".into(), glyph: "*".into(),
+        identified: true.into(), quantity: 1.0.into(), effect: BLESSING_DESCRIPTION.to_string().into(), ..Default::default() }
+}
 pub fn dagger(id: f64) -> Item {
     Item { id, name: DAGGER_NAME.into(), kind: "tool".into(), glyph: "/".into(),
         identified: true.into(), effect: DAGGER_DESCRIPTION.to_string().into(), ..Default::default() }
@@ -55,6 +64,24 @@ pub fn dagger_cell(f: &Floor) -> Option<usize> {
     Some(p.y as usize * f.width() + p.x as usize + 1)
 }
 fn position(f: &Floor, at: usize) -> (f64, f64) { ((at % f.width()) as f64, (at / f.width()) as f64) }
+/// Once per new floor: O(V + A + I + F + P) time and scratch for the fixed-degree
+/// reachability pass and V cells, A actors, I loot, F fixture cells, P portal endpoints.
+/// Select only clear reachable dry cells; the private stream shifts no existing draw.
+pub(crate) fn floor_shard_cell(seed: &str, f: &Floor, actors: &[Actor], ground: &[GroundItem]) -> Result<usize, String> {
+    let w = f.width();
+    let mut occupied: HashSet<_> = actors.iter().map(|a| a.y as usize * w + a.x as usize)
+        .chain(ground.iter().map(|g| g.y as usize * w + g.x as usize))
+        .chain(crate::spawn_heatmap::fixture_cells(f))
+        .chain(f.portals.as_ref().into_iter().flatten().flat_map(|p| [p.a, p.b]))
+        .collect();
+    if let Some(p) = crate::entrance::arrival(f) { occupied.insert(p.y as usize * w + p.x as usize); }
+    let cells: Vec<_> = crate::generation::reachable_without_braziers(f, None).into_iter()
+        .filter(|&at| matches!(f.tiles[at].as_str(), "floor" | "grass") && !occupied.contains(&at))
+        .collect();
+    if cells.is_empty() { return Err("No reachable dry cell for a Shard of the Phantasmii".into()); }
+    let mut rng = crate::population::population_random(&format!("{seed}:floor:{}:floor-shard", f.depth));
+    Ok(cells[(rng.random() * cells.len() as f64).floor() as usize])
+}
 /// O(V + A + I + K*K*V), K<=7 selections, O(V+A+I) scratch. Candidates include water
 /// so water-heavy floors cannot silently omit required actors/shards. No terrain
 /// mutation, ordinary budget/RNG consumption, repeated activation or respawning.

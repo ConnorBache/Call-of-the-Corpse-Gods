@@ -618,6 +618,7 @@ fn dispatch_inner(r: &mut Run, c: &Command) -> Result<DispatchOutcome, EngineErr
     let _timing_function = crate::timing::span("command.action_dispatch");
     bump(r, "commands", 1.0);
     r.replay.push(c.clone());
+    crate::phantasmii_blessing_rules::seed_active_legacy_floor(r);
     resources::observe_resource_history(r);
     crate::lifecycle::settle_nonpositive_health(r)?;
     crate::corpse_currents::settle_falls(r).map_err(EngineError)?;
@@ -994,6 +995,7 @@ fn finish_inner(r: &mut Run, took: bool, completed_action: bool) -> Result<Dispa
     crate::monster_grab::release_invalid(r);
     settle_doors(r);
     if crate::dreamwalking::active(r) {crate::dreamwalking::with_plane(r,true,settle_doors);}
+    crate::phantasmii_blessing_rules::seed_active_legacy_floor(r);
     let cap = crate::inventory::carrying_capacity(r)?;
     crate::inventory::collect_underfoot(r, cap)?;
     settle_doors(r);
@@ -2500,7 +2502,7 @@ pub fn remember(r: &mut Run) {
         .get(&r.depth.to_string())
         .into_iter()
         .flat_map(|g| g.iter())
-        .filter(|e| observed(e.x, e.y) && (!(crate::phantasmii_generation::is_shard(&e.item) || crate::dreamwalking::dream_ground_item(&e.item)) || crate::dreamwalking::dream_view(r)))
+        .filter(|e| observed(e.x, e.y) && (!(crate::phantasmii_generation::is_dream_shard(&e.item) || crate::dreamwalking::dream_ground_item(&e.item)) || crate::dreamwalking::dream_view(r)))
         .map(|e| RunRememberedItemsEntryEntry {
             x: e.x,
             y: e.y,
@@ -4106,7 +4108,7 @@ pub fn settle_doors(r: &mut Run) {
             r.ground
                 .get(&r.depth.to_string())
                 .into_iter()
-                .flat_map(|g| g.iter().filter(|e|(crate::phantasmii_generation::is_shard(&e.item)||crate::dreamwalking::dream_ground_item(&e.item))==crate::dreamwalking::context_dream(r)).map(|e| (e.x, e.y))),
+                .flat_map(|g| g.iter().filter(|e|(crate::phantasmii_generation::is_dream_shard(&e.item)||crate::dreamwalking::dream_ground_item(&e.item))==crate::dreamwalking::context_dream(r)).map(|e| (e.x, e.y))),
         )
         .map(|(x, y)| y as usize * w + x as usize)
         .collect();

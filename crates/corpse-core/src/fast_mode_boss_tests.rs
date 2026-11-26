@@ -81,8 +81,9 @@ fn assert_population(r: &Run, depth: u32, kind: &str) {
     let ground = &r.ground[&depth.to_string()];
     assert_eq!(ground.iter().filter(|g| crate::phantasmii_generation::is_dagger(&g.item)).count(),
         usize::from(kind == "Phantasmii"));
-    assert_eq!(ground.iter().filter(|g| crate::phantasmii_generation::is_shard(&g.item)).count(),
+    assert_eq!(ground.iter().filter(|g| crate::phantasmii_generation::is_dream_shard(&g.item)).count(),
         if kind == "Phantasmii" { 3 } else { 0 });
+    assert_eq!(ground.iter().filter(|g| crate::phantasmii_generation::is_floor_shard(&g.item)).count(), 1);
     if kind == "Veridian" {
         assert_eq!(event.display_name.as_ref().map(String::as_str), Some("Verdania"));
         let tap = event.tap.as_ref().unwrap();
@@ -248,7 +249,7 @@ fn activate_generated(mut r: Run, depth: u32) {
             assert_eq!(body.conditions.get("phantasmiiBody"), Some(&1.));
             assert_eq!((body.x, body.y), (altar.x, altar.y));
             r = strict_round_trip(&r, "Phantasmii sleeping body and dream floor");
-            let shards: Vec<_> = r.ground[&depth.to_string()].iter().filter(|g| crate::phantasmii_generation::is_shard(&g.item)).map(|g| g.item.id).collect();
+            let shards: Vec<_> = r.ground[&depth.to_string()].iter().filter(|g| crate::phantasmii_generation::is_dream_shard(&g.item)).map(|g| g.item.id).collect();
             assert_eq!(shards.len(), 3);
             for id in shards { collect_generated(&mut r, id); }
             assert!(crate::dreamwalking::unlocked(&r));

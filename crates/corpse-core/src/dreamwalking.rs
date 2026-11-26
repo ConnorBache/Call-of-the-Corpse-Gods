@@ -98,7 +98,7 @@ pub fn ability(r:&mut Run,id:&str)->Result<Option<bool>,EngineError> {
 }
 pub fn shards_collected(r:&mut Run) {
     if !active(r) || unlocked(r) {return}
-    let count:f64=r.inventory.iter().filter(|i|crate::phantasmii_generation::is_shard(i)).map(crate::inventory::quantity).sum();
+    let count:f64=r.inventory.iter().filter(|i|crate::phantasmii_generation::is_dream_shard(i)).map(crate::inventory::quantity).sum();
     if count>=3. {r.dreamwalking.as_mut().unwrap().unlocked=true;crate::events::inventory(r,"E83","unlock-diamond",None);engine::log(r,"The ritual is complete. You can now Dreamwalk whenever you wish.","player");}
 }
 /// O(A+P) at resource synchronization boundaries. Conditions remain body-local.
@@ -120,7 +120,7 @@ pub fn dream_ground_item(item:&crate::Item)->bool {
 }
 /// Whether the player can collect this item in their currently active plane.
 pub fn item_in_plane(r:&Run,item:&crate::Item)->bool {
-    let dream=crate::phantasmii_generation::is_shard(item)
+    let dream=crate::phantasmii_generation::is_dream_shard(item)
         || (crate::borge::weapon_enabled(r) && dream_ground_item(item));
     dream==active(r)
 }

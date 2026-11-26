@@ -53,6 +53,10 @@ pub struct ReplayRecord {
     pub minotaur_straight_from: Field<usize>,
     #[serde(rename = "mercuriaAmuletFrom", default, skip_serializing_if = "Field::is_missing")]
     pub mercuria_amulet_from: Field<usize>,
+    #[serde(rename = "phantasmiiBlessingsFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub phantasmii_blessings_from: Field<usize>,
+    #[serde(rename = "phantasmiiBirthShards", default, skip_serializing_if = "Field::is_missing")]
+    pub phantasmii_birth_shards: Field<bool>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]
@@ -118,6 +122,8 @@ impl ReplayRecord {
             local_floor_ticks_from: match run.local_floor_ticks_from { Field::Value(n) => n.into(), _ => Field::Missing },
             minotaur_straight_from: match run.minotaur_straight_from { Field::Value(n) => n.into(), _ => Field::Missing },
             mercuria_amulet_from: match run.mercuria_amulet_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            phantasmii_blessings_from: match run.phantasmii_blessings_from { Field::Value(n) => n.into(), _ => Field::Missing },
+            phantasmii_birth_shards: run.phantasmii_birth_shards.clone(),
             steam_rules_from: match run.steam_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             execute_rules_from: match run.execute_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
             beckoning_rules_from: match run.beckoning_rules_from { Field::Value(n) => n.into(), _ => Field::Missing },
@@ -237,6 +243,13 @@ impl ReplayRecord {
             && matches!(self.mercuria_amulet_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Invalid Mercuria amulet replay boundary".into()));
         }
+        if !self.phantasmii_blessings_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
+            && matches!(self.phantasmii_blessings_from, Field::Value(n) if n <= self.commands.len())) {
+            return Err(StorageError("Invalid Phantasmii blessing replay boundary".into()));
+        }
+        if !self.phantasmii_birth_shards.is_missing() && !(
+            self.phantasmii_birth_shards.as_ref() == Some(&true) && self.phantasmii_blessings_from.as_ref() == Some(&0)
+        ) { return Err(StorageError("Invalid Phantasmii birth policy".into())); }
         if !self.death_gas_rules_from.is_missing() && !(self.simulation_revision.value_or(29.) >= 52.
             && matches!(self.death_gas_rules_from, Field::Value(n) if n <= self.commands.len())) {
             return Err(StorageError("Unsupported Death Gas rules replay boundary".into()));
@@ -288,6 +301,7 @@ impl ReplayRecord {
         crate::local_floor_rules::apply_replay_policy(&mut engine.run, &self.local_floor_ticks_from, cursor);
         crate::minotaur_straight::apply_replay_policy(&mut engine.run, &self.minotaur_straight_from, cursor);
         crate::mercuria_rules::apply_replay_policy(&mut engine.run, &self.mercuria_amulet_from, cursor);
+        crate::phantasmii_blessing_rules::apply_replay_policy(&mut engine.run, &self.phantasmii_blessings_from, cursor);
         crate::steam_rules::apply_replay_policy(&mut engine.run, &self.steam_rules_from, cursor);
         crate::execute_rules::apply_replay_policy(&mut engine.run, &self.execute_rules_from, cursor);
         crate::beckoning_rules::apply_replay_policy(&mut engine.run, &self.beckoning_rules_from, cursor);
@@ -344,6 +358,7 @@ impl ReplaySession {
         crate::local_floor_rules::apply_replay_policy(&mut initial, &record.local_floor_ticks_from, 0);
         crate::minotaur_straight::apply_replay_policy(&mut initial, &record.minotaur_straight_from, 0);
         crate::mercuria_rules::apply_replay_policy(&mut initial, &record.mercuria_amulet_from, 0);
+        crate::phantasmii_blessing_rules::apply_replay_policy(&mut initial, &record.phantasmii_blessings_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
@@ -372,6 +387,7 @@ impl ReplaySession {
             || record.dev != initial.dev
             || record.playtest != initial.playtest
             || record.avatar_starter_policy != initial.avatar_starter_policy
+            || record.phantasmii_birth_shards != initial.phantasmii_birth_shards
         {
             return Err(StorageError(
                 "Replay requires matching initial fixture and simulation revision 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 50, 51 or 52".into(),
@@ -399,6 +415,7 @@ impl ReplaySession {
         crate::local_floor_rules::apply_replay_policy(&mut initial, &record.local_floor_ticks_from, 0);
         crate::minotaur_straight::apply_replay_policy(&mut initial, &record.minotaur_straight_from, 0);
         crate::mercuria_rules::apply_replay_policy(&mut initial, &record.mercuria_amulet_from, 0);
+        crate::phantasmii_blessing_rules::apply_replay_policy(&mut initial, &record.phantasmii_blessings_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &record.beckoning_rules_from, 0);
@@ -429,7 +446,7 @@ impl ReplaySession {
         let outcome = self.engine.dispatch(&self.record.commands[self.cursor])?;
         self.cursor += 1;
         // Boundary at end must persist even before another command is played.
-        if self.record.mercuria_amulet_from.as_ref()==Some(&self.cursor) || self.record.local_floor_ticks_from.as_ref()==Some(&self.cursor) || self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
+        if self.record.phantasmii_blessings_from.as_ref()==Some(&self.cursor) || self.record.mercuria_amulet_from.as_ref()==Some(&self.cursor) || self.record.local_floor_ticks_from.as_ref()==Some(&self.cursor) || self.record.banshee_shriek_from.as_ref()==Some(&self.cursor) || self.record.borge_throw_from.as_ref()==Some(&self.cursor) || self.record.minotaur_bump_from.as_ref()==Some(&self.cursor) || self.record.death_gas_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_range_from.as_ref()==Some(&self.cursor) || self.record.half_here_energy_from.as_ref()==Some(&self.cursor) || self.record.half_here_lock_from.as_ref()==Some(&self.cursor) || self.record.blood_mist_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.future_floor_rules_from.as_ref()==Some(&self.cursor) || self.record.gas_rules_from.as_ref()==Some(&self.cursor) || self.record.commandment_rules_from.as_ref()==Some(&self.cursor) || self.record.screamer_rules_from.as_ref()==Some(&self.cursor) || self.record.ragelight_rules_from.as_ref()==Some(&self.cursor) || self.record.collapse_rules_from.as_ref()==Some(&self.cursor) || self.record.balance_rules_from.as_ref()==Some(&self.cursor) || self.record.beckoning_rules_from.as_ref()==Some(&self.cursor) || self.record.ichor_fire_rules_from.as_ref()==Some(&self.cursor) || self.record.execute_rules_from.as_ref()==Some(&self.cursor) || self.record.steam_rules_from.as_ref()==Some(&self.cursor) || self.record.ember_rules_from.as_ref()==Some(&self.cursor) || self.record.ring_rules_from.as_ref()==Some(&self.cursor) || self.record.potion_rules_from.as_ref()==Some(&self.cursor) || self.record.amulet_rules_from.as_ref()==Some(&self.cursor) || self.record.snapshot_from.as_ref()==Some(&self.cursor) || self.record.firebolt_travel_from.as_ref()==Some(&self.cursor) {self.record.apply_policy(&mut self.engine,self.cursor).map_err(crate::engine::EngineError)?;}
         Ok(Some(outcome))
     }
     pub fn finished(&self) -> bool {
@@ -466,6 +483,7 @@ impl ReplaySession {
         crate::local_floor_rules::apply_replay_policy(&mut initial, &self.record.local_floor_ticks_from, 0);
         crate::minotaur_straight::apply_replay_policy(&mut initial, &self.record.minotaur_straight_from, 0);
         crate::mercuria_rules::apply_replay_policy(&mut initial, &self.record.mercuria_amulet_from, 0);
+        crate::phantasmii_blessing_rules::apply_replay_policy(&mut initial, &self.record.phantasmii_blessings_from, 0);
         crate::steam_rules::apply_replay_policy(&mut initial, &self.record.steam_rules_from, 0);
         crate::execute_rules::apply_replay_policy(&mut initial, &self.record.execute_rules_from, 0);
         crate::beckoning_rules::apply_replay_policy(&mut initial, &self.record.beckoning_rules_from, 0);
@@ -479,15 +497,17 @@ impl ReplaySession {
 }
 
 fn create_initial(record: &ReplayRecord) -> Result<Run, String> {
-    if record.compressed_depths.value_or(false) { return crate::startup::create_avatar_run_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from, &record.avatar_starter_policy); }
-    if record.fast_mode.value_or(false) { return crate::startup::create_avatar_run_fast_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from, &record.avatar_starter_policy); }
+    // A live zero-command upgrade did not generate its starting floors with shards.
+    let birth = if record.phantasmii_birth_shards.value_or(false) { &record.phantasmii_blessings_from } else { &Field::Missing };
+    if record.compressed_depths.value_or(false) { return crate::startup::create_avatar_run_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from, birth, &record.avatar_starter_policy); }
+    if record.fast_mode.value_or(false) { return crate::startup::create_avatar_run_fast_replay_policies(&record.seed, &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from, birth, &record.avatar_starter_policy); }
     if let Some(p) = record.playtest.as_ref() {
         if p.version == 2 {return Err("DEBUG loadout edits are not command-ledger replayable; use the saved session instead.".into());}
-        let run = crate::playtest::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, p.start_floor, &p.profile, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from)?;
+        let run = crate::playtest::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, p.start_floor, &p.profile, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from, birth)?;
         if run.playtest != record.playtest { return Err("Playtest replay starting profile does not match this build.".into()); }
         Ok(run)
     } else if record.playtest.is_missing() {
-        crate::startup::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from, &record.avatar_starter_policy)
+        crate::startup::create_run_revision_replay_policies(&record.seed, &record.mode, record.dev, record.simulation_revision.value_or(29.), &record.amulet_rules_from, &record.potion_rules_from, &record.ring_rules_from, &record.gas_rules_from, &record.future_floor_rules_from, birth, &record.avatar_starter_policy)
     } else { Err("Invalid null playtest replay profile.".into()) }
 }
 
