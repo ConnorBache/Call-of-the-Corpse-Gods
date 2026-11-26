@@ -2602,9 +2602,8 @@ impl Painter {
                 // at the same lower tile padding as grass, including multi-digit links.
                 self.ground_number(&cell.glyph,x,y,cw,ch,gw,gh,ink)
             } else {
-                let (dx,dy)=crate::cogworks_ui::clay_avatar_offset(cell,cw,ch);
-                self.map_identity_aligned(&cell.glyph, x + (cw - gw) / 2 + dx,
-                    y + (ch - gh) / 2 + dy, gw, gh, ink,
+                self.map_identity_aligned(&cell.glyph, x + (cw - gw) / 2,
+                    y + (ch - gh) / 2, gw, gh, ink,
                     cell.bottom_aligned && cell.glyph == "\"")
             };
             for animation in &cell.animations {

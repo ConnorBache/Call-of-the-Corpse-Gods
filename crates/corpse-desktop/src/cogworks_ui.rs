@@ -14,14 +14,6 @@ fn clay_glyph(cell: &mut Cell) {
     cell.underlays.push(("#".into(), CLAY_WALL_ORANGE, 0.82));
 }
 
-/// A slight upper-right offset leaves the hash's lower-left grid visibly
-/// behind the avatar rather than letting the two glyphs become a solid mass.
-pub fn clay_avatar_offset(cell: &Cell, w:i32, h:i32) -> (i32,i32) {
-    if cell.cogworks && cell.label==CLAY_LABEL && cell.glyph=="@" {
-        (w / 7, -(h / 6))
-    } else { (0,0) }
-}
-
 /// O(V + K + C), O(V) temporary bits: V observed grid size, K total stored
 /// modification footprint cells, C projected terrain cells. Called on observation.
 /// Remembered terrain is not a live view. Without saved color provenance, leave

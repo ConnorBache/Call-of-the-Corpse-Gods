@@ -2776,4 +2776,4 @@ Bulwark is drawn at the destination before the expanding green effect. Nova cell
 The desktop death screen presents its notification and waits for fresh Space before the black transition; victory begins fading to white without a pre-fade prompt. The death fade runs once then transitions to the existing results reveal without a second press. These are O(1) presentation flags sampled once per frame, plus the unchanged drawable-size tint work until fade completion. No simulation/save changes or extra event queues.
 
 ### Clay Army tile glyph
-A projected Clay Soldier wall draws the existing full-size wall glyph in darker orange and one smaller, slightly inset orange @ over it. Both are fixed-size clipped glyph masks, using existing terrain layer invalidation and restoration; no actor, light source, pathfinding work, or additional map traversal is added.
+A projected Clay Soldier wall draws the existing full-size wall glyph in darker orange and one smaller orange @ centered on it. Both are fixed-size clipped glyph masks, using existing terrain layer invalidation and restoration; no actor, light source, pathfinding work, or additional map traversal is added.
