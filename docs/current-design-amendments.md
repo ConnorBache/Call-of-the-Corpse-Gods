@@ -1139,16 +1139,21 @@ their original rewards.
 ### R52 Minotaur straight charges
 
 The displayed arrow is a commitment to up to two tile attempts before
-another wind-up. Only a creature physically on the next square in that
+the arrow is renewed. Only a creature physically on the next square in that
 direction can be struck. A spatial link that would divert the charge stops
 it, and neither Confusion nor spending a final attempt can turn a Fast
 follow-up onto a different direction. Walls and impassable corners are
 still solid. Minotaurs charge into hazards; fire contact is registered
 on entry, and a chasm uses the normal creature-fall rules.
 
-A visible wind-up plays a brief white scream wave in reverse, converging
-on the Minotaur when it commits to its new arrow. Old replay commands
-retain their original charge policy.
+Minotaurs do not play a wind-up animation. Old replay commands retain
+their original movement policy.
+
+### R52 Valta moonbeam wind-up
+
+When Valta commits energy to start charging its moonbeam, a brief white
+reverse scream converges on it. The visual plays once per paid charge,
+not while waiting for a clear shot or when releasing the beam.
 
 ### Shards of the Phantasmii and Blessings
 

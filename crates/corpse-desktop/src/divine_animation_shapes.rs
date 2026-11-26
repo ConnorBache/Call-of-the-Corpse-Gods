@@ -120,7 +120,7 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
 #[cfg(test)]mod tests{
  use super::*;use corpse_core::events::{AnimationCue,Delivery,EventPoint,Stage};
  fn event(style:&str)->PresentationEvent{let cells=(-2..=2).flat_map(|y|(-2..=2).map(move|x|EventPoint{x:x as f64,y:y as f64})).collect();PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P01".into(),style:style.into(),stage:Stage::Special,action:1,cells,delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})}}
- #[test]fn minotaur_windup_runs_from_the_outer_ring_to_the_actor(){
+ #[test]fn valta_windup_runs_from_the_outer_ring_to_the_actor(){
   let mut e=event("wave-charge-inward");
   e.animation.as_mut().unwrap().cells=vec![EventPoint{x:4.,y:0.},EventPoint{x:2.,y:0.},EventPoint{x:0.,y:0.}];
   let at=|age|tiles(&e,age,false,[255,255,255]).unwrap().iter().map(|t|t.x).collect::<Vec<_>>();

@@ -4337,10 +4337,6 @@ fn choose_commitment(r: &mut Run, id: f64) -> Result<(), EngineError> {
     a.conditions.insert("monsterChargeDx".into(), d.x as f64);
     a.conditions.insert("monsterChargeDy".into(), d.y as f64);
     a.conditions.insert("monsterChargeRemaining".into(), 2.0);
-    if straight {
-        let a=actor(r,id).unwrap();
-        if !ai::sleeping(a) {crate::animation_enemy::charge_windup(r,a);}
-    }
     Ok(())
 }
 

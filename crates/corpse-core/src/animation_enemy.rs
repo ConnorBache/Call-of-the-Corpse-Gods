@@ -433,8 +433,8 @@ pub fn expired_statuses(r:&Run,before:&Actor) {
 
 }
 
-/// Visible commitments only, a bounded 4-tile inward version of the scream.
-pub fn charge_windup(r:&Run,a:&Actor) {
+/// Visible Valta beam wind-ups only, a bounded 4-tile inverse scream.
+pub fn moonbeam_windup(r:&Run,a:&Actor) {
     if !events::enabled(r) || !events::actor_observed(r,a) {return;}
     let Some(f)=r.floor() else{return;};
     let mut cells=Vec::new();
@@ -443,6 +443,6 @@ pub fn charge_windup(r:&Run,a:&Actor) {
         if dx*dx+dy*dy<=16 && crate::portals::cell(f,x,y).is_some() {cells.push(EventPoint{x,y});}
     }}
     let serial=events::emission_serial();
-    events::cue(r,a,"E09","wave-charge-inward",Stage::Special,&cells);
-    events::decorate(serial,"E09","wave-charge-inward",a.into(),"#ffffff",None);
+    events::cue(r,a,"E49","wave-charge-inward",Stage::Special,&cells);
+    events::decorate(serial,"E49","wave-charge-inward",a.into(),"#ffffff",None);
 }

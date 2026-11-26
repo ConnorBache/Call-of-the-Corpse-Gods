@@ -182,9 +182,7 @@ fn minotaur_finishing_the_last_step_cannot_attack_down_a_new_arrow() {
     let a=&r.actors_at(1.)[0];
     assert_eq!((a.x,a.y),(12.,10.));
     assert_eq!(a.conditions["monsterChargeRemaining"],2.);
-    let windups:Vec<_>=out.events.iter().filter(|e|e.animation.as_ref().is_some_and(|a|a.style=="wave-charge-inward")).collect();
-    assert_eq!(windups.len(),1);
-    assert_eq!((windups[0].to.x,windups[0].to.y),(12.,10.));
+    assert!(!out.events.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.style=="wave-charge-inward")));
 }
 
 #[test]

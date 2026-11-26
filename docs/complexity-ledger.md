@@ -2608,6 +2608,8 @@ placement scan.
 - Accepted movement and chasm transfers reuse ordinary arrival and creature
   fall pipelines; a cold landing may still generate a floor and test its
   cells for landing. Fire contact is local at each step before a Fast follow-up.
+
+### Valta moonbeam wind-up (R52)
 - The wind-up considers only an integer radius-four disc and clips it to
   visible cells. Desktop cost is O(C log C) to prepare its admitted geometry
   and O(C) tile projection per frame, with C at most 49. It adds no simulation RNG.

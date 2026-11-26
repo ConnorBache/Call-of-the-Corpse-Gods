@@ -92,7 +92,11 @@ pub fn special_action(
             .unwrap()
             .conditions
             .insert("laserCharge".into(), 1.0);
-        crate::events::actor_event(r, &a, "pulse", "Charging moonbeam", None, None);
+        if crate::events::enabled(r) {
+            crate::animation_enemy::moonbeam_windup(r, &a);
+        } else {
+            crate::events::actor_event(r, &a, "pulse", "Charging moonbeam", None, None);
+        }
         crate::monster_horn::report(r, &a, &b, "charges a searing moonbeam.");
         return Ok(true);
     }
@@ -101,6 +105,54 @@ pub fn special_action(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn valta_windup_plays_only_when_it_starts_a_paid_moonbeam() {
+        let mut r: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        r.simulation_revision=52.0.into();
+        r.player.x=10.;r.player.y=10.;r.player.hp=1000.;r.player.max_hp=1000.;
+        r.player.abilities.clear();r.player.active.clear();r.player.conditions.clear();
+        let f=r.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);
+        f.doors=crate::Field::Missing;f.portals=crate::Field::Missing;
+        let w=f.width();
+        let mut valta=crate::population::create_actor_revision("valta",900.,15.,10.,false,52.).unwrap();
+        valta.conditions.clear();valta.state="hunting".into();valta.energy=100.;
+        r.actors_at_mut(r.depth).clear();r.actors_at_mut(r.depth).push(valta);
+        let target=r.player.id;
+        let windup=|e:&crate::events::PresentationEvent|e.animation.as_ref()
+            .is_some_and(|a| a.proposal=="E49" && a.style=="wave-charge-inward");
+
+        crate::events::begin();
+        assert!(special_action(&mut r,900.,target,false).unwrap());
+        let paid=crate::events::finish();
+        assert_eq!(condition(actor(&r,900.).unwrap(),"laserCharge"),1.);
+        assert_eq!(actor(&r,900.).unwrap().energy,80.);
+        let cues:Vec<_>=paid.iter().filter(|e|windup(e)).collect();
+        assert_eq!(cues.len(),1);
+        assert_eq!((cues[0].to.x,cues[0].to.y),(15.,10.));
+        assert_eq!(cues[0].animation.as_ref().unwrap().cells.len(),49);
+
+        r.floor_mut().unwrap().tiles[10*w+12]="wall".into();
+        crate::events::begin();
+        assert!(!special_action(&mut r,900.,target,false).unwrap());
+        assert!(!crate::events::finish().iter().any(windup));
+        assert_eq!(condition(actor(&r,900.).unwrap(),"laserCharge"),1.);
+        assert_eq!(actor(&r,900.).unwrap().energy,80.);
+
+        r.floor_mut().unwrap().tiles[10*w+12]="floor".into();
+        crate::events::begin();
+        assert!(special_action(&mut r,900.,target,false).unwrap());
+        let release=crate::events::finish();
+        assert!(!release.iter().any(windup));
+        assert!(release.iter().any(|e|e.animation.as_ref().is_some_and(|a|a.proposal=="E49" && a.style=="bolt-blue")));
+        assert_eq!(condition(actor(&r,900.).unwrap(),"laserCharge"),0.);
+        assert_eq!(actor(&r,900.).unwrap().energy,80.);
+
+        actor_mut_trusted(&mut r,900.).unwrap().energy=19.;
+        crate::events::begin();
+        assert!(!special_action(&mut r,900.,target,false).unwrap());
+        assert!(!crate::events::finish().iter().any(windup));
+        assert_eq!(condition(actor(&r,900.).unwrap(),"laserCharge"),0.);
+    }
     #[test]
     fn moon_matches_frozen_reference() {
         let cases: serde_json::Value =
