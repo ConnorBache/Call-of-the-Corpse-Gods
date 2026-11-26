@@ -1205,6 +1205,8 @@ pub struct EnvironmentalState {
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Floor {
+    #[serde(rename = "stoneSeals", default, skip_serializing_if = "Field::is_missing")]
+    pub stone_seals: Field<Vec<crate::stone_seal_rules::Seal>>,
     #[serde(rename = "phantasmiiShardSeeded", default, skip_serializing_if = "Field::is_missing")]
     pub phantasmii_shard_seeded: Field<bool>,
     #[serde(rename = "revision50Darkness", default, skip_serializing_if = "Field::is_missing")]
@@ -1776,6 +1778,8 @@ pub struct Run {
     pub star_power_from: Field<usize>,
     #[serde(rename = "dreamShardsFrom", default, skip_serializing_if = "Field::is_missing")]
     pub dream_shards_from: Field<usize>,
+    #[serde(rename = "stoneSealFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub stone_seal_from: Field<usize>,
     #[serde(rename = "ichorFireRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub ichor_fire_rules_from: Field<usize>,
     #[serde(rename = "avatarStarterPolicy", default, skip_serializing_if = "Field::is_missing")]

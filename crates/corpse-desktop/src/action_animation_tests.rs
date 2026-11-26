@@ -529,3 +529,81 @@ fn enemy_gasser_scream_only_marks_the_paid_exhalation() {
         assert!(fx.cues.iter().all(|c|!c.event.animation.as_ref().is_some_and(|a|a.proposal=="E56")));
     }
 }
+
+fn placed_bulwark() -> (corpse_core::Run, corpse_core::Run, effects::Effects) {
+    let mut before=room();
+    let id=corpse_core::abilities::BULWARK;
+    before.player.abilities=vec![id.into()];
+    before.player.ability_reserves=Field::Missing;
+    before.player.energy=50.;
+    corpse_core::revision50_ability_energy::initialize_reserve(&mut before.player,id,10.,0.).unwrap();
+    let mut engine=crate::temporal::Engine::new(before.clone()).unwrap();
+    let mut fx=effects::Effects::default();
+    let out=crate::dispatch(&mut engine,&mut fx,500.,&Command::Ability{
+        id:id.into(),target:Field::Missing,x:16.0.into(),y:11.0.into(),
+    }).unwrap();
+    assert!(!out.took_turn);
+    assert_eq!(engine.run.tick,before.tick);
+    assert_eq!(engine.run.player.energy,30.);
+    fx.begin_frame(500.);
+    (before,engine.run.clone(),fx)
+}
+
+#[test]
+fn bulwark_cast_paints_the_glyph_before_the_nonblocking_green_nova() {
+    use corpse_core::animation_shapes::BULWARK_NOVA;
+    let (before,after,fx)=placed_bulwark();
+    let cue=fx.cues.iter().find(|c|c.event.animation.as_ref().is_some_and(|a|a.style==BULWARK_NOVA)).unwrap();
+    assert_eq!(cue.event.to,EventPoint{x:16.,y:11.});
+    assert_eq!(cue.event.color.as_deref(),Some("#56ff37"));
+    assert!(effects::tiles(cue,550.,false).is_empty());
+    let wave=effects::tiles(cue,800.,false);
+    assert!(wave.len()>1 && wave.iter().all(|t|(t.x,t.y)!=(16,11) && t.color==[86,255,55]));
+    assert!(effects::tiles(cue,1200.,false).is_empty());
+    assert!(!fx.presentation_pending(500.) && !fx.presentation_pending(800.));
+    assert!(fx.sequence.view(550.).is_none(),"the live ward must be the base scene");
+    let pre=observe::observe(&before);let post=observe::observe(&after);
+    let has_ward=|v:&View|v.cells.iter().any(|c|(c.x,c.y)==(16,11) && c.animations.iter().any(|a|matches!(a,render::Animation::WardPulse{..})));
+    assert!(!has_ward(&pre) && has_ward(&post));
+    let mut p=Painter::new();p.resize(1280,800);p.set_responsive_canvas(true);
+    let (cw,ch,ox,oy)=p.map_layout(post.width,post.height);
+    let patch=|p:&Painter| {
+        let x=(ox+16*cw) as usize;let y=(oy+11*ch) as usize;
+        (y..y+ch as usize).flat_map(|row|p.pixels[(row*p.width+x)*4..(row*p.width+x+cw as usize)*4].iter().copied())
+            .collect::<Vec<_>>()
+    };
+    p.game_at(&post,"",false,1200.);let bright=patch(&p);
+    p.game_at(&post,"",false,1800.);let dim=patch(&p);
+    let green=|r:&[u8]|r.chunks_exact(4).map(|c|u64::from(c[1])).sum::<u64>();
+    assert!(green(&bright)>green(&dim),"ward's green ink dims between peaks");
+    p.game_at(&post,"",false,1200.);assert_eq!(patch(&p),bright,"pulse is deterministic");
+    let snapshot=post.terrain_snapshot.as_ref().unwrap();
+    let (rebuilt,_,_)=observe::terrain_frame(snapshot,&p.profile,0,1200.);
+    assert!(rebuilt.iter().any(|c|(c.x,c.y)==(16,11) && c.animations.iter().any(|a|matches!(a,render::Animation::WardPulse{..}))));
+}
+
+#[test]
+#[ignore = "explicit review capture; native painter and FFmpeg"]
+fn capture_bulwark_green_nova() {
+    use std::{io::Write, process::{Command as Process,Stdio}};
+    let output=std::env::var("CORPSE_BULWARK_VIDEO").expect("output path");
+    let (before,after,fx)=placed_bulwark();
+    let mut p=Painter::new();p.resize(1280,800);p.set_responsive_canvas(true);
+    let pre=observe::observe_with_profile(&before,&p.profile);
+    let post=observe::observe_with_profile(&after,&p.profile);
+    let (cw,ch,ox,oy)=p.map_layout(post.width,post.height);
+    let crop=format!("crop={}:{}:{}:{},scale=760:-2:flags=neighbor",cw*13,ch*9,ox+8*cw,oy+7*ch);
+    let mut encoder=Process::new("ffmpeg").args(["-hide_banner","-loglevel","error","-y",
+        "-f","rawvideo","-pix_fmt","rgba","-s","1280x800","-r","30","-i","-",
+        "-vf",&crop,"-an","-c:v","libx264","-threads","2","-crf","17","-pix_fmt","yuv420p",
+        "-movflags","+faststart",&output]).stdin(Stdio::piped()).spawn().unwrap();
+    let mut sink=encoder.stdin.take().unwrap();
+    for frame in 0..96 {
+        let now=frame as f64*1000./30.;
+        let view=if now<500. {&pre} else {fx.sequence.view(now).unwrap_or(&post)};
+        p.game_at(view,"",false,now);
+        p.effects(view,&fx.cues,now,false);
+        sink.write_all(&p.pixels).unwrap();
+    }
+    drop(sink);assert!(encoder.wait().unwrap().success());
+}

@@ -418,7 +418,7 @@ pub fn remove(
 fn raised_wall_at(r:&crate::Run,cell:Cell)->bool {
     let Some(f)=crate::dreamwalking::floor_for(r,&r.player) else{return false};
     let Some(at)=crate::portals::cell(f,cell.x as f64,cell.y as f64) else{return false};
-    r.actors_at(r.depth).iter().any(|a|crate::engine::condition(a,"raisedWallExpires")>0.
+    crate::stone_seal_rules::contains(f,at) || r.actors_at(r.depth).iter().any(|a|crate::engine::condition(a,"raisedWallExpires")>0.
         && a.conditions.get("raisedWallIndex")==Some(&(at as f64))
         && a.conditions.get("raisedWallPlane").copied().map(|p|p==1.)
             .unwrap_or_else(||crate::dreamwalking::dream_actor(r,a))==crate::dreamwalking::context_dream(r))

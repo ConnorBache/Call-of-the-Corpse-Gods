@@ -342,7 +342,60 @@ pub fn ability_prompt(run: &Run, id: &str) -> &'static str {
 /// never identifies an unobserved occupant on an otherwise visible square.
 pub fn nightmare_blocker(run: &Run, x: usize, y: usize) -> Option<String> {
     if !vision::visible(run, x, y) { return Some("Select a visible unoccupied square.".into()); }
-    corpse_core::revision50_nightmares::preflight(run, x as f64, y as f64).err()
+    corpse_core::revision50_nightmares::preview(run, x as f64, y as f64).err()
+}
+/// Read-only explanations for already rejected R52 targets. Missing knowledge
+/// never identifies a hidden actor; the core remains authoritative on click.
+pub fn known_target_blocker(
+    run: &Run, id: &str, actor: Option<f64>, x: usize, y: usize,
+) -> Option<&'static str> {
+    if run.simulation_revision.value_or(29.) < 52. { return None; }
+    match id {
+        "numo-mind-slave" | "morae-sever-fate" => {
+            let Some(target) = actor.and_then(|id| corpse_core::engine::actor(run,id))
+                .filter(|a| (a.id==run.player.id || vision::visible_actor(run,a))
+                    && !a.dead.value_or(false) && corpse_core::dreamwalking::same_plane(run,&run.player,a)) else {
+                return Some("Select a visible creature.");
+            };
+            if corpse_core::ahvamitt::is_actor(target) {
+                return Some("The Godbeast will not be swayed.");
+            }
+            if corpse_core::half_here::is_clone(target) {
+                return Some("Half Here is your own body, not an enemy target.");
+            }
+            if id=="numo-mind-slave" && target.hp>0.2*target.max_hp {
+                return Some("Mind Slave requires 20% HP or less.");
+            }
+            if id=="morae-sever-fate" && target.hp>=0.5*target.max_hp {
+                return Some("Sever Fate requires less than 50% HP.");
+            }
+            None
+        },
+        "pelian-bulwark-of-mind" | "anavani-illuminate" => {
+            if !corpse_core::ability_sight::tile(run,x,y) {
+                return Some("Select a visible, unobstructed square.");
+            }
+            if id=="anavani-illuminate" { return None; }
+            let Some(floor)=corpse_core::dreamwalking::floor_for(run,&run.player) else {
+                return Some("Select a visible unoccupied square.");
+            };
+            let Some(at)=corpse_core::portals::cell(floor,x as f64,y as f64) else {
+                return Some("Select a visible unoccupied square.");
+            };
+            if matches!(floor.tiles[at].as_str(),"wall"|"tree")
+                || floor.grates.as_ref().is_some_and(|grates|grates.contains(&(at as f64))) {
+                return Some("A wall, tree, or grate cannot hold the bulwark.");
+            }
+            if std::iter::once(&run.player).chain(run.actors_at(run.depth)).any(|a|
+                !a.dead.value_or(false) && corpse_core::dreamwalking::same_plane(run,&run.player,a)
+                && corpse_core::portals::same_position(run,a,x as f64,y as f64)
+                && (a.id==run.player.id || vision::visible_actor(run,a))) {
+                return Some("Select an unoccupied square.");
+            }
+            None
+        },
+        _ => None,
+    }
 }
 /// O(visibility + actors) for one hovered candidate. No RNG or Run mutation.
 pub fn ability_preview(run: &Run, id: &str, attacker: Option<f64>, hover: Option<(usize,usize)>) -> Vec<(usize,usize)> {
@@ -370,7 +423,18 @@ pub fn ability_preview(run: &Run, id: &str, attacker: Option<f64>, hover: Option
         "ursa-waking-nightmares" => nightmare_blocker(run,x,y).is_none(),
         "pelian-relentless-pursuit" => enemy().is_some(),
         "pelian-fated-duel" => enemy().is_some_and(|a| adjacent_enemy(run,a.id)),
-        "numo-implant-thought" => attacker.map_or_else(||enemy().is_some(),|id|implant_victim_blocker(run,id,x,y).is_none()),
+        "numo-mind-slave" | "morae-sever-fate" if run.simulation_revision.value_or(29.)>=52. => {
+            let target=std::iter::once(&run.player).chain(run.actors_at(run.depth)).find(|a|
+                !a.dead.value_or(false) && corpse_core::dreamwalking::same_plane(run,&run.player,a)
+                && corpse_core::portals::same_position(run,a,x as f64,y as f64)
+                && (a.id==run.player.id || vision::visible_actor(run,a)));
+            known_target_blocker(run,id,target.map(|a|a.id),x,y).is_none()
+        },
+        "pelian-bulwark-of-mind" | "anavani-illuminate" if run.simulation_revision.value_or(29.)>=52. =>
+            known_target_blocker(run,id,None,x,y).is_none(),
+        "numo-implant-thought" => attacker.map_or_else(
+            || implant_attacker_blocker(run, enemy().map(|a| a.id)).is_none(),
+            |id|implant_victim_blocker(run,id,x,y).is_none()),
         _ => false,
     };
     if valid { vec![(x,y)] } else { Vec::new() }
@@ -403,17 +467,31 @@ pub fn pursuit_path(run: &Run) -> Vec<(usize,usize)> {
             && mask.get(y as usize*f.width()+x as usize)==Some(&true))
         .map(|(x,y)|(x as usize,y as usize)).collect()
 }
-pub fn implant_victim_blocker(run: &Run, attacker: f64, x: usize, y: usize) -> Option<&'static str> {
-    let Some(source) = corpse_core::engine::actor(run, attacker).filter(|_| visible_enemy(run, attacker)) else {
-        return Some("The selected enemy is no longer visible.");
+/// Only observed actors can enter the target picker. Ahvamitt is explicitly
+/// immune to being selected as the attacker; leave the core rule unchanged.
+pub fn implant_attacker_blocker(run: &Run, attacker: Option<f64>) -> Option<&'static str> {
+    let Some(id) = attacker.filter(|&id| visible_enemy(run, id)) else {
+        return Some("Select a visible enemy first.");
     };
-    let valid = std::iter::once(&run.player).chain(run.actors_at(run.depth)).any(|a|
+    if corpse_core::engine::actor(run, id).is_some_and(corpse_core::ahvamitt::is_actor) {
+        return Some("The Godbeast will not be swayed.");
+    }
+    None
+}
+
+pub fn implant_victim_blocker(run: &Run, attacker: f64, x: usize, y: usize) -> Option<&'static str> {
+    if let Some(message) = implant_attacker_blocker(run, Some(attacker)) { return Some(message); }
+    let source = corpse_core::engine::actor(run, attacker).unwrap();
+    let Some(victim) = std::iter::once(&run.player).chain(run.actors_at(run.depth)).find(|a|
         a.id != attacker && a.hp > 0. && !a.dead.value_or(false)
         && (a.id == run.player.id || corpse_core::ability_sight::actor(run, a))
         && corpse_core::dreamwalking::same_plane(run, source, a)
         && corpse_core::portals::same_position(run, a, x as f64, y as f64)
-        && corpse_core::portals::actor_chebyshev(run, source, a) <= 1.);
-    (!valid).then_some("Choose a visible creature adjacent to the selected enemy.")
+        && corpse_core::portals::actor_chebyshev(run, source, a) <= 1.) else {
+        return Some("Choose a visible creature adjacent to the selected enemy.");
+    };
+    corpse_core::engine::attack_blocker(run, source, victim, 0., false)
+        .map(|_| "The selected enemy cannot attack that creature.")
 }
 
 #[cfg(test)]
@@ -428,6 +506,31 @@ mod revision50_target_tests {
         assert!(implant_victim_blocker(&run,-12345.,run.player.x as usize,run.player.y as usize).is_some());
         assert_eq!(run,before);
     }
+    #[test] fn implant_aim_checks_immunity_and_real_attack_admission() {
+        let mut run: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.simulation_revision=52.0.into();
+        run.player.x=10.;run.player.y=10.;
+        run.player.stats.perception=300.;
+        run.player.conditions.clear();
+        run.minotaur_bump_from=0usize.into();
+        run.actors_at_mut(run.depth).clear();
+        let f=run.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);
+        f.doors=corpse_core::Field::Missing;f.portals=corpse_core::Field::Missing;
+        let id=run.next_id;
+        let mut enemy=corpse_core::population::create_actor_revision("rat",id,11.,10.,false,52.).unwrap();
+        enemy.state="hunting".into();
+        run.actors_at_mut(run.depth).push(enemy);
+        run.next_id+=1.;
+        let power="numo-implant-thought";
+        assert_eq!(ability_preview(&run,power,None,Some((11,10))),vec![(11,10)]);
+        assert_eq!(ability_preview(&run,power,Some(id),Some((10,10))),vec![(10,10)]);
+        run.actors_at_mut(run.depth)[0].abilities.push("enemy:beast:minotaur".into());
+        assert_eq!(implant_victim_blocker(&run,id,10,10),Some("The selected enemy cannot attack that creature."));
+        assert!(ability_preview(&run,power,Some(id),Some((10,10))).is_empty());
+        run.actors_at_mut(run.depth)[0].conditions.insert("ahvamitt".into(),1.);
+        assert_eq!(implant_attacker_blocker(&run,Some(id)),Some("The Godbeast will not be swayed."));
+        assert!(ability_preview(&run,power,None,Some((11,10))).is_empty());
+    }
     #[test] fn empty_and_invisible_nightmare_targets_do_not_mutate() {
         let mut run: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
         run.simulation_revision=50.0.into();
@@ -438,6 +541,68 @@ mod revision50_target_tests {
         assert!(ability_preview(&run,"ursa-waking-nightmares",None,None).is_empty());
         assert!(pursuit_path(&run).is_empty());
         assert_eq!(run,before);
+    }
+    #[test] fn nightmare_aim_does_not_reveal_unseen_occupants_but_cast_rechecks() {
+        let mut run: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let id=corpse_core::revision50_nightmares::ID;
+        run.simulation_revision=52.0.into();
+        run.player.x=10.;run.player.y=10.;
+        run.player.stats.perception=300.;
+        run.player.abilities=vec![id.into()];
+        run.player.active.clear();run.player.conditions.clear();
+        run.player.nightmares=1.0.into();
+        run.actors_at_mut(run.depth).clear();
+        let f=run.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);
+        f.doors=corpse_core::Field::Missing;f.portals=corpse_core::Field::Missing;
+        assert_eq!(ability_preview(&run,id,None,Some((14,10))),vec![(14,10)]);
+
+        let mut enemy=corpse_core::population::create_actor_revision("rat",run.next_id,14.,10.,false,52.).unwrap();
+        run.next_id+=1.;
+        enemy.conditions.insert("invisible".into(),100.);
+        run.actors_at_mut(run.depth).push(enemy);
+        let before=run.clone();
+        assert_eq!(nightmare_blocker(&run,14,10),None);
+        assert_eq!(ability_preview(&run,id,None,Some((14,10))),vec![(14,10)]);
+        assert_eq!(run,before);
+        assert!(corpse_core::engine::dispatch(&mut run,&corpse_core::Command::Ability {
+            id:id.into(),target:corpse_core::Field::Missing,x:14.0.into(),y:10.0.into(),
+        }).is_err());
+        assert_eq!(run,before);
+
+        run.player.conditions.insert("telepathic".into(),100.);
+        assert!(nightmare_blocker(&run,14,10).is_some());
+        assert!(ability_preview(&run,id,None,Some((14,10))).is_empty());
+    }
+    #[test] fn visible_aim_declines_exact_health_and_terrain_rejections() {
+        let mut run: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        run.simulation_revision=52.0.into();
+        run.player.x=10.;run.player.y=10.;
+        run.player.stats.perception=300.;
+        run.player.conditions.clear();
+        run.actors_at_mut(run.depth).clear();
+        let f=run.floor_mut().unwrap();f.tiles.fill("floor".into());f.lights.fill(100.);
+        f.doors=corpse_core::Field::Missing;f.portals=corpse_core::Field::Missing;
+        let width=f.width();
+        f.tiles[12*width+10]="wall".into();
+        let id=run.next_id;run.next_id+=1.;
+        let mut enemy=corpse_core::population::create_actor_revision("rat",id,11.,10.,false,52.).unwrap();
+        enemy.max_hp=100.;enemy.hp=20.;
+        run.actors_at_mut(run.depth).push(enemy);
+        assert!(known_target_blocker(&run,"numo-mind-slave",Some(id),11,10).is_none());
+        run.actors_at_mut(run.depth)[0].hp=20.5;
+        assert_eq!(known_target_blocker(&run,"numo-mind-slave",Some(id),11,10),Some("Mind Slave requires 20% HP or less."));
+        assert!(known_target_blocker(&run,"morae-sever-fate",Some(id),11,10).is_none());
+        run.actors_at_mut(run.depth)[0].hp=50.;
+        assert_eq!(known_target_blocker(&run,"morae-sever-fate",Some(id),11,10),Some("Sever Fate requires less than 50% HP."));
+
+        let bulwark="pelian-bulwark-of-mind";
+        let sparkle="anavani-illuminate";
+        assert_eq!(known_target_blocker(&run,bulwark,None,11,10),Some("Select an unoccupied square."));
+        run.actors_at_mut(run.depth)[0].conditions.insert("invisible".into(),100.);
+        assert_eq!(ability_preview(&run,bulwark,None,Some((11,10))),vec![(11,10)]);
+        assert!(ability_preview(&run,bulwark,None,Some((10,12))).is_empty());
+        assert_eq!(ability_preview(&run,sparkle,None,Some((10,12))),vec![(10,12)]);
+        assert!(ability_preview(&run,sparkle,None,Some((10,13))).is_empty());
     }
     #[test] fn cogworks_modes_report_wall_limit_and_legacy_has_no_pursuit() {
         let mut run: Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();

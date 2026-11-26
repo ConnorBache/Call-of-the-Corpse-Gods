@@ -26,6 +26,38 @@ pub fn project_kind(r:&Run,a:&Actor,kind:&str)->Option<Actor> {
     shown.conditions.retain(|k,_| !k.starts_with("skinWalker") && !k.starts_with("witchSummoned"));
     Some(shown)
 }
+/// Detached per-observation heart lookup. Build the ID set only if an observed
+/// corpse has a linked, uncollected heart; the heart may have fallen a floor.
+pub struct CorpseHearts<'a> {
+    run: &'a Run,
+    ground: std::cell::OnceCell<std::collections::HashSet<u64>>,
+}
+impl<'a> CorpseHearts<'a> {
+    pub fn new(run: &'a Run) -> Self {
+        Self { run, ground: std::cell::OnceCell::new() }
+    }
+
+    pub fn heartless(&self, a: &Actor) -> bool {
+        use corpse_core::corpses;
+        // Earlier versions set Actor::heartless at death but did not track
+        // the dropped heart ID. Keep their prior display instead of guessing.
+        if self.run.simulation_revision.value_or(29.) < 52. {
+            return corpses::heart_harvested(a);
+        }
+        if corpses::heart_taken(a) { return true; }
+        if let Some(id) = corpses::linked_heart(a) {
+            return !self.ground.get_or_init(|| self.run.ground.values().flat_map(|items| items.iter())
+                .filter(|entry| entry.item.kind == "heart").map(|entry| entry.item.id.to_bits()).collect())
+                .contains(&id.to_bits());
+        }
+        // Born/remade without a heart and corpses placed without a drop.
+        a.heartless.value_or(false)
+    }
+}
+
+pub fn corpse_name(name: &str, heartless: bool) -> String {
+    format!("{}{name} corpse", if heartless { "heartless " } else { "" })
+}
 /// Isolated combat/heart/ability inspection must not re-fetch the hidden actor by ID.
 /// Run clone shares floor cells but copies metadata N; replacing one actor block
 /// costs O(N + A*S), never mutating simulation state.

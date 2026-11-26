@@ -79,7 +79,7 @@ impl Index{
  }
 }
 fn bits(a:f64,b:f64)->bool{a.to_bits()==b.to_bits()}
-fn animation_eq(a:&Animation,b:&Animation)->bool{match(a,b){(Animation::Fire{phase:a,speed:as_,colors:ac},Animation::Fire{phase:b,speed:bs,colors:bc})=>bits(*a,*b)&&bits(*as_,*bs)&&ac==bc,(Animation::Water{phase:a,speed:as_},Animation::Water{phase:b,speed:bs})=>bits(*a,*b)&&bits(*as_,*bs),(Animation::Gas{phase:a,color:ac},Animation::Gas{phase:b,color:bc})|(Animation::Reflection{phase:a,color:ac},Animation::Reflection{phase:b,color:bc})=>bits(*a,*b)&&ac==bc,(Animation::Razorleaves{phase:a,speed:as_,color:ac,opacity:ao},Animation::Razorleaves{phase:b,speed:bs,color:bc,opacity:bo})=>bits(*a,*b)&&bits(*as_,*bs)&&ac==bc&&bits(*ao,*bo),(Animation::Torch,Animation::Torch)=>true,_=>false}}
+fn animation_eq(a:&Animation,b:&Animation)->bool{match(a,b){(Animation::Fire{phase:a,speed:as_,colors:ac},Animation::Fire{phase:b,speed:bs,colors:bc})=>bits(*a,*b)&&bits(*as_,*bs)&&ac==bc,(Animation::Water{phase:a,speed:as_},Animation::Water{phase:b,speed:bs})=>bits(*a,*b)&&bits(*as_,*bs),(Animation::Gas{phase:a,color:ac},Animation::Gas{phase:b,color:bc})|(Animation::Reflection{phase:a,color:ac},Animation::Reflection{phase:b,color:bc})=>bits(*a,*b)&&ac==bc,(Animation::Razorleaves{phase:a,speed:as_,color:ac,opacity:ao},Animation::Razorleaves{phase:b,speed:bs,color:bc,opacity:bo})=>bits(*a,*b)&&bits(*as_,*bs)&&ac==bc&&bits(*ao,*bo),(Animation::WardPulse{speed:a},Animation::WardPulse{speed:b})=>bits(*a,*b),(Animation::Torch,Animation::Torch)=>true,_=>false}}
 /// Exact already-observed paint values. No hashes, live state or float normalization.
 fn paint_eq(a:&Cell,b:&Cell)->bool{
  if a.cogworks!=b.cogworks || a.bottom_aligned!=b.bottom_aligned { return false; }
@@ -150,7 +150,14 @@ impl TilePlanner{
   }
   std::mem::swap(&mut self.current,&mut self.scratch);self.geometry=g;self.valid=true;
  }
- pub fn mark_animation(&mut self,v:&View,p:&Painter,now:f64,reduced:bool){let time=if reduced{0.}else{now};if self.last_time==Some(time.to_bits()){return;}if v.dreamwalking||crate::appearance_light::animated(&p.profile)||crate::appearance_material::animated(&p.profile){for i in 0..self.current.bounds.len(){self.footprint(self.current.bounds[i]);if self.eligibility.enabled{self.eligibility.global_animation_candidates+=1;}}}else{for j in 0..self.current.animated.len(){let i=self.current.animated[j];self.footprint(self.current.bounds[i]);if self.eligibility.enabled{self.eligibility.animated_candidates+=1;}}}self.last_time=Some(time.to_bits());}
+ pub fn mark_animation(&mut self,v:&View,p:&Painter,now:f64,reduced:bool){let time=if reduced{0.}else{now};if self.last_time==Some(time.to_bits()){return;}if v.dreamwalking||crate::appearance_light::animated(&p.profile)||crate::appearance_material::animated(&p.profile){for i in 0..self.current.bounds.len(){self.footprint(self.current.bounds[i]);if self.eligibility.enabled{self.eligibility.global_animation_candidates+=1;}}}else{for j in 0..self.current.animated.len(){let i=self.current.animated[j];self.footprint(self.current.bounds[i]);if self.eligibility.enabled{self.eligibility.animated_candidates+=1;}}}
+  use crate::persistent_ability_overlays::{mark_mind_read, mind_read_ink};
+  if !v.ability_overlays.mind_read.is_empty()
+    && self.last_time.map(|t| mind_read_ink(f64::from_bits(t))) != Some(mind_read_ink(time)) {
+   mark_mind_read(p, v, |rect| self.mark_native_rect(rect));
+  }
+  self.last_time=Some(time.to_bits());
+ }
  /// Rebuild exact mask from retained frame marks; repeated calls preserve marks.
  pub fn finish_damage(&mut self,p:&mut Painter){let _span_timing=corpse_core::timing::span("desktop.tile.span_prepare");p.tile_mask.diagnostics=self.eligibility.enabled;p.tile_mask.reset(p.width,p.height);if self.full{p.tile_mask.add(Rect::new(0,0,p.width,p.height));}else{let g=self.geometry;for &i in &self.tiles{if let Some(r)=p.logical_damage_rect(g.ox+(i%g.w)as i32*g.cw,g.oy+(i/g.w)as i32*g.ch,g.cw,g.ch){p.tile_mask.add(r);}}for &r in &self.rects{p.tile_mask.add(r);}}p.tile_mask.finish();if self.eligibility.enabled{self.eligibility.raw_span_entries=p.tile_mask.raw_entries as u64;self.eligibility.bitset_words_touched=p.tile_mask.words_touched as u64;self.eligibility.bitset_words_scanned=p.tile_mask.words_scanned as u64;self.eligibility.bitset_capacity_bytes=(p.tile_mask.words.capacity()*std::mem::size_of::<u64>())as u64;self.eligibility.merged_span_entries=p.tile_mask.rows.iter().map(Vec::len).sum::<usize>()as u64;self.eligibility.span_capacity_bytes=(p.tile_mask.rows.capacity()*std::mem::size_of::<Vec<(usize,usize)>>()+p.tile_mask.rows.iter().map(|r|r.capacity()*std::mem::size_of::<(usize,usize)>()).sum::<usize>())as u64;}p.tile_clip_enabled=true;}
  /// One global-order cell pass. Only footprint-intersecting layers rasterize.

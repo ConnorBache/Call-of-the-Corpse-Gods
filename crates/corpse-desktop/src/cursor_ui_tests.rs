@@ -227,6 +227,13 @@ fn cursor_native_sdl_production_event_loop_and_captures() {
 }
 
 #[test]
+#[ignore = "Actual SDL targeting loop: SDL_VIDEODRIVER=offscreen, --test-threads=1"]
+fn cogworks_native_sdl_wall_click_reaches_simulation() {
+    let root = std::env::temp_dir().join(format!("corpse-cogworks-wall-{}", std::process::id()));
+    crate::input_loop_tests::native_cogworks_wall(room(), root);
+}
+
+#[test]
 fn cursor_render_keeps_observed_footer_and_does_not_mutate_save() {
     let engine = temporal::Engine::new(room()).unwrap(); let before = engine.save().unwrap();
     let grid = crate::cursor_grid(&engine.run).unwrap(); let mut c = Cursor::default();

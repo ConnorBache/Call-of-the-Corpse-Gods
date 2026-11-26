@@ -40,6 +40,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         riptide_rally_from: Field::Missing,
         star_power_from: Field::Missing,
         dream_shards_from: Field::Missing,
+        stone_seal_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,
         avatar_starter_policy: Field::Missing,
         ember_rules_from: Field::Missing,

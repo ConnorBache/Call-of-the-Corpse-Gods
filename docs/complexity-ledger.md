@@ -2006,6 +2006,11 @@ One keyed `turn_schedule::Schedule<()>` deadline per actor with depleted fortune
 ### Cogworks modes and rally marker
 Cogworks projects its canonical mode to three compact clickable bubbles, with only the selected mode filled (orange during targeting, green otherwise). Existing numeric mode commands remain valid and both retained HUD keys include mode changes. Rally marks only an already knowledge-projected tile: standalone flag on terrain, superscript appended to the highest-priority entity without replacing its glyph/rank; animated terrain rebuilds retain standalone flags. Three-size native render tests compare retained paths and all mode transitions.
 
+The wall mode shares the existing map-click placement path with pit/removal; it no longer stops after preview. No additional targeting work, allocations, or simulation hooks are introduced. The native input regression sends map clicks and checks the five real tiles, shared 200 HP and 20 energy payment.
+
+### Heartless corpse projection
+In R52, naturally heartless corpses and corpses whose exact dropped heart has been collected or destroyed show the existing centered ring. A still-uncollected heart on a different tile or floor remains linked. The first visible corpse requiring ground membership builds one lazy temporary ID set in O(F+G) expected time and O(H) memory, where F is loaded floors, G is ground entries and H is ground hearts; other checks use existing condition and set lookups. Map/sidebar share the set and the one-tile inspector only builds its own if needed. Neither stores it beyond the observation. Historical revisions without dropped-heart tracking retain their prior display. No simulation, drop, revival or save rule changes.
+
 ### Tinkered jewelry display names
 The shared R50+ item-name projection appends the one Tinker grant to canonical ring/amulet names, retaining amulet tiers and using the current Ragelight alias. Existing base grants are not duplicated; Tinker's last added grant supplies the suffix. Stored item name, ID, grants and effects remain unchanged. Pack, ground/inspect, pickup/drop and Tinker log callers already share this projection. Tests cover tier preservation, old revision behavior, read-only state and duplicate prevention.
 
@@ -2755,3 +2760,20 @@ command boundary, item kind/name, active dream state); it uses existing lookups,
 observation and pickup traversals. Waking placement, drift, collapse, and
 ground erasure no longer treat these entries as physical items. Per-run/save
 overhead is one command boundary; old replay prefixes retain the prior rule.
+
+### Stone Seal floor ownership
+
+See [Stone Seal expiry](stone-seal-expiry.md) for the bounded local expiry,
+existing liquid/visibility helper costs, and recorded policy boundary.
+
+### R52 targeting rejection feedback and previews
+Only an active ability aim shows an instruction strip, independent of the inspector and Chronicle. It owns no input. The existing panel damage path marks its one rectangle on change/close; fitting costs O(T log T) worst case in T notice characters, plus drawing the clipped strip, without new observation or simulation. Mind Slave and Sever Fate check a known actor and the existing HP threshold. Bulwark and Sparkle use the existing ability sight/portal route checks; Bulwark adds an O(A) occupancy pass, asking visibility only of actors on the chosen cell. Implant Thought checks the existing attack admission for an observed adjacent victim. Waking Nightmares uses known occupancy for preview only, preserving full commit-time rejection. These add no RNG, new world state, or persistent preview cache.
+
+### R52 Bulwark and Mind Read presentation
+Bulwark is drawn at the destination before the expanding green effect. Nova cell collection is O(r² × visibility cost) with an authored r=2 and radius bounded by 4; its bounded cellular renderer reuses O(C² + 8C log C) propagation over C candidate cells. The ward glyph brightness grade is O(1) per animated ward tile. Mind Read pulse leaves boundary computation unchanged. It grades existing Numo-colored edge strokes over a 2.4 s cycle (24%–46% of original color strength, 35% average). The retained painters mark O(E) existing stroke footprints only when the quantized color changes, E edges; extra work is clipped stroke pixels and damage-span bookkeeping. These effects have no gameplay clocks or RNG.
+
+### R52 terminal notification timing
+The desktop death screen presents its notification and waits for fresh Space before the black transition; victory begins fading to white without a pre-fade prompt. The death fade runs once then transitions to the existing results reveal without a second press. These are O(1) presentation flags sampled once per frame, plus the unchanged drawable-size tint work until fade completion. No simulation/save changes or extra event queues.
+
+### Clay Army tile glyph
+A projected Clay Soldier wall draws the existing full-size wall glyph in darker orange and one smaller, slightly inset orange @ over it. Both are fixed-size clipped glyph masks, using existing terrain layer invalidation and restoration; no actor, light source, pathfinding work, or additional map traversal is added.

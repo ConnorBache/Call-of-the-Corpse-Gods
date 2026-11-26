@@ -19,6 +19,7 @@ pub struct State<'a> {
 enum Input {
     Key(Keycode, Mod, bool),
     Motion((usize, usize)),
+    Click((usize, usize)),
     Toolbar(usize),
     Resize(u32, u32),
 }
@@ -35,12 +36,13 @@ struct Step {
     ability: bool,
     readonly: bool,
     capture: bool,
+    cogworks_wall: Option<(usize, usize)>,
 }
 impl Step {
     fn game(label: &'static str, inputs: Vec<Input>) -> Self {
         Self { label, inputs, screen: Screen::Game, cursor: false, tile: None,
             inventory: false, help: false, resting: false, item: false, ability: false,
-            readonly: true, capture: false }
+            readonly: true, capture: false, cogworks_wall: None }
     }
 }
 struct Script {
@@ -73,6 +75,15 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
                         mousestate: sdl2::mouse::MouseState::from_sdl_state(0),
                         x: (x as f64 * scale * ww as f64 / p.width as f64).round() as i32,
                         y: (y as f64 * scale * wh as f64 / p.height as f64).round() as i32, xrel: 1, yrel: 1 }
+                },
+                Input::Click(tile) => {
+                    let Event::MouseButtonDown { x, y, .. } = cursor_click(p, script.grid, *tile, 0, canvas.window().id()).unwrap() else { unreachable!(); };
+                    let (ww, wh) = canvas.window().size();
+                    let scale = (p.width as f64 / render::WIDTH as f64).min(p.height as f64 / render::HEIGHT as f64);
+                    Event::MouseButtonDown { timestamp: 0, window_id: canvas.window().id(), which: 0,
+                        mouse_btn: MouseButton::Left, clicks: 1,
+                        x: (x as f64 * scale * ww as f64 / p.width as f64).round() as i32,
+                        y: (y as f64 * scale * wh as f64 / p.height as f64).round() as i32 }
                 },
                 Input::Toolbar(action) => {
                     let slot = render::TOOLBAR_VISIBLE_ACTIONS.iter().position(|id| id == action).unwrap();
@@ -116,6 +127,16 @@ pub fn observe(canvas: &mut Canvas<Window>, p: &Painter, state: State<'_>) -> Re
         check(state.item == step.item, "item selector")?;
         check(state.ability == step.ability, "ability selector")?;
         let engine = state.engine.ok_or_else(|| format!("{}: missing run", step.label))?;
+        if let Some((x,y)) = step.cogworks_wall {
+            use corpse_core::revision50_terrain::{Cell, Kind};
+            let floor = engine.run.floor().unwrap();
+            check(floor.revision50_terrain.as_ref().is_some_and(|mods| mods.iter().any(|m|
+                m.kind == Kind::Wall && m.hp == Some(200.) &&
+                m.cells == (-2..=2).map(|dy| Cell { x: x as i32, y: y as i32 + dy }).collect::<Vec<_>>()
+            )), "five-cell shared-HP wall")?;
+            check((y-2..=y+2).all(|row| floor.tiles[row*floor.width()+x] == "wall"), "wall tiles")?;
+            check(engine.run.player.energy == 80., "20-energy payment")?;
+        }
         let save = engine.save().map_err(|e| e.to_string())?;
         if step.readonly {
             if let Some(previous) = &script.previous { check(*previous == save, "simulation/save mutation")?; }
@@ -192,10 +213,43 @@ pub fn native_input_loop(mut r: corpse_core::Run, directory: PathBuf, software: 
     let mut step = Step::game("help-portrait", vec![key(Keycode::F1)]); step.cursor = true; step.help = true; step.capture = true; steps.push(step);
     let mut step = Step::game("help-portrait-close", vec![key(Keycode::Escape)]); step.cursor = true; steps.push(step);
     let mut step = Step::game("cursor-confirm", vec![key(Keycode::Return)]); step.readonly = false; steps.push(step);
+    run_script(directory, software, Some(fixture), grid, steps);
+}
+
+pub fn native_cogworks_wall(mut r: corpse_core::Run, directory: PathBuf) {
+    std::fs::create_dir_all(&directory).unwrap();
+    r.player.abilities = vec!["kative-cogworks".into()];
+    r.player.ability_reserves = Field::Missing;
+    corpse_core::revision50_ability_energy::initialize_reserve(
+        &mut r.player, "kative-cogworks", 10., 0.,
+    ).unwrap();
+    r.player.energy = 100.; r.player.stats.max_energy = 100.;
+    let engine = corpse_core::temporal::Engine::new(r.clone()).unwrap();
+    std::fs::write(directory.join("save.json"),
+        session_store::encode(&engine, session_store::Kind::Genuine).unwrap()).unwrap();
+    let grid = cursor_grid(&r).unwrap();
+    let key = |key| Input::Key(key, Mod::NOMOD, false);
+    let mut start = Step::game("continue-save", vec![key(Keycode::C)]);
+    start.readonly = false;
+    let mut aim = Step::game("aim-wall", vec![key(Keycode::Num1), key(Keycode::Num2)]);
+    aim.ability = true;
+    aim.readonly = false;
+    let mut invalid = Step::game("reject-off-axis-wall", vec![Input::Click((14,11))]);
+    invalid.ability = true;
+    let mut cast = Step::game("click-valid-wall", vec![Input::Click((14,10))]);
+    cast.readonly = false;
+    cast.cogworks_wall = Some((14,10));
+    run_script(directory, true, None, grid, vec![start, aim, invalid, cast]);
+}
+
+fn run_script(directory: PathBuf, software: bool, fixture: Option<PathBuf>, grid: cursor_ui::Grid, steps: Vec<Step>) {
     let expected = steps.len();
     SCRIPT.with(|slot| *slot.borrow_mut() = Some(Script { directory:directory.clone(), grid, steps,
         index:0,pushed:false,previous:None,reports:vec![] }));
-    let mut args = vec!["corpse-desktop".into(),"--fixture".into(),fixture.to_string_lossy().into_owned()];
+    let mut args = vec!["corpse-desktop".into()];
+    if let Some(fixture) = fixture {
+        args.extend(["--fixture".into(), fixture.to_string_lossy().into_owned()]);
+    }
     for (flag,name) in [("--save","save.json"),("--profile","profile.json"),("--appearance","appearance.json"),("--replay-dir","replays")] {
         args.push(flag.into()); args.push(directory.join(name).to_string_lossy().into_owned());
     }

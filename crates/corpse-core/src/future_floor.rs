@@ -90,6 +90,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.riptide_rally_from=r.riptide_rally_from.clone();
     next.star_power_from=r.star_power_from.clone();
     next.dream_shards_from=r.dream_shards_from.clone();
+    next.stone_seal_from=r.stone_seal_from.clone();
     crate::star_power::reconcile(&mut next);
     next.ichor_fire_rules_from=r.ichor_fire_rules_from.clone();
     next.avatar_starter_policy=r.avatar_starter_policy.clone();

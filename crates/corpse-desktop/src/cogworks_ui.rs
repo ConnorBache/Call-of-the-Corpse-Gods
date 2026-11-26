@@ -2,6 +2,26 @@
 use corpse_core::{Run, revision50_terrain::Kind, vision::TerrainObservation};
 use crate::render::Cell;
 
+const CLAY_LABEL: &str = "Clay Soldier (unbreakable wall)";
+const CLAY_AVATAR_ORANGE: [u8;3] = [255, 197, 106];
+const CLAY_WALL_ORANGE: [u8;3] = [241, 105, 25];
+/// Paint the ordinary "#" silhouette under a smaller, brighter "@". Use a
+/// terrain underlay rather than creating an actor in the presentation.
+fn clay_glyph(cell: &mut Cell) {
+    cell.glyph = "@".into();
+    cell.fg = CLAY_AVATAR_ORANGE;
+    cell.emphasis = 0.86;
+    cell.underlays.push(("#".into(), CLAY_WALL_ORANGE, 0.82));
+}
+
+/// A slight upper-right offset leaves the hash's lower-left grid visibly
+/// behind the avatar rather than letting the two glyphs become a solid mass.
+pub fn clay_avatar_offset(cell: &Cell, w:i32, h:i32) -> (i32,i32) {
+    if cell.cogworks && cell.label==CLAY_LABEL && cell.glyph=="@" {
+        (w / 7, -(h / 6))
+    } else { (0,0) }
+}
+
 /// O(V + K + C), O(V) temporary bits: V observed grid size, K total stored
 /// modification footprint cells, C projected terrain cells. Called on observation.
 /// Remembered terrain is not a live view. Without saved color provenance, leave
@@ -33,7 +53,7 @@ pub fn terrain(run: &Run, observation: &TerrainObservation, cells: &mut [Cell]) 
             cell.background_overlay=Some((crate::ability_ui::god_color(10),0.18));
         }
         cell.label=match kind {
-            Kind::ClaySoldier=>"Clay Soldier (unbreakable wall)".into(),
+            Kind::ClaySoldier=>{clay_glyph(cell);CLAY_LABEL.into()},
             Kind::Wall=>format!("Cogworks wall ({}/200 shared HP)",hp.unwrap_or(0.)),
             Kind::Pit=>format!("Cogworks {}",cell.label),
         };
@@ -42,12 +62,14 @@ pub fn terrain(run: &Run, observation: &TerrainObservation, cells: &mut [Cell]) 
 
 /// O(label bytes), detached values only. Used after animated terrain rebuilds.
 pub fn restore_marker(cell: &mut Cell, original: &Cell) {
+    if original.cogworks {
+        cell.cogworks=true;
+        cell.fg=original.fg;
+        cell.background_overlay=original.background_overlay;
+        cell.label=original.label.clone();
+        if original.label==CLAY_LABEL {clay_glyph(cell);}
+    }
     if original.glyph=="⚑" {cell.glyph=original.glyph.clone();cell.fg=original.fg;}
-    if !original.cogworks {return;}
-    cell.cogworks=true;
-    cell.fg=original.fg;
-    cell.background_overlay=original.background_overlay;
-    cell.label=original.label.clone();
 }
 
 #[cfg(test)]
@@ -94,16 +116,20 @@ mod tests {
         run.simulation_revision=50.0.into();let at=cells[0].y*observation.width+cells[0].x;
         observation.cells[at].tile=Some("floor".into());let mut changed=cells.clone();terrain(&run,&observation,&mut changed);assert_eq!(changed,cells);
     }
-    #[test] fn clay_keeps_wall_glyph_and_authored_label_through_reconstruction() {
+    #[test] fn clay_layers_avatar_over_wall_glyph_through_reconstruction() {
         let (mut run,mut observation,mut cells)=fixture();
         run.floor_mut().unwrap().revision50_terrain.as_mut().unwrap()[0].kind=Kind::ClaySoldier;
         let at=cells[0].y*observation.width+cells[0].x;
         observation.cells[at].tile=Some("wall".into());cells[0].glyph="#".into();cells[0].label="wall".into();
         terrain(&run,&observation,&mut cells);
-        assert_eq!(cells[0].label,"Clay Soldier (unbreakable wall)");assert_eq!(cells[0].glyph,"#");
-        assert_eq!(cells[0].fg,crate::ability_ui::god_color(10));
+        assert_eq!(cells[0].label,CLAY_LABEL);assert_eq!(cells[0].glyph,"@");
+        assert_eq!(cells[0].fg,CLAY_AVATAR_ORANGE);
+        assert_eq!(cells[0].underlays.last().map(|g| (&g.0[..],g.1)),Some(("#",CLAY_WALL_ORANGE)));
+        assert_eq!(cells[0].actor_id,None);
         let mut rebuilt=Cell{glyph:"#".into(),..Default::default()};restore_marker(&mut rebuilt,&cells[0]);
-        assert_eq!(rebuilt.label,cells[0].label);assert_eq!(rebuilt.glyph,"#");assert!(rebuilt.cogworks);
+        assert_eq!(rebuilt.label,cells[0].label);assert_eq!(rebuilt.glyph,"@");assert!(rebuilt.cogworks);
+        assert_eq!(rebuilt.emphasis,cells[0].emphasis);
+        assert_eq!(rebuilt.underlays,cells[0].underlays);
     }
     #[test] fn visible_wall_reports_shared_pool_without_leaking_remembered_health() {
         let (mut run,mut observation,mut cells)=fixture();
@@ -115,6 +141,53 @@ mod tests {
         terrain(&run,&observation,&mut cells);assert_eq!(cells,remembered);
     }
 
+    #[test]
+    fn native_clay_soldier_overlay_after_ability_command() {
+        let mut run=corpse_core::startup::create_avatar_run("10-03-09:clay-demo").unwrap();
+        let ability=corpse_core::revision50_terrain::CLAY_ARMY;
+        if !run.player.abilities.iter().any(|id| id==ability) {
+            run.player.abilities.push(ability.into());
+        }
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut run).unwrap();
+        run.player.energy=run.player.energy.max(21.);
+        let mut engine=corpse_core::temporal::Engine::new(run).unwrap();
+        let (from_x, from_y)=(engine.run.player.x as usize,engine.run.player.y as usize);
+        let (to_x, to_y)=corpse_core::movement::DIRECTIONS.iter().find_map(|d| {
+            let x=from_x as i32+d.x;let y=from_y as i32+d.y;
+            corpse_core::revision50_terrain::clay_preview_for_run(&engine.run,x as f64,y as f64)
+                .ok().map(|_|(x,y))
+        }).expect("starting room has a valid Clay Army step");
+        engine.dispatch(&corpse_core::Command::Ability {
+            id:ability.into(),target:corpse_core::Field::Missing,x:(to_x as f64).into(),y:(to_y as f64).into(),
+        }).unwrap();
+        assert_eq!((engine.run.player.x,engine.run.player.y),(to_x as f64,to_y as f64));
+        let view=crate::observe::observe(&engine.run);
+        let soldier=view.cells.iter().take(view.terrain_count).find(|c| c.x==from_x && c.y==from_y).unwrap();
+        assert_eq!(soldier.label,CLAY_LABEL);
+        assert_eq!(soldier.glyph,"@");
+        assert_eq!(soldier.underlays.last().map(|g| g.0.as_str()),Some("#"));
+        assert!(soldier.actor_id.is_none());
+        assert!(!view.creatures.iter().any(|c| c.name.starts_with("Clay Soldier")));
+
+        // Native framebuffer, not a standalone glyph drawing. Live animated
+        // terrain rebuild must carry the same centered overlay.
+        let mut painter=crate::render::Painter::new();
+        painter.resize(2560,1600);
+        painter.set_responsive_canvas(true);
+        painter.game_at(&view,"",false,1250.);
+        if let Ok(directory)=std::env::var("CORPSE_CLAY_CAPTURE") {
+            let write_png=|name:&str,w:u32,h:u32,pixels:&[u8]| {
+                let file=std::fs::File::create(format!("{directory}/{name}.png")).unwrap();
+                let mut png=png::Encoder::new(file,w,h);
+                png.set_color(png::ColorType::Rgba);png.set_depth(png::BitDepth::Eight);
+                png.write_header().unwrap().write_image_data(pixels).unwrap();
+            };
+            write_png("Clay_Army",painter.width as u32,painter.height as u32,&painter.pixels);
+            let (cw,ch,ox,oy)=painter.map_layout(view.width,view.height);
+            let x=ox+cw*from_x as i32;let y=oy+ch*from_y as i32;
+            eprintln!("Clay tile: x={} y={} w={} h={}",x*2,y*2,cw*2,ch*2);
+        }
+    }
 }
 
 pub fn bubble_hit(x:i32,y:i32,left:i32,top:i32)->Option<u8>{

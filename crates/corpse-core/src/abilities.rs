@@ -987,7 +987,11 @@ fn activate_inner(
                 .get_or_insert_with(Default::default)
                 .insert(at.to_string(), expires);
             r.floor_mut().unwrap().dirty = true;
-            crate::events::at(r,"P11","bracket",crate::events::Stage::Special,&[crate::events::EventPoint{x,y}]);
+            if r.simulation_revision.value_or(29.) >= 52. {
+                crate::animation_shapes::bulwark_nova(r, crate::events::EventPoint { x, y });
+            } else {
+                crate::events::at(r,"P11","bracket",crate::events::Stage::Special,&[crate::events::EventPoint{x,y}]);
+            }
             log(r, "You use Bulwark of Mind.", "player");
         }
         SLEEP => {

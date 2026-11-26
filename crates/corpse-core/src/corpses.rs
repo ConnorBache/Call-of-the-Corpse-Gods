@@ -30,8 +30,17 @@ pub(crate) fn record_heart_pickups(r: &mut Run, ids: &std::collections::HashSet<
     }
 }
 
+/// Stable identity of the heart left on the ground by this death, if any.
+pub fn linked_heart(a: &Actor) -> Option<f64> {
+    a.conditions.get(HEART_ITEM).copied()
+}
+
+/// Collection is independent of whether the player has stepped on the corpse.
+pub fn heart_taken(a: &Actor) -> bool {
+    a.conditions.contains_key(HEART_TAKEN)
+}
 pub fn heart_harvested(a: &Actor) -> bool {
-    a.conditions.contains_key(STOMPED) && a.conditions.contains_key(HEART_TAKEN)
+    a.conditions.contains_key(STOMPED) && heart_taken(a)
 }
 pub fn has_permanent_burning(a: &Actor) -> bool {
     a.abilities.iter().any(|x| x == "enemy:beast:everburn")

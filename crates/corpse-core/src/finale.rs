@@ -360,6 +360,7 @@ fn erode(r: &mut Run, depth: u32, cells: &[usize]) {
     let f = crate::mutation_journal::make_mut(r.floors.iter_mut().find(|f| f.depth == depth as f64).unwrap());
     let w = f.width();
     let changed: HashSet<_> = cells.iter().copied().collect();
+    crate::stone_seal_rules::forget_where(f, |cell| changed.contains(&cell));
     for &i in cells {
         f.tiles[i] = "chasm".into();
         for layer in [&mut f.ichor,&mut f.slime,&mut f.mud,&mut f.roots,&mut f.razorleaves,&mut f.currents,&mut f.water_blood] {

@@ -73,7 +73,56 @@ fn shown_actor(v: &View, id: f64) -> &Cell {
 }
 
 #[test]
-fn corpse_covers_its_heart_and_gets_circle_only_after_stomp_and_pickup() {
+fn jackal_death_displays_immediate_heartless_corpse_on_map_and_inspector() {
+    let mut r = color_room(52.);
+    let mut a = corpse_core::population::create_actor_revision("pale:Jackal", 80., 13., 10., false, 52.).unwrap();
+    assert!(a.heartless.value_or(false), "R52 Jackals are born heartless");
+    a.hp = 0.;
+    r.actors_at_mut(1.).push(a);
+    corpse_core::engine::death_if_nonpositive(&mut r, 80.).unwrap();
+    let loaded = corpse_core::storage::deserialize(&corpse_core::storage::serialize(&r).unwrap()).unwrap();
+    assert!(loaded.ground.get("1").is_none_or(|items| items.is_empty()));
+    assert!(!corpse_core::corpses::heart_harvested(&loaded.actors_at(1.)[0]));
+    let view = crate::observe::observe(&loaded);
+    let corpse = shown_actor(&view, 80.);
+    assert!(corpse.corpse && corpse.heartless);
+    let report = crate::inspection_ui::observe_tile(&loaded, 13, 10);
+    assert!(report.scene.contains("heartless pale jackal corpse"), "{}", report.scene);
+}
+
+#[test]
+fn corpse_stays_regular_while_its_heart_exists_and_marks_pickup_without_a_stomp() {
+    let mut r = color_room(52.);
+    let mut a = corpse_core::population::create_actor_revision("rat", 80., 13., 10., false, 52.).unwrap();
+    a.hp = 0.;
+    r.actors_at_mut(1.).push(a);
+    corpse_core::engine::death_if_nonpositive(&mut r, 80.).unwrap();
+    let mut heart = r.ground_at_mut(1.).pop().unwrap();
+    let other_heart = corpse_core::inventory::heart_for_revision(&r.actors_at(1.)[0], 999., 52.).unwrap();
+    r.ground_at_mut(1.).push(corpse_core::GroundItem { item: other_heart, ..heart.clone() });
+    heart.x = 12.;
+    r.ground_at_mut(2.).push(heart.clone());
+    assert!(!shown_actor(&crate::observe::observe(&r), 80.).heartless);
+    assert!(!crate::inspection_ui::observe_tile(&r, 13, 10).scene.contains("heartless"));
+    // Destruction, rather than collection, also removes the linked heart.
+    let mut erased = r.clone();
+    erased.ground_at_mut(2.).clear();
+    assert!(shown_actor(&crate::observe::observe(&erased), 80.).heartless);
+    // Pick it up away from the corpse, with no stomp. Another same-species
+    // heart on the body does not count as this body's heart.
+    r.ground_at_mut(2.).clear();
+    r.ground_at_mut(1.).push(heart);
+    r.player.x = 12.;
+    assert_eq!(corpse_core::inventory::collect_underfoot(&mut r, 10.).unwrap(), 1);
+    assert!(!corpse_core::corpses::heart_harvested(&r.actors_at(1.)[0]));
+    let view = crate::observe::observe(&r);
+    assert!(shown_actor(&view, 80.).heartless);
+    assert!(view.ground_entities.iter().any(|e| e.id == 80_f64.to_bits() && e.name.starts_with("heartless ")));
+    assert!(crate::inspection_ui::observe_tile(&r, 13, 10).scene.contains("heartless"));
+}
+
+#[test]
+fn corpse_covers_its_heart_and_gets_circle_after_pickup() {
     let mut r = color_room(52.);
     let mut a = corpse_core::population::create_actor_revision("rat",80.,13.,10.,false,52.).unwrap();
     a.hp = 0.;
@@ -174,7 +223,7 @@ fn corpse_color_survives_actual_death_save_and_revival_without_new_fields() {
         assert_eq!(loaded.actors_at(1.)[0].color,"#3bcda6");
         let before=corpse_core::storage::serialize(&loaded).unwrap();
         let view=crate::observe::observe(&loaded);let corpse=shown_actor(&view,80.);
-        assert!(corpse.corpse);assert!(!corpse.heartless);
+        assert!(corpse.corpse);assert_eq!(corpse.heartless,revision>=52.);
         assert_eq!(corpse.entity_ink.unwrap().color,shown_actor(&live,80.).entity_ink.unwrap().color);
         assert_eq!(corpse.glyph,shown_actor(&live,80.).glyph);
         assert_eq!(corpse_core::storage::serialize(&loaded).unwrap(),before,"observation never rewrites a legacy save");

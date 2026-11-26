@@ -1,13 +1,16 @@
 //! Detached tile-only animation patterns. Geometry is restricted to admitted receipt cells.
 //! No gameplay RNG or simulation mutation. Nova is a small deterministic cellular wave.
 use crate::{effects::{Tile, MAGIC_CELL_MS},render::Rgb};
-use corpse_core::events::PresentationEvent;
+use corpse_core::{animation_shapes::BULWARK_NOVA, events::PresentationEvent};
+const WARD_LEAD_MS: f64 = 110.;
+const WARD_WAVE_MS: f64 = 470.;
 use std::collections::{BTreeMap,BTreeSet};
 pub fn duration(e:&PresentationEvent)->Option<f64>{
  let a=e.animation.as_ref()?;let s=a.style.as_str();
  if let Some(d)=s.strip_prefix("line-hold:").or_else(||s.strip_prefix("moving-actor:")).and_then(|d|d.parse().ok()){return Some(d)}
  if s=="moving-actor-commandment"{Some(240.)}
  else if s==corpse_core::animation_shapes::SHORT_NOVA {Some(360.)}
+ else if s==BULWARK_NOVA {Some(WARD_LEAD_MS+WARD_WAVE_MS)}
  else if s.starts_with("nova-"){Some(if s.ends_with("large"){1800.}else{1200.})}
  else if s.starts_with("box-"){Some(500.)}
  else if s=="line-grow"||s=="line-hold"{Some(a.cells.len().max(1) as f64*MAGIC_CELL_MS+50.)}
@@ -22,7 +25,11 @@ pub fn duration(e:&PresentationEvent)->Option<f64>{
 fn nova_color(s:&str,default:Rgb)->Rgb{if s.contains("redorange"){return [255,75,30]}for(word,c)in[("red",[255,35,55]),("blue",[50,130,255]),("green",[65,255,90]),("black",[0,0,0]),("orange",[255,145,30]),("yellow",[255,240,45]),("pink",[255,105,210])]{if s.contains(word){return c}}default}
 pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<Tile>>{
  let a=e.animation.as_ref()?;let total=duration(e)?;let s=a.style.as_str();
- if age<0.||age>=total{return Some(vec![])}
+ let ward=s==BULWARK_NOVA;
+ if age<0.||age>=total || (ward && age<WARD_LEAD_MS) {return Some(vec![])}
+ // The live ward has already been painted. Start the decorative wake after
+ // that lead and never cover the central glyph with a full-tile flash.
+ let (age,total)=if ward {(age-WARD_LEAD_MS,WARD_WAVE_MS)}else{(age,total)};
  let white=s==corpse_core::banshee_rules::WHITE_WAVE;
  if white || s==corpse_core::banshee_rules::PURPLE_WAVE {
   let color=if white{[255,255,255]}else{[185,75,255]};
@@ -38,11 +45,11 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
   }).collect())
  }
  let center=(e.to.x.round() as i32,e.to.y.round() as i32);
- let mut color=if s=="wave-reveal-telepathy"{[45,140,255]}else if s=="wave-reveal-fire"{[255,90,20]}else if s=="wave-reveal-darkness"{[0,0,0]}else if s=="wave-reveal-shattering"{[90,210,255]}else if s=="wave-reveal-yellow"{[255,235,45]}else if s=="wave-reveal-white"{[255,255,255]}else if s=="wave-reveal-purple"{[185,75,255]}else if s.starts_with("nova-") && s!=corpse_core::animation_shapes::SHORT_NOVA {nova_color(s,default)}else{default};
+ let mut color=if s=="wave-reveal-telepathy"{[45,140,255]}else if s=="wave-reveal-fire"{[255,90,20]}else if s=="wave-reveal-darkness"{[0,0,0]}else if s=="wave-reveal-shattering"{[90,210,255]}else if s=="wave-reveal-yellow"{[255,235,45]}else if s=="wave-reveal-white"{[255,255,255]}else if s=="wave-reveal-purple"{[185,75,255]}else if s.starts_with("nova-") && s!=corpse_core::animation_shapes::SHORT_NOVA && !ward {nova_color(s,default)}else{default};
  if s=="light100"||s.starts_with("moving-actor"){color=[255,255,255];}
  let make=|x,y,light,glyph|Tile{x,y,color,light,field_strength:if s=="light100"||s.starts_with("moving-actor"){1.}else{0.85},glyph,mark:None};
  if s=="thread-grow"{return Some(vec![])}
- if reduced{return Some(a.cells.iter().map(|p|make(p.x as i32,p.y as i32,0.55,None)).collect())}
+ if reduced{return Some(a.cells.iter().filter(|p| !ward || (p.x as i32,p.y as i32)!=center).map(|p|make(p.x as i32,p.y as i32,if ward {0.20}else{0.55},None)).collect())}
  let phase=(age/total).clamp(0.,1.);
  let allowed:BTreeSet<_>=a.cells.iter().map(|p|(p.x as i32,p.y as i32)).collect();
  if s=="wave-charge-inward" {
@@ -79,7 +86,7 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
     if born.get(&p).is_none_or(|old|arrival<*old){born.insert(p,arrival);}
    }}
   }
-  if s==corpse_core::animation_shapes::SHORT_NOVA {
+  if s==corpse_core::animation_shapes::SHORT_NOVA || ward {
    // Clipped footprints can have disconnected islands. Illuminate only the
    // admitted cells, using distance for cells that had no visible connection.
    for &p in &allowed {
@@ -93,6 +100,7 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
   let propagation=total*0.45;
   let fade=total*0.55;
   return Some(born.into_iter().filter_map(|((x,y),arrival)|{
+   if ward && (x,y)==center {return None;}
    let t=age-arrival as f64/max*propagation;
    (t>=0.&&t<fade).then(||{let mut tile=make(x,y,0.95*(1.-t/fade),None);
     if s.contains("rainbow"){let colors=[[255,45,55],[255,150,30],[255,240,45],[60,255,100],[50,160,255],[170,70,255]];tile.color=colors[((arrival/100)as usize+(x-center.0).unsigned_abs()as usize)%colors.len()];}tile

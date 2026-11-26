@@ -32,7 +32,15 @@ pub const LICHOR:&str="#ff3f8e";
 pub const ANAVANI:&str="#fff0a3";
 pub const MORAE:&str="#f36cff";
 
-fn nova_colored(r:&Run,a:&Actor,key:&str,style:&str,radius:i32,color:&str) {
+/// Presentation-only cue centered on the placed ward, not the caster.
+pub const BULWARK_NOVA: &str = "nova-bulwark-green";
+pub fn bulwark_nova(r: &Run, center: EventPoint) {
+    if !events::enabled(r) || !crate::vision::directly_visible_tile(r, center.x as usize, center.y as usize) { return; }
+    let serial = events::emission_serial();
+    events::at(r, "P11", BULWARK_NOVA, Stage::Special, &nova_cells(&center, 2));
+    events::decorate(serial, "P11", BULWARK_NOVA, center, "#56ff37", None);
+}
+fn nova_cells(center: &EventPoint, radius: i32) -> Vec<EventPoint> {
     // Lobed radial envelope: the old square was an unintended visible boundary.
     // The extra two cells leave room for wisps beyond the nominal radius, but
     // admission still goes through the ordinary visibility-filtered cue path.
@@ -43,9 +51,13 @@ fn nova_colored(r:&Run,a:&Actor,key:&str,style:&str,radius:i32,color:&str) {
         let angle=(dy as f64).atan2(dx as f64);
         let edge=radius as f64+0.7+0.65*(3.*angle+0.4).sin()+0.55*(5.*angle-0.8).cos();
         if ((dx*dx+dy*dy) as f64).sqrt()<=edge.max(1.) {
-            cells.push(EventPoint{x:a.x+f64::from(dx),y:a.y+f64::from(dy)});
+            cells.push(EventPoint{x:center.x+f64::from(dx),y:center.y+f64::from(dy)});
         }
     }}
+    cells
+}
+fn nova_colored(r:&Run,a:&Actor,key:&str,style:&str,radius:i32,color:&str) {
+    let cells = nova_cells(&a.into(), radius);
     let serial=events::emission_serial();
     events::cue(r,a,key,style,Stage::Special,&cells);
     events::decorate(serial,key,style,a.into(),color,None);

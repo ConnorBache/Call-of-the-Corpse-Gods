@@ -183,6 +183,7 @@ pub fn validate(run: &Run) -> Result<()> {
     crate::beckoning_rules::validate(run).map_err(StorageError)?;
     crate::star_power::validate(run).map_err(StorageError)?;
     crate::phantasmii_blessing_rules::validate_dream_shards(run).map_err(StorageError)?;
+    crate::stone_seal_rules::validate(run).map_err(StorageError)?;
     crate::ichor_fire_rules::validate(run).map_err(StorageError)?;
     crate::future_floor::validate(run).map_err(StorageError)?;
     crate::firebolt_travel::validate(run).map_err(StorageError)?;

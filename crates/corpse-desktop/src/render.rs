@@ -80,6 +80,7 @@ pub enum Animation {
     Gas { phase: f64, color: Rgb },
     Reflection { phase: f64, color: Rgb },
     Razorleaves { phase: f64, speed: f64, color: Rgb, opacity: f64 },
+    WardPulse { speed: f64 },
     Torch,
 }
 #[derive(Clone, Copy, PartialEq)]
@@ -2544,8 +2545,15 @@ impl Painter {
             }
             let mut ink = cell_fg;
             for animation in &cell.animations {
-                if let Animation::Fire { phase,speed,colors } = animation {
-                    ink=crate::appearance_material::fire_ink(*colors,*phase,*speed,now);
+                match *animation {
+                    Animation::Fire { phase,speed,colors } =>
+                        ink=crate::appearance_material::fire_ink(colors,phase,speed,now),
+                    Animation::WardPulse { speed } if now > 0. => {
+                        // Pulse the ward's glyph, not the underlying tile or actors.
+                        let wave = (now * speed * std::f64::consts::TAU / 1200.).cos();
+                        ink = crate::color::composite(cell_bg, cell_fg, 0.76 + 0.24 * wave);
+                    }
+                    _ => {}
                 }
             }
             if cell.fire_flicker && now > 0. {
@@ -2594,8 +2602,9 @@ impl Painter {
                 // at the same lower tile padding as grass, including multi-digit links.
                 self.ground_number(&cell.glyph,x,y,cw,ch,gw,gh,ink)
             } else {
-                self.map_identity_aligned(&cell.glyph, x + (cw - gw) / 2,
-                    y + (ch - gh) / 2, gw, gh, ink,
+                let (dx,dy)=crate::cogworks_ui::clay_avatar_offset(cell,cw,ch);
+                self.map_identity_aligned(&cell.glyph, x + (cw - gw) / 2 + dx,
+                    y + (ch - gh) / 2 + dy, gw, gh, ink,
                     cell.bottom_aligned && cell.glyph == "\"")
             };
             for animation in &cell.animations {
@@ -2606,7 +2615,7 @@ impl Painter {
             if now > 0. {
                 for animation in &cell.animations {
                     match *animation {
-                        Animation::Water { .. } | Animation::Razorleaves { .. } => {}
+                        Animation::Water { .. } | Animation::Razorleaves { .. } | Animation::WardPulse { .. } => {}
                         Animation::Gas { phase, color } => {
                             let pulse = 0.5 + 0.5 * (now / 1900. + phase).sin();
                             self.blend_rect(x,y,cw,ch,color,((0.012+pulse*0.018)*255.) as u8);
@@ -2883,7 +2892,7 @@ impl Painter {
             }
         }
         } // interaction marks
-        if map_damage { crate::persistent_ability_overlays::paint(self,v); crate::perception_ui::paint(self,v); }
+        if map_damage { crate::persistent_ability_overlays::paint(self,v,now); crate::perception_ui::paint(self,v); }
         let footer_top=self.frame().map.1+self.frame().map.3;
         if self.intersects_damage(0,footer_top,self.logical_width(),self.logical_height()-footer_top) {
         #[cfg(test)]

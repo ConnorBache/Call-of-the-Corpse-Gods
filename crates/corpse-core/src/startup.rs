@@ -565,6 +565,7 @@ pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, r
         riptide_rally_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         star_power_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         dream_shards_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        stone_seal_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         ichor_fire_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         future_floor_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         future_floor: None,

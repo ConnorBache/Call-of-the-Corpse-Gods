@@ -13,8 +13,18 @@ pub fn enabled(r: &Run) -> bool { r.simulation_revision.value_or(29.) >= 50. }
 pub fn preflight(r: &Run, x: f64, y: f64) -> Result<(), String> {
     preflight_for(r,r.player.id,x,y)
 }
+/// Player aiming uses the same admission except that unknown occupants never
+/// change the preview. The command still checks actual occupancy before paying.
+pub fn preview(r: &Run, x: f64, y: f64) -> Result<(), String> {
+    admission(r, r.player.id, x, y, true)
+}
+
 /// Explicit independent owner and target; caller chooses the square, not this API.
 pub fn preflight_for(r: &Run, owner_id: f64, x: f64, y: f64) -> Result<(), String> {
+    admission(r, owner_id, x, y, false)
+}
+
+fn admission(r: &Run, owner_id: f64, x: f64, y: f64, known_only: bool) -> Result<(), String> {
     if !enabled(r) { return Err("Waking Nightmares requires revision 50.".into()); }
     let p=crate::engine::actor(r,owner_id).ok_or("Nightmare owner is missing.")?;
     if crate::half_here::is_clone(p) || is_decoy(p) {return Err("Nightmares require an independent owner.".into());}
@@ -40,6 +50,7 @@ pub fn preflight_for(r: &Run, owner_id: f64, x: f64, y: f64) -> Result<(), Strin
         !a.dead.value_or(false) && a.hp > 0.
             && crate::dreamwalking::same_plane(r, p, a)
             && crate::portals::same_position(r, a, x, y)
+            && (!known_only || a.id == r.player.id || crate::vision::visible_actor(r, a))
     }) || !crate::vision::visible_from(r, p, x as usize, y as usize) {
         return Err("Select a visible unoccupied square.".into());
     }

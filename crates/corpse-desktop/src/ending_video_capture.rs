@@ -40,7 +40,7 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &Canvas<Window>) -> Result<(), String> {
     })
 }
 
-pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &str, prompt: bool, result_tint: Option<([u8; 3], u8)>) -> Result<bool, String> {
+pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &str, prompt: bool, world_tint: Option<([u8; 3], u8)>, result_tint: Option<([u8; 3], u8)>) -> Result<bool, String> {
     CAPTURE.with(|capture| {
         let mut capture=capture.borrow_mut();
         let Some(c)=capture.as_mut() else{return Ok(false);};
@@ -54,15 +54,24 @@ pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &
                 "-c:v","libx264","-threads","2","-crf","18","-pix_fmt","yuv420p","-movflags","+faststart"])
                 .arg(&c.destination).stdin(Stdio::piped()).spawn().map_err(|e|e.to_string())?);
         }
-        if condition==c.expected && prompt {
-            c.prompt_at.get_or_insert_with(Instant::now);
-            let expected_ink=if condition=="won" {255} else {0};
-            assert_eq!(&p.pixels[..4], &[expected_ink,expected_ink,expected_ink,255]);
-            assert_eq!(&p.pixels[p.pixels.len()-4..], &[expected_ink,expected_ink,expected_ink,255]);
+        if condition==c.expected {
+            if !c.space_sent && condition=="dead" {
+                assert!(world_tint.is_none(), "death must not fade before the prompt is acknowledged");
+            }
+            if prompt {
+                c.prompt_at.get_or_insert_with(Instant::now);
+                if condition=="won" {
+                    assert_eq!(world_tint, Some(([255;3],255)), "escape fades before waiting for Space");
+                    assert_eq!(&p.pixels[..4], &[255;4]);
+                    assert_eq!(&p.pixels[p.pixels.len()-4..], &[255;4]);
+                } else {
+                    assert!(world_tint.is_none(), "death prompt is drawn over the intact floor");
+                }
+            }
         }
         if elapsed >= c.next_frame {
             let corner=p.pixels[0];
-            if condition==c.expected && !prompt && c.previous_corner.is_some_and(|prev| prev!=corner) {c.changing_frames+=1;}
+            if condition==c.expected && world_tint.is_some() && !prompt && c.previous_corner.is_some_and(|prev| prev!=corner) {c.changing_frames+=1;}
             c.previous_corner=Some(corner);
             let out=c.encoder.as_mut().unwrap().stdin.as_mut().unwrap();
             while elapsed >= c.next_frame {

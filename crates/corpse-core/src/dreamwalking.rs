@@ -160,6 +160,7 @@ pub fn ensure_layer(r:&mut Run) {
     let d=r.depth;
     if r.dreamwalking.as_ref().is_some_and(|s|s.floors.iter().any(|f|f.depth==d)) {return}
     let Some(mut f)=r.floor().cloned() else{return};
+    crate::stone_seal_rules::strip_copied_seals(&mut f);
     f.environment=Field::Missing;f.vents=Field::Missing;f.permanent_fire=Field::Missing;
     f.fungal_roots=Field::Missing;f.roots=Field::Missing;f.razorleaves=Field::Missing;
     f.blood=Field::Missing;f.water_blood=Field::Missing;f.kelpie_blood_sources=Field::Missing;

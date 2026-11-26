@@ -111,15 +111,42 @@ pub fn paint_thread(p:&mut Painter,layout:(i32,i32,i32,i32),cells:&[(usize,usize
         p.faint_line(x0,y0,x1,y1,color,alpha);
     }
 }
-pub fn paint(p:&mut Painter,v:&View){
-    let(cw,ch,ox,oy)=p.map_layout(v.width,v.height);let old=p.clip;
+const MIND_READ_PERIOD_MS: f64 = 2400.;
+
+/// Preserve Numo's green hue. Average stroke brightness is 35% with a
+/// 24%–46% breathing range; the dark rim stays still for legibility.
+pub fn mind_read_ink(now: f64) -> [u8; 3] {
+    let phase = now.rem_euclid(MIND_READ_PERIOD_MS) / MIND_READ_PERIOD_MS;
+    let gain = 0.35 + 0.11 * (std::f64::consts::TAU * phase).sin();
+    crate::ability_ui::god_color(3).map(|channel| (f64::from(channel) * gain).round() as u8)
+}
+
+fn edge_rect(e: &Edge, (cw, ch, ox, oy): (i32, i32, i32, i32), w: usize, h: usize) -> (i32, i32, i32, i32) {
+    let x = ox + e.x as i32 * cw - i32::from(e.x == w);
+    let y = oy + e.y as i32 * ch - i32::from(e.y == h);
+    (x, y, if e.vertical { 2 } else { cw + 1 }, if e.vertical { ch + 1 } else { 2 })
+}
+
+/// Only the inner stroke changes with time. This leaves the retained idle
+/// redraw proportional to outline length instead of invalidating the map.
+pub fn mark_mind_read(p: &Painter, v: &View, mut mark: impl FnMut(crate::render::damage::Rect)) {
+    if v.ability_overlays.mind_read.is_empty() { return; }
+    let layout = p.map_layout(v.width, v.height);
+    for edge in &v.ability_overlays.mind_read {
+        let (x, y, w, h) = edge_rect(edge, layout, v.width, v.height);
+        if let Some(rect) = p.logical_damage_rect(x, y, w, h) { mark(rect); }
+    }
+}
+
+pub fn paint(p:&mut Painter,v:&View,now:f64){
+    let layout = p.map_layout(v.width, v.height);
+    let(cw,ch,ox,oy)=layout;let old=p.clip;
     p.clip=Some((ox,oy,cw*v.width as i32,ch*v.height as i32));
     for (edges,color) in [(&v.ability_overlays.entropy,[255,255,255]),
-        (&v.ability_overlays.mind_read,crate::ability_ui::god_color(3))] {for e in edges {
-        let x=ox+e.x as i32*cw-i32::from(e.x==v.width);
-        let y=oy+e.y as i32*ch-i32::from(e.y==v.height);
-        p.rect(x-1,y-1,if e.vertical{3}else{cw+3},if e.vertical{ch+3}else{3},[15,15,22]);
-        p.rect(x,y,if e.vertical{2}else{cw+1},if e.vertical{ch+1}else{2},color);
+        (&v.ability_overlays.mind_read,mind_read_ink(now))] {for e in edges {
+        let (x,y,w,h)=edge_rect(e,layout,v.width,v.height);
+        p.rect(x-1,y-1,w+1+i32::from(!e.vertical),h+1+i32::from(e.vertical),[15,15,22]);
+        p.rect(x,y,w,h,color);
     }}
     for pair in v.ability_overlays.riptide.windows(2){
         let((ax,ay),(bx,by))=(pair[0],pair[1]);
@@ -250,13 +277,136 @@ pub fn paint(p:&mut Painter,v:&View){
     }
     #[test] fn mind_read_outline_uses_numo_ink_and_same_entropy_stroke() {
         let r=mind_run();let mut v=crate::observe::observe(&r);
-        let mut p=Painter::new();p.resize(1280,800);paint(&mut p,&v);
-        let green=crate::ability_ui::god_color(3);
+        let mut p=Painter::new();p.resize(1280,800);paint(&mut p,&v,0.);
+        let green=mind_read_ink(0.);
         let green_mask=p.pixels.chunks_exact(4).map(|c|c[..3]==green).collect::<Vec<_>>();
         assert!(green_mask.iter().any(|&v|v));
         v.ability_overlays.entropy=std::mem::take(&mut v.ability_overlays.mind_read);
-        let mut white=Painter::new();white.resize(1280,800);paint(&mut white,&v);
+        let mut white=Painter::new();white.resize(1280,800);paint(&mut white,&v,0.);
         assert_eq!(green_mask,white.pixels.chunks_exact(4).map(|c|c[..3]==[255,255,255]).collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn mind_read_pulse_is_dim_continuous_and_periodic() {
+        let green = crate::ability_ui::god_color(3);
+        let frames: Vec<_> = (0..240).map(|i| mind_read_ink(f64::from(i) * 10.)).collect();
+        for channel in 0..3 {
+            assert!(frames.iter().all(|ink| ink[channel] <= (f64::from(green[channel]) * 0.46).round() as u8));
+            let mean = frames.iter().map(|ink| f64::from(ink[channel])).sum::<f64>() / frames.len() as f64;
+            assert!((mean / f64::from(green[channel]) - 0.35).abs() < 0.01);
+            assert!(frames.windows(2).all(|pair| pair[0][channel].abs_diff(pair[1][channel]) <= 1));
+        }
+        assert_ne!(mind_read_ink(600.), mind_read_ink(1800.));
+        assert_eq!(mind_read_ink(0.), mind_read_ink(MIND_READ_PERIOD_MS));
+    }
+
+    #[test]
+    fn mind_read_idle_updates_both_retained_painters_without_world_refresh() {
+        let r = mind_run();
+        let mut view = crate::observe::observe(&r);
+        for cell in &mut view.cells {
+            cell.animations.clear();
+            cell.pulse_speed = 0.;
+            cell.fire_flicker = false;
+        }
+        for (width,height) in [(960,600), (1280,800)] {
+            let painter = || {
+                let mut p = Painter::new();
+                p.resize(width,height);
+                p.set_responsive_canvas(true);
+                p
+            };
+            let mut tiled = painter();
+            let mut tile = crate::render::tile_damage::TilePlanner::default();
+            tile.replace_view(None,&view,&tiled);
+            let mut retained = painter();
+            let mut regions = crate::render::damage::RetainedGame::default();
+            let mut full = painter();
+            let mut before = Vec::new();
+            for (i, now) in [0.,600.,1800.,0.].into_iter().enumerate() {
+                tile.mark_animation(&view,&tiled,now,false);
+                tile.finish_damage(&mut tiled);
+                assert!(!tiled.tile_mask.is_empty());
+                if i > 0 { assert!(tiled.tile_mask.area() < width*height/10, "do not repaint the full dungeon"); }
+                tile.paint_base(&mut tiled,&view,"",now);
+                tiled.tile_clip_enabled=false;
+                tile.clear_frame();
+                regions.update(&mut retained,&view,"",now,i==0,i==0).unwrap();
+                full.game_at(&view,"",false,now);
+                assert!(full.pixels == tiled.pixels, "tile frame differs at {width}x{height}, {now}ms");
+                assert!(full.pixels == retained.pixels, "region frame differs at {width}x{height}, {now}ms");
+                if i > 0 { assert!(full.pixels != before, "idle paint should change the stroke"); }
+                before.clone_from(&full.pixels);
+            }
+            tile.mark_animation(&view,&tiled,2000.,true);
+            tile.finish_damage(&mut tiled);
+            assert!(tiled.tile_mask.is_empty(), "reduced motion stays at the dim steady color");
+        }
+    }
+
+    #[test]
+    #[ignore = "Native in-game painter capture requires ffmpeg and output path"]
+    fn capture_mind_read_range_pulse() {
+        use std::{io::Write, process::{Command as Process, Stdio}};
+        let output = std::env::var("CORPSE_MIND_READ_VIDEO").expect("video output");
+        let mut r = mind_run();
+        r.inventory.clear();
+        r.ground.clear();
+        for depth in r.floors.iter().map(|f| f.depth).collect::<Vec<_>>() {
+            r.actors_at_mut(depth);
+            r.ground_at_mut(depth);
+        }
+        r.offers.clear();
+        r.history.clear();
+        r.replay.clear();
+        corpse_core::revision50_ability_energy::initialize_reserve(
+            &mut r.player, "numo-mind-read", 10., 10.,
+        ).unwrap();
+        r.player.x = 36.;
+        r.player.y = 14.;
+        let rat = corpse_core::population::create_actor_revision("rat", 900., 41., 14., true, 52.).unwrap();
+        r.actors_at_mut(1.).push(rat);
+        r.next_id = r.next_id.max(901.);
+        let f = r.floor_mut().unwrap();
+        f.tiles.fill("floor".into());
+        f.lights.fill(50.);
+        f.seen.fill(true);
+        f.non_euclidean = corpse_core::Field::Missing;
+        f.portals = corpse_core::Field::Missing;
+        f.doors = corpse_core::Field::Missing;
+        f.environment = corpse_core::Field::Missing;
+        let mut engine = corpse_core::temporal::Engine::new(r).unwrap();
+        let mut p = Painter::new();
+        p.resize(960,600);
+        p.set_responsive_canvas(true);
+        let mut v = crate::observe::observe_with_profile(&engine.run,&p.profile);
+        let mut fx = crate::effects::Effects::default();
+        let mut encoder = Process::new("ffmpeg").args([
+            "-hide_banner","-loglevel","error","-y","-f","rawvideo","-pix_fmt","rgba","-s","960x600",
+            "-r","30","-i","-","-an","-c:v","libx264","-preset","fast","-crf","16","-pix_fmt","yuv420p",
+            "-movflags","+faststart",&output,
+        ]).stdin(Stdio::piped()).spawn().unwrap();
+        let mut sink = encoder.stdin.take().unwrap();
+        for i in 0..198 {
+            let now = f64::from(i)*1000./30.;
+            if i==90 {
+                let mut after = engine.dispatch(&corpse_core::Command::Ability {
+                    id:"numo-mind-read".into(), target:corpse_core::Field::Missing,
+                    x:corpse_core::Field::Missing, y:corpse_core::Field::Missing,
+                }).unwrap();
+                assert!(engine.run.player.active.iter().any(|s|s=="numo-mind-read"), "{}", engine.run.log.join("\n"));
+                fx.add(std::mem::take(&mut after.events),engine.run.tick,engine.run.depth,now,false);
+                let active = crate::observe::observe_with_profile(&engine.run,&p.profile);
+                assert_ne!(active.ability_overlays.mind_read,v.ability_overlays.mind_read);
+                v = active;
+            }
+            fx.prune(now);
+            p.game_at(&v,"",false,now);
+            p.effects(&v,&fx.cues,now,false);
+            sink.write_all(&p.pixels).unwrap();
+        }
+        drop(sink);
+        assert!(encoder.wait().unwrap().success());
     }
 
 }

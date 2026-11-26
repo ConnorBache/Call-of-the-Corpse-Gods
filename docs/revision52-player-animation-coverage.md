@@ -18,7 +18,7 @@ Automated tests in animation_player.rs passed in verification/r52-animations/cor
 | P08 | I Came For You | Snapshot cameTarget change brackets observable target; engine closer movement credit |
 | P09 | Fated Duel | Snapshot new duel activation, exact fixed 5x5 perimeter |
 | P10 | Never Surrender | divine_reactions::pay_surrender successful once-turn payment |
-| P11 | Bulwark of Mind | abilities successful Bulwark placement exact cell |
+| P11 | Bulwark of Mind | successful placement reveals the ward glyph first, then a nonblocking green nova centered on the ward; its visible glyph continues to pulse |
 | P12 | Relentless Pursuit | Snapshot selected target changed, authoritative pursuit route; bonus hook |
 | P13 | Hanged | engine::apply_hp_loss shield cue only for actual main-energy redirection; no stale toggle or retreat receipt |
 | P14 | Tools of the Trade | inventory-only free potion/heart action (integration owner) |

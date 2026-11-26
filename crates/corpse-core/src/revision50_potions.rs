@@ -202,6 +202,7 @@ fn shatter(r:&mut Run,x:f64,y:f64) {
         let mut changed=false;
         if matches!(f.tiles[at].as_str(),"wall"|"tree") {
             // Cancel temporary wall restoration before opening the terrain.
+            crate::stone_seal_rules::forget_where(f, |cell| cell == at);
             let prior=f.revision50_temporary_terrain.as_ref().and_then(|v|v.iter().find(|t|t.cell==at&&t.tile=="wall")).map(|t|t.previous.clone());
             if let Some(v)=f.revision50_temporary_terrain.as_mut(){v.retain(|t|t.cell!=at||t.tile!="wall");}
             f.tiles[at]=prior.unwrap_or_else(||"floor".into());changed=true;

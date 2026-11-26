@@ -275,19 +275,28 @@ fn actor_cell(
     )
 }
 fn actor_cell_profile(
+    profile: &crate::appearance_profile::Profile, run: &Run, a: &corpse_core::Actor,
+    width: usize, backgrounds: &[Rgb], player: bool,
+) -> Cell {
+    actor_cell_with_hearts(profile, run, a, width, backgrounds, player,
+        &crate::creature_presentation::CorpseHearts::new(run))
+}
+fn actor_cell_with_hearts(
     profile: &crate::appearance_profile::Profile,
     run: &Run,
     a: &corpse_core::model::Actor,
     width: usize,
     backgrounds: &[Rgb],
     player: bool,
+    hearts: &crate::creature_presentation::CorpseHearts<'_>,
 ) -> Cell {
+    let marked_heartless = if a.dead.value_or(false) { hearts.heartless(a) } else { a.heartless.value_or(false) };
     let presented=if player&&run.simulation_revision.value_or(29.)>=43. {None}else{crate::creature_presentation::project(run,a)};
-    let mut cell=actor_cell_presented(profile,run,a,width,backgrounds,player,presented.as_ref());
+    let mut cell=actor_cell_presented(profile,run,a,width,backgrounds,player,presented.as_ref(),marked_heartless);
     if !player && presented.is_some() && crate::hallucination_ui::affects(run,a) {
         let variants=std::array::from_fn(|phase| {
             let shown=crate::creature_presentation::project_kind(run,a,crate::hallucination_ui::kind(run,a,phase)).unwrap();
-            let mut c=actor_cell_presented(profile,run,a,width,backgrounds,false,Some(&shown));
+            let mut c=actor_cell_presented(profile,run,a,width,backgrounds,false,Some(&shown),marked_heartless);
             crate::hallucination_ui::question(&mut c.label);crate::hallucination_ui::question(&mut c.superscript);if c.superscript.is_empty(){c.superscript.push('?');} c
         });
         cell.hallucination=Some(std::sync::Arc::new(variants));
@@ -295,7 +304,7 @@ fn actor_cell_profile(
     }
     cell
 }
-fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&corpse_core::Actor,width:usize,backgrounds:&[Rgb],player:bool,presented:Option<&corpse_core::Actor>)->Cell {
+fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&corpse_core::Actor,width:usize,backgrounds:&[Rgb],player:bool,presented:Option<&corpse_core::Actor>,marked_heartless:bool)->Cell {
     let invisible_player = player && corpse_core::engine::condition(a, "invisible") > 0.;
     let nightmare = corpse_core::dreamwalking::is_nightmare(a);
     let body = corpse_core::dreamwalking::is_body(a);
@@ -427,7 +436,7 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         // Actors inherit the lit terrain. Telepathy changes the ink, not
         // the tile; only an explicitly authored background overrides it.
         background_overlay: entity.background.map(|bg| (bg, 1.)),
-        heartless: !body && if dead { corpse_core::corpses::heart_harvested(a) } else { a.heartless.value_or(false) },
+        heartless: !body && marked_heartless,
         corpse: dead,
         superscript,
         subscript,
@@ -596,13 +605,14 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         let nonheart_cells: std::collections::HashSet<_> = items.iter()
             .filter(|(_, item, _, _)| item.kind != "heart").map(|(i, _, _, _)| *i).collect();
         let mut corpses = std::collections::HashSet::new();
+        let hearts = crate::creature_presentation::CorpseHearts::new(run);
         for a in &observed_actors {
             let i = a.y as usize * width + a.x as usize;
             if a.dead.value_or(false) && visibility().directly_visible_actor(a) && observation.cells.get(i).is_some_and(|o|o.current&&o.direct) {
-                let cell=actor_cell_profile(profile,run,a,width,&backgrounds,false);
-                let hallucination=cell.hallucination.as_ref().map(|variants|std::sync::Arc::new(std::array::from_fn(|i|(format!("{} corpse?",variants[i].label.trim_end_matches('?')),variants[i].glyph.clone(),variants[i].fg))));
+                let cell=actor_cell_with_hearts(profile,run,a,width,&backgrounds,false,&hearts);
+                let hallucination=cell.hallucination.as_ref().map(|variants|std::sync::Arc::new(std::array::from_fn(|i|(format!("{}?",crate::creature_presentation::corpse_name(variants[i].label.trim_end_matches('?'), variants[i].heartless)),variants[i].glyph.clone(),variants[i].fg))));
                 ground_entities.push(GroundEntity{reserve:None,hallucination,kind:GroundKind::Corpse,x:cell.x,y:cell.y,id:a.id.to_bits(),
-                    name:format!("{} corpse",cell.label.trim_end_matches('?')),glyph:cell.glyph,color:cell.fg,distance:distance(cell.x,cell.y)});
+                    name:crate::creature_presentation::corpse_name(cell.label.trim_end_matches('?'), cell.heartless),glyph:cell.glyph,color:cell.fg,distance:distance(cell.x,cell.y)});
             }
             if a.dead.value_or(false)
                 && !active.contains(&i)
@@ -610,7 +620,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 && !nonheart_cells.contains(&i)
                 && corpses.insert(i)
             {
-                let mut cell = actor_cell_profile(profile, run, a, width, &backgrounds, false);
+                let mut cell = actor_cell_with_hearts(profile, run, a, width, &backgrounds, false, &hearts);
                 crate::hallucination_ui::map_cell(&mut cell, |cell| {
                     cell.fg = entity_ink(profile,&observation.cells[i],observation.all_seeing,
                         light[i],material_backgrounds[i],backgrounds[i],cell.entity_ink.unwrap());
@@ -1938,6 +1948,10 @@ fn terrain_frame_palette(
                 important = true;
             }
             if h.bulwark.as_ref().is_some() {
+                let speed = profile.number("terrain.feature:ward.animationSpeed");
+                if o.current && speed > 0. {
+                    animations.push(crate::render::Animation::WardPulse { speed });
+                }
                 detail!(
                     crate::world_features::material(
                         profile,
@@ -3025,6 +3039,10 @@ fn terrain_frame_palette_json_reference(
                 important = true;
             }
             if h.bulwark.as_ref().is_some() {
+                let speed = profile.number("terrain.feature:ward.animationSpeed");
+                if o.current && speed > 0. {
+                    animations.push(crate::render::Animation::WardPulse { speed });
+                }
                 detail!(
                     crate::world_features::material(
                         profile,

@@ -160,6 +160,7 @@ pub fn can_replace_terrain(r:&Run,at:usize)->bool {
 fn replaceable_ground(r:&Run,at:usize)->bool {
     let Some(f)=crate::dreamwalking::floor_for(r,&r.player) else{return false};
     f.tiles.get(at).is_some_and(|t|matches!(t.as_str(),"floor"|"grass"|"shallow-water"|"snow"|"sand"))
+        && !crate::stone_seal_rules::contains(f,at)
         && f.doors.as_ref().is_none_or(|d|!d.contains_key(&at.to_string()))
         && f.grates.as_ref().is_none_or(|v|!v.contains(&(at as f64)))
         && !crate::borge::solid_at(f,(at%f.width())as f64,(at/f.width())as f64)

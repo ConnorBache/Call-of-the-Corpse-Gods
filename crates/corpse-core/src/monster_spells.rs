@@ -278,6 +278,8 @@ pub fn heal_others(r: &mut Run, id: f64) -> Result<bool, String> {
         }
         if landed.actor_id!=Some(b.id) {
             let ready=r.tick+2.;actor_mut_trusted(r,id).unwrap().conditions.insert("monsterHealReadyAt".into(),ready);
+            // A paid route miss still casts; the successful branch names the healed ally.
+            crate::monster_horn::report_cast(r, &a, &b, "Healing Grove");
             return Ok(true);
         }
     }

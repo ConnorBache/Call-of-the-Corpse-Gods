@@ -1096,12 +1096,13 @@ impl TileStack {
             let name=pack::displayed_name(r,&g.item);
             article(&if g.item.kind=="heart" {name.to_lowercase()}else{name})
         }).collect();
+        let hearts = crate::creature_presentation::CorpseHearts::new(r);
         let corpses=actors.iter().filter(|a|a.x==x as f64&&a.y==y as f64&&(a.dead.value_or(false)||a.hp<=0.)).map(|a|{
             let shown=if crate::hallucination_ui::affects(r,a) {
                 crate::creature_presentation::project_kind(r,a,crate::hallucination_ui::kind(r,a,phase))
             }else{crate::creature_presentation::project(r,a)};
             let name=creature_title_base(shown.as_ref().unwrap_or(a));
-            format!("{} corpse",article(&format!("{}{}",if corpse_core::corpses::heart_harvested(a){"heartless "}else{""},name.to_lowercase())))
+            article(&crate::creature_presentation::corpse_name(&name.to_lowercase(), hearts.heartless(a)))
         }).collect();
         Self{surface,fixtures,local_items,corpses,portal}
     }

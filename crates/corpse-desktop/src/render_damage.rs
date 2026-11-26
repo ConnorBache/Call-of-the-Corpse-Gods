@@ -246,6 +246,11 @@ impl RetainedGame {
                     for r in scene.bounds.values(){damage.add(*r);}
                 }else{for r in &scene.animated{damage.add(*r);}}
                 if p.profile.number("path.animationSpeed")>0. {scene.add_interactions(p,v,&mut damage);}
+                use crate::persistent_ability_overlays::{mark_mind_read, mind_read_ink};
+                if !v.ability_overlays.mind_read.is_empty()
+                    && self.now.map(|t| mind_read_ink(f64::from_bits(t))) != Some(mind_read_ink(now)) {
+                    mark_mind_read(p, v, |rect| damage.add(rect));
+                }
             }
         }
         if let Some(next)=next{self.scene=Some(next);}

@@ -3,6 +3,7 @@ use corpse_core::{Command,Run};
 use sdl2::{event::Event,keyboard::Keycode};
 use std::rc::Rc;
 pub const CONTINUE:&str="Press space to continue";
+pub const DEATH:&str="You died.";
 pub const PARALYZED:&str="You are paralyzed. Press space to wait until un-paralyzed";
 #[derive(Default)]pub struct Pause {
  pub enabled:bool,
@@ -76,6 +77,7 @@ pub fn needs_ack(r:&Run,c:&Command)->bool {
 pub fn paint(p:&mut crate::render::Painter,text:&str){p.centered_sheet(|p|{
  p.rect(280,320,720,110,[12,10,20]);p.border(280,320,720,110,[255,217,53]);
  if text==PARALYZED {p.text("You are paralyzed.",304,340,20,[255,248,232]);p.text("Press space to wait until un-paralyzed",304,378,18,[255,248,232]);}
+ else if text==DEATH {p.text(DEATH,304,340,20,[255,248,232]);p.text(CONTINUE,304,378,18,[255,248,232]);}
  else if text==crate::hazards_ui::CHASM_QUESTION {p.text(text,304,340,20,[255,248,232]);p.text("Space to jump · Esc to cancel",304,378,18,[255,248,232]);}
  else {p.text(text,304,359,20,[255,248,232]);}
 });}

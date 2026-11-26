@@ -237,10 +237,10 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
                 }
                 let x = b.x + dx as f64;
                 let y = b.y + dy as f64;
+                let f=r.floor().unwrap();
                 if free(r, x, y, None)
-                    && r.floor().unwrap().tiles
-                        [y as usize * r.floor().unwrap().width() + x as usize]
-                        == "floor"
+                    && crate::portals::cell(f,x,y).is_some_and(|at|
+                        f.tiles[at]=="floor" && !crate::stone_seal_rules::contains(f,at))
                 {
                     choices.push((x, y));
                 }
@@ -255,10 +255,14 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
             let tick = r.tick;
             let wall_plane = crate::dreamwalking::enabled(r)
                 .then(|| if crate::dreamwalking::context_dream(r) { 1. } else { 0. });
+            let floor_owned=crate::stone_seal_rules::current(r);
+            if floor_owned { crate::stone_seal_rules::record(r,i,tick+5.); }
             let a = actor_mut_trusted(r, id).unwrap();
-            a.conditions.insert("raisedWallIndex".into(), i as f64);
             a.conditions.insert("raisedWallExpires".into(), tick + 5.0);
-            if let Some(plane) = wall_plane { a.conditions.insert("raisedWallPlane".into(), plane); }
+            if !floor_owned {
+                a.conditions.insert("raisedWallIndex".into(), i as f64);
+                if let Some(plane) = wall_plane { a.conditions.insert("raisedWallPlane".into(), plane); }
+            }
             a.conditions.insert("beastCooldown".into(), 3.0);
             let a = a.clone();
             crate::events::actor_event(
@@ -318,25 +322,31 @@ pub fn world_turn(r: &mut Run) {
             let i = a.conditions.get("raisedWallIndex").copied();
             let plane = a.conditions.get("raisedWallPlane").copied()
                 .map(|v| v == 1.).unwrap_or_else(|| crate::dreamwalking::dream_actor(r, a));
-            crate::dreamwalking::with_plane(r, plane, |r| {
-                if let Some(i) = i {
-                    let revision = r.simulation_revision.value_or(29.);
-                    let f = r.floor_mut().unwrap();
-                    if f.tiles.get(i as usize).is_some_and(|s| s == "wall") {
-                        f.tiles[i as usize] = "floor".into();
-                        crate::ichor::enqueue_opening_revision(f, i as usize, revision);
-                        let w=f.width();
-                        crate::events::at(r,"E40","fracture-stone",crate::events::Stage::Special,&[crate::events::EventPoint{x:(i as usize%w) as f64,y:(i as usize/w) as f64}]);
+            // Before the recorded adoption boundary, reproduce the historical
+            // actor-owned edit. An in-flight legacy wall carries no exact floor
+            // provenance, so after adoption its old timer must not mutate terrain.
+            if !crate::stone_seal_rules::current(r) {
+                crate::dreamwalking::with_plane(r, plane, |r| {
+                    if let Some(i) = i {
+                        let revision = r.simulation_revision.value_or(29.);
+                        let f = r.floor_mut().unwrap();
+                        if f.tiles.get(i as usize).is_some_and(|s| s == "wall") {
+                            f.tiles[i as usize] = "floor".into();
+                            crate::ichor::enqueue_opening_revision(f, i as usize, revision);
+                            let w=f.width();
+                            crate::events::at(r,"E40","fracture-stone",crate::events::Stage::Special,&[crate::events::EventPoint{x:(i as usize%w) as f64,y:(i as usize/w) as f64}]);
+                        }
                     }
-                }
-                r.floor_mut().unwrap().dirty = true;
-            });
+                    r.floor_mut().unwrap().dirty = true;
+                });
+            }
             let a = actor_mut_trusted(r, id).unwrap();
             a.conditions.shift_remove("raisedWallExpires");
             a.conditions.shift_remove("raisedWallIndex");
             a.conditions.shift_remove("raisedWallPlane");
         }
     }
+    crate::stone_seal_rules::expire(r);
     // Ordered aura refresh: O(A*F + A²*(A+R+P)), including linear actor_mut_trusted
     // lookups, rays R, powers P and plane lookup F. Snapshots cost O(A*actor-size).
     // First-use layer provisioning and shared-block detach add their COW costs.

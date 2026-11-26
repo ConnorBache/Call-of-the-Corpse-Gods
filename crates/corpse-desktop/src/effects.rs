@@ -166,7 +166,7 @@ pub(crate) fn admitted(e: &PresentationEvent) -> bool {
 /// collapse must not own an input/scene lock. Normal admission now drops it.
 pub(crate) fn blocks(e: &PresentationEvent) -> bool {
     e.kind != "cosmetic-death"
-        && !e.animation.as_ref().is_some_and(|a| a.style == corpse_core::animation_shapes::SHORT_NOVA)
+        && !e.animation.as_ref().is_some_and(|a| matches!(a.style.as_str(), corpse_core::animation_shapes::SHORT_NOVA | corpse_core::animation_shapes::BULWARK_NOVA))
 }
 fn lock_duration(e: &PresentationEvent) -> f64 { if blocks(e) { duration(e) } else { 0. } }
 pub struct PlaneTransition {pub before:crate::render::View,pub started:f64,pub ascend:bool}

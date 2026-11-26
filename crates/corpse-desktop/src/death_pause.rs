@@ -20,21 +20,40 @@ impl Ending {
     }
 }
 
-/// Presentation time only. Start once the last gameplay effect is on screen,
-/// and gate the existing continuation prompt until the full fade is presented.
+/// Presentation time only. Death waits on the visible prompt; escape starts
+/// fading on the first ready terminal frame. All clocks start on drawable frames.
 #[derive(Default)]
-pub struct Fade { started: Option<(Ending, f64)> }
+pub struct Fade {
+    started: Option<(Ending, f64)>,
+    death_acknowledged: bool,
+}
 impl Fade {
+    pub fn acknowledge_death(&mut self) {
+        self.death_acknowledged = true;
+    }
     pub fn sample(&mut self, status: &str, now: f64, skip_motion: bool) -> Option<([u8; 3], u8)> {
-        let Some(ending) = Ending::from_status(status).filter(|_| !skip_motion) else {
-            self.started = None;
+        let ending = Ending::from_status(status);
+        if ending.is_none() {
+            *self = Self::default();
             return None;
-        };
+        }
+        let Some(ending) = ending.filter(|ending| !skip_motion
+            && (*ending != Ending::Death || self.death_acknowledged)) else { return None; };
         if !self.started.is_some_and(|(current, _)| current == ending) {
             self.started = Some((ending, now));
         }
         let elapsed = (now - self.started.unwrap().1) / END_FADE_MS;
         Some((ending.color(), eased_alpha(elapsed)))
+    }
+    pub fn prompt(&self, status: &str, fade: Option<([u8; 3], u8)>) -> bool {
+        match Ending::from_status(status) {
+            Some(Ending::Death) => !self.death_acknowledged,
+            Some(Ending::Escape) => fade.is_none_or(|(_, alpha)| alpha == 255),
+            None => false,
+        }
+    }
+    pub fn death_complete(&self, status: &str, fade: Option<([u8; 3], u8)>) -> bool {
+        status == "dead" && self.death_acknowledged && fade.is_none_or(|(_, alpha)| alpha == 255)
     }
 }
 
@@ -88,10 +107,22 @@ impl DeathPause {
   let mut fade=Fade::default();
   assert_eq!(fade.sample("playing",10.,false),None);
   for (status,color) in [("dead",[0;3]),("won",[255;3])] {
+   if status == "dead" {
+    assert!(fade.prompt(status, None));
+    assert_eq!(fade.sample(status,20.,false),None);
+    assert_eq!(fade.sample(status,1900.,false),None);
+    assert!(!fade.death_complete(status,None));
+    fade.acknowledge_death();
+    assert!(!fade.prompt(status,None));
+   } else {
+    assert!(!fade.prompt(status,Some(([255;3],0))));
+   }
    assert_eq!(fade.sample(status,100.,false),Some((color,0)));
    assert_eq!(fade.sample(status,580.,false),Some((color,127)));
    assert_eq!(fade.sample(status,1059.,false),Some((color,254)));
    assert_eq!(fade.sample(status,1060.,false),Some((color,255)));
+   assert_eq!(fade.death_complete(status, Some((color,255))), status=="dead");
+   assert_eq!(fade.prompt(status, Some((color,255))), status=="won");
    assert_eq!(fade.sample(status,1500.,false),Some((color,255)));
    assert_eq!(fade.sample(status,1500.,true),None);
    assert_eq!(fade.sample("playing",1600.,false),None);

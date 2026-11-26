@@ -241,6 +241,7 @@ pub mod execute_rules;
 pub mod beckoning_rules;
 pub mod riptide_rally;
 pub mod star_power;
+pub mod stone_seal_rules;
 pub mod ichor_fire_rules;
 mod beckoning_skip;
 pub mod screamer_schedule;

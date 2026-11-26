@@ -82,6 +82,7 @@ fn clone_snapshot_state(run:&Run)->Run {
             riptide_rally_from: Default::default(),
             star_power_from: Default::default(),
             dream_shards_from: Default::default(),
+            stone_seal_from: Default::default(),
             ichor_fire_rules_from: Default::default(),
             avatar_starter_policy: Default::default(),
             ember_rules_from: Default::default(),

@@ -764,6 +764,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             let terminal_status=run.as_ref().filter(|_|screen==Screen::Game).map(|r|r.run.status.as_str()).unwrap_or("playing");
             match death_pause.event_for_status(terminal_status,&event) {
                 death_pause::Decision::Advance => {
+                    if terminal_status == "dead" {
+                        ending_fade.acknowledge_death();
+                        dirty = true;
+                        continue;
+                    }
                     let skip_motion = reduced || minimized || drawable_w == 0 || drawable_h == 0
                         || settings.store.action_animation_mode != appearance_store::ActionAnimationMode::Normal;
                     results_fade = death_pause::ResultsFade::new(terminal_status, skip_motion);
@@ -2156,6 +2161,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                                 .is_some_and(|a| corpse_core::dreamwalking::same_plane(&r.run, &r.run.player, a)))
                                             .map(Field::Value)
                                             .unwrap_or(Field::Missing);
+                                        if let Some(reason) = targeting_ui::known_target_blocker(&r.run, &id, target.as_ref().copied(), tx, ty) {
+                                            pending_ability = Some(id); notice = reason.into(); continue;
+                                        }
                                         let target = if id == "etill-riptide" && corpse_core::riptide_rally::current(&r.run) {
                                             let reason = if corpse_core::riptide_rally::placed(&r.run).is_none() {
                                                 Some("Right-click a map tile to set a rally point first.")
@@ -2182,8 +2190,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                                 Field::Value(attacker)
                                             } else {
                                                 let attacker = target.as_ref().copied();
-                                                if !attacker.is_some_and(|actor| targeting_ui::visible_enemy(&r.run, actor)) {
-                                                    pending_ability = Some(id); notice = "Select a visible enemy first.".into(); continue;
+                                                if let Some(reason) = targeting_ui::implant_attacker_blocker(&r.run, attacker) {
+                                                    pending_ability = Some(id); notice = reason.into(); continue;
                                                 }
                                                 implant_attacker = attacker;
                                                 pending_ability = Some(id);
@@ -2210,28 +2218,19 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                             }
                                         }
                                         let target=if id=="kative-cogworks" {
-                                            if corpse_core::revision50_terrain::mode(&r.run)==2 {
-                                                pending_ability=Some(id);notice=targeting_ui::cogworks_prompt(&r.run);continue;
-                                            }
                                             if !corpse_core::vision::visible(&r.run,tx,ty)
                                                 || corpse_core::revision50_terrain::preview_for_run(&r.run,tx as f64,ty as f64).is_err() {
                                                 pending_ability=Some(id);notice="Select a visible valid placement or one of your terrain modifications.".into();continue;
                                             }
                                             Field::Missing
                                         } else if id==corpse_core::revision50_terrain::CLAY_ARMY {Field::Missing} else {target};
-                                        notice = match dispatch(
-                                            r,
-                                            &mut effects,
-                                            start.elapsed().as_millis() as f64,
-                                            &Command::Ability {
-                                                id,
-                                                target,
-                                                x: Field::Value(tx as f64),
-                                                y: Field::Value(ty as f64),
-                                            },
-                                        ) {
+                                        let command = Command::Ability {
+                                            id: id.clone(), target,
+                                            x: Field::Value(tx as f64), y: Field::Value(ty as f64),
+                                        };
+                                        notice = match dispatch(r, &mut effects, start.elapsed().as_millis() as f64, &command) {
                                             Ok(_) => String::new(),
-                                            Err(e) => e.to_string(),
+                                            Err(e) => { pending_ability = Some(id); e.0 },
                                         };
                                     } else {
                                         if tile_report.is_some() {
@@ -2762,11 +2761,14 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         // A full repaint prevents feedback from blending against the previous
         // faded frame and bypasses tile damage/upload clipping.
         if terminal { tile_enabled = false; }
-        let fade = ending_fade.sample(if terminal_ready { terminal_status } else { "playing" }, now,
-            action_reduced || minimized || drawable_w==0 || drawable_h==0);
-        let ending_prompt = terminal_ready && fade.is_none_or(|(_, alpha)| alpha==255);
+        let skip_ending_motion = action_reduced || minimized || drawable_w==0 || drawable_h==0;
+        let ready_status = if terminal_ready { terminal_status } else { "playing" };
+        let fade = ending_fade.sample(ready_status, now, skip_ending_motion);
+        let ending_prompt = ending_fade.prompt(ready_status, fade);
+        let death_fade_complete = ending_fade.death_complete(ready_status, fade);
+        let mut enter_death_results = false;
         let fade_animating = fade.is_some_and(|(_, alpha)| alpha<255);
-        dirty |= terminal_ready && !death_pause.is_presented() && !fade_animating;
+        dirty |= (ending_prompt && !death_pause.is_presented()) || death_fade_complete;
         let results_tint = if !minimized && drawable_w > 0 && drawable_h > 0 {
             results_fade.as_mut().map(|fade| fade.sample(now))
         } else { None };
@@ -2941,6 +2943,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 tile_plan.replace_view(None,current_view,&painter);
                             }
                             let paint_notice=inspection_ui::footer_text(&notice, hover_report.as_ref());
+                            let aim_notice = (pending_ability.is_some() && r.run.status == "playing" && !notice.is_empty())
+                                .then(|| (ability_aim_banner(&painter), notice.as_str()));
                             let ability_detail_view=ability_detail.as_ref().map(|id|ability_ui::observe(&r.run,id));
                             let mut planned_overlay=None;
                             let mut full_pack_state=None;
@@ -2964,6 +2968,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 // details share exact content-sized bounds with their painter.
                                 if hazard_prompt.is_some(){panels.extend(painter.sheet_damage_rect(0,282,render::WIDTH as i32,render::HEIGHT as i32-282));}
                                 if let Some(ability)=&ability_detail_view{panels.extend(painter.ability_detail_damage(ability));}
+                                if let Some(((x,y,w,h),_))=aim_notice {panels.extend(painter.logical_damage_rect(x,y,w,h));}
                                 if debug_loadout.active(&r.run){panels.extend(painter.sheet_damage_rect(0,51,render::WIDTH as i32,718));}
                                 let next=tile_overlay::Frame{pack:pack_state,hover:hover_state,effects:tile_overlay::effects(&painter,current_view,&effects.cues,now,action_reduced),shutter:shutter_state,
                                     full_modal:!current_view.offers.is_empty()&&r.run.status=="playing",panels,redraw_panels:dirty||hallucination_changed||effects.redraw_panels(now),choice:choice_selected,inspector:inspecting.then_some((inspected_actor.map(f64::to_bits),creature_offset)),save_error:autosave.error.clone()};
@@ -3019,6 +3024,13 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     creature_offset,
                                 );
                             }
+                            if let Some(((x,y,w,h), message))=aim_notice {
+                                painter.rect(x,y,w,h,[21,17,29]);
+                                painter.border(x,y,w,h,[110,89,132]);
+                                let role=typography_ui::Role::Secondary;
+                                let text=painter.fit_text_role(role,message,w-20,14);
+                                painter.text_role(role,&text,x+10,y+6,14,[243,228,246]);
+                            }
                             if let Some(report) = &tile_report {
                                 painter.centered_sheet(|p|inspection_ui::paint(report,p,tile_report_scroll));
                             }
@@ -3052,7 +3064,10 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             help.paint(&mut painter);
             if screen==Screen::Game && !effects.sequence.pending(now) && !effects.gameplay_pause.fall_active(){if let Some(level)=health_warning.level(){painter.tile_clip_enabled=false;health_warning::paint(&mut painter,level);}}
             if screen==Screen::Game && !effects.presentation_pending(now) && effects.gameplay_pause.active() && (!health_warning.active()||effects.gameplay_pause.fall_active()){painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,effects.gameplay_pause.text());}
-            if ending_prompt {painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,gameplay_pause::CONTINUE);}
+            if ending_prompt {
+                painter.tile_clip_enabled=false;
+                gameplay_pause::paint(&mut painter,if terminal_status=="dead" {gameplay_pause::DEATH} else {gameplay_pause::CONTINUE});
+            }
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
             if let Some((color, alpha)) = results_tint { painter.ending_fade(color, alpha); }
             if let Some(frame)=painter.gpu.as_ref(){
@@ -3075,20 +3090,34 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             if !effects.presentation_pending(now) { if effects.gameplay_pause.active()&&(!health_warning.active()||effects.gameplay_pause.fall_active()){effects.gameplay_pause.presented();}else{health_warning.presented();} }
             death_pause.presented(ending_prompt);
+            enter_death_results = death_fade_complete;
             if results_tint.is_some_and(|(_, alpha)| alpha == 0) { results_fade = None; }
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
             dirty = false;
             cosmetic_dirty = false;
             last_frame = frame;
         }
-        #[cfg(test)] if ending_video_capture::observe(&mut canvas,&painter,screen,terminal_status,ending_prompt,results_tint)? {break 'running;}
+        #[cfg(test)] if ending_video_capture::observe(&mut canvas,&painter,screen,terminal_status,ending_prompt,fade,results_tint)? {break 'running;}
         #[cfg(test)] if input_loop_tests::observe(&mut canvas,&painter,input_loop_tests::State {
             screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
             help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),
         })? {break 'running;}
+        if enter_death_results {
+            results_fade = death_pause::ResultsFade::new("dead", skip_ending_motion);
+            summary = run.as_ref().map(|r| corpse_core::profile::summarize_run(&r.run));
+            summary_scroll = 0;
+            screen = Screen::Summary;
+            dirty = true;
+        }
         std::thread::sleep(Duration::from_millis(8));
     }
     Ok(())
+}
+/// A targeted-action prompt is separate from tile inspection and never owns input.
+fn ability_aim_banner(p:&Painter)->(i32,i32,i32,i32) {
+    let (x,y,w,h)=p.frame().map.tuple();
+    let width=(w-12).clamp(48,640);
+    (x+((w-width)/2).max(0),y+h-30,width,28)
 }
 /// Paint-only persistence banner, drawn last over the complete frame.
 fn paint_save_failure(painter:&mut Painter,error:&str){
@@ -3780,7 +3809,8 @@ mod menu_seed_creation_tests {
 /// O(registered profile entries + cached cells) worst case; dream flag short-circuits O(1).
 /// Only redraw eligibility; no observation, simulation state or RNG access.
 fn cached_view_needs_idle_paint(v:&render::View,p:&appearance_profile::Profile)->bool {
-    v.dreamwalking || appearance_light::animated(p) || appearance_material::animated(p)
+    v.dreamwalking || !v.ability_overlays.mind_read.is_empty()
+        || appearance_light::animated(p) || appearance_material::animated(p)
         || v.cells.iter().any(|c|!c.animations.is_empty()||c.pulse_speed!=0.||c.fire_flicker)
         || (p.number("path.animationSpeed")>0.&&!v.path.is_empty())
 }
@@ -3792,6 +3822,9 @@ fn cached_view_needs_idle_paint(v:&render::View,p:&appearance_profile::Profile)-
   let before=serde_json::to_vec(&r).unwrap();let mut v=observe::observe(&r);
   for c in &mut v.cells {c.animations.clear();c.pulse_speed=0.;c.fire_flicker=false;}v.path.clear();v.dreamwalking=false;
   assert!(!cached_view_needs_idle_paint(&v,appearance_profile::Profile::defaults()));
+  v.ability_overlays.mind_read.push(perception_ui::Edge{x:0,y:0,vertical:false});
+  assert!(cached_view_needs_idle_paint(&v,appearance_profile::Profile::defaults()));
+  v.ability_overlays.mind_read.clear();
   v.dreamwalking=true;assert!(cached_view_needs_idle_paint(&v,appearance_profile::Profile::defaults()));
   assert_eq!(serde_json::to_vec(&r).unwrap(),before);
  }

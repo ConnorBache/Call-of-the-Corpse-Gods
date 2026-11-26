@@ -15,7 +15,7 @@ fn has_clay(r:&Run,depth:f64)->bool {
 }
 fn dynamic(r: &Run, f: &Floor) -> bool {
     let _timing_function = crate::timing::span("offscreen.dynamic_guard");
-    if has_clay(r,f.depth) {return true;}
+    if has_clay(r,f.depth) || crate::stone_seal_rules::pending(r,f.depth) {return true;}
     if crate::corpse_currents::has_activity(r, f) {return true;}
     // Unresolved zero HP must enter the real death lifecycle, never bulk regen.
     if r.simulation_revision.value_or(29.) >= 52. && r.actors_at(f.depth).iter()
@@ -152,7 +152,7 @@ fn dynamic(r: &Run, f: &Floor) -> bool {
     })
 }
 fn involved(r: &Run, f: &Floor) -> bool {
-    f.depth != r.depth && (f.dirty || f.last_tick > 0. || f.seen.iter().any(|&v| v) || has_clay(r,f.depth) || crate::revision50_control_amulets::has_temporary_terrain(r,f.depth))
+    f.depth != r.depth && (f.dirty || f.last_tick > 0. || f.seen.iter().any(|&v| v) || has_clay(r,f.depth) || crate::stone_seal_rules::pending(r,f.depth) || crate::revision50_control_amulets::has_temporary_terrain(r,f.depth))
 }
 pub fn validate_supported(r: &Run) -> Result<(), String> {
     let _timing_function = crate::timing::span("offscreen.validate");
@@ -516,6 +516,7 @@ fn catch_up(
         && f.last_tick == 0.
         && !f.seen.iter().any(|&v| v)
         && !has_clay(r,depth)
+        && !crate::stone_seal_rules::pending(r,depth)
         && !crate::revision50_control_amulets::has_temporary_terrain(r,depth)
         && !f
             .godbeast_event
