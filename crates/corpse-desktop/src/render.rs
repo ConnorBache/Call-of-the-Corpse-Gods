@@ -1710,10 +1710,13 @@ impl Painter {
     fn menu_embers(&mut self, frame: u32) {
         let width = self.scale.round().max(1.) as i32;
         for i in 0..16 {
-            let x = hash(i, 8) * 52. + if i % 2 != 0 { 266. } else { 0. };
-            let life = (f64::from(title_fire::phase(frame)) + hash(i, 4)).fract();
-            let rise = life * (90. + hash(i, 17) * 65.);
-            // Extinguish before respawning so the loop never teleports a lit ember.
+            let clock = title_fire::elapsed_frames(frame) / (310. + hash(i, 3) * 140.) + hash(i, 4);
+            let birth = clock.floor() as i64;
+            let life = clock.fract();
+            let x = f64::from(title_fire::grain(i, birth, 8)) * 52.
+                + if i % 2 != 0 { 266. } else { 0. };
+            let rise = life * (90. + f64::from(title_fire::grain(i, birth, 17)) * 65.);
+            // Extinguish before respawning; a new ember has its own origin and height.
             let alpha = (255. * (life / 0.10).min((1. - life) / 0.16).min(1.)) as u8;
             let (x, y) = (
                 self.native_x(x * 4.),
@@ -1776,7 +1779,7 @@ impl Painter {
         }
     }
     pub fn menu(&mut self, frame: u32, selected: usize, can_continue: bool, _mode: &str) {
-        // Flames, embers, and the existing heartbeat share a repeat boundary.
+        // Fire and embers use elapsed menu time; the emblem keeps its own pulse.
         let fire = hellfire(frame);
         // Fill the drawable including widescreen wings, with no panel or letterbox bar.
         let left = -(self.origin.0 as f64 / self.scale).ceil() as i32;
@@ -3300,15 +3303,15 @@ mod tests {
         assert_ne!(hellfire(18).rgba, hellfire(19).rgba);
     }
     #[test]
-    fn title_fire_embers_and_heartbeat_repeat_as_one_scene() {
+    fn title_fire_is_not_reset_when_the_heartbeat_repeats() {
         let mut p = Painter::new();
         p.resize(640, 400);
-        for frame in [18, 77, 377] {
-            p.menu(frame, 0, false, "Avatar");
-            let first = p.pixels.clone();
-            p.menu(frame + title_fire::LOOP_FRAMES, 0, false, "Avatar");
-            assert_eq!(p.pixels, first, "frame {frame} did not repeat");
-        }
+        p.menu(18, 0, false, "Avatar");
+        let first = p.pixels.clone();
+        p.menu(378, 0, false, "Avatar");
+        assert_ne!(p.pixels, first);
+        p.menu(18, 0, false, "Avatar");
+        assert_eq!(p.pixels, first, "reduced-motion frame stays deterministic");
     }
     #[test]
     fn continue_disabled_never_receives_active_menu_highlight() {
