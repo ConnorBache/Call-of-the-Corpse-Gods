@@ -1045,6 +1045,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         None => { owned = vision::observe_terrain(r); let Some(o) = owned.as_ref() else { return unknown(); }; o }
     };
     let o = &observation.cells[y * f.width() + x];
+    let portal_name = crate::portal_ui::known_name(r, o);
     let portal_alias = crate::portal_ui::observed_alias_with_terrain(r, x, y, observation);
     let pocket_alias = crate::non_euclidean_ui::observed_alias_with_terrain(r, x, y, observation);
     let alias = portal_alias.or(pocket_alias);
@@ -1057,6 +1058,12 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         .min_by_key(|a| (a.dead.value_or(false), !corpse_core::dreamwalking::is_nightmare(a)))
     {
         let decorate=|mut detail:CreatureReport,phase:usize| {
+        if portal_name.is_some() {
+            detail.scene.truncate(detail.scene.trim_end_matches('.').len());
+            detail.scene.push_str(crate::portal_ui::CREATURE_SCENE_SUFFIX);
+            detail.description = if detail.description.is_empty() { detail.scene.clone() }
+                else { format!("{}\n{}", detail.scene, detail.description) };
+        }
         if alias.is_some_and(|other| a.id == other.id) {
             let text = if portal_alias.is_some() { " This creature occupies the linked portal space at the other end." }
                 else { " This already visible creature also occupies this linked Non-Euclidean space." };
@@ -1114,9 +1121,9 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             lines: vec![text],
             ..Default::default()
         };
-        if let Some(text) = crate::portal_ui::description(r, x, y) {
-            report.title = text.split('.').next().unwrap_or("Portal").into();
-            report.scene.push_str(&format!(" {text}")); report.lines.push(text);
+        if let Some(name) = &portal_name {
+            report.title = name.clone();
+            report.scene.clear(); // Keep the ground details below the portal's own line.
         }
         if let Some(text) = crate::non_euclidean_ui::description(r, &observation, x, y) {
             report.title = if text.starts_with("Speed-up area.") { "Speed-up area" } else { "Non-Euclidean space" }.into();
@@ -1263,6 +1270,12 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             "A banshee’s shriek came from here. Nothing else is revealed by the sound.".into();
         report.lines = vec![report.scene.clone()];
         report.item_hover.clear();
+    }
+    if portal_name.is_some() {
+        let text = crate::portal_ui::INSPECTOR_SCENE;
+        let supporting = report.scene.trim();
+        report.scene = if supporting.is_empty() { text.into() } else { format!("{text} {supporting}") };
+        report.lines.insert(0, text.into());
     }
     report
 }

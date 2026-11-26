@@ -58,11 +58,14 @@ pub fn observed_item_mate(run: &Run, observation: &vision::TerrainObservation, a
     observation.cells.get(mate)?.direct.then_some(mate)
 }
 
-pub fn description(run: &Run, x: usize, y: usize) -> Option<String> {
-    if !corpse_core::portals::enabled(run) { return None; }
+pub const INSPECTOR_SCENE: &str = "Reality warps around a portal.";
+pub const CREATURE_SCENE_SUFFIX: &str = " as reality warps around a portal.";
+
+pub fn known_name(run: &Run, cell: &vision::ObservedCell) -> Option<String> {
+    if !corpse_core::portals::enabled(run) || !(cell.current || cell.remembered) { return None; }
     let f = run.floor()?;
-    let pair = corpse_core::portals::pair_at(f, y * f.width() + x)?;
-    Some(format!("{} portal. Its paired portal shares this space; stepping in crosses to the other end.", NAMES[(pair.color_index as usize).min(6)]))
+    let pair = corpse_core::portals::pair_at(f, cell.index)?;
+    Some(format!("{} portal", NAMES[(pair.color_index as usize).min(6)]))
 }
 
 #[cfg(test)]
@@ -106,6 +109,28 @@ mod tests {
         assert!(!cells[0].italic);
     }
     #[test]
+    fn portal_ui_inspector_names_empty_and_occupied_portals_without_revealing_hidden_ones() {
+        let mut r = scene();
+        r.actors_at_mut(r.depth).clear();
+        let empty = crate::inspection_ui::observe_tile(&r, 11, 10);
+        assert_eq!(empty.title, "Blue portal");
+        assert_eq!(empty.scene, "Reality warps around a portal.");
+        assert_eq!(empty.lines.first().map(String::as_str), Some(INSPECTOR_SCENE));
+        let actor = corpse_core::population::create_actor_revision("rat", 900., 11., 10., false, 35.).unwrap();
+        r.actors_at_mut(r.depth).push(actor);
+        let occupied = crate::inspection_ui::observe_tile(&r, 11, 10);
+        assert!(occupied.scene.starts_with("A giant rat "));
+        assert!(occupied.scene.ends_with(CREATURE_SCENE_SUFFIX));
+        assert!(occupied.creature.unwrap().description.starts_with(&occupied.scene));
+        r.actors_at_mut(r.depth).clear();
+        let mut observed = vision::observe_terrain(&r).unwrap();
+        let cell = &mut observed.cells[10 * observed.width + 11];
+        cell.current = false;
+        cell.remembered = false;
+        let hidden = crate::inspection_ui::observe_tile_with_terrain(&r, 11, 10, &observed);
+        assert!(!hidden.scene.contains("portal"));
+    }
+    #[test]
     fn portal_ui_remote_actor_alias_inspection_and_one_list_entry() {
         let mut r=scene();let a=corpse_core::population::create_actor_revision("rat",900.,45.,10.,false,34.).unwrap();
         r.actors_at_mut(r.depth).push(a);
@@ -115,6 +140,7 @@ mod tests {
         assert_eq!(v.creatures.iter().filter(|c|c.id==900.).count(),1);
         let report=crate::inspection_ui::observe_tile(&r,11,10);
         assert!(report.scene.contains("linked portal space"));assert!(report.creature.is_some());
+        assert!(report.scene.contains(CREATURE_SCENE_SUFFIX));
     }
     #[test]
     fn portal_ui_ground_item_alias_observed_only_and_single_identity() {
