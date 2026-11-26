@@ -278,7 +278,9 @@ pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)
     let (mut x,mut y)=(x,y);
     let mut intercepted=None;
     if r.simulation_revision.value_or(29.)>=52. && matches!(kind,ControlEffect::Beckoning|ControlEffect::Discord|ControlEffect::Roots|ControlEffect::Obstruction) {
-        let key=match kind {ControlEffect::Beckoning=>"A07",ControlEffect::Discord=>"A08",ControlEffect::Roots=>"A10",_=>"A09"};
+        // Beckoning retains the same collision checks. Its round-trip
+        // cue is emitted only when a creature was actually pulled.
+        let key=match kind {ControlEffect::Beckoning=>None,ControlEffect::Discord=>Some("A08"),ControlEffect::Roots=>Some("A10"),_=>Some("A09")};
         let hit=crate::animation_amulets::control_cast(r,key,x,y);
         x=hit.x;y=hit.y;intercepted=hit.actor_id;
         if kind==ControlEffect::Obstruction {
@@ -309,7 +311,10 @@ pub fn execute_with_profile(r:&mut Run,kind:ControlEffect,x:f64,y:f64,p:Profile)
                 if let Some(a)=engine::actor(r,id){traveled.push(a.into());}
             }
             if traveled.len()>1 {crate::beckoning_skip::after_pull(r,r.player.id,id);}
-            crate::events::cue(r,&original,"A07","root",crate::events::Stage::Travel,&traveled);
+            if crate::events::enabled(r) && traveled.len()>1 {
+                traveled.push((&r.player).into());
+                crate::animation_shapes::beckon_round_trip(r,&r.player,&original,"A07",&traveled,"#b78ee8");
+            }
         },
         ControlEffect::Discord=>{let id=intercepted.unwrap_or_else(||visible_target(r,x,y,p.range.unwrap_or(f64::INFINITY)).unwrap().id);let duration=crate::monster_statuses::status_duration(r,engine::actor(r,id).unwrap(),p.duration.unwrap());engine::actor_mut_trusted(r,id).unwrap().conditions.insert(DISCORD.into(),duration);let a=engine::actor(r,id).unwrap();crate::events::cue(r,a,"A08","crossed-ring",crate::events::Stage::Special,&[a.into()]);},
         ControlEffect::Roots=>{

@@ -31,7 +31,7 @@ impl Sequence {
         for action in actions {
             if let Some(index) = frames.iter().rposition(|f| f.action < action) { selected.insert(index); }
         }
-        for cue in &cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")||a.arrival_steps.is_some()) {
+        for cue in &cues {if cue.event.animation.as_ref().is_some_and(|a|a.style=="map-reveal"||a.style.starts_with("wave-reveal")||a.arrival_steps.is_some()||a.hide_actor.is_some()) {
             let action=cue.event.animation.as_ref().unwrap().action;
             if let Some(index)=frames.iter().position(|f|f.action==action){selected.insert(index);}
         }}
@@ -89,7 +89,6 @@ impl Sequence {
                 }
             }
         }
-        self.reveals.sort_by(|a,b|a.0.total_cmp(&b.0));
         for cue in &cues {
             let end = cue.started + duration(&cue.event);
             self.finish = self.finish.max(end);
@@ -98,6 +97,31 @@ impl Sequence {
                 else { self.ends.push((a.action,end)); }
             }
         }
+        for cue in &cues {
+            let Some(a)=cue.event.animation.as_ref().filter(|_| !cue.static_marks) else { continue };
+            let Some(actor)=a.hide_actor else { continue };
+            let base=self.frames.iter().rev().find(|(id,_)|*id<a.action)
+                .map(|(_,v)|v).or(self.before.as_ref()).unwrap();
+            // Paint the original terrain and everyone's original positions
+            // while the return beam travels, hiding only this actor layer.
+            if base.cells.iter().any(|c|c.actor_id==Some(actor)) {
+                let mut hidden=(**base).clone();
+                hidden.cells.retain(|c|c.actor_id!=Some(actor));
+                hidden.hallucination_cells=hidden.cells.iter().enumerate()
+                    .filter_map(|(idx,c)|c.hallucination.is_some().then_some(idx)).collect();
+                let end=cue.started+duration(&cue.event);
+                self.reveals.push((cue.started,end,Rc::new(hidden)));
+                // If a secondary HUD cue is still running, the landed actor
+                // is already visible at the exact end of the return trip.
+                let action_end=self.ends.iter().find(|(id,_)|*id==a.action).map_or(end,|(_,end)|*end);
+                if action_end>end {
+                    if let Some((_,after))=self.frames.iter().find(|(id,_)|*id==a.action) {
+                        self.reveals.push((end,action_end,after.clone()));
+                    }
+                }
+            }
+        }
+        self.reveals.sort_by(|a,b|a.0.total_cmp(&b.0));
     }
     pub fn shift(&mut self, amount: f64) { self.finish += amount; for (start,end,_) in &mut self.reveals {*start+=amount;*end+=amount;} for (_,end) in &mut self.ends { *end += amount; } }
     pub fn active(&self) -> bool { self.before.is_some() }
@@ -159,7 +183,7 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
   let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let profile=crate::appearance_profile::Profile::defaults();
   let mut before=observe(&run,profile);before.cells.clear();let mut after=before.clone();
   for x in [0,5,10] {after.cells.push(crate::render::Cell{x,y:0,glyph:".".into(),label:"revealed".into(),..Default::default()});}
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P72".into(),style:"map-reveal".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.},EventPoint{x:10.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P72".into(),style:"map-reveal".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.},EventPoint{x:10.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None,hide_actor:None,arrival_steps:None})};
   let cue=Cue{event,started:0.,held:false,static_marks:false};let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[cue],profile);
   assert_eq!(sequence.view(0.).unwrap().cells.len(),1);assert_eq!(sequence.view(400.).unwrap().cells.len(),1);assert_eq!(sequence.view(700.).unwrap().cells.len(),2);assert!(!sequence.view(700.).unwrap().cells.iter().any(|c|c.x==5));assert!(sequence.view(900.).is_none());
  }
@@ -175,7 +199,7 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
   before.creatures=vec![crate::render::Creature { perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,id:2.,name:"Victim".into(),glyph:"v".into(),color:[255,255,255],state:"Hunting".into(),distance:5.,hp:10.,max_hp:10.,energy:0.,max_energy:0.,uses_energy:false,statuses:vec![],meters:vec![] }];
   before.cells=vec![crate::render::Cell {x:5,y:0,actor_id:Some(2.),glyph:"v".into(),..Default::default()},crate::render::Cell {x:10,y:0,actor_id:Some(1.),glyph:"@".into(),..Default::default()}];
   let mut after=before.clone();after.creatures.clear();after.cells[0].actor_id=None;after.cells[0].glyph="x".into();after.hp=0.;after.dead=true;after.player_statuses.push(crate::statuses_ui::Status{name:"Stunned".into(),duration:Some(2.)});
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"E18".into(),style:"wave-reveal-purple".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"E18".into(),style:"wave-reveal-purple".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None,hide_actor:None,arrival_steps:None})};
   let cue=Cue{event:event.clone(),started:0.,held:false,static_marks:false};let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[cue],profile);
   let early=sequence.view(324.).unwrap();assert_eq!(early.creatures[0].hp,10.);assert_eq!(early.cells.iter().find(|c|c.x==5).unwrap().glyph,"v");assert_eq!(early.hp,50.);assert!(!early.dead);assert!(early.player_statuses.is_empty());
   let middle=sequence.view(325.).unwrap();assert!(middle.creatures.is_empty());assert_eq!(middle.cells.iter().find(|c|c.x==5).unwrap().glyph,"x");assert_eq!(middle.hp,50.);assert!(!middle.dead);assert!(middle.player_statuses.is_empty());
@@ -198,7 +222,7 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
   let mut after=before.clone();after.log=vec!["Future".into()];
   after.cells=vec![crate::render::Cell{x:5,y:0,glyph:".".into(),..Default::default()},crate::render::Cell{x:5,y:0,glyph:"B".into(),actor_id:Some(2.),..Default::default()}];
   after.creatures=vec![crate::render::Creature { perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,id:2.,name:"Bear".into(),glyph:"B".into(),color:[255,255,255],state:"Sleeping".into(),distance:5.,hp:10.,max_hp:10.,energy:0.,max_energy:0.,uses_energy:false,statuses:vec![],meters:vec![] }];
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-telepathy".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-telepathy".into(),stage:Stage::Special,action:1,cells:(0..=10).map(|x|EventPoint{x:x as f64,y:0.}).collect(),delivery:Delivery::Local,surface:None,item_id:None,hide_actor:None,arrival_steps:None})};
   let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[Cue{event:event.clone(),started:0.,held:false,static_marks:false}],profile);
   assert!(sequence.view(324.).unwrap().creatures.is_empty());assert!(sequence.view(324.).unwrap().cells.is_empty());
   let reached=sequence.view(325.).unwrap();assert_eq!(reached.creatures[0].name,"Bear");assert_eq!(reached.cells.len(),2);assert_eq!(reached.log,vec!["Before"]);assert!(reached.terrain_snapshot.is_none());
@@ -208,8 +232,65 @@ pub fn observe(run: &corpse_core::Run, profile: &crate::appearance_profile::Prof
  #[test] fn shattering_wall_remains_during_crystal_flash(){
   let run:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let profile=crate::appearance_profile::Profile::defaults();
   let mut before=observe(&run,profile);before.cells=vec![crate::render::Cell{x:0,y:0,glyph:"#".into(),..Default::default()}];let mut after=before.clone();after.cells[0].glyph=".".into();
-  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-shattering".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})};
+  let event=PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"potion-wave".into(),style:"wave-reveal-shattering".into(),stage:Stage::Special,action:1,cells:vec![EventPoint{x:0.,y:0.}],delivery:Delivery::Local,surface:None,item_id:None,hide_actor:None,arrival_steps:None})};
   let mut sequence=Sequence::default();sequence.capture(before,vec![PresentationFrame{action:1,observation:Rc::new(after)}],&[Cue{event,started:0.,held:false,static_marks:false}],profile);
   assert_eq!(sequence.view(119.).unwrap().cells[0].glyph,"#");assert_eq!(sequence.view(120.).unwrap().cells[0].glyph,".");
  }
+}
+
+#[cfg(test)]
+mod beckon_tests {
+    use super::*;
+    use corpse_core::{
+        animation_shapes::BECKON_BEAM,
+        events::{AnimationCue, Delivery, EventPoint, PresentationEvent, Stage},
+    };
+
+    #[test]
+    fn beckon_hides_one_layer_without_hiding_the_terrain_or_nearby_actors() {
+        let run: corpse_core::Run =
+            serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+        let profile = crate::appearance_profile::Profile::defaults();
+        let mut before = observe(&run, profile);
+        before.cells = vec![
+            crate::render::Cell { x:5, y:1, glyph:".".into(), ..Default::default() },
+            crate::render::Cell { x:5, y:1, glyph:"r".into(), actor_id:Some(9.), ..Default::default() },
+            crate::render::Cell { x:5, y:1, glyph:"B".into(), actor_id:Some(8.), ..Default::default() },
+        ];
+        before.terrain_count = 1;
+        before.hallucination_cells.clear();
+        let mut after = before.clone();
+        after.cells[1].x = 7;
+        let event = PresentationEvent {
+            kind:"animation".into(), from:None, to:EventPoint { x:8., y:1. },
+            glyph:None, color:None, label:None, depth:1.,
+            animation:Some(AnimationCue {
+                delivery:Delivery::Magic, proposal:"A07".into(), style:BECKON_BEAM.into(),
+                stage:Stage::Travel, action:1, cells:vec![EventPoint {x:5.,y:1.},EventPoint {x:8.,y:1.}],
+                hide_actor:Some(9.), surface:None, item_id:None, arrival_steps:None,
+            }),
+        };
+        let end = 100. + duration(&event);
+        let cue = Cue {event:event.clone(), started:100., held:false, static_marks:false};
+        let mut secondary = cue.clone();
+        secondary.started = end;
+        let hud = secondary.event.animation.as_mut().unwrap();
+        hud.stage = Stage::Health;
+        hud.hide_actor = None;
+        let mut sequence = Sequence::default();
+        sequence.capture(before.clone(), vec![PresentationFrame {action:1, observation:Rc::new(after.clone())}],
+            &[cue.clone(),secondary], profile);
+        let ids = |view:&View| view.cells.iter().map(|c|c.actor_id).collect::<Vec<_>>();
+        assert_eq!(ids(sequence.view(99.).unwrap()), vec![None,Some(9.),Some(8.)]);
+        assert_eq!(ids(sequence.view(100.).unwrap()), vec![None,Some(8.)]);
+        assert_eq!(ids(sequence.view(end-1.).unwrap()), vec![None,Some(8.)]);
+        assert_eq!(sequence.view(end).unwrap().cells[1].x, 7);
+        sequence.shift(75.);
+        assert_eq!(ids(sequence.view(174.).unwrap()), vec![None,Some(9.),Some(8.)]);
+        assert_eq!(ids(sequence.view(175.).unwrap()), vec![None,Some(8.)]);
+
+        let reduced = Cue {static_marks:true,..cue};
+        sequence.capture(before, vec![PresentationFrame {action:1, observation:Rc::new(after)}], &[reduced], profile);
+        assert_eq!(ids(sequence.view(100.).unwrap()), vec![None,Some(9.),Some(8.)]);
+    }
 }

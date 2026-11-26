@@ -50,7 +50,20 @@ pub struct CreatureReport {
     pub hover_available: bool,
     #[serde(default)]
     pub bow_shot: String,
+    #[serde(skip)]
+    creature_card: Option<CreatureCard>,
 }
+
+/// The passive card has its own copy, separate from the detailed Inspector.
+#[derive(Clone, Debug, PartialEq)]
+struct CreatureCard {
+    conditions: String,
+    mechanics: Vec<String>,
+    your_melee: String,
+    enemy_melee: String,
+    administrator: bool,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct HoverResource {
     pub label: String,
@@ -839,6 +852,44 @@ fn creature_presented(r:&Run,a:&Actor,tile:Option<&vision::ObservedCell>, projec
         .and_then(|o| o.illumination)
         .map_or("unknown".into(), |n| js_round(n).to_string());
     let (abilities, ability_details) = crate::creature_abilities_ui::describe(r, a);
+    let mut statuses = statuses_ui::observe(r, a);
+    if feeding == Some("Feeding") {
+        statuses.push(statuses_ui::Status { name: "Feeding".into(), duration: None });
+    }
+    let creature_card = (r.simulation_revision.value_or(29.) >= 52.
+        && a.id != r.player.id && !half_here::is_clone(a) && !corpse_core::dreamwalking::is_body(a))
+        .then(|| {
+            // Range changes accuracy, not per-hit damage. Report a hit forecast,
+            // not a promise that the current sight line is unobstructed.
+            let ranged = |base| {
+                let low = strike_damage(r, a, &r.player, base, 0.75, 0., true);
+                let high = strike_damage(r, a, &r.player, base, 1.25, 0., true);
+                (low, high)
+            };
+            let conditions = statuses.iter().filter_map(|status| {
+                let label = match status.name.as_str() {
+                    "Ranged recovery" | "Charging moonbeam: next normal action" => return None,
+                    "Slow: acts every other turn" => "Slow",
+                    "Slowed: acts every other turn" => "Slowed",
+                    "Lucky: next attack" => "Lucky",
+                    "Unlucky: next attack" => "Unlucky",
+                    "Distracted: next attack" => "Distracted",
+                    "Stuck: next move escapes" => "Stuck",
+                    _ => return Some(compact_condition(status)),
+                };
+                Some(status.duration.map_or_else(|| label.into(), |t| format!("{label} ({t}t)")))
+            }).collect::<Vec<_>>().join(", ");
+            let mechanics = crate::creature_abilities_ui::hover::describe(
+                r, a, [their.strike.minimum, their.strike.maximum], ranged);
+            CreatureCard {
+                conditions, mechanics,
+                your_melee: if corpse_core::ahvamitt::is_actor(a) { String::new() }
+                    else { format_hover_melee(&your, true) },
+                enemy_melee: if corpse_core::ahvamitt::is_actor(a) { String::new() }
+                    else { format_hover_melee(&their, false) },
+                administrator: corpse_core::finale::is_boss(a),
+            }
+        });
     CreatureReport {
         title,
         description: flavor(a),
@@ -860,13 +911,7 @@ fn creature_presented(r:&Run,a:&Actor,tile:Option<&vision::ObservedCell>, projec
             }
             text
         },
-        conditions: {
-            let mut statuses=statuses_ui::observe(r,a);
-            if feeding==Some("Feeding") {
-                statuses.push(statuses_ui::Status{name:"Feeding".into(),duration:None});
-            }
-            statuses.iter().map(compact_condition).collect::<Vec<_>>().join(", ")
-        },
+        conditions: statuses.iter().map(compact_condition).collect::<Vec<_>>().join(", "),
         your_attack: if !projected && corpse_core::ahvamitt::is_actor(a)
             && corpse_core::dreamwalking::same_plane(r, &r.player, a) {
             "Attack him to continue his game; he teleports away instead of taking ordinary attack damage.".into()
@@ -880,6 +925,7 @@ fn creature_presented(r:&Run,a:&Actor,tile:Option<&vision::ObservedCell>, projec
         hover_resources: hover_resources(r, a),
         hover_available: !a.dead.value_or(false),
         bow_shot: String::new(),
+        creature_card,
     }
 }
 fn hover_resources(r: &Run, a: &Actor) -> Vec<HoverResource> {
@@ -1753,7 +1799,11 @@ pub fn paint_hover(report: &Report, p: &mut Painter) {
         }
         offset += gap;
     };
-    add(&c.description, MUTED, 15, 4);
+    let card = c.creature_card.as_ref();
+    let flavor = if card.is_some_and(|v| v.administrator) {
+        crate::creature_abilities_ui::hover::ADMIN_FLAVOR
+    } else { &c.description };
+    add(flavor, MUTED, 15, 4);
     add(&c.behavior, MUTED, 15, 4);
     // Resource meters are an observed detached projection, never parsed from prose.
     let resource_y = offset + 4;
@@ -1771,12 +1821,25 @@ pub fn paint_hover(report: &Report, p: &mut Painter) {
     if c.hover_resources.is_empty() {
         add(&c.resources, INK, 15, 4)
     }
-    add(&c.conditions, [193, 138, 255], 14, 7);
-    add("Your attacks", [36, 223, 255], 15, 2);
-    add(&c.your_attack, [36, 223, 255], 15, 7);
-    add(ENEMY_MELEE_HEADING, [255, 82, 120], 15, 2);
-    add(&c.their_attack, [255, 82, 120], 15, 7);
-    add(&c.abilities, MUTED, 15, 4);
+    if let Some(card) = card {
+        add(&card.conditions, [193, 138, 255], 14, 7);
+        for (index, row) in card.mechanics.iter().enumerate() {
+            add(row, if index == 0 { INK } else { MUTED }, 15, 2);
+        }
+        if !card.your_melee.is_empty() {
+            add(&format!("Your melee · {}", card.your_melee), [36, 223, 255], 15, 3);
+        }
+        if !card.enemy_melee.is_empty() {
+            add(&format!("Enemy melee · {}", card.enemy_melee), [255, 82, 120], 15, 4);
+        }
+    } else {
+        add(&c.conditions, [193, 138, 255], 14, 7);
+        add("Your attacks", [36, 223, 255], 15, 2);
+        add(&c.your_attack, [36, 223, 255], 15, 7);
+        add(ENEMY_MELEE_HEADING, [255, 82, 120], 15, 2);
+        add(&c.their_attack, [255, 82, 120], 15, 7);
+        add(&c.abilities, MUTED, 15, 4);
+    }
     add(&c.heart, GOLD, 14, 0);
     add(&c.bow_shot, INK, 15, 7);
     let (x, y, w, h) = modal_ui::hover_bounds_painter(p, offset + 12).tuple();
@@ -3107,6 +3170,39 @@ fn attacks(r: &Run, a: &Actor) -> (Attack, Attack) {
         project_attack(&view, &projected, &view.player),
     )
 }
+fn format_hover_melee(a: &Attack, yours: bool) -> String {
+    use crate::creature_abilities_ui::hover::percent;
+    if let Some(reason) = a.reason.as_deref() {
+        return match reason {
+            "harmless" | "rooted" | "inactive-mech" | "attacker-dead" => String::new(),
+            "missed-me-retreat" => "Missed Me may evade the hit.".into(),
+            "paralyzed" => "Paralyzed.".into(),
+            "different-plane" => "Different plane.".into(),
+            "stranded" => "Out of habitat.".into(),
+            "out-of-reach" | "inaccessible" => "Out of reach.".into(),
+            _ => format_attack(a, yours),
+        };
+    }
+    if a.offhand.is_some() {
+        return format_attack(a, yours);
+    }
+    if a.strike.maximum <= 0. {
+        return "0% HP/hit.".into();
+    }
+    let mut n = [a.strike.minimum, a.strike.maximum];
+    let mut energy = String::new();
+    if let Some(nrg) = a.hanged_energy {
+        let paid = a.hanged_surrender_main_cost.unwrap_or([0., 0.]);
+        let low = corpse_core::hanged::split(a.defender_hp, nrg - paid[0], n[0]);
+        let high = corpse_core::hanged::split(a.defender_hp, nrg - paid[1], n[1]);
+        n = [low.hp, high.hp];
+        energy = format!(" + {}–{} NRG (Hanged)", (low.energy + paid[0]).round(), (high.energy + paid[1]).round());
+    }
+    let (lo, hi) = (percent(n[0], a.defender_max_hp), percent(n[1], a.defender_max_hp));
+    let damage = if lo == hi { hi } else { format!("{}–{hi}", lo.trim_end_matches('%')) };
+    format!("{:.0}% hit · {damage} HP/hit{energy}.", a.strike.chance.clamp(0., 1.) * 100.)
+}
+
 fn format_attack(a: &Attack, yours: bool) -> String {
     if let Some(reason) = a.reason.as_deref() {
         let pair = match reason {
@@ -3265,6 +3361,10 @@ fn format_attack(a: &Attack, yours: bool) -> String {
         format!("They hit you {hit}% of the time and deal {range} of your health per hit. At best, they could kill you in {count}.")
     }
 }
+
+#[cfg(test)]
+#[path = "monster_hover_render_tests.rs"]
+mod monster_hover_render_tests;
 
 #[cfg(test)]
 mod hover_tests {

@@ -6,7 +6,7 @@ use corpse_core::events::{AnimationCue,Delivery,EventPoint,PresentationEvent,Sta
 fn event(key:&str,style:&str,stage:Stage,action:u32,cells:&[(f64,f64)])->PresentationEvent{
  let cells:Vec<_>=cells.iter().map(|&(x,y)|EventPoint{x,y}).collect();
  PresentationEvent{kind:"animation".into(),from:None,to:cells.last().cloned().unwrap_or(EventPoint{x:10.,y:10.}),glyph:None,color:None,label:None,depth:1.,
- animation:Some(AnimationCue{delivery:if stage==Stage::Travel&&(style.starts_with("bolt")||matches!(style,"ember"|"dart"|"glob")){if key=="shared"||key=="E61"{Delivery::Projectile}else{Delivery::Magic}}else{Delivery::Local},proposal:key.into(),style:style.into(),stage,action,cells,surface:None,item_id:None,arrival_steps:None})}
+ animation:Some(AnimationCue{delivery:if stage==Stage::Travel&&(style.starts_with("bolt")||matches!(style,"ember"|"dart"|"glob")){if key=="shared"||key=="E61"{Delivery::Projectile}else{Delivery::Magic}}else{Delivery::Local},proposal:key.into(),style:style.into(),stage,action,cells,surface:None,item_id:None,hide_actor:None,arrival_steps:None})}
 }
 fn capture(p:&Painter,name:&str){if let Ok(dir)=std::env::var("CORPSE_ACTION_REVIEW"){std::fs::create_dir_all(&dir).unwrap();let f=std::fs::File::create(format!("{dir}/{name}.png")).unwrap();let mut enc=png::Encoder::new(f,p.width as u32,p.height as u32);enc.set_color(png::ColorType::Rgba);enc.set_depth(png::BitDepth::Eight);enc.write_header().unwrap().write_image_data(&p.pixels).unwrap();}}
 #[test]fn action_animation_exact_cells_order_and_instant(){

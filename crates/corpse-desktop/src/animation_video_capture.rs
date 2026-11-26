@@ -21,6 +21,24 @@ fn render_animation_review_videos() {
   let mut painter=Painter::new();painter.resize(960,600);painter.set_responsive_canvas(true);
   let pre=observe::observe_with_profile(&before,&painter.profile);let post=observe::observe_with_profile(&after,&painter.profile);
   fx.sequence.capture(pre,frames,&fx.cues,&painter.profile);
+  if let Some(inward)=fx.cues.iter().find(|c|c.event.animation.as_ref()
+      .is_some_and(|a|a.style==corpse_core::animation_shapes::BECKON_BEAM)) {
+   let receipt=inward.event.animation.as_ref().unwrap();
+   if let Some(actor)=receipt.hide_actor {
+    let outbound=fx.cues.iter().find(|c|c.event.animation.as_ref()
+        .is_some_and(|a|a.style==corpse_core::animation_shapes::BECKON_OUTBOUND&&a.action==receipt.action)).unwrap();
+    let location=|now|fx.sequence.view(now).unwrap_or(&post).cells.iter()
+        .find(|c|c.actor_id==Some(actor)).map(|c|(c.x,c.y));
+    let origin=receipt.cells.first().unwrap();
+    assert_eq!(location(outbound.started),Some((origin.x as usize,origin.y as usize)));
+    assert_eq!(location(inward.started-1.),location(outbound.started));
+    assert_eq!(location(inward.started),None);
+    let lands=inward.started+effects::duration(&inward.event);
+    assert_eq!(location(lands-1.),None);
+    assert!(location(lands).is_some(),"Beckoned actor must reappear at beam completion");
+    assert_ne!(location(lands),location(outbound.started));
+   }
+  }
   let end=fx.cues.iter().map(|c|c.started+effects::duration(&c.event)).fold(500f64,f64::max);
   let duration=(end+700.).max(2000.);let count=(duration*60./1000.).ceil()as usize;
   let destination=format!("{output}/{name}.mp4");

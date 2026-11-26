@@ -27,10 +27,10 @@ pub fn expired_statuses(r:&Run,before:&Actor){
 
 /// Commit the actual collision/portal ray once; animation consumes that detached
 /// receipt, never re-traces it or consumes extra randomness.
-pub(crate) fn control_cast(r:&mut Run,key:&str,x:f64,y:f64)->crate::projectiles::Landing {
+pub(crate) fn control_cast(r:&mut Run,key:Option<&str>,x:f64,y:f64)->crate::projectiles::Landing {
     let source=r.player.clone();
     let landing=crate::projectiles::trace_committed_from_actor(r,&source,x,y);
     let cells=events::take_path(&source);
-    events::travel(r,&source,key,"bolt",&cells,events::Delivery::Magic,None);
+    if let Some(key)=key {events::travel(r,&source,key,"bolt",&cells,events::Delivery::Magic,None);}
     landing
 }

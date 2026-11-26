@@ -94,9 +94,9 @@ impl Manual {
         let mut catalog: Catalog = serde_json::from_str(include_str!("../assets/manual.json"))
             .expect("immutable bestiary catalog");
         for (id,name,text,cost) in [
-            ("dragon","Flight","Takes a faster route to safe ground; lasts up to 6 turns.",8),
-            ("blorb","Caustic touch","Damaging melee hits add 1 caustic damage before protection.",0),
-            ("killspawn","Deep bleeding","Damaging melee hits add half their damage as bleeding over 3 turns. Wounds add together.",0),
+            ("dragon","Flight","Flies to safety for up to 6 turns.",8),
+            ("blorb","Caustic touch","Damaging melee adds caustic damage.",0),
+            ("killspawn","Deep bleeding","Damaging melee adds 50% of hit damage as Bleeding over 3 turns. Stacks.",0),
         ] {
             if let Some(entry)=catalog.entries.iter_mut().find(|e|e.id==id) {
                 entry.mechanics.push(Mechanic {name:name.into(),text:text.into(),cost:cost.into()});
@@ -136,15 +136,15 @@ impl Manual {
                 match mechanic.name.as_str() {
                     "Hallucinogenic Gas Cloud" | "Death Gas Cloud" => {
                         mechanic.name=if current {"Death Gas Cloud"}else{"Hallucinogenic Gas Cloud"}.into();
-                        mechanic.text=if current {"Continually emits Death Gas, combining caustic damage with hallucinations."}
-                            else {"Continually emits hallucinogenic gas instead of caustic gas. Exposure refreshes Hallucinating to two normal world turns."}.into();
+                        mechanic.text=if current {"Emits Death Gas: about 6.7% max HP per turn + Hallucinating (5 turns, refreshed in the gas)."}
+                            else {"Emits hallucinogenic gas; refreshes Hallucinating on exposure."}.into();
                     }
-                    "Forceful Exhalation" => mechanic.text=if current {"Exhales an additional cloud of Death Gas."}
-                        else {"Can exhale an additional cloud of hallucinogenic gas."}.into(),
+                    "Forceful Exhalation" => mechanic.text=if current {"Exhales an extra cloud of Death Gas."}
+                        else {"Exhales an extra hallucinogenic cloud."}.into(),
                     "Caustic Gas Immunity" | "Pale Gas Immunity" => {
                         mechanic.name=if current {"Pale Gas Immunity"}else{"Caustic Gas Immunity"}.into();
-                        mechanic.text=if current {"Immune to both effects of Death Gas, as well as ordinary caustic and hallucinogenic gas."}
-                            else {"Is immune to caustic gas damage."}.into();
+                        mechanic.text=if current {"Immune to Death Gas, caustic gas, and hallucinogenic gas."}
+                            else {""}.into();
                     }
                     _ => (),
                 }
@@ -610,11 +610,7 @@ fn redundant_source(source: &Source) -> bool {
         || (source.kind == "ordinary" && source.text == "May appear in roaming groups.")
 }
 fn mechanic_heading(mechanic: &Mechanic) -> &str {
-    match (mechanic.name.as_str(), mechanic.text.as_str()) {
-        ("Slow (acts every other turn)", "Acts only every other normal turn.") => "Slow",
-        ("Fast (extra movement step)", "Takes an extra movement step each turn.") => "Fast",
-        _ => &mechanic.name,
-    }
+    &mechanic.name
 }
 struct ContentLine {
     text: String,
@@ -739,9 +735,9 @@ fn fit_content_part(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i3
         for (index,mechanic) in entry.mechanics.iter().enumerate() {
             if part != -1 && part != index as isize {continue;}
             let cost = if mechanic.cost.as_str() == Some("all") {
-                " (all Energy)".into()
+                " · all NRG".into()
             } else if mechanic.cost.as_f64().unwrap_or(0.) > 0. {
-                format!(" ({} Energy)", mechanic.cost)
+                format!(" · {} NRG", mechanic.cost)
             } else {
                 String::new()
             };
@@ -1155,6 +1151,48 @@ corpse_core::population::fungus_revision(d as u32, revision).unwrap()
         assert_eq!(fungus_setup_depths(52.), (1..=40).collect::<Vec<_>>());
     }
     #[test]
+    fn concise_bestiary_preserves_signature_threats_and_shared_labels() {
+        let mut manual = Manual::new();
+        let page = |manual: &Manual, id: &str, ability: &str| {
+            let e = manual.catalog.entries.iter().find(|e| e.id == id).unwrap();
+            let m = e.mechanics.iter().find(|m| m.name == ability).unwrap();
+            effect_ranges::page_text(e, m).to_owned()
+        };
+        assert_eq!(page(&manual, "cave-bat", "Fast"), "");
+        assert!(page(&manual, "pale:Greater Breather", "Death Gas Cloud").contains("about 6.7% max HP"));
+        manual.set_death_gas(false);
+        assert!(page(&manual, "pale:Greater Breather", "Hallucinogenic Gas Cloud").contains("Hallucinating"));
+        manual.set_death_gas(true);
+        assert!(page(&manual, "bombardier", "Reservoir Explosion").contains("50% max HP"));
+        assert!(page(&manual, "banshee", "Banshee Shriek").contains("50% current HP + 100"));
+        assert!(page(&manual, "samara", "Razorleaves").contains("2% max HP"));
+        assert!(page(&manual, "zillennia:transcendent", "Ground Erasure").contains("loose items"));
+        for e in manual.catalog.entries.iter().filter(|e|e.kind == "zillennia") {
+            assert!(page(&manual, &e.id, "Ruin Pulse").contains("within 3 tiles"));
+            assert!(page(&manual, &e.id, "Mouth of Silence").contains("within 3 tiles"));
+        }
+        for (id, ability, damage) in [("needleling","Weak Venom",1),("long-saidri","Venom",2),("saidri-guardian","Guardian Venom",4)] {
+            assert!(page(&manual, id, ability).contains(&format!("+{damage} damage per turn")));
+        }
+    }
+    #[test]
+    fn concise_bestiary_native_examples() {
+        let Ok(directory) = std::env::var("CORPSE_BESTIARY_COPY_REVIEW") else { return; };
+        std::fs::create_dir_all(&directory).unwrap();
+        let mut manual = Manual::new(); manual.preview_all();
+        let mut p = Painter::new();
+        p.try_resize(1280, 800).unwrap();
+        for id in ["witch", "bombardier", "pale:Greater Breather", "zillennia:transcendent", "banshee", "valta"] {
+            assert!(manual.select_id(id));
+            manual.paint(&mut p);
+            let file = std::fs::File::create(format!("{directory}/bestiary-{}.png", id.replace(':', "-"))).unwrap();
+            let mut encoder = png::Encoder::new(file, p.width as u32, p.height as u32);
+            encoder.set_color(png::ColorType::Rgba);
+            encoder.set_depth(png::BitDepth::Eight);
+            encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();
+        }
+    }
+    #[test]
     fn r52_bestiary_ranges_ignore_stale_manual_floors_and_fungus_requires_both_feasts() {
         let manual = Manual::new();
         for id in ["rat", "bastidion", "zillennia:child", "saidribee-queen"] {
@@ -1262,8 +1300,19 @@ corpse_core::population::fungus_revision(d as u32, revision).unwrap()
         for entry in &manual.catalog.entries {
             if corpse_core::balance52::profiles().iter().any(|r| r.kind == entry.id
                 && (r.heal_amount.is_some() || r.special_damage.is_some())) {
-                for mechanic in &entry.mechanics {
-                    assert!(!mechanic.text.chars().any(|c| c.is_ascii_digit()), "{}: {}", entry.id, mechanic.text);
+                // Static entries may show geometric limits and timing, but the
+                // damage/heal packet varies by spawn profile rather than the reader's HP.
+                let name = if entry.id == "dryad" { "Healing Grove" } else { "Moonbeam" };
+                let mechanic = entry.mechanics.iter().find(|m| m.name == name).unwrap();
+                let copy = effect_ranges::page_text(entry, mechanic);
+                let range = if entry.id == "dryad" { "6 tiles" } else { "16-tile" };
+                assert!(copy.contains(range), "{}: {copy}", entry.id);
+                for packet in corpse_core::balance52::profiles().iter()
+                    .filter(|r| r.kind == entry.id)
+                    .filter_map(|r| r.heal_amount.or(r.special_damage))
+                {
+                    assert!(!copy.contains(&format!("{packet} HP")), "{}: {copy}", entry.id);
+                    assert!(!copy.contains(&format!("{packet} damage")), "{}: {copy}", entry.id);
                 }
                 checked += 1;
             }

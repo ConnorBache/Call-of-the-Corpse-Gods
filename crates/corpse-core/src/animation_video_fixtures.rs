@@ -24,3 +24,90 @@ fn record(name:&str,mut r:Run,f:impl FnOnce(&mut Run)){let before=r.clone();let 
  use revision50_amulet_effects::{make_amulet,Effect};
  for name in ["iceblast","blinking","beckoning","discord","roots","obstruction","teleportation"]{let mut r=room();let mut item=make_amulet(Effect::Lightning,800.).unwrap();item.effect=name.to_string().into();item.name=format!("Amulet of {name}");r.inventory.push(item);let before=r.clone();let observer=events::PresentationObserver::install(|r|std::rc::Rc::new(r.clone()));let(x,y)=if name=="blinking"{(16.,15.)}else if name=="obstruction"{(16.,12.)}else{(18.,12.)};let out=engine::dispatch(&mut r,&Command::UseAt{id:800.,x,y}).unwrap();export(&format!("amulet-{name}"),&before,&r,out.events,observer.take());}
 }
+
+fn beckon_scene(cast_by_player: bool) -> (Run, Command, EventCoords) {
+    let mut r = room();
+    r.beckoning_rules_from = 0usize.into();
+    r.player.x = 12.;
+    r.player.y = 12.;
+    r.tick = 30.;
+    r.floor_mut().unwrap().monster_entry_tick = 0.0.into();
+    let w = r.floor().unwrap().width();
+    let floor = r.floor_mut().unwrap();
+    for y in 5..20 {
+        for x in 7..32 {
+            if y == 5 || y == 19 || x == 7 || x == 31 {
+                floor.tiles[y*w+x] = "wall".into();
+            }
+        }
+    }
+    let (x,y) = (28.,12.);
+    let (key, target, caster);
+    let command = if cast_by_player {
+        r.actors_at_mut(r.depth)[0].x = x;
+        r.actors_at_mut(r.depth)[0].y = y;
+        let mut item = Item{id:800.,kind:"amulet".into(),effect:"beckoning".to_string().into(),..Default::default()};
+        revision50_amulets::initialize_item_for_revision(&mut item,52.).unwrap();
+        revision52_amulet_tiers::initialize_birth(&mut item,52.,1).unwrap();
+        r.inventory.push(item);
+        key = "A07"; target = (x,y); caster = (r.player.x,r.player.y);
+        Command::UseAt { id:800., x, y }
+    } else {
+        r.actors_at_mut(r.depth).clear();
+        let mut horn = population::create_actor_revision("horn-3",900.,x,y,false,52.).unwrap();
+        horn.state = "hunting".into();
+        horn.energy = 100.;
+        horn.stats.perception = 300.;
+        horn.abilities = vec!["enemy:beast:beckon".into()];
+        r.actors_at_mut(r.depth).push(horn);
+        key = "E39"; target = (r.player.x,r.player.y); caster = (x,y);
+        Command::Wait
+    };
+    let target_id=if cast_by_player {900.} else {r.player.id};
+    (r,command,EventCoords { key, target, caster, target_id })
+}
+
+struct EventCoords { key: &'static str, target: (f64,f64), caster: (f64,f64), target_id: f64 }
+
+fn assert_beckon_direction(out: &[events::PresentationEvent], coords: EventCoords) {
+    let hits: Vec<_> = out.iter().filter_map(|e|e.animation.as_ref())
+        .filter(|a|a.proposal==coords.key).collect();
+    assert_eq!(hits.len(),2,"missing or additional Beckon receipts: {:?}",out);
+    let outbound=hits[0];
+    let beam=hits[1];
+    assert_eq!(outbound.style,animation_shapes::BECKON_OUTBOUND);
+    assert_eq!(beam.style,animation_shapes::BECKON_BEAM);
+    assert_eq!(outbound.action,beam.action);
+    assert_eq!(outbound.hide_actor,None);
+    assert_eq!(beam.hide_actor,Some(coords.target_id));
+    assert_eq!((outbound.delivery,beam.delivery),(events::Delivery::Magic,events::Delivery::Magic));
+    assert!(outbound.cells.iter().eq(beam.cells.iter().rev()));
+    let coords_of = |p:&events::EventPoint| (p.x,p.y);
+    assert_eq!(beam.cells.first().map(coords_of),Some(coords.target));
+    assert_eq!(beam.cells.last().map(coords_of),Some(coords.caster));
+    let step = (coords.caster.0-coords.target.0).signum();
+    assert!(beam.cells.windows(2).all(|p|p[1].x-p[0].x==step));
+}
+
+#[test]
+fn beckon_round_trip_hides_only_the_pulled_actor_on_return() {
+    for cast_by_player in [true,false] {
+        let (mut r, cmd, coords)=beckon_scene(cast_by_player);
+        let out=engine::dispatch(&mut r,&cmd).unwrap();
+        assert_beckon_direction(&out.events, coords);
+    }
+}
+
+#[test]
+#[ignore = "explicit Beckoning animation review fixtures"]
+fn export_beckon_round_trip() {
+    for cast_by_player in [true,false] {
+        let (mut r, cmd, coords)=beckon_scene(cast_by_player);
+        let before=r.clone();
+        let observer=events::PresentationObserver::install(|r|std::rc::Rc::new(r.clone()));
+        let out=engine::dispatch(&mut r,&cmd).unwrap();
+        assert_beckon_direction(&out.events, coords);
+        export(if cast_by_player {"avatar-beckons-rat"} else {"tricorn-beckons-avatar"},
+            &before,&r,out.events,observer.take());
+    }
+}

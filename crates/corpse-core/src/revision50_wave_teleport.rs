@@ -191,7 +191,7 @@ pub fn execute_with_profile(r:&mut Run,teleportation:bool,x:f64,y:f64,range:f64,
     if !target_valid_with_range(r,teleportation,x,y,range){return Err(EngineError("Invalid amulet target.".into()))}
     if teleportation {
         let id=if r.simulation_revision.value_or(29.)>=52. {
-            let hit=crate::animation_amulets::control_cast(r,"A11",x,y);
+            let hit=crate::animation_amulets::control_cast(r,Some("A11"),x,y);
             let Some(a)=hit.actor_id.and_then(|id|engine::actor(r,id)) else{return Ok(())};
             if crate::half_here::owner_id(r,a)==r.player.id || a.hp<=0. || a.dead.value_or(false)
                 || crate::dreamwalking::inert(r,a) || crate::revision50_terrain::is_soldier(a)

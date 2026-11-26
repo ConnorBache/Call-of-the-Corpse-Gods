@@ -348,6 +348,9 @@ pub struct AnimationCue {
     pub surface: Option<String>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub item_id: Option<f64>,
+    /// Detached actor layer to hide for this cue, never a simulation change.
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub hide_actor: Option<f64>,
     /// Parallel beam or wave arrival bands, indexed by the exact admitted cells.
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub arrival_steps: Option<Vec<u8>>,
@@ -390,7 +393,7 @@ pub fn at(r:&Run, proposal:&str, style:&str, stage:Stage, cells:&[EventPoint]) {
     let Some(to)=cells.last().cloned() else{return};
     let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action));
     emit(r, PresentationEvent { kind:"animation".into(),from:None,to,glyph:None,color:None,
-        label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage,action,cells,surface:None,item_id:None,arrival_steps:None}) });
+        label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage,action,cells,surface:None,item_id:None,hide_actor:None,arrival_steps:None}) });
 }
 /// Actor identity and plane admission precede all actor-related visual output.
 /// Terrain-only at() must not be used to bypass this guard for hidden actors.
@@ -444,6 +447,14 @@ pub fn decorate(since:u64,proposal:&str,style:&str,center:EventPoint,color:&str,
         }
     });
 }
+/// Attach an exact actor mask only to a newly admitted receipt.
+pub(crate) fn hide_actor_during(since:u64, actor:&Actor) {
+    if emission_serial()==since{return;}
+    PENDING.with(|p|if let Some(cue)=p.borrow_mut().as_mut()
+        .and_then(|b|b.events.last_mut()).and_then(|e|e.animation.as_mut()){
+        cue.hide_actor=Some(actor.id);
+    });
+}
 /// Known launched-item identity for detached landing presentation. This annotates
 /// the current action's admitted physical route only; no world or RNG mutation.
 pub(crate) fn projectile_item(r:&Run,item_id:f64){
@@ -482,7 +493,7 @@ pub fn inventory(r:&Run,proposal:&str,style:&str,item_id:Option<f64>){
     if !enabled(r)||r.player.x<0.{return}
     let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action));
     let event=PresentationEvent{kind:"animation".into(),from:None,to:(&r.player).into(),glyph:None,color:None,label:None,depth:r.depth,
-        animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage:if proposal=="P65"&&style=="gear"{Stage::Travel}else{Stage::Special},action,cells:vec![],surface:Some("inventory".into()),item_id,arrival_steps:None})};
+        animation:Some(AnimationCue{delivery:Delivery::Local,proposal:proposal.into(),style:style.into(),stage:if proposal=="P65"&&style=="gear"{Stage::Travel}else{Stage::Special},action,cells:vec![],surface:Some("inventory".into()),item_id,hide_actor:None,arrival_steps:None})};
     PENDING.with(|p|{if let Some(b)=p.borrow_mut().as_mut(){b.serial=b.serial.wrapping_add(1);b.events.push(event);if b.events.len()>4096{b.events.remove(0);}}});
 }
 
@@ -501,7 +512,7 @@ pub fn audible_banshee(r:&Run,a:&Actor){
     if !enabled(r)||r.player.x<0.||!crate::dreamwalking::same_plane(r,&r.player,a)||!crate::lifecycle::audible_banshee(r,a){return}
     let to=EventPoint{x:crate::engine::condition(a,"monsterAudibleX"),y:crate::engine::condition(a,"monsterAudibleY")};
     let action=PENDING.with(|p|p.borrow().as_ref().map_or(0,|b|b.action));
-    let event=PresentationEvent{kind:"animation".into(),from:None,to:to.clone(),glyph:None,color:None,label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:"E11".into(),style:"sound-violet".into(),stage:Stage::Special,action,cells:vec![to],surface:Some("audible".into()),item_id:None,arrival_steps:None})};
+    let event=PresentationEvent{kind:"animation".into(),from:None,to:to.clone(),glyph:None,color:None,label:None,depth:r.depth,animation:Some(AnimationCue{delivery:Delivery::Local,proposal:"E11".into(),style:"sound-violet".into(),stage:Stage::Special,action,cells:vec![to],surface:Some("audible".into()),item_id:None,hide_actor:None,arrival_steps:None})};
     PENDING.with(|p|if let Some(b)=p.borrow_mut().as_mut(){b.serial=b.serial.wrapping_add(1);b.events.push(event);if b.events.len()>4096{b.events.remove(0);}});
 }
 
@@ -545,6 +556,7 @@ pub fn banshee_wave(r: &Run, a: &Actor) {
                 label: None, depth: r.depth, animation: Some(AnimationCue {
                     delivery: Delivery::Local, proposal: "E11".into(), style: style.into(),
                     stage: Stage::Special, action: b.action, cells, surface, item_id: None,
+                    hide_actor: None,
                     arrival_steps: Some(bands),
                 }),
             });

@@ -3,6 +3,29 @@
 use corpse_core::{engine, half_here, lifecycle, Actor, Run};
 use serde::Deserialize;
 use std::{collections::HashSet, sync::OnceLock};
+#[path = "creature_hover.rs"]
+pub mod hover;
+
+// The passive card names carried powers; the full Inspector retains their
+// detailed descriptions. Never give a monster credit for a player-only cast.
+fn behavior(r: &Run, a: &Actor) -> Vec<String> {
+    let rev = r.simulation_revision.value_or(29.);
+    let mut rows: Vec<String> = Vec::new();
+    for id in &a.abilities {
+        if id == corpse_core::revision50_combat::MAGICKAL_CASTER {
+            rows.push("Magickal Caster.".into());
+        } else if let Some(d) = corpse_core::progression::definition_for_revision(rev, id) {
+            let active = a.active.contains(id);
+            if d.flags.iter().any(|f| f == "passive") || active {
+                rows.push(format!("{}: {}", d.name, crate::ability_ui::display_description(r, id, &d.description)));
+            } else {
+                rows.push(format!("Carries {}.", d.name));
+            }
+        }
+    }
+    rows
+}
+
 #[derive(Deserialize)]
 struct Enemy {
     id: String,

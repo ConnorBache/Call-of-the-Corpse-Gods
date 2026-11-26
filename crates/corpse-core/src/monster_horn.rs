@@ -178,11 +178,17 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
             }
         }
         if !choices.is_empty() && spell_spend(r, id, 12.0) {
-            crate::animation_shapes::line(r,&a,(&b).into(),"E39","line-grow","#ffd340");
             let q = &choices[(crate::rng::random(r) * choices.len() as f64).floor() as usize];
             let relocated=!crate::revision50_nightmares::is_decoy(&b) && (b.x!=q.x || b.y!=q.y);
-            if crate::events::enabled(r) {if relocated {crate::animation_enemy::mark(r,&b,"E39","bracket-fold-gold",crate::events::Stage::Travel);}}
-            else {crate::events::actor_event(r, &b, "pulse", "Vanish", None, None);}
+            if relocated && crate::events::actor_observed(r,&a) && crate::events::enabled(r) {
+                // Resolve the same optical connection as the old cast, but
+                // traverse its exact cells in reverse, including portal hops.
+                let route: Vec<_> = crate::animation_shapes::connection_cells(r,&a,(&b).into(),false)
+                    .into_iter().rev().map(|p|crate::events::EventPoint{x:p.x as f64,y:p.y as f64}).collect();
+                crate::animation_shapes::beckon_round_trip(r,&a,&b,"E39",&route,"#ffd340");
+            } else if !crate::events::enabled(r) {
+                crate::events::actor_event(r, &b, "pulse", "Vanish", None, None);
+            }
             let t = actor_mut_trusted(r, target).unwrap();
             // The caster still targets/spends its action on the apparent player,
             // but a stationary hallucination cannot be teleported by Beckon.
@@ -198,8 +204,7 @@ pub fn special_action(r: &mut Run, id: f64, target: f64) -> Result<bool, String>
                 .shift_remove("forcedMove");
             if relocated {crate::beckoning_skip::after_pull(r,id,target);}
             let b = actor(r, target).unwrap().clone();
-            if crate::events::enabled(r) {if relocated {crate::animation_enemy::mark(r,&b,"E39","bracket-unfold-gold",crate::events::Stage::Special);}}
-            else {crate::events::actor_event(r, &b, "pulse", "Appear", None, None);}
+            if !crate::events::enabled(r) {crate::events::actor_event(r, &b, "pulse", "Appear", None, None);}
             r.floor_mut().unwrap().dirty = true;
             actor_mut_trusted(r, id)
                 .unwrap()

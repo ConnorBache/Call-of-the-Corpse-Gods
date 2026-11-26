@@ -78,6 +78,20 @@ pub fn connection_cells(r: &Run, a: &Actor, to: EventPoint, effect: bool) -> Vec
     cells
 }
 
+/// Two consecutive beams on the exact same route, first cast then pull.
+pub const BECKON_OUTBOUND: &str = "beckon-outbound";
+pub const BECKON_BEAM: &str = "beckon-return";
+pub fn beckon_round_trip(r: &Run, caster: &Actor, target: &Actor, key: &str, inward: &[EventPoint], color: &str) {
+    let outward: Vec<_> = inward.iter().rev().cloned().collect();
+    let serial = events::emission_serial();
+    events::travel(r, caster, key, BECKON_OUTBOUND, &outward, Delivery::Magic, None);
+    events::decorate(serial, key, BECKON_OUTBOUND, caster.into(), color, None);
+    let serial = events::emission_serial();
+    events::travel(r, caster, key, BECKON_BEAM, inward, Delivery::Magic, None);
+    events::decorate(serial, key, BECKON_BEAM, caster.into(), color, None);
+    if events::actor_observed(r,target) {events::hide_actor_during(serial,target);}
+}
+
 pub fn line(r:&Run,a:&Actor,to:EventPoint,key:&str,style:&str,color:&str) {
     emit_line(r,a,to,key,style,color,false);
 }

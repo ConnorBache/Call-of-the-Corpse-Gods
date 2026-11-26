@@ -2645,3 +2645,39 @@ upload. The additional overlay costs O(P) on the CPU renderer for P native
 drawable pixels and O(1) submission plus O(P) GPU blend work on the GPU path,
 with no additional frame buffer or simulation work. Reduced/Instant motion
 skips the overlay. This is an implementation bound, not a measured speedup.
+
+### R52 passive monster hover copy
+
+On an already-admitted hover report, let K be the observed actor’s trait and
+power count, C its conditions, I the relevant equipped items, L the emitted
+text length, and D the fixed description catalog size. The hover-only pass
+indexes traits, partitions signature threats ahead of melee, and formats
+matchup damage. Time is O(K log K + K·D + K·(C + I) + L); scratch is O(K + L)
+beyond the existing observation and melee projection. The new pass neither
+traces projectile paths nor enumerates actors or tiles; it describes a ranged
+hit conditional on a clear legal shot. Core convenience functions reuse the
+existing actor/owner index; a cold index rebuild is a pre-existing observation
+cost and not included above. Paint adds existing wrap/font work for the new
+bounded text rows and O(clipped hover pixels) composition. The clicked
+Inspector and the Chronicle do not use this adapter. Render checks exercise
+the ordinary hover painter at 1280×800 and 1024×600; no throughput claim.
+
+## Beckoning round-trip beam (native)
+
+Two detached cues per successful observed pull, with no simulation work driven by
+animation. For a player cast, collecting the existing walked cells and appending
+the adjacent caster costs O(L) time and scratch for L pull cells; this adds no
+pathfinding. The committed collision ray still runs and retains its prior costs.
+For a Horn cast, reverse the same optical route used by the old outward cue:
+O(L + R) time and O(L + S) scratch, with R/S the time and space of the existing
+portal-aware optical route query. Without portals it is just O(L); with portals
+use the [portal geometry budget](revision51-aiming-paths.md#complexity).
+The ordinary cue filters L cells through existing viewport and direct-visibility
+queries, costing O(L × V) time and O(L) receipt space (V is one visibility
+query, including its cache misses). All cells are bounded by the finite map and
+its admitted optical segments. The standard beam painter scans C admitted cells
+per animation frame in O(C) time and O(C) scratch; timing is the existing
+16 ms/cell plus a 64 ms tail per leg. At normal motion the sequence masks the
+exact pulled actor using one detached O(V) view copy and filter (V is the number
+of observed layers and HUD entries), plus an existing landing view reference.
+No extra copy is made per frame; reduced/instant skip the actor mask.
