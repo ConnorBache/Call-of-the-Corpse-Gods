@@ -297,14 +297,18 @@ pub fn enemy_action_options(
         if a.id == r.player.id || vision::visible_actor(r, &a) {
             log(
                 r,
-                format!("{} exhales a billowing cloud of {gas} gas.", a.name),
+                if gas == crate::death_gas_rules::GAS {
+                    format!("{} exhales a billowing cloud of Death Gas.", a.name)
+                } else {
+                    format!("{} exhales a billowing cloud of {gas} gas.", a.name)
+                },
                 "enemy",
             );
         }
         if crate::events::enabled(r) {
             if deposited {crate::animation_enemy::gas_deposited(r,&a,i,before,gas,"E57");}
         } else {
-            crate::events::actor_event(r, &a, "burst", if gas == "hallucinogenic" { "Hallucinogenic gas" } else { "Caustic gas" }, None, None);
+            crate::events::actor_event(r, &a, "burst", match gas { crate::death_gas_rules::GAS => "Death Gas", "hallucinogenic" => "Hallucinogenic gas", _ => "Caustic gas" }, None, None);
         }
         return Ok(true);
     }

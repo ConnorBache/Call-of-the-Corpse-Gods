@@ -2494,3 +2494,21 @@ full-history passes, preserving raw archive indices for bestiary notices.
 Directional copy adds O(1) work per completed current-rules floor transition,
 before the existing log append. Hover no longer adds a biome-description line.
 Wendigo titles use the stored name; no change to actor growth or rendering state.
+
+## R52 Dreamwalking footsteps and Death Gas
+
+A stomp attempt (arrival or Wait) now checks projection state in constant
+time and skips the existing O(A) floor-actor scan when dreamwalking. Awake
+stomping and corpse revival do not acquire an extra scan.
+
+Death Gas adds one optional channel to the existing single-gas-per-cell
+propagation grid. For N floor cells, an existing initialization or view refresh
+can spend O(N) extra time checking for this gas or filling its channel; a
+used channel adds O(N) volume/provenance storage. For D deposits that invoke
+initialization in a turn, the worst-case additional scan cost is O(D × N).
+Diffusion still uses the same bounded neighborhood and RNG order. Contact adds fixed gas-type tests
+and bounded ability-list checks to the existing damage/status processing on
+exposed actors. UI presentation reuses the existing gas blend per observed
+cell and hazard-inspection paths. Replay admission and temporal preservation
+add one scalar command-boundary stamp; no new world copy or event log is
+required. These are analytical bounds, not benchmark results.

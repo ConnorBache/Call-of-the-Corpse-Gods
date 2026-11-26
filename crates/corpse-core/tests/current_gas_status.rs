@@ -30,9 +30,15 @@ fn ring(id: f64, effect: &str) -> Item {
 }
 
 fn current(copies:usize)->Run {let mut r=room(52.);r.ring_rules_from=0usize.into();for i in 0..copies {r.inventory.push(ring(100.+i as f64,rings::WILLPOWER));}r}
-const GASES: [(&str, &str, f64); 3] = [("paralysis", "paralyzed", 2.), ("confusion", "confused", 8.), ("hallucinogenic", "hallucinating", 2.)];
+const DEATH_GAS: &str = corpse_core::death_gas_rules::GAS;
+const GASES: [(&str, &str, f64); 4] = [
+    ("paralysis", "paralyzed", 2.),
+    ("confusion", "confused", 8.),
+    ("hallucinogenic", "hallucinating", 2.),
+    (DEATH_GAS, "hallucinating", 2.),
+];
 fn gas_run(copies: usize, gas: &str) -> Run {
- let mut r=current(copies); r.gas_rules_from=0usize.into();
+ let mut r=current(copies); r.gas_rules_from=0usize.into(); r.death_gas_rules_from=0usize.into();
  let at=10*r.floor().unwrap().width()+10;
  environment::add_gas(r.floor_mut().unwrap(),at,gas,1000.,-1.).unwrap(); r
 }
@@ -68,10 +74,10 @@ fn gas_run(copies: usize, gas: &str) -> Run {
 }
 #[test] fn gas_immunity_still_blocks_all_status_gases() {
  for (gas,key,_) in GASES {let mut r=gas_run(0,gas);r.player.abilities.push("enemy:beast:gas-immunity".into());environment::tick_environment(&mut r).unwrap();assert_eq!(engine::condition(&r.player,key),0.);}
- let mut r=gas_run(0,"hallucinogenic");r.player.abilities.push("enemy:pale:gas-immunity".into());environment::tick_environment(&mut r).unwrap();assert_eq!(engine::condition(&r.player,"hallucinating"),0.);
+ for gas in ["hallucinogenic",DEATH_GAS] {let mut r=gas_run(0,gas);r.player.abilities.push("enemy:pale:gas-immunity".into());environment::tick_environment(&mut r).unwrap();assert_eq!(engine::condition(&r.player,"hallucinating"),0.);}
 }
 #[test] fn historical_gas_durations_are_preserved() {
- for (gas,key,old) in GASES {let mut r=gas_run(0,gas);r.gas_rules_from=Field::Null;environment::tick_environment(&mut r).unwrap();assert_eq!(engine::condition(&r.player,key),old);}
+ for (gas,key,old) in GASES {if gas==DEATH_GAS {continue;}let mut r=gas_run(0,gas);r.gas_rules_from=Field::Null;environment::tick_environment(&mut r).unwrap();assert_eq!(engine::condition(&r.player,key),old);}
 }
 #[test] fn non_status_gases_do_not_gain_statuses() {
  for gas in environment::GAS_TYPES {if GASES.iter().any(|(g,_,_)|*g==gas){continue;}let mut r=gas_run(0,gas);environment::tick_environment(&mut r).unwrap();for (_,key,_) in GASES {assert_eq!(engine::condition(&r.player,key),0.,"{gas}/{key}");}}

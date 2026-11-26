@@ -1002,6 +1002,10 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
                 format!("Continually emits {} gas. Roots grow along a direct route toward visible corpses within 10 tiles, one tile every 3 normal turns. Once roots reach a corpse, they feed on it, preventing its revival and increasing gas output.", corpse_core::fungi::emission(r, source).0)
             } else if corpse_core::fungi::hallucination_emitter(r, source) && id == "enemy:beast:fungal-gas" {
                 "Continually emits hallucinogenic gas. Roots feed on visible corpses within 10 tiles, preventing their revival. Each connected corpse increases its gas output.".into()
+            } else if matches!(id.as_str(),"enemy:pale:breath"|"enemy:pale:breath-boost")
+                && corpse_core::environment::breather_gas(r, source)==corpse_core::death_gas_rules::GAS {
+                if id=="enemy:pale:breath" {"Continually emits Death Gas: both caustic and hallucinogenic.".into()}
+                else {"Exhales an additional cloud of Death Gas for 10 Energy.".into()}
             } else if r.simulation_revision.value_or(29.) >= 33. && source.name.starts_with("Greater ") && matches!(id.as_str(),"enemy:pale:breath"|"enemy:pale:breath-boost") {
                 if id=="enemy:pale:breath" {"Continually emits hallucinogenic gas.".into()} else {"Exhales an additional hallucinogenic cloud for 10 Energy.".into()}
             } else if r.simulation_revision.value_or(29.) >= 33. && id == "enemy:pale:scream" {
@@ -1039,8 +1043,13 @@ fn text(r: &Run, a: &Actor, compact: bool) -> String {
         if source.creature_kind.as_ref().is_some_and(|k|k=="skin-walker") {
             parts.push("Disguises itself as a much shallower creature beyond two grid squares of an observing player body. Nearer bodies reveal its true form; combat statistics remain unchanged.".into());
         }
-        if source.name.starts_with("Greater ") && source.abilities.iter().any(|s|s=="enemy:pale:breath") {
-            parts.push("Exposure refreshes Hallucinating to 2 turns while exposed, changing only perceived creature identities.".into());
+        if source.abilities.iter().any(|s|s=="enemy:pale:breath") {
+            if corpse_core::environment::breather_gas(r, source)==corpse_core::death_gas_rules::GAS {
+                let turns=if corpse_core::gas_rules::current(r) {5} else {2};
+                parts.push(format!("Death Gas deals ordinary caustic gas damage and refreshes Hallucinating to {turns} turns for the player while exposed."));
+            } else if source.name.starts_with("Greater ") {
+                parts.push("Exposure refreshes Hallucinating to 2 turns while exposed, changing only perceived creature identities.".into());
+            }
         }
     }
     if parts.is_empty() {

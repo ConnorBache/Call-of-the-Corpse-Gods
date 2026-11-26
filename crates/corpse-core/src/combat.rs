@@ -56,7 +56,7 @@ fn damage_scale_for_run(r: &crate::Run, kind: Option<&str>) -> f64 {
 }
 fn damage_scale(kind: Option<&str>) -> f64 {
     match kind {
-        Some("fire" | "caustic" | "ichor" | "breatherGas" | "fall") => 0.25,
+        Some("fire" | "caustic" | "ichor" | "breatherGas" | crate::death_gas_rules::GAS | "fall") => 0.25,
         Some("attack" | "bleeding") => 0.5,
         _ => 1.0,
     }

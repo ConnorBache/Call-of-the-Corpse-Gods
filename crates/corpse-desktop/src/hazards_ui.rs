@@ -56,6 +56,14 @@ fn exposure(r: &Run, x: f64, y: f64, verb: &str, entering: bool) -> Option<Strin
     }) { return None; }
     let gas = h.gas.as_ref()?;
     let kind = gas.r#type.as_str();
+    if kind == corpse_core::death_gas_rules::GAS {
+        return match corpse_core::death_gas_rules::effects(p) {
+            (true, true) => Some(format!("{verb} in Death Gas? It can damage you and distort perceived creature identities.")),
+            (true, false) => Some(format!("{verb} in Death Gas? It can damage you.")),
+            (false, true) => Some(format!("{verb} in Death Gas? It can distort perceived creature identities.")),
+            (false, false) => None,
+        };
+    }
     if has(p, "enemy:beast:gas-immunity")
         || (kind=="hallucinogenic" && has(p,"enemy:pale:gas-immunity"))
         || (matches!(kind, "caustic" | "breather")
@@ -365,6 +373,33 @@ pub fn intentional(r: &Run, command: &Command) -> Option<String> {
 mod tests {
     use super::*;
     use serde_json::{json, Value};
+    #[test]
+    fn death_gas_warns_about_damage_and_hallucination_and_keeps_partial_immunity() {
+        let mut r=crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision=52.0.into();
+        r.death_gas_rules_from=0usize.into();
+        r.gas_rules_from=0usize.into();
+        r.player.stats.perception=100.;
+        let f=r.floor_mut().unwrap();
+        f.non_euclidean=corpse_core::Field::Missing;
+        let at=10*f.width()+11;
+        corpse_core::environment::add_gas(f,at,corpse_core::death_gas_rules::GAS,100.,-1.).unwrap();
+        let warning=exposure(&r,11.,10.,"Step",true).unwrap();
+        assert!(warning.contains("Death Gas")&&warning.contains("damage")&&warning.contains("distort"));
+        assert!(crate::inspection_ui::observe_tile(&r,11,10).scene.contains("Death Gas"));
+        let a=corpse_core::population::create_actor_revision("pale:Greater Breather",901.,11.,10.,false,52.).unwrap();
+        r.actors_at_mut(r.depth).push(a);
+        let report=crate::inspection_ui::observe_tile(&r,11,10);
+        let c=report.creature.unwrap();
+        assert!(c.scene.contains("Death Gas"));
+        assert!(c.ability_details.contains("both caustic and hallucinogenic"));
+        r.player.abilities.push("grisha-entropy".into());
+        let warning=exposure(&r,11.,10.,"Step",true).unwrap();
+        assert!(warning.contains("distort")&&!warning.contains("damage"));
+        r.player.abilities.push("enemy:pale:gas-immunity".into());
+        assert!(exposure(&r,11.,10.,"Step",true).is_none());
+    }
+
     #[test]
     fn frozen_warning_projection() {
         let specs: Vec<Value> =

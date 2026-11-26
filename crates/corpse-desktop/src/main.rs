@@ -2747,6 +2747,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 Screen::Manual => {
                     let manual_run=if previous==Screen::ReplayGame {replays.session.as_ref().map(|s|&s.engine.run)} else {run.as_ref().map(|e|&e.run)};
                     manual.set_compressed_depths(manual_run.map_or(true,|r|r.compressed_depths.value_or(false)));
+                    manual.set_death_gas(!matches!(previous, Screen::Game | Screen::ReplayGame)
+                        || manual_run.is_none_or(corpse_core::death_gas_rules::current));
                     manual.set_simulation_revision(manual_simulation_revision(previous,
                         run.as_ref().map(|engine| &engine.run),
                         replays.session.as_ref().map(|session| &session.engine.run)));

@@ -81,9 +81,10 @@ fn cell_list(v: &Value, n: usize, p: &str) -> Result<()> {
     let a = array(v, p)?;
     req(a.len() <= n && a.iter().all(|x| cell(x, n)), p)
 }
-const GAS: [&str; 10] = [
+const GAS: [&str; 11] = [
     "bloodMist",
     "hallucinogenic",
+    "deathGas",
     "caustic",
     "breather",
     "paralysis",
@@ -116,6 +117,7 @@ pub fn validate(run: &Run) -> Result<()> {
     crate::blood_mist::validate_fire_rules(run).map_err(StorageError)?;
     crate::half_here::validate_lock_policy(run).map_err(StorageError)?;
     crate::screamer_rules::validate_range(run).map_err(StorageError)?;
+    crate::death_gas_rules::validate(run).map_err(StorageError)?;
     for f in &run.floors {
         req(crate::pocket_biomes::validate(f), "pocket biome metadata")?;
         req(crate::entrance::validate(f) || crate::entrance::metadata_cell(f)

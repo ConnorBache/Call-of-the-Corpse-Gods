@@ -68,7 +68,7 @@ fn safe_contact(f:&Floor,at:usize)->bool {
         && !f.bulwarks.as_ref().is_some_and(|b|b.contains_key(&at.to_string()))
         && f.environment.as_ref().is_none_or(|e|
             [&e.fire,&e.caustic,&e.breather,&e.paralysis].iter().all(|l|l.get(at).is_none_or(|v|*v==0.))
-            && [&e.gas_volume,&e.confusion,&e.steam,&e.flammable,&e.explosive,&e.hydrogen,&e.hallucinogenic]
+            && [&e.gas_volume,&e.confusion,&e.steam,&e.flammable,&e.explosive,&e.hydrogen,&e.hallucinogenic,&e.death_gas]
                 .iter().all(|l|!nonzero(l,at)))
 }
 

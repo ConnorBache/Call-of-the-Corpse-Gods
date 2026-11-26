@@ -2,7 +2,8 @@
 use crate::propagation::{self, Dissipation, GasGrid, GridSize, RandomInt};
 use crate::{EnvironmentalState, EnvironmentalStateProvenanceEntry, Field, Floor, Run};
 use indexmap::IndexMap;
-pub const GAS_TYPES: [&str; 10] = [
+use crate::death_gas_rules::GAS as DEATH_GAS;
+pub const GAS_TYPES: [&str; 11] = [
     "caustic",
     "breather",
     "paralysis",
@@ -13,9 +14,11 @@ pub const GAS_TYPES: [&str; 10] = [
     "steam",
     "hallucinogenic",
     "bloodMist",
+    DEATH_GAS,
 ];
 fn channel<'a>(e: &'a EnvironmentalState, gas: &str) -> &'a [f64] {
     match gas {
+        DEATH_GAS => e.death_gas.as_ref().map(Vec::as_slice).unwrap_or(&[]),
         "bloodMist" => e.blood_mist.as_ref().map(Vec::as_slice).unwrap_or(&[]),
         "caustic" => &e.caustic,
         "breather" => &e.breather,
@@ -34,7 +37,8 @@ pub fn breather_gas(r: &Run, a: &crate::Actor) -> &'static str {
     let name = crate::revision50_creature_identity::legacy_name(name);
     let greater = a.creature_kind.as_ref().is_some_and(|k| k == "pale:Greater Breather")
         || (name.starts_with("Greater ") && name.ends_with("Breather"));
-    if crate::water_blood::enabled(r) && greater { "hallucinogenic" } else { "caustic" }
+    if greater && crate::death_gas_rules::current(r) { DEATH_GAS }
+    else if crate::water_blood::enabled(r) && greater { "hallucinogenic" } else { "caustic" }
 }
 pub fn fire_active(kind: Option<&str>) -> bool {
     kind.is_some_and(|k| k != "embers")
@@ -109,7 +113,8 @@ pub fn refresh_gas_views(e: &mut EnvironmentalState) {
     let n = e.fire.len();
     for gas in GAS_TYPES {
         // Optional native channel must not alter legacy save/trace bytes.
-        if ((gas == "hallucinogenic" && e.hallucinogenic.is_missing()) || (gas == "bloodMist" && e.blood_mist.is_missing()))
+        if ((gas == "hallucinogenic" && e.hallucinogenic.is_missing()) || (gas == "bloodMist" && e.blood_mist.is_missing())
+            || (gas == DEATH_GAS && e.death_gas.is_missing()))
             && !e.gas_type.as_ref().unwrap().iter().any(|g| g.as_deref() == Some(gas))
         { continue; }
         let values = (0..n)
@@ -122,6 +127,7 @@ pub fn refresh_gas_views(e: &mut EnvironmentalState) {
             })
             .collect();
         match gas {
+            DEATH_GAS => e.death_gas = Field::Value(values),
             "bloodMist" => e.blood_mist = Field::Value(values),
             "caustic" => e.caustic = values,
             "breather" => e.breather = values,
@@ -273,6 +279,12 @@ pub fn initialize(f: &mut Floor) -> Result<&mut EnvironmentalState, String> {
             owner: vec![-1.; n], player: vec![0.; n],
         });
     }
+    if e.death_gas.as_ref().is_some() || e.gas_type.as_ref().unwrap().iter().any(|g| g.as_deref() == Some(DEATH_GAS)) {
+        e.death_gas.get_or_insert_with(|| vec![0.; n]);
+        e.provenance.as_mut().unwrap().entry(DEATH_GAS.into()).or_insert_with(|| EnvironmentalStateProvenanceEntry {
+            owner: vec![-1.; n], player: vec![0.; n],
+        });
+    }
     if e.blood_mist.as_ref().is_some() || e.gas_type.as_ref().unwrap().iter().any(|g|g.as_deref()==Some("bloodMist")) {
         e.blood_mist.get_or_insert_with(||vec![0.;n]);
         e.blood_mist_turns.get_or_insert_with(||vec![5.;n]);
@@ -343,7 +355,7 @@ impl GasGrid for GasPass<'_> {
         match g.as_deref() {
             None | Some("explosive" | "hydrogen") => Dissipation::None,
             Some("bloodMist") => Dissipation::None,
-            Some("paralysis" | "confusion" | "hallucinogenic" | "steam") => Dissipation::Quick,
+            Some("paralysis" | "confusion" | "hallucinogenic" | DEATH_GAS | "steam") => Dissipation::Quick,
             _ => Dissipation::Normal,
         }
     }
@@ -703,9 +715,10 @@ pub fn add_gas(
     }
     let depth_bits = f.depth.to_bits();
     let e = initialize(f)?;
-    if gas == "hallucinogenic" {
+    if matches!(gas, "hallucinogenic" | DEATH_GAS) {
         let n = e.fire.len();
-        e.hallucinogenic.get_or_insert_with(|| vec![0.; n]);
+        let view = if gas == DEATH_GAS { &mut e.death_gas } else { &mut e.hallucinogenic };
+        view.get_or_insert_with(|| vec![0.; n]);
         e.provenance.as_mut().unwrap().entry(gas.into()).or_insert_with(|| EnvironmentalStateProvenanceEntry {
             owner: vec![-1.; n], player: vec![0.; n],
         });
@@ -735,6 +748,7 @@ pub fn add_gas(
     for kind in GAS_TYPES {
         let value = if kind == gas { volume } else { 0. };
         match kind {
+            DEATH_GAS => { if let Some(v) = e.death_gas.as_mut() { v[i] = value; } },
             "bloodMist" => {if let Some(v)=e.blood_mist.as_mut(){v[i]=value;}},
             "caustic" => e.caustic[i] = value,
             "breather" => e.breather[i] = value,
@@ -1328,7 +1342,7 @@ pub fn tick_environment_options_with_falls(
             let before=adapter.run.floor().unwrap().environment.as_ref().and_then(|e|e.gas_volume.as_ref()).map_or(0.,|v|v[at]);
             add_gas(adapter.run.floor_mut().unwrap(), at, gas, volume, owner)?;
             let after=adapter.run.floor().unwrap().environment.as_ref().and_then(|e|e.gas_volume.as_ref()).map_or(0.,|v|v[at]);
-            if after>before {crate::animation_enemy::mark(adapter.run,&a,"E56",if gas=="hallucinogenic" {"puff-violet"}else{"puff-green"},crate::events::Stage::Special);}
+            if after>before {crate::animation_enemy::mark(adapter.run,&a,"E56",if matches!(gas, "hallucinogenic" | DEATH_GAS) {"puff-violet"}else{"puff-green"},crate::events::Stage::Special);}
         }
         if !crate::dreamwalking::is_body(&a) && a.abilities.iter().any(|id| id == "anavani-star-power") {
             if a.active.iter().any(|id| id == "anavani-star-power") {
@@ -1445,7 +1459,7 @@ pub fn tick_environment_options_with_falls(
                 .any(|id| id == "grisha-entropy" || id == "enemy:pale:gas-immunity")
         {
             match gas.as_deref() {
-                Some("caustic" | "breather") => {
+                Some("caustic" | "breather" | DEATH_GAS) => {
                     let raw = a.max_hp * (1. / 15.) * (1. + cond(&a, "gasVulnerable").max(0.));
                     let damage = if crate::combat::nearest_damage_enabled(r) { raw } else { raw.ceil() };
                     crate::engine::damage_environment(
@@ -1453,10 +1467,10 @@ pub fn tick_environment_options_with_falls(
                         id,
                         damage,
                         source,
-                        if gas.as_deref() == Some("caustic") {
-                            "caustic"
-                        } else {
-                            "breatherGas"
+                        match gas.as_deref() {
+                            Some(DEATH_GAS) => DEATH_GAS,
+                            Some("caustic") => "caustic",
+                            _ => "breatherGas",
                         },
                         true,
                     )
@@ -1494,7 +1508,7 @@ pub fn tick_environment_options_with_falls(
             let five_turn_gas = crate::gas_rules::current(r);
             let paralysis_duration = crate::monster_statuses::status_duration(r, &a, if five_turn_gas { 5. } else { 2. });
             let mental_duration = match gas.as_deref() {
-                Some("hallucinogenic") => crate::monster_statuses::willpower_duration(r, &a, if five_turn_gas { 5. } else { 2. }),
+                Some("hallucinogenic" | DEATH_GAS) => crate::monster_statuses::willpower_duration(r, &a, if five_turn_gas { 5. } else { 2. }),
                 Some("confusion") => crate::monster_statuses::willpower_duration(r, &a, if five_turn_gas { 5. } else { 8. }),
                 _ => 0.,
             };
@@ -1505,7 +1519,7 @@ pub fn tick_environment_options_with_falls(
                 let v = cond(a, "paralyzed").max(paralysis_duration);
                 a.conditions.insert("paralyzed".into(), v);
             }
-            if native_hooks && hallucination_contact && gas.as_deref() == Some("hallucinogenic")
+            if native_hooks && hallucination_contact && matches!(gas.as_deref(), Some("hallucinogenic" | DEATH_GAS))
                 && !a.abilities.iter().any(|id| id == "enemy:pale:gas-immunity")
             {
                 let duration = if five_turn_gas { cond(a, "hallucinating").max(mental_duration) } else { mental_duration };
@@ -1797,6 +1811,10 @@ pub fn creature_hazard_at(r: &Run, a: &crate::Actor, i: usize) -> bool {
     }
     match gas {
         Some("caustic" | "breather") => !has("grisha-entropy") && !has("enemy:pale:gas-immunity"),
+        Some(DEATH_GAS) => {
+            let (damage, hallucinate) = crate::death_gas_rules::effects(a);
+            damage || (hallucinate && hallucination_affects(r, a))
+        }
         Some("paralysis" | "confusion") => true,
         Some("hallucinogenic") => crate::water_blood::enabled(r)
             && hallucination_affects(r, a) && !has("enemy:pale:gas-immunity"),

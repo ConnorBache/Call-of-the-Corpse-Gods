@@ -171,7 +171,7 @@ pub fn build_spawn_heatmap(f: &Floor) -> SpawnHeatmap {
                     || e.caustic[at] != 0.0
                     || e.breather[at] != 0.0
                     || e.paralysis[at] != 0.0
-                    || e.confusion.as_ref().is_some_and(|a| a[at] != 0.0)
+                    || layer(&e.confusion) || layer(&e.death_gas)
             });
         if hazard {
             around(&mut flags, w, h, at, 1, 32)

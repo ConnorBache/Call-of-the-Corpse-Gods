@@ -80,6 +80,7 @@ pub struct Manual {
     preview: bool,
     simulation_revision: f64,
     compressed_depths: bool,
+    death_gas: bool,
     pub catalog: Catalog,
     pub depth: usize,
     ordered_ids: Vec<String>,
@@ -105,11 +106,12 @@ impl Manual {
         let mut entries: Vec<_> = catalog.entries.iter().collect();
         entries.sort_by_key(|e| (first_depth(e).unwrap_or(usize::MAX), e.name.to_lowercase(), e.id.clone()));
         let ordered_ids = entries.into_iter().map(|e| e.id.clone()).collect();
-        Self {
+        let mut manual=Self {
             progress: Default::default(),
             preview: false,
             simulation_revision: 52.,
             compressed_depths: true,
+            death_gas: false,
             catalog,
             depth: 0,
             ordered_ids,
@@ -117,12 +119,37 @@ impl Manual {
             scroll: 0,
             art: None,
             void_field: None,
-        }
+        };
+        manual.set_death_gas(true);
+        manual
     }
     /// Only the originating run's scalar revision crosses the UI boundary.
     /// Menu/inactive runs use current rules; discovery is independent of this choice.
     pub fn set_simulation_revision(&mut self, revision: Option<f64>) {
         self.simulation_revision = revision.unwrap_or(52.);
+    }
+    pub fn set_death_gas(&mut self, current: bool) {
+        if current == self.death_gas { return; }
+        self.death_gas = current;
+        if let Some(entry)=self.catalog.entries.iter_mut().find(|e|e.id=="pale:Greater Breather") {
+            for mechanic in &mut entry.mechanics {
+                match mechanic.name.as_str() {
+                    "Hallucinogenic Gas Cloud" | "Death Gas Cloud" => {
+                        mechanic.name=if current {"Death Gas Cloud"}else{"Hallucinogenic Gas Cloud"}.into();
+                        mechanic.text=if current {"Continually emits Death Gas, combining caustic damage with hallucinations."}
+                            else {"Continually emits hallucinogenic gas instead of caustic gas. Exposure refreshes Hallucinating to two normal world turns."}.into();
+                    }
+                    "Forceful Exhalation" => mechanic.text=if current {"Exhales an additional cloud of Death Gas."}
+                        else {"Can exhale an additional cloud of hallucinogenic gas."}.into(),
+                    "Caustic Gas Immunity" | "Pale Gas Immunity" => {
+                        mechanic.name=if current {"Pale Gas Immunity"}else{"Caustic Gas Immunity"}.into();
+                        mechanic.text=if current {"Immune to both effects of Death Gas, as well as ordinary caustic and hallucinogenic gas."}
+                            else {"Is immune to caustic gas damage."}.into();
+                    }
+                    _ => (),
+                }
+            }
+        }
     }
     pub fn set_compressed_depths(&mut self, compressed: bool) { self.compressed_depths = compressed; }
     pub fn preview_all(&mut self) { self.preview = true; }

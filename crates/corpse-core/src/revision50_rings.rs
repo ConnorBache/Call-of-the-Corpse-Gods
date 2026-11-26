@@ -165,7 +165,7 @@ pub fn resist_damage(r: &Run, actor: &Actor, kind: &str, damage: f64) -> f64 {
     let effect = match kind {
         "fire" | "steam" => FIRE_RESISTANCE,
         "poison" | "venom" => POISON_RESISTANCE,
-        "caustic" | "ichor" | "breatherGas" | "acid" => CORROSION_RESISTANCE,
+        "caustic" | "ichor" | "breatherGas" | crate::death_gas_rules::GAS | "acid" => CORROSION_RESISTANCE,
         "cold" => return if has_effect(r, actor, ICE_IMMUNITY) { 0.0 } else { damage },
         _ => return damage,
     };

@@ -1170,6 +1170,8 @@ pub struct EnvironmentalState {
     pub confusion: Field<Vec<f64>>,
     #[serde(rename = "hallucinogenic", default, skip_serializing_if = "Field::is_missing")]
     pub hallucinogenic: Field<Vec<f64>>,
+    #[serde(rename = "deathGas", default, skip_serializing_if = "Field::is_missing")]
+    pub death_gas: Field<Vec<f64>>,
     #[serde(rename = "steam", default, skip_serializing_if = "Field::is_missing")]
     pub steam: Field<Vec<f64>>,
     #[serde(
@@ -1742,6 +1744,8 @@ pub struct Run {
     pub half_here_energy_from: Field<usize>,
     #[serde(rename = "screamerRangeFrom", default, skip_serializing_if = "Field::is_missing")]
     pub screamer_range_from: Field<usize>,
+    #[serde(rename = "deathGasRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub death_gas_rules_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

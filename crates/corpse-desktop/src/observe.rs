@@ -210,6 +210,7 @@ fn gas_color(kind: &str) -> Rgb {
         "breather" => [35, 213, 157],
         "paralysis" => [161, 62, 255],
         "confusion" => [255, 47, 203],
+        corpse_core::death_gas_rules::GAS => [171, 112, 238],
         "hallucinogenic" => [238, 108, 255],
         "flammable" => [255, 156, 69],
         "explosive" => [255, 214, 0],
@@ -1764,7 +1765,7 @@ fn terrain_frame_palette(
             }
             if let Some(gas) = h.gas.as_ref() {
                 let key = format!("gas:{}", gas.r#type);
-                let fallback=(matches!(gas.r#type.as_str(),"hallucinogenic"|"bloodMist") && profile.resolved_material(&key,crate::appearance_profile::MaterialParent::None).is_none())
+                let fallback=(matches!(gas.r#type.as_str(),"hallucinogenic"|"bloodMist"|corpse_core::death_gas_rules::GAS) && profile.resolved_material(&key,crate::appearance_profile::MaterialParent::None).is_none())
                     .then(|| {let color=gas_color(&gas.r#type);(color,color)});
                 let (_, c) =
                     crate::appearance_material::feature_colors(profile, &key, x, y, seed, fallback);
@@ -2851,7 +2852,7 @@ fn terrain_frame_palette_json_reference(
             }
             if let Some(gas) = h.gas.as_ref() {
                 let key = format!("gas:{}", gas.r#type);
-                let fallback=(matches!(gas.r#type.as_str(),"hallucinogenic"|"bloodMist") && profile.material(&key,None).is_none())
+                let fallback=(matches!(gas.r#type.as_str(),"hallucinogenic"|"bloodMist"|corpse_core::death_gas_rules::GAS) && profile.material(&key,None).is_none())
                     .then(|| {let color=gas_color(&gas.r#type);(color,color)});
                 let (_, c) =
                     crate::appearance_material::feature_colors(profile, &key, x, y, seed, fallback);

@@ -34,3 +34,57 @@ fn debug_seed_replay_rejects_unrecorded_stash_edits_with_session_guidance() {
  assert!(err.to_string().contains("saved session"));
  assert!(storage::deserialize(&storage::serialize(&r).unwrap()).is_ok());
 }
+
+#[test]
+fn current_dreamwalking_does_not_stomp_on_arrival_or_wait() {
+    let mut r=room();
+    r.simulation_revision=52.0.into();
+    r.death_gas_rules_from=0usize.into();
+    let id=r.next_id;
+    r.next_id+=1.;
+    let mut rat=corpse_core::population::create_actor_revision("rat",id,9.,8.,false,52.).unwrap();
+    rat.hp=0.;
+    r.actors_at_mut(r.depth).push(rat);
+    engine::death_if_nonpositive(&mut r,id).unwrap();
+    let heart=r.ground["1"].iter().find(|g|g.item.kind=="heart").unwrap().item.id;
+    let corpse=engine::actor_mut(&mut r,id).unwrap();
+    corpse.corpse_age=32.0.into();
+    corpse.conditions.insert("monsterPhoenixRolls".into(),3.);
+    start(&mut r);
+    for command in [Command::Move{dx:1.,dy:0.},Command::Wait] {
+        assert!(engine::dispatch(&mut r,&command).unwrap().took_turn);
+        let corpse=engine::actor(&r,id).unwrap();
+        assert!(corpse.corpse_age.value_or(0.)>=32.);
+        assert_eq!(corpse.conditions.get("monsterPhoenixRolls"),Some(&3.));
+        assert!(!corpse.conditions.contains_key("corpseStomped"));
+        assert!(r.ground["1"].iter().any(|g|g.item.id==heart));
+        assert!(!r.inventory.iter().any(|i|i.id==heart));
+        assert!(!r.log.iter().any(|s|s.contains("stomp on")));
+    }
+    assert_eq!((r.player.x,r.player.y),(9.,8.));
+    assert!(d::wake(&mut r));
+    assert!(engine::dispatch(&mut r,&Command::Move{dx:1.,dy:0.}).unwrap().took_turn);
+    let corpse=engine::actor(&r,id).unwrap();
+    assert!(corpse.corpse_age.value_or(99.)<=1.);
+    assert!(!corpse.conditions.contains_key("monsterPhoenixRolls"));
+    assert!(corpse_core::corpses::heart_harvested(corpse));
+    assert!(r.inventory.iter().any(|i|i.id==heart));
+    assert!(r.log.iter().any(|s|s.contains("stomp on")));
+}
+
+#[test]
+fn historical_dreamwalking_replay_without_new_policy_keeps_stomp() {
+    for revision in [34.,52.] {
+        let mut r=room();
+        r.simulation_revision=revision.into();
+        let id=add(&mut r,false,9.,8.);
+        let corpse=engine::actor_mut(&mut r,id).unwrap();
+        corpse.hp=0.;
+        corpse.dead=true.into();
+        corpse.corpse_age=32.0.into();
+        start(&mut r);
+        let player=r.player.id;
+        assert!(engine::move_actor(&mut r,player,1.,0.,false).unwrap());
+        assert_eq!(engine::actor(&r,id).unwrap().corpse_age.as_ref(),Some(&0.));
+    }
+}

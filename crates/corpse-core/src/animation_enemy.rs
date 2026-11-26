@@ -31,7 +31,7 @@ pub fn classify(a: &Actor, kind: &str, label: &str) -> Option<(&'static str, &'s
         "Stone seal" | "Stone Seal" => ("E40", "rise-stone", Special),
         "Scream" => ("E65", "sound-pale", Special),
         "Caustic gas" if has("enemy:pale:breath-boost") => ("E57", "puff-green", Special),
-        "Hallucinogenic gas" if has("enemy:pale:breath-boost") => ("E57", "puff-violet", Special),
+        "Hallucinogenic gas" | "Death Gas" if has("enemy:pale:breath-boost") => ("E57", "puff-violet", Special),
         "Summon Saidribee" => ("E66", "summon-honey", Special),
         "Summon" if has("enemy:beast:witch") => ("E08", "summon-violet", Special),
         "Mercuria’s well" => ("E78", "wave-ichor", Special),
@@ -58,7 +58,7 @@ pub fn gas_deposited(r:&Run,a:&Actor,cell:usize,before:(bool,f64),gas:&str,key:&
     let (after_type,after_volume)=gas_cell(r,cell);
     if after_type!=Some(gas) || after_volume<=0. || (before.0 && before.1==after_volume) {return;}
     let Some(f)=r.floor() else{return};
-    events::cue(r,a,key,if gas=="hallucinogenic"{"ripple-exhale-violet"}else{"ripple-exhale-green"},Stage::Special,
+    events::cue(r,a,key,if matches!(gas, "hallucinogenic" | crate::death_gas_rules::GAS){"ripple-exhale-violet"}else{"ripple-exhale-green"},Stage::Special,
         &[EventPoint{x:(cell%f.width())as f64,y:(cell/f.width())as f64}]);
 }
 /// Optional rejection glints/static classifications deliberately have no idle emitter.
@@ -89,7 +89,7 @@ pub fn damage(r: &Run, a: &Actor, kind: &str) {
         "hemophilia" => return,
         "fire"|"burning" => ("E71","ember"),
         "razorleaf"|"razorleaves" => ("E42","leaf-slash"),
-        "caustic"|"breatherGas"|"gas"|"ichor" => ("E72","droplet"),
+        "caustic"|"breatherGas"|crate::death_gas_rules::GAS|"gas"|"ichor" => ("E72","droplet"),
         _ => return,
     };
     mark(r,a,key,style,Stage::Health);

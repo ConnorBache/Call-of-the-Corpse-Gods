@@ -1064,3 +1064,15 @@ commands use the nonflammable rule after live save admission.
 Creature glyphs no longer apply the default dark or blue inset over terrain.
 Telepathy still changes the glyph ink, and explicitly authored appearance
 backgrounds still override the default.
+
+### R52 Dreamwalking footsteps and Death Gas
+
+While dreamwalking, moving onto a corpse or waiting over one does not stomp
+it, delay revival, or affect heart-harvest state. Stomping while awake is
+unchanged.
+
+Greater Gassers emit Death Gas both passively and when they exhale a larger
+cloud. It applies the ordinary caustic damage and hallucinogenic exposure
+rules together, preserving each component's immunities. Ordinary Gassers
+still emit caustic gas. Existing saves adopt these changes on the next
+recorded command; old replay prefixes retain their original behavior.

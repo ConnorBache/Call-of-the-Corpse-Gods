@@ -248,6 +248,7 @@ fn gas_label(kind: &str) -> &str {
         "confusion" => "Confusion gas",
         "bloodMist" => "Blood Mist",
         "hallucinogenic" => "Hallucinogenic gas",
+        corpse_core::death_gas_rules::GAS => "Death Gas",
         "flammable" => "Flammable gas",
         "explosive" => "Explosive gas",
         "steam" => "Steam",
@@ -567,6 +568,9 @@ fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
                     ""
                 }
             ));
+            if g.r#type == corpse_core::death_gas_rules::GAS {
+                details.push("It is both caustic and hallucinogenic.".into());
+            }
         }
         if !o.current {
             if let Some(feature) = h.feature.as_ref() {
@@ -1883,6 +1887,21 @@ fn gas_exposure(r: &Run, a: &Actor, g: &corpse_core::GasPresence) -> String {
         } else {
             format!("{prefix}: your fire immunity prevents scalding.")
         };
+    }
+    if g.r#type == corpse_core::death_gas_rules::GAS {
+        let (damage, hallucination) = corpse_core::death_gas_rules::effects(a);
+        if !damage && !hallucination { return format!("{prefix}: immune."); }
+        let mut effects = Vec::new();
+        if damage {
+            let raw = a.max_hp * (1. / 15.) * (1. + cond(a, "gasVulnerable").max(0.));
+            let packet = combat::damage_packet(r, a, raw, corpse_core::death_gas_rules::GAS, true);
+            effects.push(format!("{} HP per normal turn while present", crate::stat_presentation::whole_number(packet)));
+        }
+        if hallucination {
+            let duration = corpse_core::monster_statuses::willpower_duration(r, a, if corpse_core::gas_rules::current(r) { 5. } else { 2. });
+            effects.push(format!("refreshes hallucinations to {duration} turns while present"));
+        }
+        return format!("{prefix}: {}.", effects.join("; "));
     }
     let corrosive = matches!(g.r#type.as_str(), "caustic" | "breather");
     let immunity = if has(a, "enemy:beast:gas-immunity") {

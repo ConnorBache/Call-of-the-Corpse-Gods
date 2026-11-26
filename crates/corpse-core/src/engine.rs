@@ -1065,6 +1065,11 @@ fn point(a: &Actor) -> Point {
     }
 }
 fn stomp(r: &mut Run, announce: bool) {
+    // Both arrival and Wait call this helper. The dream projection cannot
+    // reset a waking corpse's revival timer or mark its heart as stomped.
+    if crate::death_gas_rules::current(r) && crate::dreamwalking::active(r) {
+        return;
+    }
     let (x, y) = (r.player.x, r.player.y);
     let mut count = 0;
     let mut harvested = 0;
@@ -3591,10 +3596,10 @@ fn damage_environment_core(
     let has = |id: &str| a.abilities.iter().any(|v| v == id);
     if (matches!(kind, "fire" | "steam") && (crate::revision51_ichor_fire::immune(r.simulation_revision.value_or(29.), &a) || has("enemy:beast:fire-immunity") || has("anavani-star-power") || (crate::revision50::enabled(r) && crate::revision50_potions::fire_immune(&a))))
         || (kind == "explosion" && (has("enemy:beast:explosion-immunity") || has("anavani-nova")))
-        || (["caustic", "ichor", "breatherGas"].contains(&kind)
+        || (["caustic", "ichor", "breatherGas", crate::death_gas_rules::GAS].contains(&kind)
             && ((has("grisha-entropy") && (kind != "ichor" || r.simulation_revision.value_or(29.) < 52.))
                 || (kind != "ichor" && has("enemy:beast:gas-immunity"))
-                || (["caustic", "breatherGas"].contains(&kind) && has("enemy:pale:gas-immunity"))))
+                || (["caustic", "breatherGas", crate::death_gas_rules::GAS].contains(&kind) && has("enemy:pale:gas-immunity"))))
     {
         return Ok(());
     }
@@ -3621,6 +3626,7 @@ fn damage_environment_core(
         "water" if crate::revision50::enabled(r) => "Floods",
         "roots" if crate::revision50::enabled(r) => "Roots",
         "caustic" => "Caustic gas",
+        crate::death_gas_rules::GAS => "Death Gas",
         "ichor" => "Caustic ichor",
         "breatherGas" if crate::revision50::enabled(r) => "Gasser gas",
         "breatherGas" => "Breather gas",
@@ -3751,7 +3757,7 @@ fn damage_environment_core(
         }
     }
     crate::half_here::sync(r);
-    after_damage_with_source(r, victim, source, source_snapshot.as_ref(), direct || !matches!(kind, "caustic" | "breatherGas" | "fire" | "steam" | "poison" | "venom" | "bleeding" | "killspawnBleed" | "hemophilia" | "roots"));
+    after_damage_with_source(r, victim, source, source_snapshot.as_ref(), direct || !matches!(kind, crate::death_gas_rules::GAS | "caustic" | "breatherGas" | "fire" | "steam" | "poison" | "venom" | "bleeding" | "killspawnBleed" | "hemophilia" | "roots"));
     Ok(())
 }
 
