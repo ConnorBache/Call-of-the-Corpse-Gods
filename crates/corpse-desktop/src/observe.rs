@@ -432,17 +432,9 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
             remembered: false,
             detected: false,
         }),
-        // The player inherits the lit terrain underneath, just like other
-        // cells. Only an explicitly authored entity background overrides it.
-        background_overlay: if let Some(bg) = entity.background {
-            Some((bg, 1.))
-        } else if player {
-            None
-        } else if telepathic {
-            Some(([77, 115, 192], 0.2))
-        } else {
-            Some(([0, 0, 0], 0.2))
-        },
+        // Actors inherit the lit terrain. Telepathy changes the ink, not
+        // the tile; only an explicitly authored background overrides it.
+        background_overlay: entity.background.map(|bg| (bg, 1.)),
         heartless: a.heartless.value_or(false) && !dead && !body,
         corpse: dead,
         superscript,

@@ -13,6 +13,58 @@ pub(crate) fn room()->Run {
     r
 }
 fn cell(view:&View,id:f64)->&crate::render::Cell {view.cells.iter().find(|c|c.actor_id==Some(id)).unwrap()}
+
+#[test]
+fn enemy_background_matches_lit_terrain_in_sight_and_through_telepathy() {
+    let mut run = room();
+    run.simulation_revision = 52.0.into();
+    run.actors_at_mut(run.depth).truncate(1);
+    let id = run.actors_at(run.depth)[0].id;
+    let (x, y) = (7, 10);
+    let width = run.floor().unwrap().width();
+    for tile in ["floor", "grass", "shallow-water"] {
+        run.floor_mut().unwrap().tiles[y * width + x] = tile.into();
+        for telepathic in [false, true] {
+            let mut r = run.clone();
+            if telepathic {
+                r.player.conditions.insert("telepathic".into(), 10.);
+                // A full wall between the Avatar and creature blocks sight, not thought.
+                let floor = r.floor_mut().unwrap();
+                for row in 0..floor.height() { floor.tiles[row * width + 8] = "wall".into(); }
+            }
+            let mut view = crate::observe::observe(&r);
+            let actor = cell(&view, id);
+            assert_eq!((actor.x, actor.y), (x, y));
+            assert_eq!(actor.entity_ink.unwrap().telepathic, telepathic);
+            assert_eq!(actor.background_overlay, None);
+            let ground = view.cells[..view.terrain_count].iter()
+                .find(|c| (c.x, c.y) == (x, y)).expect("observed terrain");
+            assert_eq!(actor.bg, ground.bg, "{tile}, telepathic={telepathic}");
+            // Isolate the background pixels from both the terrain and creature ink.
+            let ground = crate::render::Cell { x, y, bg: ground.bg, current: true, ..Default::default() };
+            let actor = crate::render::Cell {
+                glyph: String::new(), superscript: String::new(), subscript: String::new(),
+                heartless: false, ..actor.clone()
+            };
+            view.terrain_snapshot = None;
+            view.terrain_count = 1;
+            view.cells = vec![ground];
+            let mut painter = Painter::new();
+            painter.game_at(&view, "", false, 0.);
+            let empty = painter.pixels.clone();
+            view.cells.push(actor);
+            painter.game_at(&view, "", false, 0.);
+            assert_eq!(painter.pixels, empty, "{tile}, telepathic={telepathic}");
+        }
+    }
+
+    // Leave deliberate appearance overrides available.
+    let profile = Profile::default().set("entities.creatures.blorb.inherited", false.into()).unwrap()
+        .set("entities.creatures.blorb.background", "#123456".into()).unwrap();
+    let view = crate::observe::observe_with_profile(&run, &profile);
+    assert_eq!(cell(&view, id).background_overlay.map(|(_, alpha)| alpha), Some(1.));
+}
+
 fn capture(p:&Painter,name:&str) {
     if let Ok(dir)=std::env::var("CORPSE_CREATURE_IDENTITY_REVIEW") {
         std::fs::create_dir_all(&dir).unwrap();
