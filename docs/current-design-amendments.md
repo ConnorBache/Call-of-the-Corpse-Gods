@@ -1127,3 +1127,25 @@ their direct landing effects without running unrelated distant ecology.
 Absolute world deadlines may already be due on return; per-turn effects
 do not tick while the floor is out of range. Historical replay commands
 retain their original catch-up behavior.
+
+### R52 Mercuria's Ichor Well
+
+Opening Mercuria's well creates exactly one randomly chosen amulet from the
+current amulet pool at maximum tier (tier 9), independent of floor depth or
+whether the Composite Bow has spawned. Sphinx rewards and ordinary loot are
+unchanged. Already-generated rewards and historical replay commands retain
+their original rewards.
+
+### R52 Minotaur straight charges
+
+The displayed arrow is a commitment to up to two tile attempts before
+another wind-up. Only a creature physically on the next square in that
+direction can be struck. A spatial link that would divert the charge stops
+it, and neither Confusion nor spending a final attempt can turn a Fast
+follow-up onto a different direction. Walls and impassable corners are
+still solid. Minotaurs charge into hazards; fire contact is registered
+on entry, and a chasm uses the normal creature-fall rules.
+
+A visible wind-up plays a brief white scream wave in reverse, converging
+on the Minotaur when it commits to its new arrow. Old replay commands
+retain their original charge policy.

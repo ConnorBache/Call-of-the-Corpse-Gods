@@ -321,20 +321,22 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
     let mut arrow = String::new();
     if kind == "minotaur" || a.abilities.iter().any(|a| a == "enemy:beast:minotaur") {
         glyph = "M".into();
-        let dx = a.conditions.get("monsterChargeDx").copied().unwrap_or(0.) as i32;
-        let dy = a.conditions.get("monsterChargeDy").copied().unwrap_or(0.) as i32;
-        arrow = match (dx, dy) {
-            (-1, -1) => "↖",
-            (0, -1) => "↑",
-            (1, -1) => "↗",
-            (-1, 0) => "←",
-            (1, 0) => "→",
-            (-1, 1) => "↙",
-            (0, 1) => "↓",
-            (1, 1) => "↘",
-            _ => "",
+        if !corpse_core::minotaur_straight::current(run) || a.conditions.get("monsterChargeRemaining").is_some_and(|n|*n>0.) {
+            let dx = a.conditions.get("monsterChargeDx").copied().unwrap_or(0.) as i32;
+            let dy = a.conditions.get("monsterChargeDy").copied().unwrap_or(0.) as i32;
+            arrow = match (dx, dy) {
+                (-1, -1) => "↖",
+                (0, -1) => "↑",
+                (1, -1) => "↗",
+                (-1, 0) => "←",
+                (1, 0) => "→",
+                (-1, 1) => "↙",
+                (0, 1) => "↓",
+                (1, 1) => "↘",
+                _ => "",
+            }
+            .into();
         }
-        .into();
     }
     let half = a.conditions.get("halfHereClone") == Some(&1.);
     let superscript = if dead || body || player {

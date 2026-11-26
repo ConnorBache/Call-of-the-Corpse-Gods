@@ -436,7 +436,11 @@ fn detailed_enemy(r: &Run, a: &Actor, e: &Enemy) -> String {
             if corpse_core::minotaur_rules::current(r) {
                 limits.push("only attacks by bumping into a foe along its committed direction".into());
             }
-            let arrow = if a.conditions.contains_key("monsterChargeDx")
+            if corpse_core::minotaur_straight::current(r) {
+                limits.push("charges through fire and can fall into a chasm".into());
+            }
+            let arrow = if (!corpse_core::minotaur_straight::current(r) || condition(a,"monsterChargeRemaining")>0.)
+                && a.conditions.contains_key("monsterChargeDx")
                 && a.conditions.contains_key("monsterChargeDy")
             {
                 match (

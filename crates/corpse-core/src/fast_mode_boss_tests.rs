@@ -182,7 +182,9 @@ fn activate_generated(mut r: Run, depth: u32) {
             let lever = e.lever.as_ref().unwrap();
             let mut expected_run = r.clone();
             let mut rng = crate::population::population_random(&format!("{}:floor:{depth}:Mercuria", r.seed));
-            let expected_reward = crate::equipment::make_godbeast_permanent_for_run(&mut expected_run, depth, &mut rng).unwrap();
+            let expected_reward = crate::equipment::make_mercuria_reward(&mut expected_run, depth, &mut rng).unwrap();
+            assert_eq!(expected_reward.kind, "amulet");
+            assert_eq!(expected_reward.amulet_tier.value_or(0.), crate::revision52_amulet_tiers::MAX_TIER as f64);
             assert!(crate::godbeast_interactions::pull_lever(&mut r, lever.x, lever.y).unwrap());
             assert_eq!(r.ground[&depth.to_string()].iter().find(|g| g.item.id == expected_reward.id).unwrap().item, expected_reward);
             assert!(!crate::godbeast_interactions::pull_lever(&mut r, lever.x, lever.y).unwrap());

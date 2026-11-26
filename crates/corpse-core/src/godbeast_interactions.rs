@@ -40,7 +40,7 @@ pub fn pull_lever(r: &mut Run, x: f64, y: f64) -> Result<bool, String> {
         let mut rng =
             crate::population::population_random(&format!("{}:floor:{}:Mercuria", r.seed, r.depth));
         let depth = r.depth as u32;
-        let item = crate::equipment::make_godbeast_permanent_for_run(r, depth, &mut rng)?;
+        let item = crate::equipment::make_mercuria_reward(r, depth, &mut rng)?;
         r.next_id += 1.;
         let placement=crate::item_placement::place_ground_item(
             r,
@@ -65,7 +65,11 @@ pub fn pull_lever(r: &mut Run, x: f64, y: f64) -> Result<bool, String> {
     }
     crate::engine::log(
         r,
-        "You pull Mercuria’s lever. Ichor rises from the well around a gleaming permanent.",
+        if crate::mercuria_rules::current(r) {
+            "You pull Mercuria’s lever. Ichor rises from the well around a gleaming tier 9 amulet."
+        } else {
+            "You pull Mercuria’s lever. Ichor rises from the well around a gleaming permanent."
+        },
         "player",
     );
     crate::events::actor_event(

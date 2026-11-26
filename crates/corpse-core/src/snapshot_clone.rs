@@ -72,6 +72,8 @@ fn clone_snapshot_state(run:&Run)->Run {
             borge_throw_from: Default::default(),
             banshee_shriek_from: Default::default(),
             local_floor_ticks_from: Default::default(),
+            minotaur_straight_from: Default::default(),
+            mercuria_amulet_from: Default::default(),
             execute_rules_from: Default::default(),
             beckoning_rules_from: Default::default(),
             ichor_fire_rules_from: Default::default(),

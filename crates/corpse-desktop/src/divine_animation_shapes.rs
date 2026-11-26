@@ -14,6 +14,7 @@ pub fn duration(e:&PresentationEvent)->Option<f64>{
  else if s=="thread-grow"{Some(a.cells.len().max(1) as f64*32.+100.)}
  else if s=="map-reveal"||s.starts_with("wave-reveal")||s==corpse_core::banshee_rules::PURPLE_WAVE{Some(900.)}
  else if s=="wave-gasser"{Some(230.)}
+ else if s=="wave-charge-inward"{Some(340.)}
  else if s=="light100"{Some(a.cells.len().max(1) as f64*30.+50.)}
  else if s.starts_with("moving-actor"){Some(a.cells.len().max(1) as f64*60.+100.)}
  else {None}
@@ -44,6 +45,13 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
  if reduced{return Some(a.cells.iter().map(|p|make(p.x as i32,p.y as i32,0.55,None)).collect())}
  let phase=(age/total).clamp(0.,1.);
  let allowed:BTreeSet<_>=a.cells.iter().map(|p|(p.x as i32,p.y as i32)).collect();
+ if s=="wave-charge-inward" {
+  return Some(allowed.into_iter().filter_map(|(x,y)|{
+   let d=f64::from(x-center.0).hypot(f64::from(y-center.1));
+   let t=age-(4.-d).max(0.)*55.;
+   (0. ..120.).contains(&t).then(||make(x,y,0.92*(1.-t/120.),None))
+  }).collect());
+ }
  if s=="wave-gasser" {
   return Some(allowed.into_iter().filter_map(|(x,y)| {
    let offset=if (x,y)==center {0.}else{70.};
@@ -112,6 +120,16 @@ pub fn tiles(e:&PresentationEvent,age:f64,reduced:bool,default:Rgb)->Option<Vec<
 #[cfg(test)]mod tests{
  use super::*;use corpse_core::events::{AnimationCue,Delivery,EventPoint,Stage};
  fn event(style:&str)->PresentationEvent{let cells=(-2..=2).flat_map(|y|(-2..=2).map(move|x|EventPoint{x:x as f64,y:y as f64})).collect();PresentationEvent{kind:"animation".into(),from:None,to:EventPoint{x:0.,y:0.},glyph:None,color:None,label:None,depth:1.,animation:Some(AnimationCue{proposal:"P01".into(),style:style.into(),stage:Stage::Special,action:1,cells,delivery:Delivery::Local,surface:None,item_id:None,arrival_steps:None})}}
+ #[test]fn minotaur_windup_runs_from_the_outer_ring_to_the_actor(){
+  let mut e=event("wave-charge-inward");
+  e.animation.as_mut().unwrap().cells=vec![EventPoint{x:4.,y:0.},EventPoint{x:2.,y:0.},EventPoint{x:0.,y:0.}];
+  let at=|age|tiles(&e,age,false,[255,255,255]).unwrap().iter().map(|t|t.x).collect::<Vec<_>>();
+  assert_eq!(duration(&e),Some(340.));
+  assert_eq!(at(0.),vec![4]);
+  assert_eq!(at(135.),vec![2]);
+  assert_eq!(at(240.),vec![0]);
+  assert!(at(340.).is_empty());
+ }
  #[test]fn banshee_white_and_purple_use_the_same_outward_bands(){
   use corpse_core::banshee_rules::{PURPLE_WAVE,WHITE_WAVE};
   let mut white=event(WHITE_WAVE);

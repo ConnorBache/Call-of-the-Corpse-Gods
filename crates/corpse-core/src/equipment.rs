@@ -538,6 +538,7 @@ pub fn refresh_known_magic(i: &mut Item) {
 }
 #[path = "equipment_generation.rs"]
 mod generated_loot;
+pub(crate) use generated_loot::make_mercuria_reward;
 pub use generated_loot::{
     generate_floor_loot_for_run, make_godbeast_permanent_for_run,
     create_equipment, create_equipment_revision, generate_floor_loot, generate_floor_loot_revision, make_godbeast_permanent, make_godbeast_permanent_revision, modify_equipment,

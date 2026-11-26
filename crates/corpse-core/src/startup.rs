@@ -547,6 +547,8 @@ pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, r
         borge_throw_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         banshee_shriek_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         local_floor_ticks_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        minotaur_straight_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        mercuria_amulet_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         steam_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
         execute_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         beckoning_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },

@@ -30,6 +30,8 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         borge_throw_from: Field::Missing,
         banshee_shriek_from: Field::Missing,
         local_floor_ticks_from: Field::Missing,
+        minotaur_straight_from: Field::Missing,
+        mercuria_amulet_from: Field::Missing,
         execute_rules_from: Field::Missing,
         beckoning_rules_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,

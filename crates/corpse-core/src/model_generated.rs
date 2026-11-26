@@ -1754,6 +1754,10 @@ pub struct Run {
     pub banshee_shriek_from: Field<usize>,
     #[serde(rename = "localFloorTicksFrom", default, skip_serializing_if = "Field::is_missing")]
     pub local_floor_ticks_from: Field<usize>,
+    #[serde(rename = "minotaurStraightFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub minotaur_straight_from: Field<usize>,
+    #[serde(rename = "mercuriaAmuletFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub mercuria_amulet_from: Field<usize>,
     #[serde(rename = "executeRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub execute_rules_from: Field<usize>,
     #[serde(rename = "beckoningRulesFrom", default, skip_serializing_if = "Field::is_missing")]

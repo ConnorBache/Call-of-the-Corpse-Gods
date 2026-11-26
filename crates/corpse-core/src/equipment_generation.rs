@@ -329,6 +329,19 @@ pub fn make_godbeast_permanent_for_run(
     if crate::unique_composite_bow::is_composite(&item) { run.composite_bow_generated = true.into(); }
     Ok(item)
 }
+/// The well always uses the named amulet pool at its maximum tier. Keep the
+/// old group draw's stream position even though Mercuria no longer uses it.
+pub(crate) fn make_mercuria_reward(run: &mut Run, depth: u32, rng: &mut GenerationRng) -> Result<Item, String> {
+    if !crate::mercuria_rules::current(run) {
+        return make_godbeast_permanent_for_run(run, depth, rng);
+    }
+    let _ = rng.random();
+    let revision = run.simulation_revision.value_or(29.);
+    let mut item = revision50::create_with_item_rules("amulet", rng, run.next_id, revision,
+        crate::amulet_rules::current(run), crate::ring_rules::current(run))?;
+    crate::revision52_amulet_tiers::initialize_max_birth(&mut item, revision)?;
+    Ok(item)
+}
 /// Existing event catalog filtered to Composite bow, Ring and Amulet: one equal
 /// candidate per useful group, then the same uniform named-jewelry draw as loot.
 /// O(C) legacy catalog scan; O(1) R50 lookup plus returned item allocation.

@@ -185,7 +185,13 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
     let had_local_floor_ticks = corpse_core::local_floor_rules::current(&engine.run);
     corpse_core::local_floor_rules::admit(&mut engine.run)?;
     let local_floor_ticks_migrated = !had_local_floor_ticks && corpse_core::local_floor_rules::current(&engine.run);
-    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated))
+    let had_minotaur_straight = corpse_core::minotaur_straight::current(&engine.run);
+    corpse_core::minotaur_straight::admit(&mut engine.run)?;
+    let minotaur_straight_migrated = !had_minotaur_straight && corpse_core::minotaur_straight::current(&engine.run);
+    let had_mercuria_amulet = corpse_core::mercuria_rules::current(&engine.run);
+    corpse_core::mercuria_rules::admit(&mut engine.run)?;
+    let mercuria_amulet_migrated = !had_mercuria_amulet && corpse_core::mercuria_rules::current(&engine.run);
+    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated || mercuria_amulet_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]

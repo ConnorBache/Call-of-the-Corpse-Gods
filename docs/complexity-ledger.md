@@ -2592,3 +2592,22 @@ placement scan.
   generate a missing destination; this is a direct effect, not catch-up.
   Timing impact is not inferred from asymptotics; benchmark repeated Wait
   across increasing visited-floor counts and separate cold fall generation.
+
+### Mercuria well amulet (R52)
+- Once per unopened well: O(1) selection from the existing fixed named amulet
+  pool plus O(L) item-name formatting for L name bytes, O(L) result space.
+  It keeps the historical named selection's local RNG position and consumes
+  no simulation RNG; it does not scan or modify Composite Bow history.
+  Existing ground placement, optional fall, and animation work is unchanged.
+
+### Straight Minotaur charge (R52)
+- Each existing commitment still takes at most two attempts. The edge
+  check is O(P+G) worst case for P portal pairs and G spatial pocket groups;
+  it accepts only the literal coordinate rather than exploring alternate
+  routes. The collision query scans at most A local actors, O(A) time.
+- Accepted movement and chasm transfers reuse ordinary arrival and creature
+  fall pipelines; a cold landing may still generate a floor and test its
+  cells for landing. Fire contact is local at each step before a Fast follow-up.
+- The wind-up considers only an integer radius-four disc and clips it to
+  visible cells. Desktop cost is O(C log C) to prepare its admitted geometry
+  and O(C) tile projection per frame, with C at most 49. It adds no simulation RNG.

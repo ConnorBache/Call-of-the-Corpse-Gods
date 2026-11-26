@@ -147,6 +147,52 @@ fn actual_mercuria_reward_uses_revisioned_constructor_and_preserves_simulation_r
     assert_eq!(r.ground.get(&r.depth.to_string()).unwrap().len(),1);
 }
 #[test]
+fn actual_mercuria_lever_guarantees_one_max_tier_amulet_at_any_birth_depth() {
+    let mut effects = std::collections::HashSet::new();
+    let mut old_kinds = std::collections::HashSet::new();
+    for depth in [5., 21.] {
+        for seed in 0..20 {
+            let mut run = room();
+            run.simulation_revision = 52.0.into();
+            run.amulet_rules_from = 0usize.into();
+            run.seed = format!("mercuria-max-{seed}");
+            run.depth = depth;
+            run.floors.truncate(1);
+            let floor = std::sync::Arc::make_mut(&mut run.floors[0]);
+            floor.depth = depth;
+            floor.tiles.fill("floor".into());
+            floor.godbeast_event = crate::GodbeastEvent {
+                kind: "Mercuria".into(), x: 15., y: 14.,
+                lever: crate::GodbeastEventLever { x: 14., y: 14. }.into(), ..Default::default()
+            }.into();
+            run.next_id = 200.;
+            run.composite_bow_generated = (seed % 2 == 0).into();
+            let mut historical = run.clone();
+            run.mercuria_amulet_from = 0usize.into();
+            let before = (run.rng, run.composite_bow_generated.clone());
+            assert!(crate::godbeast_interactions::pull_lever(&mut run, 14., 14.).unwrap());
+            assert!(crate::godbeast_interactions::pull_lever(&mut historical, 14., 14.).unwrap());
+            let prize = &run.ground[&depth.to_string()][0];
+            let old = &historical.ground[&depth.to_string()][0].item;
+            old_kinds.insert(old.kind.clone());
+            if old.kind == "amulet" { assert_eq!(prize.item.effect, old.effect); }
+            assert!(prize.item.name.starts_with("Tier 9 Amulet of "));
+            assert_eq!((prize.item.id, prize.item.kind.as_str()), (200., "amulet"));
+            assert_eq!((prize.x, prize.y), (15., 14.));
+            assert_eq!(crate::revision52_amulet_tiers::profile(&run, &prize.item).unwrap().tier, crate::revision52_amulet_tiers::MAX_TIER);
+            assert!(prize.item.amulet_state.as_ref().is_some());
+            assert!(!crate::revision52_amulet_tiers::retired(&run, &prize.item));
+            effects.insert(prize.item.effect.as_ref().unwrap().clone());
+            assert_eq!((run.rng, run.composite_bow_generated.clone()), before);
+            assert_eq!(run.next_id, 201.);
+            assert!(!crate::godbeast_interactions::pull_lever(&mut run, 14., 14.).unwrap());
+            assert_eq!(run.ground[&depth.to_string()].len(), 1);
+        }
+    }
+    assert!(effects.len() > 1);
+    assert!(old_kinds.contains("ring") && old_kinds.contains("weapon"));
+}
+#[test]
 fn actual_sphinx_reward_branch_uses_named_permanents() {
     let fixture: serde_json::Value=serde_json::from_str(include_str!("../../../fixtures/startup-v48.json")).unwrap();
     let case=fixture["cases"].as_array().unwrap().iter().find(|c|c["depth"]==35).unwrap();

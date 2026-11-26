@@ -31,5 +31,5 @@ pub(crate) fn apply_replay_policy(r: &mut Run, from: &Field<usize>, cursor: usiz
 
 /// Restrict actors driven by Minotaur AI, not the player’s direct controls.
 pub(crate) fn only_bump(r: &Run, a: &crate::Actor) -> bool {
-    current(r) && a.id != r.player.id && a.abilities.iter().any(|id| id == "enemy:beast:minotaur")
+    (current(r) || crate::minotaur_straight::current(r)) && a.id != r.player.id && a.abilities.iter().any(|id| id == "enemy:beast:minotaur")
 }

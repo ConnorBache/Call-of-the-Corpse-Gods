@@ -1162,7 +1162,7 @@ fn move_actor_inner(
             confused = true;
         }
     }
-    Ok(move_actor_step(r, id, dx, dy, movement_only, confused, trace)? || confused)
+    Ok(move_actor_step(r, id, dx, dy, movement_only, confused, trace, false)? || confused)
 }
 fn move_actor_step(
     r: &mut Run,
@@ -1172,6 +1172,7 @@ fn move_actor_step(
     movement_only: bool,
     confused: bool,
     mut trace: Option<&mut CommandMoveTrace>,
+    straight_charge: bool,
 ) -> Result<bool, EngineError> {
     let a = actor(r, id)
         .ok_or_else(|| EngineError("actor missing".into()))?
@@ -1181,6 +1182,7 @@ fn move_actor_step(
     // retain ordinary fall scaling even when they enter the same chasm tile.
     let (entry_x, entry_y) = (a.x + dx, a.y + dy);
     let options=crate::portals::step_options(r,&a,entry_x,entry_y);
+    if straight_charge && options.as_slice() != [(entry_x,entry_y)] {return Ok(false);}
     // The ordinary allied swap must not relocate a freshly placed endpoint,
     // including through a portal exit chosen later by the movement lottery.
     if id == r.player.id && crate::half_here::turns_until_dismissal(r) > 0
@@ -1253,7 +1255,7 @@ fn move_actor_step(
     }
     let f = r.floor().unwrap();
     let tile = &f.tiles[y as usize * f.width() + x as usize];
-    if id != r.player.id && tile == "chasm" && !flying_in(r, &a) {
+    if !straight_charge && id != r.player.id && tile == "chasm" && !flying_in(r, &a) {
         return Ok(false);
     }
     if id != r.player.id
@@ -1396,6 +1398,14 @@ fn move_actor_step(
             && (x!=before_move.x || y!=before_move.y);
     }
     finish_actor_arrival(r,id,old,voluntary_chasm,r50_grapple)?;
+    if straight_charge {
+        crate::revision52_speed::record_move(id);
+        // A Fast Minotaur can already be on the next tile by environment
+        // settlement. Record actual fire contact before that second step.
+        if actor(r,id).is_some_and(|a| !a.dead.value_or(false) && a.hp > 0.) {
+            crate::environment::refresh_burning_from_fire(r,id).map_err(EngineError)?;
+        }
+    }
     if let Some(after)=actor(r,id){
         crate::animation_enemy::moved(r,&before_move,after);
         if animation_depth==r.depth {
@@ -1405,6 +1415,11 @@ fn move_actor_step(
             if crate::animation_player::shadow_active(r,after){crate::animation_player::moved(r,&before_move,after,"P43","speed");}
             if after.abilities.iter().any(|s|s=="etill-drown")&&crate::divine_environment::water_at(r,after)&&!crate::divine_environment::water_at(r,&before_move){crate::animation_player::local(r,after,"P27","ripple",crate::events::Stage::Special);}
         }
+    }
+    if straight_charge && actor(r,id).is_some_and(|a|
+        crate::portals::cell(r.floor().unwrap(),a.x,a.y).is_some_and(|i|r.floor().unwrap().tiles[i]=="chasm")
+            && !flying_in(r,a)) {
+        crate::travel::fall_actors_one_level(r,animation_depth,&[id],None).map_err(EngineError)?;
     }
     Ok(true)
 }
@@ -1652,6 +1667,8 @@ pub(crate) fn fast_followup(r: &mut Run, id: f64, before: &Actor, cache: &mut Pa
         || crate::dreamwalking::inert(r,&a) || crate::ichor::stranded(r,&a) {
         return Ok(());
     }
+    if crate::minotaur_straight::current(r) && a.abilities.iter().any(|s|s=="enemy:beast:minotaur")
+        && condition(&a,"monsterChargeRemaining")<=0. {return Ok(());}
     // Already-paid Dragon landing precedes rest on both ordinary and Fast
     // movement. This exception cannot activate flight, wake or attack.
     if ai::sleeping(&a) {
@@ -4227,6 +4244,23 @@ pub fn monster_prepare_player_turn(r: &mut Run) -> Result<(), EngineError> {
     }
     Ok(())
 }
+/// A straight charge uses one literal map edge; portal or pocket remaps
+/// cannot turn the direction arrow into a hidden collision. Hazard tiles
+/// are allowed, but terrain, closed corners and occupancy still matter.
+// O(P + G) linked-edge admission for P portal pairs and G pocket groups.
+fn straight_charge_edge(r:&Run,a:&Actor,x:f64,y:f64)->bool {
+    let f=r.floor().unwrap();
+    let Some(i)=crate::portals::cell(f,x,y) else{return false};
+    if (x,y)==(a.x,a.y) || (a.x-x).abs().max((a.y-y).abs())!=1.
+        || !actor_passable(r,a,x,y) || bulwark_blocks(r,a,x,y)
+        || !crate::ichor::movement_allowed(r,a,x,y)
+        || crate::portals::step_options(r,a,x,y).as_slice()!=[(x,y)]
+        || !movement::diagonal_step_allowed(&f.tiles,f.width(),point(a),
+            Point{x:x as i32,y:y as i32},a.active.iter().any(|s|s=="etill-phase-through")) {return false}
+    f.tiles[i]!="chasm" || flying_in(r,a) || crate::finale::collapsed(r,r.depth,i)
+        || crate::fast_mode::playable(r,crate::fast_mode::below(r,r.depth))
+}
+
 fn choose_commitment(r: &mut Run, id: f64) -> Result<(), EngineError> {
     let a = actor(r, id).unwrap().clone();
     let goal = if a.state == "ally" {
@@ -4249,6 +4283,7 @@ fn choose_commitment(r: &mut Run, id: f64) -> Result<(), EngineError> {
     } else {
         None
     };
+    let straight=crate::minotaur_straight::current(r);
     let toward = if let Some(goal) = goal {
         let f = r.floor().unwrap();
         let allowed: Vec<_> = (0..f.tiles.len())
@@ -4279,10 +4314,16 @@ fn choose_commitment(r: &mut Run, id: f64) -> Result<(), EngineError> {
     } else {
         None
     };
+    let allowed_edge=|d:&Point| {
+        let (x,y)=(a.x+d.x as f64,a.y+d.y as f64);
+        if straight {straight_charge_edge(r,&a,x,y)} else {can_traverse(r,&a,x,y)}
+    };
+    let toward=toward.filter(|d|!straight || allowed_edge(d));
     let options: Vec<_> = movement::DIRECTIONS
         .into_iter()
-        .filter(|d| can_traverse(r, &a, a.x + d.x as f64, a.y + d.y as f64))
+        .filter(allowed_edge)
         .collect();
+    if straight && toward.is_none() && options.is_empty() {return Ok(());}
     let d = toward.unwrap_or_else(|| {
         if options.is_empty() {
             movement::DIRECTIONS[0]
@@ -4294,6 +4335,10 @@ fn choose_commitment(r: &mut Run, id: f64) -> Result<(), EngineError> {
     a.conditions.insert("monsterChargeDx".into(), d.x as f64);
     a.conditions.insert("monsterChargeDy".into(), d.y as f64);
     a.conditions.insert("monsterChargeRemaining".into(), 2.0);
+    if straight {
+        let a=actor(r,id).unwrap();
+        if !ai::sleeping(a) {crate::animation_enemy::charge_windup(r,a);}
+    }
     Ok(())
 }
 
@@ -4363,7 +4408,9 @@ fn monster_ai_turn_target_inner(
     if !a.abilities.iter().any(|id| id == "enemy:beast:minotaur") {
         return crate::monster_caster::turn(r, id, target, movement_only).map_err(EngineError);
     }
+    let straight=crate::minotaur_straight::current(r);
     if condition(&a, "monsterChargeRemaining") <= 0.0 {
+        if straight {return Ok(true);} // only the player-facing boundary announces a new arrow
         choose_commitment(r, id)?;
     }
     let a = actor(r, id).unwrap().clone();
@@ -4374,8 +4421,9 @@ fn monster_ai_turn_target_inner(
     let allied = a.state == "ally";
     let bump_only=crate::minotaur_rules::only_bump(r,&a);
     let (x,y)=(a.x+dx,a.y+dy);
-    let can_bump=!bump_only || (!movement_only && condition(&a,"forcedMove")==0.
-        && can_traverse(r,&a,x,y));
+    let physical=straight && straight_charge_edge(r,&a,x,y);
+    let can_bump=if straight {!movement_only && condition(&a,"forcedMove")==0. && physical}
+        else {!bump_only || (!movement_only && condition(&a,"forcedMove")==0. && can_traverse(r,&a,x,y))};
     let victim = std::iter::once(&r.player)
         .chain(r.actors_at(r.depth))
         .find(|b| {
@@ -4385,14 +4433,14 @@ fn monster_ai_turn_target_inner(
                 && crate::dreamwalking::same_plane(r,&a,b)
                 && (((b.id == r.player.id || b.state == "ally") != allied)
                     || (bump_only && crate::revision50_control_amulets::discord_hostility(r,&a,b)))
-                && crate::portals::same_position(r,b,x,y)
+                && (if straight {(b.x,b.y)==(x,y)} else {crate::portals::same_position(r,b,x,y)})
         })
         .map(|b| b.id);
     if let Some(v) = victim {
         if !movement_only
             && !crate::monster_statuses::try_hemophilia_episode(r, id).map_err(EngineError)?
         {
-            if bump_only {
+            if bump_only || straight {
                 let landed=std::cell::Cell::new(false);
                 attack_base_with_accuracy(r,id,v,1.,None,false,0.,1.,false,
                     None,&landed,true,false,false,None,false,1.,false,true)?;
@@ -4401,12 +4449,15 @@ fn monster_ai_turn_target_inner(
             }
         }
     } else {
-        let accepted=move_actor(r, id, dx, dy, movement_only)?;
+        let accepted=if straight {
+            physical && move_actor_step(r,id,dx,dy,true,false,None,true)?
+        } else {move_actor(r,id,dx,dy,movement_only)?};
         crate::animation_enemy::blocked_charge(r,&a,dx,dy,accepted);
     }
-    let a = actor_mut_trusted(r, id).unwrap();
+    // A real fall may have transferred or removed the actor.
+    let Some(a) = crate::engine::actor_any_mut(r,id) else{return Ok(true)};
     *a.conditions.get_mut("monsterChargeRemaining").unwrap() -= 1.0;
-    if condition(a, "monsterChargeRemaining") <= 0.0 && !a.dead.value_or(false) && a.hp > 0.0 {
+    if !straight && condition(a, "monsterChargeRemaining") <= 0.0 && !a.dead.value_or(false) && a.hp > 0.0 {
         choose_commitment(r, id)?;
     }
     Ok(true)

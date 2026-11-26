@@ -160,3 +160,87 @@ fn blocked_counterattack_does_not_spend_energy() {
     assert_eq!(r.player.hp,hp);
     assert_eq!(engine::actor(&r,id).unwrap().energy,100.);
 }
+
+fn straight_room() -> Run {
+    let mut r=room(52.);
+    r.minotaur_bump_from=0usize.into();
+    r.minotaur_straight_from=0usize.into();
+    r.player.stats.dodge=-1000.;
+    r
+}
+
+#[test]
+fn minotaur_finishing_the_last_step_cannot_attack_down_a_new_arrow() {
+    let mut r=straight_room();
+    r.player.x=12.;r.player.y=11.;
+    let hp=r.player.hp;
+    let a=&mut r.actors_at_mut(1.)[0];
+    a.stats.perception=300.;
+    a.conditions.insert("monsterChargeRemaining".into(),1.);
+    let out=engine::dispatch(&mut r,&Command::Wait).unwrap();
+    assert_eq!(r.player.hp,hp);
+    let a=&r.actors_at(1.)[0];
+    assert_eq!((a.x,a.y),(12.,10.));
+    assert_eq!(a.conditions["monsterChargeRemaining"],2.);
+    let windups:Vec<_>=out.events.iter().filter(|e|e.animation.as_ref().is_some_and(|a|a.style=="wave-charge-inward")).collect();
+    assert_eq!(windups.len(),1);
+    assert_eq!((windups[0].to.x,windups[0].to.y),(12.,10.));
+}
+
+#[test]
+fn minotaur_charge_does_not_bump_a_portal_alias() {
+    let mut r=straight_room();
+    r.player.x=20.;
+    let hp=r.player.hp;
+    let f=r.floor_mut().unwrap();
+    f.portals=vec![corpse_core::portals_generation::PortalPair{a:10*79+12,b:10*79+20,color_index:0}].into();
+    engine::dispatch(&mut r,&Command::Wait).unwrap();
+    let a=&r.actors_at(1.)[0];
+    assert_eq!((a.x,a.y),(11.,10.));
+    assert_eq!(r.player.hp,hp);
+}
+
+#[test]
+fn minotaur_charge_crosses_fire_and_catches_on_first_step() {
+    let mut r=straight_room();
+    r.floor_mut().unwrap().tiles[10*79+12]="grass".into();
+    corpse_core::environment::ignite(&mut r,12.,10.,Some(20.),None).unwrap();
+    engine::dispatch(&mut r,&Command::Wait).unwrap();
+    let a=&r.actors_at(1.)[0];
+    assert_eq!((a.x,a.y),(13.,10.));
+    assert!(engine::condition(a,"burning")>0.);
+}
+
+#[test]
+fn minotaur_charge_falls_and_stops_before_the_second_step() {
+    let mut r=straight_room();
+    let mut below=r.floor().unwrap().clone();
+    below.depth=2.;
+    if let Some(f)=r.floors.iter_mut().find(|f|f.depth==2.) {*f=Arc::new(below);}
+    else {r.floors.push(Arc::new(below));}
+    r.floor_mut().unwrap().tiles[10*79+12]="chasm".into();
+    let id=r.actors_at(1.)[0].id;
+    assert!(engine::dispatch(&mut r,&Command::Wait).unwrap().took_turn);
+    assert_eq!(r.depth,1.);
+    assert!(r.actors_at(1.).iter().all(|a|a.id!=id));
+    let landed=r.actors_at(2.).iter().find(|a|a.id==id).unwrap();
+    assert_eq!((landed.x,landed.y),(12.,10.));
+    assert!(landed.hp<1000. && landed.hp>0.);
+}
+
+#[test]
+fn adopted_straight_charge_is_at_the_live_save_boundary_only() {
+    let mut old=corpse_core::startup::create_avatar_run("minotaur-straight-replay").unwrap();
+    old.minotaur_straight_from=Field::Missing;
+    engine::dispatch(&mut old,&Command::Wait).unwrap();
+    let boundary=old.replay.len();
+    let live=corpse_core::temporal::Engine::new(old).unwrap();
+    assert_eq!(live.run.minotaur_straight_from.as_ref(),Some(&boundary));
+    let saved=corpse_core::storage::serialize(&live.run).unwrap();
+    assert_eq!(corpse_core::storage::deserialize(&saved).unwrap().minotaur_straight_from.as_ref(),Some(&boundary));
+    let record=corpse_core::replay::ReplayRecord::from_run(&live.run);
+    let mut replay=corpse_core::replay::ReplaySession::create(record,true).unwrap();
+    assert!(!corpse_core::minotaur_straight::current(&replay.engine.run));
+    while replay.step().unwrap() {}
+    assert!(corpse_core::minotaur_straight::current(&replay.engine.run));
+}

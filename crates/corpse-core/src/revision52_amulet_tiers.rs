@@ -47,10 +47,21 @@ pub fn initialize_birth(item: &mut Item, revision: f64, depth: u32) -> Result<()
     if revision != 52. || !crate::revision50_amulet_effects::is_amulet(item) { return Ok(()); }
     if item.amulet_tier.is_missing() {
         if !(1..=40).contains(&depth) { return Err("Invalid amulet birth floor".into()); }
-        item.amulet_tier = (tier_for_depth(depth) as f64).into();
-        item.name = format!("Tier {} {}", tier_for_depth(depth), crate::revision50_amulet_effects::display_name(item).unwrap());
+        assign_birth(item, tier_for_depth(depth));
     }
     Ok(())
+}
+/// Authored special reward. Never retier existing inventory or floor items.
+pub(crate) fn initialize_max_birth(item: &mut Item, revision: f64) -> Result<(), String> {
+    if revision != 52. || !valid_item(item, revision) || !crate::revision50_amulet_effects::is_amulet(item) {
+        return Err("Maximum tier reward requires an R52 amulet".into());
+    }
+    if item.amulet_tier.is_missing() { assign_birth(item, MAX_TIER); }
+    Ok(())
+}
+fn assign_birth(item: &mut Item, tier: u8) {
+    item.amulet_tier = (tier as f64).into();
+    item.name = format!("Tier {tier} {}", crate::revision50_amulet_effects::display_name(item).unwrap());
 }
 /// O(effect bytes), no allocation. Missing tier is always authored base one.
 pub fn profile(r: &Run, item: &Item) -> Option<Profile> {
