@@ -2802,9 +2802,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     painter.menu_fast_mode(menu_fast_mode,menu_selected==menu_ui::FAST_INDEX);
                     avatar_selection.paint_slots(&mut painter,menu_selected);
                     if !notice.is_empty() {
-                        painter.rect(103,415,559,24,[24,10,12]);
-                        let label=painter.fit_text_role(typography_ui::Role::Secondary,&notice,545,12);
-                        painter.text_role(typography_ui::Role::Secondary,&label,110,420,12,[240,170,145]);
+                        painter.rect(menu_ui::START_X, 730, menu_ui::START_WIDTH, 25, [24,10,12]);
+                        let label=painter.fit_text_role(typography_ui::Role::Secondary,&notice,menu_ui::START_WIDTH-14,12);
+                        painter.text_role(typography_ui::Role::Secondary,&label,menu_ui::START_X+7,735,12,[240,170,145]);
                     }
                     avatar_selection.paint_picker(&mut painter);
                     help_ui::paint_menu_button(&mut painter, menu_help_hover && !help.active());

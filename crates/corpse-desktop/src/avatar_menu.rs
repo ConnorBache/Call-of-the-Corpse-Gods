@@ -6,6 +6,11 @@ pub const MODE: &str = "Avatar";
 pub const GOD_START: usize = 8;
 const INK: Rgb = [15, 10, 18];
 const PAPER: Rgb = [238, 229, 207];
+const MUTED: Rgb = [181, 166, 153];
+const SURFACE: Rgb = [23, 17, 22];
+const FOCUSED: Rgb = [37, 26, 32];
+const RULE: Rgb = [86, 65, 72];
+const FADED_PAPER: Rgb = [172, 158, 146];
 
 pub struct God {
     pub name: &'static str,
@@ -29,9 +34,22 @@ pub const GODS: [God; 12] = [
 
 pub type Rect = (i32, i32, i32, i32);
 pub fn contains((x,y,w,h): Rect, px:i32, py:i32)->bool { px>=x && px<x+w && py>=y && py<y+h }
-pub fn slot_rect(slot:usize)->Rect { (710, 491 + slot as i32 * 91, 470, 80) }
-pub fn card_rect(id:usize)->Rect { (74 + (id%3) as i32*384, 166 + (id/3) as i32*116, 364, 102) }
-pub const CANCEL: Rect = (940, 681, 266, 54);
+pub fn slot_rect(slot:usize)->Rect { (608, 384 + slot as i32 * 65, 572, 56) }
+pub fn card_rect(id:usize)->Rect { (58 + (id%3) as i32*394, 140 + (id/3) as i32*133, 374, 114) }
+pub const CANCEL: Rect = (972, 706, 254, 52);
+
+/// Occupied slots stay identifiable by hue but take a back seat to available choices.
+pub(crate) fn card_stripe(color: Rgb, occupied: bool) -> Rgb {
+    if occupied {
+        std::array::from_fn(|i| ((u16::from(color[i]) * 3 + u16::from(SURFACE[i])) / 4) as u8)
+    } else {
+        color
+    }
+}
+
+fn domain_label(god: &God) -> &'static str {
+    god.domain.split_once(" of ").map_or(god.domain, |(_, subject)| subject)
+}
 pub fn slot_at(x:i32,y:i32)->Option<usize> { (0..3).find(|i|contains(slot_rect(*i),x,y)) }
 pub fn card_at(x:i32,y:i32)->Option<usize> { (0..12).find(|i|contains(card_rect(*i),x,y)) }
 
@@ -158,42 +176,66 @@ impl Selection {
         if let Some(selected)=selected {if picker.selected!=selected {picker.selected=selected;return true;}}
         false
     }
-    pub fn paint_slots(&self,p:&mut Painter,selected:usize) {
-        p.text("YOUR AVATAR'S GODS",710,451,21,PAPER);
-        for (slot,id) in self.gods.iter().enumerate() {
-            let (x,y,w,h)=slot_rect(slot);
-            let god=&GODS[*id]; let color=god_color(*id);
-            p.rect(x,y,w,h,color);
-            if selected==GOD_START+slot {p.border(x-3,y-3,w+6,h+6,PAPER);}
-            p.text(&format!("{}  {}",slot+1,god.name),x+14,y+9,23,INK);
-            p.text(god.alias,x+14,y+35,17,INK);
-            p.text(god.domain,x+14,y+58,13,INK);
-            p.text("CHANGE >",x+w-101,y+34,14,INK);
+    pub fn paint_slots(&self, p: &mut Painter, selected: usize) {
+        let (left, y, _, _) = slot_rect(0);
+        p.prose("YOUR AVATAR'S GODS", left, y - 46, 27, PAPER, false);
+        for (slot, id) in self.gods.iter().enumerate() {
+            let (x, y, w, h) = slot_rect(slot);
+            let god = &GODS[*id];
+            let color = god_color(*id);
+            let focused = selected == GOD_START + slot;
+            p.rect(x, y, w, h, if focused { FOCUSED } else { SURFACE });
+            p.border(x, y, w, h, if focused { PAPER } else { RULE });
+            p.rect(x + 1, y + 1, 8, h - 2, color);
+            p.prose(&format!("{}", slot + 1), x + 20, y + 10, 27, PAPER, false);
+            p.prose(god.name, x + 65, y + 10, 27, color, true);
+            p.prose(domain_label(god), x + 208, y + 14, 23, MUTED, false);
+            let change = "Change >";
+            p.prose(change, x + w - 17 - p.prose_width(change, 22, false), y + 14, 22, PAPER, false);
         }
     }
+
     /// O(12 + G + P): fixed catalog, glyph raster/cache costs and painted pixels.
     /// No Run/visibility queries, random calls, file IO or persisted UI state.
-    pub fn paint_picker(&self,p:&mut Painter) {
-        let Some(picker)=&self.picker else{return;};
-        p.clear([12,8,14]);
-        p.text(&format!("CHOOSE GOD {}",picker.slot+1),74,56,36,PAPER);
-        for (id,god) in GODS.iter().enumerate() {
-            let (x,y,w,h)=card_rect(id); let color=god_color(id);
-            p.rect(x,y,w,h,color);
-            if picker.selected==id {p.border(x-4,y-4,w+8,h+8,PAPER);p.border(x-6,y-6,w+12,h+12,PAPER);}
-            p.text(god.name,x+14,y+8,24,INK);
-            p.text(god.alias,x+14,y+37,18,INK);
-            p.text(god.domain,x+14,y+62,15,INK);
-            if let Some(slot)=self.gods.iter().position(|g|*g==id) {
-                p.text(if slot==picker.slot {"CURRENT CHOICE"} else {"CHOSEN IN ANOTHER SLOT"},x+14,y+84,10,INK);
+    pub fn paint_picker(&self, p: &mut Painter) {
+        let Some(picker) = &self.picker else { return; };
+        p.clear(INK);
+        p.prose(&format!("REPLACE {}", GODS[self.gods[picker.slot]].name), 56, 31, 40, PAPER, true);
+        p.prose(&format!("God slot {}", picker.slot + 1), 58, 80, 25, MUTED, false);
+        for (id, god) in GODS.iter().enumerate() {
+            let (x, y, w, h) = card_rect(id);
+            let slot = self.gods.iter().position(|g| *g == id);
+            let occupied = slot.is_some_and(|slot| slot != picker.slot);
+            let focused = picker.selected == id;
+            let stripe = card_stripe(god_color(id), occupied);
+            p.rect(x, y, w, h, if focused { FOCUSED } else { SURFACE });
+            p.border(x, y, w, h, RULE);
+            p.rect(x + 1, y + 1, 12, h - 2, stripe);
+            if focused {
+                p.border(x - 2, y - 2, w + 4, h + 4, PAPER);
+            }
+
+            p.prose(god.name, x + 30, y + 4, 34, stripe, true);
+            p.prose(god.alias, x + 30, y + 43, 23, if occupied { FADED_PAPER } else { PAPER }, false);
+            p.prose(domain_label(god), x + 30, y + 70, 23, MUTED, false);
+
+            if let Some(slot) = slot {
+                let current = slot == picker.slot;
+                let badge = if current { "CURRENT".into() } else { format!("IN SLOT {}", slot + 1) };
+                let bx = x + w - 14 - p.prose_width(&badge, 20, false);
+                p.prose(&badge, bx, y + 9, 20, if current { stripe } else { MUTED }, false);
             }
         }
-        p.text(&picker.notice,74,643,14,[255,173,153]);
-        p.text("Arrows / Tab: move    Enter: choose",74,690,17,PAPER);
-        p.text("Esc: cancel.",74,720,14,[197,183,176]);
-        let(x,y,w,h)=CANCEL;
-        p.rect(x,y,w,h,if picker.selected==12 {PAPER}else{[45,32,40]});
-        p.border(x,y,w,h,PAPER);
-        p.text("CANCEL",x+80,y+16,21,if picker.selected==12 {INK}else{PAPER});
+        if !picker.notice.is_empty() {
+            p.prose(&picker.notice, 58, 669, 19, [255, 173, 153], false);
+        }
+        p.prose("Arrows / Tab move    Enter choose    Esc cancel", 58, 720, 21, PAPER, false);
+        let (x, y, w, h) = CANCEL;
+        let focused = picker.selected == GODS.len();
+        p.rect(x, y, w, h, if focused { PAPER } else { SURFACE });
+        p.border(x, y, w, h, PAPER);
+        let label = "CANCEL";
+        p.prose(label, x + (w - p.prose_width(label, 26, false)) / 2, y + 9, 26,
+            if focused { INK } else { PAPER }, false);
     }
 }

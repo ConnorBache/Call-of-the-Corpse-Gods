@@ -31,7 +31,11 @@ pub fn fast_label(enabled: bool) -> &'static str {
     if enabled { "Fast mode: ON" } else { "Fast mode: OFF" }
 }
 pub const SEED_INDEX: usize = 7;
-pub const SEED_RECT:(i32,i32,i32,i32)=(490,443,172,66);
+pub const START_X: i32 = 608;
+pub const START_WIDTH: i32 = 572;
+pub const SEED_RECT: (i32, i32, i32, i32) = (START_X, 587, START_WIDTH, 42);
+pub const SEED_FIELD: (i32, i32, i32, i32) = (813, 587, 367, 42);
+pub const SEED_SIZE: u16 = 19;
 /// O(1), shared logical input bounds; separate from existing button/art layout.
 pub fn seed_at(x:i32,y:i32)->bool{let(a,b,w,h)=SEED_RECT;x>=a&&x<a+w&&y>=b&&y<b+h}
 /// O(text bytes), bounded UTF-8 edit; validation of seed syntax remains in startup.
@@ -39,13 +43,13 @@ pub fn edit_seed(seed:&mut String,text:&str,replace:bool)->bool{if text.chars().
 /// O(seed bytes), unchanged trimming/blank-random semantics, one random call only for blank.
 pub fn selected_seed(seed:&str,random:impl FnOnce()->String)->String{if seed.trim().is_empty(){random()}else{seed.trim().into()}}
 const ALL_ITEMS: [Item; 7] = [
-    Item { label: "DESCEND", x: 103, y: 443, w: 375, h: 66, size: 32 },
-    Item { label: "CONTINUE", x: 174, y: 515, w: 434, h: 54, size: 31 },
-    Item { label: "VIEW REPLAY", x: 266, y: 581, w: 342, h: 39, size: 24 },
-    Item { label: "VIEW HIGH SCORES", x: 266, y: 624, w: 342, h: 39, size: 24 },
-    Item { label: "VIEW BESTIARY", x: 266, y: 667, w: 342, h: 39, size: 24 },
-    Item { label: "SETTINGS", x: 266, y: 710, w: 342, h: 39, size: 24 },
-    Item { label: "PLAY FROM X'TH FLOOR", x: 174, y: 753, w: 434, h: 39, size: 22 },
+    Item { label: "DESCEND", x: START_X, y: 652, w: START_WIDTH, h: 66, size: 36 },
+    Item { label: "CONTINUE", x: 113, y: 409, w: 352, h: 54, size: 30 },
+    Item { label: "VIEW REPLAY", x: 113, y: 471, w: 352, h: 46, size: 27 },
+    Item { label: "HIGH SCORES", x: 113, y: 525, w: 352, h: 46, size: 27 },
+    Item { label: "BESTIARY", x: 113, y: 579, w: 352, h: 46, size: 27 },
+    Item { label: "SETTINGS", x: 113, y: 633, w: 352, h: 46, size: 27 },
+    Item { label: "PLAY FROM X'TH FLOOR", x: 113, y: 687, w: 352, h: 42, size: 21 },
 ];
 
 pub const ITEMS: &[Item] = if crate::release_policy::DEV_TOOLS { &ALL_ITEMS } else {
@@ -144,8 +148,8 @@ mod tests {
     #[test]
     fn settings_is_accessible_from_the_main_menu() {
         assert_eq!(ITEMS.len(), 6 + usize::from(crate::release_policy::DEV_TOOLS));
-        assert_eq!(item_at(250, 765), crate::release_policy::DEV_TOOLS.then_some(6));
-        assert_eq!(item_at(300, 730), Some(5));
+        assert_eq!(item_at(250, 706), crate::release_policy::DEV_TOOLS.then_some(6));
+        assert_eq!(item_at(300, 654), Some(5));
     }
     #[test]
     fn selection_never_moves_composition_and_disabled_continue_is_gray() {
@@ -193,8 +197,11 @@ mod tests {
     }
     /// O(control count), input and first row never overlap each other or anatomical art.
     #[test]
-    fn seed_input_is_beside_descend_and_outside_art(){
-        let(x,y,w,h)=SEED_RECT;assert_eq!(y,ITEMS[0].y);assert!(x>ITEMS[0].x+ITEMS[0].w);assert!(x+w<=662);assert!(x+w<676);
+    fn seed_input_is_between_gods_and_descend(){
+        let(x,y,w,h)=SEED_RECT;
+        let (gx,gy,gw,gh)=crate::avatar_menu::slot_rect(2);
+        assert_eq!((x,w), (gx,gw));assert!(gy+gh<y);
+        assert_eq!((x,w), (ITEMS[0].x,ITEMS[0].w));assert!(y+h<ITEMS[0].y);
         assert_eq!(item_at(x,y),Some(SEED_INDEX));assert_eq!(item_at(x+w-1,y+h-1),Some(SEED_INDEX));assert_eq!(item_at(x+w,y),None);
         for(width,height)in[(640,480),(960,540),(1280,800),(1920,1080)]{let scale=(width as f64/1280.).min(height as f64/800.);let ox=(width as f64-1280.*scale)/2.;let oy=(height as f64-800.*scale)/2.;assert!(ox+x as f64*scale>=0.&&ox+(x+w)as f64*scale<=width as f64);assert!(oy+y as f64*scale>=0.&&oy+(y+h)as f64*scale<=height as f64);}
     }

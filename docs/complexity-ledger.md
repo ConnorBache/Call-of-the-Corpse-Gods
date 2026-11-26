@@ -2710,3 +2710,21 @@ movement and portal routing. Goal resolution has O(1) extra storage. Both the
 path overlay and the cast cue read the same goal, so there is no second
 simulation, additional search, or RNG in setting a rally point. One optional
 command index gates replay compatibility in O(1) time and storage per run.
+
+### Procedural title fire
+
+The native title menu draws a 320×192 cosmetic fire field at most once per
+visible 30 Hz frame (once at the fixed frame under reduced motion). The field
+uses four fixed interpolated noise layers per source pixel and a fifth per
+column for breathing, so generation is O(W×H + W) time and O(W×H + W) scratch,
+including its RGBA image; W=320 and H=192 are independent of display size.
+The painter upscales the opaque result to the drawable using its existing
+nearest-neighbor picture path (O(drawable pixels) CPU raster work), followed
+by sixteen foreground embers at drawable resolution. The field uses only a
+cosmetic frame number and has no engine, RNG, replay, or persistence effects.
+
+The title layout and God picker share their logical hit and draw bounds.
+The title has a fixed number of controls; God cards scan three current
+selections over a fixed 12-entry catalog. Painting remains O(G + P) for
+cached glyph work G and covered drawable pixels P. Seed clipping is O(S)
+for seed length S (bounded by 180 bytes). No new simulation work.

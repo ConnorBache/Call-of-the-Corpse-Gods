@@ -1706,7 +1706,7 @@ impl Painter {
             self.native_x((x + w) as f64), self.native_y((y + h) as f64), [255; 3], alpha);
     }
     // Sixteen cosmetic particles, rasterized at drawable resolution rather than upscaled
-    // with the 320x180 pixel-art flame field. O(16 * max(1, scale)^2), O(1) extra memory.
+    // with the low-resolution pixel-art flame field. O(16 * max(1, scale)^2), O(1) extra memory.
     fn menu_embers(&mut self, frame: u32) {
         let width = self.scale.round().max(1.) as i32;
         for i in 0..16 {
@@ -1773,9 +1773,9 @@ impl Painter {
         }
     }
     pub fn menu(&mut self, frame: u32, selected: usize, can_continue: bool, _mode: &str) {
-        // Heart runs smoothly at 30 Hz; preserve the existing fire/ember tempo.
+        // Heart and fire update at 30 Hz; embers keep their original cadence.
         let ambient_frame = 18 + ((frame.saturating_sub(18) as u64 * 33) / 83) as u32;
-        let fire = hellfire(ambient_frame);
+        let fire = hellfire(frame);
         // Fill the drawable including widescreen wings, with no panel or letterbox bar.
         let left = -(self.origin.0 as f64 / self.scale).ceil() as i32;
         let top = -(self.origin.1 as f64 / self.scale).ceil() as i32;
@@ -1785,37 +1785,33 @@ impl Painter {
         self.menu_embers(ambient_frame);
         let bone = [238, 229, 207];
         let blood = [197, 37, 54];
-        let art_w = 276;
+        let art_w = 217;
         let art_h = (art_w as f64 * self.logo.h as f64 / self.logo.w as f64).round() as i32;
-        self.beating_emblem(803, 49, art_w, art_h, frame);
-        crate::menu_ui::lettering(self, "CALL OF THE", 113, 61, 337, 35, bone, false);
-        crate::menu_ui::lettering(self, "CORPSE", 103, 116, 559, 129, bone, true);
-        crate::menu_ui::lettering(self, "GODS", 177, 266, 463, 145, blood, true);
+        self.beating_emblem(785, 43, art_w, art_h, frame);
+        crate::menu_ui::lettering(self, "CALL OF THE", 130, 97, 252, 28, bone, false);
+        crate::menu_ui::lettering(self, "CORPSE", 124, 143, 405, 95, bone, true);
+        crate::menu_ui::lettering(self, "GODS", 124, 253, 358, 116, blood, true);
         for (i, item) in crate::menu_ui::ITEMS.iter().enumerate() {
             let disabled = i == 1 && !can_continue;
             let active = selected == i;
-            // Disabled Continue stays gray even under the pointer. Fixed positions and
-            // hit regions mean selecting never shifts text or its neighboring entries.
-            if active {
-                let paper = if disabled { [74, 70, 70] } else if i == 0 { blood } else { bone };
-                self.rect(item.x, item.y, item.w, item.h, paper);
-                // A clipped print edge, confined to the selection; never six boxes.
-                self.rect(item.x + item.w - 7, item.y, 7, 5, [8, 6, 9]);
-                self.rect(item.x, item.y + item.h - 4, 5, 4, [8, 6, 9]);
-            }
-            let color = if disabled { [139, 133, 132] }
-                else if active && i != 0 { [8, 6, 9] } else { bone };
-            let label = item.label;
-            let text_x = item.x + 15;
             let text_y = item.y + (item.h - item.size as i32) / 2 - 2;
+            if i == 0 {
+                self.rect(item.x, item.y, item.w, item.h, if active { blood } else { [156, 24, 45] });
+                let width: i32 = item.label.chars().map(|ch| self.font.metrics(ch, item.size as f32).advance_width.round() as i32).sum();
+                self.text(item.label, item.x + (item.w - width) / 2, text_y, item.size, bone);
+                continue;
+            }
+            if active {
+                self.rect(item.x, item.y, item.w, item.h, if disabled { [74, 70, 70] } else { [34, 23, 24] });
+                if !disabled { self.rect(item.x, item.y, 3, item.h, bone); }
+            }
+            let text_x = item.x + 15;
             if !active {
-                // A tight ink keyline keeps labels readable if a flame rises behind
-                // them, without a backing panel or changing any hit/text position.
-                for (dx, dy) in [(-2, 0), (2, 0), (0, -2), (0, 2)] {
-                    self.text(label, text_x + dx, text_y + dy, item.size, [8, 6, 9]);
+                for (dx, dy) in [(-1, 0), (1, 0), (0, -1), (0, 1)] {
+                    self.text(item.label, text_x + dx, text_y + dy, item.size, [8, 6, 9]);
                 }
             }
-            self.text(label, text_x, text_y, item.size, color);
+            self.text(item.label, text_x, text_y, item.size, if disabled { [135, 119, 122] } else { bone });
         }
     }
     /// Fixed text and bounds; O(covered drawable pixels + glyph raster work).
@@ -1825,20 +1821,21 @@ impl Painter {
         let mut width=0;let mut tail=Vec::new();
         for ch in seed.chars().rev(){
             let face=if self.font.lookup_glyph_index(ch)!=0{&self.font}else{self.fallback.iter().find(|f|f.lookup_glyph_index(ch)!=0).unwrap_or(&self.font)};
-            let next=face.metrics(ch,14.).advance_width.round() as i32;
-            if width+next>crate::menu_ui::SEED_RECT.2-32{break;}width+=next;tail.push(ch);
+            let next=face.metrics(ch,crate::menu_ui::SEED_SIZE as f32).advance_width.round() as i32;
+            if width+next>crate::menu_ui::SEED_FIELD.2-36{break;}width+=next;tail.push(ch);
         }tail.into_iter().rev().collect()
     }
     /// O(seed glyphs + input pixels), overlay only; heart/ribs render unchanged.
     pub fn menu_seed(&mut self,seed:&str,focused:bool,busy:bool){
-        let(x,y,w,h)=crate::menu_ui::SEED_RECT;
-        self.rect(x,y,w,h,if focused{[238,229,207]}else{[100,83,78]});
-        self.rect(x+2,y+2,w-4,h-4,[12,8,12]);
-        self.text(if busy{"PREPARING..."}else{"SEED (OPTIONAL)"},x+9,y+7,10,[181,161,145]);
-        let label=if seed.is_empty(){"Random seed".to_owned()}else{self.menu_seed_tail(seed)};
-        self.text(&label,x+9,y+29,14,if seed.is_empty(){[150,140,140]}else{[238,229,207]});
-        if focused&&!busy{self.rect(x+w-14,y+30,2,20,[238,229,207]);}
+        let (x, y, w, h) = crate::menu_ui::SEED_FIELD;
+        self.text("Seed (optional)", crate::menu_ui::START_X + 4, y + 9, 19, [199, 185, 168]);
+        self.rect(x,y,w,h,[17,11,15]);
+        self.border(x,y,w,h,if focused {[238,229,207]} else {[111,91,86]});
+        let label=if busy {"Preparing…".to_owned()} else if seed.is_empty() {"Random seed".to_owned()} else {self.menu_seed_tail(seed)};
+        self.text(&label,x+16,y+8,crate::menu_ui::SEED_SIZE,if seed.is_empty()||busy {[164,150,145]} else {[238,229,207]});
+        if focused&&!busy {self.rect(x+w-13,y+10,2,21,[238,229,207]);}
     }
+
     pub fn import_save(&mut self, notice: &str) {
         self.clear([5, 4, 12]);
         self.text("Import save", 284, 195, 35, GOLD);
@@ -3002,85 +2999,11 @@ fn hash(x: i32, y: i32) -> f64 {
     let h = (h ^ (h >> 13)).wrapping_mul(1274126177);
     h as f64 / 4294967296.0
 }
-// Cosmetic time only: O(W H K), K=12 authored tongues; never calls simulation RNG.
+#[path = "title_fire.rs"]
+mod title_fire;
+
 pub fn hellfire(frame: u32) -> Picture {
-    const P: [[u8; 3]; 12] = [
-        [8, 8, 8],
-        [20, 10, 12],
-        [35, 12, 15],
-        [57, 15, 18],
-        [84, 20, 21],
-        [118, 29, 22],
-        [153, 43, 23],
-        [186, 62, 24],
-        [216, 88, 29],
-        [236, 126, 41],
-        [245, 168, 66],
-        [250, 204, 109],
-    ];
-    let tongues: [[f64; 3]; 12] = [
-        [8., 17., 130.],
-        [29., 13., 95.],
-        [48., 12., 70.],
-        [69., 10., 43.],
-        [99., 11., 29.],
-        [133., 10., 21.],
-        [171., 12., 24.],
-        [207., 11., 31.],
-        [244., 12., 49.],
-        [269., 14., 77.],
-        [292., 12., 110.],
-        [314., 17., 142.],
-    ];
-    let mut rgba = vec![0; 320 * 180 * 4];
-    let phase = frame as f64 * 0.13;
-    for y in 0..180 {
-        let rise = (179 - y) as f64;
-        let mut centers = [0.; 12];
-        let mut widths = [0.; 12];
-        let mut tapers = [0.; 12];
-        for (i, t) in tongues.iter().enumerate() {
-            let top = t[2] * (0.86 + 0.14 * (phase * 0.67 + i as f64 * 2.7).sin());
-            let taper = (1. - rise / top).max(0.);
-            centers[i] = t[0]
-                + (rise * 0.074 - phase + i as f64 * 1.9).sin() * (3. + rise * 0.035)
-                + (rise * 0.17 - phase * 1.4 + i as f64).sin() * 1.6;
-            widths[i] = t[1] * (0.12 + taper * 0.88);
-            tapers[i] = taper;
-        }
-        for x in 0..320 {
-            let edge = (x as f64 - 160.).abs() / 160.;
-            let mut heat = 0.0f64;
-            for i in 0..12 {
-                heat = heat.max((1. - (x as f64 - centers[i]).abs() / widths[i]) * tapers[i]);
-            }
-            let mut color = if edge > 0.78 && hash(x / 5, y / 7) > 0.48 {
-                1
-            } else {
-                0
-            };
-            if heat > 0. {
-                color = (3 + (heat * 9. + hash(x, y - (frame / 2) as i32) * 0.8).floor() as usize)
-                    .min(11);
-            }
-            let rock = 5. + hash(x / 13, 29) * 14. + (edge - 0.7).max(0.) * 66.;
-            let crest = rock * (1. - ((x % 13) as f64 - 6.).abs() / 10.);
-            if rise < crest {
-                color = if hash(x, y) > 0.985 && rise < 6. {
-                    5
-                } else {
-                    0
-                };
-            }
-            let at = (y as usize * 320 + x as usize) * 4;
-            rgba[at..at + 4].copy_from_slice(&[P[color][0], P[color][1], P[color][2], 255]);
-        }
-    }
-    Picture {
-        w: 320,
-        h: 180,
-        rgba,
-    }
+    title_fire::picture(frame)
 }
 #[cfg(test)]
 mod tests {
@@ -4044,11 +3967,12 @@ mod fast_menu_layout_tests {
             selection.open(0);
             selection.paint_picker(&mut painter);
             for id in 0..GODS.len() {
-                let (x,y,w,h) = crate::avatar_menu::card_rect(id);
-                let px = painter.native_x((x+w-3) as f64) as usize;
+                let (x,y,_,h) = crate::avatar_menu::card_rect(id);
+                let px = painter.native_x((x+4) as f64) as usize;
                 let py = painter.native_y((y+h-3) as f64) as usize;
                 let offset = (py*width+px)*4;
-                assert_eq!(&painter.pixels[offset..offset+3],&crate::ability_ui::god_color(id));
+                let occupied = selection.gods.iter().position(|&god| god == id).is_some_and(|slot| slot != 0);
+                assert_eq!(&painter.pixels[offset..offset+3], &crate::avatar_menu::card_stripe(crate::ability_ui::god_color(id), occupied));
             }
             let picker_frame = painter.pixels.clone();
             let name = format!("avatar-god-picker-{width}x{height}.png");

@@ -21,8 +21,12 @@ fn avatar_menu_exact_authored_god_catalog_and_colors() {
     let mut p=Painter::new();selection.paint_picker(&mut p);
     for (id,god) in GODS.iter().enumerate() {
         assert_eq!((god.name,god.alias,god.domain),expected[id]);
-        let(x,y,w,h)=card_rect(id);let at=((y+h-3) as usize*p.width as usize+(x+w-3) as usize)*4;
-        assert_eq!(&p.pixels[at..at+3],&crate::ability_ui::god_color(id));
+        let(x,y,w,h)=card_rect(id);
+        let at=((y+h-3) as usize*p.width as usize+(x+4) as usize)*4;
+        let occupied = matches!(id, 1 | 2);
+        assert_eq!(&p.pixels[at..at+3],&card_stripe(crate::ability_ui::god_color(id), occupied));
+        let interior=((y+h-3) as usize*p.width as usize+(x+w-3) as usize)*4;
+        assert_ne!(&p.pixels[interior..interior+3],&crate::ability_ui::god_color(id));
     }
 }
 #[test]
@@ -75,7 +79,7 @@ fn avatar_menu_keyboard_mouse_parity_cancel_reopen_and_no_clickthrough() {
     keyboard.key(Keycode::Space,Mod::NOMOD,&mut ks);assert!(!keyboard.active());
     // Repeated confirm after a committed choice cannot touch the closed picker.
     keyboard.key(Keycode::Return,Mod::NOMOD,&mut ks);assert_eq!(keyboard.gods,[3,1,2]);
-    keyboard.open(2);keyboard.click(110,507,&mut ks);assert!(keyboard.active()); // modal gap, not underlying DESCEND
+    keyboard.open(2);keyboard.click(440,442,&mut ks);assert!(keyboard.active()); // modal gap, not underlying DESCEND
 }
 #[test]
 fn avatar_menu_seed_sync_preserves_full_seed_and_free_form_suffix() {
