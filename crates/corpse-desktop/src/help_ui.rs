@@ -17,9 +17,10 @@ const MENU_BUTTON: Rect = Rect(1212, 18, 48, 42);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Entry { pub label: &'static str, pub description: &'static str }
-pub const COMMANDS: [Entry; 9] = [
+pub const COMMANDS: [Entry; 10] = [
     Entry { label: "mouse", description: "move cursor to examine terrain and monsters or activate divine abilities" },
     Entry { label: "click", description: "travel" },
+    Entry { label: "right click", description: "place or move the rally point on the map" },
     Entry { label: "enter", description: "enable keyboard cursor control" },
     Entry { label: "esc", description: "exit keyboard cursor control, close panels, or cancel targeting" },
     Entry { label: "numpad", description: "move or attack" },

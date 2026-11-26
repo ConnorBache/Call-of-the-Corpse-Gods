@@ -19,6 +19,8 @@ struct Capture {
     encoder: Option<Child>,
     previous_corner: Option<u8>,
     changing_frames: usize,
+    summary_alpha: Option<u8>,
+    summary_fading_frames: usize,
 }
 thread_local! { static CAPTURE: RefCell<Option<Capture>> = const { RefCell::new(None) }; }
 
@@ -38,7 +40,7 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &Canvas<Window>) -> Result<(), String> {
     })
 }
 
-pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &str, prompt: bool) -> Result<bool, String> {
+pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &str, prompt: bool, result_tint: Option<([u8; 3], u8)>) -> Result<bool, String> {
     CAPTURE.with(|capture| {
         let mut capture=capture.borrow_mut();
         let Some(c)=capture.as_mut() else{return Ok(false);};
@@ -70,11 +72,25 @@ pub fn observe(_: &mut Canvas<Window>, p: &Painter, screen: Screen, condition: &
         }
         if screen==Screen::Summary {
             if !c.space_sent {return Err("Summary appeared without a fresh Space press".into());}
+            if let Some((color, alpha)) = result_tint {
+                let expected = if c.expected == "won" { [255;3] } else { [0;3] };
+                assert_eq!(color, expected);
+                if let Some(previous) = c.summary_alpha {
+                    assert!(alpha <= previous);
+                    if alpha < previous && alpha > 0 { c.summary_fading_frames += 1; }
+                } else {
+                    assert_eq!(alpha, 255, "first results frame must match the ending color");
+                    assert_eq!(&p.pixels[..3], &expected);
+                }
+                c.summary_alpha = Some(alpha);
+            }
             let at=c.summary_at.get_or_insert_with(Instant::now);
             if at.elapsed().as_millis()>=800 {
                 let mut encoder=c.encoder.take().unwrap();
                 drop(encoder.stdin.take());
                 if !encoder.wait().map_err(|e|e.to_string())?.success(){return Err("ffmpeg failed".into());}
+                assert_eq!(c.summary_alpha, Some(0));
+                assert!(c.summary_fading_frames >= 3);
                 if c.changing_frames<3{return Err(format!("{} did not visibly animate",c.expected));}
                 return Ok(true);
             }
@@ -115,7 +131,7 @@ fn capture(directory:&Path, escape:bool) {
     CAPTURE.with(|capture| *capture.borrow_mut()=Some(Capture{
         destination:directory.join(format!("{stem}.mp4")),expected:if escape{"won"}else{"dead"},action,
         continued:false,action_sent:false,space_sent:false,started:Instant::now(),game_at:None,
-        prompt_at:None,summary_at:None,next_frame:0.,encoder:None,previous_corner:None,changing_frames:0,
+        prompt_at:None,summary_at:None,next_frame:0.,encoder:None,previous_corner:None,changing_frames:0,summary_alpha:None,summary_fading_frames:0,
     }));
     let mut args=vec!["corpse-desktop".into(),"--software-renderer".into(),"--save".into(),save.to_string_lossy().into_owned()];
     for (flag,name) in [("--profile","profile.json"),("--appearance","appearance.json"),("--replay-dir","replays")] {

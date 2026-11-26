@@ -64,7 +64,7 @@ pub fn observe(run:&Run,o:Option<&vision::TerrainObservation>)->Overlays {
     let known=|x:f64,y:f64|corpse_core::portals::cell(f,x,y).is_some_and(|i|o.and_then(|o|o.cells.get(i)).is_some_and(|c|c.current&&c.tile.is_some()));
     if !known(a.x,a.y)||!vision::visible_actor(run,&a){return out;}
     if corpse_core::revision50_terrain::is_soldier(&a)||corpse_core::revision50_nightmares::is_decoy(&a)||corpse_core::ahvamitt::is_actor(&a)||corpse_core::dreamwalking::is_body(&a){return out;}
-    let(goal_x,goal_y)=(c(&run.player,"riptideX"),c(&run.player,"riptideY"));
+    let Some((goal_x, goal_y)) = corpse_core::riptide_rally::goal(run, &run.player) else { return out; };
     let mut seen=std::collections::HashSet::new();
     for _ in 0..w*h {
         if !seen.insert((a.x as usize,a.y as usize)){break;}
@@ -191,6 +191,25 @@ pub fn paint(p:&mut Painter,v:&View){
         corpse_core::divine_environment::apply_riptide(&mut r).unwrap();
         assert_eq!(observe(&r,Some(&o)).riptide,vec![(13,10),(14,10)]);
         r.player.active.clear();assert!(observe(&r,Some(&o)).riptide.is_empty());
+    }
+
+    #[test]
+    fn riptide_overlay_switches_direction_with_the_current_flag() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.riptide_rally_from = 0usize.into();
+        r.floor_mut().unwrap().non_euclidean = corpse_core::Field::Missing;
+        let a = corpse_core::population::create_actor_revision("bear", 901., 12., 10., false, 52.).unwrap();
+        r.actors_at_mut(r.depth).push(a);
+        r.player.active.push("etill-riptide".into());
+        r.player.conditions.insert("riptideTarget".into(), 901.);
+        let mut o = vision::observe_terrain(&r).unwrap();
+        for c in &mut o.cells { c.current = true; c.tile = Some("floor".into()); }
+        assert!(observe(&r, Some(&o)).riptide.is_empty());
+        r.rally = Some(corpse_core::RunRally { x: 16., y: 10. });
+        assert_eq!(observe(&r, Some(&o)).riptide.last(), Some(&(16,10)));
+        r.rally = Some(corpse_core::RunRally { x: 12., y: 14. });
+        assert_eq!(observe(&r, Some(&o)).riptide.last(), Some(&(12,14)));
     }
 
     fn mind_run()->Run {

@@ -319,8 +319,15 @@ pub fn adjacent_enemy(run: &Run, id: f64) -> bool {
         .is_some_and(|a| corpse_core::portals::actor_chebyshev(run, &run.player, a) <= 1.)
 }
 /// A target-kind hint is presentation only; core admission still owns payment.
-pub fn ability_prompt(id: &str) -> &'static str {
+pub fn ability_prompt(run: &Run, id: &str) -> &'static str {
     match id {
+        "etill-riptide" if corpse_core::riptide_rally::current(run) => {
+            if corpse_core::riptide_rally::placed(run).is_some() {
+                "Select a visible enemy to pull toward the rally point. Escape cancels."
+            } else {
+                "Right-click a map tile to set the rally point, then select a visible enemy."
+            }
+        }
         "etill-riptide" => "Select a visible enemy, then its rally point. Escape cancels.",
         "numo-implant-thought" => "Select a visible enemy, then an adjacent creature. Escape cancels.",
         "pelian-fated-duel" => "Select a visible adjacent enemy. Escape cancels.",
@@ -357,6 +364,8 @@ pub fn ability_preview(run: &Run, id: &str, attacker: Option<f64>, hover: Option
     let enemy = || run.actors_at(run.depth).iter().find(|a|
         visible_enemy(run,a.id) && corpse_core::portals::same_position(run,a,x as f64,y as f64));
     let valid=match id {
+        "etill-riptide" if corpse_core::riptide_rally::current(run) =>
+            corpse_core::riptide_rally::placed(run).is_some() && enemy().is_some(),
         "etill-riptide" => attacker.map_or_else(||enemy().is_some(), |_|run.floor().is_some_and(|f|x<f.width()&&y<f.height())),
         "ursa-waking-nightmares" => nightmare_blocker(run,x,y).is_none(),
         "pelian-relentless-pursuit" => enemy().is_some(),

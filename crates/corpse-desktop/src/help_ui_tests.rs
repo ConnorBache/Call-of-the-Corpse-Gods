@@ -22,8 +22,10 @@ fn large_painter() -> Painter {
 #[test]
 fn help_preserves_requested_columns_casing_and_colors() {
     assert_eq!(COMMANDS.iter().map(|e|e.label).collect::<Vec<_>>(),
-        ["mouse", "click", "enter", "esc", "numpad", "I", "Z", "Shift Z", "x"]);
+        ["mouse", "click", "right click", "enter", "esc", "numpad", "I", "Z", "Shift Z", "x"]);
     assert_eq!(COMMANDS[0].description, "move cursor to examine terrain and monsters or activate divine abilities");
+    let rally = COMMANDS.iter().find(|entry| entry.label == "right click").unwrap();
+    assert_eq!(rally.description, "place or move the rally point on the map");
     let escape=COMMANDS.iter().find(|entry|entry.label=="esc").unwrap();
     assert_eq!(escape.description,"exit keyboard cursor control, close panels, or cancel targeting");
     assert_eq!(INFORMATION, [

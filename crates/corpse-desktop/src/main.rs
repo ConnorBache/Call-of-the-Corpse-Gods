@@ -645,6 +645,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut summary_scroll = 0usize;
     let mut death_pause=death_pause::DeathPause::default();
     let mut ending_fade=death_pause::Fade::default();
+    let mut results_fade: Option<death_pause::ResultsFade> = None;
     let mut health_warning=health_warning::Warning::default();
     let mut tile_report: Option<inspection_ui::Report> = None;
     let mut tile_report_scroll = 0usize;
@@ -762,10 +763,22 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             let terminal_status=run.as_ref().filter(|_|screen==Screen::Game).map(|r|r.run.status.as_str()).unwrap_or("playing");
             match death_pause.event_for_status(terminal_status,&event) {
-                death_pause::Decision::Advance=>{summary=run.as_ref().map(|r|corpse_core::profile::summarize_run(&r.run));summary_scroll=0;screen=Screen::Summary;dirty=true;continue;},
+                death_pause::Decision::Advance => {
+                    let skip_motion = reduced || minimized || drawable_w == 0 || drawable_h == 0
+                        || settings.store.action_animation_mode != appearance_store::ActionAnimationMode::Normal;
+                    results_fade = death_pause::ResultsFade::new(terminal_status, skip_motion);
+                    summary = run.as_ref().map(|r| corpse_core::profile::summarize_run(&r.run));
+                    summary_scroll = 0;
+                    screen = Screen::Summary;
+                    dirty = true;
+                    continue;
+                },
                 death_pause::Decision::Block=>continue,
                 death_pause::Decision::Pass=>{},
             }
+            // Track Space release above, but don't let queued clicks/Enter
+            // activate unseen results-screen controls during the reveal.
+            if results_fade.is_some() && death_pause::ResultsFade::blocks_input(&event) { continue; }
             match health_warning.event(&event){
                 health_warning::Decision::Dismiss=>{dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;continue;},
                 health_warning::Decision::Block=>continue,
@@ -1653,7 +1666,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         {
                             implant_attacker = None; riptide_target.cancel();pending_item=None;
                             pending_ability = Some(id.clone());
-                            notice = if r.run.simulation_revision.value_or(29.) >= 50. { targeting_ui::ability_prompt(id) } else { "Select a target. Escape cancels." }.into();
+                            notice = if r.run.simulation_revision.value_or(29.) >= 50. { targeting_ui::ability_prompt(&r.run, id) } else { "Select a target. Escape cancels." }.into();
                             if id=="kative-cogworks" { notice=targeting_ui::cogworks_prompt(&r.run); }
                             continue;
                         }
@@ -2086,7 +2099,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                         && !ability_ui::deactivates_without_target(&r.run, &id)
                                     {
                                         implant_attacker = None; riptide_target.cancel();pending_item=None;
-                                        notice = if r.run.simulation_revision.value_or(29.) >= 50. { targeting_ui::ability_prompt(&id) } else { "Select a target. Escape cancels." }.into();
+                                        notice = if r.run.simulation_revision.value_or(29.) >= 50. { targeting_ui::ability_prompt(&r.run, &id) } else { "Select a target. Escape cancels." }.into();
                                         if id=="kative-cogworks" { notice=targeting_ui::cogworks_prompt(&r.run); }
                                         pending_ability = Some(id);
                                         continue;
@@ -2143,7 +2156,17 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                                 .is_some_and(|a| corpse_core::dreamwalking::same_plane(&r.run, &r.run.player, a)))
                                             .map(Field::Value)
                                             .unwrap_or(Field::Missing);
-                                        let target = if id == "etill-riptide" {
+                                        let target = if id == "etill-riptide" && corpse_core::riptide_rally::current(&r.run) {
+                                            let reason = if corpse_core::riptide_rally::placed(&r.run).is_none() {
+                                                Some("Right-click a map tile to set a rally point first.")
+                                            } else if !target.as_ref().is_some_and(|&tid| targeting_ui::visible_enemy(&r.run, tid)) {
+                                                Some("Select a visible enemy.")
+                                            } else { None };
+                                            if let Some(reason) = reason {
+                                                pending_ability = Some(id); notice = reason.into(); continue;
+                                            }
+                                            target
+                                        } else if id == "etill-riptide" {
                                             match riptide_target.select(&r.run, target.as_ref().copied(), tx, ty) {
                                                 Ok(Some(actor)) => Field::Value(actor),
                                                 Ok(None) => { pending_ability=Some(id); notice="Select the rally point. Escape cancels.".into(); continue; },
@@ -2744,14 +2767,18 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         let ending_prompt = terminal_ready && fade.is_none_or(|(_, alpha)| alpha==255);
         let fade_animating = fade.is_some_and(|(_, alpha)| alpha<255);
         dirty |= terminal_ready && !death_pause.is_presented() && !fade_animating;
-        let transient = fade_animating || effects.animate(now) || (screen==Screen::ReplayGame&&replays.animating(now));
+        let results_tint = if !minimized && drawable_w > 0 && drawable_h > 0 {
+            results_fade.as_mut().map(|fade| fade.sample(now))
+        } else { None };
+        dirty |= results_tint.is_some_and(|(_, alpha)| alpha == 0);
+        let transient = fade_animating || results_tint.is_some() || effects.animate(now) || (screen==Screen::ReplayGame&&replays.animating(now));
         let frame = if reduced {
             18
         } else {
             18 + (start.elapsed().as_millis() / if screen == Screen::Menu { 33 } else if transient && screen != Screen::Manual { 16 } else { 83 }) as u32
         };
         if !minimized&&drawable_w>0&&drawable_h>0 && (dirty || cosmetic_dirty
-            || (screen_has_timed_paint(screen) && frame != last_frame)
+            || ((screen_has_timed_paint(screen) || results_tint.is_some()) && frame != last_frame)
             || (screen == Screen::Game
                 && !reduced
                 && frame != last_frame
@@ -3027,6 +3054,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             if screen==Screen::Game && !effects.presentation_pending(now) && effects.gameplay_pause.active() && (!health_warning.active()||effects.gameplay_pause.fall_active()){painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,effects.gameplay_pause.text());}
             if ending_prompt {painter.tile_clip_enabled=false;gameplay_pause::paint(&mut painter,gameplay_pause::CONTINUE);}
             if !tile_frame||!painter.tile_mask.is_empty(){if let Some(error)=autosave.error.as_ref(){paint_save_failure(&mut painter,error);}}
+            if let Some((color, alpha)) = results_tint { painter.ending_fade(color, alpha); }
             if let Some(frame)=painter.gpu.as_ref(){
                 let _gpu_timing=corpse_core::timing::span("desktop.gpu.draw");
                 if let Err(error)=gpu_renderer.draw(&mut canvas,frame){
@@ -3047,12 +3075,13 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             if !effects.presentation_pending(now) { if effects.gameplay_pause.active()&&(!health_warning.active()||effects.gameplay_pause.fall_active()){effects.gameplay_pause.presented();}else{health_warning.presented();} }
             death_pause.presented(ending_prompt);
+            if results_tint.is_some_and(|(_, alpha)| alpha == 0) { results_fade = None; }
             painter.tile_clip_enabled=false;tile_plan.clear_frame();force_present=false;force_texture_upload=false;
             dirty = false;
             cosmetic_dirty = false;
             last_frame = frame;
         }
-        #[cfg(test)] if ending_video_capture::observe(&mut canvas,&painter,screen,terminal_status,ending_prompt)? {break 'running;}
+        #[cfg(test)] if ending_video_capture::observe(&mut canvas,&painter,screen,terminal_status,ending_prompt,results_tint)? {break 'running;}
         #[cfg(test)] if input_loop_tests::observe(&mut canvas,&painter,input_loop_tests::State {
             screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
             help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),

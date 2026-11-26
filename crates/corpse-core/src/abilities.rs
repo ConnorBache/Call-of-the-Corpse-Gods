@@ -590,24 +590,34 @@ fn activate_inner(
                 r.player.active.retain(|s| s != id);
                 r.player.conditions.shift_remove("riptideTarget");
             } else {
-                let (Some(&tid), Some(&x), Some(&y)) = (target.as_ref(), x.as_ref(), y.as_ref())
-                else {
-                    return Ok(false);
-                };
-                if tid == r.player.id
-                    || !crate::engine::actor(r, tid).is_some_and(|a| !a.dead.value_or(false))
-                    || !r.floor().is_some_and(|f| {
+                let Some(&tid) = target.as_ref() else { return Ok(false); };
+                let live = crate::riptide_rally::current(r);
+                if tid == r.player.id || !crate::engine::actor(r, tid).is_some_and(|a| {
+                    !a.dead.value_or(false) && (!live || a.hp > 0.
+                        && !matches!(a.state.as_str(), "ally" | "neutral") && crate::ability_sight::actor(r, a))
+                }) { return Ok(false); }
+                let fixed_goal = if live {
+                    if crate::riptide_rally::placed(r).is_none() {
+                        log(r, "Right-click a map tile to set a rally point first.", "player");
+                        return Ok(false);
+                    }
+                    None
+                } else {
+                    let (Some(&x), Some(&y)) = (x.as_ref(), y.as_ref()) else { return Ok(false); };
+                    if !r.floor().is_some_and(|f| {
                         x >= 0.0 && y >= 0.0 && x < f.width() as f64 && y < f.height() as f64
-                    })
-                {
-                    return Ok(false);
-                }
-                if !pay(r, id, 15.0) {
-                    return Ok(false);
-                }
+                    }) { return Ok(false); }
+                    Some((x, y))
+                };
+                if !pay(r, id, 15.0) { return Ok(false); }
                 r.player.conditions.insert("riptideTarget".into(), tid);
-                r.player.conditions.insert("riptideX".into(), x);
-                r.player.conditions.insert("riptideY".into(), y);
+                if let Some((x, y)) = fixed_goal {
+                    r.player.conditions.insert("riptideX".into(), x);
+                    r.player.conditions.insert("riptideY".into(), y);
+                } else {
+                    r.player.conditions.shift_remove("riptideX");
+                    r.player.conditions.shift_remove("riptideY");
+                }
                 if !crate::revision50_ability_energy::can_pay(r, r.player.id, id, upkeep_cost_in(r,&r.player,id)) {
                     log(r, "Not enough energy to maintain this ability.", "player");
                 } else {

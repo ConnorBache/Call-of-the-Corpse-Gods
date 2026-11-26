@@ -45,9 +45,8 @@ pub fn apply_riptide(r: &mut Run) -> Result<(), String> {
     else {
         return Ok(());
     };
-    let (dx, dy) = crate::portals::direction_toward(r, a,
-        crate::engine::condition(&r.player, "riptideX"),
-        crate::engine::condition(&r.player, "riptideY"));
+    let Some((goal_x, goal_y)) = crate::riptide_rally::goal(r, &r.player) else { return Ok(()); };
+    let (dx, dy) = crate::portals::direction_toward(r, a, goal_x, goal_y);
     let before=a.clone();
     crate::engine::actor_mut_trusted(r, id)
         .unwrap()

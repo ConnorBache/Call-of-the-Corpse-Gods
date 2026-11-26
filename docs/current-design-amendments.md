@@ -1185,3 +1185,13 @@ to black and escape fades it to white. The existing fresh-Space continuation
 prompt appears on the fully faded frame and opens the same run summary. Reduced
 Motion, Reduced action animation, and Instant action animation skip the fade.
 This is desktop presentation only; saves and simulation are unchanged.
+
+### Riptide follows the rally point
+
+In current R52, right-click a map tile to place or move the rally point, then
+select an enemy for Riptide. Each maintained pull uses the current flag;
+moving it redirects the next pull without recasting or taking a turn. Existing
+costs, targeting knowledge, forced movement, and terrain rules still apply.
+Earlier replay commands retain their original fixed target coordinate. An
+existing cast loaded from an old save keeps its original destination until a
+rally point is available.

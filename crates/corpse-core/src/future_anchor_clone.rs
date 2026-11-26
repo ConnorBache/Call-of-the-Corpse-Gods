@@ -81,6 +81,7 @@ fn clone_anchor_state(run:&Run)->Run {
             phantasmii_birth_shards: Default::default(),
             execute_rules_from: Default::default(),
             beckoning_rules_from: Default::default(),
+            riptide_rally_from: Default::default(),
             ichor_fire_rules_from: Default::default(),
             avatar_starter_policy: Default::default(),
             ember_rules_from: Default::default(),

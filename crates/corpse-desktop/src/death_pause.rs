@@ -2,6 +2,12 @@
 use sdl2::{event::Event,keyboard::Keycode};
 pub fn terminal(status: &str) -> bool { matches!(status, "dead" | "won") }
 const END_FADE_MS: f64 = 960.;
+const RESULTS_FADE_MS: f64 = 560.;
+
+fn eased_alpha(t: f64) -> u8 {
+    let t = t.clamp(0., 1.);
+    (255. * t * t * (3. - 2. * t)).floor() as u8
+}
 
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Ending { Death, Escape }
@@ -28,10 +34,29 @@ impl Fade {
             self.started = Some((ending, now));
         }
         let elapsed = (now - self.started.unwrap().1) / END_FADE_MS;
-        let t = elapsed.clamp(0., 1.);
-        // Smoothstep with a guaranteed fully opaque last frame.
-        let alpha = if t == 1. { 255 } else { (255. * t * t * (3. - 2. * t)).floor() as u8 };
-        Some((ending.color(), alpha))
+        Some((ending.color(), eased_alpha(elapsed)))
+    }
+}
+
+/// Fade the already-laid-out results out of the same solid color as the last
+/// gameplay frame. Start the clock on the first drawable frame, not the key
+/// event, so autosaving or a display resize cannot skip the opaque frame.
+pub struct ResultsFade {
+    ending: Ending,
+    started: Option<f64>,
+}
+impl ResultsFade {
+    pub fn new(status: &str, skip_motion: bool) -> Option<Self> {
+        if skip_motion { return None; }
+        Ending::from_status(status).map(|ending| Self { ending, started: None })
+    }
+    pub fn sample(&mut self, now: f64) -> ([u8; 3], u8) {
+        let started = *self.started.get_or_insert(now);
+        (self.ending.color(), 255 - eased_alpha((now - started) / RESULTS_FADE_MS))
+    }
+    pub fn blocks_input(event: &Event) -> bool {
+        !matches!(event, Event::Quit { .. } | Event::Window { .. }
+            | Event::RenderTargetsReset { .. } | Event::RenderDeviceReset { .. })
     }
 }
 #[derive(Default)]
@@ -71,6 +96,21 @@ impl DeathPause {
    assert_eq!(fade.sample(status,1500.,true),None);
    assert_eq!(fade.sample("playing",1600.,false),None);
   }
+ }
+ #[test] fn results_reveal_starts_opaque_and_finishes_clear_for_both_endings() {
+  for (status, color) in [("dead", [0;3]), ("won", [255;3])] {
+   let mut fade = ResultsFade::new(status, false).unwrap();
+   assert_eq!(fade.sample(40000.), (color,255));
+   assert_eq!(fade.sample(40280.), (color,128));
+   assert_eq!(fade.sample(40559.), (color,1));
+   assert_eq!(fade.sample(40560.), (color,0));
+   assert_eq!(fade.sample(41000.), (color,0));
+   assert!(ResultsFade::new(status, true).is_none());
+  }
+  assert!(ResultsFade::new("playing", false).is_none());
+  assert!(ResultsFade::blocks_input(&key(Keycode::Return,false)));
+  assert!(ResultsFade::blocks_input(&key(Keycode::Down,false)));
+  assert!(!ResultsFade::blocks_input(&Event::Quit {timestamp:0}));
  }
  #[test] fn the_ending_tint_covers_the_drawable_even_with_clips(){
   let mut p=crate::render::Painter::new();

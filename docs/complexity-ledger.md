@@ -2639,7 +2639,8 @@ existing frame path. The Windows GUI subsystem is a link-time setting.
 ### Desktop ending fades
 
 The death/escape presentation samples one elapsed timestamp in O(1) time and
-space per frame during a single 960 ms ease. To avoid tint feedback and missed
+space per frame during its 960 ms ease. A fresh Space press reveals the results
+from that same solid color over 560 ms, using the same full-frame overlay. To avoid tint feedback and missed
 dirty rectangles the terminal scene uses its ordinary full-frame paint and
 upload. The additional overlay costs O(P) on the CPU renderer for P native
 drawable pixels and O(1) submission plus O(P) GPU blend work on the GPU path,
@@ -2700,3 +2701,12 @@ selected authored page: line wrapping scans the text, and split selection
 scans the resulting lines. Artwork decoding and stat-template sampling are
 unchanged. The capture test uses the same native painter; it does not
 benchmark runtime or exercise a Windows graphics driver.
+
+### Live Riptide rally direction
+
+Read the existing rally coordinate and validate it with O(F) physical-floor
+lookup (F is bounded by 20 in a current run), then use the existing forced
+movement and portal routing. Goal resolution has O(1) extra storage. Both the
+path overlay and the cast cue read the same goal, so there is no second
+simulation, additional search, or RNG in setting a rally point. One optional
+command index gates replay compatibility in O(1) time and storage per run.

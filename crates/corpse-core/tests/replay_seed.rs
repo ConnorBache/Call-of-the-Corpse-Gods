@@ -37,6 +37,7 @@ fn record(seed: &str, mode: &str) -> ReplayRecord {
         phantasmii_birth_shards: Field::Missing,
         execute_rules_from: Field::Missing,
         beckoning_rules_from: Field::Missing,
+        riptide_rally_from: Field::Missing,
         ichor_fire_rules_from: Field::Missing,
         avatar_starter_policy: Field::Missing,
         ember_rules_from: Field::Missing,

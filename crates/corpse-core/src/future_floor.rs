@@ -87,6 +87,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.phantasmii_birth_shards=r.phantasmii_birth_shards.clone();
     next.execute_rules_from=r.execute_rules_from.clone();
     next.beckoning_rules_from=r.beckoning_rules_from.clone();
+    next.riptide_rally_from=r.riptide_rally_from.clone();
     next.ichor_fire_rules_from=r.ichor_fire_rules_from.clone();
     next.avatar_starter_policy=r.avatar_starter_policy.clone();
     next.ember_rules_from=r.ember_rules_from.clone();

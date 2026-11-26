@@ -562,6 +562,7 @@ pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, r
         steam_rules_from: if revision >= 50. { 0usize.into() } else { crate::Field::Missing },
         execute_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         beckoning_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        riptide_rally_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         ichor_fire_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         future_floor_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         future_floor: None,

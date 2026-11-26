@@ -104,7 +104,11 @@ impl Snapshot {
       local(r,a,p,"bracket",Stage::Special);
      } else if id=="etill-riptide" && on {
       if let Some(target)=a.conditions.get("riptideTarget").and_then(|&id|engine::actor(r,id)){local(r,target,p,"root",Stage::Special);}
-      if a.conditions.contains_key("riptideTarget"){events::at(r,p,"bracket",Stage::Special,&[EventPoint{x:engine::condition(a,"riptideX"),y:engine::condition(a,"riptideY")}]);}
+      if a.conditions.contains_key("riptideTarget") {
+       if let Some((x,y))=crate::riptide_rally::goal(r,a) {
+        events::at(r,p,"bracket",Stage::Special,&[EventPoint{x,y}]);
+       }
+      }
       if !a.conditions.contains_key("riptideTarget"){local(r,a,p,style,Stage::Special);}
      } else if id=="isheilah-make-slippery" && on {
       if let Some(target)=a.conditions.get("slipperyTarget").and_then(|&id|engine::actor(r,id)) {

@@ -86,6 +86,9 @@ pub const RAGELIGHT_DESCRIPTION:&str="Whenever you would die, if you can pay the
 const LEGACY_RAGELIGHT_DESCRIPTION:&str="When active, whenever you would die, instead be reduced to 1 HP and spend X energy and double the cost. X starts at 0 and goes to 1 on first use, and when you level up, reduce the cost back to 0.";
 pub const FUTURE_FLOOR_DESCRIPTION:&str="Whenever you activate this ability or die, you are reset to when you last entered the floor. This can only be used once per floor.";
 pub fn display_description<'a>(run: &Run, id: &str, original: &'a str) -> &'a str {
+    if id == "etill-riptide" && corpse_core::riptide_rally::current(run) {
+        return "Select a visible enemy. While active, pull it toward your current rally point and prevent its voluntary movement. Right-click a map tile to move the rally point and redirect the pull.";
+    }
     if id == corpse_core::half_here::ID && corpse_core::half_here::paid_placement(run) {
         return "Spend 5 energy to place a stationary half clone on a visible, unoccupied tile. It shares your health and grants sight from its tile. Activate again at any time to dismiss it for free.";
     }
