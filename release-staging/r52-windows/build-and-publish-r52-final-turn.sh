@@ -2,8 +2,8 @@
 set -euo pipefail
 
 mode=${1:?build or publish}
-commit=7cbcc93a74c06e6ae69a2692b076fa7ebe6f04a7
-tree=4e3c8a807ef42ed6ae39dad5d4f85fd0c16f44b2
+commit=770dcf6ccdb8fa74ce4324254bfe324be3fc8ac1
+tree=1bd7f46052031dcba6738530877625fd9bcddfda
 tag=r52-final-turn-20261126
 asset=Call-of-the-Corpse-Gods-R52-Final-Turn-Windows-x64.zip
 sdk="${RUNNER_TEMP:?}/corpse-r52-sdk"
