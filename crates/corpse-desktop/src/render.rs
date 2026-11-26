@@ -1711,7 +1711,10 @@ impl Painter {
         let width = self.scale.round().max(1.) as i32;
         for i in 0..16 {
             let x = hash(i, 8) * 52. + if i % 2 != 0 { 266. } else { 0. };
-            let rise = (frame as f64 * (0.35 + hash(i, 4) * 0.5) + i as f64 * 29.) % 155.;
+            let life = (f64::from(title_fire::phase(frame)) + hash(i, 4)).fract();
+            let rise = life * (90. + hash(i, 17) * 65.);
+            // Extinguish before respawning so the loop never teleports a lit ember.
+            let alpha = (255. * (life / 0.10).min((1. - life) / 0.16).min(1.)) as u8;
             let (x, y) = (
                 self.native_x(x * 4.),
                 self.native_y((179. - rise) * 800. / 180.),
@@ -1719,7 +1722,7 @@ impl Painter {
             let color = [[186, 62, 24], [216, 88, 29], [236, 126, 41]][i as usize % 3];
             for dy in 0..width * if i % 3 == 0 { 2 } else { 1 } {
                 for dx in 0..width {
-                    self.native_pixel(x + dx, y + dy, color, 255);
+                    self.native_pixel(x + dx, y + dy, color, alpha);
                 }
             }
         }
@@ -1773,8 +1776,7 @@ impl Painter {
         }
     }
     pub fn menu(&mut self, frame: u32, selected: usize, can_continue: bool, _mode: &str) {
-        // Heart and fire update at 30 Hz; embers keep their original cadence.
-        let ambient_frame = 18 + ((frame.saturating_sub(18) as u64 * 33) / 83) as u32;
+        // Flames, embers, and the existing heartbeat share a repeat boundary.
         let fire = hellfire(frame);
         // Fill the drawable including widescreen wings, with no panel or letterbox bar.
         let left = -(self.origin.0 as f64 / self.scale).ceil() as i32;
@@ -1782,7 +1784,7 @@ impl Painter {
         let wide = (self.width as f64 / self.scale).ceil() as i32;
         let high = (self.height as f64 / self.scale).ceil() as i32;
         self.picture(&fire, left, top, wide, high);
-        self.menu_embers(ambient_frame);
+        self.menu_embers(frame);
         let bone = [238, 229, 207];
         let blood = [197, 37, 54];
         let art_w = 217;
@@ -3296,6 +3298,17 @@ mod tests {
     fn fire_is_deterministic_animated() {
         assert_eq!(hellfire(18).rgba, hellfire(18).rgba);
         assert_ne!(hellfire(18).rgba, hellfire(19).rgba);
+    }
+    #[test]
+    fn title_fire_embers_and_heartbeat_repeat_as_one_scene() {
+        let mut p = Painter::new();
+        p.resize(640, 400);
+        for frame in [18, 77, 377] {
+            p.menu(frame, 0, false, "Avatar");
+            let first = p.pixels.clone();
+            p.menu(frame + title_fire::LOOP_FRAMES, 0, false, "Avatar");
+            assert_eq!(p.pixels, first, "frame {frame} did not repeat");
+        }
     }
     #[test]
     fn continue_disabled_never_receives_active_menu_highlight() {

@@ -2722,6 +2722,10 @@ The painter upscales the opaque result to the drawable using its existing
 nearest-neighbor picture path (O(drawable pixels) CPU raster work), followed
 by sixteen foreground embers at drawable resolution. The field uses only a
 cosmetic frame number and has no engine, RNG, replay, or persistence effects.
+Noise indices tile independently in the direction of travel, with one common
+360-frame loop. Ember lifetimes and the existing heartbeat repeat at the same
+boundary. The loop uses O(1) time/space per sample beyond the existing work,
+with no saved frame sequence or extra compositing pass.
 
 The title layout and God picker share their logical hit and draw bounds.
 The title has a fixed number of controls; God cards scan three current
