@@ -2503,7 +2503,7 @@ pub fn remember(r: &mut Run) {
         .get(&r.depth.to_string())
         .into_iter()
         .flat_map(|g| g.iter())
-        .filter(|e| observed(e.x, e.y) && (!(crate::phantasmii_generation::is_dream_shard(&e.item) || crate::dreamwalking::dream_ground_item(&e.item)) || crate::dreamwalking::dream_view(r)))
+        .filter(|e| observed(e.x, e.y) && crate::dreamwalking::item_visible(r, &e.item))
         .map(|e| RunRememberedItemsEntryEntry {
             x: e.x,
             y: e.y,
@@ -2511,12 +2511,15 @@ pub fn remember(r: &mut Run) {
         })
         .collect();
     let dream_view=crate::dreamwalking::dream_view(r);
+    let active_dream=crate::dreamwalking::active(r);
+    let dream_shards_only=crate::phantasmii_blessing_rules::dream_shards_only(r);
     let remembered = r
         .remembered_items
         .get_or_insert_with(Default::default)
         .entry(r.depth.to_string())
         .or_default();
-    remembered.retain(|e| (dream_view || !crate::dreamwalking::dream_ground_item(&e.item)) && !observed(e.x, e.y) && !items.iter().any(|i| i.item.id == e.item.id));
+    remembered.retain(|e| (dream_view || !crate::dreamwalking::dream_ground_item(&e.item))
+        && (active_dream || !dream_shards_only || !crate::phantasmii_generation::is_shard(&e.item)) && !observed(e.x, e.y) && !items.iter().any(|i| i.item.id == e.item.id));
     remembered.extend(items);
 }
 
@@ -4109,7 +4112,7 @@ pub fn settle_doors(r: &mut Run) {
             r.ground
                 .get(&r.depth.to_string())
                 .into_iter()
-                .flat_map(|g| g.iter().filter(|e|(crate::phantasmii_generation::is_dream_shard(&e.item)||crate::dreamwalking::dream_ground_item(&e.item))==crate::dreamwalking::context_dream(r)).map(|e| (e.x, e.y))),
+                .flat_map(|g| g.iter().filter(|e|crate::dreamwalking::dream_item(r,&e.item)==crate::dreamwalking::context_dream(r)).map(|e| (e.x, e.y))),
         )
         .map(|(x, y)| y as usize * w + x as usize)
         .collect();

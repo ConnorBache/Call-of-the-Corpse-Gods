@@ -402,7 +402,8 @@ fn settle_floor(r: &mut Run, depth: u32) -> Result<(), String> {
     r.actors_at_mut(depth as f64).retain(|a| !lost.contains(&a.id.to_bits()));
     let collapse = Arc::clone(r.collapse.as_ref().unwrap());
     let wave = collapse.waves.iter().find(|c| c.depth == depth).unwrap();
-    r.ground_at_mut(depth as f64).retain(|g| crate::dreamwalking::dream_ground_item(&g.item) || !wave.gap(g.y as usize*w+g.x as usize));
+    let dream_shards_only = crate::phantasmii_blessing_rules::dream_shards_only(r);
+    r.ground_at_mut(depth as f64).retain(|g| crate::dreamwalking::protected_ground(&g.item, dream_shards_only) || !wave.gap(g.y as usize*w+g.x as usize));
     if lose_player { fall_player(r)?; }
     Ok(())
 }

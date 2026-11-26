@@ -52,7 +52,7 @@ impl Snapshot {
     pub fn value(&self) -> Result<Value> {
         let mut v = serde_json::to_value(&*self.state)?;
         let o = v.as_object_mut().unwrap();
-        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "halfHereLockFrom", "halfHereEnergyFrom", "screamerRangeFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom","riptideRallyFrom", "starPowerFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
+        for k in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "halfHereLockFrom", "halfHereEnergyFrom", "screamerRangeFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom","riptideRallyFrom", "starPowerFrom", "dreamShardsFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
             o.shift_remove(k);
         }
         if let Some(c) = self.cursor {
@@ -131,6 +131,7 @@ impl Snapshot {
         o.shift_remove("beckoningRulesFrom");
         o.shift_remove("riptideRallyFrom");
         o.shift_remove("starPowerFrom");
+        o.shift_remove("dreamShardsFrom");
         o.shift_remove("ichorFireRulesFrom");
         o.shift_remove("futureFloorRulesFrom");
         let state = serde_json::from_value(v)?;
@@ -174,6 +175,7 @@ impl Snapshot {
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.riptide_rally_from = run.riptide_rally_from.clone();
         restored.star_power_from = run.star_power_from.clone();
+        restored.dream_shards_from = run.dream_shards_from.clone();
         crate::star_power::reconcile(&mut restored);
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
         restored.avatar_starter_policy = run.avatar_starter_policy.clone();
@@ -611,6 +613,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.beckoning_rules_from = Field::Missing;
     copy.riptide_rally_from = Field::Missing;
     copy.star_power_from = Field::Missing;
+    copy.dream_shards_from = Field::Missing;
     copy.ichor_fire_rules_from = Field::Missing;
     copy.avatar_starter_policy = Field::Missing;
     copy.ember_rules_from = Field::Missing;
@@ -665,6 +668,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.beckoning_rules_from=run.beckoning_rules_from.clone();
     restored.riptide_rally_from=run.riptide_rally_from.clone();
     restored.star_power_from = run.star_power_from.clone();
+    restored.dream_shards_from = run.dream_shards_from.clone();
     crate::star_power::reconcile(&mut restored);
     restored.ichor_fire_rules_from=run.ichor_fire_rules_from.clone();
     restored.avatar_starter_policy=run.avatar_starter_policy.clone();
@@ -716,6 +720,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.beckoning_rules_from = run.beckoning_rules_from.clone();
         restored.riptide_rally_from = run.riptide_rally_from.clone();
         restored.star_power_from = run.star_power_from.clone();
+        restored.dream_shards_from = run.dream_shards_from.clone();
         crate::star_power::reconcile(&mut restored);
         restored.ichor_fire_rules_from = run.ichor_fire_rules_from.clone();
         restored.avatar_starter_policy = run.avatar_starter_policy.clone();
@@ -881,7 +886,7 @@ fn snapshot_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Run {
 fn inverse_header(snapshot: &Snapshot, mask_dream_floors: bool) -> Result<Value> {
     let _timing = crate::timing::span("history.journal_header");
     let mut value = serde_json::to_value(snapshot_header(snapshot, mask_dream_floors))?;
-    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "halfHereLockFrom", "halfHereEnergyFrom", "screamerRangeFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom","riptideRallyFrom", "starPowerFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
+    for key in ["history", "replay", "hasteSnapshot", "logArchive", "runId", "replaySnapshotFrom", "fireboltTravelFrom", "amuletRulesFrom", "potionRulesFrom", "ringRulesFrom", "gasRulesFrom", "commandmentRulesFrom", "screamerRulesFrom", "avatarStarterPolicy", "emberRulesFrom", "ragelightRulesFrom", "balanceRulesFrom", "collapseRulesFrom", "bloodMistFireRulesFrom", "halfHereLockFrom", "halfHereEnergyFrom", "screamerRangeFrom", "steamRulesFrom", "executeRulesFrom", "beckoningRulesFrom","riptideRallyFrom", "starPowerFrom", "dreamShardsFrom", "ichorFireRulesFrom", "futureFloorRulesFrom"] {
         value.as_object_mut().unwrap().shift_remove(key);
     }
     Ok(value)
@@ -1191,6 +1196,7 @@ impl Engine {
         crate::beckoning_rules::admit_current(&mut run).map_err(StorageError)?;
         crate::riptide_rally::admit_current(&mut run).map_err(StorageError)?;
         crate::star_power::admit_current(&mut run).map_err(StorageError)?;
+        crate::phantasmii_blessing_rules::admit_dream_shards(&mut run).map_err(StorageError)?;
         crate::ichor_fire_rules::admit_current(&mut run).map_err(StorageError)?;
         crate::future_floor::admit_current(&mut run).map_err(StorageError)?;
         crate::firebolt_travel::admit_current(&mut run).map_err(StorageError)?;
@@ -1253,6 +1259,7 @@ impl Engine {
         if matches!(run.beckoning_rules_from, Field::Null) { run.beckoning_rules_from = Field::Missing; }
         if matches!(run.riptide_rally_from, Field::Null) { run.riptide_rally_from = Field::Missing; }
         if matches!(run.star_power_from, Field::Null) { run.star_power_from = Field::Missing; }
+        if matches!(run.dream_shards_from, Field::Null) { run.dream_shards_from = Field::Missing; }
         if matches!(run.ichor_fire_rules_from, Field::Null) { run.ichor_fire_rules_from = Field::Missing; }
         if matches!(run.future_floor_rules_from, Field::Null) { run.future_floor_rules_from = Field::Missing; }
         Self::new(run)

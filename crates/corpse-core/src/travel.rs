@@ -1374,7 +1374,7 @@ pub fn collapse_descent(r: &mut Run, x: f64, y: f64, diluted: bool) -> Result<bo
         .get(&source_depth.to_string())
         .into_iter()
         .flat_map(|g| g.iter())
-        .filter(|g| !crate::dreamwalking::dream_ground_item(&g.item) && changed.contains(&(g.y as usize * w + g.x as usize)))
+        .filter(|g| !crate::dreamwalking::protected_ground(&g.item, crate::phantasmii_blessing_rules::dream_shards_only(r)) && changed.contains(&(g.y as usize * w + g.x as usize)))
         .cloned()
         .collect();
     crate::events::actor_event(

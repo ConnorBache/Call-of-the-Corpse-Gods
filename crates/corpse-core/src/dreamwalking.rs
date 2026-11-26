@@ -118,9 +118,26 @@ pub fn damage_notice(r:&mut Run,a:&Actor,n:f64) {
 pub fn dream_ground_item(item:&crate::Item)->bool {
     crate::borge::is_shard(item) && item.dream_ground.value_or(false)
 }
+/// Special ground items that waking-world terrain and item placement must ignore.
+pub(crate) fn protected_ground(item: &crate::Item, dream_shards_only: bool) -> bool {
+    dream_ground_item(item) || (dream_shards_only && crate::phantasmii_generation::is_shard(item))
+}
+/// Map, inspector and ground-list visibility use one rule. A dream clone or
+/// memory cannot reveal a Phantasmii shard to a player who is currently awake.
+pub fn item_visible(r: &Run, item: &crate::Item) -> bool {
+    if crate::phantasmii_blessing_rules::dream_shards_only(r) && crate::phantasmii_generation::is_shard(item) {
+        return active(r);
+    }
+    !(crate::phantasmii_generation::is_dream_shard(item) || dream_ground_item(item)) || dream_view(r)
+}
+pub fn dream_item(r: &Run, item: &crate::Item) -> bool {
+    crate::phantasmii_generation::is_dream_shard(item)
+        || protected_ground(item, crate::phantasmii_blessing_rules::dream_shards_only(r))
+}
 /// Whether the player can collect this item in their currently active plane.
 pub fn item_in_plane(r:&Run,item:&crate::Item)->bool {
     let dream=crate::phantasmii_generation::is_dream_shard(item)
+        || (crate::phantasmii_blessing_rules::dream_shards_only(r) && crate::phantasmii_generation::is_floor_shard(item))
         || (crate::borge::weapon_enabled(r) && dream_ground_item(item));
     dream==active(r)
 }

@@ -16,8 +16,7 @@ pub fn observation_run(run: &corpse_core::Run) -> std::borrow::Cow<'_, corpse_co
 /// Quest shards and tagged dropped weapons belong to the dream plane, including
 /// a dream Half Here viewpoint. Waking items remain observable from dreams.
 pub fn item_visible(run: &corpse_core::Run, item: &corpse_core::Item) -> bool {
-    !(corpse_core::phantasmii_generation::is_dream_shard(item) || corpse_core::dreamwalking::dream_ground_item(item))
-        || corpse_core::dreamwalking::dream_view(run)
+    corpse_core::dreamwalking::item_visible(run, item)
 }
 
 /// O(1 + U + E) for a cell's bounded underlays U and four edges E. Only already
@@ -125,6 +124,24 @@ mod integration_tests {
         assert_eq!(crate::inspection_ui::observe_tile(&r, 8, 4).title, "Giant Rat");
         assert!(crate::ability_ui::visible_abilities(&r).is_empty());
         assert_eq!(r, before);
+    }
+    #[test]
+    fn phantasmii_floor_shards_are_hidden_from_waking_map_list_and_inspector() {
+        let mut r = room(false);
+        r.simulation_revision = 52.0.into();
+        r.dream_shards_from = 0usize.into();
+        let shard = corpse_core::phantasmii_generation::floor_shard(23.);
+        r.ground_at_mut(1.).push(GroundItem { x: 9., y: 4., item: shard.clone(), ..Default::default() });
+        r.remembered_items = serde_json::from_value(serde_json::json!({"1":[{"x":9,"y":4,"item":shard}]})).unwrap();
+        r.detected_items = serde_json::from_value(serde_json::json!({"1":[{"x":9,"y":4,"item":shard}]})).unwrap();
+        for in_dream in [false, true, false] {
+            if in_dream { enter(&mut r); }
+            else if corpse_core::dreamwalking::active(&r) { assert!(corpse_core::dreamwalking::wake(&mut r)); }
+            let view = crate::observe::observe(&r);
+            assert_eq!(view.cells.iter().any(|c| c.label == shard.name && c.dream_entity), in_dream);
+            assert_eq!(view.ground_entities.iter().any(|e| e.name == shard.name), in_dream);
+            assert_eq!(crate::inspection_ui::observe_tile(&r,9,4).scene.contains(&shard.name), in_dream);
+        }
     }
     #[test]
     fn borge_shard_r39_dream_ground_visibility_inspection_and_ink() {

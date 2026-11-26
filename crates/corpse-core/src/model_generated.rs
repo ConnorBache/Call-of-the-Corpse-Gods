@@ -1774,6 +1774,8 @@ pub struct Run {
     pub riptide_rally_from: Field<usize>,
     #[serde(rename = "starPowerFrom", default, skip_serializing_if = "Field::is_missing")]
     pub star_power_from: Field<usize>,
+    #[serde(rename = "dreamShardsFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub dream_shards_from: Field<usize>,
     #[serde(rename = "ichorFireRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub ichor_fire_rules_from: Field<usize>,
     #[serde(rename = "avatarStarterPolicy", default, skip_serializing_if = "Field::is_missing")]

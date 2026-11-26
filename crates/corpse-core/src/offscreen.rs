@@ -87,7 +87,7 @@ fn dynamic(r: &Run, f: &Floor) -> bool {
         return true;
     }
     if r.ground.get(&f.depth.to_string()).is_some_and(|v| {
-        v.iter().filter(|e| !crate::dreamwalking::dream_ground_item(&e.item)).any(|e| {
+        v.iter().filter(|e| !crate::dreamwalking::protected_ground(&e.item, crate::phantasmii_blessing_rules::dream_shards_only(r))).any(|e| {
             let i = e.y as usize * w + e.x as usize;
             f.tiles[i] == "water" || f.ichor.as_ref().is_some_and(|v| v[i] > 0.)
         })

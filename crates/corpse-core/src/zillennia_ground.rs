@@ -45,14 +45,19 @@ fn erase_cells(r: &mut Run, depth: f64, cells: &HashSet<usize>) -> bool {
     let key = depth.to_string();
     let dream = crate::dreamwalking::context_dream(r);
     let plane_items = crate::borge::weapon_enabled(r);
+    let dream_shards_only = crate::phantasmii_blessing_rules::dream_shards_only(r);
+    let item_here = |item: &crate::Item| {
+        if dream_shards_only && crate::phantasmii_generation::is_shard(item) { return dream; }
+        !plane_items || crate::dreamwalking::dream_ground_item(item) == dream
+    };
     let has_items = r.ground.get(&key).is_some_and(|ground| ground.iter().any(|g| {
-        (!plane_items || crate::dreamwalking::dream_ground_item(&g.item) == dream) && cell(f, g.x, g.y).is_some_and(|at| cells.contains(&at))
+        item_here(&g.item) && cell(f, g.x, g.y).is_some_and(|at| cells.contains(&at))
     }));
     let has_cover = cells.iter().any(|&at| covered(f, at));
     if !has_items && !has_cover { return false; }
     if has_items {
         crate::mutation_journal::make_mut(r.ground.get_mut(&key).unwrap()).retain(|g| {
-            (plane_items && crate::dreamwalking::dream_ground_item(&g.item) != dream) || !cell(f, g.x, g.y).is_some_and(|at| cells.contains(&at))
+            !item_here(&g.item) || !cell(f, g.x, g.y).is_some_and(|at| cells.contains(&at))
         });
     }
     let f = crate::mutation_journal::make_mut(&mut r.floors[fi]);

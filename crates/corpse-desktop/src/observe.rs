@@ -659,8 +659,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             );
             cells.push(Cell {
                 ground_item_id: Some(item.id.to_bits()),
-                dream_entity: corpse_core::phantasmii_generation::is_dream_shard(item)
-                    || corpse_core::dreamwalking::dream_ground_item(item),
+                dream_entity: corpse_core::dreamwalking::dream_item(run, item),
                 x: i % width,
                 y: i / width,
                 glyph: style.glyph,

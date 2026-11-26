@@ -1,6 +1,31 @@
 //! Shard generation and Blessing discount command boundary.
 use crate::{Field, Run};
 
+/// Plane changes affect pickup and memory, so old replays keep the original
+/// waking-plane rule up to the live save's upgrade boundary.
+pub fn dream_shards_only(r: &Run) -> bool {
+    r.simulation_revision.value_or(29.) >= 52. && r.dream_shards_from.as_ref().is_some()
+}
+pub(crate) fn validate_dream_shards(r: &Run) -> Result<(), String> {
+    if !r.dream_shards_from.is_missing() && (r.simulation_revision.value_or(29.) < 52.
+        || r.dream_shards_from.as_ref().is_some_and(|&n| n > r.replay.len())) {
+        return Err("Invalid dream shard command boundary".into());
+    }
+    Ok(())
+}
+pub fn admit_dream_shards(r: &mut Run) -> Result<(), String> {
+    validate_dream_shards(r)?;
+    if r.simulation_revision.value_or(29.) >= 52. && r.dream_shards_from.is_missing() {
+        r.dream_shards_from = r.replay.len().into();
+    }
+    Ok(())
+}
+pub(crate) fn apply_dream_shards_policy(r: &mut Run, policy: &Field<usize>, cursor: usize) {
+    if r.simulation_revision.value_or(29.) < 52. { return; }
+    if policy.as_ref() == Some(&cursor) { r.dream_shards_from = cursor.into(); }
+    else if cursor == 0 { r.dream_shards_from = Field::Null; }
+}
+
 pub fn uses_three_blessing_discount(r: &Run) -> bool {
     r.simulation_revision.value_or(29.) >= 52. && matches!(r.phantasmii_discount_from, Field::Value(_))
 }
@@ -80,7 +105,18 @@ pub(crate) fn seed_active_legacy_floor(r: &mut Run) {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Command, GroundItem, engine, inventory, phantasmii_generation as shards, progression, replay, startup};
+    use crate::{Command, Field, GroundItem, dreamwalking as dream, engine, inventory, phantasmii_generation as shards, progression, replay, startup};
+
+    fn walk() -> Command {
+        Command::Ability { id: dream::DREAMWALK_ID.into(), target: Field::Missing, x: Field::Missing, y: Field::Missing }
+    }
+    fn unlock_and_enter(r: &mut crate::Run) {
+        let depth = r.depth;
+        r.actors_at_mut(depth).clear();
+        r.dreamwalking.get_or_insert_with(Default::default).unlocked = true;
+        engine::dispatch(r, &walk()).unwrap();
+        assert!(dream::active(r));
+    }
 
     #[test]
     fn phantasmii_floor_generation_and_seed_replays_select_the_same_shards() {
@@ -92,7 +128,8 @@ mod tests {
             assert_eq!(prizes.len(), 1);
             let at = prizes[0].y as usize * floor.width() + prizes[0].x as usize;
             assert!(crate::generation::reachable_without_braziers(floor, None).contains(&at));
-            assert!(crate::dreamwalking::item_in_plane(&new, &prizes[0].item));
+            assert!(!dream::item_in_plane(&new, &prizes[0].item));
+            assert!(!dream::item_visible(&new, &prizes[0].item));
         }
         let record = replay::ReplayRecord::from_run(&new);
         let same = replay::ReplaySession::create(record.clone(), true).unwrap();
@@ -127,6 +164,13 @@ mod tests {
 
         (live.player.x, live.player.y) = (prize.x, prize.y);
         engine::dispatch(&mut live, &Command::Pickup).unwrap();
+        assert!(!live.inventory.iter().any(shards::is_floor_shard));
+        assert!(!dream::item_visible(&live, &prize.item));
+        unlock_and_enter(&mut live);
+        assert!(dream::item_visible(&live, &prize.item));
+        engine::dispatch(&mut live, &Command::Pickup).unwrap();
+        assert!(live.inventory.iter().any(shards::is_floor_shard));
+        assert!(dream::wake(&mut live));
         let raw = crate::storage::serialize(&live).unwrap();
         let mut live = crate::storage::deserialize(&raw).unwrap();
         super::seed_active_legacy_floor(&mut live);
@@ -141,6 +185,8 @@ mod tests {
     fn phantasmii_pickup_chains_all_earned_levels_through_normal_choices() {
         let mut r = startup::create_avatar_run("0-1-2:shard-blessings-pickup").unwrap();
         r.level = 1.; r.exp = 0.; r.offers.clear(); r.gods.clear();
+        unlock_and_enter(&mut r);
+        r.level = 1.; r.exp = 0.;
         let depth = r.depth;
         let id = r.next_id;
         r.next_id += 1.;
@@ -154,7 +200,7 @@ mod tests {
         }
         // Compressed 1 and 2 are free; the next threshold is 4-3.
         assert_eq!((r.level, r.exp, progression::level_up_cost(&r)), (3., 0., 1.));
-        assert!(!crate::dreamwalking::unlocked(&r));
+        assert!(!r.inventory.iter().any(shards::is_dream_shard));
 
         let mut second = shards::floor_shard(r.next_id); r.next_id += 1.;
         second.quantity = 2.0.into();
@@ -172,6 +218,29 @@ mod tests {
         assert_eq!(progression::level_up_cost(&saved), 7.);
         inventory::take_one(&mut r, stack);
         assert_eq!((r.level, progression::level_up_cost(&r)), (5., 10.));
+    }
+
+    #[test]
+    fn phantasmii_prior_seed_replay_keeps_waking_shards_but_live_load_hides_them() {
+        let current = startup::create_avatar_run("0-1-2:shard-blessings").unwrap();
+        let mut record = replay::ReplayRecord::from_run(&current);
+        record.dream_shards_from = Field::Missing;
+        let mut old = replay::ReplaySession::create(record, true).unwrap().engine.run;
+        let depth = old.depth;
+        let prize = old.ground[&depth.to_string()].iter()
+            .find(|g| shards::is_floor_shard(&g.item)).unwrap().clone();
+        assert!(dream::item_in_plane(&old, &prize.item));
+        assert!(dream::item_visible(&old, &prize.item));
+        let (x, y) = (prize.x, prize.y);
+        (old.player.x, old.player.y) = (x, y);
+        engine::remember(&mut old);
+        let raw = crate::storage::serialize(&old).unwrap();
+        let mut live = crate::temporal::Engine::load(&raw).unwrap();
+        assert!(super::dream_shards_only(&live.run));
+        live.dispatch(&Command::Pickup).unwrap();
+        assert!(live.run.inventory.iter().all(|i| !shards::is_shard(i)));
+        assert!(!live.run.remembered_items.as_ref().unwrap()[&depth.to_string()]
+            .iter().any(|e| e.item.id == prize.item.id));
     }
 
     #[test]

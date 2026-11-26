@@ -2745,3 +2745,13 @@ catalog wording is retained for historical replays and overridden in the current
 UI. The per-actor world check and toggle/restore work are O(A + C) worst case
 for actor abilities, active effects and conditions; added space is O(1) per run
 and per toggled actor. No floor scans or new per-turn scheduler work.
+
+### Dream-only Phantasmii shards (R52)
+The same generated ground entry and seeded coordinate are assigned to the dream
+plane; no duplicate floor, terrain, item, or random draw is added. The per-floor
+bonus shards still lower the Blessings threshold, and the three ritual shards
+still unlock Dreamwalking. The rule is decided in O(1) per candidate (revision,
+command boundary, item kind/name, active dream state); it uses existing lookups,
+observation and pickup traversals. Waking placement, drift, collapse, and
+ground erasure no longer treat these entries as physical items. Per-run/save
+overhead is one command boundary; old replay prefixes retain the prior rule.

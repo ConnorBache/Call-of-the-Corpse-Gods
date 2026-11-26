@@ -86,6 +86,7 @@ pub fn place_ground_item(
             && ["chasm", "pit"].contains(&f.tiles[y as usize * w + x as usize].as_str());
         if direct && crate::finale::collapsed(r, depth, y as usize*w+x as usize) { break; }
         let key = depth.to_string();
+        let dream_shards_only = crate::phantasmii_blessing_rules::dream_shards_only(r);
         let ground = r
             .ground
             .entry(key.clone())
@@ -96,8 +97,8 @@ pub fn place_ground_item(
             Some((true, x, y))
         } else {
             // Dream-owned Shards cannot occupy a waking item's placement cell.
-            if ground.iter().any(|g| crate::dreamwalking::dream_ground_item(&g.item)) {
-                let waking: Vec<_> = ground.iter().filter(|g| !crate::dreamwalking::dream_ground_item(&g.item)).cloned().collect();
+            if ground.iter().any(|g| crate::dreamwalking::protected_ground(&g.item, dream_shards_only)) {
+                let waking: Vec<_> = ground.iter().filter(|g| !crate::dreamwalking::protected_ground(&g.item, dream_shards_only)).cloned().collect();
                 ground_destination(f, &waking, x, y)
             } else { ground_destination(f, ground, x, y) }
         };
@@ -136,11 +137,12 @@ pub fn normalize_ground_items(
     let mut depths: Vec<_> = r.floors.iter().map(|f| (f.depth, f.width())).collect();
     depths.sort_by(|a, b| a.0.total_cmp(&b.0));
     let mut pending = Vec::new();
+    let dream_shards_only = crate::phantasmii_blessing_rules::dream_shards_only(r);
     for (d, w) in depths {
         if let Some(entries) = r.ground.get_mut(&d.to_string()) {
             let mut occupied = HashSet::new();
             crate::mutation_journal::make_mut(entries).retain(|e| {
-                if crate::dreamwalking::dream_ground_item(&e.item) || occupied.insert((e.y * w as f64 + e.x).to_bits()) {
+                if crate::dreamwalking::protected_ground(&e.item, dream_shards_only) || occupied.insert((e.y * w as f64 + e.x).to_bits()) {
                     true
                 } else {
                     pending.push((d, e.clone()));

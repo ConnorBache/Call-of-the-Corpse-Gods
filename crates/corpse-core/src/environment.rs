@@ -1660,7 +1660,7 @@ fn drift_ground_items(r: &mut Run) -> Result<(), String> {
         .get(&depth.to_string())
         .into_iter()
         .flat_map(|v| v.iter())
-        .filter(|e| !crate::dreamwalking::dream_ground_item(&e.item))
+        .filter(|e| !crate::dreamwalking::protected_ground(&e.item, crate::phantasmii_blessing_rules::dream_shards_only(r)))
         .map(|e| e.y as usize * width + e.x as usize)
         .collect();
     for index in 0..count {
