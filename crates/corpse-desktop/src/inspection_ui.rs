@@ -1991,6 +1991,17 @@ fn gas_exposure(r: &Run, a: &Actor, g: &corpse_core::GasPresence) -> String {
             (a.max_hp / 15. * (1. + cond(a, "gasVulnerable").max(0.))).ceil()
         );
     }
+    if corpse_core::gas_rules::current(r) {
+        let status = match g.r#type.as_str() {
+            "paralysis" => Some(("paralysis", corpse_core::monster_statuses::status_duration(r, a, 5.))),
+            "confusion" => Some(("confusion", corpse_core::monster_statuses::willpower_duration(r, a, 5.))),
+            "hallucinogenic" => Some(("hallucinations", corpse_core::monster_statuses::willpower_duration(r, a, 5.))),
+            _ => None,
+        };
+        if let Some((name, turns)) = status {
+            return format!("{prefix}: refreshes {name} to at least {turns} turns while present.");
+        }
+    }
     match g.r#type.as_str() {
         "paralysis" => format!("{prefix}: refreshes paralysis to 2 turns while present."),
         "confusion" => format!("{prefix}: refreshes confusion to 8 turns while present."),
@@ -2011,6 +2022,21 @@ mod tests {
     use super::*;
     fn base() -> Run {
         serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap()
+    }
+    #[test]
+    fn current_gas_inspector_reports_actual_lingering_refresh_floor() {
+        let mut r = base();
+        r.simulation_revision = 52.0.into();
+        r.gas_rules_from = 0usize.into();
+        r.player.abilities.clear();
+        r.inventory.clear();
+        for (kind, name) in [("paralysis", "paralysis"), ("confusion", "confusion"),
+            ("hallucinogenic", "hallucinations")] {
+            let gas = corpse_core::GasPresence { r#type: kind.into(), concentration: 0. };
+            let text = gas_exposure(&r, &r.player, &gas);
+            assert!(text.contains("lingering gas layer"));
+            assert!(text.contains(&format!("{name} to at least 5 turns")), "{text}");
+        }
     }
     fn merge(target: &mut serde_json::Value, patch: &serde_json::Value) {
         for (k, v) in patch.as_object().unwrap() {
