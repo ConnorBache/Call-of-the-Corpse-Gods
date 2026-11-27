@@ -1744,15 +1744,10 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             continue;
                         }
                     }
-                    if cached_view.as_ref().and_then(|v| painter.ability_inspect_at(v.abilities.len(),x,y)).is_some() {
+                    if let Some(index)=cached_view.as_ref().and_then(|v|painter.ability_inspect_at(v.abilities.len(),x,y)) {
                         if let Some(r) = &run {
                             ability_detail = ability_ui::visible_abilities(&r.run)
-                                .get(
-                                    ability_offset
-                                        + ((y - painter.game_ability_top())
-                                            / painter.game_ability_row())
-                                            as usize,
-                                )
+                                .get(ability_offset+index)
                                 .map(|a| a.id.clone());
                             ability_detail_scroll = 0;
                             dirty = true;
@@ -2086,15 +2081,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     pack::PackAction::Notice(message)=>notice=message,
                                     _=>{}
                                 }
-                            } else if x >= painter.hud_left() + 4
-                                && y >= painter.game_ability_top()
-                                && y < painter.game_ability_top()
-                                    + painter.game_ability_row()
-                                        * painter.ability_capacity() as i32
-                            {
-                                let i = ((y - painter.game_ability_top())
-                                    / painter.game_ability_row())
-                                    as usize;
+                            } else if let Some(i)=painter.ability_inspect_at(painter.ability_capacity(),x,y) {
                                 if let Some(id) = ability_ui::visible_abilities(&r.run)
                                     .get(i + ability_offset)
                                     .map(|a| a.id.clone())
@@ -2452,10 +2439,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             painter.item_rail_offset=if y<0 {painter.item_rail_offset.saturating_add(1).min(max)}
                                 else {painter.item_rail_offset.saturating_sub(1)};
                         }
-                    } else if mouse_x >= painter.hud_left() + 4
-                        && mouse_y >= painter.game_ability_top()
-                        && mouse_y < painter.game_ability_top()+painter.game_ability_row()*painter.ability_capacity() as i32
-                    {
+                    } else if painter.ability_inspect_at(painter.ability_capacity(),mouse_x,mouse_y).is_some() {
                         if y < 0 {
                             ability_offset += 1;
                         } else {

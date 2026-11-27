@@ -562,24 +562,16 @@ impl Painter {
     pub fn game_toolbar_rect(&self, slot: usize) -> (i32, i32) {
         let r=self.hud_tracks().button(slot);(r.0,r.2)
     }
-    pub fn game_ability_top(&self)->i32 {
-        self.hud_tracks().divine.1+crate::game_hud::ABILITY_INSET
-    }
-    pub fn game_ability_row(&self)->i32 {
-        crate::game_hud::DIVINE_ROW
-    }
+    pub fn game_ability_top(&self)->i32 {self.hud_tracks().divine_rows().area.1}
+    pub fn game_ability_rect(&self,index:usize)->crate::modal_ui::Rect {self.hud_tracks().divine_rows().row(index)}
     pub fn cogworks_hud_center(&self,row:usize,orb:i32)->(i32,i32){
-        let y=self.game_ability_top()+row as i32*self.game_ability_row();
-        let r=crate::game_hud::right_slot(self.hud_tracks().divine,y);
+        let r=crate::game_hud::right_slot(self.game_ability_rect(row));
         (r.0+7+orb*16,r.1+r.3/2)
     }
     pub fn cogworks_hud_hit(&self,row:usize,x:i32,y:i32)->Option<u8>{
         (0..3).find(|&i|{let(cx,cy)=self.cogworks_hud_center(row,i);(x-cx).abs()<=7&&(y-cy).abs()<=7}).map(|i|i as u8+1)
     }
-    pub fn ability_capacity(&self) -> usize {
-        let d=self.hud_tracks().divine;
-        ((d.3-2*crate::game_hud::ABILITY_INSET)/self.game_ability_row()).max(0) as usize
-    }
+    pub fn ability_capacity(&self)->usize {self.hud_tracks().divine_rows().count}
     /// O(C+A) over detached visible cells/creatures; no world or hidden actor reads.
     pub fn enemy_at_map_point(&self,v:&View,x:i32,y:i32)->Option<u64>{
         let(cw,ch,ox,oy)=self.map_layout(v.width,v.height);
@@ -589,12 +581,7 @@ impl Painter {
         v.creatures.iter().any(|a|a.id==id).then_some(id.to_bits())
     }
     pub fn ability_inspect_at(&self,count:usize,x:i32,y:i32)->Option<usize>{
-        let top=self.game_ability_top();
-        let row=self.game_ability_row();
-        let n=count.min(self.ability_capacity());
-        let left=self.hud_left();
-        let bounds=crate::modal_ui::Rect(left+4,top,(self.logical_width()-left-8).max(0),row*n as i32);
-        (bounds.contains(x,y)&&row>0).then(||((y-top)/row) as usize)
+        self.hud_tracks().divine_rows().index(x,y).filter(|i|*i<count)
     }
     pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{let r=self.hud_tracks().chronicle;crate::modal_ui::Rect(8,8,r.2-16,r.3-16)}
     fn native_x(&self, x: f64) -> i32 {
@@ -2168,8 +2155,7 @@ impl Painter {
     pub fn reaction_action_anchor(&self,v:&View,style:&str)->(i32,i32,i32,i32){
         if let Some((i,a))=v.abilities.iter().take(self.ability_capacity()).enumerate().find(|(_,a)|a.id==if style=="reaction-spent-missed-me"{"isheilah-missed-me"}else{"isheilah-quick-hand"}) {
             let _=a;
-            let y=self.game_ability_top()+i as i32*self.game_ability_row();
-            return crate::game_hud::right_slot(self.hud_tracks().divine,y).tuple();
+            return crate::game_hud::right_slot(self.game_ability_rect(i)).tuple();
 
         }
         (self.hud_left()+12,self.hud_tracks().divine.1+2,20,20)
@@ -2782,8 +2768,9 @@ impl Painter {
         #[cfg(test)]
         let _paint_abilities = paint_profile_bench::span(paint_profile_bench::Kind::HudAbilities);
         for (i,a) in v.abilities.iter().take(self.ability_capacity()).enumerate() {
-            let row=self.game_ability_row();
-            let y=self.game_ability_top()+i as i32*row;
+            let bounds=hud.divine_rows().row(i);
+            let y=bounds.1;
+            let row=bounds.3;
             let r=hud.divine;
             let chosen=self.ability_hover==Some(i);
             let selecting=v.selected_ability.as_deref()==Some(a.id.as_str());
@@ -2795,7 +2782,7 @@ impl Painter {
             let ragelight=matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::RagelightCost(_)));
             let passive=ragelight||(a.mode.eq_ignore_ascii_case("passive")&&!selecting);
             let reserve=if passive&&!ragelight{None}else{a.reserve};
-            let slot=crate::game_hud::right_slot(r,y);
+            let slot=crate::game_hud::right_slot(bounds);
             let has_metadata=reserve.is_some()||a.indicator.is_some()||a.fortunes.is_some()||!passive;
             let badges=if cogworks&&reserve.is_some(){40}
                 else if a.indicator.is_some()&&reserve.is_some(){28}else{0};

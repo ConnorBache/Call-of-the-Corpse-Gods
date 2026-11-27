@@ -68,11 +68,20 @@ fn baseline_game_grid_fits_the_whole_floor_and_preserves_hud_hit_targets() {
             assert_eq!(p.toolbar_action(hx, hy), Some(action));
         }
         assert_eq!(p.toolbar_action(frame.map.2, p.toolbar_y()+20), None);
-        let top=p.game_ability_top();
-        let row=p.game_ability_row();
-        let count=p.ability_capacity();
-        assert!(top + row*count as i32 <= p.hud_tracks().items.1);
-        assert_eq!(p.ability_inspect_at(100, frame.sidebar+20, top+row*count as i32),None);
+        let tracks=p.hud_tracks();
+        for (slots,count,bottom) in [
+            (tracks.divine_rows(),crate::game_hud::DIVINE_SLOTS,tracks.items.1),
+            (tracks.item_geometry(),crate::game_hud::ITEM_SLOTS,p.logical_height()),
+        ] {
+            assert_eq!(slots.count,count);
+            let last=slots.row(count-1);
+            assert_eq!(last.1+last.3,bottom-crate::game_hud::ABILITY_INSET);
+            assert_eq!(slots.index(last.0,last.1+last.3),None);
+            for i in 0..count {
+                let r=slots.row(i);
+                for y in r.1..r.1+r.3 {assert_eq!(slots.index(r.0,y),Some(i));}
+            }
+        }
     }
 }
 #[test]

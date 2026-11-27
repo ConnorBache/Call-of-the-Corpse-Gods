@@ -496,7 +496,8 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout,now:f64) {
             for line in p.wrap_text_role(Role::Secondary,text,width,13) {
                 assert!(p.measure_text_role(Role::Secondary,&line,13)<=width as f64);
             }
-            let ability_bottom=p.game_ability_top()+p.game_ability_row()*p.ability_capacity() as i32;
+            let rows=p.hud_tracks().divine_rows();
+            let ability_bottom=rows.area.1+rows.area.3;
             assert!(ability_bottom<=p.hud_tracks().items.1);
         }
     }

@@ -8,9 +8,10 @@ pub const RAIL_WIDTH: i32 = 166;
 pub const HEADER: i32 = 82;
 pub const FOOTER: i32 = 116;
 pub const MAP_TILE: (i32, i32) = (12,18);
-pub const ITEM_ROW: i32 = 21;
-pub const DIVINE_ROW: i32 = 21;
-pub const ABILITY_INSET: i32 = 5;
+pub const DIVINE_SLOTS: usize = 16; // 15 divine powers plus Dreamwalk
+pub const ITEM_SLOTS: usize = 11; // bow plus ten amulets
+pub const ABILITY_INSET: i32 = 3;
+const MIN_ABILITY_ROW: i32 = 18;
 pub const YELLOW: [u8;3] = [255,218,74];
 pub const RAIL_INSET: i32 = 8;
 pub const STATUS_SLOTS: usize = 4;
@@ -119,7 +120,8 @@ impl Tracks {
         let stats_x=map.2-stats_width-2*supply;
         let footer_height=h-foot;
         let footer_split=foot+(footer_height*43)/100;
-        let split=header+((h-header)*55/100).max(16*DIVINE_ROW+2*ABILITY_INSET);
+        let usable=(h-header-4*ABILITY_INSET).max(0);
+        let split=header+2*ABILITY_INSET+usable*DIVINE_SLOTS as i32/(DIVINE_SLOTS+ITEM_SLOTS) as i32;
         let gods_width=264.min(stats_x);
         Self {
             chronicle:Rect(0,0,cut,header),
@@ -151,12 +153,36 @@ impl Tracks {
         let w = (r.2 - 28) / 2;
         Rect(r.0 + 10 + slot as i32 * (w + 8), r.1 + 4, w, 23)
     }
-    pub fn item_rows(self)->usize { ((self.items.3-2*ABILITY_INSET)/ITEM_ROW).max(0) as usize }
+    pub fn divine_rows(self)->RailRows {RailRows::new(self.divine,DIVINE_SLOTS)}
+    pub fn item_geometry(self)->RailRows {RailRows::new(self.items,ITEM_SLOTS)}
+    pub fn item_rows(self)->usize {self.item_geometry().count}
     pub fn item_at(self,x:i32,y:i32,offset:usize,count:usize)->Option<usize> {
-        let area=Rect(self.items.0+6,self.items.1+ABILITY_INSET,self.items.2-12,ITEM_ROW*self.item_rows() as i32);
-        if !area.contains(x,y){return None}
-        let i=offset+((y-area.1)/ITEM_ROW) as usize;
+        let i=offset+self.item_geometry().index(x,y)?;
         (i<count).then_some(i)
+    }
+}
+/// Shared O(1) geometry for paint and hit tests. Distribution by cumulative
+/// edges gives each leftover pixel to a row instead of leaving a bottom gap.
+#[derive(Clone,Copy)]
+pub struct RailRows {
+    pub area:Rect,
+    pub count:usize,
+}
+impl RailRows {
+    fn new(r:Rect,max:usize)->Self {
+        let height=(r.3-2*ABILITY_INSET).max(0);
+        Self{area:Rect(r.0+4,r.1+ABILITY_INSET,(r.2-8).max(0),height),
+            count:max.min((height/MIN_ABILITY_ROW) as usize)}
+    }
+    pub fn row(self,i:usize)->Rect {
+        let Rect(x,y,w,h)=self.area;
+        let n=self.count.max(1) as i32;
+        let top=h*i as i32/n;
+        Rect(x,y+top,w,h*(i as i32+1)/n-top)
+    }
+    pub fn index(self,x:i32,y:i32)->Option<usize> {
+        if self.count==0 || !self.area.contains(x,y){return None;}
+        Some((((y-self.area.1+1)*self.count as i32-1)/self.area.3) as usize)
     }
 }
 pub fn panel(p:&mut Painter, r:Rect) {
@@ -343,7 +369,7 @@ pub fn compact_label(p:&Painter,name:&str,suffix:&str,width:i32)->(String,u16) {
     let reserved=p.measure_text_role(role,suffix,9).ceil() as i32;
     (format!("{}{suffix}",p.fit_text_role(role,name,(width-reserved).max(0),9)),9)
 }
-pub fn right_slot(r:Rect,y:i32)->Rect {Rect(r.0+r.2-57,y+4,48,13)}
+pub fn right_slot(row:Rect)->Rect {Rect(row.0+row.2-53,row.1+(row.3-13)/2,48,13)}
 fn tier_suffix(tier:Option<u8>)->String{
     match tier {Some(n) if n>1=>format!(" +{}",n-1),_=>String::new()}
 }
@@ -353,12 +379,14 @@ pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks) {
     panel(p,r);
     let old=p.clip;
     p.clip=Some((r.0+4,r.1+ABILITY_INSET,r.2-8,r.3-2*ABILITY_INSET));
-    let offset=p.item_rail_offset.min(v.pack_hud.items.len().saturating_sub(t.item_rows()));
+    let slots=t.item_geometry();
+    let offset=p.item_rail_offset.min(v.pack_hud.items.len().saturating_sub(slots.count));
     for (i,a) in v.pack_hud.items.iter().skip(offset).take(t.item_rows()).enumerate(){
-        let y=r.1+ABILITY_INSET+i as i32*ITEM_ROW;
-        let Rect(x,my,w,h)=right_slot(r,y);
+        let row=slots.row(i);
+        let y=row.1;
+        let Rect(x,my,w,h)=right_slot(row);
         let (name,size)=compact_label(p,&a.label,&tier_suffix(a.tier),x-r.0-11);
-        p.text(&name,r.0+7,y+(ITEM_ROW-size as i32)/2,size,INK);
+        p.text(&name,r.0+7,y+(row.3-size as i32)/2,size,INK);
         if let Some((current,max))=a.reserve {
             resource_ui::paint_bar(p,"",&format!("{current:.0}/{max:.0}"),x,my,w,h,game_color(&p.profile,"ui.colors.energy"),current/max.max(1.),9);
         } else {
@@ -366,7 +394,7 @@ pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks) {
             let dx=x+w-resource_ui::text_width(p,&detail,9);
             p.text(&detail,dx,my+2,9,[147,210,246]);
         }
-        p.rect(r.0+7,y+ITEM_ROW-1,r.2-14,1,[43,37,55]);
+        p.rect(r.0+7,y+row.3-1,r.2-14,1,[43,37,55]);
     }
     p.clip=old;
     scroll_mark(p,r,v.pack_hud.items.len(),t.item_rows(),offset);
@@ -447,7 +475,8 @@ mod tests {
         assert!(t.button(1).0<t.button(0).0);
         assert_eq!(t.gods.1,t.inspector.1+t.inspector.3);
         assert_eq!(t.gods.0+t.gods.2,t.rings.0);
-        assert!(p.ability_capacity()>=16 && t.item_rows()>=11);
+        assert_eq!(p.ability_capacity(),DIVINE_SLOTS);
+        assert_eq!(t.item_rows(),ITEM_SLOTS);
         assert_eq!(tier_suffix(Some(9))," +8");
         assert_eq!(tier_suffix(Some(1)),"");
         assert_eq!(t.rings.1,t.stats.1+t.stats.3);
