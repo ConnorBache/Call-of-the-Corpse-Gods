@@ -1,0 +1,66 @@
+name: Move the R52 gallery off the release notes
+on:
+  push:
+    branches:
+      - release-publishing/r52-followup
+    paths:
+      - .github/workflows/remove-r52-final-turn-release-gallery.yml
+permissions:
+  contents: write
+concurrency:
+  group: r52-final-turn-gallery
+  cancel-in-progress: false
+jobs:
+  remove-gallery:
+    if: github.repository == 'ConnorBache/Call-of-the-Corpse-Gods' && github.ref == 'refs/heads/release-publishing/r52-followup'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Verify the repository gallery and remove only the old gallery text
+        shell: bash
+        run: |
+          set -euo pipefail
+          work=$(mktemp -d)
+          root="https://raw.githubusercontent.com/$GH_REPO/main"
+          dir=docs/screenshots/r52-final-turn
+          curl -fsSL --retry 3 "$root/README.md" -o "$work/front.md"
+          for name in main-menu depth-05 depth-10 depth-15 depth-20; do
+            grep -Fq "$dir/$name.webp" "$work/front.md"
+            curl -fsSL --retry 3 "$root/$dir/$name.webp" -o "$work/$name.webp"
+            file "$work/$name.webp" | grep -q 'Web/P'
+          done
+          endpoint="repos/$GH_REPO/releases/459982159"
+          gh api "$endpoint" > "$work/before.json"
+          jq -e '.id == 459982159 and .tag_name == "r52-final-turn-20261126" and (.draft|not) and any(.assets[]; .name == "Call-of-the-Corpse-Gods-R52-Final-Turn-Windows-x64.zip")' "$work/before.json" >/dev/null
+          if jq -e '.body|contains("## Screenshot gallery")' "$work/before.json" >/dev/null; then
+            python3 - "$work" <<'PY'
+          from hashlib import sha256
+          from pathlib import Path
+          import json
+          import sys
+
+          d = Path(sys.argv[1])
+          current = json.loads((d / "before.json").read_text())["body"]
+          start_marker = "\n\n## Screenshot gallery\n"
+          start = current.find(start_marker)
+          close = "</details>\n"
+          end = current.find(close, start)
+          gallery = current[start : end + len(close)] if start >= 0 and end > start else ""
+          if sha256(gallery.encode()).hexdigest() != "b4556e0c4d8cf7ca6cb28c40a99f4ab26a730032fdd5c1f5546144fde198bf77":
+              raise SystemExit("Original gallery changed; no release notes were edited.")
+          cleaned = current.replace(gallery, "", 1)
+          if "## Screenshot gallery" in cleaned:
+              raise SystemExit("Another gallery remains; no release notes were edited.")
+          (d / "patch.json").write_text(json.dumps({"body": cleaned}))
+          PY
+            gh api --method PATCH "$endpoint" --input "$work/patch.json" >/dev/null
+          else
+            jq '{body}' "$work/before.json" > "$work/patch.json"
+          fi
+          gh api "$endpoint" > "$work/after.json"
+          jq -e --slurpfile expected "$work/patch.json" '.body == $expected[0].body and (.body|contains("## Screenshot gallery")|not)' "$work/after.json" >/dev/null
+          shape='{id,tag_name,draft,prerelease,target_commitish,assets:(.assets|map({id,name,size,digest})|sort_by(.name))}'
+          diff -u <(jq "$shape" "$work/before.json") <(jq "$shape" "$work/after.json")
