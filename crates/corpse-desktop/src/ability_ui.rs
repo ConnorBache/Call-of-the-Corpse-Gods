@@ -74,7 +74,16 @@ pub struct AbilityView {
 /// catalog identity, replays and saved state. O(text bytes), borrowed if absent.
 pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
     let mut result = std::borrow::Cow::Borrowed(text);
-    for (old,new) in [("Rage at the Dying of the Light","Ragelight"),("You Shall Never Be Rid of Me","Never Be Rid of Me"),("See The Future","Futuresight"),("See the Future","Futuresight")] {
+    for (old, new) in [
+        ("Rage at the Dying of the Light", "Ragelight"),
+        ("You Shall Never Be Rid of Me", "Never Be Rid of Me"),
+        ("See The Future", "Futuresight"),
+        ("See the Future", "Futuresight"),
+        ("Are You Sure About That?", "Redirect"),
+        ("Dream of Time Gone By", "Past Dream"),
+        ("Bonded By Unseen Threads", "Scarlet Threads"),
+        ("Bonded by Unseen Threads", "Scarlet Threads"),
+    ] {
         if result.contains(old) { result = std::borrow::Cow::Owned(result.replace(old,new)); }
     }
     result
@@ -1280,7 +1289,15 @@ mod revision50_ui_tests {
         let mut r:Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();r.simulation_revision=50.0.into();r.offers.clear();
         for a in progression::catalog_for_revision(50.) {
             let row=observe(&r,&a.id);
-            let expected_name=match a.name.as_str() { "Rage at the Dying of the Light"=>"Ragelight", "You Shall Never Be Rid of Me"=>"Never Be Rid of Me", _=>a.name.as_str() };
+            let expected_name = match a.name.as_str() {
+                "Rage at the Dying of the Light" => "Ragelight",
+                "You Shall Never Be Rid of Me" => "Never Be Rid of Me",
+                "See The Future" => "Futuresight",
+                "Are You Sure About That?" => "Redirect",
+                "Dream of Time Gone By" => "Past Dream",
+                "Bonded By Unseen Threads" => "Scarlet Threads",
+                _ => a.name.as_str(),
+            };
             assert_eq!(row.name,expected_name);
             // Keep the frozen catalog intact while pinning the two authorized
             // display-unit amendments independently of display_description.
@@ -1290,7 +1307,7 @@ mod revision50_ui_tests {
                 "lichor-bleed-them"=>"Your attacks inflict bleed proportional to your Damage bonus.",
                 _=>a.description.as_str(),
             };
-            assert!(row.description.starts_with(expected),"{}: {}",a.id,row.description);
+            assert!(row.description.starts_with(display_text(expected).as_ref()),"{}: {}",a.id,row.description);
         }
         assert_eq!(observe(&r,"numo-implant-thought").cost,"Reserve not configured · 15 NRG + action");
         assert!(crate::observe::ability_needs_target_for_run(&r,"pelian-fated-duel"));
@@ -1535,6 +1552,40 @@ mod never_surrender_detail_followup_tests {
         assert_eq!(serde_json::to_string(&r).unwrap(),before);
         assert!(matches!(display_text("@"),std::borrow::Cow::Borrowed(_)));
     }
+}
+
+#[cfg(test)]
+#[test]
+fn short_ability_names_fit_in_the_hud_without_changing_canonical_identity() {
+    let mut run: Run = serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();
+    run.simulation_revision = 52.0.into();
+    run.balance_rules_from = 0usize.into();
+    run.offers.clear();
+    run.player.active.clear();
+    let cases = [
+        ("isheilah-are-you-sure-about-that", "Are You Sure About That?", "Redirect"),
+        ("ursa-dream-of-time-gone-by", "Dream of Time Gone By", "Past Dream"),
+        ("morae-bonded-by-unseen-threads", "Bonded By Unseen Threads", "Scarlet Threads"),
+    ];
+    run.player.abilities = cases.iter().map(|(id, _, _)| (*id).to_string()).collect();
+    let before = serde_json::to_vec(&run).unwrap();
+    let mut painter = crate::render::Painter::new();
+    painter.set_responsive_canvas(true);
+    for (w, h) in [(1280, 800), (1920, 1080), (960, 1200)] {
+        painter.resize(w, h);
+        // Tight HUD lane: a toggle orb on the left and a reserve/counter on the right.
+        let rail = painter.logical_width() - painter.hud_left() - 24;
+        let width = rail - rail / 3 - 6 - 18 - 8;
+        for ((id, old, new), ability) in cases.into_iter().zip(visible_abilities(&run)) {
+            assert_eq!(ability.id, id);
+            assert_eq!(ability.name, new);
+            assert_eq!(progression::definition_for_revision(52., id).unwrap().name, old);
+            assert_eq!(painter.wrap_text_role(crate::typography_ui::Role::Ability, &ability.name, width, 13), [new]);
+            assert_eq!(crate::chronicle::present(&format!("You activate {old}.")), format!("You activate {new}."));
+        }
+    }
+    assert_eq!(display_text("Bonded by Unseen Threads · linked"), "Scarlet Threads · linked");
+    assert_eq!(serde_json::to_vec(&run).unwrap(), before);
 }
 
 #[cfg(test)] mod compact_spacing_tests {
