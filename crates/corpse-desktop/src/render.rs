@@ -36,7 +36,7 @@ pub const WIDTH: usize = 1280;
 pub const HEIGHT: usize = 800; // Authored menu and dialog sheets.
 pub const GAME_HEIGHT: usize = 720;
 pub const GAME_UI_UNIT: i32 = 8;
-const GAME_RESOURCE_WIDTH: i32 = 37 * GAME_UI_UNIT;
+const GAME_RESOURCE_WIDTH: i32 = crate::game_hud::RAIL_WIDTH;
 
 /// O(1): fit the gameplay baseline or authored sheet without stretching.
 pub(crate) fn canvas_scale(width: usize, height: usize, gameplay: bool) -> f64 {
@@ -169,6 +169,7 @@ impl Cell {
 #[derive(Clone)]
 #[cfg_attr(test, derive(Debug))]
 pub struct Creature {
+    pub has_heart: Option<bool>,
     pub perception_range: Option<String>,
     pub identity_outline: Option<Rgb>,
     /// Six detached sidebar variants; never retains a Run or hidden actor.
@@ -221,6 +222,7 @@ pub struct View {
     pub player_status_offset: usize,
     pub selected_actor: Option<f64>,
     pub player_meters: Vec<crate::statuses_ui::Meter>,
+    pub pack_hud: crate::game_hud::PackHud,
     pub provenance: String,
     pub width: usize,
     pub height: usize,
@@ -344,6 +346,7 @@ pub struct Painter {
     pub toolbar_focus: Option<usize>,
     pub bestiary_unread: bool,
     pub enemy_list_offset: usize,
+    pub item_rail_offset: usize,
     pub enemy_hover: Option<u64>,
     pub ground_hover: Option<(usize,usize)>,
     pub ability_hover: Option<usize>,
@@ -399,6 +402,7 @@ impl Painter {
             toolbar_focus: None,
             bestiary_unread: false,
             enemy_list_offset: 0,
+            item_rail_offset: 0,
             enemy_hover: None,
             ground_hover: None,
             ability_hover: None,
@@ -546,19 +550,27 @@ impl Painter {
     pub fn logical_height(&self)->i32{if self.responsive_canvas{(self.height as f64/self.scale).ceil()as i32}else{HEIGHT as i32}}
     pub fn frame(&self)->crate::modal_ui::Frame{crate::modal_ui::Frame::for_size(&self.profile,self.logical_width(),self.logical_height())}
     pub fn hud_left(&self)->i32{hud_left(&self.profile)+self.logical_width()-WIDTH as i32}
-    pub fn toolbar_y(&self)->i32{toolbar_y(&self.profile)+self.logical_height()-HEIGHT as i32}
+    pub fn toolbar_y(&self)->i32{self.hud_tracks().nav.1+8}
+    pub fn hud_tracks(&self)->crate::game_hud::Tracks{crate::game_hud::Tracks::resolve(self)}
     pub fn toolbar_action(&self,x:i32,y:i32)->Option<usize>{
-        if !(self.toolbar_y()..self.toolbar_y()+40).contains(&y) {return None;}
-        TOOLBAR_VISIBLE_ACTIONS.iter().enumerate().find_map(|(slot,id)|{
-            let(left,w)=self.game_toolbar_rect(slot);
-            (x>=left&&x<left+w).then_some(*id)
-        })
+        let tracks=self.hud_tracks();
+        if tracks.hearts.contains(x,y) { return Some(crate::game_hud::HEARTS); }
+        if tracks.potions.contains(x,y) { return Some(crate::game_hud::POTIONS); }
+        TOOLBAR_VISIBLE_ACTIONS.iter().enumerate()
+            .find_map(|(slot,id)|tracks.button(slot).contains(x,y).then_some(*id))
     }
     pub fn game_toolbar_rect(&self, slot: usize) -> (i32, i32) {
-        toolbar_rect_for_width(slot, self.frame().map.2)
+        let r=self.hud_tracks().button(slot);(r.0,r.2)
+    }
+    pub fn game_ability_top(&self)->i32 {
+        self.hud_tracks().divine.1+26
+    }
+    pub fn game_ability_row(&self)->i32 {
+        (crate::ability_ui::row(&self.profile)+18).max(54)
     }
     pub fn ability_capacity(&self) -> usize {
-        crate::ability_ui::capacity_before(&self.profile, self.frame().rail_bottom - 88)
+        let d=self.hud_tracks().divine;
+        ((d.1+d.3-self.game_ability_top())/self.game_ability_row()).max(0) as usize
     }
     /// O(C+A) over detached visible cells/creatures; no world or hidden actor reads.
     pub fn enemy_at_map_point(&self,v:&View,x:i32,y:i32)->Option<u64>{
@@ -569,14 +581,14 @@ impl Painter {
         v.creatures.iter().any(|a|a.id==id).then_some(id.to_bits())
     }
     pub fn ability_inspect_at(&self,count:usize,x:i32,y:i32)->Option<usize>{
-        let top=crate::ability_ui::top(&self.profile);
-        let row=crate::ability_ui::row(&self.profile);
+        let top=self.game_ability_top();
+        let row=self.game_ability_row();
         let n=count.min(self.ability_capacity());
         let left=self.hud_left();
         let bounds=crate::modal_ui::Rect(left+12,top,(self.logical_width()-left-26).max(0),row*n as i32);
         (bounds.contains(x,y)&&row>0).then(||((y-top)/row) as usize)
     }
-    pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{crate::modal_ui::Rect(12,12,(self.frame().map.2-24).max(0),chronicle_height(&self.profile).max(0))}
+    pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{let r=self.hud_tracks().chronicle;crate::modal_ui::Rect(8,8,r.2-16,r.3-16)}
     fn native_x(&self, x: f64) -> i32 {
         self.origin.0 + (x * self.scale).round() as i32
     }
@@ -2132,7 +2144,12 @@ impl Painter {
         ability_dialog::bounds(self, a)
     }
     pub fn inspection_notice_y(&self) -> i32 {
-        self.frame().map.1+self.frame().map.3+5
+        self.hud_tracks().inspector.1+20
+    }
+    pub fn hud_damage(&self)->impl Iterator<Item=damage::Rect>+'_ {
+        let t=self.hud_tracks();
+        [t.resources,t.nav,t.stats,t.hearts,t.potions,t.divine,t.items].into_iter().filter_map(|r|
+            self.logical_damage_rect(r.0,r.1,r.2,r.3))
     }
     pub fn footer_damage(&self) -> Option<damage::Rect> {
         let top = self.frame().map.1+self.frame().map.3;
@@ -2142,12 +2159,12 @@ impl Painter {
     /// Read-only anchor at the already displayed Quick Hand reaction cost.
     pub fn reaction_action_anchor(&self,v:&View,style:&str)->(i32,i32,i32,i32){
         if let Some((i,a))=v.abilities.iter().take(self.ability_capacity()).enumerate().find(|(_,a)|a.id==if style=="reaction-spent-missed-me"{"isheilah-missed-me"}else{"isheilah-quick-hand"}) {
-            let left=self.hud_left();let rail=self.logical_width()-left-26;
-            let state=if a.active{"ACTIVE"}else if !a.supported{"UNAVAILABLE"}else if a.mode.eq_ignore_ascii_case("passive"){"PASSIVE"}else{&a.state};
-            let (_,_,x)=self.ability_metadata(state,&ability_cost_text(&a.cost,state),left+19,left+12+rail-3);
-            return (x,crate::ability_ui::top(&self.profile)+i as i32*crate::ability_ui::row(&self.profile)+16,14,16)
+            let left=self.hud_left();let rail=self.logical_width()-left-24;
+            let _=a;
+            let x=left+12+rail-66;
+            return (x,self.game_ability_top()+i as i32*self.game_ability_row()+34,14,16)
         }
-        (self.hud_left()+12,crate::ability_ui::top(&self.profile)-26,20,20)
+        (self.hud_left()+12,self.game_ability_top()-26,20,20)
     }
     fn ability_metadata(&self,state:&str,cost:&str,left:i32,right:i32)->(String,String,i32){
         let role=crate::typography_ui::Role::Secondary;
@@ -2362,6 +2379,7 @@ impl Painter {
         let _paint_background = paint_profile_bench::span(paint_profile_bench::Kind::Background);
         self.set_responsive_canvas(true);
         let frame = self.frame();
+        let hud=self.hud_tracks();
         let map_top = frame.map.1;
         self.clear_with_rect(
             game_color(&self.profile, "ui.colors.background"),
@@ -2381,10 +2399,11 @@ impl Painter {
         let map_right=self.frame().map.2;
         let panel_bottom=self.frame().map.1+self.frame().map.3;
         let rail_bottom=frame.rail_bottom;
-        let stats_top=rail_bottom-88;
         // Measured wrapping is O(L²) worst-case metric work for bounded recent log text.
         // Raster fade is O(A) over the native chronicle rectangle, with no copied frame.
-        if self.intersects_damage(0,0,map_right,chronicle_height(&self.profile)+20) {
+        if self.intersects_damage(0,0,hud.chronicle.2,hud.chronicle.3) {
+        crate::game_hud::panel(self,hud.chronicle);
+        self.text("CHRONICLE",12,7,11,MUTED);
         #[cfg(test)]
         let _paint_chronicle = paint_profile_bench::span(paint_profile_bench::Kind::Chronicle);
         let mut lines = Vec::new();
@@ -2396,24 +2415,24 @@ impl Painter {
                 format!("{}  ×{}", group.message, group.count)
             } else { group.message.clone() };
             for line in self.wrap_text_role(crate::typography_ui::Role::Chronicle,
-                &message, map_right - 32, size) {
+                &message, hud.chronicle.2 - 24, size) {
                 lines.push((line, crate::chronicle::color(&group.message)));
             }
         }
         let end = lines.len().saturating_sub(v.chronicle_offset.min(lines.len().saturating_sub(4)));
-        let height = chronicle_height(&self.profile);
+        let height = hud.chronicle.3-31;
         let start = end.saturating_sub(((height + line_height - 1) / line_height) as usize);
-        let bottom = 12 + height;
-        self.clip = Some((16, 12, map_right - 32, height));
+        let bottom = 23 + height;
+        self.clip = Some((12, 23, hud.chronicle.2 - 24, height));
         for (i, (line, color)) in lines[start..end].iter().enumerate() {
-            self.text_role(crate::typography_ui::Role::Chronicle, line, 16,
+            self.text_role(crate::typography_ui::Role::Chronicle, line, 12,
                 bottom - (end - start - i) as i32 * line_height, size,
                 if *color == INK { game_color(&self.profile, "ui.colors.chronicle") } else { *color });
         }
         self.clip = None;
-        let background = game_color(&self.profile, "ui.colors.background");
-        let (left_px, right_px) = (self.native_x(16.).max(0), self.native_x((map_right - 16) as f64).min(self.width as i32));
-        let (top_px, bottom_px) = (self.native_y(12.).max(0), self.native_y(bottom as f64).min(self.height as i32));
+        let background = [14,13,22];
+        let (left_px, right_px) = (self.native_x(12.).max(0), self.native_x((hud.chronicle.2 - 12) as f64).min(self.width as i32));
+        let (top_px, bottom_px) = (self.native_y(23.).max(0), self.native_y(bottom as f64).min(self.height as i32));
         self.paint_chronicle_fade(background,(left_px,top_px,right_px,bottom_px));
         if self.chronicle_hover {
             let r=self.chronicle_hit_rect();
@@ -2738,66 +2757,10 @@ impl Painter {
         }
         #[cfg(test)]
         drop(_paint_map);
-        if self.intersects_damage(left,0,self.logical_width()-left,self.logical_height()) {
-        #[cfg(test)]
-        let _paint_hud = paint_profile_bench::span(paint_profile_bench::Kind::HudResources);
-        self.text(&format!("Depth {:.0}/{}",v.display_depth,v.max_depth),left+12,12,13,game_color(&self.profile,"ui.colors.headings"));
-        self.text(&format!("Lvl {:.0}",v.level),self.logical_width()-80,12,13,INK);
-        for (i,(name,color)) in v.god_labels.iter().take(3).enumerate() {
-            let width=rail_width/3;
-            self.text(name,left+12+i as i32*width,34,11,*color);
-        }
-        for (i, (label, value, max, color)) in [
-            (
-                "Health",
-                v.hp,
-                v.max_hp,
-                game_color(&self.profile, "ui.colors.health"),
-            ),
-            (
-                "Energy",
-                v.energy,
-                v.max_energy,
-                game_color(&self.profile, "ui.colors.energy"),
-            ),
-            (
-                "Blessings",
-                v.blessings,
-                v.blessing_goal,
-                game_color(&self.profile, "ui.colors.blessing"),
-            ),
-        ]
-        .into_iter()
-        .enumerate()
-        {
-            let y = 76 + i as i32 * 26;
-            let text = resource_ui::value_text(label, value, max, &v.resource_changes[i]);
-            let (fill,pending)=resource_ui::bar_fractions(value,max,if i==1{v.pending_energy_loss}else{0.});
-            resource_ui::paint_bar_pending(self,label,&text,left+12,y,rail_width,24,color,
-                fill,13,pending);
-        }
-        for(i,(label,value))in ["Damage","HP","DR","Accuracy","Dodge"].into_iter().zip(v.player_stats).enumerate(){
-            let text=if i<2 {format!("{label} {value:+}")} else {format!("{label} {value}")};
-            let col=rail_width/2;
-            self.text_role(crate::typography_ui::Role::Secondary,&text,left+12+(i%2)as i32*col,
-                stats_top+12+(i/2)as i32*19,13,game_color(&self.profile,"ui.colors.primary"));
-        }
-        for (i, m) in v
-            .player_meters
-            .iter()
-            .skip(v.player_status_offset)
-            .take(2)
-            .enumerate()
-        {
-            self.condition_meter(
-                m,
-                left + 12 + (i % 2) as i32 * (rail_width/2),
-                stats_top+66 + (i / 2) as i32 * 22,
-                rail_width/2-8,
-            );
-        }
-        self.rect(left + 12, crate::ability_ui::top(&self.profile) - 28, rail_width, 1, [36, 30, 46]);
-        } // upper HUD
+        crate::game_hud::paint_resources(self,v,hud);
+        crate::game_hud::paint_nav(self,hud);
+        crate::game_hud::paint_divine_header(self,hud);
+        crate::game_hud::paint_item_rail(self,v,hud);
         if self.intersects_damage(map_right,0,left-map_right,self.logical_height()) {
             #[cfg(test)]
             let _paint_enemies = paint_profile_bench::span(paint_profile_bench::Kind::Enemies);
@@ -2813,11 +2776,11 @@ impl Painter {
             .take(self.ability_capacity())
             .enumerate()
         {
-            let y = crate::ability_ui::top(&self.profile)
-                + i as i32 * crate::ability_ui::row(&self.profile);
+            let y = self.game_ability_top()
+                + i as i32 * self.game_ability_row();
             if self.ability_hover == Some(i) {
-                self.rect(left + 12, y, rail_width, crate::ability_ui::row(&self.profile), [39,44,61]);
-                self.border(left + 12, y, rail_width, crate::ability_ui::row(&self.profile), [174,158,107]);
+                self.rect(left + 12, y, rail_width, self.game_ability_row(), [39,44,61]);
+                self.border(left + 12, y, rail_width, self.game_ability_row(), [174,158,107]);
             }
             let selecting=v.selected_ability.as_deref()==Some(a.id.as_str());
             let ragelight_cost=match a.indicator {
@@ -2829,46 +2792,47 @@ impl Painter {
             let reserve=if passive && ragelight_cost.is_none() {None}else{a.reserve};
             let cogworks=a.id=="kative-cogworks";
             let orb_width=if passive{0}else if cogworks{50}else{18};
-            let name_x=left+18+orb_width;
+            let name_x=left+12+if cogworks{0}else{orb_width};
             let bar_width=if matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::FutureFloors{..})){140.min(rail_width/2)}else{rail_width/3};
+            let bar_width=bar_width.max(66).min(rail_width);
             let bar_x=left+12+rail_width-bar_width;
+            let meter_y=y+32;
             let ragelight_box=ragelight_cost.map(|cost| {
                 let width=ability_indicator_ui::ragelight_width(self,cost);
                 (bar_x-width-6,width)
             });
-            let name_width=if let Some((box_x,_))=ragelight_box {box_x-name_x-8}
-                else if reserve.is_some()||a.fortunes.is_some()||a.indicator.is_some(){bar_x-name_x-8}else{rail_width-12-orb_width};
+            let name_width=if cogworks{rail_width}else{rail_width-8-orb_width};
             let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);
-            self.clip=Some((left+12,y,rail_width,crate::ability_ui::row(&self.profile)));
-            for(line,name)in names.iter().enumerate(){
+            self.clip=Some((left+12,y,rail_width,self.game_ability_row()));
+            for(line,name)in names.iter().take(2).enumerate(){
                 self.text(name,name_x,y+3+line as i32*15,13,a.color);
             }
             if let Some((box_x,box_width))=ragelight_box {
-                ability_indicator_ui::paint(self,a.indicator.unwrap(),box_x,y,box_width);
+                ability_indicator_ui::paint(self,a.indicator.unwrap(),box_x,meter_y,box_width);
             }
             if let Some(indicator)=a.indicator.filter(|_|ragelight_box.is_none()) {
-                ability_indicator_ui::paint(self,indicator,bar_x,y,bar_width);
+                ability_indicator_ui::paint(self,indicator,bar_x,meter_y,bar_width);
             } else if let Some((count,until))=a.fortunes {
                 let box_w=((bar_width-6)/3).max(18);
                 for i in 0..3 {
                     let bx=bar_x+i* (box_w+3);
-                    if i<count as i32 {self.rect(bx,y,box_w,19,[184,119,255]);}
-                    self.border(bx,y,box_w,19,[184,119,255]);
+                    if i<count as i32 {self.rect(bx,meter_y,box_w,19,[184,119,255]);}
+                    self.border(bx,meter_y,box_w,19,[184,119,255]);
                     if count<3&&i==count as i32 {
                         let text=until.to_string();let tw=resource_ui::text_width(self,&text,12);
-                        self.text(&text,bx+(box_w-tw)/2,y+2,12,[232,220,255]);
+                        self.text(&text,bx+(box_w-tw)/2,meter_y+2,12,[232,220,255]);
                     }
                 }
             } else if let Some((current,maximum))=reserve {
-                let value=format!("{current:.0}/{maximum:.0} NRG");
-                resource_ui::paint_bar_pending(self,"",&value,bar_x,y,bar_width,19,
+                let value=format!("{current:.0}/{maximum:.0}");
+                resource_ui::paint_bar_pending(self,"",&value,bar_x,meter_y,bar_width,19,
                     game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),11,a.pending_reserve_loss/maximum.max(1.));
             }
             if !passive {
                 for orb in 0..if cogworks{3}else{1} {
                     let chosen=if cogworks{orb+1==v.cogworks_mode as i32}else{a.active};
                     let targeting=selecting&&(!cogworks||chosen);
-                    let cx=left+23+orb*16;let cy=y+11;
+                    let cx=left+19+orb*16;let cy=if cogworks{y+40}else{y+11};
                     for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(targeting||chosen||d>=15){self.rect(cx+dx,cy+dy,1,1,if targeting{[255,155,56]}else if chosen{[100,255,114]}else{[110,110,125]});}}}
                 }
             }
@@ -2941,48 +2905,10 @@ impl Painter {
         }
         } // interaction marks
         if map_damage { crate::persistent_ability_overlays::paint(self,v,now); crate::perception_ui::paint(self,v); }
-        let footer_top=self.frame().map.1+self.frame().map.3;
-        if self.intersects_damage(0,footer_top,map_right,self.logical_height()-footer_top) {
-        #[cfg(test)]
-        let _paint_footer = paint_profile_bench::span(paint_profile_bench::Kind::Footer);
-        let strip_height=self.toolbar_y()-footer_top;
-        self.rect(8,footer_top,map_right-16,strip_height,[8,7,13]);
-        self.border(8,footer_top,map_right-16,strip_height,[88,81,98]);
-        let previous_clip=self.clip;
-        self.clip=Some((12,footer_top+1,map_right-24,strip_height-2));
-        self.text_role(
-            crate::typography_ui::Role::Primary,
-            &self.fit_text_role(crate::typography_ui::Role::Primary, notice, map_right-40, 15),
-            20,
-            self.inspection_notice_y(),
-            15,
-            game_color(&self.profile, "ui.colors.secondary"),
-        );
-
-        self.clip=previous_clip;
-        for (i, label) in TOOLBAR_ACTIONS.iter().enumerate() {
-            let (x, w) = self.game_toolbar_rect(i);
-            let y = self.toolbar_y();
-            let selected = self.toolbar_focus == Some(TOOLBAR_VISIBLE_ACTIONS[i]);
-            if selected {
-                self.rect(x + 2, y, w - 4, 40, game_color(&self.profile, "ui.colors.hover"));
-                self.rect(x + 12, y + 37, w - 24, 2, game_color(&self.profile, "ui.colors.blessing"));
-            }
-            let label_width=self.measure_text_role(crate::typography_ui::Role::Primary,label,16).ceil()as i32;
-            self.text_role(crate::typography_ui::Role::Primary, label, x + (w-label_width)/2, y + 10, 16,
-                if selected { game_color(&self.profile, "ui.colors.primary") } else { [184, 177, 194] });
-            if TOOLBAR_VISIBLE_ACTIONS[i]==7 && self.bestiary_unread {
-                self.text("!",x+(w+label_width)/2+8,y+10,16,[255,217,53]);
-            }
-        }
-        } // footer damage section
-        // Flush shared panel boundaries. O(1) primitives, no simulation work.
-        let edge=[88,81,98];
-        self.border(8,8,map_right-8,chronicle_height(&self.profile)+4,edge);
-        self.border(8,map_top,map_right-8,panel_bottom-map_top+1,edge);
-        self.border(map_right-1,8,left-map_right+2,rail_bottom-7,edge);
-        self.border(left,8,self.logical_width()-left-8,rail_bottom-7,edge);
-        self.border(left,stats_top,self.logical_width()-left-8,rail_bottom-stats_top+1,edge);
+        crate::game_hud::paint_footer(self,v,hud,notice);
+        let edge=[70,63,81];
+        self.border(0,map_top,map_right,panel_bottom-map_top,edge);
+        self.border(map_right,map_top,left-map_right,rail_bottom-map_top,edge);
         if let Some(veil) = crate::illumination_ui::screen_tint(v) {
             // Rebuilt base pixels only: clipped/tile paths tint their disjoint
             // repainted regions once, never previously tinted retained pixels.
@@ -3014,7 +2940,7 @@ pub fn hud_left(p: &crate::appearance_profile::Profile) -> i32 {
     .floor() as i32
 }
 pub fn chronicle_height(p: &crate::appearance_profile::Profile) -> i32 {
-    chronicle_height_for(p, 14 * GAME_UI_UNIT - 12)
+    chronicle_height_for(p, crate::game_hud::HEADER - 12)
 }
 pub(crate) fn chronicle_height_for(p: &crate::appearance_profile::Profile, baseline: i32) -> i32 {
     let explicit = p.number("ui.layout.chronicleHeight");
@@ -3041,10 +2967,12 @@ pub fn map_layout_profile(
     map_layout_frame(w,h,p,crate::modal_ui::Frame::from_profile(p))
 }
 pub fn map_layout_frame(w:usize,h:usize,p:&crate::appearance_profile::Profile,frame:crate::modal_ui::Frame)->(i32,i32,i32,i32){
-    let aspect = p.number("typography.map.tileHeight") / p.number("typography.map.tileWidth");
+    let (tw,th)=(p.number("typography.map.tileWidth"),p.number("typography.map.tileHeight"));
+    // Brogue's fullscreen 1080p tile ratio, rounded to whole logical pixels.
+    let aspect = if (tw,th)==(15.,24.) {(1080./34.)/(1920./100.)} else {th/tw};
     let area_w = (frame.map.2 - 24).max(1);
-    let top = chronicle_height(p) + 20;
-    let area_h = (frame.map.1 + frame.map.3 - 20 - top).max(1);
+    let top = frame.map.1 + 2;
+    let area_h = (frame.map.3 - 4).max(1);
     let mut cw = ((area_w as f64 / w.max(1) as f64).min(area_h as f64 / (h.max(1) as f64 * aspect)))
         .floor()
         .max(1.) as i32;

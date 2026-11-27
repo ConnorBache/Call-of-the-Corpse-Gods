@@ -231,6 +231,8 @@ pub struct PackView {
     read_only: bool,
     pending: bool,
     focus_action: Option<usize>,
+    quick_kind: Option<&'static str>,
+    quick_order: Vec<f64>,
 }
 /// Small owned UI descriptor; item groups and canonical Run are never cloned here.
 #[derive(Clone,Debug,PartialEq)]
@@ -278,6 +280,8 @@ impl PackView {
             minimum_list_width: 402,
             button_metrics: None,
             groups: display_groups(run),
+            quick_kind: None,
+            quick_order: Vec::new(),
             stamp: Stamp::observe(run),
             slots: pack_limited_occupancy(run),
             capacity: pack_capacity(run),
@@ -371,6 +375,10 @@ impl PackView {
         }
         self.stamp = stamp;
         self.groups = display_groups(run);
+        if let Some(kind)=self.quick_kind {
+            self.quick_order=self.groups.iter().flat_map(|g|g.items.iter().map(|i|i.id)).collect();
+            self.groups.retain(|g|g.item.kind==kind);
+        }
         self.slots = pack_limited_occupancy(run);
         self.capacity = pack_capacity(run);
         if !self.groups.iter().any(|g| Some(g.item.id) == self.selected) {
@@ -387,7 +395,20 @@ impl PackView {
             self.focus_action = None;
         }
     }
+    pub fn focus_kind(&mut self,run:&Run,kind:Option<&'static str>){
+        self.quick_kind=kind;
+        self.quick_order.clear();
+        self.cancel_selection();
+        self.selected=None;
+        self.list_scroll=0;
+        self.detail_scroll=0;
+        self.refresh(run);
+        if kind.is_some(){
+            if let Some(group)=self.groups.first(){self.selected=Some(group.item.id);self.reveal_selected();}
+        }
+    }
     pub fn display_order(&self) -> Vec<f64> {
+        if self.quick_kind.is_some(){return self.quick_order.clone();}
         self.groups
             .iter()
             .flat_map(|g| g.items.iter().map(|i| i.id))
@@ -566,7 +587,7 @@ impl PackView {
         (self.groups.get(index)?.section == self.groups.get(other)?.section).then_some(other)
     }
     fn move_group(&mut self, index: usize, delta: isize) -> PackAction {
-        if self.pending || self.read_only || self.request.is_some() {
+        if self.pending || self.read_only || self.request.is_some() || self.quick_kind.is_some() {
             return PackAction::None;
         }
         let Some(other) = self.reorder_neighbor(index, delta) else { return PackAction::None; };
@@ -720,6 +741,10 @@ impl PackView {
     /// O(G + S) time and O(S) memory: five R50 sections or two legacy sections.
     /// Unsupported direct projections stay visible without claiming trinket space.
     fn section_positions(&self) -> Vec<(usize, i32)> {
+        if let Some(kind)=self.quick_kind {
+            let section=if self.stamp.revision<50. {1} else if kind=="heart" {4} else {3};
+            return vec![(section,self.layout.list.1)];
+        }
         let count = if self.stamp.revision >= 50. { self.stamp.category_headers.len() } else { 2 };
         let mut y = self.layout.list.1;
         let mut group = 0;
@@ -735,6 +760,10 @@ impl PackView {
         sections
     }
     fn row_positions(&self) -> Vec<(usize, i32)> {
+        if self.quick_kind.is_some(){
+            return self.groups.iter().enumerate().map(|(index,_)|
+                (index,self.layout.list.1+24+index as i32*self.layout.row)).collect();
+        }
         let sections = self.section_positions();
         let mut offsets = vec![0; sections.len()];
         self.groups.iter().enumerate().map(|(index, group)| {
@@ -744,7 +773,7 @@ impl PackView {
         }).collect()
     }
     fn list_max_scroll(&self) -> i32 {
-        let height = if self.stamp.revision >= 50. {
+        let height = if self.quick_kind.is_some(){24+self.layout.row*self.groups.len() as i32} else if self.stamp.revision >= 50. {
             self.stamp.category_headers.len() as i32 * 24 + self.layout.row * self.groups.len() as i32
         } else {
             48 + self.layout.row * self.groups.len().max(20) as i32
@@ -970,7 +999,7 @@ impl PackView {
         modal_ui::border(p, self.layout.bounds, p.profile.rgb("ui.colors.border"));
         p.text_role(
             Role::Headings,
-            "Pack",
+            match self.quick_kind {Some("heart")=>"Hearts",Some("potion")=>"Potions",_=>"Pack"},
             self.layout.list.0,
             self.layout.bounds.1 + 11,
             18,
@@ -1011,7 +1040,7 @@ impl PackView {
                 p.profile.rgb("ui.colors.primary"),
             );
         }
-        if self.request.is_none() && self.stamp.revision >= 50. {
+        if self.request.is_none() && self.quick_kind.is_none() && self.stamp.revision >= 50. {
             let summary = p.fit_text_role(Role::Primary, &self.stamp.category_summary, self.layout.bounds.2 - 24, 13);
             p.text_role(Role::Primary, &summary, self.layout.list.0, self.layout.bounds.1 + 74, 13, p.profile.rgb("ui.colors.secondary"));
         }
@@ -1384,6 +1413,22 @@ fn display_groups(run: &Run) -> Vec<Group> {
         .collect();
     ranked.sort_by_key(|(key, _)| *key);
     ranked.into_iter().map(|(_, g)| g).collect()
+}
+/// Shortcut admission uses the same current item, blocker and target as the Pack.
+pub fn quick_item_action(run:&Run,id:f64)->PackAction {
+    let Some(item)=run.inventory.iter().find(|i|i.id==id&&crate::game_hud::is_quick_item(run,i)) else {
+        return PackAction::Notice("That item is no longer available.".into());
+    };
+    for button in item_actions(run,item) {
+        if !matches!(button.label.as_str(),"Apply"|"Teleport"){continue}
+        if let Some(blocker)=button.blocker {return PackAction::Notice(blocker);}
+        match button.action {
+            ButtonAction::Target(target)=>return PackAction::Target(target),
+            ButtonAction::Command(command)=>return PackAction::Command(command),
+            _=>{}
+        }
+    }
+    PackAction::Notice("This item has no available action.".into())
 }
 fn item_actions(run: &Run, item: &Item) -> Vec<Button> {
     let mut buttons = vec![];

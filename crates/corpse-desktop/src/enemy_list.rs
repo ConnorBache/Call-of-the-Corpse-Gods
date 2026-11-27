@@ -20,7 +20,7 @@ pub fn sort_ground(rows: &mut [GroundEntity]) {
     rows.sort_by(|a,b|a.kind.cmp(&b.kind).then(a.distance.total_cmp(&b.distance))
         .then((a.y,a.x,a.id).cmp(&(b.y,b.x,b.id))).then(a.name.cmp(&b.name)));
 }
-pub const RESERVED_WIDTH: i32 = 31 * super::GAME_UI_UNIT;
+pub const RESERVED_WIDTH: i32 = crate::game_hud::RAIL_WIDTH;
 #[derive(Clone, Copy, Debug)]
 pub struct Layout { pub bounds: Rect, pub rows: Rect }
 impl Layout {
@@ -30,7 +30,7 @@ impl Layout {
     /// O(1), uses the same responsive playfield as map/input geometry.
     pub fn resolve_frame(p:&crate::appearance_profile::Profile,_map_left:i32,frame:crate::modal_ui::Frame)->Self {
         let _=p;
-        let top=8;
+        let top=frame.map.1;
         let bottom=frame.rail_bottom;
         let bounds=Rect(frame.map.2,top,RESERVED_WIDTH,(bottom-top).max(0));
         Self { bounds, rows:Rect(bounds.0+8,bounds.1+8,bounds.2-16,bounds.3-16) }
@@ -39,18 +39,25 @@ impl Layout {
     pub fn content_view(self,p:&Painter,v:&View)->Content {
         let mut content=self.content(p,&v.creatures);
         for row in &v.ground_entities {
-            let mut card=Card{reserve:row.reserve,top:content.height,height:0,lines:Vec::new(),bars:Vec::new()};
+            let mut card=Card{reserve:row.reserve,heart:None,top:content.height,height:0,lines:Vec::new(),bars:Vec::new()};
             let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(13.));
             let step=(style.font_size*style.line_height).ceil().max(15.) as i32;
             let mut y=5;
-            for line in p.wrap_text_role(Role::Secondary,&format!("{} {}",row.glyph,row.name),(self.rows.2-16-if row.reserve.is_some(){80}else{0}).max(1),13) {
+            for line in p.wrap_text_role(Role::Secondary,&format!("{} {}",row.glyph,row.name),(self.rows.2-12).max(1),13) {
                 card.lines.push(Line{hover_only:false,text:line,y,size:13,color:row.color,outline:None,black_initial:false});y+=step;
             }
-            card.height=y+9;content.height+=card.height;content.cards.push(card);
+            card.height=y+6+if card.reserve.is_some(){20}else{0};content.height+=card.height;content.cards.push(card);
         }
-        let stairs=Content::stair_count(v);
-        content.cards[..v.creatures.len()+stairs].rotate_right(stairs);
-        let mut top=0;for card in &mut content.cards{card.top=top;top+=card.height;}
+        content.cards.rotate_right(v.ground_entities.len());
+        let mut top=22;
+        let mut headings=vec![(0,"ON THE FLOOR")];
+        for (i,card) in content.cards.iter_mut().enumerate(){
+            if i==v.ground_entities.len() {headings.push((top,"ENEMIES"));top+=22;}
+            card.top=top;top+=card.height;
+        }
+        if v.creatures.is_empty(){headings.push((top,"ENEMIES"));top+=22;}
+        content.headings=headings;
+        content.height=top;
         content
     }
 }
@@ -59,16 +66,16 @@ struct Line { hover_only:bool, text:String, y:i32, size:u16, color:super::Rgb, o
 #[derive(Clone,Debug)]
 struct Bar { y:i32, label:String, value:String, fraction:f64, color:super::Rgb }
 #[derive(Clone,Debug)]
-struct Card { reserve:Option<(f64,f64)>, top:i32, height:i32, lines:Vec<Line>, bars:Vec<Bar> }
+struct Card { heart:Option<bool>, reserve:Option<(f64,f64)>, top:i32, height:i32, lines:Vec<Line>, bars:Vec<Bar> }
 #[derive(Clone,Debug)]
-pub struct Content { cards:Vec<Card>, height:i32, layout:Layout }
+pub struct Content { cards:Vec<Card>, height:i32, layout:Layout, headings:Vec<(i32,&'static str)> }
 impl Content {
     pub fn stair_count(v:&View)->usize {v.ground_entities.partition_point(|g|g.kind==GroundKind::Stair)}
-    pub fn creature_index(v:&View,index:usize)->Option<usize>{index.checked_sub(Self::stair_count(v)).filter(|&i|i<v.creatures.len())}
+    pub fn creature_index(v:&View,index:usize)->Option<usize>{index.checked_sub(v.ground_entities.len()).filter(|&i|i<v.creatures.len())}
     pub fn actor(v:&View,index:usize)->Option<u64>{Self::creature_index(v,index).map(|i|v.creatures[i].id.to_bits())}
-    pub fn ground_index(v:&View,index:usize)->Option<usize>{if index<Self::stair_count(v){Some(index)}else{index.checked_sub(v.creatures.len()).filter(|&i|i>=Self::stair_count(v)&&i<v.ground_entities.len())}}
+    pub fn ground_index(v:&View,index:usize)->Option<usize>{(index<v.ground_entities.len()).then_some(index)}
     pub fn ground(v:&View,index:usize)->Option<(usize,usize)>{Self::ground_index(v,index).map(|i|{let g=&v.ground_entities[i];(g.x,g.y)})}
-    pub fn row_for_ground(v:&View,index:usize)->usize{if index<Self::stair_count(v){index}else{index+v.creatures.len()}}
+    pub fn row_for_ground(_v:&View,index:usize)->usize{index}
 
     /// O(T²) worst-case text measurement via measured word wrapping, O(T+C)
     /// temporary storage for C admitted creatures and T displayed characters.
@@ -77,7 +84,7 @@ impl Content {
         let width=(layout.rows.2-16).max(1);
         let mut cards=Vec::with_capacity(actors.len());let mut top=0;
         for a in actors {
-            let mut card=Card{reserve:None,top,height:0,lines:Vec::new(),bars:Vec::new()};let mut y=5;
+            let mut card=Card{reserve:None,heart:a.has_heart,top,height:0,lines:Vec::new(),bars:Vec::new()};let mut y=5;
             fn text(p:&Painter,card:&mut Card,y:&mut i32,width:i32,s:&str,size:u16,color:super::Rgb) {
                 let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(size as f64));
                 let line=(style.font_size*style.line_height).ceil().max(size as f64+2.) as i32;
@@ -87,11 +94,11 @@ impl Content {
             }
             let black_b=a.glyph=="B" && a.color==[0;3] && a.identity_outline.is_none();
             let color=if black_b {p.profile.rgb("ui.colors.primary")} else {a.color};
-            text(p,&mut card,&mut y,width,&format!("{} {}",a.glyph,a.name),13,color);
+            text(p,&mut card,&mut y,(width-if a.has_heart.is_some(){17}else{0}).max(1),&format!("{} {}",a.glyph,a.name),12,color);
             if black_b {if let Some(line)=card.lines.first_mut(){line.black_initial=true;}}
             for line in &mut card.lines {line.outline=a.identity_outline;}
             y+=1;
-            if !a.shared_resources {
+            if !a.shared_resources && layout.bounds.2>=180 {
                 for (name,value,max,color,invulnerable) in [
                     ("Health",a.hp,a.max_hp,[255,48,85],a.invulnerable),
                     ("Energy",a.energy,a.max_energy,[36,223,255],false),
@@ -121,7 +128,7 @@ impl Content {
             }
             card.height=y.max(conditions_top+16)+3;top+=card.height;cards.push(card);
         }
-        Self{cards,height:top,layout}
+        Self{cards,height:top,layout,headings:Vec::new()}
     }
     /// Pixel scrolling keeps every condition reachable even for a card taller
     /// than the viewport. Clamping after removals cannot strand the final card.
@@ -153,11 +160,23 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
     p.enemy_list_offset=content.offset(p.enemy_list_offset);
     let old_clip=p.clip;p.clip=Some(layout.bounds.tuple());
     p.clip=Some(layout.rows.tuple());
+    for &(top,label) in &content.headings {
+        let y=layout.rows.1+top-p.enemy_list_offset as i32;
+        if y+20>=layout.rows.1 && y<layout.rows.1+layout.rows.3 {
+            p.text(label,layout.rows.0+4,y+3,11,MUTED);
+            p.rect(layout.rows.0+4,y+19,layout.rows.2-8,1,[70,63,81]);
+        }
+    }
     for (index,card) in content.cards.iter().enumerate() {
         let selected=Content::actor(v,index).is_some_and(|id|p.enemy_hover==Some(id)) || Content::ground(v,index).is_some_and(|at|p.ground_hover==Some(at));
         let y=layout.rows.1+card.top-p.enemy_list_offset as i32;
         if y+card.height<=layout.rows.1 || y>=layout.rows.1+layout.rows.3 {continue;}
         if selected {p.rect(layout.rows.0,y,layout.rows.2-4,card.height-2,[39,44,61]);}
+        if let Some(heart)=card.heart {
+            let x=layout.rows.0+layout.rows.2-16;
+            p.text("♥",x,y+4,13,if heart {[255,116,133]} else {[150,128,151]});
+            if !heart{p.text("×",x,y+3,13,[255,56,72]);}
+        }
         for line in &card.lines {
             if line.hover_only&&!selected{continue;}
             if let Some(outline)=line.outline {for (dx,dy) in [(-1,0),(1,0),(0,-1),(0,1)] {p.text_role(Role::Secondary,&line.text,layout.rows.0+4+dx,y+line.y+dy,line.size,outline);}}
@@ -172,7 +191,7 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         }
         if let Some((energy,capacity))=card.reserve {
             super::resource_ui::paint_bar(p,"",&format!("{energy:.0}/{capacity:.0}"),
-                layout.rows.0+layout.rows.2-84,y+4,72,19,p.profile.rgb("ui.colors.energy"),energy/capacity.max(1.),11);
+                layout.rows.0+4,y+card.height-21,72,17,p.profile.rgb("ui.colors.energy"),energy/capacity.max(1.),11);
         }
         for bar in &card.bars {
             let w=(layout.rows.2-16).max(1);let yy=y+bar.y;
@@ -479,7 +498,7 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
             let frame=p.frame();let l=Layout::resolve_frame(&p.profile,0,frame);
             assert_eq!(l.bounds.0,frame.map.2);
             assert_eq!(l.bounds.0+l.bounds.2,p.hud_left());
-            assert_eq!(l.bounds.1,8);
+            assert_eq!(l.bounds.1,frame.map.1);
             assert_eq!(l.bounds.1+l.bounds.3,frame.rail_bottom);
             assert!(p.chronicle_hit_rect().0+p.chronicle_hit_rect().2<l.bounds.0);
             let text="B Greater Extremely Long Monster Name That Must Remain Inside Its Panel";
@@ -487,8 +506,8 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
             for line in p.wrap_text_role(Role::Secondary,text,width,13) {
                 assert!(p.measure_text_role(Role::Secondary,&line,13)<=width as f64);
             }
-            let ability_bottom=crate::ability_ui::top(&p.profile)+crate::ability_ui::row(&p.profile)*p.ability_capacity() as i32;
-            assert!(ability_bottom<=frame.rail_bottom-88);
+            let ability_bottom=p.game_ability_top()+p.game_ability_row()*p.ability_capacity() as i32;
+            assert!(ability_bottom<=p.hud_tracks().items.1);
         }
     }
 }

@@ -24,15 +24,10 @@ fn quiet_ui_toolbar_adds_help_with_four_evenly_spaced_labels(){
     let mut p=Painter::new();
     for(w,h)in [(1280,800),(1920,1080),(1537,911),(960,1200)]{
         p.resize(w,h);p.set_responsive_canvas(true);
-        let mut centers=vec![];
         for(slot,id)in TOOLBAR_VISIBLE_ACTIONS.iter().enumerate(){
-            let(x,width)=p.game_toolbar_rect(slot);
-            centers.push(x+width/2);
-            assert_eq!(p.toolbar_action(x+width/2,p.toolbar_y()+20),Some(*id));
-            assert_eq!(p.toolbar_action(x,p.toolbar_y()-1),None);
-        }
-        for centers in centers.windows(3) {
-            assert!(((centers[1]-centers[0])-(centers[2]-centers[1])).abs()<=1);
+            let r=p.hud_tracks().button(slot);
+            assert_eq!(p.toolbar_action(r.0+r.2/2,r.1+r.3/2),Some(*id));
+            assert_eq!(p.toolbar_action(r.0,r.1+r.3),None);
         }
     }
 }

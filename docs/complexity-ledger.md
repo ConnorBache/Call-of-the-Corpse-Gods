@@ -2794,3 +2794,5 @@ After an admitted hostile strike against the player, check same-plane eight-neig
 
 ### Terminal overkill and animation drain
 The final player HP packet supplies one detached signed-value receipt; ordinary simulation and archived replay state still normalize terminal health to zero. The HUD can display the signed value with an empty bar. Before the death acknowledgment, inspect the existing bounded finite-cue list (O(E) time, O(1) scratch, E ≤ 4096) even for nonblocking effects, then present one clean terminal gameplay frame. Held static effects do not extend the wait. Victory animation and Space-to-results timing are unchanged.
+
+Gameplay mockup HUD: [track/input/retained paint costs](desktop-complexity.md#gameplay-hud-mockup-composition).

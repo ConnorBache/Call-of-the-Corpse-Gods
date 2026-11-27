@@ -79,3 +79,7 @@ The normal seed form displays the selected mode read-only; DEBUG floor setup
 retains its independent setup selector. No save/replay format or simulation rule
 changes. Keyboard traversal is bounded by the eight-item menu and skips disabled
 Continue. Input and paint share the same hit-region constants.
+
+## Gameplay HUD mockup composition
+
+The 1280 × 720 reference uses a 1024-wide map track and two 128-wide side rails. Chronicle, HP/NRG/status and menu controls share the header. Inspector, stats and pack shortcuts share the footer. The map fits its full 79 × 29 floor with 12 × 20 logical-pixel tiles at the default reference profile; geometry adapts independently of simulation. Dialog sheets, methods of spending turns, engine commands and save formats are unchanged. The HUD resolves a fixed number of paint/hit/damage rectangles in O(1) time and space. Pack shortcuts add one O(I) detached projection on view refresh with as many labels as usable items; click admission calls existing Pack blockers on demand. Known ground G and admitted creature C descriptors share the existing scroll list with two constant headings; ordering/click identity is O(G+C), text wrapping and visible raster retain the same bounds above. Retained and tile renderers invalidate the relocated regions and compare the detached quick-item/heart state, not hidden world data.

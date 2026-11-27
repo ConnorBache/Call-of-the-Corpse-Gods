@@ -1,6 +1,7 @@
 #![cfg_attr(all(target_os = "windows", not(debug_assertions), not(feature = "dev-tools")), windows_subsystem = "windows")]
 
 mod gameplay_pause;
+mod game_hud;
 mod health_warning;
 mod death_pause;
 #[cfg(test)] mod ending_video_capture;
@@ -1473,6 +1474,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     }
                     if key == Keycode::I {
                         inventory = !inventory;
+                        if inventory {
+                            pack_view.get_or_insert_with(||pack::PackView::observe(&r.run)).focus_kind(&r.run,None);
+                        }
                         continue;
                     }
                     if key == Keycode::F6 {
@@ -1653,6 +1657,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         if id == "kative-tinker" {
                             let view =
                                 pack_view.get_or_insert_with(|| pack::PackView::observe(&r.run));
+                            view.focus_kind(&r.run,None);
                             let action = view.begin_tinker(&r.run, id);
                             inventory = true;
                             apply_pack_action(
@@ -1745,8 +1750,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             ability_detail = ability_ui::visible_abilities(&r.run)
                                 .get(
                                     ability_offset
-                                        + ((y - ability_ui::top(&painter.profile))
-                                            / ability_ui::row(&painter.profile))
+                                        + ((y - painter.game_ability_top())
+                                            / painter.game_ability_row())
                                             as usize,
                                 )
                                 .map(|a| a.id.clone());
@@ -2026,7 +2031,13 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                             Err(e) => e.to_string(),
                                         };
                                     }
-                                    4 => inventory = !inventory,
+                                    4 | game_hud::HEARTS | game_hud::POTIONS => {
+                                        inventory = !inventory;
+                                        if inventory {
+                                            let kind=match action {game_hud::HEARTS=>Some("heart"),game_hud::POTIONS=>Some("potion"),_=>None};
+                                            pack_view.get_or_insert_with(||pack::PackView::observe(&r.run)).focus_kind(&r.run,kind);
+                                        }
+                                    }
                                     5 => {
                                         if tile_report.is_some() {
                                             tile_report = None;
@@ -2053,22 +2064,37 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     help_ui::ACTION => {}, // Help is routed before command dispatch.
                                     _ => screen = Screen::Menu,
                                 }
+                            } else if let Some(index)=painter.hud_tracks().item_at(x,y,
+                                painter.item_rail_offset.min(view.pack_hud.items.len().saturating_sub(painter.hud_tracks().item_rows())),
+                                view.pack_hud.items.len()) {
+                                let id=view.pack_hud.items[index].id;
+                                match pack::quick_item_action(&r.run,id) {
+                                    pack::PackAction::Target(target)=>{
+                                        if pending_item.as_ref()==Some(&target){pending_item=None;notice.clear();}
+                                        else {
+                                            pending_ability=None;
+                                            implant_attacker=None;
+                                            riptide_target.cancel();
+                                            notice=directional_zap_ui::prompt(&r.run,&target).into();
+                                            pending_item=Some(target);
+                                        }
+                                    }
+                                    pack::PackAction::Command(command)=>{
+                                        notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&command){
+                                            Ok(_)=>String::new(),Err(e)=>e.to_string(),
+                                        };
+                                    }
+                                    pack::PackAction::Notice(message)=>notice=message,
+                                    _=>{}
+                                }
                             } else if x >= painter.hud_left() + 10
-                                && y >= painter.frame().map.1+painter.frame().map.3-22
-                                && y < painter.frame().map.1+painter.frame().map.3
-                            {
-                                inspected_actor = view.creatures.first().map(|a| a.id);
-                                inspecting = true;
-                                creature_offset = 0;
-                                inventory = false;
-                            } else if x >= painter.hud_left() + 10
-                                && y >= ability_ui::top(&painter.profile)
-                                && y < ability_ui::top(&painter.profile)
-                                    + ability_ui::row(&painter.profile)
+                                && y >= painter.game_ability_top()
+                                && y < painter.game_ability_top()
+                                    + painter.game_ability_row()
                                         * painter.ability_capacity() as i32
                             {
-                                let i = ((y - ability_ui::top(&painter.profile))
-                                    / ability_ui::row(&painter.profile))
+                                let i = ((y - painter.game_ability_top())
+                                    / painter.game_ability_row())
                                     as usize;
                                 if let Some(id) = ability_ui::visible_abilities(&r.run)
                                     .get(i + ability_offset)
@@ -2080,13 +2106,14 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                         continue;
                                     }
                                     if id=="kative-cogworks" {
-                                        if let Some(mode)=cogworks_ui::bubble_hit(x,y,painter.hud_left(),ability_ui::top(&painter.profile)+i as i32*ability_ui::row(&painter.profile)) {
+                                        if let Some(mode)=cogworks_ui::bubble_hit(x+4,y-29,painter.hud_left(),painter.game_ability_top()+i as i32*painter.game_ability_row()) {
                                             notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&Command::Ability{id:id.clone(),target:Field::Value(mode as f64),x:Field::Missing,y:Field::Missing}){Ok(_)=>targeting_ui::cogworks_prompt(&r.run),Err(e)=>e.to_string()};
                                         }
                                     }
                                     if id == "kative-tinker" {
                                         let pv = pack_view
                                             .get_or_insert_with(|| pack::PackView::observe(&r.run));
+                                        pv.focus_kind(&r.run,None);
                                         let action = pv.begin_tinker(&r.run, &id);
                                         inventory = true;
                                         apply_pack_action(
@@ -2414,17 +2441,21 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             }
                         }
                     }
-                    if mouse_x >= painter.hud_left() + 10
-                        && (painter.frame().rail_bottom-22..painter.frame().rail_bottom).contains(&mouse_y)
-                    {
-                        if y < 0 {
-                            player_status_offset += 2;
-                        } else {
-                            player_status_offset = player_status_offset.saturating_sub(2);
+                    if painter.hud_tracks().status.contains(mouse_x,mouse_y) {
+                        if let Some(v)=cached_view.as_ref(){
+                            let max=v.player_meters.len().saturating_sub(3);
+                            player_status_offset=if y<0 {player_status_offset.saturating_add(3).min(max)}
+                                else {player_status_offset.saturating_sub(3)};
+                        }
+                    } else if painter.hud_tracks().items.contains(mouse_x,mouse_y) {
+                        if let Some(v)=cached_view.as_ref(){
+                            let max=v.pack_hud.items.len().saturating_sub(painter.hud_tracks().item_rows());
+                            painter.item_rail_offset=if y<0 {painter.item_rail_offset.saturating_add(1).min(max)}
+                                else {painter.item_rail_offset.saturating_sub(1)};
                         }
                     } else if mouse_x >= painter.hud_left() + 10
-                        && mouse_y >= ability_ui::top(&painter.profile)
-                        && mouse_y < ability_ui::top(&painter.profile)+ability_ui::row(&painter.profile)*painter.ability_capacity() as i32
+                        && mouse_y >= painter.game_ability_top()
+                        && mouse_y < painter.game_ability_top()+painter.game_ability_row()*painter.ability_capacity() as i32
                     {
                         if y < 0 {
                             ability_offset += 1;
@@ -2912,7 +2943,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 meter_tick = r.run.tick;
                                 view.measure_conditions(&mut condition_meters);
                                 view.player_status_offset = player_status_offset
-                                    .min(view.player_meters.len().saturating_sub(2));
+                                    .min(view.player_meters.len().saturating_sub(3));
                                 view.selected_actor = inspected_actor;
                                 view.path = travel.as_ref().map(|(t, _)| t.path())
                                     .or_else(|| autoexplore.path())
@@ -2970,7 +3001,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 let shutter_state=history.as_ref().and_then(|_|chronicle_overlay::bounds_painter(&painter,&shutter,now,reduced).and_then(|(x,y,w,h)|painter.logical_damage_rect(x,y,w,h)).map(|bounds|tile_overlay::Shutter{bounds,offset:shutter.offset}));
                                 let mut panels=Vec::new();
                                 if effects.plane_transition.is_some(){let b=painter.frame().map;panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}
-                                if !effects::inventory_marks(&effects.cues,now).is_empty(){panels.extend(painter.logical_damage_rect(0,painter.toolbar_y(),painter.logical_width(),64));panels.extend(painter.logical_damage_rect(painter.hud_left(),40,painter.logical_width()-painter.hud_left(),662));if let Some(pack)=pack_view.as_ref(){let b=pack.bounds();panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}}
+                                if !effects::inventory_marks(&effects.cues,now).is_empty(){panels.extend(painter.hud_damage());if let Some(pack)=pack_view.as_ref(){let b=pack.bounds();panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}}
                                 if inspecting{panels.extend(painter.sheet_damage_rect(333,121,644,587));}
                                 if tile_report.is_some(){let(x,y,w,h)=inspection_ui::bounds(&painter.profile);panels.extend(painter.sheet_damage_rect(x,y,w,h));}
                                 // Unclipped hazard prose retains its horizontal band. Ability
@@ -4166,7 +4197,7 @@ fn refresh_panel_hover(p:&mut Painter,v:&render::View,point:Option<(i32,i32)>,al
             let index=content.hit(x,y,p.enemy_list_offset);
             (index.and_then(|i|render::enemy_list::Content::actor(v,i)),index.and_then(|i|render::enemy_list::Content::ground(v,i)))
         }else{(from_map,map_ground.map(|i|{let g=&v.ground_entities[i];(g.x,g.y)}))};
-        let reveal=from_map.and_then(|id|v.creatures.iter().position(|a|a.id.to_bits()==id).map(|i|i+render::enemy_list::Content::stair_count(v)))
+        let reveal=from_map.and_then(|id|v.creatures.iter().position(|a|a.id.to_bits()==id).map(|i|i+v.ground_entities.len()))
             .or_else(||map_ground.map(|i|render::enemy_list::Content::row_for_ground(v,i)));
         if let Some(index)=reveal{p.enemy_list_offset=content.reveal(index,p.enemy_list_offset);}
         (enemy,ground,p.ability_inspect_at(v.abilities.len(),x,y))

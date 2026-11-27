@@ -31,7 +31,7 @@ impl Frame {
         let sidebar = crate::render::hud_left(p)+width-crate::render::WIDTH as i32;
         let command = changed_number(p, "ui.layout.buttonHeight", 42.).round() as i32 + 4;
         let top = chronicle + 12;
-        let bottom = crate::render::toolbar_y(p)+height-HEIGHT as i32-inspection_strip_height(p);
+        let bottom = height- crate::game_hud::FOOTER.max(inspection_strip_height(p));
         Self {
             map: Rect(
                 0,

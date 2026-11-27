@@ -801,6 +801,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 let presented=crate::creature_presentation::project(run,a);
                 let a=presented.as_ref().unwrap_or(a);
                 let mut row=crate::render::Creature {
+                    has_heart: (direct && presented.is_none() && !corpse_core::dreamwalking::is_body(a)).then(||corpse_core::debug_floor::natural_heart(a)),
                     perception_range: crate::perception_ui::range_label(run,a),
                     identity_outline: if corpse_core::dreamwalking::active(run) {None} else {cell.entity_ink.and_then(|ink|ink.identity_outline)},
                     hallucination: None,
@@ -920,6 +921,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         selected_actor: None,
         player_statuses: crate::statuses_ui::observe(run, &run.player),
         player_meters: Vec::new(),
+        pack_hud: crate::game_hud::observe(run),
         provenance: "Native migration test scene / incomplete port".into(),
         domain: run.floor().map(|f| f.domain.clone()).unwrap_or_default(),
         mode: if run.fast_mode.value_or(false) && !run.compressed_depths.value_or(false) { "Fast mode".into() } else { run.mode.clone() },

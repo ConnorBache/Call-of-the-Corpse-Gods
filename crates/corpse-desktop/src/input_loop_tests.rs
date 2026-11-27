@@ -22,6 +22,7 @@ enum Input {
     Click((usize, usize)),
     Toolbar(usize),
     Resize(u32, u32),
+    ClickHud(i32,i32),
 }
 struct Step {
     label: &'static str,
@@ -53,13 +54,24 @@ struct Script {
     pushed: bool,
     previous: Option<String>,
     reports: Vec<serde_json::Value>,
+    record: Option<Recording>,
+}
+// Optional test-only SDL readback. This records the production event loop,
+ // including real command and animation frames, rather than redraw a mockup.
+struct Recording {
+    pipe: std::process::ChildStdin,
+    since: std::time::Instant,
+    next: std::time::Instant,
+    frames: usize,
 }
 thread_local! { static SCRIPT: RefCell<Option<Script>> = const { RefCell::new(None) }; }
 
 pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Result<(), String> {
     SCRIPT.with(|slot| {
         let mut slot = slot.borrow_mut(); let Some(script) = slot.as_mut() else { return Ok(()); };
-        if script.pushed { return Err("Input script observed no completed frame".into()); }
+        if script.pushed {
+            return if script.record.is_some() {Ok(())} else {Err("Input script observed no completed frame".into())};
+        }
         let step = &script.steps[script.index];
         let events = sdl.event()?;
         for input in &step.inputs {
@@ -87,14 +99,23 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
                 },
                 Input::Toolbar(action) => {
                     let slot = render::TOOLBAR_VISIBLE_ACTIONS.iter().position(|id| id == action).unwrap();
-                    let (x, w) = p.game_toolbar_rect(slot);
+                    let rect=p.hud_tracks().button(slot);
+                    let (x,w)=(rect.0,rect.2);
                     let (ww, wh) = canvas.window().size();
                     let scale = render::canvas_scale(p.width,p.height,true);
                     Event::MouseButtonDown { timestamp: 0, window_id: canvas.window().id(), which: 0,
                         mouse_btn: MouseButton::Left, clicks: 1,
                         x: ((x + w / 2) as f64 * scale * ww as f64 / p.width as f64).round() as i32,
-                        y: ((p.toolbar_y() + 20) as f64 * scale * wh as f64 / p.height as f64).round() as i32 }
+                        y: ((rect.1+rect.3/2) as f64 * scale * wh as f64 / p.height as f64).round() as i32 }
                 },
+                Input::ClickHud(x,y) => {
+                    let (ww,wh)=canvas.window().size();
+                    let scale=render::canvas_scale(p.width,p.height,true);
+                    Event::MouseButtonDown { timestamp:0,window_id:canvas.window().id(),which:0,
+                        mouse_btn:MouseButton::Left,clicks:1,
+                        x:(*x as f64*scale*ww as f64/p.width as f64).round() as i32,
+                        y:(*y as f64*scale*wh as f64/p.height as f64).round() as i32 }
+                }
                 Input::Resize(w, h) => {
                     canvas.window_mut().set_size(*w, *h).map_err(|e| e.to_string())?;
                     Event::Window { timestamp: 0, window_id: canvas.window().id(),
@@ -104,6 +125,7 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
             events.push_event(event)?;
         }
         script.pushed = true;
+        if let Some(rec)=script.record.as_mut(){rec.since=std::time::Instant::now();}
         Ok(())
     })
 }
@@ -117,6 +139,19 @@ pub fn observe(canvas: &mut Canvas<Window>, p: &Painter, state: State<'_>) -> Re
     SCRIPT.with(|slot| {
         let mut slot = slot.borrow_mut(); let Some(script) = slot.as_mut() else { return Ok(false); };
         let step = &script.steps[script.index];
+        if let Some(rec)=script.record.as_mut() {
+            use std::{io::Write,time::{Duration,Instant}};
+            let now=Instant::now();
+            if p.width==2560 && p.height==1440 && now>=rec.next {
+                let rgba=canvas.read_pixels(None,PixelFormatEnum::RGBA32)?;
+                let copies=if rec.frames==0 {1} else { ((now-rec.next).as_millis()/40+1).min(30) as usize };
+                for _ in 0..copies { rec.pipe.write_all(&rgba).map_err(|e|e.to_string())?; }
+                rec.frames+=copies;
+                rec.next=now+Duration::from_millis(40);
+            }
+            let hold=if step.label=="bow-aim" {1400} else if step.inventory || step.label=="showcase" {1500} else {855};
+            if rec.since.elapsed()<Duration::from_millis(hold) {return Ok(false);}
+        }
         let check = |condition: bool, what: &str| if condition { Ok(()) } else { Err(format!("{}: unexpected {what}", step.label)) };
         check(state.screen == step.screen, "screen")?;
         check(state.cursor == step.cursor, "cursor ownership")?;
@@ -127,6 +162,11 @@ pub fn observe(canvas: &mut Canvas<Window>, p: &Painter, state: State<'_>) -> Re
         check(state.item == step.item, "item selector")?;
         check(state.ability == step.ability, "ability selector")?;
         let engine = state.engine.ok_or_else(|| format!("{}: missing run", step.label))?;
+        if step.label=="bow-fire"{
+            let arrows=engine.run.inventory.iter().filter(|i|corpse_core::inventory::is_arrow(i))
+                .map(corpse_core::inventory::quantity).sum::<f64>();
+            check(arrows==7.,"bow shot did not spend one arrow")?;
+        }
         if let Some((x,y)) = step.cogworks_wall {
             use corpse_core::revision50_terrain::{Cell, Kind};
             let floor = engine.run.floor().unwrap();
@@ -243,9 +283,12 @@ pub fn native_cogworks_wall(mut r: corpse_core::Run, directory: PathBuf) {
 }
 
 fn run_script(directory: PathBuf, software: bool, fixture: Option<PathBuf>, grid: cursor_ui::Grid, steps: Vec<Step>) {
+    run_script_record(directory,software,fixture,grid,steps,None);
+}
+fn run_script_record(directory: PathBuf, software: bool, fixture: Option<PathBuf>, grid: cursor_ui::Grid, steps: Vec<Step>, record:Option<Recording>) {
     let expected = steps.len();
     SCRIPT.with(|slot| *slot.borrow_mut() = Some(Script { directory:directory.clone(), grid, steps,
-        index:0,pushed:false,previous:None,reports:vec![] }));
+        index:0,pushed:false,previous:None,reports:vec![],record }));
     let mut args = vec!["corpse-desktop".into()];
     if let Some(fixture) = fixture {
         args.extend(["--fixture".into(), fixture.to_string_lossy().into_owned()]);
@@ -257,4 +300,51 @@ fn run_script(directory: PathBuf, software: bool, fixture: Option<PathBuf>, grid
     let result = run_app(args);
     let script = SCRIPT.with(|slot|slot.borrow_mut().take().unwrap());
     result.unwrap(); assert_eq!(script.index,expected);
+}
+
+
+#[test]
+#[ignore = "Optional native HUD walkthrough, SDL offscreen and ffmpeg"]
+fn record_mockup_hud_walkthrough() {
+    let Some(dir)=std::env::var_os("CORPSE_MOCKUP_CAPTURE") else{return;};
+    let dir=PathBuf::from(dir);
+    let run=crate::session_store::load_tracked(&dir.join("showcase-save.json")).unwrap().0;
+    let grid=cursor_grid(&run.run).unwrap();
+    let staging=dir.join("recording");
+    std::fs::create_dir_all(&staging).unwrap();
+    std::fs::copy(dir.join("showcase-save.json"),staging.join("save.json")).unwrap();
+    let mut p=Painter::new();
+    p.resize(2560,1440);
+    p.set_responsive_canvas(true);
+    let tracks=p.hud_tracks();
+    let click=|b:crate::modal_ui::Rect|Input::ClickHud(b.0+b.2/2,b.1+b.3/2);
+    let key=|key|Input::Key(key,Mod::NOMOD,false);
+    let mut steps=Vec::new();
+    let mut step=Step::game("showcase",vec![Input::Resize(2560,1440),key(Keycode::C)]);
+    step.readonly=false;step.capture=true;steps.push(step);
+    let v=observe::observe(&run.run);
+    let (x,y)=v.cells.iter().find_map(|c|c.actor_id.is_some_and(|id|Some(id)==v.creatures.first().map(|a|a.id)).then_some((c.x,c.y)))
+        .unwrap_or((grid.player.0+3,grid.player.1));
+    let mut step=Step::game("look-at-enemy",vec![Input::Motion((x,y))]);step.capture=true;steps.push(step);
+    let mut step=Step::game("bow-aim",vec![Input::ClickHud(tracks.items.0+20,tracks.items.1+32),Input::Motion((x,y))]);
+    step.item=true;steps.push(step);
+    let mut step=Step::game("bow-fire",vec![Input::Click((x,y))]);step.readonly=false;steps.push(step);
+    let mut step=Step::game("open-pot-inventory",vec![click(tracks.potions)]);step.inventory=true;steps.push(step);
+    steps.push(Step::game("close-pot-inventory",vec![key(Keycode::Escape)]));
+    let mut step=Step::game("open-heart-inventory",vec![click(tracks.hearts)]);step.inventory=true;steps.push(step);
+    steps.push(Step::game("close-heart-inventory",vec![key(Keycode::Escape)]));
+    let mut step=Step::game("wait-turn",vec![key(Keycode::Z)]);step.readonly=false;steps.push(step);
+    let slot=render::TOOLBAR_VISIBLE_ACTIONS.iter().position(|id|*id==help_ui::ACTION).unwrap();
+    let mut step=Step::game("help-from-header",vec![click(tracks.button(slot))]);step.help=true;steps.push(step);
+    steps.push(Step::game("back-to-dungeon",vec![key(Keycode::Escape)]));
+    let path=dir.join("Call-of-the-Corpse-Gods-HUD-1440p.mp4");
+    let mut ffmpeg=std::process::Command::new("ffmpeg")
+        .args(["-hide_banner","-loglevel","error","-y","-f","rawvideo","-pixel_format","rgba",
+               "-video_size","2560x1440","-framerate","25","-i","-","-an","-c:v","libx264",
+               "-preset","ultrafast","-threads","2","-crf","15","-pix_fmt","yuv420p","-movflags","+faststart"])
+        .arg(path).stdin(std::process::Stdio::piped()).spawn().unwrap();
+    let now=std::time::Instant::now();
+    let record=Recording {pipe:ffmpeg.stdin.take().unwrap(),since:now,next:now,frames:0};
+    run_script_record(staging,true,None,grid,steps,Some(record));
+    assert!(ffmpeg.wait().unwrap().success());
 }

@@ -136,7 +136,7 @@ mod tests {
     }
     fn admitted_view(run:&corpse_core::Run)->crate::render::View {
         let mut view=crate::observe::observe(run);
-        view.creatures=vec![crate::render::Creature {
+        view.creatures=vec![crate::render::Creature {has_heart:None,
             perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,
             id:4.,name:"Admitted apparent actor".into(),glyph:"?".into(),color:[255;3],state:"wandering".into(),
             distance:3.,hp:10.,max_hp:10.,energy:10.,max_energy:10.,uses_energy:false,statuses:vec![],meters:vec![],

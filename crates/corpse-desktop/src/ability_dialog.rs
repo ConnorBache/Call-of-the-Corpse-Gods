@@ -48,7 +48,7 @@ impl Layout {
         offset.min(last_page)
     }
 }
-fn top(p: &Painter) -> i32 { (crate::ability_ui::top(&p.profile) - 28).max(8) }
+fn top(p: &Painter) -> i32 { (p.game_ability_top() - 20).max(8) }
 fn transform(p: &Painter, width: i32) -> (f64, (i32, i32)) {
     let scale = p.scale * DIALOG_SCALE;
     let right = p.native_x(p.hud_left() as f64);

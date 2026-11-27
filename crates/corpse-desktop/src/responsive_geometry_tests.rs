@@ -8,7 +8,7 @@ fn responsive_extents_and_authored_sheets_use_their_own_native_scales(){
         assert_eq!(p.logical_width(),(w as f64/p.scale).ceil()as i32);
         assert_eq!(p.logical_height(),(h as f64/p.scale).ceil()as i32);
         assert_eq!(p.frame().sidebar,hud_left(&p.profile)+p.logical_width()-WIDTH as i32);
-        assert_eq!(p.toolbar_y(),toolbar_y(&p.profile)+p.logical_height()-HEIGHT as i32);
+        assert_eq!(p.hud_tracks().nav.1,0);
         let scale=p.scale;let sheet_scale=canvas_scale(w,h,false);let dimensions=(p.width,p.height);let length=p.pixels.len();
         p.centered_sheet(|sheet|{assert_eq!((sheet.logical_width(),sheet.logical_height()),(1280,800));assert!((sheet.scale-sheet_scale*DIALOG_SCALE).abs()<1e-9);});
         assert_eq!(p.origin,(0,0));assert_eq!(p.scale,scale);assert_eq!((p.width,p.height),dimensions);assert_eq!(p.pixels.len(),length);
@@ -48,25 +48,25 @@ fn baseline_game_grid_fits_the_whole_floor_and_preserves_hud_hit_targets() {
         p.set_responsive_canvas(true);
         assert_eq!((p.logical_width(), p.logical_height()), (1280, 720));
         let frame = p.frame();
-        assert_eq!(frame.map, crate::modal_ui::Rect(0, 112, 736, 528));
-        assert_eq!(frame.sidebar, 984);
+        assert_eq!(frame.map, crate::modal_ui::Rect(0, 96, 1024, 584));
+        assert_eq!(frame.sidebar, 1152);
         assert_eq!(frame.rail_bottom, 712);
         let (cw, ch, ox, oy) = p.map_layout(79, 29);
-        assert_eq!((cw, ch), (9, 14));
+        assert_eq!((cw, ch), (12, 20));
         assert!(frame.map.contains(ox, oy));
         assert!(frame.map.contains(ox + 79*cw - 1, oy + 29*ch - 1));
         let window = (width as u32, height as u32);
         for (slot, action) in TOOLBAR_VISIBLE_ACTIONS.into_iter().enumerate() {
-            let (x, w) = p.game_toolbar_rect(slot);
-            let point = (p.native_x((x + w/2) as f64), p.native_y((p.toolbar_y()+20) as f64));
+            let r=p.hud_tracks().button(slot);
+            let point=(p.native_x((r.0+r.2/2)as f64),p.native_y((r.1+r.3/2)as f64));
             let (hx, hy) = p.logical_point_for_canvas(point.0, point.1, window, true);
             assert_eq!(p.toolbar_action(hx, hy), Some(action));
         }
         assert_eq!(p.toolbar_action(frame.map.2, p.toolbar_y()+20), None);
-        let top=crate::ability_ui::top(&p.profile);
-        let row=crate::ability_ui::row(&p.profile);
+        let top=p.game_ability_top();
+        let row=p.game_ability_row();
         let count=p.ability_capacity();
-        assert!(top + row*count as i32 <= frame.rail_bottom-88);
+        assert!(top + row*count as i32 <= p.hud_tracks().items.1);
         assert_eq!(p.ability_inspect_at(100, frame.sidebar+20, top+row*count as i32),None);
     }
 }

@@ -68,13 +68,14 @@ pub fn hover(p:&Painter,report:&crate::inspection_ui::Report)->Option<Hover>{
 }
 /// Bounded panel keys are presentation state, not a cloned world Scene.
 #[derive(Clone,Copy,PartialEq,Eq)]
-pub struct PanelKeys{toolbar:Option<usize>,bestiary:bool,enemy:Option<u64>,ground:Option<(usize,usize)>,ability:Option<usize>,chronicle:bool,enemy_offset:usize}
+pub struct PanelKeys{toolbar:Option<usize>,bestiary:bool,enemy:Option<u64>,ground:Option<(usize,usize)>,ability:Option<usize>,chronicle:bool,enemy_offset:usize,item_offset:usize}
 impl PanelKeys{
- pub fn read(p:&Painter)->Self{Self{toolbar:p.toolbar_focus,bestiary:p.bestiary_unread,enemy:p.enemy_hover,ground:p.ground_hover,ability:p.ability_hover,chronicle:p.chronicle_hover,enemy_offset:p.enemy_list_offset}}
+ pub fn read(p:&Painter)->Self{Self{toolbar:p.toolbar_focus,bestiary:p.bestiary_unread,enemy:p.enemy_hover,ground:p.ground_hover,ability:p.ability_hover,chronicle:p.chronicle_hover,enemy_offset:p.enemy_list_offset,item_offset:p.item_rail_offset}}
  pub fn mark_changes(self,old:Option<Self>,p:&Painter,v:&View,plan:&mut crate::render::tile_damage::TilePlanner){
   let Some(old)=old else{plan.mark_native_rect(Rect::new(0,0,p.width,p.height));return;};let left=p.hud_left();let h=crate::render::chronicle_height(&p.profile);
   let mut mark=|x,y,w,hh|{if let Some(r)=p.logical_damage_rect(x,y,w,hh){plan.mark_native_rect(r);}};
-  if self.toolbar!=old.toolbar||self.bestiary!=old.bestiary{let y=p.toolbar_y()-24;mark(0,y,p.logical_width(),p.logical_height()-y);}
+  if self.toolbar!=old.toolbar||self.bestiary!=old.bestiary{let t=p.hud_tracks();for r in [t.nav,t.hearts,t.potions]{mark(r.0,r.1,r.2,r.3);}}
+  if self.item_offset!=old.item_offset{let r=p.hud_tracks().items;mark(r.0,r.1,r.2,r.3);}
   if self.ground!=old.ground||self.enemy!=old.enemy||self.enemy_offset!=old.enemy_offset{let entities=p.frame().map.2;mark(entities,0,left-entities,p.logical_height());}
   if self.ability!=old.ability{mark(left,0,p.logical_width()-left,p.logical_height());}
   if self.chronicle!=old.chronicle{mark(0,0,left,h+20);}
@@ -209,7 +210,7 @@ pub fn upload_plan(p:&Painter,force_full:bool)->UploadPlan{
  use super::*;
  #[test]fn two_bounded_inspector_selections_repaint_even_without_world_damage(){
   let r:corpse_core::Run=serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let mut v=crate::observe::observe(&r);
-  v.creatures=(1..=2).map(|id|crate::render::Creature{perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,id:id as f64,name:format!("Test creature {id}"),glyph:"b".into(),color:[220,180,30],state:"hunting".into(),distance:4.,hp:20.,max_hp:20.,energy:10.,max_energy:10.,uses_energy:true,statuses:Vec::new(),meters:Vec::new()}).collect();
+  v.creatures=(1..=2).map(|id|crate::render::Creature{has_heart:None,perception_range:None,identity_outline:None,hallucination:None,shared_resources:false,invulnerable:false,id:id as f64,name:format!("Test creature {id}"),glyph:"b".into(),color:[220,180,30],state:"hunting".into(),distance:4.,hp:20.,max_hp:20.,energy:10.,max_energy:10.,uses_energy:true,statuses:Vec::new(),meters:Vec::new()}).collect();
   let mut p=Painter::new();let mut full=Painter::new();let mut plan=crate::render::tile_damage::TilePlanner::default();let mut track=Tracker::default();plan.replace_view(None,&v,&p);
   for id in [1.,2.,2.]{let panel=p.logical_damage_rect(333,121,644,587).unwrap();let state=Frame{panels:vec![panel],inspector:Some((Some(f64::to_bits(id)),0)),..Default::default()};let marks=track.changes(&p,&state);for rect in marks{plan.mark_native_rect(rect);}finish_dependencies(&mut p,&mut plan,&state);plan.paint_base(&mut p,&v,"",0.);if !p.tile_mask.is_empty(){p.creatures(&v,Some(id),0);}p.tile_clip_enabled=false;
    full.game_at(&v,"",false,0.);full.creatures(&v,Some(id),0);if let Some(i)=p.pixels.iter().zip(&full.pixels).position(|(a,b)|a!=b){panic!("inspector{id}: differing byte{i}");}track.commit(state);plan.clear_frame();}
