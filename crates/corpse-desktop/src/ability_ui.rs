@@ -76,7 +76,11 @@ pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
     let mut result = std::borrow::Cow::Borrowed(text);
     for (old, new) in [
         ("Rage at the Dying of the Light", "Ragelight"),
-        ("You Shall Never Be Rid of Me", "Never Be Rid of Me"),
+        ("You Shall Never Be Rid of Me", "'Till Death"),
+        ("Never Be Rid of Me", "'Till Death"),
+        ("Relentless Pursuit", "Hunter"),
+        ("Shadow in the Dark", "Shadow cloak"),
+        ("Erase Metaphysical", "Erase"),
         ("See The Future", "Futuresight"),
         ("See the Future", "Futuresight"),
         ("Are You Sure About That?", "Redirect"),
@@ -1298,7 +1302,10 @@ mod revision50_ui_tests {
             let row=observe(&r,&a.id);
             let expected_name = match a.name.as_str() {
                 "Rage at the Dying of the Light" => "Ragelight",
-                "You Shall Never Be Rid of Me" => "Never Be Rid of Me",
+                "You Shall Never Be Rid of Me" => "'Till Death",
+                "Relentless Pursuit" => "Hunter",
+                "Shadow in the Dark" => "Shadow cloak",
+                "Erase Metaphysical" => "Erase",
                 "See The Future" => "Futuresight",
                 "Are You Sure About That?" => "Redirect",
                 "Dream of Time Gone By" => "Past Dream",
@@ -1714,8 +1721,8 @@ mod never_be_rid_name_tests {
         r.simulation_revision = 52.0.into();
         let id = "pelian-you-shall-never-be-rid-of-me";
         let before = serde_json::to_string(&r).unwrap();
-        assert_eq!(super::observe(&r,id).name,"Never Be Rid of Me");
-        assert_eq!(super::display_text("You Shall Never Be Rid of Me activates."),"Never Be Rid of Me activates.");
+        assert_eq!(super::observe(&r,id).name,"'Till Death");
+        assert_eq!(super::display_text("You Shall Never Be Rid of Me activates."),"'Till Death activates.");
         assert_eq!(serde_json::to_string(&r).unwrap(),before);
     }
 }

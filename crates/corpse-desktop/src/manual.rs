@@ -273,8 +273,9 @@ impl Manual {
                 if i == self.selected {
                     p.rect(INDEX_LEFT, y - 3, INDEX_RIGHT - INDEX_LEFT, 24, ink);
                 }
+                let name=if self.unlocked(id){crate::display_names::present(&e.name)}else{"".into()};
                 p.prose(
-                    if self.unlocked(id) { &e.name } else { "" },
+                    &name,
                     INDEX_LEFT + INDEX_LABEL_PAD,
                     y,
                     INDEX_LABEL_SIZE,
@@ -308,12 +309,13 @@ impl Manual {
         }
         let page=resolve_page(p,&displayed_entry,self.art.as_ref().map(|(_,a)|a));
         let layout=&page.content;
+        let title=crate::display_names::present(&entry.name).to_uppercase();
         let mut title_size = 50;
-        while p.prose_width(&entry.name.to_uppercase(), title_size, true) > 990 { title_size -= 1; }
+        while p.prose_width(&title, title_size, true) > 990 { title_size -= 1; }
         p.prose(&format!("{} / {}", entry.family.to_uppercase(), first_depth(&displayed_entry)
             .map(|d| format!("FIRST APPEARS AT DEPTH {d:02}"))
             .unwrap_or_else(|| "COMPANION".into())),248,26,16,ink,false);
-        p.prose(&entry.name.to_uppercase(),248,48,title_size,ink,true);
+        p.prose(&title,248,48,title_size,ink,true);
         p.rect(248,106,64,4,theme.accent);
         if let Some((_,art))=&self.art {
             let (x,y,aw,ah)=page.art;
@@ -744,7 +746,7 @@ fn fit_content_part(p:&Painter,entry:&Entry,width:i32,columns:bool,max_height:i3
                 String::new()
             };
             section(
-                &format!("{}{}", mechanic_heading(mechanic), cost),
+                &format!("{}{}", crate::ability_ui::display_text(mechanic_heading(mechanic)), cost),
                 effect_ranges::page_text(entry, mechanic).to_owned(),
             );
         }

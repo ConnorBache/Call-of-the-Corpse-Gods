@@ -2,6 +2,7 @@
 
 mod gameplay_pause;
 mod game_hud;
+mod display_names;
 mod health_warning;
 mod death_pause;
 #[cfg(test)] mod ending_video_capture;

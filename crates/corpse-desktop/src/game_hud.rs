@@ -509,6 +509,18 @@ mod tests {
     }
 
     #[test]
+    fn hud_rename_amulet_labels_keep_the_engine_effects() {
+        let r=sample();
+        for (effect,old,new) in [("teleportation","Amulet of Teleportation","Vanish Amulet"),("obstruction","Amulet of Obstruction","Wall Amulet")] {
+            let i=Item{kind:"amulet".into(),name:old.into(),effect:effect.to_string().into(),amulet_tier:9.0.into(),..Default::default()};
+            assert_eq!(crate::pack::ground_name(&r,&i),new);
+            assert!(crate::pack::displayed_name(&r,&i).ends_with(new));
+            assert_eq!(i.name,old);
+            assert_eq!(i.effect.as_ref().unwrap(),effect);
+        }
+    }
+
+    #[test]
     fn hud_font_audit() {
         use crate::typography_ui::Role;
         let mut r=sample();
@@ -521,13 +533,18 @@ mod tests {
             (p.measure_text_role(Role::Primary,&a.name,11)/width as f64,a.name)
         }).collect::<Vec<_>>();
         w.sort_by(|a,b|b.0.total_cmp(&a.0)); eprintln!("Divine names past width at size 11: {:?}",w.iter().filter(|a|a.0>1.).collect::<Vec<_>>());
-        let item_names=["Teleportation Amulet +8","Obstruction Amulet +8","Lightning Amulet +8","Beckoning Amulet +8","Ahvamitt Teleport","Shard of the Borge",
+        let item_names=["Vanish Amulet +8","Wall Amulet +8","Lightning Amulet +8","Beckoning Amulet +8","Ahvamitt Teleport","Shard of the Borge",
             "Firebolt Amulet +8","Poison Amulet +8","Iceblast Amulet +8","Blinking Amulet +8","Discord Amulet +8","Roots Amulet +8","Floods Amulet +8"];
         let mut w=item_names.into_iter().map(|a|(p.measure_text_role(Role::Primary,a,11)/(t.items.2-68)as f64,a)).collect::<Vec<_>>();
         w.sort_by(|a,b|b.0.total_cmp(&a.0));eprintln!("Item names past width at size 11: {:?}",w.iter().filter(|a|a.0>1.).collect::<Vec<_>>());
+        let floor_width=p.frame().sidebar-p.frame().map.2-28;
+        for n in ["! Potion of Fire Immunity (diluted)","! Potion of Teleportation (diluted)","; Blessed Hemomancer <heart> (marked)","; Blessed Ichor Leviathan <heart>","; Greater Pale Screamer <heart>"] {
+            eprintln!("Floor label at size 11: {:.2}×: {n}",p.measure_text_role(Role::Secondary,n,11)/floor_width as f64);
+        }
         let frame=p.frame();
         let mut names=corpse_core::population::catalog().actors.values().map(|a|{
             let name=corpse_core::revision50_creature_identity::display_name(&a.name);
+            let name=crate::display_names::present(&name);
             let label=format!("{} {name}",a.glyph);
             let width=frame.sidebar-frame.map.2-16-16-17;
             (p.measure_text_role(Role::Secondary,&label,12)/width as f64,label)
@@ -620,13 +637,20 @@ mod tests {
         r.exp=2.;
         // A staged late-build inventory on a compact generated floor. Do not
         // export this as a playable starting save or a scored run.
-        for ability in ["isheilah-tools-of-the-trade","kative-bottomless-pack","kative-appropriate",
-            "isheilah-make-slippery","isheilah-quick-hand","isheilah-are-you-sure-about-that",
-            "isheilah-spellslinger","numo-implant-thought","numo-distract","numo-mind-read",
-            "numo-mind-slave","numo-remember","anavani-shine","anavani-illuminate","anavani-commandment"] {
-            r.player.abilities.push(ability.into());
+        r.player.abilities = [
+            "shrail-rage-at-the-dying-of-the-light", "lichor-overflowing",
+            "pelian-you-shall-never-be-rid-of-me", "morae-see-the-future",
+            "morae-fortune-teller", "ursa-waking-nightmares", "kative-cogworks",
+            "isheilah-quick-hand", "pelian-relentless-pursuit",
+            "dawel-shadow-in-the-dark", "grisha-erase-metaphysical", "numo-mind-read",
+            "isheilah-tools-of-the-trade", "kative-bottomless-pack", "kative-appropriate",
+        ].into_iter().map(str::to_owned).collect();
+        for (key,value) in [("rageCost",16.),("overflowingSaves",3.),("fortunes",2.),("nightmareAt",r.tick+42.)] {
+            r.player.conditions.insert(key.into(),value);
         }
-        r.player.abilities.drain(..3);
+        r.player.reactions=2.0.into();
+        r.player.nightmares=3.0.into();
+        r.future_floor=Some(corpse_core::future_floor::State{depth:r.depth,anchor:None,used_floors:vec![1.,3.,5.]});
         assert_eq!(r.player.abilities.len(),15);
         corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
         r.dreamwalking=corpse_core::dreamwalking::State{unlocked:true,..Default::default()}.into();
@@ -725,6 +749,9 @@ mod tests {
             assert!(meters.iter().take(STATUS_SLOTS).any(|m|m.name.starts_with(name)),"missing preview status {name}: {meters:?}");
         }
         assert_eq!(view.total_abilities,15);
+        assert_eq!(view.abilities.iter().filter(|a|a.indicator.is_some()||a.fortunes.is_some()).count(),7);
+        for name in ["'Till Death","Hunter","Shadow cloak","Erase"] {assert!(view.abilities.iter().any(|a|a.name==name));}
+        for name in ["Vanish Amulet","Wall Amulet"] {assert!(view.pack_hud.items.iter().any(|a|a.label==name));}
         assert_eq!(view.pack_hud.items[0].label,"Ahvamitt Teleport");
         assert_eq!(view.pack_hud.items[1].label,"Dreamwalk");
         assert_eq!(view.pack_hud.rings.len(),13);

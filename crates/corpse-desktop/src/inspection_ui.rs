@@ -200,7 +200,7 @@ fn creature_title_base(a: &Actor) -> String {
     if corpse_core::monster_vampire::flying(a) {
         return "Vampire Bat".into();
     }
-    a.name.clone()
+    crate::display_names::present(&a.name).into_owned()
 }
 fn flavor(a: &Actor) -> String {
     if a.creature_kind.as_ref().is_some_and(|kind| kind=="ahvamitt") {

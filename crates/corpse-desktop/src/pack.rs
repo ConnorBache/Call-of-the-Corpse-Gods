@@ -1278,7 +1278,7 @@ fn longest_tinkered_amulet_name(p: &Painter, revision: f64) -> String {
         let item = Item { kind: "amulet".into(), effect: effect.to_string().into(), ..Default::default() };
         let name = corpse_core::revision50_amulet_effects::display_name(&item).unwrap();
         for a in progression::catalog_for_revision(revision).iter().filter(|a| !a.id.starts_with("kative-")) {
-            let ability = match a.id.as_str() { "shrail-rage-at-the-dying-of-the-light" => "Ragelight", "pelian-you-shall-never-be-rid-of-me" => "Never Be Rid of Me", _ => &a.name };
+            let ability = crate::ability_ui::display_text(&a.name);
             let label = jewelry_label(format!("Tier 4 {name} and {ability}"), "Amulet", false);
             let measured = p.measure_text_role(Role::Inventory, &label, 14);
             if measured > width { width = measured; longest = label; }
@@ -1632,6 +1632,7 @@ fn jewelry_label(name: String, kind: &str, floor: bool) -> String {
     let of = match kind { "Ring" => "Ring of ", _ => "Amulet of " };
     let Some(effect) = body.strip_prefix(of) else { return name; };
     let (effect, grant) = effect.split_once(" and ").map_or((effect,None),|(effect,grant)|(effect,Some(grant)));
+    let effect = match (kind,effect) {("Amulet","Teleportation")=>"Vanish",("Amulet","Obstruction")=>"Wall",_=>effect};
     if floor { return format!("{effect} {kind}"); }
     let prefix = &name[..name.len()-body.len()];
     grant.map_or_else(||format!("{prefix}{effect} {kind}"),|g|format!("{prefix}{effect} {kind} and {g}"))
@@ -1675,6 +1676,8 @@ pub(crate) fn displayed_name(run: &Run, i: &Item) -> String {
         i.name.clone()
     };
     let name = if let Some(kind) = jewelry_kind(i) { jewelry_label(name,kind,false) } else { name };
+    let name = if jewelry_kind(i).is_some() {crate::ability_ui::display_text(&name).into_owned()}
+        else if i.kind=="heart" {crate::display_names::present(&name).into_owned()} else {name};
     let name = name.replace("Potion of Offense", "Potion of Damage").replace("Potion of Defense", "Potion of HP").replace("Potion of offense", "Potion of Damage").replace("Potion of defense", "Potion of HP");
     let name = if !corpse_core::revision50::enabled(run) && marked_heart(i) { format!("{name} (marked)") } else { name };
     match magic_nature(run, i) {

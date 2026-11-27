@@ -231,7 +231,7 @@ pub fn present(message: &str) -> String {
             break;
         }
     }
-    output
+    crate::display_names::present(&output).into_owned()
 }
 
 #[cfg(test)]

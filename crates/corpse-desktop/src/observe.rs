@@ -413,7 +413,7 @@ fn actor_cell_presented(profile:&crate::appearance_profile::Profile,run:&Run,a:&
         label: { let label = if body { "Your sleeping body".into() } else if corpse_core::monster_vampire::flying(a) {
             "Vampire Bat".into()
         } else {
-            a.name.clone()
+            crate::display_names::present(&a.name).into_owned()
         }; if marked { format!("{label} · Borge-marked") } else { label } },
         emphasis: entity.emphasis,
         pulse_speed: entity.speed,

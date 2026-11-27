@@ -16,10 +16,11 @@ fn behavior(r: &Run, a: &Actor) -> Vec<String> {
             rows.push("Magickal Caster.".into());
         } else if let Some(d) = corpse_core::progression::definition_for_revision(rev, id) {
             let active = a.active.contains(id);
+            let name=crate::ability_ui::display_text(&d.name);
             if d.flags.iter().any(|f| f == "passive") || active {
-                rows.push(format!("{}: {}", d.name, crate::ability_ui::display_description(r, id, &d.description)));
+                rows.push(format!("{}: {}", name, crate::ability_ui::display_description(r, id, &d.description)));
             } else {
-                rows.push(format!("Carries {}.", d.name));
+                rows.push(format!("Carries {name}."));
             }
         }
     }
