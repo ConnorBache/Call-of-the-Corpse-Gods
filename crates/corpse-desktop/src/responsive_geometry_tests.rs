@@ -48,11 +48,11 @@ fn baseline_game_grid_fits_the_whole_floor_and_preserves_hud_hit_targets() {
         p.set_responsive_canvas(true);
         assert_eq!((p.logical_width(), p.logical_height()), (1280, 720));
         let frame = p.frame();
-        assert_eq!(frame.map, crate::modal_ui::Rect(0, 96, 1024, 584));
-        assert_eq!(frame.sidebar, 1152);
+        assert_eq!(frame.map, crate::modal_ui::Rect(0, 76, 952, 532));
+        assert_eq!(frame.sidebar, 1116);
         assert_eq!(frame.rail_bottom, 712);
         let (cw, ch, ox, oy) = p.map_layout(79, 29);
-        assert_eq!((cw, ch), (12, 20));
+        assert_eq!((cw, ch), (11, 18));
         assert_eq!(ox, frame.map.0);
         assert_eq!(crate::pointer_tile_dimensions(&p,79,29,ox,oy),Some((0,0)));
         assert_eq!(crate::pointer_tile_dimensions(&p,79,29,ox-1,oy),None);

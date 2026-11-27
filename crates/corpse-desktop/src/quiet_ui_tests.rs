@@ -19,7 +19,7 @@ fn capture(name:&str,p:&Painter){
 }
 #[test]
 fn quiet_ui_toolbar_contains_only_bestiary_help_and_menu(){
-    assert_eq!(TOOLBAR_ACTIONS,["Bestiary","?","Menu"]);
+    assert_eq!(TOOLBAR_ACTIONS,["Bestiary","?","Main Menu"]);
     assert_eq!(TOOLBAR_VISIBLE_ACTIONS,[7,crate::help_ui::ACTION,9]);
     let mut p=Painter::new();
     for(w,h)in [(1280,800),(1920,1080),(1537,911),(960,1200)]{

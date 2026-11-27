@@ -2148,7 +2148,7 @@ impl Painter {
     }
     pub fn hud_damage(&self)->impl Iterator<Item=damage::Rect>+'_ {
         let t=self.hud_tracks();
-        [t.resources,t.nav,t.stats,t.hearts,t.potions,t.divine,t.items].into_iter().filter_map(|r|
+        [t.resources,t.nav,t.depth,t.stats,t.gods,t.rings,t.hearts,t.potions,t.divine,t.items].into_iter().filter_map(|r|
             self.logical_damage_rect(r.0,r.1,r.2,r.3))
     }
     pub fn footer_damage(&self) -> Option<damage::Rect> {
@@ -2178,6 +2178,9 @@ impl Painter {
         (state,cost,right-cw)
     }
     pub fn condition_meter(&mut self, m: &crate::statuses_ui::Meter, x: i32, y: i32, w: i32) {
+        self.condition_meter_tinted(m,x,y,w,[193,138,255]);
+    }
+    pub fn condition_meter_tinted(&mut self, m: &crate::statuses_ui::Meter, x: i32, y: i32, w: i32, tint:Rgb) {
         let label = self.condition_meter_label(m,w);
         self.text_role(
             crate::typography_ui::Role::Secondary,
@@ -2185,7 +2188,7 @@ impl Painter {
             x,
             y,
             13,
-            [193, 138, 255],
+            tint,
         );
         if m.duration.is_some() {
             self.rect(x, y + 18, w, 3, [36, 41, 53]);
@@ -2194,11 +2197,11 @@ impl Painter {
                 y + 18,
                 (w as f64 * m.percent / 100.).clamp(0., w as f64) as i32,
                 3,
-                [193, 138, 255],
+                tint,
             );
             if !m.reference_known {
                 for dx in (0..w).step_by(5) {
-                    self.rect(x + dx, y + 17, 2, 1, [193, 138, 255]);
+                    self.rect(x + dx, y + 17, 2, 1, tint);
                 }
             }
         }
@@ -2756,9 +2759,11 @@ impl Painter {
         }
         #[cfg(test)]
         drop(_paint_map);
-        crate::game_hud::paint_resources(self,v,hud);
+        crate::game_hud::paint_resources(self,v,hud,now);
         crate::game_hud::paint_nav(self,hud);
+        crate::game_hud::paint_depth(self,v,hud);
         crate::game_hud::panel(self,hud.divine);
+        crate::game_hud::scroll_mark(self,hud.divine,v.total_abilities,self.ability_capacity(),v.total_abilities.saturating_sub(v.abilities.len()));
         crate::game_hud::paint_item_rail(self,v,hud);
         if self.intersects_damage(map_right,0,left-map_right,self.logical_height()) {
             #[cfg(test)]

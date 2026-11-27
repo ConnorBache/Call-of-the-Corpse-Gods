@@ -100,18 +100,14 @@ impl Content {
             if black_b {if let Some(line)=card.lines.first_mut(){line.black_initial=true;}}
             for line in &mut card.lines {line.outline=a.identity_outline;}
             y+=1;
-            if !a.shared_resources && layout.bounds.2>=180 {
-                for (name,value,max,color,invulnerable) in [
-                    ("Health",a.hp,a.max_hp,[255,48,85],a.invulnerable),
-                    ("Energy",a.energy,a.max_energy,[36,223,255],false),
-                ].into_iter().take(if a.uses_energy {2} else {1}) {
-                    let display=if invulnerable {"Invulnerable".into()} else {
-                        format!("{:.0}/{}",if name=="Health" {crate::stat_presentation::current_health(value)} else {value},super::resource_max_label(max))
-                    };
-                    card.bars.push(Bar{y,label:name.into(),value:display,
-                        fraction:if invulnerable {1.} else {(value/if max.is_infinite(){100.}else{max.max(1.)}).clamp(0.,1.)},color});
-                    y+=26;
-                }
+            if !a.shared_resources && a.state != "sensed" {
+                let display=if a.invulnerable {"Immune".into()} else {
+                    format!("{:.0}/{}",crate::stat_presentation::current_health(a.hp),super::resource_max_label(a.max_hp))
+                };
+                card.bars.push(Bar{y,label:"HP".into(),value:display,
+                    fraction:if a.invulnerable {1.} else {(a.hp/if a.max_hp.is_infinite(){100.}else{a.max_hp.max(1.)}).clamp(0.,1.)},
+                    color:super::game_color(&p.profile,"ui.colors.health")});
+                y+=19;
             }
             if !a.state.is_empty() && !a.statuses.iter().any(|s| crate::statuses_ui::display_name(&s.name).eq_ignore_ascii_case(&a.state)) {
                 let mut chars=a.state.chars();
@@ -190,7 +186,7 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         }
         for bar in &card.bars {
             let w=(layout.rows.2-16).max(1);let yy=y+bar.y;
-            super::resource_ui::paint_bar(p,&bar.label,&bar.value,layout.rows.0+4,yy,w,24,bar.color,bar.fraction,11);
+            super::resource_ui::paint_bar(p,&bar.label,&bar.value,layout.rows.0+4,yy,w,16,bar.color,bar.fraction,11);
         }
         p.rect(layout.rows.0+4,y+card.height-3,(layout.rows.2-16).max(1),1,[36,30,46]);
     }
@@ -258,8 +254,8 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
                 let(cw,ch,ox,oy)=p.map_layout(mw,mh);let frame=p.frame();
                 let l=Layout::resolve_frame(&p.profile,ox,frame);
                 assert!(l.bounds.2>=RESERVED_WIDTH-16);assert!(l.rows.3>0);
-                assert_eq!(ox+cw*mw as i32,frame.map.2-12);assert_eq!(l.bounds.0,frame.map.2);assert_eq!(l.bounds.0+l.bounds.2,frame.sidebar);assert!(oy>=frame.map.1);
-                assert!(oy+ch*mh as i32<=frame.map.1+frame.map.3-20);
+                assert_eq!(ox,frame.map.0);assert!(ox+cw*mw as i32<=frame.map.2);assert_eq!(l.bounds.0,frame.map.2);assert_eq!(l.bounds.0+l.bounds.2,frame.sidebar);assert!(oy>=frame.map.1);
+                assert!(oy+ch*mh as i32<=frame.map.1+frame.map.3);
                 let px=p.native_x((ox+cw*(mw as i32-1)+cw/2)as f64);let py=p.native_y((oy+ch*(mh as i32-1)+ch/2)as f64);
                 let(x,y)=p.logical_point(px,py,(w as u32,h as u32));
                 assert_eq!(((x-ox)/cw,(y-oy)/ch),(mw as i32-1,mh as i32-1));
@@ -272,10 +268,10 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         v.creatures.truncate(1);v.creatures[0].shared_resources=false;v.creatures[0].invulnerable=false;
         v.creatures[0].max_hp=100.;v.creatures[0].hp=0.25;
         let c=l.content(&p,&v.creatures);
-        assert!(c.cards[0].bars.iter().any(|bar|bar.label=="Health"&&bar.value=="1/100"));
+        assert!(c.cards[0].bars.iter().any(|bar|bar.label=="HP"&&bar.value=="1/100"));
         assert_eq!(c.cards[0].bars[0].fraction,0.0025);
         v.creatures[0].hp=0.;let c=l.content(&p,&v.creatures);
-        assert!(c.cards[0].bars.iter().any(|bar|bar.label=="Health"&&bar.value=="0/100"));
+        assert!(c.cards[0].bars.iter().any(|bar|bar.label=="HP"&&bar.value=="0/100"));
     }
     #[test] fn every_dense_preview_and_every_long_condition_remains_reachable() {
         let mut v=view();let mut template=v.creatures[0].clone();template.uses_energy=true;
@@ -283,7 +279,7 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         let p=Painter::new();let(_,_,ox,_)=p.map_layout(v.width,v.height);let l=Layout::resolve_frame(&p.profile,ox,p.frame());let c=l.content(&p,&v.creatures);
         assert!(c.cards[0].height>l.rows.3);
         for(i,card)in c.cards.iter().enumerate(){
-            assert!(card.bars.iter().any(|b|b.label=="Health"));assert!(card.bars.iter().any(|b|b.label=="Energy"));
+            assert_eq!(card.bars.len(),1);assert_eq!(card.bars[0].label,"HP");
             for line in &card.lines {let at=(card.top+line.y)as usize;let off=c.offset(at);let y=l.rows.1+at as i32-off as i32;assert_eq!(c.hit(l.rows.0+4,y,off),Some(i));}
         }
         assert_eq!(c.hit(l.rows.0-1,l.rows.1,0),None);assert_eq!(c.hit(l.rows.0,l.rows.1+l.rows.3,0),None);
@@ -294,7 +290,7 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         let engine=corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let before=engine.save().unwrap();let mut v=crate::observe::observe(&engine.run);
         let mut a=v.creatures[0].clone();a.max_energy=f64::INFINITY;a.uses_energy=true;a.invulnerable=true;a.shared_resources=false;v.creatures=vec![a.clone()];
         let mut p=Painter::new();let(_,_,ox,_)=p.map_layout(v.width,v.height);let l=Layout::resolve_frame(&p.profile,ox,p.frame());let c=l.content(&p,&v.creatures);
-        assert!(c.cards[0].bars.iter().any(|b|b.value=="Invulnerable"));assert!(c.cards[0].bars.iter().any(|b|b.value.contains('∞')));
+        assert_eq!(c.cards[0].bars.len(),1);assert_eq!(c.cards[0].bars[0].value,"Immune");
         v.creatures[0].shared_resources=true;let c=l.content(&p,&v.creatures);assert!(!c.cards[0].lines.iter().any(|l|l.text.contains("Shares")));assert!(c.cards[0].bars.is_empty());
         v.creatures[0]=a;p.game_at(&v,"",false,0.);assert_eq!(engine.save().unwrap(),before);
         if let Ok(path)=std::env::var("ENEMY_LIST_SCREENSHOT"){let file=std::fs::File::create(path).unwrap();let mut encoder=png::Encoder::new(file,p.width as u32,p.height as u32);encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);encoder.write_header().unwrap().write_image_data(&p.pixels).unwrap();}
@@ -514,10 +510,13 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         let a=&mut v.creatures[0];a.state="hunting".into();a.statuses.clear();a.perception_range=None;a.shared_resources=false;a.uses_energy=true;
         let p=Painter::new();let layout=Layout::resolve_frame(&p.profile,0,p.frame());let c=layout.content(&p,&v.creatures);let card=&c.cards[0];
         let state=card.lines.iter().find(|l|l.text=="Hunting").unwrap();
-        assert_eq!(card.bars.len(),2);
+        assert_eq!(card.bars.len(),1);
+        assert_eq!(card.bars[0].label,"HP");
         assert!(card.bars[0].y<state.y);
-        assert_eq!(state.y,card.bars[1].y+26);
+        assert_eq!(state.y,card.bars[0].y+19);
         assert!(card.bars[0].y-card.lines[0].y<=22);
         assert!(card.height>=state.y+11+3);
+        v.creatures[0].state="sensed".into();
+        assert!(layout.content(&p,&v.creatures).cards[0].bars.is_empty(),"sensing a creature should not reveal its HP");
     }
 }

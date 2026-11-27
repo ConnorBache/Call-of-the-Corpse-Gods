@@ -322,6 +322,11 @@ fn record_mockup_hud_walkthrough() {
     let mut steps=Vec::new();
     let mut step=Step::game("showcase",vec![Input::Resize(2560,1440),key(Keycode::C)]);
     step.readonly=false;step.capture=true;steps.push(step);
+    // A visible stair has inspector prose but no item/creature popup.
+    let stair=observe::observe(&run.run).ground_entities.iter()
+        .find(|row|row.kind==render::enemy_list::GroundKind::Stair).map(|row|(row.x,row.y)).unwrap();
+    let mut step=Step::game("showcase-inspector",vec![Input::Motion(stair)]);
+    step.capture=true;steps.push(step);
     let (jx,jy): (usize,usize) = serde_json::from_slice(&std::fs::read(dir.join("jewelry-location.json")).unwrap()).unwrap();
     let mut step=Step::game("look-at-flight-ring",vec![Input::Motion((jx,jy))]);step.capture=true;steps.push(step);
     let v=observe::observe(&run.run);
@@ -335,6 +340,9 @@ fn record_mockup_hud_walkthrough() {
     steps.push(Step::game("close-pot-inventory",vec![key(Keycode::Escape)]));
     let mut step=Step::game("open-heart-inventory",vec![click(tracks.hearts)]);step.inventory=true;steps.push(step);
     steps.push(Step::game("close-heart-inventory",vec![key(Keycode::Escape)]));
+    steps.push(Step::game("divine-abilities-next-page",vec![key(Keycode::PageDown)]));
+    steps.push(Step::game("divine-abilities-another-page",vec![key(Keycode::PageDown)]));
+    steps.push(Step::game("divine-abilities-back-to-dreamwalk",vec![key(Keycode::PageUp),key(Keycode::PageUp)]));
     let mut step=Step::game("open-full-pack-by-key",vec![key(Keycode::I)]);step.inventory=true;steps.push(step);
     steps.push(Step::game("close-full-pack",vec![key(Keycode::Escape)]));
     let mut step=Step::game("wait-turn",vec![key(Keycode::Z)]);step.readonly=false;steps.push(step);

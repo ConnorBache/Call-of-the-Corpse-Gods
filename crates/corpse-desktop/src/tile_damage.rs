@@ -156,6 +156,9 @@ impl TilePlanner{
     && self.last_time.map(|t| mind_read_ink(f64::from_bits(t))) != Some(mind_read_ink(time)) {
    mark_mind_read(p, v, |rect| self.mark_native_rect(rect));
   }
+  if let Some(rect)=crate::game_hud::status_animation_damage(p,v,self.last_time.map(f64::from_bits),time) {
+   self.mark_native_rect(rect);
+  }
   self.last_time=Some(time.to_bits());
  }
  /// Rebuild exact mask from retained frame marks; repeated calls preserve marks.

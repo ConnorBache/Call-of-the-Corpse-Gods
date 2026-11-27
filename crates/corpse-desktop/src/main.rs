@@ -2442,9 +2442,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     }
                     if painter.hud_tracks().status.contains(mouse_x,mouse_y) {
                         if let Some(v)=cached_view.as_ref(){
-                            let max=v.player_meters.len().saturating_sub(3);
-                            player_status_offset=if y<0 {player_status_offset.saturating_add(3).min(max)}
-                                else {player_status_offset.saturating_sub(3)};
+                            let max=v.player_meters.len().saturating_sub(game_hud::STATUS_SLOTS);
+                            player_status_offset=if y<0 {player_status_offset.saturating_add(game_hud::STATUS_SLOTS).min(max)}
+                                else {player_status_offset.saturating_sub(game_hud::STATUS_SLOTS)};
                         }
                     } else if painter.hud_tracks().items.contains(mouse_x,mouse_y) {
                         if let Some(v)=cached_view.as_ref(){
@@ -2942,7 +2942,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 meter_tick = r.run.tick;
                                 view.measure_conditions(&mut condition_meters);
                                 view.player_status_offset = player_status_offset
-                                    .min(view.player_meters.len().saturating_sub(3));
+                                    .min(view.player_meters.len().saturating_sub(game_hud::STATUS_SLOTS));
                                 view.selected_actor = inspected_actor;
                                 view.path = travel.as_ref().map(|(t, _)| t.path())
                                     .or_else(|| autoexplore.path())
@@ -3855,7 +3855,7 @@ mod menu_seed_creation_tests {
 /// O(registered profile entries + cached cells) worst case; dream flag short-circuits O(1).
 /// Only redraw eligibility; no observation, simulation state or RNG access.
 fn cached_view_needs_idle_paint(v:&render::View,p:&appearance_profile::Profile)->bool {
-    v.dreamwalking || !v.ability_overlays.mind_read.is_empty()
+    v.dreamwalking || game_hud::status_burning_visible(v) || !v.ability_overlays.mind_read.is_empty()
         || appearance_light::animated(p) || appearance_material::animated(p)
         || v.cells.iter().any(|c|!c.animations.is_empty()||c.pulse_speed!=0.||c.fire_flicker)
         || (p.number("path.animationSpeed")>0.&&!v.path.is_empty())

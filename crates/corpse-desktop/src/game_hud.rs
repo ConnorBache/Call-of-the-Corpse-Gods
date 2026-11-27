@@ -4,16 +4,15 @@ use corpse_core::{Item, Run};
 
 pub const HEARTS: usize = 18;
 pub const POTIONS: usize = 19;
-pub const RAIL_WIDTH: i32 = 128;
-pub const HEADER: i32 = 96;
-pub const FOOTER: i32 = 40;
+pub const RAIL_WIDTH: i32 = 164;
+pub const HEADER: i32 = 76;
+pub const FOOTER: i32 = 112;
 pub const ITEM_ROW: i32 = 34;
 pub const RAIL_INSET: i32 = 8;
-pub const NAV: [(usize, &str); 3] = [(7, "Bestiary"), (crate::help_ui::ACTION, "?"), (9, "Menu")];
-const NAV_WIDTHS: [i32; NAV.len()] = [82, 32, 62];
-const NAV_GAP: i32 = 6;
-const NAV_INSET: i32 = 8;
-const NAV_WIDTH: i32 = NAV_WIDTHS[0] + NAV_WIDTHS[1] + NAV_WIDTHS[2] + 2 * NAV_GAP + 2 * NAV_INSET;
+pub const STATUS_SLOTS: usize = 4;
+pub const NAV: [(usize, &str); 3] = [(7, "Bestiary"), (crate::help_ui::ACTION, "?"), (9, "Main Menu")];
+const NAV_WIDTH: i32 = 168;
+const DEPTH_WIDTH: i32 = 80;
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct PackHud {
@@ -22,6 +21,10 @@ pub struct PackHud {
     pub heart_capacity: Option<u32>,
     pub potion_capacity: Option<u32>,
     pub items: Vec<ItemAction>,
+    pub rings: Vec<String>,
+    pub shards: u32,
+    pub borge_shards: u32,
+    pub ring_capacity: Option<u32>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -45,6 +48,7 @@ pub fn observe(run: &Run) -> PackHud {
     if corpse_core::revision50_inventory::enabled(run) {
         let capacity = corpse_core::revision50_inventory::capacity(run);
         out.heart_capacity = Some(capacity.hearts as u32);
+        out.ring_capacity = Some(capacity.rings as u32);
         out.potion_capacity = Some(capacity.potions as u32);
     }
     let mut arrows = 0.;
@@ -53,6 +57,9 @@ pub fn observe(run: &Run) -> PackHud {
         match i.kind.as_str() {
             "heart" => out.hearts = out.hearts.saturating_add(n),
             "potion" => out.potions = out.potions.saturating_add(n),
+            "ring" if corpse_core::revision50_inventory::active(run,i) => out.rings.push(crate::pack::ground_name(run,i)),
+            _ if corpse_core::borge::is_shard(i) => out.borge_shards = out.borge_shards.saturating_add(n),
+            _ if corpse_core::phantasmii_generation::is_shard(i) => out.shards = out.shards.saturating_add(n),
             _ => {}
         }
         if corpse_core::inventory::is_arrow(i) { arrows += n as f64; }
@@ -83,9 +90,12 @@ pub struct Tracks {
     pub chronicle: Rect,
     pub resources: Rect,
     pub status: Rect,
+    pub depth: Rect,
     pub nav: Rect,
     pub inspector: Rect,
     pub stats: Rect,
+    pub gods: Rect,
+    pub rings: Rect,
     pub hearts: Rect,
     pub potions: Rect,
     pub divine: Rect,
@@ -99,34 +109,46 @@ impl Tracks {
         let h=p.logical_height();
         let header=map.1;
         let foot=map.1+map.3;
-        let cut=map.2-NAV_WIDTH;
-        let stats_width=216;
-        let supply=104;
+        let width=p.logical_width();
+        // The player bars begin at column 87.5 of the reference grid, before the side rails.
+        let resources_x=map.2-252;
+        let depth_x=resources_x-DEPTH_WIDTH;
+        let cut=depth_x-NAV_WIDTH;
+        let stats_width=192;
+        let supply=120;
         let stats_x=map.2-stats_width-2*supply;
-        let item_height=((h-header)/3).clamp(128,224);
-        let split=h-item_height;
+        let footer_height=h-foot;
+        let footer_split=foot+(footer_height*43)/100;
+        let split=header+((h-header)/4).clamp(176,216);
         Self {
             chronicle:Rect(0,0,cut,header),
-            resources:Rect(map.2,0,p.logical_width()-map.2,header),
-            status:Rect(map.2+10,33,p.logical_width()-map.2-20,23),
+            resources:Rect(resources_x,0,width-resources_x,header),
+            status:Rect(resources_x+10,29,width-resources_x-20,21),
             nav:Rect(cut,0,NAV_WIDTH,header),
-            inspector:Rect(0,foot,stats_x,h-foot),
-            stats:Rect(stats_x,foot,stats_width,h-foot),
-            hearts:Rect(map.2-2*supply+5,foot+3,supply-10,h-foot-6),
-            potions:Rect(map.2-supply+5,foot+3,supply-10,h-foot-6),
+            depth:Rect(depth_x,0,DEPTH_WIDTH,header),
+            inspector:Rect(0,foot,stats_x,footer_split-foot),
+            gods:Rect(0,footer_split,stats_x,h-footer_split),
+            stats:Rect(stats_x,foot,stats_width,footer_split-foot),
+            rings:Rect(stats_x,footer_split,stats_width,h-footer_split),
+            hearts:Rect(map.2-2*supply+4,foot+4,supply-8,footer_height-8),
+            potions:Rect(map.2-supply+4,foot+4,supply-8,footer_height-8),
             divine:Rect(frame.sidebar,header,rail,split-header),
             items:Rect(frame.sidebar,split,rail,h-split),
         }
     }
     pub fn button(self,slot:usize)->Rect {
-        let x = self.nav.0 + NAV_INSET + NAV_WIDTHS[..slot].iter().sum::<i32>() + NAV_GAP * slot as i32;
-        let h = 34.min(self.nav.3);
-        Rect(x, self.nav.1 + (self.nav.3 - h) / 2, NAV_WIDTHS[slot], h)
+        let Rect(x,y,w,h)=self.nav;
+        let split=(h+4)/2;
+        match slot {
+            2=>Rect(x+5,y+5,w-10,split-6),
+            1=>Rect(x+5,y+split+3,w/2-7,h-split-8),
+            _=>Rect(x+w/2+2,y+split+3,w/2-7,h-split-8),
+        }
     }
     pub fn vital(self, slot: usize) -> Rect {
         let r = self.resources;
         let w = (r.2 - 28) / 2;
-        Rect(r.0 + 10 + slot as i32 * (w + 8), r.1 + 6, w, 24)
+        Rect(r.0 + 10 + slot as i32 * (w + 8), r.1 + 4, w, 23)
     }
     pub fn item_rows(self)->usize { ((self.items.3-2*RAIL_INSET)/ITEM_ROW).max(0) as usize }
     pub fn item_at(self,x:i32,y:i32,offset:usize,count:usize)->Option<usize> {
@@ -155,7 +177,38 @@ pub fn paint_nav(p:&mut Painter,t:Tracks) {
         p.text(text,r.0+(r.2-len)/2,r.1+(r.3-i32::from(size))/2,size,if active {GOLD}else{INK});
     }
 }
-pub fn paint_resources(p:&mut Painter,v:&View,t:Tracks) {
+/// Record a display class, not gameplay state. Untimed next-action effects
+/// remain temporary even without a turn countdown.
+fn status_tint(m:&crate::statuses_ui::Meter,now:f64)->[u8;3] {
+    let name=crate::statuses_ui::display_name(&m.name);
+    if m.duration.is_none() && !matches!(name,"Lucky"|"Unlucky"|"Distracted"|"Stuck"|"Held"|"Silenced"|"Charging moonbeam"|"Riptide") {
+        return [193,138,255];
+    }
+    match name {
+        "Burning"=>burning_ink(now),
+        "Hemophilia"|"Bleeding"=>[255,84,109],
+        _ if name.starts_with("Envenomed")||name.starts_with("Poisoned")=>[113,240,91],
+        "Confused"|"Hallucinating"|"Disoriented"=>[255,220,112],
+        "Slowed"|"Paralyzed"|"Rooted"|"Held"|"Stuck"=>[90,222,244],
+        "Haste"|"Flying"|"Lucky"|"Emboldened"=>[255,191,79],
+        "Silenced"|"Unlucky"|"Corroded"|"Distracted"=>[243,139,188],
+        _=>[122,194,255],
+    }
+}
+pub fn burning_ink(now:f64)->[u8;3] {
+    let pulse=(1.-(now * std::f64::consts::TAU / 840.).cos())*0.5;
+    [255, (117.+77.*pulse).round() as u8, (41.+25.*pulse).round() as u8]
+}
+pub fn status_burning_visible(v:&View)->bool {
+    v.player_meters.iter().skip(v.player_status_offset).take(STATUS_SLOTS)
+        .any(|m|m.duration.is_some() && m.name=="Burning")
+}
+pub fn status_animation_damage(p:&Painter,v:&View,previous:Option<f64>,now:f64)->Option<crate::render::damage::Rect> {
+    if !status_burning_visible(v) || previous.map(burning_ink)==Some(burning_ink(now)) { return None; }
+    let r=p.hud_tracks().status;
+    p.logical_damage_rect(r.0,r.1,r.2,r.3)
+}
+pub fn paint_resources(p:&mut Painter,v:&View,t:Tracks,now:f64) {
     let r=t.resources;
     if !p.intersects_damage(r.0,r.1,r.2,r.3){return}
     panel(p,r);
@@ -170,22 +223,25 @@ pub fn paint_resources(p:&mut Painter,v:&View,t:Tracks) {
     }
     let z=t.status;
     if v.player_meters.is_empty() {p.text("No status effects",z.0,z.1+4,11,MUTED);}
-    for (i,m) in v.player_meters.iter().skip(v.player_status_offset).take(3).enumerate(){
-        let w=(z.2-16)/3;
-        p.condition_meter(m,z.0+i as i32*(w+8),z.1,w);
+    for (i,m) in v.player_meters.iter().skip(v.player_status_offset).take(STATUS_SLOTS).enumerate(){
+        let w=(z.2-8*(STATUS_SLOTS as i32-1))/STATUS_SLOTS as i32;
+        p.condition_meter_tinted(m,z.0+i as i32*(w+8),z.1,w,status_tint(m,now));
     }
-    let role = crate::typography_ui::Role::Primary;
-    let summary = format!("Depth {:.0}/{} · L{:.0} · Blessings {:.0}/{:.0}",v.display_depth,v.max_depth,v.level,v.blessings,v.blessing_goal);
-    let summary = p.fit_text_role(role, &summary, r.2 - 20, 10);
-    p.text(&summary,r.0+10,r.1+57,10,MUTED);
-    let mut x=r.0+10;
-    let god_width = (r.2 - 36) / 3;
-    for (name,color) in v.god_labels.iter().take(3) {
-        let name = p.fit_text_role(role, name, god_width, 10);
-        p.text(&name,x,r.1+73,10,*color);
-        x += p.measure_text_role(role,&name,10).ceil() as i32 + 8;
-    }
+    let level = format!("LVL {:.0}",v.level);
+    let value = format!("Blessings {:.0} / {:.0}",v.blessings,v.blessing_goal);
+    let bar_x=r.0+96;
+    p.text(&level,r.0+10,54,12,INK);
+    let fraction = if v.blessing_goal > 0. { (v.blessings / v.blessing_goal).clamp(0.,1.) } else { 1. };
+    resource_ui::paint_bar(p,"",&value,bar_x,52,r.2-106,19,[175,134,224],fraction,11);
 }
+pub fn paint_depth(p:&mut Painter,v:&View,t:Tracks) {
+    let r=t.depth;
+    if !p.intersects_damage(r.0,r.1,r.2,r.3){return;}
+    panel(p,r);
+    p.text("Depth",r.0+10,r.1+13,11,MUTED);
+    p.text(&format!("{:.0}/{}",v.display_depth,v.max_depth),r.0+10,r.1+30,16,INK);
+}
+
 fn supply_label(count: u32, max: Option<u32>) -> String {
     max.map_or_else(|| count.to_string(), |max| format!("{count} / {max}"))
 }
@@ -198,8 +254,9 @@ fn paint_supply(p: &mut Painter, b: Rect, id: usize, name: &str, count: u32, max
     let active = p.toolbar_focus == Some(id);
     p.rect(b.0,b.1,b.2,b.3,if active { [59,46,62] } else { fill });
     p.border(b.0,b.1,b.2,b.3,if active { GOLD } else { border });
-    p.text(name,b.0+7,b.1+3,11,INK);
-    p.text(&supply_label(count,max),b.0+7,b.1+16,14,accent);
+    let top=b.1+(b.3-42)/2;
+    p.text(name,b.0+9,top,13,INK);
+    p.text(&supply_label(count,max),b.0+9,top+20,17,accent);
     // Right-facing chevron shows this opens an inventory view.
     let x=b.0+b.2-14;
     let y=b.1+b.3/2;
@@ -211,19 +268,59 @@ fn paint_supply(p: &mut Painter, b: Rect, id: usize, name: &str, count: u32, max
 }
 pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
     let r=t.inspector;
-    if p.intersects_damage(r.0,r.1,p.frame().map.2,r.3) {
-        panel(p,Rect(t.hearts.0-5,r.1,2*(t.hearts.2+10),r.3));
-        for b in [r,t.stats]{panel(p,b);}
-        let text=p.fit_text_role(crate::typography_ui::Role::Primary,notice,r.2-16,13);
+    let bottom=t.gods.1+t.gods.3;
+    if p.intersects_damage(r.0,r.1,p.frame().map.2,bottom-r.1) {
+        let end=t.potions.0+t.potions.2+4;
+        let start=t.hearts.0-4;
+        panel(p,Rect(start,r.1,end-start,bottom-r.1));
+        for b in [r,t.stats,t.rings]{panel(p,b);}
+        let role=crate::typography_ui::Role::Primary;
+        let text=p.fit_text_role(role,notice,r.2-16,13);
         p.text(&text,r.0+8,p.inspection_notice_y(),13,INK);
+        for i in 0..3 {
+            let z=t.gods;
+            let left=z.0+z.2*i/3;
+            let width=z.0+z.2*(i+1)/3-left;
+            let rect=Rect(left,z.1,width,z.3);
+            panel(p,rect);
+            if let Some((name,color))=v.god_labels.get(i as usize) {
+                p.rect(left+1,z.1+1,width-2,2,*color);
+                let name=p.fit_text_role(role,name,width-16,14);
+                p.text(&name,left+9,z.1+(z.3-14)/2,14,*color);
+            }
+        }
         let z=t.stats;
         let [damage,hp,dr,acc,dodge]=v.player_stats;
-        p.text(&format!("DMG {damage:+}  HP {hp:+}  DR {dr}"),z.0+8,z.1+5,12,INK);
-        p.text(&format!("ACC {acc}  DODGE {dodge}"),z.0+8,z.1+21,12,MUTED);
+        p.text(&format!("DMG {damage:+}  HP {hp:+}  DR {dr}"),z.0+8,z.1+4,11,INK);
+        p.text(&format!("ACC {acc}  DODGE {dodge}"),z.0+8,z.1+18,11,MUTED);
         let pack = &v.pack_hud;
+        let shards=format!("Shards {} · Borge {}",pack.shards,pack.borge_shards);
+        p.text(&shards,z.0+8,z.1+32,10,[194,161,236]);
+        let z=t.rings;
+        if pack.rings.is_empty() {
+            p.text("No rings worn",z.0+8,z.1+8,11,MUTED);
+        } else {
+            let count=supply_label(pack.rings.len() as u32,pack.ring_capacity);
+            p.text(&format!("{count} rings"),z.0+8,z.1+5,11,INK);
+            let all=pack.rings.join(" · ");
+            let lines=p.wrap_text_role(role,&all,z.2-16,10);
+            let visible=if lines.len()>3{2}else{3};
+            for (i,line) in lines.iter().take(visible).enumerate() {
+                p.text(line,z.0+8,z.1+20+i as i32*13,10,[220,199,145]);
+            }
+            if lines.len()>visible {p.text("…  I for full Pack",z.0+8,z.1+46,10,MUTED);}
+        }
         paint_supply(p,t.hearts,HEARTS,"Hearts",pack.hearts,pack.heart_capacity);
         paint_supply(p,t.potions,POTIONS,"Potions",pack.potions,pack.potion_capacity);
     }
+}
+pub fn scroll_mark(p:&mut Painter,r:Rect,count:usize,visible:usize,offset:usize) {
+    if visible==0 || count<=visible { return; }
+    let height=(r.3-12).max(1);
+    let thumb=(height*visible as i32/count as i32).clamp(1,height);
+    let top=(height-thumb)*offset.min(count-visible) as i32/(count-visible) as i32;
+    p.rect(r.0+r.2-6,r.1+6,2,height,[50,44,64]);
+    p.rect(r.0+r.2-6,r.1+6+top,2,thumb,[144,112,174]);
 }
 pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks) {
     let r=t.items;
@@ -240,6 +337,7 @@ pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks) {
         p.rect(r.0+8,y+31,r.2-16,1,[43,37,55]);
     }
     p.clip=old;
+    scroll_mark(p,r,v.pack_hud.items.len(),t.item_rows(),offset);
 }
 #[cfg(test)]
 mod tests {
@@ -264,6 +362,16 @@ mod tests {
         r.inventory.push(corpse_core::revision50_amulet_effects::make_amulet_for_revision(
             corpse_core::revision50_amulet_effects::Effect::Firebolt,id,52.).unwrap());
         r
+    }
+
+    #[test]
+    fn mockup_status_colors_preserve_permanents_and_animate_timed_fire() {
+        let meter=|name:&str,duration|crate::statuses_ui::Meter{name:name.into(),duration,reference:8.,reference_known:true,percent:75.};
+        assert_eq!(status_tint(&meter("Flying",None),0.),[193,138,255]);
+        assert_eq!(status_tint(&meter("Hemophilia",Some(8.)),0.),[255,84,109]);
+        assert_eq!(status_tint(&meter("Envenomed 4",Some(8.)),0.),[113,240,91]);
+        assert_ne!(status_tint(&meter("Burning",Some(8.)),0.),status_tint(&meter("Burning",Some(8.)),420.));
+        assert_eq!(status_tint(&meter("Burning",None),420.),[193,138,255]);
     }
 
     #[test]
@@ -296,13 +404,18 @@ mod tests {
         p.resize(1920,1080);
         p.set_responsive_canvas(true);
         let t=Tracks::resolve(&p);
-        assert_eq!(p.frame().map,Rect(0,96,1024,584));
-        assert_eq!(p.frame().sidebar,1152);
+        assert_eq!(p.frame().map,Rect(0,76,952,532));
+        assert_eq!(p.frame().sidebar,1116);
         let (cw,ch,x,y)=p.map_layout(79,29);
-        assert_eq!((cw,ch),(12,20));
+        assert_eq!((cw,ch),(11,18));
         assert_eq!(x,p.frame().map.0);
-        assert_eq!(t.resources.0,p.frame().map.2);
-        assert_eq!(t.nav.0+t.nav.2,t.resources.0);
+        assert_eq!(t.resources.0,700);
+        assert_eq!(t.nav.0+t.nav.2,t.depth.0);
+        assert_eq!(t.depth.0+t.depth.2,t.resources.0);
+        assert!(t.button(2).1+t.button(2).3<t.button(1).1);
+        assert!(t.button(1).0<t.button(0).0);
+        assert_eq!(t.gods.1,t.inspector.1+t.inspector.3);
+        assert_eq!(t.rings.1,t.stats.1+t.stats.3);
         assert!(t.nav.2<t.resources.2);
         assert!(NAV.iter().all(|&(id,_)|id!=4));
         assert!(p.frame().map.contains(x+79*cw-1,y+29*ch-1));
@@ -323,7 +436,46 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         let mut r=sample();
         r.dev=false;
+        for line in &mut r.log {
+            if line=="Creature and loot tuning is provisional and documented." {
+                *line="You enter the dungeon.".into();
+            }
+        }
+        r.level=4.;
+        r.exp=2.;
+        // A staged late-build inventory on a compact generated floor. Do not
+        // export this as a playable starting save or a scored run.
+        for ability in ["isheilah-tools-of-the-trade","kative-bottomless-pack","kative-appropriate",
+            "isheilah-make-slippery","isheilah-quick-hand","isheilah-are-you-sure-about-that",
+            "isheilah-spellslinger","numo-implant-thought","numo-distract","numo-mind-read",
+            "numo-mind-slave","numo-remember","anavani-shine","anavani-illuminate","anavani-commandment"] {
+            r.player.abilities.push(ability.into());
+        }
+        r.player.abilities.drain(..3);
+        assert_eq!(r.player.abilities.len(),15);
+        r.dreamwalking=corpse_core::dreamwalking::State{unlocked:true,..Default::default()}.into();
+        for effect in ["light","flight","stealth","regeneration","vampirism","reaping",
+            "willpower","protection","slaying","swimming","light","stealth","willpower"] {
+            let mut ring=Item{id:r.next_id,kind:"ring".into(),glyph:"=".into(),effect:effect.to_owned().into(),..Default::default()};
+            ring.name=corpse_core::revision50_rings::display_name(&ring).unwrap().into();
+            r.next_id+=1.;r.inventory.push(ring);
+        }
+        // The sample already holds a Firebolt Amulet.
+        for effect in ["lightning","poison","iceblast","blinking","beckoning","discord","obstruction","roots","teleportation"] {
+            let mut item=Item{id:r.next_id,kind:"amulet".into(),glyph:"\"".into(),effect:effect.to_owned().into(),..Default::default()};
+            item.name=corpse_core::revision50_amulet_effects::display_name(&item).unwrap().into();
+            corpse_core::revision50_amulets::initialize_item_for_revision(&mut item,52.).unwrap();
+            r.next_id+=1.;r.inventory.push(item);
+        }
+        let id=r.next_id;r.next_id+=1.;
+        r.inventory.push(corpse_core::phantasmii_generation::floor_shard(id));
+        let id=r.next_id;r.next_id+=1.;
+        r.inventory.push(corpse_core::borge::shard(id));
+        assert!(corpse_core::revision50_inventory::finite_categories_fit_revision(&r.inventory,&r.player.abilities,52.));
         r.player.hp=82.;r.player.energy=78.;
+        for (condition, turns) in [("burning",8.),("hemophilia",15.),("envenomed",12.),("venom:1",4.)] {
+            r.player.conditions.insert(condition.into(),turns);
+        }
         r.player.stats.perception=220.;
         let d=r.depth;
         let (x,y,w,h) = {
@@ -354,6 +506,7 @@ mod tests {
             if let Some((x,y))=candidates.nth(1) {
                 actor.x=x as f64;actor.y=y as f64;
                 actor.heartless=(n!=0).into();
+                if n==1 {actor.hp=(actor.max_hp*0.55).ceil();}
                 actor.state="sleeping".into();
             }
         }
@@ -378,6 +531,16 @@ mod tests {
         std::fs::write(dir.join("showcase-save.json"),save).unwrap();
         let run=&engine.run;
         let view=crate::observe::observe(run);
+        let mut meter_model=crate::statuses_ui::ConditionMeters::default();
+        let meters=meter_model.measure(run.player.id,&crate::statuses_ui::observe(run,&run.player));
+        for name in ["Flying","Hemophilia","Burning","Envenomed"] {
+            assert!(meters.iter().take(STATUS_SLOTS).any(|m|m.name.starts_with(name)),"missing preview status {name}: {meters:?}");
+        }
+        assert_eq!(view.total_abilities,16);
+        assert_eq!(view.abilities[0].name,"Dreamwalk");
+        assert_eq!(view.pack_hud.rings.len(),13);
+        assert_eq!(view.pack_hud.items.len(),11);
+        assert_eq!(view.pack_hud.borge_shards,1);
         assert!(view.creatures.iter().filter(|a|a.has_heart==Some(false)).count()>=2,
             "the walkthrough must show multiple visible heartless enemies");
         assert!(view.creatures.iter().any(|a|a.has_heart==Some(true)));

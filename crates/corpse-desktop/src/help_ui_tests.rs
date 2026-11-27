@@ -48,7 +48,7 @@ fn help_preserves_requested_columns_casing_and_colors() {
 fn help_toolbar_and_menu_question_mark_have_exact_hit_regions() {
     let slot = TOOLBAR_VISIBLE_ACTIONS.iter().position(|a| *a == ACTION).unwrap();
     assert_eq!(TOOLBAR_ACTIONS[slot], "?");
-    assert_eq!(TOOLBAR_ACTIONS.last(), Some(&"Menu"));
+    assert_eq!(TOOLBAR_ACTIONS.last(), Some(&"Main Menu"));
     let mut p = Painter::new();
     for (width, height) in [(1280, 800), (1920, 1080), (900, 1200)] {
         p.resize(width, height); p.set_responsive_canvas(true);
