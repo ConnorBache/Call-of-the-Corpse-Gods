@@ -563,14 +563,22 @@ impl Painter {
         let r=self.hud_tracks().button(slot);(r.0,r.2)
     }
     pub fn game_ability_top(&self)->i32 {
-        self.hud_tracks().divine.1+crate::game_hud::RAIL_INSET
+        self.hud_tracks().divine.1+crate::game_hud::ABILITY_INSET
     }
     pub fn game_ability_row(&self)->i32 {
-        (crate::ability_ui::row(&self.profile)+18).max(54)
+        crate::game_hud::DIVINE_ROW
+    }
+    pub fn cogworks_hud_center(&self,row:usize,orb:i32)->(i32,i32){
+        let y=self.game_ability_top()+row as i32*self.game_ability_row();
+        let r=crate::game_hud::right_slot(self.hud_tracks().divine,y);
+        (r.0+7+orb*16,r.1+r.3/2)
+    }
+    pub fn cogworks_hud_hit(&self,row:usize,x:i32,y:i32)->Option<u8>{
+        (0..3).find(|&i|{let(cx,cy)=self.cogworks_hud_center(row,i);(x-cx).abs()<=7&&(y-cy).abs()<=7}).map(|i|i as u8+1)
     }
     pub fn ability_capacity(&self) -> usize {
         let d=self.hud_tracks().divine;
-        ((d.1+d.3-self.game_ability_top())/self.game_ability_row()).max(0) as usize
+        ((d.3-2*crate::game_hud::ABILITY_INSET)/self.game_ability_row()).max(0) as usize
     }
     /// O(C+A) over detached visible cells/creatures; no world or hidden actor reads.
     pub fn enemy_at_map_point(&self,v:&View,x:i32,y:i32)->Option<u64>{
@@ -585,7 +593,7 @@ impl Painter {
         let row=self.game_ability_row();
         let n=count.min(self.ability_capacity());
         let left=self.hud_left();
-        let bounds=crate::modal_ui::Rect(left+12,top,(self.logical_width()-left-26).max(0),row*n as i32);
+        let bounds=crate::modal_ui::Rect(left+4,top,(self.logical_width()-left-8).max(0),row*n as i32);
         (bounds.contains(x,y)&&row>0).then(||((y-top)/row) as usize)
     }
     pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{let r=self.hud_tracks().chronicle;crate::modal_ui::Rect(8,8,r.2-16,r.3-16)}
@@ -2159,10 +2167,10 @@ impl Painter {
     /// Read-only anchor at the already displayed Quick Hand reaction cost.
     pub fn reaction_action_anchor(&self,v:&View,style:&str)->(i32,i32,i32,i32){
         if let Some((i,a))=v.abilities.iter().take(self.ability_capacity()).enumerate().find(|(_,a)|a.id==if style=="reaction-spent-missed-me"{"isheilah-missed-me"}else{"isheilah-quick-hand"}) {
-            let left=self.hud_left();let rail=self.logical_width()-left-24;
             let _=a;
-            let x=left+12+rail-66;
-            return (x,self.game_ability_top()+i as i32*self.game_ability_row()+34,14,16)
+            let y=self.game_ability_top()+i as i32*self.game_ability_row();
+            return crate::game_hud::right_slot(self.hud_tracks().divine,y).tuple();
+
         }
         (self.hud_left()+12,self.hud_tracks().divine.1+2,20,20)
     }
@@ -2398,7 +2406,6 @@ impl Painter {
         let hovered_enemy=self.enemy_hover.and_then(|id|v.cells.iter()
             .find(|c|c.actor_id.is_some_and(|actor|actor.to_bits()==id)).map(|c|(c.x,c.y)));
         let left = self.hud_left();
-        let rail_width = self.logical_width() - left - 24;
         let map_right=self.frame().map.2;
         let panel_bottom=self.frame().map.1+self.frame().map.3;
         let rail_bottom=frame.rail_bottom;
@@ -2769,78 +2776,63 @@ impl Painter {
             #[cfg(test)]
             let _paint_enemies = paint_profile_bench::span(paint_profile_bench::Kind::Enemies);
             let enemy_layout=enemy_list::Layout::resolve_frame(&self.profile, ox,self.frame());
-            enemy_list::paint(self,v,enemy_layout);
+            enemy_list::paint(self,v,enemy_layout,now);
         }
         if self.intersects_damage(left,0,self.logical_width()-left,self.logical_height()) {
         #[cfg(test)]
         let _paint_abilities = paint_profile_bench::span(paint_profile_bench::Kind::HudAbilities);
-        for (i, a) in v
-            .abilities
-            .iter()
-            .take(self.ability_capacity())
-            .enumerate()
-        {
-            let y = self.game_ability_top()
-                + i as i32 * self.game_ability_row();
-            if self.ability_hover == Some(i) {
-                self.rect(left + 12, y, rail_width, self.game_ability_row(), [39,44,61]);
-                self.border(left + 12, y, rail_width, self.game_ability_row(), [174,158,107]);
-            }
+        for (i,a) in v.abilities.iter().take(self.ability_capacity()).enumerate() {
+            let row=self.game_ability_row();
+            let y=self.game_ability_top()+i as i32*row;
+            let r=hud.divine;
+            let chosen=self.ability_hover==Some(i);
             let selecting=v.selected_ability.as_deref()==Some(a.id.as_str());
-            let ragelight_cost=match a.indicator {
-                Some(crate::ability_ui::CustomIndicator::RagelightCost(cost))=>Some(cost),
-                _=>None,
-            };
-            let passive=ragelight_cost.is_some()||(a.mode.eq_ignore_ascii_case("passive")&&!selecting);
-            // Ragelight has no activation orb, but still spends its own reserve.
-            let reserve=if passive && ragelight_cost.is_none() {None}else{a.reserve};
+            if chosen {
+                self.rect(r.0+4,y,r.2-8,row,[39,44,61]);
+                self.border(r.0+4,y,r.2-8,row,[174,158,107]);
+            }
             let cogworks=a.id=="kative-cogworks";
-            let orb_width=if passive{0}else if cogworks{50}else{18};
-            let name_x=left+12+if cogworks{0}else{orb_width};
-            let bar_width=if matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::FutureFloors{..})){140.min(rail_width/2)}else{rail_width/3};
-            let bar_width=bar_width.max(66).min(rail_width);
-            let bar_x=left+12+rail_width-bar_width;
-            let meter_y=y+32;
-            let ragelight_box=ragelight_cost.map(|cost| {
-                let width=ability_indicator_ui::ragelight_width(self,cost);
-                (bar_x-width-6,width)
-            });
-            let name_width=if cogworks{rail_width}else{rail_width-8-orb_width};
-            let names=self.wrap_text_role(crate::typography_ui::Role::Ability,&a.name,name_width,13);
-            self.clip=Some((left+12,y,rail_width,self.game_ability_row()));
-            for(line,name)in names.iter().take(2).enumerate(){
-                self.text(name,name_x,y+3+line as i32*15,13,a.color);
-            }
-            if let Some((box_x,box_width))=ragelight_box {
-                ability_indicator_ui::paint(self,a.indicator.unwrap(),box_x,meter_y,box_width);
-            }
-            if let Some(indicator)=a.indicator.filter(|_|ragelight_box.is_none()) {
-                ability_indicator_ui::paint(self,indicator,bar_x,meter_y,bar_width);
+            let ragelight=matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::RagelightCost(_)));
+            let passive=ragelight||(a.mode.eq_ignore_ascii_case("passive")&&!selecting);
+            let reserve=if passive&&!ragelight{None}else{a.reserve};
+            let slot=crate::game_hud::right_slot(r,y);
+            let has_metadata=reserve.is_some()||a.indicator.is_some()||a.fortunes.is_some()||!passive;
+            let badges=if cogworks&&reserve.is_some(){40}
+                else if a.indicator.is_some()&&reserve.is_some(){28}else{0};
+            let meter=if cogworks&&reserve.is_some(){crate::modal_ui::Rect(slot.0-40,slot.1,36,slot.3)}else{slot};
+            let right=if has_metadata{slot.0-badges-4}else{r.0+r.2-9};
+            let (name,size)=crate::game_hud::compact_label(self,&a.name,"",right-r.0-8);
+            let previous=self.clip;
+            self.clip=Some((r.0+4,y,r.2-8,row));
+            self.text(&name,r.0+8,y+(row-size as i32)/2,size,a.color);
+            self.rect(r.0+8,y+row-1,r.2-16,1,[43,37,55]);
+            if let Some(value)=a.indicator {
+                ability_indicator_ui::paint_compact(self,value,if badges>0{crate::modal_ui::Rect(slot.0-28,slot.1,26,slot.3)}else{slot});
             } else if let Some((count,until))=a.fortunes {
-                let box_w=((bar_width-6)/3).max(18);
-                for i in 0..3 {
-                    let bx=bar_x+i* (box_w+3);
-                    if i<count as i32 {self.rect(bx,meter_y,box_w,19,[184,119,255]);}
-                    self.border(bx,meter_y,box_w,19,[184,119,255]);
-                    if count<3&&i==count as i32 {
-                        let text=until.to_string();let tw=resource_ui::text_width(self,&text,12);
-                        self.text(&text,bx+(box_w-tw)/2,meter_y+2,12,[232,220,255]);
-                    }
+                for idx in 0..3 {
+                    let x=slot.0+idx*16;
+                    if idx<count as i32 {self.rect(x,slot.1,14,slot.3,[153,101,223]);}
+                    self.border(x,slot.1,14,slot.3,[184,119,255]);
+                    if count<3&&idx==count as i32 {self.text(&until.to_string(),x+3,slot.1+1,8,INK);}
                 }
-            } else if let Some((current,maximum))=reserve {
-                let value=format!("{current:.0}/{maximum:.0}");
-                resource_ui::paint_bar_pending(self,"",&value,bar_x,meter_y,bar_width,19,
-                    game_color(&self.profile,"ui.colors.energy"),current/maximum.max(1.),11,a.pending_reserve_loss/maximum.max(1.));
             }
-            if !passive {
+            if let Some((current,max))=reserve {
+                resource_ui::paint_bar_pending(self,"",&format!("{current:.0}/{max:.0}"),meter.0,meter.1,meter.2,meter.3,
+                    game_color(&self.profile,"ui.colors.energy"),current/max.max(1.),if cogworks{8}else{9},a.pending_reserve_loss/max.max(1.));
+            }
+            if !passive && (cogworks || a.indicator.is_none() && a.fortunes.is_none()) {
                 for orb in 0..if cogworks{3}else{1} {
-                    let chosen=if cogworks{orb+1==v.cogworks_mode as i32}else{a.active};
-                    let targeting=selecting&&(!cogworks||chosen);
-                    let cx=left+19+orb*16;let cy=if cogworks{y+40}else{y+11};
-                    for dy in -5i32..=5 {for dx in -5i32..=5 {let d=dx*dx+dy*dy;if d<=25&&(targeting||chosen||d>=15){self.rect(cx+dx,cy+dy,1,1,if targeting{[255,155,56]}else if chosen{[100,255,114]}else{[110,110,125]});}}}
+                    let active=if cogworks{orb+1==v.cogworks_mode as i32}else{a.active};
+                    let aimed=selecting&&(!cogworks||active);
+                    let (cx,cy)=if cogworks {self.cogworks_hud_center(i,orb)}
+                        else if reserve.is_some(){(slot.0-5,slot.1+slot.3/2)}
+                        else {(slot.0+slot.2-5,slot.1+slot.3/2)};
+                    for dy in -3i32..=3 {for dx in -3i32..=3 {let q=dx*dx+dy*dy;
+                        if q<=9&&(active||aimed||q>=5){self.rect(cx+dx,cy+dy,1,1,if aimed{[255,155,56]}else if active{[100,255,114]}else{[142,142,158]});}
+                    }}
                 }
             }
-            self.clip=None;
+            self.clip=previous;
         }
         } // HUD damage section
         if map_damage && (!v.path.is_empty()||!v.target_path.is_empty()||!v.target_area.is_empty()||v.target_impact.is_some()||!v.possible_exits.is_empty()||v.hover.is_some()) {

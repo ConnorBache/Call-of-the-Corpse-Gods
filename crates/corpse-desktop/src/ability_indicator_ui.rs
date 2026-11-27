@@ -95,6 +95,40 @@ pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
     }
 }
 
+/// Same detached counters as the full detail sheet in a single HUD row.
+pub fn paint_compact(p:&mut Painter,value:CustomIndicator,r:crate::modal_ui::Rect) {
+    let crate::modal_ui::Rect(x,y,w,h)=r;
+    let (text,fill,border)=match value {
+        CustomIndicator::Nightmares{count,until}=>(format!("{count} · {until}"),[75,47,152],[143,119,241]),
+        CustomIndicator::Reactions(n)=>(n.to_string(),[77,65,33],[255,219,113]),
+        CustomIndicator::Rescue(ready)|CustomIndicator::Future(ready)=>(if ready{"Ready"}else{"Spent"}.into(),[40,64,105],[126,171,255]),
+        CustomIndicator::RagelightCost(bits)=>(ragelight_label(bits),RAGELIGHT_FILL,RAGELIGHT_OUTLINE),
+        CustomIndicator::FutureFloors{used}=>{
+            // Keep all 20 floor states, using ten dots per row.
+            for n in 0..20 {
+                let ink=if used&(1<<n)==0{[160,121,231]}else{[66,49,85]};
+                p.rect(x+n%10*(w/10),y+2+n/10*6,3,3,ink);
+            }
+            return;
+        },
+        CustomIndicator::OverflowingSaves(n)|CustomIndicator::Blood{count:n,..}=>{
+            // Retain the blood drop glyph; progress stays in the right slot.
+            for dy in 0i32..11 {
+                let dx=if dy<6{dy/2}else{(11-dy).min(4)};
+                p.rect(x+5-dx,y+dy,2*dx+1,1,[218,51,86]);
+            }
+            let text=if let CustomIndicator::Blood{progress,..}=value{format!("{n} · {progress}")}else{n.to_string()};
+            let text=p.fit_text_role(crate::typography_ui::Role::Primary,&text,w-13,8);
+            p.text(&text,x+13,y+1,8,INK);
+            return;
+        },
+    };
+    p.rect(x,y,w,h,fill);
+    p.border(x,y,w,h,border);
+    let text=p.fit_text_role(crate::typography_ui::Role::Primary,&text,w-4,9);
+    centered(p,&text,x,y+1,w,9,INK);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -93,7 +93,7 @@ pub fn paint_bar_pending(p:&mut Painter,label:&str,value:&str,x:i32,y:i32,w:i32,
         p.border(pending_left,y,reserved,h,[110,90,235]);
     }
     let multiline=label.contains('\n');
-    let start=if multiline{x+6}else{x+6+text_width(p,label,size)+8};
+    let start=if multiline||label.is_empty(){x+6}else{x+6+text_width(p,label,size)+8};
     let(value,value_size,value_x)=fit_value(p,value,start,x+w-6);
     let previous=p.clip;
     let fill_ink=if crate::color::contrast([8,8,12],color)>=crate::color::contrast([250,247,255],color){[8,8,12]}else{[250,247,255]};

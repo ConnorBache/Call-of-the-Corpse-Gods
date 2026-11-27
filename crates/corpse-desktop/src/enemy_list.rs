@@ -39,20 +39,21 @@ impl Layout {
         let mut content=self.content(p,&v.creatures);
         for row in &v.ground_entities {
             let mut card=Card{heart:None,top:content.height,height:0,lines:Vec::new(),bars:Vec::new()};
-            let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(13.));
-            let step=(style.font_size*style.line_height).ceil().max(15.) as i32;
-            let mut y=5;
-            for line in p.wrap_text_role(Role::Secondary,&format!("{} {}",row.glyph,row.name),(self.rows.2-12).max(1),13) {
-                card.lines.push(Line{hover_only:false,text:line,y,size:13,color:row.color,outline:None,black_initial:false});y+=step;
-            }
-            card.height=y+6;content.height+=card.height;content.cards.push(card);
+            let (name,size)=crate::game_hud::compact_label(p,&format!("{} {}",row.glyph,row.name),"",self.rows.2-12);
+            let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(size as f64));
+            let step=(style.font_size*style.line_height).ceil().max(13.) as i32;
+            card.lines.push(Line{burning:false,text:name,y:4,size,color:row.color,outline:None,black_initial:false});
+            card.height=step+8;content.height+=card.height;content.cards.push(card);
         }
-        content.cards.rotate_right(v.ground_entities.len());
-        let ground = v.ground_entities.len();
+        // Historical roster priority: visible stairs, visible creatures,
+        // then items/vents/corpses in their deterministic ground order.
+        let stairs=Content::stair_count(v);
+        content.cards[..v.creatures.len()+stairs].rotate_right(stairs);
+        let ground=stairs+v.creatures.len();
         let mut top=0;
         let mut divider=None;
         for (i,card) in content.cards.iter_mut().enumerate(){
-            if i==ground && ground>0 {
+            if i==ground && !v.creatures.is_empty() {
                 divider=Some(top+4);
                 top+=10;
             }
@@ -64,7 +65,7 @@ impl Layout {
     }
 }
 #[derive(Clone,Debug)]
-struct Line { hover_only:bool, text:String, y:i32, size:u16, color:super::Rgb, outline:Option<super::Rgb>, black_initial:bool }
+struct Line { burning:bool, text:String, y:i32, size:u16, color:super::Rgb, outline:Option<super::Rgb>, black_initial:bool }
 #[derive(Clone,Debug)]
 struct Bar { y:i32, label:String, value:String, fraction:f64, color:super::Rgb }
 #[derive(Clone,Debug)]
@@ -73,11 +74,11 @@ struct Card { heart:Option<bool>, top:i32, height:i32, lines:Vec<Line>, bars:Vec
 pub struct Content { cards:Vec<Card>, height:i32, layout:Layout, divider:Option<i32> }
 impl Content {
     pub fn stair_count(v:&View)->usize {v.ground_entities.partition_point(|g|g.kind==GroundKind::Stair)}
-    pub fn creature_index(v:&View,index:usize)->Option<usize>{index.checked_sub(v.ground_entities.len()).filter(|&i|i<v.creatures.len())}
+    pub fn creature_index(v:&View,index:usize)->Option<usize>{index.checked_sub(Self::stair_count(v)).filter(|&i|i<v.creatures.len())}
     pub fn actor(v:&View,index:usize)->Option<u64>{Self::creature_index(v,index).map(|i|v.creatures[i].id.to_bits())}
-    pub fn ground_index(v:&View,index:usize)->Option<usize>{(index<v.ground_entities.len()).then_some(index)}
+    pub fn ground_index(v:&View,index:usize)->Option<usize>{{let stairs=Self::stair_count(v);if index<stairs{Some(index)}else{index.checked_sub(v.creatures.len()).filter(|&i|i>=stairs&&i<v.ground_entities.len())}}}
     pub fn ground(v:&View,index:usize)->Option<(usize,usize)>{Self::ground_index(v,index).map(|i|{let g=&v.ground_entities[i];(g.x,g.y)})}
-    pub fn row_for_ground(_v:&View,index:usize)->usize{index}
+    pub fn row_for_ground(v:&View,index:usize)->usize{if index<Self::stair_count(v){index}else{index+v.creatures.len()}}
 
     /// O(T²) worst-case text measurement via measured word wrapping, O(T+C)
     /// temporary storage for C admitted creatures and T displayed characters.
@@ -91,7 +92,7 @@ impl Content {
                 let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(size as f64));
                 let line=(style.font_size*style.line_height).ceil().max(size as f64+2.) as i32;
                 for s in p.wrap_text_role(Role::Secondary,s,width,size) {
-                    card.lines.push(Line{hover_only:false,text:s,y:*y,size,color,outline:None,black_initial:false});*y+=line;
+                    card.lines.push(Line{burning:false,text:s,y:*y,size,color,outline:None,black_initial:false});*y+=line;
                 }
             }
             let black_b=a.glyph=="B" && a.color==[0;3] && a.identity_outline.is_none();
@@ -114,17 +115,15 @@ impl Content {
                 let state=chars.next().map(|c|c.to_uppercase().collect::<String>()+chars.as_str()).unwrap_or_default();
                 text(p,&mut card,&mut y,width,&state,11,MUTED);
             }
-            let conditions_top=y;
-            let conditions=crate::statuses_ui::summary(&a.statuses);
-            if !conditions.is_empty() {
-                text(p,&mut card,&mut y,width,&conditions,11,[193,138,255]);
+            for status in &a.statuses {
+                let name=crate::statuses_ui::display_name(&status.name);
+                let ink=crate::game_hud::status_tint(&status.name,status.duration,0.);
+                let start=card.lines.len();
+                let label=if let Some(turns)=status.duration {format!("{name} · {turns:.0}")}else{name.to_owned()};
+                text(p,&mut card,&mut y,width,&label,11,ink);
+                if name=="Burning" && status.duration.is_some(){for line in &mut card.lines[start..]{line.burning=true;}}
             }
-            if let Some(label)=&a.perception_range {
-                // Reserve stable card geometry, but reveal senses only on hover.
-                let start=card.lines.len();text(p,&mut card,&mut y,width,label,11,MUTED);
-                for line in &mut card.lines[start..] {line.hover_only=true;}
-            }
-            card.height=y.max(conditions_top+16)+3;top+=card.height;cards.push(card);
+            card.height=y+4;top+=card.height;cards.push(card);
         }
         Self{cards,height:top,layout,divider:None}
     }
@@ -152,7 +151,7 @@ impl Content {
 }
 /// Same ordered text/rectangle commands for GPU and software. Only intersecting
 /// cards rasterize; the clip excludes the heading/footer and map.
-pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
+pub fn paint(p:&mut Painter,v:&View,layout:Layout,now:f64) {
     if layout.bounds.2<24 || layout.rows.3<=0 {return;}
     let content=layout.content_view(p,v);
     p.enemy_list_offset=content.offset(p.enemy_list_offset);
@@ -170,18 +169,18 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         if let Some(heart)=card.heart {
             let x=layout.rows.0+layout.rows.2-16;
             p.text("♥",x,y+4,13,if heart {[255,116,133]} else {[150,128,151]});
-            if !heart{p.text("×",x,y+3,13,[255,56,72]);}
+            if !heart{p.text("×",x,y+3,13,crate::game_hud::YELLOW);}
         }
         for line in &card.lines {
-            if line.hover_only&&!selected{continue;}
+            let color=if line.burning{crate::game_hud::burning_ink(now)}else{line.color};
             if let Some(outline)=line.outline {for (dx,dy) in [(-1,0),(1,0),(0,-1),(0,1)] {p.text_role(Role::Secondary,&line.text,layout.rows.0+4+dx,y+line.y+dy,line.size,outline);}}
             let x=layout.rows.0+4;
             if let Some(name)=line.black_initial.then(||line.text.strip_prefix("B")).flatten() {
                 let advance=p.measure_text_role(Role::Secondary,"B",line.size).round() as i32;
                 p.text_role(Role::Secondary,"B",x,y+line.y,line.size,[0;3]);
-                p.text_role(Role::Secondary,name,x+advance,y+line.y,line.size,line.color);
+                p.text_role(Role::Secondary,name,x+advance,y+line.y,line.size,color);
             } else {
-                p.text_role(Role::Secondary,&line.text,x,y+line.y,line.size,line.color);
+                p.text_role(Role::Secondary,&line.text,x,y+line.y,line.size,color);
             }
         }
         for bar in &card.bars {
@@ -237,7 +236,7 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         assert!(bottom>0);assert_eq!(content.scroll(bottom,i32::MAX),0);
         for offset in [0,bottom/2,bottom] {
             p.clear([7,11,19]);p.enemy_list_offset=offset;
-            let before=p.pixels.clone();paint(&mut p,&v,layout);
+            let before=p.pixels.clone();paint(&mut p,&v,layout,0.);
             assert_eq!(p.enemy_list_offset,offset);
             let x=p.native_x((layout.rows.0+layout.rows.2-2)as f64) as usize;
             for y in layout.rows.1..layout.rows.1+layout.rows.3 {
@@ -516,6 +515,15 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         assert_eq!(state.y,card.bars[0].y+19);
         assert!(card.bars[0].y-card.lines[0].y<=22);
         assert!(card.height>=state.y+11+3);
+        let old_height=card.height;
+        v.creatures[0].statuses=vec![
+            crate::statuses_ui::Status{name:"Burning".into(),duration:Some(7.)},
+            crate::statuses_ui::Status{name:"Envenomed 3".into(),duration:Some(9.)},
+        ];
+        let with_status=layout.content(&p,&v.creatures);
+        assert!(with_status.cards[0].height>old_height);
+        assert!(with_status.cards[0].lines.iter().any(|l|l.burning&&l.text.starts_with("Burning")));
+        assert!(with_status.cards[0].lines.iter().any(|l|l.color==[113,240,91]&&l.text.starts_with("Envenomed")));
         v.creatures[0].state="sensed".into();
         assert!(layout.content(&p,&v.creatures).cards[0].bars.is_empty(),"sensing a creature should not reveal its HP");
     }

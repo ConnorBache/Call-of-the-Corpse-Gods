@@ -333,16 +333,13 @@ fn record_mockup_hud_walkthrough() {
     let (x,y)=v.cells.iter().find_map(|c|c.actor_id.is_some_and(|id|Some(id)==v.creatures.first().map(|a|a.id)).then_some((c.x,c.y)))
         .unwrap_or((grid.player.0+3,grid.player.1));
     let mut step=Step::game("look-at-enemy",vec![Input::Motion((x,y))]);step.capture=true;steps.push(step);
-    let mut step=Step::game("bow-aim",vec![Input::ClickHud(tracks.items.0+20,tracks.items.1+game_hud::RAIL_INSET+8),Input::Motion((x,y))]);
+    let mut step=Step::game("bow-aim",vec![Input::ClickHud(tracks.items.0+20,tracks.items.1+game_hud::ABILITY_INSET+8),Input::Motion((x,y))]);
     step.item=true;steps.push(step);
     let mut step=Step::game("bow-fire",vec![Input::Click((x,y))]);step.readonly=false;steps.push(step);
     let mut step=Step::game("open-pot-inventory",vec![click(tracks.potions)]);step.inventory=true;steps.push(step);
     steps.push(Step::game("close-pot-inventory",vec![key(Keycode::Escape)]));
     let mut step=Step::game("open-heart-inventory",vec![click(tracks.hearts)]);step.inventory=true;steps.push(step);
     steps.push(Step::game("close-heart-inventory",vec![key(Keycode::Escape)]));
-    steps.push(Step::game("divine-abilities-next-page",vec![key(Keycode::PageDown)]));
-    steps.push(Step::game("divine-abilities-another-page",vec![key(Keycode::PageDown)]));
-    steps.push(Step::game("divine-abilities-back-to-dreamwalk",vec![key(Keycode::PageUp),key(Keycode::PageUp)]));
     let mut step=Step::game("open-full-pack-by-key",vec![key(Keycode::I)]);step.inventory=true;steps.push(step);
     steps.push(Step::game("close-full-pack",vec![key(Keycode::Escape)]));
     let mut step=Step::game("wait-turn",vec![key(Keycode::Z)]);step.readonly=false;steps.push(step);

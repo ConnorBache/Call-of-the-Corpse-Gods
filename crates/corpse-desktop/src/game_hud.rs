@@ -8,7 +8,10 @@ pub const RAIL_WIDTH: i32 = 166;
 pub const HEADER: i32 = 82;
 pub const FOOTER: i32 = 116;
 pub const MAP_TILE: (i32, i32) = (12,18);
-pub const ITEM_ROW: i32 = 34;
+pub const ITEM_ROW: i32 = 21;
+pub const DIVINE_ROW: i32 = 21;
+pub const ABILITY_INSET: i32 = 5;
+pub const YELLOW: [u8;3] = [255,218,74];
 pub const RAIL_INSET: i32 = 8;
 pub const STATUS_SLOTS: usize = 4;
 pub const NAV: [(usize, &str); 3] = [(7, "Bestiary"), (crate::help_ui::ACTION, "?"), (9, "Main Menu")];
@@ -32,7 +35,9 @@ pub struct PackHud {
 pub struct ItemAction {
     pub id: f64,
     pub label: String,
-    pub detail: String,
+    pub arrows: Option<u32>,
+    pub reserve: Option<(f64,f64)>,
+    pub tier: Option<u8>,
 }
 
 pub fn is_quick_item(run: &Run, i: &Item) -> bool {
@@ -69,17 +74,11 @@ pub fn observe(run: &Run) -> PackHud {
         for i in run.inventory.iter().filter(|i| corpse_core::projectiles::is_bow(i)==bow && is_quick_item(run,i)) {
             let revision=run.simulation_revision.value_or(29.);
             let label=if bow {"Bow".into()} else {crate::pack::ground_name(run,i)};
-            let detail=if bow { format!("{arrows:.0} arrows") } else {
-                resource_ui::amulet_reserve(i,revision)
-                    .map_or_else(||"Apply".to_owned(), |(n,m)| {
-                        let tier=if corpse_core::revision52_amulet_tiers::enabled(run) {
-                            corpse_core::revision52_amulet_tiers::profile(run,i).map(|p|p.tier)
-                        } else { None };
-                        let reserve=format!("{n:.0}/{m:.0} NRG");
-                        match tier {Some(tier)=>format!("{reserve} · T{tier}"),None=>reserve}
-                    })
-            };
-            out.items.push(ItemAction { id: i.id, label, detail });
+            let tier=if !bow && corpse_core::revision52_amulet_tiers::enabled(run) {
+                corpse_core::revision52_amulet_tiers::profile(run,i).map(|p|p.tier)
+            } else {None};
+            out.items.push(ItemAction{id:i.id,label,arrows:bow.then_some(arrows as u32),
+                reserve:resource_ui::amulet_reserve(i,revision),tier});
         }
     }
     out
@@ -120,7 +119,8 @@ impl Tracks {
         let stats_x=map.2-stats_width-2*supply;
         let footer_height=h-foot;
         let footer_split=foot+(footer_height*43)/100;
-        let split=header+((h-header)/4).clamp(176,216);
+        let split=header+((h-header)*55/100).max(16*DIVINE_ROW+2*ABILITY_INSET);
+        let gods_width=264.min(stats_x);
         Self {
             chronicle:Rect(0,0,cut,header),
             resources:Rect(resources_x,0,width-resources_x,header),
@@ -128,9 +128,9 @@ impl Tracks {
             nav:Rect(cut,0,NAV_WIDTH,header),
             depth:Rect(depth_x,0,DEPTH_WIDTH,header),
             inspector:Rect(0,foot,stats_x,footer_split-foot),
-            gods:Rect(0,footer_split,stats_x,h-footer_split),
+            gods:Rect(0,footer_split,gods_width,h-footer_split),
             stats:Rect(stats_x,foot,stats_width,footer_split-foot),
-            rings:Rect(stats_x,footer_split,stats_width,h-footer_split),
+            rings:Rect(gods_width,footer_split,stats_x+stats_width-gods_width,h-footer_split),
             hearts:Rect(map.2-2*supply+4,foot+4,supply-8,footer_height-8),
             potions:Rect(map.2-supply+4,foot+4,supply-8,footer_height-8),
             divine:Rect(frame.sidebar,header,rail,split-header),
@@ -151,9 +151,9 @@ impl Tracks {
         let w = (r.2 - 28) / 2;
         Rect(r.0 + 10 + slot as i32 * (w + 8), r.1 + 4, w, 23)
     }
-    pub fn item_rows(self)->usize { ((self.items.3-2*RAIL_INSET)/ITEM_ROW).max(0) as usize }
+    pub fn item_rows(self)->usize { ((self.items.3-2*ABILITY_INSET)/ITEM_ROW).max(0) as usize }
     pub fn item_at(self,x:i32,y:i32,offset:usize,count:usize)->Option<usize> {
-        let area=Rect(self.items.0+6,self.items.1+RAIL_INSET,self.items.2-12,ITEM_ROW*self.item_rows() as i32);
+        let area=Rect(self.items.0+6,self.items.1+ABILITY_INSET,self.items.2-12,ITEM_ROW*self.item_rows() as i32);
         if !area.contains(x,y){return None}
         let i=offset+((y-area.1)/ITEM_ROW) as usize;
         (i<count).then_some(i)
@@ -180,9 +180,9 @@ pub fn paint_nav(p:&mut Painter,t:Tracks) {
 }
 /// Record a display class, not gameplay state. Untimed next-action effects
 /// remain temporary even without a turn countdown.
-fn status_tint(m:&crate::statuses_ui::Meter,now:f64)->[u8;3] {
-    let name=crate::statuses_ui::display_name(&m.name);
-    if m.duration.is_none() && !matches!(name,"Lucky"|"Unlucky"|"Distracted"|"Stuck"|"Held"|"Silenced"|"Charging moonbeam"|"Riptide") {
+pub fn status_tint(name:&str,duration:Option<f64>,now:f64)->[u8;3] {
+    let name=crate::statuses_ui::display_name(name);
+    if duration.is_none() && !matches!(name,"Lucky"|"Unlucky"|"Distracted"|"Stuck"|"Held"|"Silenced"|"Charging moonbeam"|"Riptide") {
         return [193,138,255];
     }
     match name {
@@ -203,6 +203,14 @@ pub fn burning_ink(now:f64)->[u8;3] {
 pub fn status_burning_visible(v:&View)->bool {
     v.player_meters.iter().skip(v.player_status_offset).take(STATUS_SLOTS)
         .any(|m|m.duration.is_some() && m.name=="Burning")
+}
+pub fn enemy_burning_visible(v:&View)->bool {
+    v.creatures.iter().any(|a|a.statuses.iter().any(|s|s.duration.is_some()&&s.name=="Burning"))
+}
+pub fn enemy_status_animation_damage(p:&Painter,v:&View,previous:Option<f64>,now:f64)->Option<crate::render::damage::Rect> {
+    if previous.map(burning_ink)==Some(burning_ink(now)) || !enemy_burning_visible(v) {return None;}
+    let r=p.frame();
+    p.logical_damage_rect(r.map.2,r.map.1,r.sidebar-r.map.2,r.rail_bottom-r.map.1)
 }
 pub fn status_animation_damage(p:&Painter,v:&View,previous:Option<f64>,now:f64)->Option<crate::render::damage::Rect> {
     if !status_burning_visible(v) || previous.map(burning_ink)==Some(burning_ink(now)) { return None; }
@@ -226,14 +234,14 @@ pub fn paint_resources(p:&mut Painter,v:&View,t:Tracks,now:f64) {
     if v.player_meters.is_empty() {p.text("No status effects",z.0,z.1+4,11,MUTED);}
     for (i,m) in v.player_meters.iter().skip(v.player_status_offset).take(STATUS_SLOTS).enumerate(){
         let w=(z.2-8*(STATUS_SLOTS as i32-1))/STATUS_SLOTS as i32;
-        p.condition_meter_tinted(m,z.0+i as i32*(w+8),z.1,w,status_tint(m,now));
+        p.condition_meter_tinted(m,z.0+i as i32*(w+8),z.1,w,status_tint(&m.name,m.duration,now));
     }
     let level = format!("LVL {:.0}",v.level);
     let value = format!("Blessings {:.0} / {:.0}",v.blessings,v.blessing_goal);
     let bar_x=r.0+96;
     p.text(&level,r.0+10,54,12,INK);
     let fraction = if v.blessing_goal > 0. { (v.blessings / v.blessing_goal).clamp(0.,1.) } else { 1. };
-    resource_ui::paint_bar(p,"",&value,bar_x,52,r.2-106,19,[175,134,224],fraction,11);
+    resource_ui::paint_bar(p,"",&value,bar_x,52,r.2-106,19,YELLOW,fraction,11);
 }
 pub fn paint_depth(p:&mut Painter,v:&View,t:Tracks) {
     let r=t.depth;
@@ -303,7 +311,8 @@ pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
         } else {
             let count=supply_label(pack.rings.len() as u32,pack.ring_capacity);
             p.text(&format!("{count} rings"),z.0+8,z.1+5,11,INK);
-            let all=pack.rings.join(" · ");
+            let all=pack.rings.iter().map(|name|name.strip_suffix(" Ring").unwrap_or(name))
+                .collect::<Vec<_>>().join(" · ");
             let lines=p.wrap_text_role(role,&all,z.2-16,10);
             let visible=if lines.len()>3{2}else{3};
             for (i,line) in lines.iter().take(visible).enumerate() {
@@ -323,19 +332,41 @@ pub fn scroll_mark(p:&mut Painter,r:Rect,count:usize,visible:usize,offset:usize)
     p.rect(r.0+r.2-6,r.1+6,2,height,[50,44,64]);
     p.rect(r.0+r.2-6,r.1+6+top,2,thumb,[144,112,174]);
 }
+/// Prefer the regular label size, then shrink only this label. Reserve width
+/// for the tier suffix so an unusually long item still shows its upgrade.
+pub fn compact_label(p:&Painter,name:&str,suffix:&str,width:i32)->(String,u16) {
+    let role=crate::typography_ui::Role::Primary;
+    let full=format!("{name}{suffix}");
+    for size in [11,10,9] {
+        if p.measure_text_role(role,&full,size)<=width as f64 {return (full,size);}
+    }
+    let reserved=p.measure_text_role(role,suffix,9).ceil() as i32;
+    (format!("{}{suffix}",p.fit_text_role(role,name,(width-reserved).max(0),9)),9)
+}
+pub fn right_slot(r:Rect,y:i32)->Rect {Rect(r.0+r.2-57,y+4,48,13)}
+fn tier_suffix(tier:Option<u8>)->String{
+    match tier {Some(n) if n>1=>format!(" +{}",n-1),_=>String::new()}
+}
 pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks) {
     let r=t.items;
     if !p.intersects_damage(r.0,r.1,r.2,r.3){return}
     panel(p,r);
     let old=p.clip;
-    p.clip=Some((r.0+6,r.1+RAIL_INSET,r.2-12,r.3-RAIL_INSET));
+    p.clip=Some((r.0+4,r.1+ABILITY_INSET,r.2-8,r.3-2*ABILITY_INSET));
     let offset=p.item_rail_offset.min(v.pack_hud.items.len().saturating_sub(t.item_rows()));
     for (i,a) in v.pack_hud.items.iter().skip(offset).take(t.item_rows()).enumerate(){
-        let y=r.1+RAIL_INSET+i as i32*ITEM_ROW;
-        let name=p.fit_text_role(crate::typography_ui::Role::Primary,&a.label,r.2-16,12);
-        p.text(&name,r.0+8,y,12,INK);
-        p.text(&a.detail,r.0+8,y+15,10,[147,210,246]);
-        p.rect(r.0+8,y+31,r.2-16,1,[43,37,55]);
+        let y=r.1+ABILITY_INSET+i as i32*ITEM_ROW;
+        let Rect(x,my,w,h)=right_slot(r,y);
+        let (name,size)=compact_label(p,&a.label,&tier_suffix(a.tier),x-r.0-11);
+        p.text(&name,r.0+7,y+(ITEM_ROW-size as i32)/2,size,INK);
+        if let Some((current,max))=a.reserve {
+            resource_ui::paint_bar(p,"",&format!("{current:.0}/{max:.0}"),x,my,w,h,game_color(&p.profile,"ui.colors.energy"),current/max.max(1.),9);
+        } else {
+            let detail=a.arrows.map_or_else(||"Apply".to_owned(), |n|format!("{n} arrows"));
+            let dx=x+w-resource_ui::text_width(p,&detail,9);
+            p.text(&detail,dx,my+2,9,[147,210,246]);
+        }
+        p.rect(r.0+7,y+ITEM_ROW-1,r.2-14,1,[43,37,55]);
     }
     p.clip=old;
     scroll_mark(p,r,v.pack_hud.items.len(),t.item_rows(),offset);
@@ -367,12 +398,11 @@ mod tests {
 
     #[test]
     fn mockup_status_colors_preserve_permanents_and_animate_timed_fire() {
-        let meter=|name:&str,duration|crate::statuses_ui::Meter{name:name.into(),duration,reference:8.,reference_known:true,percent:75.};
-        assert_eq!(status_tint(&meter("Flying",None),0.),[193,138,255]);
-        assert_eq!(status_tint(&meter("Hemophilia",Some(8.)),0.),[255,84,109]);
-        assert_eq!(status_tint(&meter("Envenomed 4",Some(8.)),0.),[113,240,91]);
-        assert_ne!(status_tint(&meter("Burning",Some(8.)),0.),status_tint(&meter("Burning",Some(8.)),420.));
-        assert_eq!(status_tint(&meter("Burning",None),420.),[193,138,255]);
+        assert_eq!(status_tint("Flying",None,0.),[193,138,255]);
+        assert_eq!(status_tint("Hemophilia",Some(8.),0.),[255,84,109]);
+        assert_eq!(status_tint("Envenomed 4",Some(8.),0.),[113,240,91]);
+        assert_ne!(status_tint("Burning",Some(8.),0.),status_tint("Burning",Some(8.),420.));
+        assert_eq!(status_tint("Burning",None,420.),[193,138,255]);
     }
 
     #[test]
@@ -416,6 +446,10 @@ mod tests {
         assert!(t.button(2).1+t.button(2).3<t.button(1).1);
         assert!(t.button(1).0<t.button(0).0);
         assert_eq!(t.gods.1,t.inspector.1+t.inspector.3);
+        assert_eq!(t.gods.0+t.gods.2,t.rings.0);
+        assert!(p.ability_capacity()>=16 && t.item_rows()>=11);
+        assert_eq!(tier_suffix(Some(9))," +8");
+        assert_eq!(tier_suffix(Some(1)),"");
         assert_eq!(t.rings.1,t.stats.1+t.stats.3);
         assert!(t.nav.2<t.resources.2);
         assert!(NAV.iter().all(|&(id,_)|id!=4));
@@ -426,7 +460,7 @@ mod tests {
         }
         assert_eq!(p.toolbar_action(t.hearts.0+4,t.hearts.1+4),Some(HEARTS));
         assert_eq!(p.toolbar_action(t.potions.0+4,t.potions.1+4),Some(POTIONS));
-        assert_eq!(t.item_at(t.items.0+8,t.items.1+RAIL_INSET+2,0,summary.items.len()),Some(0));
+        assert_eq!(t.item_at(t.items.0+8,t.items.1+ABILITY_INSET+2,0,summary.items.len()),Some(0));
     }
 
     #[test]
@@ -454,6 +488,7 @@ mod tests {
         }
         r.player.abilities.drain(..3);
         assert_eq!(r.player.abilities.len(),15);
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
         r.dreamwalking=corpse_core::dreamwalking::State{unlocked:true,..Default::default()}.into();
         for effect in ["light","flight","stealth","regeneration","vampirism","reaping",
             "willpower","protection","slaying","swimming","light","stealth","willpower"] {
@@ -465,6 +500,7 @@ mod tests {
         for effect in ["lightning","poison","iceblast","blinking","beckoning","discord","obstruction","roots","teleportation"] {
             let mut item=Item{id:r.next_id,kind:"amulet".into(),glyph:"\"".into(),effect:effect.to_owned().into(),..Default::default()};
             item.name=corpse_core::revision50_amulet_effects::display_name(&item).unwrap().into();
+            if effect=="iceblast"{item.amulet_tier=9.0.into();}
             corpse_core::revision50_amulets::initialize_item_for_revision(&mut item,52.).unwrap();
             r.next_id+=1.;r.inventory.push(item);
         }
@@ -507,7 +543,12 @@ mod tests {
             if let Some((x,y))=candidates.nth(1) {
                 actor.x=x as f64;actor.y=y as f64;
                 actor.heartless=(n!=0).into();
-                if n==1 {actor.hp=(actor.max_hp*0.55).ceil();}
+                if n==1 {
+                    actor.hp=(actor.max_hp*0.55).ceil();
+                    actor.conditions.insert("burning".into(),7.);
+                    actor.conditions.insert("envenomed".into(),9.);
+                    actor.conditions.insert("venom:1".into(),3.);
+                }
                 actor.state="sleeping".into();
             }
         }
@@ -541,6 +582,7 @@ mod tests {
         assert_eq!(view.abilities[0].name,"Dreamwalk");
         assert_eq!(view.pack_hud.rings.len(),13);
         assert_eq!(view.pack_hud.items.len(),11);
+        assert!(view.creatures.iter().any(|a|a.statuses.iter().any(|s|s.name=="Burning")&&a.statuses.iter().any(|s|s.name.starts_with("Envenomed"))));
         assert_eq!(view.pack_hud.borge_shards,1);
         assert!(view.creatures.iter().filter(|a|a.has_heart==Some(false)).count()>=2,
             "the walkthrough must show multiple visible heartless enemies");

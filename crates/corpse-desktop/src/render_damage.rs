@@ -244,6 +244,9 @@ impl RetainedGame {
                 if let Some(rect)=crate::game_hud::status_animation_damage(p,v,self.now.map(f64::from_bits),now) {
                     damage.add(rect);
                 }
+                if let Some(rect)=crate::game_hud::enemy_status_animation_damage(p,v,self.now.map(f64::from_bits),now) {
+                    damage.add(rect);
+                }
                 let scene=next.as_ref().unwrap_or(previous);
                 if v.dreamwalking||crate::appearance_light::animated(&p.profile)||crate::appearance_material::animated(&p.profile){
                     // These existing paths change every affected terrain descriptor.

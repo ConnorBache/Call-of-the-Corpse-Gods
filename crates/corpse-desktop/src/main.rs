@@ -1462,7 +1462,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             .min(
                                 ability_ui::visible_abilities(&r.run)
                                     .len()
-                                    .saturating_sub(1),
+                                    .saturating_sub(painter.ability_capacity()),
                             );
                         continue;
                     }
@@ -2086,7 +2086,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     pack::PackAction::Notice(message)=>notice=message,
                                     _=>{}
                                 }
-                            } else if x >= painter.hud_left() + 10
+                            } else if x >= painter.hud_left() + 4
                                 && y >= painter.game_ability_top()
                                 && y < painter.game_ability_top()
                                     + painter.game_ability_row()
@@ -2105,7 +2105,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                         continue;
                                     }
                                     if id=="kative-cogworks" {
-                                        if let Some(mode)=cogworks_ui::bubble_hit(x+4,y-29,painter.hud_left(),painter.game_ability_top()+i as i32*painter.game_ability_row()) {
+                                        if let Some(mode)=painter.cogworks_hud_hit(i,x,y) {
                                             notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&Command::Ability{id:id.clone(),target:Field::Value(mode as f64),x:Field::Missing,y:Field::Missing}){Ok(_)=>targeting_ui::cogworks_prompt(&r.run),Err(e)=>e.to_string()};
                                         }
                                     }
@@ -2452,7 +2452,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             painter.item_rail_offset=if y<0 {painter.item_rail_offset.saturating_add(1).min(max)}
                                 else {painter.item_rail_offset.saturating_sub(1)};
                         }
-                    } else if mouse_x >= painter.hud_left() + 10
+                    } else if mouse_x >= painter.hud_left() + 4
                         && mouse_y >= painter.game_ability_top()
                         && mouse_y < painter.game_ability_top()+painter.game_ability_row()*painter.ability_capacity() as i32
                     {
@@ -2465,7 +2465,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             ability_offset = ability_offset.min(
                                 ability_ui::visible_abilities(&r.run)
                                     .len()
-                                    .saturating_sub(1),
+                                    .saturating_sub(painter.ability_capacity()),
                             );
                         }
                     } else if painter.chronicle_hit_rect().contains(mouse_x,mouse_y)
@@ -3855,7 +3855,7 @@ mod menu_seed_creation_tests {
 /// O(registered profile entries + cached cells) worst case; dream flag short-circuits O(1).
 /// Only redraw eligibility; no observation, simulation state or RNG access.
 fn cached_view_needs_idle_paint(v:&render::View,p:&appearance_profile::Profile)->bool {
-    v.dreamwalking || game_hud::status_burning_visible(v) || !v.ability_overlays.mind_read.is_empty()
+    v.dreamwalking || game_hud::enemy_burning_visible(v) || game_hud::status_burning_visible(v) || !v.ability_overlays.mind_read.is_empty()
         || appearance_light::animated(p) || appearance_material::animated(p)
         || v.cells.iter().any(|c|!c.animations.is_empty()||c.pulse_speed!=0.||c.fire_flicker)
         || (p.number("path.animationSpeed")>0.&&!v.path.is_empty())
