@@ -457,17 +457,23 @@ pub fn inventory_marks(cues:&[Cue],now:f64)->Vec<(Option<f64>,crate::action_mark
 /// Logical anchors shared by painting and retained damage. Item-free resource
 /// receipts stay on their real HUD even while the map's Pack overlay is open.
 pub fn inventory_hud_anchor(p:&crate::render::Painter,mark:&crate::action_marks::Mark)->(i32,i32,i32,i32) {
-    if mark.style=="health-slash" {(p.hud_tracks().resources.0+12,15,24,24)}else if mark.style=="pack-capacity" {
-        let r=p.hud_tracks().button(0);let (x,w)=(r.0,r.2);
-        (x+w/2-12,p.toolbar_y()+4,24,28)
-    } else if mark.style=="charge-spark"||mark.style=="unlock-diamond" {
-        (p.hud_left()+12,p.game_ability_top()-26,24,24)
-    } else {(p.hud_tracks().resources.0+p.hud_tracks().resources.2/2+12,15,24,24)}
+    let tracks = p.hud_tracks();
+    match mark.style.as_str() {
+        "pack-capacity" | "split-potion" => {
+            let r = tracks.potions;
+            (r.0+r.2-31,r.1+5,18,24)
+        }
+        "charge-spark" | "unlock-diamond" => (p.hud_left()+12,tracks.divine.1+2,24,24),
+        _ => {
+            let bar = tracks.vital(usize::from(mark.style!="health-slash"));
+            (bar.0+6,bar.1,24,bar.3)
+        }
+    }
 }
 pub fn paint_inventory_hud(p:&mut crate::render::Painter,view:&crate::render::View,cues:&[Cue],now:f64,pack_open:bool){
     for (id,mark,color,alpha) in inventory_marks(cues,now) {
         if id.is_some() && pack_open || mark.style=="pack-capacity"&&pack_open {continue}
-        let anchor=if mark.style.starts_with("reaction-spent"){p.reaction_action_anchor(view,&mark.style)}else if id.is_some(){let r=p.hud_tracks().button(0);let (x,w)=(r.0,r.2);(x+w/2-12,p.toolbar_y()+4,24,28)}else{inventory_hud_anchor(p,&mark)};
+        let anchor=if mark.style.starts_with("reaction-spent"){p.reaction_action_anchor(view,&mark.style)}else if id.is_some() && mark.style!="split-potion"{let r=p.hud_tracks().items;(r.0+r.2-30,r.1+2,24,24)}else{inventory_hud_anchor(p,&mark)};
         crate::action_marks::paint(p,&mark,anchor.0,anchor.1,anchor.2,anchor.3,color,alpha);
     }
 }

@@ -1098,7 +1098,7 @@ impl TileStack {
         if o.grate {fixtures.push("a grate".into());}
         if o.bridge {fixtures.push("a bridge".into());}
         let local_items=items.iter().filter(|g|g.x==x as f64&&g.y==y as f64).map(|g|{
-            let name=pack::displayed_name(r,&g.item);
+            let name=pack::ground_name(r,&g.item);
             article(&if g.item.kind=="heart" {name.to_lowercase()}else{name})
         }).collect();
         let hearts = crate::creature_presentation::CorpseHearts::new(r);
@@ -1271,11 +1271,11 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 if g.x!=x as f64 || g.y!=y as f64 {
                     let place=if crate::portal_ui::observed_item_mate(r,observation,o.index)
                         ==Some(g.y as usize*f.width()+g.x as usize) {"through the linked portal"}else{"in the linked Non-Euclidean space"};
-                    let text=format!("{} rests {place}.",pack::displayed_name(r,&g.item));
+                    let text=format!("{} rests {place}.",pack::ground_name(r,&g.item));
                     append_scene(&mut detail.scene,&text);
                     detail.description.push_str(&format!("\n{text}"));
                 }
-                detail.description.push_str(&format!("\n{}",pack::describe_item(r,&g.item)));
+                detail.description.push_str(&format!("\n{}",pack::ground_description(r,&g.item)));
             }
         }
         detail.report()
@@ -1356,11 +1356,11 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             }
             let mate=crate::portal_ui::observed_item_mate(r,observation,o.index);
             for g in &ground {
-                let description=pack::describe_item(r,&g.item);
+                let description=pack::ground_description(r,&g.item);
                 if corpse_core::revision50::enabled(r) {report.item_hover.push(description.clone());}
                 if g.x!=x as f64 || g.y!=y as f64 {
                     let place=if mate==Some(g.y as usize*f.width()+g.x as usize) {"through the linked portal"}else{"in the linked Non-Euclidean space"};
-                    let text=format!("{} rests {place}.",pack::displayed_name(r,&g.item));
+                    let text=format!("{} rests {place}.",pack::ground_name(r,&g.item));
                     append_scene(&mut report.scene,&text);
                     report.lines.push(text);
                 }
@@ -1431,13 +1431,13 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 if magical { "You sense" } else { "You remember" },
                 items
                     .iter()
-                    .map(|(i, _)| pack::displayed_name(r, i))
+                    .map(|(i, _)| pack::ground_name(r, i))
                     .collect::<Vec<_>>()
                     .join(", ")
             );
             if corpse_core::revision50::enabled(r) { report.item_hover.push(report.lines[0].clone()); }
             for (i, _) in items {
-                let description=pack::describe_item(r,i);
+                let description=pack::ground_description(r,i);
                 if corpse_core::revision50::enabled(r) { report.item_hover.push(description.clone()); }
                 report.lines.push(description);
             }

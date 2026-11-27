@@ -53,6 +53,10 @@ fn baseline_game_grid_fits_the_whole_floor_and_preserves_hud_hit_targets() {
         assert_eq!(frame.rail_bottom, 712);
         let (cw, ch, ox, oy) = p.map_layout(79, 29);
         assert_eq!((cw, ch), (12, 20));
+        assert_eq!(ox, frame.map.0);
+        assert_eq!(crate::pointer_tile_dimensions(&p,79,29,ox,oy),Some((0,0)));
+        assert_eq!(crate::pointer_tile_dimensions(&p,79,29,ox-1,oy),None);
+        assert_eq!(crate::pointer_tile_dimensions(&p,79,29,ox+79*cw,oy),None);
         assert!(frame.map.contains(ox, oy));
         assert!(frame.map.contains(ox + 79*cw - 1, oy + 29*ch - 1));
         let window = (width as u32, height as u32);

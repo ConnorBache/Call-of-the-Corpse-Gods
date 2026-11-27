@@ -322,17 +322,21 @@ fn record_mockup_hud_walkthrough() {
     let mut steps=Vec::new();
     let mut step=Step::game("showcase",vec![Input::Resize(2560,1440),key(Keycode::C)]);
     step.readonly=false;step.capture=true;steps.push(step);
+    let (jx,jy): (usize,usize) = serde_json::from_slice(&std::fs::read(dir.join("jewelry-location.json")).unwrap()).unwrap();
+    let mut step=Step::game("look-at-flight-ring",vec![Input::Motion((jx,jy))]);step.capture=true;steps.push(step);
     let v=observe::observe(&run.run);
     let (x,y)=v.cells.iter().find_map(|c|c.actor_id.is_some_and(|id|Some(id)==v.creatures.first().map(|a|a.id)).then_some((c.x,c.y)))
         .unwrap_or((grid.player.0+3,grid.player.1));
     let mut step=Step::game("look-at-enemy",vec![Input::Motion((x,y))]);step.capture=true;steps.push(step);
-    let mut step=Step::game("bow-aim",vec![Input::ClickHud(tracks.items.0+20,tracks.items.1+32),Input::Motion((x,y))]);
+    let mut step=Step::game("bow-aim",vec![Input::ClickHud(tracks.items.0+20,tracks.items.1+game_hud::RAIL_INSET+8),Input::Motion((x,y))]);
     step.item=true;steps.push(step);
     let mut step=Step::game("bow-fire",vec![Input::Click((x,y))]);step.readonly=false;steps.push(step);
     let mut step=Step::game("open-pot-inventory",vec![click(tracks.potions)]);step.inventory=true;steps.push(step);
     steps.push(Step::game("close-pot-inventory",vec![key(Keycode::Escape)]));
     let mut step=Step::game("open-heart-inventory",vec![click(tracks.hearts)]);step.inventory=true;steps.push(step);
     steps.push(Step::game("close-heart-inventory",vec![key(Keycode::Escape)]));
+    let mut step=Step::game("open-full-pack-by-key",vec![key(Keycode::I)]);step.inventory=true;steps.push(step);
+    steps.push(Step::game("close-full-pack",vec![key(Keycode::Escape)]));
     let mut step=Step::game("wait-turn",vec![key(Keycode::Z)]);step.readonly=false;steps.push(step);
     let slot=render::TOOLBAR_VISIBLE_ACTIONS.iter().position(|id|*id==help_ui::ACTION).unwrap();
     let mut step=Step::game("help-from-header",vec![click(tracks.button(slot))]);step.help=true;steps.push(step);

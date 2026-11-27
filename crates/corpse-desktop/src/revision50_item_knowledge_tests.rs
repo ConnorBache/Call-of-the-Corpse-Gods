@@ -46,7 +46,7 @@ fn r50_item_hover_jewelry_hearts_tools_and_grants_keep_effect_details() {
     r.inventory[0]=Item{id:900.,kind:"ring".into(),name:"stale ring".into(),effect:"light".to_string().into(),
         granted_ability:"shrail-execute".to_string().into(),..Default::default()};
     let mut view=PackView::observe(&r);view.configure(&p,p.frame().map.tuple());hover_first(&mut view);
-    let text=view.tooltip().unwrap();assert!(text.contains("Ring of Light")&&text.contains("Execute"));
+    let text=view.tooltip().unwrap();assert!(text.contains("Light Ring")&&text.contains("Execute"));
     assert!(text.find("Adds 10 illumination").unwrap()<text.find("Execute").unwrap());
 }
 #[test]

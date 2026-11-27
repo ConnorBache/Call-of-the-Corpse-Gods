@@ -8,7 +8,6 @@ use crate::{modal_ui::Rect, typography_ui::{Role, RoleStyle}};
 /// Knowledge-filtered ground evidence; no live world references survive observation.
 #[derive(Clone, Debug, PartialEq)]
 pub struct GroundEntity {
-    pub reserve:Option<(f64,f64)>,
     pub hallucination: Option<std::sync::Arc<[(String,String,super::Rgb);6]>>,
     pub kind: GroundKind, pub x: usize, pub y: usize, pub id: u64,
     pub name: String, pub glyph: String, pub color: super::Rgb, pub distance: f64,
@@ -39,24 +38,27 @@ impl Layout {
     pub fn content_view(self,p:&Painter,v:&View)->Content {
         let mut content=self.content(p,&v.creatures);
         for row in &v.ground_entities {
-            let mut card=Card{reserve:row.reserve,heart:None,top:content.height,height:0,lines:Vec::new(),bars:Vec::new()};
+            let mut card=Card{heart:None,top:content.height,height:0,lines:Vec::new(),bars:Vec::new()};
             let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(13.));
             let step=(style.font_size*style.line_height).ceil().max(15.) as i32;
             let mut y=5;
             for line in p.wrap_text_role(Role::Secondary,&format!("{} {}",row.glyph,row.name),(self.rows.2-12).max(1),13) {
                 card.lines.push(Line{hover_only:false,text:line,y,size:13,color:row.color,outline:None,black_initial:false});y+=step;
             }
-            card.height=y+6+if card.reserve.is_some(){20}else{0};content.height+=card.height;content.cards.push(card);
+            card.height=y+6;content.height+=card.height;content.cards.push(card);
         }
         content.cards.rotate_right(v.ground_entities.len());
-        let mut top=22;
-        let mut headings=vec![(0,"ON THE FLOOR")];
+        let ground = v.ground_entities.len();
+        let mut top=0;
+        let mut divider=None;
         for (i,card) in content.cards.iter_mut().enumerate(){
-            if i==v.ground_entities.len() {headings.push((top,"ENEMIES"));top+=22;}
+            if i==ground && ground>0 {
+                divider=Some(top+4);
+                top+=10;
+            }
             card.top=top;top+=card.height;
         }
-        if v.creatures.is_empty(){headings.push((top,"ENEMIES"));top+=22;}
-        content.headings=headings;
+        content.divider=divider;
         content.height=top;
         content
     }
@@ -66,9 +68,9 @@ struct Line { hover_only:bool, text:String, y:i32, size:u16, color:super::Rgb, o
 #[derive(Clone,Debug)]
 struct Bar { y:i32, label:String, value:String, fraction:f64, color:super::Rgb }
 #[derive(Clone,Debug)]
-struct Card { heart:Option<bool>, reserve:Option<(f64,f64)>, top:i32, height:i32, lines:Vec<Line>, bars:Vec<Bar> }
+struct Card { heart:Option<bool>, top:i32, height:i32, lines:Vec<Line>, bars:Vec<Bar> }
 #[derive(Clone,Debug)]
-pub struct Content { cards:Vec<Card>, height:i32, layout:Layout, headings:Vec<(i32,&'static str)> }
+pub struct Content { cards:Vec<Card>, height:i32, layout:Layout, divider:Option<i32> }
 impl Content {
     pub fn stair_count(v:&View)->usize {v.ground_entities.partition_point(|g|g.kind==GroundKind::Stair)}
     pub fn creature_index(v:&View,index:usize)->Option<usize>{index.checked_sub(v.ground_entities.len()).filter(|&i|i<v.creatures.len())}
@@ -84,7 +86,7 @@ impl Content {
         let width=(layout.rows.2-16).max(1);
         let mut cards=Vec::with_capacity(actors.len());let mut top=0;
         for a in actors {
-            let mut card=Card{reserve:None,heart:a.has_heart,top,height:0,lines:Vec::new(),bars:Vec::new()};let mut y=5;
+            let mut card=Card{heart:a.has_heart,top,height:0,lines:Vec::new(),bars:Vec::new()};let mut y=5;
             fn text(p:&Painter,card:&mut Card,y:&mut i32,width:i32,s:&str,size:u16,color:super::Rgb) {
                 let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(size as f64));
                 let line=(style.font_size*style.line_height).ceil().max(size as f64+2.) as i32;
@@ -128,7 +130,7 @@ impl Content {
             }
             card.height=y.max(conditions_top+16)+3;top+=card.height;cards.push(card);
         }
-        Self{cards,height:top,layout,headings:Vec::new()}
+        Self{cards,height:top,layout,divider:None}
     }
     /// Pixel scrolling keeps every condition reachable even for a card taller
     /// than the viewport. Clamping after removals cannot strand the final card.
@@ -160,12 +162,9 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
     p.enemy_list_offset=content.offset(p.enemy_list_offset);
     let old_clip=p.clip;p.clip=Some(layout.bounds.tuple());
     p.clip=Some(layout.rows.tuple());
-    for &(top,label) in &content.headings {
+    if let Some(top)=content.divider {
         let y=layout.rows.1+top-p.enemy_list_offset as i32;
-        if y+20>=layout.rows.1 && y<layout.rows.1+layout.rows.3 {
-            p.text(label,layout.rows.0+4,y+3,11,MUTED);
-            p.rect(layout.rows.0+4,y+19,layout.rows.2-8,1,[70,63,81]);
-        }
+        p.rect(layout.rows.0+4,y,layout.rows.2-8,1,[70,63,81]);
     }
     for (index,card) in content.cards.iter().enumerate() {
         let selected=Content::actor(v,index).is_some_and(|id|p.enemy_hover==Some(id)) || Content::ground(v,index).is_some_and(|at|p.ground_hover==Some(at));
@@ -188,10 +187,6 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
             } else {
                 p.text_role(Role::Secondary,&line.text,x,y+line.y,line.size,line.color);
             }
-        }
-        if let Some((energy,capacity))=card.reserve {
-            super::resource_ui::paint_bar(p,"",&format!("{energy:.0}/{capacity:.0}"),
-                layout.rows.0+4,y+card.height-21,72,17,p.profile.rgb("ui.colors.energy"),energy/capacity.max(1.),11);
         }
         for bar in &card.bars {
             let w=(layout.rows.2-16).max(1);let yy=y+bar.y;
@@ -456,7 +451,7 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
         }
     }
     #[test] fn deterministic_group_distance_and_ties() {
-        let row=|kind,distance,id|GroundEntity{reserve:None,hallucination:None,kind,distance,id,x:2,y:3,name:"Thing".into(),glyph:"!".into(),color:INK};
+        let row=|kind,distance,id|GroundEntity{hallucination:None,kind,distance,id,x:2,y:3,name:"Thing".into(),glyph:"!".into(),color:INK};
         let mut rows=vec![row(GroundKind::Corpse,0.,1),row(GroundKind::Vent,0.,1),row(GroundKind::Item,9.,1),row(GroundKind::Item,1.,2),row(GroundKind::Item,1.,1)];
         sort_ground(&mut rows);assert_eq!(rows.iter().map(|g|(g.kind,g.distance,g.id)).collect::<Vec<_>>(),vec![(GroundKind::Item,1.,1),(GroundKind::Item,1.,2),(GroundKind::Item,9.,1),(GroundKind::Vent,0.,1),(GroundKind::Corpse,0.,1)]);
         let expected=rows.clone();rows.reverse();sort_ground(&mut rows);assert_eq!(rows,expected);

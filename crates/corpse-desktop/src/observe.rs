@@ -551,14 +551,14 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
         for o in observation.cells.iter().filter(|o|o.current&&o.direct) {
             if matches!(o.tile.as_deref(),Some("up"|"down")) {
                 let style=ground_compiled::prepare(profile,o,flesh);let glyph=style.glyph;let color=style.fg;let x=o.index%width;let y=o.index/width;
-                ground_entities.push(GroundEntity{reserve:None,hallucination:None,kind:GroundKind::Stair,x,y,id:o.index as u64,
+                ground_entities.push(GroundEntity{hallucination:None,kind:GroundKind::Stair,x,y,id:o.index as u64,
                     name:if o.tile.as_deref()==Some("up"){"Upward Staircase".into()}else{"Downward Staircase".into()},glyph,color,distance:distance(x,y)});
             }
             if let Some(vent)=o.hazards.as_ref().and_then(|h|h.vent.as_ref()) {
                 let x=o.index%width;let y=o.index/width;
                 let color=profile.value(&format!("terrain.gas:{}.color",vent.gas)).and_then(|v|v.as_str()).map(hex).unwrap_or_else(||gas_color(&vent.gas));
                 let style=crate::entity_profile::resolve(profile,"objects","vent",None,"=",color);
-                ground_entities.push(GroundEntity{reserve:None,hallucination:None,kind:GroundKind::Vent,x,y,id:o.index as u64,
+                ground_entities.push(GroundEntity{hallucination:None,kind:GroundKind::Vent,x,y,id:o.index as u64,
                     name:format!("{} vent",vent.gas),glyph:style.glyph,color:style.color,distance:distance(x,y)});
             }
         }
@@ -571,8 +571,8 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 if observation.cells.get(i).is_some_and(|o|o.current&&o.direct) {
                     let key=if g.item.kind=="potion"{format!("potion:{}",g.item.effect.as_ref().map(String::as_str).unwrap_or(""))}else{g.item.name.clone()};
                     let style=crate::entity_profile::resolve(profile,"items",&key,Some(&format!("kind:{}",g.item.kind)),&item_glyph(&g.item),item_color(&g.item.kind));
-                    ground_entities.push(GroundEntity{reserve:crate::render::resource_ui::amulet_reserve(&g.item,run.simulation_revision.value_or(29.)),hallucination:None,kind:GroundKind::Item,x:g.x as usize,y:g.y as usize,id:g.item.id.to_bits(),
-                        name:if corpse_core::revision50::enabled(run){crate::pack::displayed_name(run,&g.item)}else{g.item.name.clone()},
+                    ground_entities.push(GroundEntity{hallucination:None,kind:GroundKind::Item,x:g.x as usize,y:g.y as usize,id:g.item.id.to_bits(),
+                        name:crate::pack::ground_name(run,&g.item),
                         glyph:style.glyph,color:style.color,distance:distance(g.x as usize,g.y as usize)});
                 }
                 if observation.cells.get(i).is_some_and(|c| c.direct) && item_cells.insert(i) {
@@ -611,7 +611,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             if a.dead.value_or(false) && visibility().directly_visible_actor(a) && observation.cells.get(i).is_some_and(|o|o.current&&o.direct) {
                 let cell=actor_cell_with_hearts(profile,run,a,width,&backgrounds,false,&hearts);
                 let hallucination=cell.hallucination.as_ref().map(|variants|std::sync::Arc::new(std::array::from_fn(|i|(format!("{}?",crate::creature_presentation::corpse_name(variants[i].label.trim_end_matches('?'), variants[i].heartless)),variants[i].glyph.clone(),variants[i].fg))));
-                ground_entities.push(GroundEntity{reserve:None,hallucination,kind:GroundKind::Corpse,x:cell.x,y:cell.y,id:a.id.to_bits(),
+                ground_entities.push(GroundEntity{hallucination,kind:GroundKind::Corpse,x:cell.x,y:cell.y,id:a.id.to_bits(),
                     name:crate::creature_presentation::corpse_name(cell.label.trim_end_matches('?'), cell.heartless),glyph:cell.glyph,color:cell.fg,distance:distance(cell.x,cell.y)});
             }
             if a.dead.value_or(false)
@@ -675,7 +675,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
                 glyph: style.glyph,
                 emphasis: style.emphasis,
                 pulse_speed: style.speed,
-                label: if corpse_core::revision50::enabled(run) { crate::pack::displayed_name(run, item) } else { item.name.clone() },
+                label: crate::pack::ground_name(run,item),
                 entity_ink: Some(ink),
                 background_overlay: style.background.map(|c| (c, 1.)),
                 fg,
@@ -1003,7 +1003,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
             .map(|i| {
                 format!(
                     "{}{}",
-                    if corpse_core::revision50::enabled(run) { crate::pack::displayed_name(run, i) } else { i.name.clone() },
+                    if corpse_core::revision50::enabled(run) || matches!(i.kind.as_str(),"ring"|"amulet"){crate::pack::displayed_name(run,i)}else{i.name.clone()},
                     if corpse_core::revision50::enabled(run) {
                         if corpse_core::revision50_inventory::worn(i) { " [active]" } else { "" }
                     } else if i.equipped.as_ref().is_some() {

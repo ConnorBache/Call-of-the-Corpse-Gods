@@ -550,7 +550,7 @@ impl Painter {
     pub fn logical_height(&self)->i32{if self.responsive_canvas{(self.height as f64/self.scale).ceil()as i32}else{HEIGHT as i32}}
     pub fn frame(&self)->crate::modal_ui::Frame{crate::modal_ui::Frame::for_size(&self.profile,self.logical_width(),self.logical_height())}
     pub fn hud_left(&self)->i32{hud_left(&self.profile)+self.logical_width()-WIDTH as i32}
-    pub fn toolbar_y(&self)->i32{self.hud_tracks().nav.1+8}
+    pub fn toolbar_y(&self)->i32{self.hud_tracks().button(0).1}
     pub fn hud_tracks(&self)->crate::game_hud::Tracks{crate::game_hud::Tracks::resolve(self)}
     pub fn toolbar_action(&self,x:i32,y:i32)->Option<usize>{
         let tracks=self.hud_tracks();
@@ -563,7 +563,7 @@ impl Painter {
         let r=self.hud_tracks().button(slot);(r.0,r.2)
     }
     pub fn game_ability_top(&self)->i32 {
-        self.hud_tracks().divine.1+26
+        self.hud_tracks().divine.1+crate::game_hud::RAIL_INSET
     }
     pub fn game_ability_row(&self)->i32 {
         (crate::ability_ui::row(&self.profile)+18).max(54)
@@ -2144,7 +2144,7 @@ impl Painter {
         ability_dialog::bounds(self, a)
     }
     pub fn inspection_notice_y(&self) -> i32 {
-        self.hud_tracks().inspector.1+20
+        {let r=self.hud_tracks().inspector; r.1+(r.3-13)/2}
     }
     pub fn hud_damage(&self)->impl Iterator<Item=damage::Rect>+'_ {
         let t=self.hud_tracks();
@@ -2164,7 +2164,7 @@ impl Painter {
             let x=left+12+rail-66;
             return (x,self.game_ability_top()+i as i32*self.game_ability_row()+34,14,16)
         }
-        (self.hud_left()+12,self.game_ability_top()-26,20,20)
+        (self.hud_left()+12,self.hud_tracks().divine.1+2,20,20)
     }
     fn ability_metadata(&self,state:&str,cost:&str,left:i32,right:i32)->(String,String,i32){
         let role=crate::typography_ui::Role::Secondary;
@@ -2403,7 +2403,6 @@ impl Painter {
         // Raster fade is O(A) over the native chronicle rectangle, with no copied frame.
         if self.intersects_damage(0,0,hud.chronicle.2,hud.chronicle.3) {
         crate::game_hud::panel(self,hud.chronicle);
-        self.text("CHRONICLE",12,7,11,MUTED);
         #[cfg(test)]
         let _paint_chronicle = paint_profile_bench::span(paint_profile_bench::Kind::Chronicle);
         let mut lines = Vec::new();
@@ -2420,10 +2419,10 @@ impl Painter {
             }
         }
         let end = lines.len().saturating_sub(v.chronicle_offset.min(lines.len().saturating_sub(4)));
-        let height = hud.chronicle.3-31;
+        let height = hud.chronicle.3-16;
         let start = end.saturating_sub(((height + line_height - 1) / line_height) as usize);
-        let bottom = 23 + height;
-        self.clip = Some((12, 23, hud.chronicle.2 - 24, height));
+        let bottom = 8 + height;
+        self.clip = Some((12, 8, hud.chronicle.2 - 24, height));
         for (i, (line, color)) in lines[start..end].iter().enumerate() {
             self.text_role(crate::typography_ui::Role::Chronicle, line, 12,
                 bottom - (end - start - i) as i32 * line_height, size,
@@ -2432,7 +2431,7 @@ impl Painter {
         self.clip = None;
         let background = [14,13,22];
         let (left_px, right_px) = (self.native_x(12.).max(0), self.native_x((hud.chronicle.2 - 12) as f64).min(self.width as i32));
-        let (top_px, bottom_px) = (self.native_y(23.).max(0), self.native_y(bottom as f64).min(self.height as i32));
+        let (top_px, bottom_px) = (self.native_y(8.).max(0), self.native_y(bottom as f64).min(self.height as i32));
         self.paint_chronicle_fade(background,(left_px,top_px,right_px,bottom_px));
         if self.chronicle_hover {
             let r=self.chronicle_hit_rect();
@@ -2759,7 +2758,7 @@ impl Painter {
         drop(_paint_map);
         crate::game_hud::paint_resources(self,v,hud);
         crate::game_hud::paint_nav(self,hud);
-        crate::game_hud::paint_divine_header(self,hud);
+        crate::game_hud::panel(self,hud.divine);
         crate::game_hud::paint_item_rail(self,v,hud);
         if self.intersects_damage(map_right,0,left-map_right,self.logical_height()) {
             #[cfg(test)]
@@ -2958,7 +2957,7 @@ pub(crate) fn chronicle_height_for(p: &crate::appearance_profile::Profile, basel
         explicit.round() as i32
     }
 }
-/// O(1): preserve fitted tile aspect/size and align map to playfield right edge.
+/// O(1): preserve fitted tile aspect/size and align map to playfield left edge.
 pub fn map_layout_profile(
     w: usize,
     h: usize,
@@ -2985,7 +2984,7 @@ pub fn map_layout_frame(w:usize,h:usize,p:&crate::appearance_profile::Profile,fr
     (
         cw,
         ch,
-        frame.map.2 - 12 - cw * w as i32,
+        frame.map.0,
         top + (area_h - ch * h as i32) / 2,
     )
 }
@@ -3179,12 +3178,14 @@ mod tests {
     #[test]
     fn floor_fits() {
         let (w, h, x, y) = map_layout(79, 29);
-        assert!(x >= 20 && y >= 128);
+        let frame = crate::modal_ui::Frame::from_profile(crate::appearance_profile::Profile::defaults());
+        assert_eq!(x, frame.map.0);
+        assert!(y >= frame.map.1);
         assert!(
-            (h as f64 / w as f64 - 24. / 15.).abs() <= 0.5 / w as f64,
-            "authored pixel aspect survives integer raster fit"
+            (h as f64 / w as f64 - (1080./34.)/(1920./100.)).abs() <= 0.5 / w as f64,
+            "default tile aspect survives integer raster fit"
         );
-        assert!(x + w * 79 < 1260 && y + h * 29 <= 704);
+        assert!(frame.map.contains(x + w * 79 - 1, y + h * 29 - 1));
     }
     #[test]
     fn path_tints_are_white_restrained_and_preserve_glyph_ink() {
@@ -3328,9 +3329,16 @@ mod tests {
 }
 
 // Stable command IDs are independent of their visible toolbar slots.
-pub const TOOLBAR_VISIBLE_ACTIONS: [usize; 4] = [4, 7, crate::help_ui::ACTION, 9];
-pub const TOOLBAR_ACTIONS: [&str; 4] = ["Pack", "Bestiary", "?", "Menu"];
-pub const TOOLBAR_LABELS: [&str; 4] = TOOLBAR_ACTIONS;
+const NAV_LEN: usize = crate::game_hud::NAV.len();
+pub const TOOLBAR_VISIBLE_ACTIONS: [usize; NAV_LEN] = {
+    let [a, b, c] = crate::game_hud::NAV;
+    [a.0, b.0, c.0]
+};
+pub const TOOLBAR_ACTIONS: [&str; NAV_LEN] = {
+    let [a, b, c] = crate::game_hud::NAV;
+    [a.1, b.1, c.1]
+};
+pub const TOOLBAR_LABELS: [&str; NAV_LEN] = TOOLBAR_ACTIONS;
 /// Equal slots follow the active canvas, not the original 1280px sheet.
 pub fn toolbar_rect_for_width(i:usize,width:i32)->(i32,i32){
     let usable=(width-24).max(0);

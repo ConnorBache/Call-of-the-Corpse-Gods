@@ -139,9 +139,9 @@ fn r52_amulet_ui_save_load_names_and_missing_tier_are_not_inferred_from_floor() 
         assert_eq!(describe_item(&loaded.run,a),describe_item(&engine.run,b));
     }
     let mut deep=loaded.run.clone();deep.depth=40.;
-    assert_eq!(displayed_name(&deep,&deep.inventory[0]),"Tier 1 Amulet of Blinking");
-    assert_eq!(displayed_name(&deep,&deep.inventory[1]),"Tier 9 Amulet of Blinking");
-    assert_eq!(displayed_name(&deep,&deep.inventory[2]),"Tier 1 Amulet of Lightning");
+    assert_eq!(displayed_name(&deep,&deep.inventory[0]),"Tier 1 Blinking Amulet");
+    assert_eq!(displayed_name(&deep,&deep.inventory[1]),"Tier 9 Blinking Amulet");
+    assert_eq!(displayed_name(&deep,&deep.inventory[2]),"Tier 1 Lightning Amulet");
     assert_eq!(deep.inventory[2].amulet_tier,Field::Missing);
     assert!(crate::debug_floor_ui::item_row(&deep,&deep.inventory[0],Some(1)).contains("Tier 1 Amulet of Blinking · 7/10 energy · F1"));
     assert!(crate::debug_floor_ui::item_row(&deep,&deep.inventory[1],Some(40)).contains("Tier 9 Amulet of Blinking · 10/10 energy · F40"));
@@ -150,24 +150,31 @@ fn r52_amulet_ui_save_load_names_and_missing_tier_are_not_inferred_from_floor() 
         let mut amulet=item("blinking",900.,1,7.);amulet.amulet_tier=Field::Missing;legacy.inventory=vec![amulet];
         let engine=corpse_core::temporal::Engine::new(legacy).unwrap();
         let reload=corpse_core::temporal::Engine::load(&engine.save().unwrap()).unwrap();
-        assert_eq!(displayed_name(&reload.run,&reload.run.inventory[0]),"Amulet of Blinking");
+        assert_eq!(displayed_name(&reload.run,&reload.run.inventory[0]),"Blinking Amulet");
         assert!(describe_item(&reload.run,&reload.run.inventory[0]).contains("Blink along a 10 tile line."));
         assert!(!describe_item(&reload.run,&reload.run.inventory[0]).contains("Tier"));
         let mut view=PackView::observe(&reload.run);view.selected=Some(900.);
-        assert_eq!(view.detail_lines().iter().filter(|(line,_)|line=="Amulet of Blinking").count(),1);
+        assert_eq!(view.detail_lines().iter().filter(|(line,_)|line=="Blinking Amulet").count(),1);
     }
 }
 
 #[test]
-fn r52_amulet_ui_visible_ground_uses_actual_tier_and_charge() {
+fn r52_amulet_ui_visible_ground_shows_only_its_base_name() {
     let mut r=room();let amulet=item("discord",900.,40,12.);
     r.ground_at_mut(r.depth).push(corpse_core::GroundItem{x:11.,y:10.,item:amulet.clone(),..Default::default()});
     let before=r.clone();let report=crate::inspection_ui::observe_tile(&r,11,10);
-    assert!(report.lines.join("\n").contains("Tier 9 Amulet of Discord"));
-    assert!(report.item_hover.contains(&describe_item(&r,&amulet)));
-    assert!(report.item_hover.join("\n").contains("10/10"));
-    assert!(crate::observe::observe(&r).cells.iter().any(|c|c.x==11&&c.y==10&&c.label=="Tier 9 Amulet of Discord"));
+    assert_eq!(report.item_hover,["Discord Amulet"]);
+    assert!(!report.lines.join("\n").contains("Tier"));
+    let v=crate::observe::observe(&r);
+    assert!(v.cells.iter().any(|c|c.x==11&&c.y==10&&c.label=="Discord Amulet"));
+    assert!(v.ground_entities.iter().any(|row|row.id==900_f64.to_bits()&&row.name=="Discord Amulet"));
+    assert!(describe_item(&r,&amulet).starts_with("Tier 9 Discord Amulet"));
     assert_eq!(r,before);
+    let ring=corpse_core::Item{id:901.,kind:"ring".into(),name:"Ring of Flight".into(),
+        effect:"flight".to_owned().into(),tinkered:true.into(),granted_ability:"shrail-execute".to_owned().into(),..Default::default()};
+    r.ground_at_mut(r.depth).push(corpse_core::GroundItem{x:12.,y:10.,item:ring.clone(),..Default::default()});
+    assert_eq!(crate::inspection_ui::observe_tile(&r,12,10).item_hover,["Flight Ring"]);
+    assert_eq!(displayed_name(&r,&ring),"Flight Ring and Execute");
 }
 
 #[test]
@@ -181,8 +188,9 @@ fn r52_amulet_ui_memory_never_enriches_from_hidden_live_tier_or_charge() {
     r.remembered_items.get_or_insert_with(Default::default).insert(depth.to_string(),vec![
         corpse_core::RunRememberedItemsEntryEntry{x:x as f64,y:y as f64,item:item("poison",900.,1,17.)}]);
     let before=crate::inspection_ui::observe_tile(&r,x,y);
-    assert!(before.item_hover.join("\n").contains("Tier 1 Amulet of Poison"));
-    assert!(before.item_hover.join("\n").contains("10/10"));
+    assert!(before.item_hover.iter().any(|line|line=="Poison Amulet"));
+    assert!(!before.item_hover.join("\n").contains("Tier"));
+    assert!(!before.item_hover.join("\n").contains("10/10"));
     r.ground_at_mut(depth).push(corpse_core::GroundItem{x:x as f64,y:y as f64,item:item("poison",900.,40,2.),..Default::default()});
     assert_eq!(crate::inspection_ui::observe_tile(&r,x,y),before);
 }

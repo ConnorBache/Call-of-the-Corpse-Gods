@@ -37,7 +37,7 @@ fn revision50_jewelry_capture_five_carried_categories() {
     r.inventory=vec![
         Item{id:905.,kind:"heart".into(),name:"Rat heart".into(),..Default::default()},
         Item{id:904.,kind:"potion".into(),effect:"healing".to_string().into(),quantity:2.0.into(),..Default::default()},
-        Item{id:903.,kind:"ring".into(),effect:"light".to_string().into(),name:"Ring of Light".into(),..Default::default()},
+        Item{id:903.,kind:"ring".into(),effect:"light".to_string().into(),name:"Light Ring".into(),..Default::default()},
         amulets::make_amulet(Effect::Lightning,902.).unwrap(),
         equipment::make_arrows(901.,500.),
     ];
@@ -155,7 +155,7 @@ fn revision50_jewelry_capture_actual_item_hovers() {
         let mut pack=PackView::observe(&r);pack.configure(&p,p.frame().map.tuple());
         let y=pack.row_positions()[0].1-pack.list_scroll+4;pack.hover(pack.layout.list.0+12,y);
         assert!(pack.selected.is_none());let tip=pack.tooltip().unwrap();
-        assert!(tip.contains(if ring {"Ring of Light"}else{"Potion of Freezing"}));
+        assert!(tip.contains(if ring {"Light Ring"}else{"Potion of Freezing"}));
         paint_capture(&r,&mut p,&pack,if ring {"granted-ring-pack-hover"}else{"freezing-pack-hover"});
         assert_eq!(serde_json::to_vec(&r).unwrap(),before);
     }

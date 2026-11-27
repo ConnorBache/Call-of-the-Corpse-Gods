@@ -1020,7 +1020,6 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     if screen == Screen::Game && !inventory && ability_detail.is_none() && history.is_none() {
                         let shift = keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD);
                         painter.toolbar_focus = match key {
-                            Keycode::I => Some(4),
                             Keycode::M => Some(7),
                             Keycode::Slash if shift => Some(help_ui::ACTION),
                             _ => None,
@@ -2031,7 +2030,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                             Err(e) => e.to_string(),
                                         };
                                     }
-                                    4 | game_hud::HEARTS | game_hud::POTIONS => {
+                                    game_hud::HEARTS | game_hud::POTIONS => {
                                         inventory = !inventory;
                                         if inventory {
                                             let kind=match action {game_hud::HEARTS=>Some("heart"),game_hud::POTIONS=>Some("potion"),_=>None};

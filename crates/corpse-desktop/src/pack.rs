@@ -1279,7 +1279,7 @@ fn longest_tinkered_amulet_name(p: &Painter, revision: f64) -> String {
         let name = corpse_core::revision50_amulet_effects::display_name(&item).unwrap();
         for a in progression::catalog_for_revision(revision).iter().filter(|a| !a.id.starts_with("kative-")) {
             let ability = match a.id.as_str() { "shrail-rage-at-the-dying-of-the-light" => "Ragelight", "pelian-you-shall-never-be-rid-of-me" => "Never Be Rid of Me", _ => &a.name };
-            let label = format!("Tier 4 {name} and {ability}");
+            let label = jewelry_label(format!("Tier 4 {name} and {ability}"), "Amulet", false);
             let measured = p.measure_text_role(Role::Inventory, &label, 14);
             if measured > width { width = measured; longest = label; }
         }
@@ -1617,6 +1617,40 @@ fn potion_known(run: &Run, i: &Item) -> bool {
             .iter()
             .any(|s| Some(s) == i.effect.as_ref())
 }
+fn jewelry_kind(i: &Item) -> Option<&'static str> {
+    match i.kind.as_str() { "ring" => Some("Ring"), "amulet" => Some("Amulet"), _ => None }
+}
+
+// Rewrite only the projected label. Model names are stable lookup/save keys.
+fn jewelry_label(name: String, kind: &str, floor: bool) -> String {
+    let body = name.strip_prefix("Retired ").unwrap_or(&name);
+    let body = body.strip_prefix("Tier ")
+        .and_then(|s|s.split_once(' '))
+        .filter(|(tier,_)|tier.bytes().all(|c|c.is_ascii_digit()))
+        .map_or(body, |(_,label)|label);
+    let of = match kind { "Ring" => "Ring of ", _ => "Amulet of " };
+    let Some(effect) = body.strip_prefix(of) else { return name; };
+    let (effect, grant) = effect.split_once(" and ").map_or((effect,None),|(effect,grant)|(effect,Some(grant)));
+    if floor { return format!("{effect} {kind}"); }
+    let prefix = &name[..name.len()-body.len()];
+    grant.map_or_else(||format!("{prefix}{effect} {kind}"),|g|format!("{prefix}{effect} {kind} and {g}"))
+}
+
+pub(crate) fn ground_name(run: &Run, i: &Item) -> String {
+    let Some(kind) = jewelry_kind(i) else {
+        return if corpse_core::revision50::enabled(run){displayed_name(run,i)}else{i.name.clone()};
+    };
+    let catalog_name = if corpse_core::revision50::enabled(run) {
+        corpse_core::revision50_rings::display_name(i)
+            .or_else(||corpse_core::revision50_amulet_effects::display_name(i))
+    } else { None };
+    jewelry_label(catalog_name.unwrap_or(&i.name).to_owned(), kind, true)
+}
+
+pub(crate) fn ground_description(run: &Run, i: &Item) -> String {
+    if jewelry_kind(i).is_some() {ground_name(run,i)}else{describe_item(run,i)}
+}
+
 pub(crate) fn displayed_name(run: &Run, i: &Item) -> String {
     let name = if corpse_core::revision50::enabled(run) {
         corpse_core::revision50_item_knowledge::display_name(run, i)
@@ -1639,6 +1673,7 @@ pub(crate) fn displayed_name(run: &Run, i: &Item) -> String {
     } else {
         i.name.clone()
     };
+    let name = if let Some(kind) = jewelry_kind(i) { jewelry_label(name,kind,false) } else { name };
     let name = name.replace("Potion of Offense", "Potion of Damage").replace("Potion of Defense", "Potion of HP").replace("Potion of offense", "Potion of Damage").replace("Potion of defense", "Potion of HP");
     let name = if !corpse_core::revision50::enabled(run) && marked_heart(i) { format!("{name} (marked)") } else { name };
     match magic_nature(run, i) {
@@ -3202,7 +3237,7 @@ mod revision50_pack_tests {
 
     #[test] fn ring_names_follow_vampirism_and_ice_immunity_clarifications() {
         let mut r=run();
-        for (effect,expected) in [("transference","Ring of Vampirism"),("vampirism","Ring of Vampirism"),("ice-immunity","Ring of Ice Immunity")] {
+        for (effect,expected) in [("transference","Vampirism Ring"),("vampirism","Vampirism Ring"),("ice-immunity","Ice Immunity Ring")] {
             let i=Item{kind:"ring".into(),name:"Old display label".into(),effect:effect.to_string().into(),..Default::default()};
             assert_eq!(displayed_name(&r,&i),expected);
             assert!(describe_item(&r,&i).starts_with(expected));
@@ -3225,7 +3260,7 @@ mod revision50_pack_tests {
         assert!(!target.application_preview(&r,Some((12,10))).is_empty());
         assert!(target.application_preview(&r,None).is_empty());
         assert!(item_actions(&r,&r.inventory[0]).iter().any(|b|b.label=="Apply" && b.blocker.is_none()));
-        let text=describe_item(&r,&r.inventory[0]);assert!(text.starts_with("Amulet of Lightning"));
+        let text=describe_item(&r,&r.inventory[0]);assert!(text.starts_with("Lightning Amulet"));
         assert!(text.contains("50/50"));assert!(text.contains("Activation: 25 energy"));assert!(!text.contains("No cooldown"));
         let stamp=Stamp::observe(&r);r.inventory[0].amulet_state.as_mut().unwrap().energy=25.;
         assert!(stamp!=Stamp::observe(&r));assert!(describe_item(&r,&r.inventory[0]).contains("25/50"));
@@ -3412,7 +3447,7 @@ mod widest_amulet_tests {
         let mut p = Painter::new();
         let longest = longest_tinkered_amulet_name(&p, 52.);
         eprintln!("Widest amulet: {} ({} px)", longest, p.measure_text_role(Role::Inventory, &longest, 14));
-        assert!(longest.starts_with("Tier 4 Amulet of "));
+        assert!(longest.starts_with("Tier 4 ") && longest.contains(" Amulet and "));
         let mut view = PackView::observe(&run);
         view.configure(&p, p.frame().map.tuple());
         assert!(view.layout.bounds.2 > 760);
@@ -3475,7 +3510,7 @@ mod current_ring_ui_tests {
             let item=Item{id:903.,kind:"ring".into(),effect:effect.to_string().into(),..Default::default()};
             let before=item.clone();let mut text=vec![];
             assert!(append_named_jewelry(&r,&item,&mut text));assert_eq!(text,vec!["Retired ring."]);
-            assert!(displayed_name(&r,&item).starts_with("Retired Ring of "));
+            let name=displayed_name(&r,&item);assert!(name.starts_with("Retired ") && name.ends_with(" Ring"));
             assert!(item_actions(&r,&item).iter().any(|a|a.label=="Drop"));assert_eq!(item,before);
             r.ring_rules_from=Field::Null;text.clear();assert!(append_named_jewelry(&r,&item,&mut text));assert_ne!(text,vec!["Retired ring."]);
             r.ring_rules_from=0usize.into();
