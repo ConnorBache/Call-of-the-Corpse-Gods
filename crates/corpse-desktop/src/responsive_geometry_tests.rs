@@ -1,17 +1,17 @@
 use super::*;
 #[test]
-fn responsive_extents_and_authored_sheets_share_native_scale(){
+fn responsive_extents_and_authored_sheets_use_their_own_native_scales(){
     let mut p=Painter::new();
-    for (w,h) in [(1280,800),(1920,1080),(3840,2160),(1537,911),(960,1200)]{
+    for (w,h) in [(1280,720),(1280,800),(1920,1080),(3840,2160),(1537,911),(960,1200)]{
         p.try_resize(w,h).unwrap();p.set_responsive_canvas(true);
         assert_eq!(p.origin,(0,0));
         assert_eq!(p.logical_width(),(w as f64/p.scale).ceil()as i32);
         assert_eq!(p.logical_height(),(h as f64/p.scale).ceil()as i32);
         assert_eq!(p.frame().sidebar,hud_left(&p.profile)+p.logical_width()-WIDTH as i32);
         assert_eq!(p.toolbar_y(),toolbar_y(&p.profile)+p.logical_height()-HEIGHT as i32);
-        let scale=p.scale;let dimensions=(p.width,p.height);let length=p.pixels.len();
-        p.centered_sheet(|sheet|{assert_eq!((sheet.logical_width(),sheet.logical_height()),(1280,800));assert!((sheet.scale-scale*DIALOG_SCALE).abs()<1e-9);});
-        assert_eq!(p.origin,(0,0));assert_eq!((p.width,p.height),dimensions);assert_eq!(p.pixels.len(),length);
+        let scale=p.scale;let sheet_scale=canvas_scale(w,h,false);let dimensions=(p.width,p.height);let length=p.pixels.len();
+        p.centered_sheet(|sheet|{assert_eq!((sheet.logical_width(),sheet.logical_height()),(1280,800));assert!((sheet.scale-sheet_scale*DIALOG_SCALE).abs()<1e-9);});
+        assert_eq!(p.origin,(0,0));assert_eq!(p.scale,scale);assert_eq!((p.width,p.height),dimensions);assert_eq!(p.pixels.len(),length);
     }
 }
 #[test]
@@ -23,7 +23,7 @@ fn responsive_and_sheet_input_are_distinct_and_dpi_inverse(){
     let game=p.logical_point_for_canvas(screen.0,screen.1,window,true);
     assert!((game.0-logical.0).abs()<=2&&(game.1-logical.1).abs()<=2);
     let sheet=p.logical_point_for_canvas(screen.0,screen.1,window,false);
-    assert!(sheet.0<game.0);assert_eq!(sheet.1,game.1);
+    assert!(sheet.0<game.0);assert!(sheet.1>game.1);
     let dialog=p.logical_point_for_sheet(screen.0,screen.1,window);
     p.centered_sheet(|s|{assert_eq!(s.logical_point(screen.0,screen.1,window),dialog);});
     assert_eq!(p.logical_point(screen.0,screen.1,window),game);
@@ -41,11 +41,34 @@ fn rejected_and_uncommitted_resize_preserve_last_frame(){
     p.try_resize(1280,800).unwrap();assert_eq!((p.width,p.height),size);
 }
 #[test]
-fn baseline_canvas_keeps_original_layout(){
-    let mut p=Painter::new();p.set_responsive_canvas(true);
-    assert_eq!(p.frame(),crate::modal_ui::Frame::from_profile(&p.profile));
-    assert_eq!(p.map_layout(79,29),map_layout_profile(79,29,&p.profile));
-    assert_eq!(p.toolbar_y(),toolbar_y(&p.profile));
+fn baseline_game_grid_fits_the_whole_floor_and_preserves_hud_hit_targets() {
+    for (width, height) in [(1280, 720), (1920, 1080), (2560, 1440)] {
+        let mut p = Painter::new();
+        p.resize(width, height);
+        p.set_responsive_canvas(true);
+        assert_eq!((p.logical_width(), p.logical_height()), (1280, 720));
+        let frame = p.frame();
+        assert_eq!(frame.map, crate::modal_ui::Rect(0, 112, 736, 528));
+        assert_eq!(frame.sidebar, 984);
+        assert_eq!(frame.rail_bottom, 712);
+        let (cw, ch, ox, oy) = p.map_layout(79, 29);
+        assert_eq!((cw, ch), (9, 14));
+        assert!(frame.map.contains(ox, oy));
+        assert!(frame.map.contains(ox + 79*cw - 1, oy + 29*ch - 1));
+        let window = (width as u32, height as u32);
+        for (slot, action) in TOOLBAR_VISIBLE_ACTIONS.into_iter().enumerate() {
+            let (x, w) = p.game_toolbar_rect(slot);
+            let point = (p.native_x((x + w/2) as f64), p.native_y((p.toolbar_y()+20) as f64));
+            let (hx, hy) = p.logical_point_for_canvas(point.0, point.1, window, true);
+            assert_eq!(p.toolbar_action(hx, hy), Some(action));
+        }
+        assert_eq!(p.toolbar_action(frame.map.2, p.toolbar_y()+20), None);
+        let top=crate::ability_ui::top(&p.profile);
+        let row=crate::ability_ui::row(&p.profile);
+        let count=p.ability_capacity();
+        assert!(top + row*count as i32 <= frame.rail_bottom-88);
+        assert_eq!(p.ability_inspect_at(100, frame.sidebar+20, top+row*count as i32),None);
+    }
 }
 #[test]
 fn queued_screen_switches_use_selected_canvas_without_resize(){

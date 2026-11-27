@@ -52,7 +52,7 @@ fn help_toolbar_and_menu_question_mark_have_exact_hit_regions() {
     let mut p = Painter::new();
     for (width, height) in [(1280, 800), (1920, 1080), (900, 1200)] {
         p.resize(width, height); p.set_responsive_canvas(true);
-        let (x, w) = crate::render::toolbar_rect_for_width(slot, p.logical_width());
+        let (x, w) = p.game_toolbar_rect(slot);
         assert_eq!(p.toolbar_action(x, p.toolbar_y()), Some(ACTION));
         assert_eq!(p.toolbar_action(x + w - 1, p.toolbar_y() + 39), Some(ACTION));
         assert_ne!(p.toolbar_action(x + w, p.toolbar_y()), Some(ACTION));

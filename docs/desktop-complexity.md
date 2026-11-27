@@ -1,6 +1,6 @@
 # Native desktop presentation complexity and coverage
 
-Rust/SDL2, no browser engine or JavaScript runtime. The framebuffer is 1280 × 800 RGBA (4,096,000 bytes). SDL letterboxes this logical canvas on resize. The 79 × 29 floor always fits left of the resource rail and below Chronicle. Whole-floor layout uses the authored15:24 pixel aspect over the source15-unit logical grid; integer cell raster rounding and exact responsive v48 sizing remain distinct.
+Rust/SDL2, no browser engine or JavaScript runtime. Gameplay and replays use a 1280 × 720 reference canvas, with responsive space for other aspect ratios; fixed authored menus and dialog sheets retain 1280 × 800 coordinates. The framebuffer uses the actual SDL drawable resolution, up to the existing 33,554,432-pixel cap. At the gameplay reference size the 8 px grid fits three tracks of 736, 248 and 296 logical pixels. The full 79 × 29 dungeon fits beneath the Chronicle on a separate 9 × 14 logical pixel tile scale.
 
 ## Work and storage bounds
 

@@ -458,7 +458,7 @@ pub fn inventory_marks(cues:&[Cue],now:f64)->Vec<(Option<f64>,crate::action_mark
 /// receipts stay on their real HUD even while the map's Pack overlay is open.
 pub fn inventory_hud_anchor(p:&crate::render::Painter,mark:&crate::action_marks::Mark)->(i32,i32,i32,i32) {
     if mark.style=="health-slash" {(p.hud_left()+12,84,24,24)}else if mark.style=="pack-capacity" {
-        let (x,w)=crate::render::toolbar_rect_for_width(0,p.logical_width());
+        let (x,w)=p.game_toolbar_rect(0);
         (x+w/2-12,p.toolbar_y()+4,24,28)
     } else if mark.style=="charge-spark"||mark.style=="unlock-diamond" {
         (p.hud_left()+12,crate::ability_ui::top(&p.profile)-26,24,24)
@@ -467,7 +467,7 @@ pub fn inventory_hud_anchor(p:&crate::render::Painter,mark:&crate::action_marks:
 pub fn paint_inventory_hud(p:&mut crate::render::Painter,view:&crate::render::View,cues:&[Cue],now:f64,pack_open:bool){
     for (id,mark,color,alpha) in inventory_marks(cues,now) {
         if id.is_some() && pack_open || mark.style=="pack-capacity"&&pack_open {continue}
-        let anchor=if mark.style.starts_with("reaction-spent"){p.reaction_action_anchor(view,&mark.style)}else if id.is_some(){let (x,w)=crate::render::toolbar_rect_for_width(0,p.logical_width());(x+w/2-12,p.toolbar_y()+4,24,28)}else{inventory_hud_anchor(p,&mark)};
+        let anchor=if mark.style.starts_with("reaction-spent"){p.reaction_action_anchor(view,&mark.style)}else if id.is_some(){let (x,w)=p.game_toolbar_rect(0);(x+w/2-12,p.toolbar_y()+4,24,28)}else{inventory_hud_anchor(p,&mark)};
         crate::action_marks::paint(p,&mark,anchor.0,anchor.1,anchor.2,anchor.3,color,alpha);
     }
 }

@@ -33,7 +33,16 @@ pub mod damage;
 pub mod tile_damage;
 pub use damage::RetainedGame;
 pub const WIDTH: usize = 1280;
-pub const HEIGHT: usize = 800;
+pub const HEIGHT: usize = 800; // Authored menu and dialog sheets.
+pub const GAME_HEIGHT: usize = 720;
+pub const GAME_UI_UNIT: i32 = 8;
+const GAME_RESOURCE_WIDTH: i32 = 37 * GAME_UI_UNIT;
+
+/// O(1): fit the gameplay baseline or authored sheet without stretching.
+pub(crate) fn canvas_scale(width: usize, height: usize, gameplay: bool) -> f64 {
+    let reference_height = if gameplay { GAME_HEIGHT } else { HEIGHT };
+    (width as f64 / WIDTH as f64).min(height as f64 / reference_height as f64)
+}
 /// R50 follow-up: 4.5% smaller than the R46 88% sheets (70.56% of full area).
 /// The shared input/damage transform and authored content remain unchanged.
 pub const DIALOG_SCALE: f64 = 0.84;
@@ -475,7 +484,8 @@ impl Painter {
         if width==0||height==0{return Ok(None)}
         if (width,height)==(self.width,self.height){return Ok(None)}
         let count=width.checked_mul(height).filter(|&n|n<=MAX_FRAMEBUFFER_PIXELS).ok_or("Window exceeds the 33,554,432-pixel framebuffer budget; resize smaller")?;
-        let scale=(width as f64/WIDTH as f64).min(height as f64/HEIGHT as f64);
+        // The taller reference has the smaller scale and bounds both canvases.
+        let scale=canvas_scale(width,height,false);
         if width>i32::MAX as usize||height>i32::MAX as usize||width as f64/scale>i32::MAX as f64/4.||height as f64/scale>i32::MAX as f64/4.{return Err("Window aspect exceeds drawing coordinate bounds".into())}
         let bytes=count.checked_mul(4).ok_or("Framebuffer byte count overflow")?;
         let mut pixels=Vec::new();pixels.try_reserve_exact(bytes).map_err(|_|"Cannot allocate window framebuffer; resize smaller")?;pixels.resize(bytes,0);
@@ -484,7 +494,6 @@ impl Painter {
     pub fn commit_resize(&mut self,plan:ResizePlan){
         if let Some(gpu)=self.gpu.as_mut(){gpu.invalidate();}
         self.width=plan.width;self.height=plan.height;self.pixels=plan.pixels;
-        self.scale=(self.width as f64/WIDTH as f64).min(self.height as f64/HEIGHT as f64);
         self.set_responsive_canvas(self.responsive_canvas);
         self.chronicle_fade_cache.invalidate();
         self.damage_clip=None;self.glyphs.clear();self.styled_glyphs.clear();self.map_masks.clear();self.prose_glyphs.clear();self.identity_masks.clear();self.menu_raster=None;
@@ -493,12 +502,24 @@ impl Painter {
     /// Compatibility helper for bounded renderer fixtures. Live SDL uses prepare /
     /// commit so texture allocation failure also preserves the old framebuffer.
     pub fn resize(&mut self,width:usize,height:usize)->bool{self.try_resize(width,height).expect("Invalid renderer fixture size")}
-    pub fn set_responsive_canvas(&mut self,responsive:bool){self.responsive_canvas=responsive;self.origin=if responsive{(0,0)}else{(((self.width as f64-WIDTH as f64*self.scale)/2.).round()as i32,((self.height as f64-HEIGHT as f64*self.scale)/2.).round()as i32)};}
+    pub fn set_responsive_canvas(&mut self, responsive: bool) {
+        self.responsive_canvas = responsive;
+        (self.scale, self.origin) = self.canvas_transform(responsive);
+    }
+    fn canvas_transform(&self, gameplay: bool) -> (f64, (i32, i32)) {
+        let scale = canvas_scale(self.width, self.height, gameplay);
+        let origin = if gameplay { (0, 0) } else { self.sheet_origin(scale) };
+        (scale, origin)
+    }
+    fn sheet_origin(&self, scale: f64) -> (i32, i32) {
+        (((self.width as f64-WIDTH as f64*scale)/2.).round() as i32,
+         ((self.height as f64-HEIGHT as f64*scale)/2.).round() as i32)
+    }
     /// O(1) compact modal transform. All authored content and scroll ranges stay
     /// intact. Input and damage use the exact same transform, including HiDPI.
     fn sheet_transform(&self)->(f64,(i32,i32)) {
-        let scale=(self.width as f64/WIDTH as f64).min(self.height as f64/HEIGHT as f64)*DIALOG_SCALE;
-        (scale,(((self.width as f64-WIDTH as f64*scale)/2.).round()as i32,((self.height as f64-HEIGHT as f64*scale)/2.).round()as i32))
+        let scale=canvas_scale(self.width,self.height,false)*DIALOG_SCALE;
+        (scale,self.sheet_origin(scale))
     }
     pub fn centered_sheet<T>(&mut self,paint:impl FnOnce(&mut Self)->T)->T {
         let prior=(self.scale,self.origin,self.responsive_canvas);let(scale,origin)=self.sheet_transform();
@@ -517,9 +538,9 @@ impl Painter {
         (r>l&&b>t).then(||damage::Rect::new(l as usize,t as usize,(r-l)as usize,(b-t)as usize))
     }
     pub fn logical_point_for_canvas(&self,x:i32,y:i32,window:(u32,u32),responsive:bool)->(i32,i32){
-        let origin=if responsive{(0,0)}else{(((self.width as f64-WIDTH as f64*self.scale)/2.).round()as i32,((self.height as f64-HEIGHT as f64*self.scale)/2.).round()as i32)};
+        let (scale,origin)=self.canvas_transform(responsive);
         let px=x as f64*self.width as f64/window.0.max(1)as f64;let py=y as f64*self.height as f64/window.1.max(1)as f64;
-        (((px-origin.0 as f64)/self.scale).floor()as i32,((py-origin.1 as f64)/self.scale).floor()as i32)
+        (((px-origin.0 as f64)/scale).floor()as i32,((py-origin.1 as f64)/scale).floor()as i32)
     }
     pub fn logical_width(&self)->i32{if self.responsive_canvas{(self.width as f64/self.scale).ceil()as i32}else{WIDTH as i32}}
     pub fn logical_height(&self)->i32{if self.responsive_canvas{(self.height as f64/self.scale).ceil()as i32}else{HEIGHT as i32}}
@@ -529,9 +550,15 @@ impl Painter {
     pub fn toolbar_action(&self,x:i32,y:i32)->Option<usize>{
         if !(self.toolbar_y()..self.toolbar_y()+40).contains(&y) {return None;}
         TOOLBAR_VISIBLE_ACTIONS.iter().enumerate().find_map(|(slot,id)|{
-            let(left,w)=toolbar_rect_for_width(slot,self.logical_width());
+            let(left,w)=self.game_toolbar_rect(slot);
             (x>=left&&x<left+w).then_some(*id)
         })
+    }
+    pub fn game_toolbar_rect(&self, slot: usize) -> (i32, i32) {
+        toolbar_rect_for_width(slot, self.frame().map.2)
+    }
+    pub fn ability_capacity(&self) -> usize {
+        crate::ability_ui::capacity_before(&self.profile, self.frame().rail_bottom - 88)
     }
     /// O(C+A) over detached visible cells/creatures; no world or hidden actor reads.
     pub fn enemy_at_map_point(&self,v:&View,x:i32,y:i32)->Option<u64>{
@@ -541,7 +568,14 @@ impl Painter {
         let id=v.cells.iter().rev().find(|c|(c.x,c.y)==point&&c.actor_id.is_some())?.actor_id?;
         v.creatures.iter().any(|a|a.id==id).then_some(id.to_bits())
     }
-    pub fn ability_inspect_at(&self,count:usize,x:i32,y:i32)->Option<usize>{ability_inspect_at(&self.profile,count,x-(self.logical_width()-WIDTH as i32),y)}
+    pub fn ability_inspect_at(&self,count:usize,x:i32,y:i32)->Option<usize>{
+        let top=crate::ability_ui::top(&self.profile);
+        let row=crate::ability_ui::row(&self.profile);
+        let n=count.min(self.ability_capacity());
+        let left=self.hud_left();
+        let bounds=crate::modal_ui::Rect(left+12,top,(self.logical_width()-left-26).max(0),row*n as i32);
+        (bounds.contains(x,y)&&row>0).then(||((y-top)/row) as usize)
+    }
     pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{crate::modal_ui::Rect(12,12,(self.frame().map.2-24).max(0),chronicle_height(&self.profile).max(0))}
     fn native_x(&self, x: f64) -> i32 {
         self.origin.0 + (x * self.scale).round() as i32
@@ -2107,7 +2141,7 @@ impl Painter {
     /// O(T log T) worst-case fitting, O(T) temporary strings; no truncation if both fit.
     /// Read-only anchor at the already displayed Quick Hand reaction cost.
     pub fn reaction_action_anchor(&self,v:&View,style:&str)->(i32,i32,i32,i32){
-        if let Some((i,a))=v.abilities.iter().take(crate::ability_ui::capacity(&self.profile)).enumerate().find(|(_,a)|a.id==if style=="reaction-spent-missed-me"{"isheilah-missed-me"}else{"isheilah-quick-hand"}) {
+        if let Some((i,a))=v.abilities.iter().take(self.ability_capacity()).enumerate().find(|(_,a)|a.id==if style=="reaction-spent-missed-me"{"isheilah-missed-me"}else{"isheilah-quick-hand"}) {
             let left=self.hud_left();let rail=self.logical_width()-left-26;
             let state=if a.active{"ACTIVE"}else if !a.supported{"UNAVAILABLE"}else if a.mode.eq_ignore_ascii_case("passive"){"PASSIVE"}else{&a.state};
             let (_,_,x)=self.ability_metadata(state,&ability_cost_text(&a.cost,state),left+19,left+12+rail-3);
@@ -2327,7 +2361,8 @@ impl Painter {
         #[cfg(test)]
         let _paint_background = paint_profile_bench::span(paint_profile_bench::Kind::Background);
         self.set_responsive_canvas(true);
-        let map_top = chronicle_height(&self.profile) + 12;
+        let frame = self.frame();
+        let map_top = frame.map.1;
         self.clear_with_rect(
             game_color(&self.profile, "ui.colors.background"),
             (0, map_top,
@@ -2345,7 +2380,8 @@ impl Painter {
         let rail_width = self.logical_width() - left - 24;
         let map_right=self.frame().map.2;
         let panel_bottom=self.frame().map.1+self.frame().map.3;
-        let stats_top=panel_bottom-88;
+        let rail_bottom=frame.rail_bottom;
+        let stats_top=rail_bottom-88;
         // Measured wrapping is O(L²) worst-case metric work for bounded recent log text.
         // Raster fade is O(A) over the native chronicle rectangle, with no copied frame.
         if self.intersects_damage(0,0,map_right,chronicle_height(&self.profile)+20) {
@@ -2774,7 +2810,7 @@ impl Painter {
         for (i, a) in v
             .abilities
             .iter()
-            .take(crate::ability_ui::capacity(&self.profile))
+            .take(self.ability_capacity())
             .enumerate()
         {
             let y = crate::ability_ui::top(&self.profile)
@@ -2906,17 +2942,17 @@ impl Painter {
         } // interaction marks
         if map_damage { crate::persistent_ability_overlays::paint(self,v,now); crate::perception_ui::paint(self,v); }
         let footer_top=self.frame().map.1+self.frame().map.3;
-        if self.intersects_damage(0,footer_top,self.logical_width(),self.logical_height()-footer_top) {
+        if self.intersects_damage(0,footer_top,map_right,self.logical_height()-footer_top) {
         #[cfg(test)]
         let _paint_footer = paint_profile_bench::span(paint_profile_bench::Kind::Footer);
         let strip_height=self.toolbar_y()-footer_top;
-        self.rect(8,footer_top,self.logical_width()-16,strip_height,[8,7,13]);
-        self.border(8,footer_top,self.logical_width()-16,strip_height,[88,81,98]);
+        self.rect(8,footer_top,map_right-16,strip_height,[8,7,13]);
+        self.border(8,footer_top,map_right-16,strip_height,[88,81,98]);
         let previous_clip=self.clip;
-        self.clip=Some((12,footer_top+1,self.logical_width()-24,strip_height-2));
+        self.clip=Some((12,footer_top+1,map_right-24,strip_height-2));
         self.text_role(
             crate::typography_ui::Role::Primary,
-            &self.fit_text_role(crate::typography_ui::Role::Primary, notice, self.logical_width()-40, 15),
+            &self.fit_text_role(crate::typography_ui::Role::Primary, notice, map_right-40, 15),
             20,
             self.inspection_notice_y(),
             15,
@@ -2925,7 +2961,7 @@ impl Painter {
 
         self.clip=previous_clip;
         for (i, label) in TOOLBAR_ACTIONS.iter().enumerate() {
-            let (x, w) = toolbar_rect_for_width(i,self.logical_width());
+            let (x, w) = self.game_toolbar_rect(i);
             let y = self.toolbar_y();
             let selected = self.toolbar_focus == Some(TOOLBAR_VISIBLE_ACTIONS[i]);
             if selected {
@@ -2943,10 +2979,10 @@ impl Painter {
         // Flush shared panel boundaries. O(1) primitives, no simulation work.
         let edge=[88,81,98];
         self.border(8,8,map_right-8,chronicle_height(&self.profile)+4,edge);
-        self.border(8,chronicle_height(&self.profile)+11,map_right-8,panel_bottom-chronicle_height(&self.profile)-10,edge);
-        self.border(map_right-1,8,left-map_right+2,panel_bottom-7,edge);
-        self.border(left,8,self.logical_width()-left-8,panel_bottom-7,edge);
-        self.border(left,stats_top,self.logical_width()-left-8,panel_bottom-stats_top+1,edge);
+        self.border(8,map_top,map_right-8,panel_bottom-map_top+1,edge);
+        self.border(map_right-1,8,left-map_right+2,rail_bottom-7,edge);
+        self.border(left,8,self.logical_width()-left-8,rail_bottom-7,edge);
+        self.border(left,stats_top,self.logical_width()-left-8,rail_bottom-stats_top+1,edge);
         if let Some(veil) = crate::illumination_ui::screen_tint(v) {
             // Rebuilt base pixels only: clipped/tile paths tint their disjoint
             // repainted regions once, never previously tinted retained pixels.
@@ -2969,12 +3005,18 @@ pub fn map_layout(w: usize, h: usize) -> (i32, i32, i32, i32) {
 }
 pub fn hud_left(p: &crate::appearance_profile::Profile) -> i32 {
     let max = p.number("ui.layout.rightSidebarWidth");
+    if max == 440. && p.number("ui.layout.sidebarWidthPercent") == 23. {
+        return WIDTH as i32 - GAME_RESOURCE_WIDTH;
+    }
     (WIDTH as f64
         - (WIDTH as f64 * p.number("ui.layout.sidebarWidthPercent") / 100.)
             .clamp(max.min(290.), max))
     .floor() as i32
 }
 pub fn chronicle_height(p: &crate::appearance_profile::Profile) -> i32 {
+    chronicle_height_for(p, 14 * GAME_UI_UNIT - 12)
+}
+pub(crate) fn chronicle_height_for(p: &crate::appearance_profile::Profile, baseline: i32) -> i32 {
     let explicit = p.number("ui.layout.chronicleHeight");
     if explicit == 108.
         && (p.number("typography.chronicle.fontSize") != 18.
@@ -2984,6 +3026,8 @@ pub fn chronicle_height(p: &crate::appearance_profile::Profile) -> i32 {
             * p.number("typography.chronicle.lineHeight")
             * 4.5)
             .round() as i32
+    } else if explicit == 108. {
+        baseline
     } else {
         explicit.round() as i32
     }
@@ -3668,14 +3712,6 @@ mod paint_bulk_tests;
 #[cfg(test)]
 #[path = "menu_cache_tests.rs"]
 mod menu_cache_tests;
-
-/// O(1) cached ability-row hit test shared by hover and right-click inspection.
-pub fn ability_inspect_at(p:&crate::appearance_profile::Profile,count:usize,x:i32,y:i32)->Option<usize> {
-    let top=crate::ability_ui::top(p);let row=crate::ability_ui::row(p);
-    let n=count.min(crate::ability_ui::capacity(p));
-    let bounds=crate::modal_ui::Rect(hud_left(p)+12,top,(WIDTH as i32-hud_left(p)-26).max(0),row*n as i32);
-    (bounds.contains(x,y)&&row>0).then(||((y-top)/row) as usize)
-}
 
 /// O(1) Chronicle click and hover use the same painted logical region.
 pub fn chronicle_hit_rect(p:&crate::appearance_profile::Profile)->crate::modal_ui::Rect {

@@ -20,7 +20,7 @@ pub fn sort_ground(rows: &mut [GroundEntity]) {
     rows.sort_by(|a,b|a.kind.cmp(&b.kind).then(a.distance.total_cmp(&b.distance))
         .then((a.y,a.x,a.id).cmp(&(b.y,b.x,b.id))).then(a.name.cmp(&b.name)));
 }
-pub const RESERVED_WIDTH: i32 = 252;
+pub const RESERVED_WIDTH: i32 = 31 * super::GAME_UI_UNIT;
 #[derive(Clone, Copy, Debug)]
 pub struct Layout { pub bounds: Rect, pub rows: Rect }
 impl Layout {
@@ -31,7 +31,7 @@ impl Layout {
     pub fn resolve_frame(p:&crate::appearance_profile::Profile,_map_left:i32,frame:crate::modal_ui::Frame)->Self {
         let _=p;
         let top=8;
-        let bottom=frame.map.1+frame.map.3;
+        let bottom=frame.rail_bottom;
         let bounds=Rect(frame.map.2,top,RESERVED_WIDTH,(bottom-top).max(0));
         Self { bounds, rows:Rect(bounds.0+8,bounds.1+8,bounds.2-16,bounds.3-16) }
     }
@@ -480,15 +480,15 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout) {
             assert_eq!(l.bounds.0,frame.map.2);
             assert_eq!(l.bounds.0+l.bounds.2,p.hud_left());
             assert_eq!(l.bounds.1,8);
-            assert_eq!(l.bounds.1+l.bounds.3,frame.map.1+frame.map.3);
+            assert_eq!(l.bounds.1+l.bounds.3,frame.rail_bottom);
             assert!(p.chronicle_hit_rect().0+p.chronicle_hit_rect().2<l.bounds.0);
             let text="B Greater Extremely Long Monster Name That Must Remain Inside Its Panel";
             let width=l.rows.2-16;
             for line in p.wrap_text_role(Role::Secondary,text,width,13) {
                 assert!(p.measure_text_role(Role::Secondary,&line,13)<=width as f64);
             }
-            let ability_bottom=crate::ability_ui::top(&p.profile)+crate::ability_ui::row(&p.profile)*crate::ability_ui::capacity(&p.profile) as i32;
-            assert!(ability_bottom<=frame.map.1+frame.map.3-88);
+            let ability_bottom=crate::ability_ui::top(&p.profile)+crate::ability_ui::row(&p.profile)*p.ability_capacity() as i32;
+            assert!(ability_bottom<=frame.rail_bottom-88);
         }
     }
 }

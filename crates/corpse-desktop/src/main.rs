@@ -562,7 +562,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let sdl = sdl2::init()?;
     let video = sdl.video()?;
     let mut window = video
-        .window("CALL OF THE CORPSE GODS", WIDTH as u32, HEIGHT as u32)
+        .window("CALL OF THE CORPSE GODS", WIDTH as u32, render::GAME_HEIGHT as u32)
         .position_centered()
         .resizable()
         .allow_highdpi()
@@ -1458,7 +1458,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         continue; // Help is admitted before gameplay input above.
                     }
                     if key == Keycode::PageDown {
-                        ability_offset = (ability_offset + ability_ui::capacity(&painter.profile))
+                        ability_offset = (ability_offset + painter.ability_capacity())
                             .min(
                                 ability_ui::visible_abilities(&r.run)
                                     .len()
@@ -1468,7 +1468,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     }
                     if key == Keycode::PageUp {
                         ability_offset =
-                            ability_offset.saturating_sub(ability_ui::capacity(&painter.profile));
+                            ability_offset.saturating_sub(painter.ability_capacity());
                         continue;
                     }
                     if key == Keycode::I {
@@ -2065,7 +2065,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 && y >= ability_ui::top(&painter.profile)
                                 && y < ability_ui::top(&painter.profile)
                                     + ability_ui::row(&painter.profile)
-                                        * ability_ui::capacity(&painter.profile) as i32
+                                        * painter.ability_capacity() as i32
                             {
                                 let i = ((y - ability_ui::top(&painter.profile))
                                     / ability_ui::row(&painter.profile))
@@ -2415,7 +2415,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         }
                     }
                     if mouse_x >= painter.hud_left() + 10
-                        && (painter.frame().map.1+painter.frame().map.3-22..painter.frame().map.1+painter.frame().map.3).contains(&mouse_y)
+                        && (painter.frame().rail_bottom-22..painter.frame().rail_bottom).contains(&mouse_y)
                     {
                         if y < 0 {
                             player_status_offset += 2;
@@ -2424,7 +2424,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         }
                     } else if mouse_x >= painter.hud_left() + 10
                         && mouse_y >= ability_ui::top(&painter.profile)
-                        && mouse_y < ability_ui::top(&painter.profile)+ability_ui::row(&painter.profile)*ability_ui::capacity(&painter.profile) as i32
+                        && mouse_y < ability_ui::top(&painter.profile)+ability_ui::row(&painter.profile)*painter.ability_capacity() as i32
                     {
                         if y < 0 {
                             ability_offset += 1;

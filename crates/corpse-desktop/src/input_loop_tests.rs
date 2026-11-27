@@ -70,7 +70,7 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
                     let Event::MouseButtonDown { x, y, .. } = cursor_click(p, script.grid, *tile, 0, canvas.window().id()).unwrap() else { unreachable!(); };
                     // SDL events are window pixels; inverse the current responsive mapping.
                     let (ww, wh) = canvas.window().size();
-                    let scale = (p.width as f64 / render::WIDTH as f64).min(p.height as f64 / render::HEIGHT as f64);
+                    let scale = render::canvas_scale(p.width,p.height,true);
                     Event::MouseMotion { timestamp: 0, window_id: canvas.window().id(), which: 0,
                         mousestate: sdl2::mouse::MouseState::from_sdl_state(0),
                         x: (x as f64 * scale * ww as f64 / p.width as f64).round() as i32,
@@ -79,7 +79,7 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
                 Input::Click(tile) => {
                     let Event::MouseButtonDown { x, y, .. } = cursor_click(p, script.grid, *tile, 0, canvas.window().id()).unwrap() else { unreachable!(); };
                     let (ww, wh) = canvas.window().size();
-                    let scale = (p.width as f64 / render::WIDTH as f64).min(p.height as f64 / render::HEIGHT as f64);
+                    let scale = render::canvas_scale(p.width,p.height,true);
                     Event::MouseButtonDown { timestamp: 0, window_id: canvas.window().id(), which: 0,
                         mouse_btn: MouseButton::Left, clicks: 1,
                         x: (x as f64 * scale * ww as f64 / p.width as f64).round() as i32,
@@ -87,9 +87,9 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
                 },
                 Input::Toolbar(action) => {
                     let slot = render::TOOLBAR_VISIBLE_ACTIONS.iter().position(|id| id == action).unwrap();
-                    let (x, w) = render::toolbar_rect_for_width(slot, p.logical_width());
+                    let (x, w) = p.game_toolbar_rect(slot);
                     let (ww, wh) = canvas.window().size();
-                    let scale = (p.width as f64 / render::WIDTH as f64).min(p.height as f64 / render::HEIGHT as f64);
+                    let scale = render::canvas_scale(p.width,p.height,true);
                     Event::MouseButtonDown { timestamp: 0, window_id: canvas.window().id(), which: 0,
                         mouse_btn: MouseButton::Left, clicks: 1,
                         x: ((x + w / 2) as f64 * scale * ww as f64 / p.width as f64).round() as i32,

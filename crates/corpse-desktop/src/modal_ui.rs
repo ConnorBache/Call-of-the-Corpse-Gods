@@ -22,6 +22,7 @@ pub struct Frame {
     pub sidebar: i32,
     pub chronicle: i32,
     pub command: i32,
+    pub rail_bottom: i32,
 }
 impl Frame {
     pub fn from_profile(p: &Profile) -> Self {Self::for_size(p,crate::render::WIDTH as i32,HEIGHT as i32)}
@@ -29,7 +30,7 @@ impl Frame {
         let chronicle = crate::render::chronicle_height(p);
         let sidebar = crate::render::hud_left(p)+width-crate::render::WIDTH as i32;
         let command = changed_number(p, "ui.layout.buttonHeight", 42.).round() as i32 + 4;
-        let top = chronicle + 11;
+        let top = chronicle + 12;
         let bottom = crate::render::toolbar_y(p)+height-HEIGHT as i32-inspection_strip_height(p);
         Self {
             map: Rect(
@@ -41,13 +42,14 @@ impl Frame {
             sidebar,
             chronicle,
             command,
+            rail_bottom: height - crate::render::GAME_UI_UNIT,
         }
     }
 }
 /// One text line with vertical padding, independent of its contents (no map reflow on hover).
 pub fn inspection_strip_height(p:&Profile)->i32 {
     let style=typography_ui::resolve(p,Role::Primary,RoleStyle::baseline(15.));
-    (style.font_size*style.line_height).ceil().max(style.font_size).max(18.) as i32+10
+    (style.font_size*style.line_height).ceil().max(style.font_size).max(18.) as i32+7
 }
 /// Source styles emit authored values only when different from schema defaults.
 pub fn changed_number(p: &Profile, path: &str, baseline: f64) -> f64 {
@@ -116,9 +118,11 @@ impl PackLayout {
 pub fn inspection_bounds(p: &Profile) -> Rect {
     let f = Frame::from_profile(p);
     let x = 24;
-    let y = f.chronicle + 30;
+    // This drawer is painted in the original authored dialog coordinates.
+    let chronicle = crate::render::chronicle_height_for(p, 108);
+    let y = chronicle + 30;
     let w = 520.min((f.sidebar - 48).max(1));
-    let h = 580.min((HEIGHT as i32 - f.chronicle - 120).max(1));
+    let h = 580.min((HEIGHT as i32 - chronicle - 120).max(1));
     Rect(x, y, w, h)
 }
 pub fn hover_bounds(p: &Profile, tile: (i32, i32, i32, i32), height: i32) -> Rect {
@@ -279,11 +283,11 @@ mod tests {
     fn default_geometry_and_changed_css_baselines_are_preserved() {
         let p = Profile::default();
         let frame = Frame::from_profile(&p);
-        assert_eq!(frame.map, Rect(0, 119, 733, 598));
+        assert_eq!(frame.map, Rect(0, 112, 736, 608));
         let pack = PackLayout::resolve(&p, frame.map);
-        assert_eq!(pack.bounds, Rect(12, 205, 709, 500));
-        assert_eq!(pack.list, Rect(24, 323, 374, 370));
-        assert_eq!(pack.detail, Rect(410, 323, 299, 370));
+        assert_eq!(pack.bounds, Rect(12, 208, 712, 500));
+        assert_eq!(pack.list, Rect(24, 326, 376, 370));
+        assert_eq!(pack.detail, Rect(412, 326, 300, 370));
         assert_eq!(pack.button_height, 32);
         assert_eq!(pack.button_padding, 8);
         assert_eq!(inspection_bounds(&p), Rect(24, 138, 520, 572));

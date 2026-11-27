@@ -21,8 +21,8 @@ pub fn row(p: &crate::appearance_profile::Profile) -> i32 {
     // Keep the typography minimum so larger authored fonts are never crushed.
     (19. + (previous - 19.) / 2.).max(minimum).round() as i32
 }
-pub fn capacity(p: &crate::appearance_profile::Profile) -> usize {
-    ((634 - top(p)).max(0) / row(p).max(1)).max(1) as usize
+pub fn capacity_before(p: &crate::appearance_profile::Profile, bottom: i32) -> usize {
+    ((bottom - top(p)).max(0) / row(p).max(1)) as usize
 }
 pub fn god_color(id: usize) -> Rgb {
     const C: [Rgb; 12] = [
@@ -1595,7 +1595,7 @@ fn short_ability_names_fit_in_the_hud_without_changing_canonical_identity() {
         assert_eq!(row(&profile),35);
         for(w,h)in[(1280,800),(1920,1080),(960,1200)] {
             let mut p=crate::render::Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
-            let count=capacity(&p.profile);
+            let count=p.ability_capacity();
             for i in 0..count {
                 let y=top(&p.profile)+i as i32*row(&p.profile);
                 assert_eq!(p.ability_inspect_at(count,p.hud_left()+20,y+10),Some(i));

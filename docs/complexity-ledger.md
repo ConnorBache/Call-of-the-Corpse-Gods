@@ -1,3 +1,5 @@
+Gameplay 16:9 desktop layout: [desktop rendering](desktop-complexity.md). The gameplay/menu transforms, HUD track sizes, ability capacity, and tile fit use O(1) arithmetic and O(1) extra memory per frame or pointer event for supported drawable sizes. The 8 px reference grid is a spacing unit, not a new allocation; tile traversal, font and mask costs, rendering, and native framebuffer allocation retain the bounds described in the desktop ledger.
+
 Revision 51 stair exclusion: see [revision51-stair-exclusion.md](revision51-stair-exclusion.md) for shared movement/spawn gates, adjacent/deferred arrivals, finite Mercuria flood costs, legacy behavior and verification scope.
 
 Revision 51 player fixed attack base: see [revision51-player-base-damage.md](revision51-player-base-damage.md) for constant arithmetic per attack/preview, inherited live-stat lookup costs, copy ownership and deterministic validation scope.
