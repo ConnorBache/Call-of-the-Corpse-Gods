@@ -1460,7 +1460,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     if key == Keycode::PageDown {
                         ability_offset = (ability_offset + painter.ability_capacity())
                             .min(
-                                ability_ui::visible_abilities(&r.run)
+                                ability_ui::divine_abilities(&r.run)
                                     .len()
                                     .saturating_sub(painter.ability_capacity()),
                             );
@@ -1629,7 +1629,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         };
                         if let Some(i) = n {
                             if let Some(row) =
-                                ability_ui::visible_abilities(&r.run).get(i + ability_offset)
+                                ability_ui::divine_abilities(&r.run).get(i + ability_offset)
                             {
                                 if ability_ui::command_binding_allowed(&r.run, &row.id) {
                                     command = Some(Command::Ability {
@@ -1746,7 +1746,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     }
                     if let Some(index)=cached_view.as_ref().and_then(|v|painter.ability_inspect_at(v.abilities.len(),x,y)) {
                         if let Some(r) = &run {
-                            ability_detail = ability_ui::visible_abilities(&r.run)
+                            ability_detail = ability_ui::divine_abilities(&r.run)
                                 .get(ability_offset+index)
                                 .map(|a| a.id.clone());
                             ability_detail_scroll = 0;
@@ -2061,8 +2061,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             } else if let Some(index)=painter.hud_tracks().item_at(x,y,
                                 painter.item_rail_offset.min(view.pack_hud.items.len().saturating_sub(painter.hud_tracks().item_rows())),
                                 view.pack_hud.items.len()) {
-                                let id=view.pack_hud.items[index].id;
-                                match pack::quick_item_action(&r.run,id) {
+                                let source=view.pack_hud.items[index].source;
+                                match game_hud::activate_quick(&r.run,source) {
                                     pack::PackAction::Target(target)=>{
                                         if pending_item.as_ref()==Some(&target){pending_item=None;notice.clear();}
                                         else {
@@ -2082,7 +2082,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     _=>{}
                                 }
                             } else if let Some(i)=painter.ability_inspect_at(painter.ability_capacity(),x,y) {
-                                if let Some(id) = ability_ui::visible_abilities(&r.run)
+                                if let Some(id) = ability_ui::divine_abilities(&r.run)
                                     .get(i + ability_offset)
                                     .map(|a| a.id.clone())
                                 {
@@ -2447,7 +2447,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         }
                         if let Some(r) = run.as_ref() {
                             ability_offset = ability_offset.min(
-                                ability_ui::visible_abilities(&r.run)
+                                ability_ui::divine_abilities(&r.run)
                                     .len()
                                     .saturating_sub(painter.ability_capacity()),
                             );

@@ -1420,7 +1420,8 @@ pub fn quick_item_action(run:&Run,id:f64)->PackAction {
         return PackAction::Notice("That item is no longer available.".into());
     };
     for button in item_actions(run,item) {
-        if !matches!(button.label.as_str(),"Apply"|"Teleport"){continue}
+        let shard=corpse_core::borge::is_shard(item);
+        if !(matches!(button.label.as_str(),"Apply"|"Teleport")||shard&&button.label=="Throw"){continue}
         if let Some(blocker)=button.blocker {return PackAction::Notice(blocker);}
         match button.action {
             ButtonAction::Target(target)=>return PackAction::Target(target),

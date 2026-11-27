@@ -37,9 +37,12 @@ impl Layout {
     pub fn content(self,p:&Painter,actors:&[Creature])->Content { Content::new(p,self,actors) }
     pub fn content_view(self,p:&Painter,v:&View)->Content {
         let mut content=self.content(p,&v.creatures);
+        let width=self.rows.2-12;
+        let names=v.ground_entities.iter().map(|g|(format!("{} {}",g.glyph,g.name),width)).collect::<Vec<_>>();
+        let size=crate::game_hud::group_name_size(p,Role::Secondary,&names,11);
         for row in &v.ground_entities {
             let mut card=Card{heart:None,top:content.height,height:0,lines:Vec::new(),bars:Vec::new()};
-            let (name,size)=crate::game_hud::compact_label(p,&format!("{} {}",row.glyph,row.name),"",self.rows.2-12);
+            let name=p.fit_text_role(Role::Secondary,&format!("{} {}",row.glyph,row.name),width,size);
             let style=crate::typography_ui::resolve(&p.profile,Role::Secondary,RoleStyle::baseline(size as f64));
             let step=(style.font_size*style.line_height).ceil().max(13.) as i32;
             card.lines.push(Line{burning:false,text:name,y:4,size,color:row.color,outline:None,black_initial:false});
@@ -86,6 +89,8 @@ impl Content {
     fn new(p:&Painter,layout:Layout,actors:&[Creature])->Self {
         let width=(layout.rows.2-16).max(1);
         let mut cards=Vec::with_capacity(actors.len());let mut top=0;
+        let names=actors.iter().map(|a|(format!("{} {}",a.glyph,a.name),width-if a.has_heart.is_some(){17}else{0})).collect::<Vec<_>>();
+        let name_size=crate::game_hud::group_name_size(p,Role::Secondary,&names,12);
         for a in actors {
             let mut card=Card{heart:a.has_heart,top,height:0,lines:Vec::new(),bars:Vec::new()};let mut y=5;
             fn text(p:&Painter,card:&mut Card,y:&mut i32,width:i32,s:&str,size:u16,color:super::Rgb) {
@@ -97,7 +102,8 @@ impl Content {
             }
             let black_b=a.glyph=="B" && a.color==[0;3] && a.identity_outline.is_none();
             let color=if black_b {p.profile.rgb("ui.colors.primary")} else {a.color};
-            text(p,&mut card,&mut y,(width-if a.has_heart.is_some(){17}else{0}).max(1),&format!("{} {}",a.glyph,a.name),12,color);
+            let name=p.fit_text_role(Role::Secondary,&format!("{} {}",a.glyph,a.name),(width-if a.has_heart.is_some(){17}else{0}).max(1),name_size);
+            text(p,&mut card,&mut y,width,&name,name_size,color);
             if black_b {if let Some(line)=card.lines.first_mut(){line.black_initial=true;}}
             for line in &mut card.lines {line.outline=a.identity_outline;}
             y+=1;
@@ -110,17 +116,18 @@ impl Content {
                     color:super::game_color(&p.profile,"ui.colors.health")});
                 y+=19;
             }
-            if !a.state.is_empty() && !a.statuses.iter().any(|s| crate::statuses_ui::display_name(&s.name).eq_ignore_ascii_case(&a.state)) {
+            if !a.state.is_empty() && (a.state.eq_ignore_ascii_case("Sleeping") || !a.statuses.iter().any(|s| crate::statuses_ui::display_name(&s.name).eq_ignore_ascii_case(&a.state))) {
                 let mut chars=a.state.chars();
                 let state=chars.next().map(|c|c.to_uppercase().collect::<String>()+chars.as_str()).unwrap_or_default();
-                text(p,&mut card,&mut y,width,&state,11,MUTED);
+                text(p,&mut card,&mut y,width,&state,10,MUTED);
             }
             for status in &a.statuses {
+                if status.name.eq_ignore_ascii_case("Sleeping"){continue;}
                 let name=crate::statuses_ui::display_name(&status.name);
                 let ink=crate::game_hud::status_tint(&status.name,status.duration,0.);
                 let start=card.lines.len();
                 let label=if let Some(turns)=status.duration {format!("{name} · {turns:.0}")}else{name.to_owned()};
-                text(p,&mut card,&mut y,width,&label,11,ink);
+                text(p,&mut card,&mut y,width,&label,9,ink);
                 if name=="Burning" && status.duration.is_some(){for line in &mut card.lines[start..]{line.burning=true;}}
             }
             card.height=y+4;top+=card.height;cards.push(card);
@@ -168,8 +175,18 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout,now:f64) {
         if selected {p.rect(layout.rows.0,y,layout.rows.2-4,card.height-2,[39,44,61]);}
         if let Some(heart)=card.heart {
             let x=layout.rows.0+layout.rows.2-16;
-            p.text("♥",x,y+4,13,if heart {[255,116,133]} else {[150,128,151]});
-            if !heart{p.text("×",x,y+3,13,crate::game_hud::YELLOW);}
+            let y=y+8;
+            let ink=if heart{[255,116,133]}else{[150,128,151]};
+            // The bitmap and crossed strokes share the same exact 9 × 9 center.
+            for (dy,bits) in [0b011000110u16,0b111101111,0b111111111,0b111111111,0b011111110,0b001111100,0b000111000,0b000111000,0b000010000].into_iter().enumerate(){
+                for dx in 0..9 {if bits&(1<<dx)!=0{p.rect(x+dx,y+dy as i32,1,1,ink);}}
+            }
+            if !heart {
+                for d in 0..7 {
+                    p.rect(x+1+d,y+1+d,1,1,crate::game_hud::YELLOW);
+                    p.rect(x+7-d,y+1+d,1,1,crate::game_hud::YELLOW);
+                }
+            }
         }
         for line in &card.lines {
             let color=if line.burning{crate::game_hud::burning_ink(now)}else{line.color};

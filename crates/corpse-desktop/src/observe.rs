@@ -881,7 +881,7 @@ fn observe_palette(run: &Run, profile: &crate::appearance_profile::Profile, fles
     drop(creature_span);
     let _hud_span=corpse_core::timing::span("desktop.observe.hud_log_inventory");
     crate::cogworks_ui::rally(run,&mut cells);
-    let abilities = crate::ability_ui::visible_abilities(run);
+    let abilities = crate::ability_ui::divine_abilities(run);
     let pursuit_path=crate::targeting_ui::pursuit_path(run);
     let player_stats=corpse_core::combat::effective_stats(run,&run.player);
     let perception_boundaries=crate::perception_ui::observe(run,terrain_snapshot.as_deref(),&creatures);

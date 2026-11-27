@@ -8,8 +8,8 @@ pub const RAIL_WIDTH: i32 = 166;
 pub const HEADER: i32 = 82;
 pub const FOOTER: i32 = 116;
 pub const MAP_TILE: (i32, i32) = (12,18);
-pub const DIVINE_SLOTS: usize = 16; // 15 divine powers plus Dreamwalk
-pub const ITEM_SLOTS: usize = 11; // bow plus ten amulets
+pub const DIVINE_SLOTS: usize = 15;
+pub const ITEM_SLOTS: usize = 14; // ten amulets, bow, Dreamwalk, Masque, Borge shard
 pub const ABILITY_INSET: i32 = 3;
 const MIN_ABILITY_ROW: i32 = 18;
 pub const YELLOW: [u8;3] = [255,218,74];
@@ -28,21 +28,36 @@ pub struct PackHud {
     pub items: Vec<ItemAction>,
     pub rings: Vec<String>,
     pub shards: u32,
-    pub borge_shards: u32,
     pub ring_capacity: Option<u32>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ItemAction {
-    pub id: f64,
+    pub source: QuickSource,
     pub label: String,
     pub arrows: Option<u32>,
     pub reserve: Option<(f64,f64)>,
     pub tier: Option<u8>,
+    pub hint: Option<String>,
 }
 
+#[derive(Clone,Copy,Debug,PartialEq)]
+pub enum QuickSource { Item(f64), Dreamwalk }
+pub fn activate_quick(run:&Run,source:QuickSource)->crate::pack::PackAction {
+    match source {
+        QuickSource::Item(id)=>crate::pack::quick_item_action(run,id),
+        QuickSource::Dreamwalk=>{
+            use corpse_core::dreamwalking as dream;
+            let id=if dream::unlocked(run){dream::DREAMWALK_ID}else if dream::active(run){dream::WAKE_UP_ID}else{
+                return crate::pack::PackAction::Notice("Dreamwalk is not available.".into());
+            };
+            crate::pack::PackAction::Command(corpse_core::Command::Ability{id:id.into(),
+                target:corpse_core::Field::Missing,x:corpse_core::Field::Missing,y:corpse_core::Field::Missing})
+        },
+    }
+}
 pub fn is_quick_item(run: &Run, i: &Item) -> bool {
-    corpse_core::projectiles::is_bow(i) || corpse_core::ahvamitt::is_mask(i)
+    corpse_core::projectiles::is_bow(i) || corpse_core::ahvamitt::is_mask(i) || (corpse_core::borge::is_shard(i) && run.simulation_revision.value_or(29.)>=50.)
         || (run.simulation_revision.value_or(29.) >= 50.
             && corpse_core::revision50_amulet_effects::is_amulet(i)
             && !corpse_core::revision52_amulet_tiers::retired(run,i))
@@ -65,21 +80,33 @@ pub fn observe(run: &Run) -> PackHud {
             "heart" => out.hearts = out.hearts.saturating_add(n),
             "potion" => out.potions = out.potions.saturating_add(n),
             "ring" if corpse_core::revision50_inventory::active(run,i) => out.rings.push(crate::pack::ground_name(run,i)),
-            _ if corpse_core::borge::is_shard(i) => out.borge_shards = out.borge_shards.saturating_add(n),
             _ if corpse_core::phantasmii_generation::is_shard(i) => out.shards = out.shards.saturating_add(n),
             _ => {}
         }
         if corpse_core::inventory::is_arrow(i) { arrows += n as f64; }
     }
+    let revision=run.simulation_revision.value_or(29.);
+    if revision>=34. {
+        if let Some(mask)=run.inventory.iter().find(|i|corpse_core::ahvamitt::is_mask(i)) {
+            let cooldown=corpse_core::ahvamitt::cooldown(run);
+            out.items.push(ItemAction{source:QuickSource::Item(mask.id),label:"Ahvamitt Teleport".into(),
+                arrows:None,reserve:None,tier:None,hint:Some(if cooldown==0{"Ready".into()}else{format!("{cooldown} turns")})});
+        }
+    }
+    if corpse_core::dreamwalking::unlocked(run)||corpse_core::dreamwalking::active(run) {
+        let active=corpse_core::dreamwalking::active(run);
+        out.items.push(ItemAction{source:QuickSource::Dreamwalk,label:if active&&!corpse_core::dreamwalking::unlocked(run){"Wake Up".into()}else{"Dreamwalk".into()},
+            arrows:None,reserve:None,tier:None,hint:Some(if active{"ON"}else{"OFF"}.into())});
+    }
     for bow in [true,false] {
-        for i in run.inventory.iter().filter(|i| corpse_core::projectiles::is_bow(i)==bow && is_quick_item(run,i)) {
-            let revision=run.simulation_revision.value_or(29.);
+        for i in run.inventory.iter().filter(|i| corpse_core::projectiles::is_bow(i)==bow && is_quick_item(run,i)&&!corpse_core::ahvamitt::is_mask(i)) {
             let label=if bow {"Bow".into()} else {crate::pack::ground_name(run,i)};
             let tier=if !bow && corpse_core::revision52_amulet_tiers::enabled(run) {
                 corpse_core::revision52_amulet_tiers::profile(run,i).map(|p|p.tier)
             } else {None};
-            out.items.push(ItemAction{id:i.id,label,arrows:bow.then_some(arrows as u32),
-                reserve:resource_ui::amulet_reserve(i,revision),tier});
+            out.items.push(ItemAction{source:QuickSource::Item(i.id),label,arrows:bow.then_some(arrows as u32),
+                reserve:resource_ui::amulet_reserve(i,revision),tier,
+                hint:corpse_core::borge::is_shard(i).then(||"Throw".into())});
         }
     }
     out
@@ -329,7 +356,7 @@ pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
         p.text(&format!("DMG {damage:+}  HP {hp:+}  DR {dr}"),z.0+8,z.1+4,11,INK);
         p.text(&format!("ACC {acc}  DODGE {dodge}"),z.0+8,z.1+18,11,MUTED);
         let pack = &v.pack_hud;
-        let shards=format!("Shards {} · Borge {}",pack.shards,pack.borge_shards);
+        let shards=format!("Phantasmii {}",pack.shards);
         p.text(&shards,z.0+8,z.1+32,10,[194,161,236]);
         let z=t.rings;
         if pack.rings.is_empty() {
@@ -337,17 +364,44 @@ pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
         } else {
             let count=supply_label(pack.rings.len() as u32,pack.ring_capacity);
             p.text(&format!("{count} rings"),z.0+8,z.1+5,11,INK);
-            let all=pack.rings.iter().map(|name|name.strip_suffix(" Ring").unwrap_or(name))
-                .collect::<Vec<_>>().join(" · ");
-            let lines=p.wrap_text_role(role,&all,z.2-16,10);
-            let visible=if lines.len()>3{2}else{3};
-            for (i,line) in lines.iter().take(visible).enumerate() {
-                p.text(line,z.0+8,z.1+20+i as i32*13,10,[220,199,145]);
-            }
-            if lines.len()>visible {p.text("…  I for full Pack",z.0+8,z.1+46,10,MUTED);}
+            paint_ring_boxes(p,z,&pack.rings);
         }
         paint_supply(p,t.hearts,HEARTS,"Hearts",pack.hearts,pack.heart_capacity);
         paint_supply(p,t.potions,POTIONS,"Potions",pack.potions,pack.potion_capacity);
+    }
+}
+fn paint_ring_boxes(p:&mut Painter,r:Rect,names:&[String]) {
+    let mut groups=Vec::<(&str,usize)>::new();
+    for name in names {
+        let name=name.strip_suffix(" Ring").unwrap_or(name);
+        if let Some((_,count))=groups.iter_mut().find(|(key,_)|*key==name){*count+=1}else{groups.push((name,1))}
+    }
+    let labels=groups.iter().map(|(name,n)|if *n==1{name.to_string()}else{format!("{name} ×{n}")}).collect::<Vec<_>>();
+    let role=crate::typography_ui::Role::Primary;
+    let max=r.2-14;
+    let widths=|p:&Painter,size:u16|labels.iter().map(|s|p.measure_text_role(role,s,size).ceil() as i32+10).collect::<Vec<_>>();
+    let mut size=9;
+    let mut cuts=widths(p,size);
+    let mut split=labels.len().div_ceil(2);
+    for n in (9..=11).rev() {
+        let w=widths(p,n);
+        if let Some(i)=(0..=w.len()).filter(|&i|w[..i].iter().sum::<i32>()<=max&&w[i..].iter().sum::<i32>()<=max)
+            .min_by_key(|&i|(w[..i].iter().sum::<i32>()-w[i..].iter().sum::<i32>()).abs()) {
+            size=n;cuts=w;split=i;break;
+        }
+    }
+    for (line,range) in [0..split,split..labels.len()].into_iter().enumerate(){
+        let y=r.1+21+line as i32*19;
+        let mut x=r.0+7;
+        let compressed=cuts[range.clone()].iter().sum::<i32>()>max;
+        let n=range.len().max(1) as i32;
+        for i in range {
+            let width=if compressed{max/n}else{cuts[i]};
+            p.border(x,y,width-3,16,[115,98,78]);
+            let label=p.fit_text_role(role,&labels[i],width-10,size);
+            p.text(&label,x+4,y+(16-size as i32)/2,size,[220,199,145]);
+            x+=width;
+        }
     }
 }
 pub fn scroll_mark(p:&mut Painter,r:Rect,count:usize,visible:usize,offset:usize) {
@@ -360,20 +414,33 @@ pub fn scroll_mark(p:&mut Painter,r:Rect,count:usize,visible:usize,offset:usize)
 }
 /// Prefer the regular label size, then shrink only this label. Reserve width
 /// for the tier suffix so an unusually long item still shows its upgrade.
-pub fn compact_label(p:&Painter,name:&str,suffix:&str,width:i32)->(String,u16) {
-    let role=crate::typography_ui::Role::Primary;
-    let full=format!("{name}{suffix}");
-    for size in [11,10,9] {
-        if p.measure_text_role(role,&full,size)<=width as f64 {return (full,size);}
-    }
-    let reserved=p.measure_text_role(role,suffix,9).ceil() as i32;
-    (format!("{}{suffix}",p.fit_text_role(role,name,(width-reserved).max(0),9)),9)
+pub fn group_name_size(p:&Painter,role:crate::typography_ui::Role,names:&[(String,i32)],max:u16)->u16 {
+    (9..=max).rev().find(|&size|names.iter().all(|(n,w)|p.measure_text_role(role,n,size)<=*w as f64)).unwrap_or(9)
+}
+pub fn fitted_name(p:&Painter,role:crate::typography_ui::Role,name:&str,suffix:&str,width:i32,size:u16)->String {
+    let reserved=p.measure_text_role(role,suffix,size).ceil() as i32;
+    format!("{}{suffix}",p.fit_text_role(role,name,(width-reserved).max(0),size))
+}
+pub fn divine_name_width(a:&crate::ability_ui::AbilityView,rail:i32)->i32 {
+    let passive=a.mode.eq_ignore_ascii_case("passive");
+    let ragelight=matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::RagelightCost(_)));
+    let reserve=a.reserve.is_some()&&(!passive||ragelight);
+    if !passive||ragelight||a.indicator.is_some()||a.fortunes.is_some() {
+        rail-69-if reserve&&a.id=="kative-cogworks"{40}else if reserve&&a.indicator.is_some(){28}else{0}
+    }else{rail-17}
 }
 pub fn right_slot(row:Rect)->Rect {Rect(row.0+row.2-53,row.1+(row.3-13)/2,48,13)}
 fn tier_suffix(tier:Option<u8>)->String{
     match tier {Some(n) if n>1=>format!(" +{}",n-1),_=>String::new()}
 }
-pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks) {
+/// O(D+I) bounded measurements for D displayed divine powers and I item actions.
+pub fn ability_label_size(p:&Painter,v:&View,t:Tracks)->u16 {
+    let role=crate::typography_ui::Role::Primary;
+    let mut names=v.abilities.iter().map(|a|(a.name.clone(),divine_name_width(a,t.divine.2))).collect::<Vec<_>>();
+    names.extend(v.pack_hud.items.iter().map(|a|(format!("{}{}",a.label,tier_suffix(a.tier)),t.items.2-68)));
+    group_name_size(p,role,&names,11)
+}
+pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks,size:u16) {
     let r=t.items;
     if !p.intersects_damage(r.0,r.1,r.2,r.3){return}
     panel(p,r);
@@ -381,16 +448,18 @@ pub fn paint_item_rail(p:&mut Painter,v:&View,t:Tracks) {
     p.clip=Some((r.0+4,r.1+ABILITY_INSET,r.2-8,r.3-2*ABILITY_INSET));
     let slots=t.item_geometry();
     let offset=p.item_rail_offset.min(v.pack_hud.items.len().saturating_sub(slots.count));
+    let role=crate::typography_ui::Role::Primary;
+    let width=r.2-68;
     for (i,a) in v.pack_hud.items.iter().skip(offset).take(t.item_rows()).enumerate(){
         let row=slots.row(i);
         let y=row.1;
         let Rect(x,my,w,h)=right_slot(row);
-        let (name,size)=compact_label(p,&a.label,&tier_suffix(a.tier),x-r.0-11);
+        let name=fitted_name(p,role,&a.label,&tier_suffix(a.tier),width,size);
         p.text(&name,r.0+7,y+(row.3-size as i32)/2,size,INK);
         if let Some((current,max))=a.reserve {
             resource_ui::paint_bar(p,"",&format!("{current:.0}/{max:.0}"),x,my,w,h,game_color(&p.profile,"ui.colors.energy"),current/max.max(1.),9);
         } else {
-            let detail=a.arrows.map_or_else(||"Apply".to_owned(), |n|format!("{n} arrows"));
+            let detail=a.arrows.map_or_else(||a.hint.clone().unwrap_or_else(||"Apply".to_owned()), |n|format!("{n} arrows"));
             let dx=x+w-resource_ui::text_width(p,&detail,9);
             p.text(&detail,dx,my+2,9,[147,210,246]);
         }
@@ -425,6 +494,48 @@ mod tests {
     }
 
     #[test]
+    fn mockup_item_rail_actions_use_canonical_commands() {
+        use corpse_core::Command;
+        let mut r=sample();
+        r.dreamwalking=corpse_core::dreamwalking::State{unlocked:true,..Default::default()}.into();
+        r.inventory.push(corpse_core::ahvamitt::mask_for_revision(40000.,52.));
+        r.inventory.push(corpse_core::borge::shard(40001.));
+        let actions=observe(&r).items;
+        assert_eq!(actions[0].label,"Ahvamitt Teleport");
+        assert!(matches!(activate_quick(&r,actions[0].source),crate::pack::PackAction::Command(Command::Ability{id,..}) if id==corpse_core::ahvamitt::TELEPORT_ID));
+        assert!(matches!(activate_quick(&r,actions[1].source),crate::pack::PackAction::Command(Command::Ability{id,..}) if id==corpse_core::dreamwalking::DREAMWALK_ID));
+        let shard=actions.iter().find(|a|a.label=="Shard of the Borge").unwrap();
+        assert!(matches!(activate_quick(&r,shard.source),crate::pack::PackAction::Target(crate::pack::PackTarget::Throw(40001.))));
+    }
+
+    #[test]
+    fn hud_font_audit() {
+        use crate::typography_ui::Role;
+        let mut r=sample();
+        let p=Painter::new();
+        let t=p.hud_tracks();
+        r.player.abilities=corpse_core::progression::catalog_for_revision(52.).iter().map(|a|a.id.clone()).collect();
+        corpse_core::revision50_ability_energy::reconcile_acquired(&mut r).unwrap();
+        let mut w=crate::ability_ui::divine_abilities(&r).into_iter().map(|a| {
+            let width=divine_name_width(&a,t.divine.2);
+            (p.measure_text_role(Role::Primary,&a.name,11)/width as f64,a.name)
+        }).collect::<Vec<_>>();
+        w.sort_by(|a,b|b.0.total_cmp(&a.0)); eprintln!("Divine names past width at size 11: {:?}",w.iter().filter(|a|a.0>1.).collect::<Vec<_>>());
+        let item_names=["Teleportation Amulet +8","Obstruction Amulet +8","Lightning Amulet +8","Beckoning Amulet +8","Ahvamitt Teleport","Shard of the Borge",
+            "Firebolt Amulet +8","Poison Amulet +8","Iceblast Amulet +8","Blinking Amulet +8","Discord Amulet +8","Roots Amulet +8","Floods Amulet +8"];
+        let mut w=item_names.into_iter().map(|a|(p.measure_text_role(Role::Primary,a,11)/(t.items.2-68)as f64,a)).collect::<Vec<_>>();
+        w.sort_by(|a,b|b.0.total_cmp(&a.0));eprintln!("Item names past width at size 11: {:?}",w.iter().filter(|a|a.0>1.).collect::<Vec<_>>());
+        let frame=p.frame();
+        let mut names=corpse_core::population::catalog().actors.values().map(|a|{
+            let name=corpse_core::revision50_creature_identity::display_name(&a.name);
+            let label=format!("{} {name}",a.glyph);
+            let width=frame.sidebar-frame.map.2-16-16-17;
+            (p.measure_text_role(Role::Secondary,&label,12)/width as f64,label)
+        }).collect::<Vec<_>>();
+        names.sort_by(|a,b|b.0.total_cmp(&a.0));eprintln!("Monster names past width at size 12: {:?}",names.iter().filter(|a|a.0>1.).take(15).collect::<Vec<_>>());
+    }
+
+    #[test]
     fn mockup_status_colors_preserve_permanents_and_animate_timed_fire() {
         assert_eq!(status_tint("Flying",None,0.),[193,138,255]);
         assert_eq!(status_tint("Hemophilia",Some(8.),0.),[255,84,109]);
@@ -448,7 +559,7 @@ mod tests {
         legacy.simulation_revision=49.0.into();
         assert_eq!(observe(&legacy).potion_capacity,None);
         assert_eq!(summary.items[0].label,"Bow");
-        assert!(matches!(crate::pack::quick_item_action(&r,summary.items[0].id),
+        assert!(matches!(crate::pack::quick_item_action(&r,match summary.items[0].source {QuickSource::Item(id)=>id,_=>unreachable!()}),
             crate::pack::PackAction::Target(crate::pack::PackTarget::Shoot(_))));
         let start=serde_json::to_vec(&r).unwrap();
         let mut pack=crate::pack::PackView::observe(&r);
@@ -537,6 +648,12 @@ mod tests {
         r.inventory.push(corpse_core::phantasmii_generation::floor_shard(id));
         let id=r.next_id;r.next_id+=1.;
         r.inventory.push(corpse_core::borge::shard(id));
+        let id=r.next_id;r.next_id+=1.;
+        r.inventory.push(corpse_core::ahvamitt::mask_for_revision(id,52.));
+        for line in ["You hear wings in the dark.","Something stirs beyond the stairs.","You grip your bow."] {
+            r.log.push(line.into());
+            if let Some(kinds)=r.log_kinds.as_mut(){kinds.push("player".into());}
+        }
         assert!(corpse_core::revision50_inventory::finite_categories_fit_revision(&r.inventory,&r.player.abilities,52.));
         r.player.hp=82.;r.player.energy=78.;
         for (condition, turns) in [("burning",8.),("hemophilia",15.),("envenomed",12.),("venom:1",4.)] {
@@ -607,12 +724,13 @@ mod tests {
         for name in ["Flying","Hemophilia","Burning","Envenomed"] {
             assert!(meters.iter().take(STATUS_SLOTS).any(|m|m.name.starts_with(name)),"missing preview status {name}: {meters:?}");
         }
-        assert_eq!(view.total_abilities,16);
-        assert_eq!(view.abilities[0].name,"Dreamwalk");
+        assert_eq!(view.total_abilities,15);
+        assert_eq!(view.pack_hud.items[0].label,"Ahvamitt Teleport");
+        assert_eq!(view.pack_hud.items[1].label,"Dreamwalk");
         assert_eq!(view.pack_hud.rings.len(),13);
-        assert_eq!(view.pack_hud.items.len(),11);
+        assert_eq!(view.pack_hud.items.len(),14);
         assert!(view.creatures.iter().any(|a|a.statuses.iter().any(|s|s.name=="Burning")&&a.statuses.iter().any(|s|s.name.starts_with("Envenomed"))));
-        assert_eq!(view.pack_hud.borge_shards,1);
+        assert!(view.pack_hud.items.iter().any(|a|a.label=="Shard of the Borge"));
         assert!(view.creatures.iter().filter(|a|a.has_heart==Some(false)).count()>=2,
             "the walkthrough must show multiple visible heartless enemies");
         assert!(view.creatures.iter().any(|a|a.has_heart==Some(true)));

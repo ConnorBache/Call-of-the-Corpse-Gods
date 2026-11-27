@@ -215,6 +215,13 @@ pub fn visible_abilities(r: &Run) -> Vec<AbilityView> {
     rows
 }
 
+/// HUD divine indices exclude the actions moved to the item rail.
+pub fn divine_abilities(r:&Run)->Vec<AbilityView> {
+    let mut rows=visible_abilities(r);
+    rows.retain(|a|!matches!(a.id.as_str(),corpse_core::dreamwalking::DREAMWALK_ID|corpse_core::dreamwalking::WAKE_UP_ID|corpse_core::ahvamitt::TELEPORT_ID));
+    rows
+}
+
 /// A single canonical row also supplies numeric keys, pointer input and details.
 fn dream_row(r: &Run) -> Option<AbilityView> {
     let active = corpse_core::dreamwalking::active(r);

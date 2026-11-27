@@ -2401,34 +2401,22 @@ impl Painter {
         crate::game_hud::panel(self,hud.chronicle);
         #[cfg(test)]
         let _paint_chronicle = paint_profile_bench::span(paint_profile_bench::Kind::Chronicle);
-        let mut lines = Vec::new();
-        let size = crate::modal_ui::changed_number(&self.profile,"typography.chronicle.fontSize",14.).round() as u16;
-        let line_height = (size as f64 * self.profile.number("typography.chronicle.lineHeight"))
-            .round().max(1.) as i32;
-        for group in &v.log_groups {
-            let message = if group.count > 1 {
-                format!("{}  ×{}", group.message, group.count)
-            } else { group.message.clone() };
-            for line in self.wrap_text_role(crate::typography_ui::Role::Chronicle,
-                &message, hud.chronicle.2 - 24, size) {
-                lines.push((line, crate::chronicle::color(&group.message)));
-            }
-        }
-        let end = lines.len().saturating_sub(v.chronicle_offset.min(lines.len().saturating_sub(4)));
-        let height = hud.chronicle.3-16;
-        let start = end.saturating_sub(((height + line_height - 1) / line_height) as usize);
-        let bottom = 8 + height;
-        self.clip = Some((12, 8, hud.chronicle.2 - 24, height));
-        for (i, (line, color)) in lines[start..end].iter().enumerate() {
-            self.text_role(crate::typography_ui::Role::Chronicle, line, 12,
-                bottom - (end - start - i) as i32 * line_height, size,
-                if *color == INK { game_color(&self.profile, "ui.colors.chronicle") } else { *color });
+        let role=crate::typography_ui::Role::Chronicle;
+        let height=hud.chronicle.3-12;
+        let line_height=(height/5).max(1);
+        let size=10.min(line_height.saturating_sub(3)).max(1) as u16;
+        let end=v.log_groups.len().saturating_sub(v.chronicle_offset.min(v.log_groups.len().saturating_sub(5)));
+        let start=end.saturating_sub(5);
+        let bottom=6+height;
+        self.clip=Some((12,6,hud.chronicle.2-24,height));
+        for (i,group) in v.log_groups[start..end].iter().enumerate() {
+            let full=if group.count>1 {format!("{} ×{}",group.message,group.count)}else{group.message.clone()};
+            let line=self.fit_text_role(role,&full,hud.chronicle.2-24,size);
+            let color=crate::chronicle::color(&group.message);
+            self.text_role(role,&line,12,bottom-(end-start-i) as i32*line_height,size,
+                if color==INK{game_color(&self.profile,"ui.colors.chronicle")}else{color});
         }
         self.clip = None;
-        let background = [14,13,22];
-        let (left_px, right_px) = (self.native_x(12.).max(0), self.native_x((hud.chronicle.2 - 12) as f64).min(self.width as i32));
-        let (top_px, bottom_px) = (self.native_y(8.).max(0), self.native_y(bottom as f64).min(self.height as i32));
-        self.paint_chronicle_fade(background,(left_px,top_px,right_px,bottom_px));
         if self.chronicle_hover {
             let r=self.chronicle_hit_rect();
             self.border(r.0,r.1,r.2,r.3,[174,158,107]);
@@ -2757,7 +2745,8 @@ impl Painter {
         crate::game_hud::paint_depth(self,v,hud);
         crate::game_hud::panel(self,hud.divine);
         crate::game_hud::scroll_mark(self,hud.divine,v.total_abilities,self.ability_capacity(),v.total_abilities.saturating_sub(v.abilities.len()));
-        crate::game_hud::paint_item_rail(self,v,hud);
+        let ability_font=crate::game_hud::ability_label_size(self,v,hud);
+        crate::game_hud::paint_item_rail(self,v,hud,ability_font);
         if self.intersects_damage(map_right,0,left-map_right,self.logical_height()) {
             #[cfg(test)]
             let _paint_enemies = paint_profile_bench::span(paint_profile_bench::Kind::Enemies);
@@ -2767,6 +2756,8 @@ impl Painter {
         if self.intersects_damage(left,0,self.logical_width()-left,self.logical_height()) {
         #[cfg(test)]
         let _paint_abilities = paint_profile_bench::span(paint_profile_bench::Kind::HudAbilities);
+        let name_role=crate::typography_ui::Role::Primary;
+        let size=ability_font;
         for (i,a) in v.abilities.iter().take(self.ability_capacity()).enumerate() {
             let bounds=hud.divine_rows().row(i);
             let y=bounds.1;
@@ -2788,7 +2779,7 @@ impl Painter {
                 else if a.indicator.is_some()&&reserve.is_some(){28}else{0};
             let meter=if cogworks&&reserve.is_some(){crate::modal_ui::Rect(slot.0-40,slot.1,36,slot.3)}else{slot};
             let right=if has_metadata{slot.0-badges-4}else{r.0+r.2-9};
-            let (name,size)=crate::game_hud::compact_label(self,&a.name,"",right-r.0-8);
+            let name=crate::game_hud::fitted_name(self,name_role,&a.name,"",right-r.0-8,size);
             let previous=self.clip;
             self.clip=Some((r.0+4,y,r.2-8,row));
             self.text(&name,r.0+8,y+(row-size as i32)/2,size,a.color);

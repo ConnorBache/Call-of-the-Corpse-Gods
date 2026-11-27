@@ -333,7 +333,7 @@ fn record_mockup_hud_walkthrough() {
     let (x,y)=v.cells.iter().find_map(|c|c.actor_id.is_some_and(|id|Some(id)==v.creatures.first().map(|a|a.id)).then_some((c.x,c.y)))
         .unwrap_or((grid.player.0+3,grid.player.1));
     let mut step=Step::game("look-at-enemy",vec![Input::Motion((x,y))]);step.capture=true;steps.push(step);
-    let mut step=Step::game("bow-aim",vec![Input::ClickHud(tracks.items.0+20,tracks.items.1+game_hud::ABILITY_INSET+8),Input::Motion((x,y))]);
+    let mut step=Step::game("bow-aim",vec![click(tracks.item_geometry().row(v.pack_hud.items.iter().position(|a|a.label=="Bow").unwrap())),Input::Motion((x,y))]);
     step.item=true;steps.push(step);
     let mut step=Step::game("bow-fire",vec![Input::Click((x,y))]);step.readonly=false;steps.push(step);
     let mut step=Step::game("open-pot-inventory",vec![click(tracks.potions)]);step.inventory=true;steps.push(step);
