@@ -1,8 +1,31 @@
-# The Call of the Corpse Gods — native Rust migration
+# Call of the Corpse Gods
+
+## Play the Windows build
+
+**[Download Call of the Corpse Gods: R52 Final Turn](https://github.com/ConnorBache/Call-of-the-Corpse-Gods/releases/tag/r52-final-turn-20261126)**
+
+### Screenshots
+
+Click any screenshot for the full 2560 × 1600 image.
+
+[![Main menu with the three Avatar god slots](docs/screenshots/r52-final-turn/main-menu.webp)](docs/screenshots/r52-final-turn/main-menu.webp)
+
+| Depth 5 | Depth 10 | Depth 15 |
+| :---: | :---: | :---: |
+| [![Dungeon at depth 5](docs/screenshots/r52-final-turn/depth-05.webp)](docs/screenshots/r52-final-turn/depth-05.webp) | [![Dungeon at depth 10](docs/screenshots/r52-final-turn/depth-10.webp)](docs/screenshots/r52-final-turn/depth-10.webp) | [![Dungeon at depth 15](docs/screenshots/r52-final-turn/depth-15.webp)](docs/screenshots/r52-final-turn/depth-15.webp) |
+
+<details>
+<summary>Depth 20 (final-floor spoiler)</summary>
+
+[![Dungeon at depth 20](docs/screenshots/r52-final-turn/depth-20.webp)](docs/screenshots/r52-final-turn/depth-20.webp)
+
+</details>
+
+## About this source branch
 
 A separate native implementation of the frozen v48 game. The browser release is retained unchanged in the sibling `release-v48` workspace. Gameplay uses Rust; the SDL2 desktop has no browser, WebView or JavaScript runtime. JavaScript under `tools/` is development-only reference testing.
 
-## Current preview: R51 follow-up
+## Source on this branch: R51 follow-up
 
 New runs use simulation revision 51; existing saves retain their recorded revision. This follow-up simplifies the HUD, links monster and left-profile highlighting, preserves terrain beneath the player, uses native drawable resolution automatically, and persists Bestiary discovery across runs. The five stats use Damage and HP display units. See [UI scope and verification](docs/quiet-ui-r51.md) and [the follow-up index](docs/revision51-follow-up-index.md) for gameplay changes, exact compatibility boundaries and test evidence. Existing priced immediate-benefit toggles pay their first turn on activation without a duplicate same-turn charge. [Restored energy costs](docs/revision50-ability-energy.md) are explicit R50-and-newer amendments, not identical historical R50 behavior. Windows cross-compilation is not Windows runtime verification.
 
