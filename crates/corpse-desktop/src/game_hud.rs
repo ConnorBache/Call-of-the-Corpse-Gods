@@ -4,9 +4,10 @@ use corpse_core::{Item, Run};
 
 pub const HEARTS: usize = 18;
 pub const POTIONS: usize = 19;
-pub const RAIL_WIDTH: i32 = 164;
-pub const HEADER: i32 = 76;
-pub const FOOTER: i32 = 112;
+pub const RAIL_WIDTH: i32 = 166;
+pub const HEADER: i32 = 82;
+pub const FOOTER: i32 = 116;
+pub const MAP_TILE: (i32, i32) = (12,18);
 pub const ITEM_ROW: i32 = 34;
 pub const RAIL_INSET: i32 = 8;
 pub const STATUS_SLOTS: usize = 4;
@@ -111,11 +112,11 @@ impl Tracks {
         let foot=map.1+map.3;
         let width=p.logical_width();
         // The player bars begin at column 87.5 of the reference grid, before the side rails.
-        let resources_x=map.2-252;
+        let resources_x=map.2-248;
         let depth_x=resources_x-DEPTH_WIDTH;
         let cut=depth_x-NAV_WIDTH;
         let stats_width=192;
-        let supply=120;
+        let supply=126;
         let stats_x=map.2-stats_width-2*supply;
         let footer_height=h-foot;
         let footer_split=foot+(footer_height*43)/100;
@@ -404,10 +405,10 @@ mod tests {
         p.resize(1920,1080);
         p.set_responsive_canvas(true);
         let t=Tracks::resolve(&p);
-        assert_eq!(p.frame().map,Rect(0,76,952,532));
-        assert_eq!(p.frame().sidebar,1116);
+        assert_eq!(p.frame().map,Rect(0,82,948,522));
+        assert_eq!(p.frame().sidebar,1114);
         let (cw,ch,x,y)=p.map_layout(79,29);
-        assert_eq!((cw,ch),(11,18));
+        assert_eq!((cw,ch),MAP_TILE);
         assert_eq!(x,p.frame().map.0);
         assert_eq!(t.resources.0,700);
         assert_eq!(t.nav.0+t.nav.2,t.depth.0);
@@ -418,7 +419,7 @@ mod tests {
         assert_eq!(t.rings.1,t.stats.1+t.stats.3);
         assert!(t.nav.2<t.resources.2);
         assert!(NAV.iter().all(|&(id,_)|id!=4));
-        assert!(p.frame().map.contains(x+79*cw-1,y+29*ch-1));
+        assert_eq!(Rect(x,y,79*cw,29*ch),p.frame().map);
         for (slot,(id,_)) in NAV.into_iter().enumerate(){
             let Rect(x,y,w,h)=t.button(slot);
             assert_eq!(p.toolbar_action(x+w/2,y+h/2),Some(id));

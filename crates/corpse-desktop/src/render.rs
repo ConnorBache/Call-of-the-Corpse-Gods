@@ -2972,11 +2972,14 @@ pub fn map_layout_profile(
 }
 pub fn map_layout_frame(w:usize,h:usize,p:&crate::appearance_profile::Profile,frame:crate::modal_ui::Frame)->(i32,i32,i32,i32){
     let (tw,th)=(p.number("typography.map.tileWidth"),p.number("typography.map.tileHeight"));
-    // Brogue's fullscreen 1080p tile ratio, rounded to whole logical pixels.
-    let aspect = if (tw,th)==(15.,24.) {(1080./34.)/(1920./100.)} else {th/tw};
-    let area_w = (frame.map.2 - 24).max(1);
-    let top = frame.map.1 + 2;
-    let area_h = (frame.map.3 - 4).max(1);
+    let stock = (tw,th)==(15.,24.);
+    let (tile_w,tile_h) = crate::game_hud::MAP_TILE;
+    // Stock geometry is measured on the 16:9 HUD, with no dead gutter.
+    // Leave custom appearance profiles' tile shape and margin semantics intact.
+    let aspect = if stock {f64::from(tile_h)/f64::from(tile_w)} else {th/tw};
+    let area_w = (frame.map.2 - if stock {0} else {24}).max(1);
+    let top = frame.map.1 + if stock {0} else {2};
+    let area_h = (frame.map.3 - if stock {0} else {4}).max(1);
     let mut cw = ((area_w as f64 / w.max(1) as f64).min(area_h as f64 / (h.max(1) as f64 * aspect)))
         .floor()
         .max(1.) as i32;
@@ -3187,7 +3190,7 @@ mod tests {
         assert_eq!(x, frame.map.0);
         assert!(y >= frame.map.1);
         assert!(
-            (h as f64 / w as f64 - (1080./34.)/(1920./100.)).abs() <= 0.5 / w as f64,
+            (h as f64 / w as f64 - 1.5).abs() <= 0.5 / w as f64,
             "default tile aspect survives integer raster fit"
         );
         assert!(frame.map.contains(x + w * 79 - 1, y + h * 29 - 1));
