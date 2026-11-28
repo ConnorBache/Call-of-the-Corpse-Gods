@@ -2225,8 +2225,9 @@ impl Painter {
     pub fn ability_detail_damage(&self, a: &crate::ability_ui::AbilityView, anchor: crate::modal_ui::DetailAnchor) -> Option<damage::Rect> {
         ability_dialog::bounds(self, a, anchor)
     }
+    #[cfg(test)]
     pub fn inspection_notice_y(&self) -> i32 {
-        {let r=self.hud_tracks().inspector; r.1+(r.3-13)/2}
+        crate::game_hud::inspector_text_top(self.hud_tracks().inspector, 1)
     }
     pub fn hud_damage(&self)->impl Iterator<Item=damage::Rect>+'_ {
         let t=self.hud_tracks();

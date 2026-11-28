@@ -332,6 +332,29 @@ fn paint_supply(p: &mut Painter, b: Rect, id: usize, name: &str, count: u32, max
         p.rect(x+d,y+3-d,2,1,ink);
     }
 }
+// A fixed type size keeps the footer from changing scale as the pointer moves.
+const INSPECTOR_TEXT_SIZE: u16 = 10;
+const INSPECTOR_LINE_HEIGHT: i32 = 13;
+const INSPECTOR_MAX_ROWS: usize = 3;
+const INSPECTOR_INSET: i32 = 8;
+fn inspector_rows(p: &Painter, r: Rect, scene: &str) -> Vec<String> {
+    let role = crate::typography_ui::Role::Primary;
+    let width = r.2 - 2 * INSPECTOR_INSET;
+    let mut rows = p.compact_text_rows(role, scene, width, INSPECTOR_TEXT_SIZE);
+    if rows.len() > INSPECTOR_MAX_ROWS {
+        rows.truncate(INSPECTOR_MAX_ROWS);
+        if let Some(last) = rows.last_mut() {
+            *last = p.fit_text_role(role, &format!("{last}…"), width, INSPECTOR_TEXT_SIZE);
+        }
+    }
+    rows
+}
+
+pub(crate) fn inspector_text_top(r: Rect, rows: usize) -> i32 {
+    let height = rows.saturating_sub(1) as i32 * INSPECTOR_LINE_HEIGHT + INSPECTOR_TEXT_SIZE as i32;
+    r.1 + (r.3 - height) / 2
+}
+
 pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
     let r=t.inspector;
     let bottom=t.gods.1+t.gods.3;
@@ -341,8 +364,12 @@ pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
         panel(p,Rect(start,r.1,end-start,bottom-r.1));
         for b in [r,t.stats,t.rings]{panel(p,b);}
         let role=crate::typography_ui::Role::Primary;
-        let text=p.fit_text_role(role,notice,r.2-16,13);
-        p.text(&text,r.0+8,p.inspection_notice_y(),13,INK);
+        let rows = inspector_rows(p, r, notice);
+        let top = inspector_text_top(r, rows.len());
+        for (i, line) in rows.iter().enumerate() {
+            p.text_role(role, line, r.0 + INSPECTOR_INSET,
+                top + i as i32 * INSPECTOR_LINE_HEIGHT, INSPECTOR_TEXT_SIZE, INK);
+        }
         for i in 0..3 {
             let z=t.gods;
             let left=z.0+z.2*i/3;
@@ -536,6 +563,27 @@ mod tests {
         assert_eq!(shard.hint.as_deref(),Some("Throw"));
         assert_eq!(actions.iter().filter(|a|a.label=="Shard of the Borge").count(),1);
         assert!(matches!(activate_quick(&r,shard.source),crate::pack::PackAction::Target(crate::pack::PackTarget::Throw(40001.))));
+    }
+
+    const WRONGSPACE_INSPECT: &str = "Your vessel stands over a transcendent zillennia <heart> beside a rally point on the wrongspace. A Hemogoblin Inventor <heart> lies on the wrongspace. A Long-legged Saidribee <heart> lies on the wrongspace.";
+
+    #[test]
+    fn inspector_footer_fits_the_wrongspace_witness_and_marks_overflow() {
+        let mut p = Painter::new();
+        p.set_responsive_canvas(true);
+        for (w, h) in [(1280,720), (1920,1080), (3840,2160), (900,1200)] {
+            p.resize(w,h);
+            let r = p.hud_tracks().inspector;
+            let rows = inspector_rows(&p, r, WRONGSPACE_INSPECT);
+            assert_eq!(rows.len(), INSPECTOR_MAX_ROWS, "{w}x{h}: {rows:?}");
+            assert_eq!(rows.join(" "), WRONGSPACE_INSPECT);
+            assert!(r.3 >= (rows.len() as i32 - 1) * INSPECTOR_LINE_HEIGHT + INSPECTOR_TEXT_SIZE as i32);
+            let overflow = inspector_rows(&p, r, &format!("{WRONGSPACE_INSPECT} {WRONGSPACE_INSPECT}"));
+            assert_eq!(overflow.len(), INSPECTOR_MAX_ROWS);
+            assert!(overflow.last().unwrap().ends_with('…'));
+            assert!(inspector_rows(&p,r,"").is_empty());
+            assert_eq!(inspector_rows(&p,r,"A heart lies on the sand."),["A heart lies on the sand."]);
+        }
     }
 
     #[test]
