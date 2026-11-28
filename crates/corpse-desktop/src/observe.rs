@@ -2404,7 +2404,9 @@ mod epidite_ui_tests {
     fn epidite_ui_countdown_is_direct_observation_not_fog_or_render_time() {
         let mut r=scene();let before=r.clone();let view=observe(&r);
         assert_eq!(view.cells.iter().find(|c|c.x==13&&c.y==10).unwrap().subscript,"3");
-        assert!(crate::inspection_ui::observe_tile(&r,13,10).scene.contains("3 turns until judgement"));
+        let report = crate::inspection_ui::observe_tile(&r,13,10);
+        assert!(!report.scene.contains("until judgement"));
+        assert!(report.feature_hover.unwrap().mechanics.iter().any(|line| line == "3 turns until judgement."));
         let mut o=view.terrain_snapshot.as_ref().unwrap().cells[10*79+13].clone();o.direct=false;
         assert_eq!(observed_epidite_countdown(&r,&o,79),None);
         assert_eq!(r,before);
@@ -2417,7 +2419,10 @@ mod epidite_ui_tests {
             let mut r=scene();r.floor_mut().unwrap().godbeast_event.as_mut().unwrap().epidite_age=age.into();
             let before=r.clone();let view=observe(&r);
             assert_eq!(view.cells.iter().find(|c|c.x==13&&c.y==10).unwrap().subscript,subscript);
-            assert!(crate::inspection_ui::observe_tile(&r,13,10).scene.contains(&format!("{remaining} turns until judgement")));
+            let report = crate::inspection_ui::observe_tile(&r,13,10);
+            let unit = if remaining == 1 { "turn" } else { "turns" };
+            assert!(!report.scene.contains("until judgement"));
+            assert!(report.feature_hover.unwrap().mechanics.iter().any(|line| *line == format!("{remaining} {unit} until judgement.")));
             let o=&view.terrain_snapshot.as_ref().unwrap().cells[10*79+13];
             assert_eq!(observed_epidite_countdown(&r,o,79),Some(remaining));assert_eq!(r,before);
             if [9,10].contains(&remaining) {
@@ -2425,7 +2430,9 @@ mod epidite_ui_tests {
                     std::fs::create_dir_all(&dir).unwrap();let mut view=view;
                     view.provenance="CONTROLLED Epidite clock fixture; native renderer; no turns simulated".into();
                     view.hover=Some((13,10));let mut painter=crate::render::Painter::new();
-                    painter.game_at(&view,&crate::inspection_ui::observe_tile(&r,13,10).scene,false,824.);
+                    let report = crate::inspection_ui::observe_tile(&r,13,10);
+                    painter.game_at(&view,&report.scene,false,824.);
+                    crate::inspection_ui::paint_hover(&report, &mut painter);
                     let file=std::fs::File::create(format!("{dir}/epidite-{remaining}-turns-controlled.png")).unwrap();
                     let mut encoder=png::Encoder::new(file,painter.width as u32,painter.height as u32);
                     encoder.set_color(png::ColorType::Rgba);encoder.set_depth(png::BitDepth::Eight);
@@ -2438,7 +2445,9 @@ mod epidite_ui_tests {
         corpse_core::epidite::world_turn(&mut r).unwrap();
         assert_eq!(corpse_core::epidite::countdown(r.floor().unwrap().godbeast_event.as_ref().unwrap()),30);
         assert!(observe(&r).cells.iter().find(|c|c.x==13&&c.y==10).unwrap().subscript.is_empty());
-        assert!(crate::inspection_ui::observe_tile(&r,13,10).scene.contains("30 turns until judgement"));
+        let report = crate::inspection_ui::observe_tile(&r,13,10);
+        assert!(!report.scene.contains("until judgement"));
+        assert!(report.feature_hover.unwrap().mechanics.iter().any(|line| line == "30 turns until judgement."));
     }
     #[test]
     fn epidite_ui_blessed_hearts_have_one_label_and_doubled_observed_rewards() {

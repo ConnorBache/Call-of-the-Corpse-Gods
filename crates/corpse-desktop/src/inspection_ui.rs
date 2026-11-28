@@ -30,6 +30,14 @@ pub struct Report {
     pub details_open: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub item_hover: Vec<String>,
+    #[serde(skip)]
+    pub feature_hover: Option<FeatureHover>,
+}
+#[derive(Clone, Debug, PartialEq)]
+pub struct FeatureHover {
+    pub title: String,
+    pub description: String,
+    pub mechanics: Vec<String>,
 }
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CreatureReport {
@@ -95,6 +103,7 @@ impl CreatureReport {
             creature: Some(self),
             details_open: false,
             item_hover: Vec::new(),
+            feature_hover: None,
         }
     }
 }
@@ -476,7 +485,7 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
             else { "You remember hellfire burning here." }.into());
     }
     if tile.is_some() && o.flowers {
-        details.push("Colorful flowers grow here. They are decorative.".into());
+        details.push("Colorful flowers grow here.".into());
     }
     if tile.is_some() && o.puddles && (o.ice || o.hellfire) {
         details.push(if o.current { "a puddle sits on the ground." } else { "You remember a puddle." }.into());
@@ -550,12 +559,9 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
                 details.push(if o.current { now } else { past }.into())
             }
         }
-        if let Some(n) = h.bulwark.as_ref() {
-            details.push(if o.current {
-                format!("Bulwark of Mind wards this square for {n} more turns.")
-            } else {
-                format!("Bulwark of Mind had {n} turns of protection left here.")
-            })
+        if h.bulwark.as_ref().is_some() {
+            details.push(if o.current { "Bulwark of Mind wards this square." }
+                else { "You remember a Bulwark of Mind here." }.into());
         }
         if !o.hellfire {
             let fire = h.fire.as_ref().map(String::as_str);
@@ -575,24 +581,9 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
             }
         }
         if let Some(v) = h.vent.as_ref() {
-            details.push(format!(
-                "{} vent. {}",
-                gas_label(&v.gas),
-                if v.phase == "waiting" {
-                    if o.current {
-                        format!("Next burst in {} normal turns.", v.countdown)
-                    } else {
-                        format!("Its next burst was due in {} normal turns.", v.countdown)
-                    }
-                } else {
-                    if o.current {
-                        "Waiting for gas to clear."
-                    } else {
-                        "It was waiting for gas to clear."
-                    }
-                    .into()
-                }
-            ));
+            let gas = gas_label(&v.gas);
+            details.push(if o.current { format!("{gas} vent.") }
+                else { format!("You remember a {} vent.", gas_in_sentence(&v.gas)) });
         }
         if let Some(g) = h.gas.as_ref() {
             if !o.current {
@@ -603,14 +594,13 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
             } else if g.concentration == 0. {
                 details.push("Only a lingering haze remains.".into());
             }
-            if g.r#type == corpse_core::death_gas_rules::GAS {
-                details.push("It is both caustic and hallucinogenic.".into());
-            }
         }
         if !o.current {
             if let Some(feature) = h.feature.as_ref() {
                 details.push(format!("You last saw {} here.", feature.name));
-                details.push(feature.description.replace("Walk into the lever to open the ichor well.","The lever was ready to open the ichor well.").replace("An ancient tree. Apply a tree tap while adjacent to collect Veridian Sap.","A tree tap could draw Veridian Sap from it.").replace("has ","had ").replace("rises ","rose ").replace("waits ","stood "));
+                if !feature_description_off_footer(&feature.name) {
+                    details.push(feature.description.replace("Walk into the lever to open the ichor well.","The lever was ready to open the ichor well.").replace("An ancient tree. Apply a tree tap while adjacent to collect Veridian Sap.","A tree tap could draw Veridian Sap from it.").replace("has ","had ").replace("rises ","rose ").replace("waits ","stood "));
+                }
             }
             if let Some(light) = h.light_source.as_ref() {
                 details.push(
@@ -1132,9 +1122,47 @@ impl TileSpace {
     }
 }
 
+fn feature_description_off_footer(name: &str) -> bool {
+    matches!(name, "Epidite" | "Borge sacrifice altar" | "Altar of the Phantasmii" | "Verdania" | "Veridian")
+}
+
+fn observed_feature_card(r: &Run, o: &vision::ObservedCell, width: usize) -> Option<FeatureHover> {
+    if !o.current { return None; }
+    let feature = o.hazards.as_ref()?.feature.as_ref()?;
+    let (description, mechanics) = match feature.name.as_str() {
+        "Epidite" => {
+            let mut mechanics = Vec::new();
+            if let Some(n) = crate::observe::observed_epidite_countdown(r, o, width) {
+                let unit = if n == 1 { "turn" } else { "turns" };
+                mechanics.push(format!("{n} {unit} until judgement."));
+            }
+            mechanics.push(format!("Every {} turns, it blesses exposed hearts and deals {} damage through damage reduction to creatures in sight.",
+                corpse_core::epidite::PERIOD, corpse_core::epidite::DAMAGE));
+            ("A tower of cleansing light. It cannot be destroyed.".into(), mechanics)
+        }
+        "Borge sacrifice altar" => {
+            let mut mechanics = Vec::new();
+            let description = if feature.description == "The Borge has accepted its one sacrifice." {
+                feature.description.clone()
+            } else {
+                mechanics.push("Carry the marked heart and walk into the altar to offer it.".into());
+                if corpse_core::borge::throw_offering_enabled(r) {
+                    mechanics.push("Or throw the marked heart onto the altar. The Shard of the Borge will be left there.".into());
+                }
+                "The altar accepts only the exact heart marked by the Borge.".into()
+            };
+            (description, mechanics)
+        }
+        "Verdania" | "Veridian" => (feature.description.clone(), vec![]),
+        _ => return None,
+    };
+    Some(FeatureHover { title: feature.name.clone(), description, mechanics })
+}
+
 struct TileStack<'a> {
     accompaniment: &'static str,
     fixtures: Vec<TileFixture>,
+    named_feature: bool,
     local_items: Vec<String>,
     corpses: Vec<String>,
     space: TileSpace,
@@ -1203,7 +1231,8 @@ impl<'a> TileStack<'a> {
             format!("the corpse of {}", article(&name))
         }).collect();
         let gas = o.hazards.as_ref().and_then(|h| h.gas.as_ref()).map(|g| g.r#type.as_str());
-        Self{accompaniment,fixtures,local_items,corpses,space,gas:gas.filter(|&g| g != "steam"),flame,steam:gas == Some("steam")}
+        let named_feature = o.hazards.as_ref().is_some_and(|h| h.feature.as_ref().is_some());
+        Self{accompaniment,fixtures,named_feature,local_items,corpses,space,gas:gas.filter(|&g| g != "steam"),flame,steam:gas == Some("steam")}
     }
     fn placement(&self) -> String {
         let fixtures:Vec<_>=self.fixtures.iter().map(|f|f.phrase.clone()).collect();
@@ -1277,7 +1306,8 @@ impl<'a> TileStack<'a> {
         if let Some(g) = gas {
             let name = gas_label(g);
             return Some(if self.space != TileSpace::Ground {
-                format!("{name} floats{location}.")
+                if self.named_feature && !place.is_empty() { format!("{name} floats above {place}{location}.") }
+                else { format!("{name} floats{location}.") }
             } else if place.is_empty() {
                 format!("{name} floats here.")
             } else {
@@ -1291,6 +1321,15 @@ impl<'a> TileStack<'a> {
                 self.space.empty_scene().into()
             };
             return Some(if place.is_empty() { scene } else { format!("{scene} {} is here.", upper_first(&place)) });
+        }
+        if self.named_feature && !place.is_empty() {
+            let phrases: Vec<_> = self.fixtures.iter().map(|f| f.phrase.clone()).collect();
+            let subject = upper_first(&prose_list(&phrases));
+            let verb = if phrases.len() == 1 { "stands" } else { "stand" };
+            let location = if self.accompaniment.is_empty() || self.fixtures.iter().any(|f| f.supersedes_surface) {
+                "here".to_string()
+            } else { format!("{} {}", self.preposition(), self.accompaniment) };
+            return Some(self.finish(format!("{subject} {verb} {location}.")));
         }
         if !place.is_empty() && self.fixtures.iter().any(|f| f.phrase == "a rally point") {
             return Some(self.finish("A rally point is set here.".into()));
@@ -1462,6 +1501,7 @@ fn dream_tile_scene(
             stack.space = TileSpace::Ground;
             stack.accompaniment = "";
             stack.fixtures.clear();
+            stack.named_feature = false;
             stack.gas = None;
             stack.flame = None;
             stack.steam = false;
@@ -1553,7 +1593,9 @@ fn wall_feeding_line(r: &Run, a: &Actor, shown: &Actor, subject: &str, line: Str
 }
 fn append_visible_features(scene:&mut String,o:&vision::ObservedCell) {
     if let Some(h)=o.hazards.as_ref(){
-        if let Some(feature)=h.feature.as_ref(){append_scene(scene,&feature.description);}
+        if let Some(feature)=h.feature.as_ref().filter(|f| !feature_description_off_footer(&f.name)) {
+            append_scene(scene,&feature.description);
+        }
         if let Some(source)=h.light_source.as_ref().filter(|_| observed_flame(o) != Some(TileFlame::Brazier)){append_scene(scene,match source.as_str(){
             "beacon"=>"A magical beacon glows here.","torch"=>"A wall torch flickers here.",_=>"A brazier is here.",
         });}
@@ -1561,7 +1603,8 @@ fn append_visible_features(scene:&mut String,o:&vision::ObservedCell) {
     if o.entrance {append_scene(scene,"The blue entrance leads out of the Flesh.");}
 }
 pub fn hover_available(report: &Report) -> bool {
-    !report.item_hover.is_empty() || report.creature.as_ref().is_some_and(|c|c.hover_available)
+    report.feature_hover.is_some() || !report.item_hover.is_empty()
+        || report.creature.as_ref().is_some_and(|c|c.hover_available)
 }
 pub fn observe_tile(r: &Run, x: usize, y: usize) -> Report {
     let mut report=observe_tile_inner(r,x,y,None);
@@ -1590,6 +1633,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         None => { owned = vision::observe_terrain(r); let Some(o) = owned.as_ref() else { return unknown(); }; o }
     };
     let o = &observation.cells[y * f.width() + x];
+    let feature_hover = observed_feature_card(r, o, f.width());
     let portal_name = crate::portal_ui::known_name(r, o);
     let pocket = crate::non_euclidean_ui::description(r, observation, x, y);
     let space = if portal_name.is_some() { TileSpace::Portal }
@@ -1635,7 +1679,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 };
                 let location = if dead { space.location() } else { space.creature_location(true) };
                 detail.scene = format!("{} {verb}{location}.", scene_subject(r, shown));
-                if !stack.local_items.is_empty() || !stack.corpses.is_empty() || stack.flame.is_some() || stack.gas.is_some() || stack.steam {
+                if stack.named_feature || !stack.local_items.is_empty() || !stack.corpses.is_empty() || stack.flame.is_some() || stack.gas.is_some() || stack.steam {
                     if let Some(objects) = stack.objects() { append_scene(&mut detail.scene, &objects); }
                 }
                 stacked = true;
@@ -1693,7 +1737,9 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             }
         }
         if let Some(text) = &pocket { detail.description.push_str(&format!("\n{text}")); }
-        detail.report()
+        let mut report = detail.report();
+        report.feature_hover = feature_hover.clone();
+        report
         };
         if crate::hallucination_ui::affects(r,a) {
             // One detached scratch Run, one admitted terrain observation; no Run retained.
@@ -1745,15 +1791,13 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         else if space == TileSpace::Wrongspace { report.title = "Wrongspace".into(); }
         if let Some(text) = &pocket { report.lines.push(text.clone()); }
         if o.current {
-            if let Some(countdown) = crate::observe::observed_epidite_countdown(r, o, f.width()) {
-                let timer = format!("{countdown} turns until judgement");
-                report.scene = format!("{timer}. {}",report.scene); report.lines.insert(0,timer);
-            }
             if let Some(h) = o.hazards.as_ref() {
                 if let Some(feature) = h.feature.as_ref() {
                     report.title = feature.name.clone();
-                    report.lines.push(feature.description.clone());
-                    report.scene.push_str(&format!(" {}", feature.description));
+                    if !feature_description_off_footer(&feature.name) {
+                        report.lines.push(feature.description.clone());
+                        append_scene(&mut report.scene, &feature.description);
+                    }
                 }
                 if let Some(source) = h.light_source.as_ref() {
                     let (name, text) = if source == "beacon" {
@@ -1862,6 +1906,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             report.lines.extend(ground);
         }
     }
+    report.feature_hover = feature_hover;
     report
 }
 /// Bow targeting enriches an already-observed creature report only. No hidden
@@ -2186,7 +2231,26 @@ pub fn paint_pinned_hover(report: &Report, p: &mut Painter, anchor:modal_ui::Det
     paint_hover_card(report,p,Some(anchor))
 }
 fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::DetailAnchor>) {
-    let Some(c) = report.creature.as_ref().filter(|c| c.hover_available) else {
+    let fixture_card;
+    let creature = report.creature.as_ref().filter(|c| c.hover_available);
+    let c = if let Some(c) = creature { c }
+    else if let Some(feature) = &report.feature_hover {
+        // Reuse the creature card compositor; a fixture has no fabricated
+        // health bar, melee forecast, conditions, or combat identity.
+        fixture_card = CreatureReport {
+            title: feature.title.clone(),
+            description: feature.description.clone(),
+            creature_card: Some(CreatureCard {
+                mechanics: feature.mechanics.clone(),
+                conditions: String::new(),
+                your_melee: String::new(),
+                enemy_melee: String::new(),
+                administrator: false,
+            }),
+            ..Default::default()
+        };
+        &fixture_card
+    } else {
         paint_item_hover(report,p);
         return;
     };
@@ -2250,6 +2314,13 @@ fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::De
     }
     add(&c.heart, GOLD, 14, 0);
     add(&c.bow_shot, INK, 15, 7);
+    if creature.is_some() {
+        if let Some(feature) = &report.feature_hover {
+            add(&feature.title, INK, 15, 2);
+            add(&feature.description, MUTED, 15, 2);
+            for mechanic in &feature.mechanics { add(mechanic, MUTED, 15, 2); }
+        }
+    }
     let (x, y, w, h) = place(p, offset + 12 + if pinned {18}else{0}).tuple();
     if h <= 0 { return; }
     let old = p.clip;
@@ -2586,7 +2657,71 @@ mod tests {
         let report=observe_tile(&r,11,12);
         assert!(report.scene.starts_with("The corpse of a Giant Rat lies atop an Altar of the Phantasmii on the sand."),"{}",report.scene);
         assert!(report.scene.contains("Falling razorleaves"));
-        assert!(report.creature.unwrap().description.contains("begin the ritual"));
+        assert!(!report.creature.unwrap().description.contains("begin the ritual"));
+        assert!(report.feature_hover.is_none());
+    }
+
+    #[test]
+    fn landmark_explanations_use_a_rendered_hover_card_not_the_footer() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        for (kind, name, needle) in [
+            ("Epidite", "Epidite", "It cannot be destroyed."),
+            ("Borge", "Borge sacrifice altar", "accepts only the exact heart"),
+            ("Veridian", "Verdania", "Apply a tree tap"),
+        ] {
+            let f = r.floor_mut().unwrap();
+            f.godbeast_event = corpse_core::GodbeastEvent {
+                kind: kind.into(), x: if kind == "Borge" { 17. } else { 11. }, y: 12.,
+                altar: corpse_core::GodbeastEventTap{x:11.,y:12.}.into(),
+                display_name: if kind == "Veridian" { "Verdania".to_string().into() } else { Field::Missing },
+                epidite_age: 27.0.into(),
+                ..Default::default()
+            }.into();
+            let report = observe_tile(&r, 11, 12);
+            assert!(hover_available(&report));
+            assert!(report.creature.is_none());
+            let card = report.feature_hover.as_ref().unwrap();
+            assert_eq!(card.title, name);
+            assert!(card.description.contains(needle));
+            assert!(report.scene.contains(name));
+            assert!(!report.scene.contains(needle) && !report.scene.contains("until judgement"));
+            if kind == "Epidite" {
+                assert!(card.mechanics.iter().any(|s| s.contains("3 turns until judgement")));
+                assert!(card.mechanics.iter().any(|s| s.contains("blesses exposed hearts") && s.contains("100 damage")));
+            }
+            let mut painter = Painter::new();
+            painter.clear([20, 30, 40]);
+            let blank = painter.pixels.clone();
+            paint_hover(&report, &mut painter);
+            assert_ne!(painter.pixels, blank, "{name}");
+            assert!(painter.clip.is_none());
+            let mut fog = vision::observe_terrain(&r).unwrap();
+            let cell = &mut fog.cells[12 * fog.width + 11];
+            cell.current = false;
+            cell.direct = false;
+            assert!(observe_tile_with_terrain(&r, 11, 12, &fog).feature_hover.is_none());
+        }
+    }
+
+    #[test]
+    fn phantasmii_altar_outlasts_portal_and_gas_without_instructions() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        let f = r.floor_mut().unwrap();
+        let at = 12 * f.width() + 11;
+        f.godbeast_event = corpse_core::GodbeastEvent {
+            kind: "Phantasmii".into(), altar: corpse_core::GodbeastEventTap {x:11.,y:12.}.into(),
+            ..Default::default()
+        }.into();
+        f.portals = vec![corpse_core::portals_generation::PortalPair{a:at,b:at+3,color_index:0}].into();
+        assert!(corpse_core::environment::add_gas(f, at, "confusion", 12., -1.).unwrap());
+        let report = observe_tile(&r, 11, 12);
+        assert!(report.scene.contains("Altar of the Phantasmii") && report.scene.contains("in a portal"), "{}", report.scene);
+        assert!(report.feature_hover.is_none());
+        assert!(!report.scene.contains("ritual"));
     }
 
     #[test]
@@ -2718,7 +2853,7 @@ mod tests {
         let f = r.floor_mut().unwrap();
         assert!(corpse_core::environment::add_gas(f, at, corpse_core::death_gas_rules::GAS, 12., -1.).unwrap());
         let report = observe_tile(&r, 11, 12);
-        assert_eq!(report.scene, "A cave bat flies over a giant rat heart in the Death Gas. It is both caustic and hallucinogenic.");
+        assert_eq!(report.scene, "A cave bat flies over a giant rat heart in the Death Gas.");
     }
 
     #[test]
@@ -2784,7 +2919,7 @@ mod tests {
         let stack=TileStack {
             accompaniment:"the sand",
             fixtures:vec![TileFixture{phrase:"a bridge".into(),supersedes_surface:true}],
-            local_items:vec!["a heart".into()], corpses:vec![], space:TileSpace::Portal, gas:None, flame:None, steam:false,
+            named_feature:false, local_items:vec!["a heart".into()], corpses:vec![], space:TileSpace::Portal, gas:None, flame:None, steam:false,
         };
         assert_eq!(stack.occupied("A bat",SceneMotion::Flies,""),"A bat flies over a heart beside a bridge while emerging from a portal.");
         assert_eq!(stack.objects().unwrap(),"A heart lies atop a bridge in a portal.");
@@ -2973,12 +3108,12 @@ mod tests {
                 "{}",
                 case["name"]
             );
-            assert_eq!(
-                description,
-                case["expected"]["description"].as_str().unwrap(),
-                "{}",
-                case["name"]
-            );
+            let expected = case["expected"]["description"].as_str().unwrap()
+                .replace("Bulwark of Mind had 4 turns of protection left here.", "You remember a Bulwark of Mind here.")
+                .replace("Paralysis gas vent. Its next burst was due in 7 normal turns.", "You remember a paralysis gas vent.")
+                .replace("Steam vent. It was waiting for gas to clear.", "You remember a steam vent.")
+                .replace(" A tree tap could draw Veridian Sap from it.", "");
+            assert_eq!(description, expected, "{}", case["name"]);
         }
     }
     #[test]
