@@ -555,27 +555,22 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
                 format!("Bulwark of Mind had {n} turns of protection left here.")
             })
         }
-        if !o.hellfire && (h.permanent_fire.value_or(false) || h.fire.as_ref().is_some_and(|s| s != "embers")) {
-            let kind = if h.fire.as_ref().is_some_and(|s| s == "ichor") {
-                "Ichor fire"
-            } else if h.permanent_fire.value_or(false) {
-                "An undying fire"
-            } else {
-                "Fire"
-            };
-            details.push(format!(
-                "{kind} {} here.",
-                if o.current { "burns" } else { "burned" }
-            ));
-        } else if h.fire.as_ref().is_some_and(|s| s == "embers") {
-            details.push(
-                if o.current {
-                    "Spent embers remain here."
-                } else {
-                    "Spent embers remained here."
-                }
-                .into(),
-            )
+        if !o.hellfire {
+            let fire = h.fire.as_ref().map(String::as_str);
+            let permanent = h.permanent_fire.value_or(false);
+            if o.current && fire == Some("ichor") {
+                details.push("The flame is ichor fire.".into());
+            } else if o.current && permanent && observed_flame(o) == Some(TileFlame::Open) {
+                details.push("The fire never burns out.".into());
+            } else if !o.current && (permanent || fire.is_some_and(|s| s != "embers")) {
+                let kind = if fire == Some("ichor") { "Ichor fire" }
+                    else if permanent { "An undying fire" }
+                    else { "Fire" };
+                details.push(format!("{kind} burned here."));
+            } else if fire == Some("embers") && observed_flame(o).is_none() {
+                details.push(if o.current { "Spent embers remain here." }
+                    else { "Spent embers remained here." }.into());
+            }
         }
         if let Some(v) = h.vent.as_ref() {
             details.push(format!(
@@ -1055,6 +1050,32 @@ struct TileFixture {
     phrase: String,
     supersedes_surface: bool,
 }
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum TileFlame { Brazier, Open }
+impl TileFlame {
+    fn phrase(self) -> &'static str {
+        match self {
+            Self::Brazier => "the brazier's roaring flame",
+            Self::Open => "the roaring flame",
+        }
+    }
+}
+fn observed_flame(o: &vision::ObservedCell) -> Option<TileFlame> {
+    if !o.current { return None; }
+    let h = o.hazards.as_ref();
+    if !o.hellfire && !h.is_some_and(|h| h.permanent_fire.value_or(false)
+        || h.fire.as_ref().map(String::as_str).is_some_and(|kind| kind != "embers"))
+    {
+        return None;
+    }
+    // The core also uses its "brazier" fire kind for persistent fire without
+    // a brazier fixture (e.g. Hellfire). Name the fixture only when observed.
+    Some(if h.is_some_and(|h| h.light_source.as_ref().map(String::as_str) == Some("brazier")) {
+        TileFlame::Brazier
+    } else {
+        TileFlame::Open
+    })
+}
 struct TileStack<'a> {
     accompaniment: &'static str,
     fixtures: Vec<TileFixture>,
@@ -1062,6 +1083,8 @@ struct TileStack<'a> {
     corpses: Vec<String>,
     portal: bool,
     gas: Option<&'a str>,
+    flame: Option<TileFlame>,
+    steam: bool,
 }
 fn article(name: &str) -> String {
     if name.starts_with("The ") || name.starts_with("the ") {
@@ -1095,11 +1118,12 @@ impl<'a> TileStack<'a> {
             Some("chasm")=>"a chasm",Some("pit")=>"the bottomless pit",
             Some("up")=>"an upward stairway",Some("down")=>"a downward stairway",_=>"",
         };
+        let flame = observed_flame(o);
         let mut fixtures=Vec::new();
         let mut fixture=|phrase:String,supersedes_surface|fixtures.push(TileFixture{phrase,supersedes_surface});
         if let Some(h)=&o.hazards {
             if let Some(f)=h.feature.as_ref(){fixture(article(&f.name),false);}
-            if let Some(source)=h.light_source.as_ref(){fixture(match source.as_str(){
+            if let Some(source)=h.light_source.as_ref().filter(|_| flame != Some(TileFlame::Brazier)){fixture(match source.as_str(){
                 "beacon"=>"a magical beacon","torch"=>"a wall torch",_=>"a brazier",
             }.into(),false);}
         }
@@ -1120,7 +1144,7 @@ impl<'a> TileStack<'a> {
             article(&crate::creature_presentation::corpse_name(&name.to_lowercase(), hearts.heartless(a)))
         }).collect();
         let gas = o.hazards.as_ref().and_then(|h| h.gas.as_ref()).map(|g| g.r#type.as_str());
-        Self{accompaniment,fixtures,local_items,corpses,portal,gas}
+        Self{accompaniment,fixtures,local_items,corpses,portal,gas:gas.filter(|&g| g != "steam"),flame,steam:gas == Some("steam")}
     }
     fn placement(&self, include_portal: bool) -> String {
         let mut fixtures:Vec<_>=self.fixtures.iter().map(|f|f.phrase.clone()).collect();
@@ -1136,25 +1160,56 @@ impl<'a> TileStack<'a> {
     fn preposition(&self)->&'static str {
         if self.accompaniment.contains("water") {"in"} else {"on"}
     }
+    fn finish(&self, mut sentence: String) -> String {
+        if self.steam {
+            if sentence.is_empty() { return "Steam rises here.".into(); }
+            if sentence.ends_with('.') { sentence.pop(); }
+            sentence.push_str(" as steam rises.");
+        }
+        sentence
+    }
+    fn creature_atmosphere(&self) -> String {
+        match (self.flame, self.gas) {
+            (Some(f), Some(g)) => format!(" in {} amid the {}.", f.phrase(), gas_in_sentence(g)),
+            (Some(f), None) => format!(" in {}.", f.phrase()),
+            (None, Some(g)) => format!(" in the {}.", gas_in_sentence(g)),
+            (None, None) => ".".into(),
+        }
+    }
     fn objects(&self) -> Option<String> {
         let place = self.placement(true);
         let items = &self.local_items;
         let corpses = &self.corpses;
-        let ending = if place.is_empty() { String::new() } else {
+        let ending = if place.is_empty() || (self.flame.is_some() && self.fixtures.is_empty() && !self.portal) {
+            String::new()
+        } else {
             let prep = if !self.fixtures.is_empty() { "atop" }
                 else if self.portal { "on" } else { self.preposition() };
             format!(" {prep} {place}")
         };
         let gas = self.gas;
-        let suffix = gas.map_or_else(|| ".".into(), |g| format!(" as {} floats above.", gas_in_sentence(g)));
+        let suffix = if self.flame.is_some() { self.creature_atmosphere() }
+            else { gas.map_or_else(|| ".".into(), |g| format!(" as {} floats above.", gas_in_sentence(g))) };
         if !items.is_empty() {
             let below = if corpses.is_empty() { String::new() } else { format!(" atop {}", prose_list(corpses)) };
             let verb = if items.len() == 1 { "lies" } else { "lie" };
-            return Some(format!("{} {verb}{below}{ending}{suffix}", upper_first(&prose_list(items))));
+            return Some(self.finish(format!("{} {verb}{below}{ending}{suffix}", upper_first(&prose_list(items)))));
         }
         if !corpses.is_empty() {
             let verb = if corpses.len() == 1 { "lies" } else { "lie" };
-            return Some(format!("{} {verb}{ending}{suffix}", upper_first(&prose_list(corpses))));
+            return Some(self.finish(format!("{} {verb}{ending}{suffix}", upper_first(&prose_list(corpses)))));
+        }
+        if let Some(f) = self.flame {
+            let main = match f {
+                TileFlame::Brazier => "The brazier burns with roaring flame",
+                TileFlame::Open => "The roaring flame burns here",
+            };
+            let gas = gas.map_or_else(String::new, |g| format!(" amid the {}", gas_in_sentence(g)));
+            let scene = self.finish(format!("{main}{gas}."));
+            if self.fixtures.is_empty() { return Some(scene); }
+            let fixtures: Vec<_> = self.fixtures.iter().map(|f| f.phrase.clone()).collect();
+            return Some(format!("{scene} {} {} here.", upper_first(&prose_list(&fixtures)),
+                if fixtures.len() == 1 { "is" } else { "are" }));
         }
         gas.map(|g| {
             let name = gas_label(g);
@@ -1170,9 +1225,8 @@ impl<'a> TileStack<'a> {
         } else {
             prose_list(&self.corpses)
         };
-        let gas_suffix = self.gas.map_or_else(
-            || ".".into(), |g| format!(" in the {}.", gas_in_sentence(g)),
-        );
+        let has_atmosphere = self.flame.is_some() || self.gas.is_some();
+        let atmosphere = self.creature_atmosphere();
         if let SceneMotion::Liquid { verb, place } = motion {
             let mut scene = format!("{subject} {verb} {place}");
             if !below.is_empty() { scene.push_str(&format!(" over {below}")); }
@@ -1180,11 +1234,11 @@ impl<'a> TileStack<'a> {
                 let fixtures: Vec<_> = self.fixtures.iter().map(|f| f.phrase.clone()).collect();
                 scene.push_str(&format!(" beside {}", prose_list(&fixtures)));
             }
-            scene.push_str(&gas_suffix);
-            return scene;
+            scene.push_str(&atmosphere);
+            return self.finish(scene);
         }
         let place = self.placement(false);
-        if self.gas.is_some() && matches!(motion, SceneMotion::Stands | SceneMotion::Flies) {
+        if has_atmosphere && matches!(motion, SceneMotion::Stands | SceneMotion::Flies) {
             let mut scene = format!("{subject} {}", motion.verb());
             if !below.is_empty() {
                 scene.push_str(&format!(" over {below}"));
@@ -1195,31 +1249,31 @@ impl<'a> TileStack<'a> {
                 let prep = if matches!(motion, SceneMotion::Flies) { "over" } else { "on" };
                 scene.push_str(&format!(" {prep} {place}"));
             }
-            scene.push_str(&gas_suffix);
-            return scene;
+            scene.push_str(&atmosphere);
+            return self.finish(scene);
         }
         if !below.is_empty() {
             let positioning = if place.is_empty() { String::new() } else {
                 format!(" {} {place}", if self.fixtures.is_empty() { self.preposition() } else { "on" })
             };
-            return match motion {
-                SceneMotion::Lies => format!("{subject} lies atop {below}{positioning}{gas_suffix}"),
+            return self.finish(match motion {
+                SceneMotion::Lies => format!("{subject} lies atop {below}{positioning}{atmosphere}"),
                 SceneMotion::Grows if !place.is_empty() => {
-                    format!("{subject} grows from {place} over {below}{gas_suffix}")
+                    format!("{subject} grows from {place} over {below}{atmosphere}")
                 }
-                _ => format!("{subject} {} over {below}{positioning}{gas_suffix}", motion.verb()),
-            };
+                _ => format!("{subject} {} over {below}{positioning}{atmosphere}", motion.verb()),
+            });
         }
         let sentence = if !self.fixtures.is_empty() && !place.is_empty() {
             motion.describe(subject, &place)
         } else {
             default.into()
         };
-        if self.gas.is_some() {
-            format!("{}{gas_suffix}", sentence.trim_end_matches('.'))
+        self.finish(if has_atmosphere {
+            format!("{}{atmosphere}", sentence.trim_end_matches('.'))
         } else {
             sentence
-        }
+        })
     }
 }
 
@@ -1296,8 +1350,8 @@ fn append_scene(scene:&mut String,text:&str) {
 fn append_visible_features(scene:&mut String,o:&vision::ObservedCell) {
     if let Some(h)=o.hazards.as_ref(){
         if let Some(feature)=h.feature.as_ref(){append_scene(scene,&feature.description);}
-        if let Some(source)=h.light_source.as_ref(){append_scene(scene,match source.as_str(){
-            "beacon"=>"A magical beacon glows here.","torch"=>"A wall torch flickers here.",_=>"A brazier burns here.",
+        if let Some(source)=h.light_source.as_ref().filter(|_| observed_flame(o) != Some(TileFlame::Brazier)){append_scene(scene,match source.as_str(){
+            "beacon"=>"A magical beacon glows here.","torch"=>"A wall torch flickers here.",_=>"A brazier is here.",
         });}
     }
     if o.entrance {append_scene(scene,"The blue entrance leads out of the Flesh.");}
@@ -1358,13 +1412,13 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             let dead=a.dead.value_or(false)||a.hp<=0.;
             let local=a.x==x as f64 && a.y==y as f64;
             let objects=(dead || !local).then(||stack.objects()).flatten();
-            let portal_as_sentence=dead && objects.is_some();
+            let portal_as_sentence=(dead && objects.is_some()) || stack.steam;
             if let Some(objects)=objects.as_ref().filter(|_|dead) {
                 detail.scene.clone_from(objects);
                 stacked=true;
             }else if !dead && local {
                 detail.scene=stack.occupied(&scene_subject(r,shown),scene_motion(r,shown,o),&detail.scene);
-                stacked=!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty()||stack.gas.is_some();
+                stacked=!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty()||stack.gas.is_some()||stack.flame.is_some()||stack.steam;
             }
             if portal_name.is_some() {
                 if portal_as_sentence {append_scene(&mut detail.scene,crate::portal_ui::INSPECTOR_SCENE);}
@@ -1459,7 +1513,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
     }
     let mut report = unknown();
     if o.current || o.remembered {
-        let copy=terrain_copy_parts(f,o);
+        let mut copy=terrain_copy_parts(f,o);
         let player = o.current && r.player.x == x as f64 && r.player.y == y as f64;
         let occupied = if o.current {
             let stack=TileStack::new(r,o,x,y,portal_name.is_some(),&ground,&[],0);
@@ -1467,7 +1521,13 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 let motion = scene_motion(r, &r.player, o);
                 let fallback = motion.describe("Your vessel", stack.accompaniment);
                 Some(stack.occupied("Your vessel",motion,&fallback))
-            }else{stack.objects()}
+            } else {
+                let objects = stack.objects();
+                if objects.is_none() && stack.steam {
+                    copy.lone = stack.finish(copy.lone);
+                }
+                objects
+            }
         }else{None};
         let text=copy.caption(occupied.as_deref());
         report = Report {
@@ -1503,11 +1563,13 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                     } else if o.tile.as_deref() == Some("wall") {
                         ("Wall torch", "A torch set into the wall flickers yellow.")
                     } else {
-                        ("Brazier", "A brazier burns here.")
+                        ("Brazier", "A brazier is here.")
                     };
                     report.title = name.into();
-                    report.lines.push(text.into());
-                    report.scene.push_str(&format!(" {text}"));
+                    if observed_flame(o) != Some(TileFlame::Brazier) {
+                        report.lines.push(text.into());
+                        append_scene(&mut report.scene, text);
+                    }
                 }
             }
             if let Some(label)=crate::perception_ui::tile_label(r,o) { report.lines.push(label); }
@@ -2491,11 +2553,69 @@ mod tests {
     }
 
     #[test]
+    fn fire_inspector_uses_occupancy_brazier_and_steam() {
+        for brazier in [false, true] {
+            let mut r = crate::non_euclidean_ui::tests::scene();
+            r.simulation_revision = 52.0.into();
+            r.player.stats.perception = 100.;
+            let f = r.floor_mut().unwrap();
+            let at = 12 * f.width() + 11;
+            f.substrates = vec!["sand".into(); f.tiles.len()].into();
+            if brazier {
+                corpse_core::environment::place_sparkle(&mut r, 11., 12.).unwrap();
+            } else {
+                corpse_core::environment::ignite(&mut r, 11., 12., Some(5.), None).unwrap();
+            }
+            let flame = if brazier { "the brazier's roaring flame" } else { "the roaring flame" };
+            let empty = if brazier { "The brazier burns with roaring flame" } else { "The roaring flame burns here" };
+            let ground = corpse_core::GroundItem { x: 11., y: 12., item: corpse_core::Item {
+                id: 902., name: "Giant Rat Heart".into(), kind: "heart".into(), ..Default::default()
+            }, ..Default::default() };
+            let rat = corpse_core::population::create_actor_revision("rat", 901., 11., 12., false, 52.).unwrap();
+            for steam in [false, true] {
+                if steam {
+                    assert!(corpse_core::environment::add_gas(r.floor_mut().unwrap(), at, "steam", 12., -1.).unwrap());
+                }
+                let end = if steam { " as steam rises." } else { "." };
+                for (item, creature, expected) in [
+                    (false, false, empty.into()),
+                    (true, false, format!("A giant rat heart lies in {flame}")),
+                    (false, true, format!("A giant rat stands in {flame}")),
+                    (true, true, format!("A giant rat stands over a giant rat heart in {flame}")),
+                ] {
+                    r.ground_at_mut(r.depth).clear();
+                    r.actors_at_mut(r.depth).clear();
+                    if item { r.ground_at_mut(r.depth).push(ground.clone()); }
+                    if creature { r.actors_at_mut(r.depth).push(rat.clone()); }
+                    assert_eq!(observe_tile(&r, 11, 12).scene, format!("{expected}{end}"));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn inspector_distinguishes_embers_and_steam_without_fire() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        let f = r.floor_mut().unwrap();
+        let at = 12 * f.width() + 11;
+        f.substrates = vec!["sand".into(); f.tiles.len()].into();
+        assert!(corpse_core::environment::add_gas(f, at, "steam", 12., -1.).unwrap());
+        assert_eq!(observe_tile(&r, 11, 12).scene, "Pale sand covers the ground as steam rises.");
+        let f = r.floor_mut().unwrap();
+        f.environment.as_mut().unwrap().fire_kind.as_mut().unwrap()[at] = Some("embers".into());
+        let line = observe_tile(&r, 11, 12).scene;
+        assert!(line.contains("Spent embers remain here."), "{line}");
+        assert!(!line.contains("flame"), "{line}");
+    }
+
+    #[test]
     fn superseding_occupant_hides_only_the_ordinary_surface() {
         let stack=TileStack {
             accompaniment:"the sand",
             fixtures:vec![TileFixture{phrase:"a bridge".into(),supersedes_surface:true}],
-            local_items:vec!["a heart".into()], corpses:vec![], portal:true, gas:None,
+            local_items:vec!["a heart".into()], corpses:vec![], portal:true, gas:None, flame:None, steam:false,
         };
         assert_eq!(stack.occupied("A bat",SceneMotion::Flies,""),"A bat flies over a heart on a bridge.");
         assert_eq!(stack.objects().unwrap(),"A heart lies atop a bridge and a portal.");
