@@ -46,6 +46,11 @@ fn assert_visible_state(r:&Run,feeding:bool) {
     assert_eq!(row.statuses.iter().filter(|s|s.name=="Feeding").count(),usize::from(feeding));
     let report=crate::inspection_ui::observe_tile(r,actor(r).x as usize,actor(r).y as usize).creature.unwrap();
     assert_eq!(report.conditions.contains("Feeding"),feeding);
+    assert_eq!(report.scene.contains("licks the bloody wall as it "), feeding, "{}", report.scene);
+    if feeding {
+        let posture = if corpse_core::travel::flying(r, actor(r)) { "flies" } else { "stands" };
+        assert!(report.scene.contains(&format!("licks the bloody wall as it {posture}")), "{}", report.scene);
+    }
     assert!(!report.behavior.contains("Feeding")&&!report.behavior.contains("Eating"),"no duplicated activity");
     assert_eq!(serde_json::to_vec(r).unwrap(),before,"presentation never mutates simulation or RNG");
 }
@@ -121,6 +126,7 @@ fn hidden_and_sensed_creatures_never_reveal_feeding() {
     assert_eq!(row.state,"sensed");assert!(!row.statuses.iter().any(|s|s.name=="Feeding"));
     let report=crate::inspection_ui::observe_tile(&r,12,10).creature.unwrap();
     assert!(!report.conditions.contains("Feeding")&&!report.behavior.contains("Eating"));
+    assert!(!report.scene.contains("licks the bloody wall"));
     r.player.conditions.shift_remove("telepathic");food::interrupt(actor_mut(&mut r));
     assert_eq!(crate::inspection_ui::observe_tile(&r,12,10),hidden,"unseen activity does not update memory");
 }
@@ -132,6 +138,7 @@ fn disguised_and_all_six_hallucinated_presentations_hide_feeding() {
     assert!(!is_feeding(&r));
     let report=crate::inspection_ui::observe_tile(&r,12,10).creature.unwrap();
     assert!(!report.conditions.contains("Feeding")&&!report.behavior.contains("Eating"));
+    assert!(!report.scene.contains("licks the bloody wall"));
     r.player.x=10.;assert!(crate::creature_presentation::project(&r,actor(&r)).is_none());
     assert_visible_state(&r,true);
     r.player.conditions.insert("hallucinating".into(),10.);
@@ -144,6 +151,7 @@ fn disguised_and_all_six_hallucinated_presentations_hide_feeding() {
     for variant in report.hallucination.as_ref().unwrap().iter() {
         let c=variant.creature.as_ref().unwrap();
         assert!(!c.conditions.contains("Feeding")&&!c.behavior.contains("Eating"));
+        assert!(!c.scene.contains("licks the bloody wall"));
     }
     assert_eq!(r,before);
 }

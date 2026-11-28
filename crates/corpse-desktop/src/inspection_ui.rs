@@ -277,7 +277,7 @@ fn gas_in_sentence(kind: &str) -> String {
 // Presentation only: remembered terrain and later feature-title overrides remain intact.
 fn terrain_report_title(name: String, current: bool) -> String {
     if current && matches!(name.as_str(),
-        "Ice" | "Puddle" | "Hellfire" | "Bloody wall" | "Rock wall" | "Stone wall" | "Wall" | "Bare ground" | "Stone floor" | "Rock floor" | "Earthen floor" | "Sand" | "Soot" | "Ash" | "Grass" | "Tree" | "Deep water" | "Shallow water" | "Chasm" | "Upstairs" | "Downstairs" | "Bottomless pit" | "Open door" | "Closed door" | "Grate" | "Bridge"
+        "Ice" | "Puddle" | "Hellfire" | "Bloody wall" | "Rock wall" | "Stone wall" | "Wall" | "Bare ground" | "Stone floor" | "Rock floor" | "Earthen floor" | "Sand" | "Soot" | "Ash" | "Grass" | "Tree" | "Deep water" | "Shallow water" | "Bloody water" | "Shallow bloody water" | "Chasm" | "Upstairs" | "Downstairs" | "Bottomless pit" | "Open door" | "Closed door" | "Grate" | "Bridge"
     ) { String::new() } else { name }
 }
 /// The lone caption can be replaced by the subject of the inspection;
@@ -302,6 +302,10 @@ fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
     let copy = terrain_copy_parts(f, o);
     let caption = copy.caption(None);
     (copy.name, caption)
+}
+fn bloody_water(o: &vision::ObservedCell) -> bool {
+    matches!(o.tile.as_deref(), Some("water" | "shallow-water"))
+        && o.hazards.as_ref().is_some_and(|h| h.water_blood.as_ref().is_some_and(|amount| *amount > 0.))
 }
 fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
     let mut details = Vec::new();
@@ -364,7 +368,7 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
         "puddle" => ("Puddle", "a puddle sits on the ground.", "a puddle"),
         "hellfire" => ("Hellfire", "Hellfire is fire that never stops burning.", "Hellfire"),
         "hellfire-entrance" => ("Blue entrance", "The blue entrance leads out of the Flesh.", "the blue entrance"),
-        "bloody-wall" => ("Bloody wall", "Blood coats this solid wall. Hungry creatures can feed from beside it.", "a blood-coated wall"),
+        "bloody-wall" => ("Bloody wall", "Blood coats the wall.", "a bloody wall"),
         "natural-wall" => (
             "Rock wall",
             "A wall of rough rock blocks the way.",
@@ -410,6 +414,8 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
             "A tree rises from the ground.",
             "a tree growing here",
         ),
+        "water" if bloody_water(o) => ("Bloody water", "Bloody water fills this part of the dungeon.", "bloody water"),
+        "shallow-water" if bloody_water(o) => ("Shallow bloody water", "Shallow bloody water covers the ground.", "shallow bloody water"),
         "water" => (
             "Deep water",
             "Deep water fills this part of the dungeon.",
@@ -486,10 +492,6 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
         )
     }
     if let Some(h) = h {
-        if let Some(amount)=h.water_blood.as_ref().filter(|v|**v>0.) {
-            details.push(format!("{} blood clouds the water ({}%).",
-                if o.current {"Diluting"} else {"Remembered"},js_round(*amount)));
-        }
         if tile == Some("water") && !h.ichor.value_or(false) {
             if let Some(code) = h.current.as_ref() {
                 let names = [
@@ -631,10 +633,25 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
     };
     TerrainCopy { name, lone: scene, overlays: details }
 }
+fn scene_sleeping(a: &Actor) -> bool {
+    !a.dead.value_or(false) && a.hp > 0. && ai::sleeping(a)
+}
+
 fn scene_subject(r: &Run, a: &Actor) -> String {
     let name = creature_title(r, a);
     if corpse_core::dreamwalking::is_body(a) {
         return "Your sleeping body".into();
+    }
+    if scene_sleeping(a) {
+        for prefix in ["Mercuria’s ", "Mercuria's ", "Your ", "The "] {
+            if let Some(rest) = name.strip_prefix(prefix) {
+                return format!("{prefix}sleeping {rest}");
+            }
+        }
+        if ["Ursa Minor", "Ursa Major", "Bastidion", "Half Here", "Mini-Me"].contains(&name.as_str()) {
+            return format!("Sleeping {name}");
+        }
+        return format!("A sleeping {}", name.to_lowercase().replace("zillennia", "Zillennia"));
     }
     if name.starts_with("Mercuria’s ")
         || name.starts_with("Mercuria's ")
@@ -665,7 +682,7 @@ fn creature_scene(r: &Run, a: &Actor, o: Option<&vision::ObservedCell>) -> Strin
     let subject = scene_subject(r, a);
     let dead = a.dead.value_or(false) || a.hp <= 0.;
     let Some(o) = o.filter(|o| o.current) else {
-        return format!("{subject} {}.", if dead { "lies still" } else { "is here" });
+        return format!("{subject} {}.", if dead || scene_sleeping(a) || corpse_core::dreamwalking::is_body(a) { "lies still" } else { "is here" });
     };
     let h = o.hazards.as_ref();
     let has = |f: fn(&HazardSnapshot) -> &Field<bool>| h.is_some_and(|h| f(h).value_or(false));
@@ -707,9 +724,12 @@ fn creature_scene(r: &Run, a: &Actor, o: Option<&vision::ObservedCell>) -> Strin
     } else {
         match tile {
             "grass" => "grass",
+            "wall" if has(|h| &h.bloody_wall) => "a bloody wall",
             "wall" => "a wall",
             "tree" => "a tree",
             "speed-up" => "the wrongspace",
+            "water" if bloody_water(o) => "bloody water",
+            "shallow-water" if bloody_water(o) => "shallow bloody water",
             "water" => "water",
             "shallow-water" => "shallow water",
             "chasm" => "a chasm",
@@ -719,7 +739,7 @@ fn creature_scene(r: &Run, a: &Actor, o: Option<&vision::ObservedCell>) -> Strin
         }
     };
     if terrain.is_empty() {
-        return format!("{subject} {}.", if dead { "lies still" } else { "is here" });
+        return format!("{subject} {}.", if dead || scene_sleeping(a) || corpse_core::dreamwalking::is_body(a) { "lies still" } else { "is here" });
     }
     if dead {
         let preposition = if liquid { "in" } else { "on" };
@@ -1149,7 +1169,10 @@ impl<'a> TileStack<'a> {
                 Some("sand")=>"the sand",Some("ash")=>"the ash",Some("soot")=>"the soot",
                 Some("wood")=>"wooden flooring",_=>"the ground",
             },
+            Some("wall") if o.hazards.as_ref().is_some_and(|h| h.bloody_wall.value_or(false)) => "a bloody wall",
             Some("grass")=>"the grass",Some("wall")=>"a wall",Some("tree")=>"a tree",
+            Some("water") if bloody_water(o) => "bloody water",
+            Some("shallow-water") if bloody_water(o) => "shallow bloody water",
             Some("water")=>"deep water",Some("shallow-water")=>"shallow water",
             Some("chasm")=>"a chasm",Some("pit")=>"the bottomless pit",
             Some("up")=>"an upward stairway",Some("down")=>"a downward stairway",_=>"",
@@ -1401,12 +1424,12 @@ fn scene_motion(r: &Run, a: &Actor, o: &vision::ObservedCell) -> SceneMotion {
     }
     match o.tile.as_deref() {
         Some("water") if aquatic && cond(a, "underwater") > 0. => {
-            Liquid { verb: "lurks", place: "in the deep water" }
+            Liquid { verb: "lurks", place: if bloody_water(o) { "in the bloody water" } else { "in the deep water" } }
         }
-        Some("water") => Liquid { verb: "swims", place: "through deep water" },
+        Some("water") => Liquid { verb: "swims", place: if bloody_water(o) { "through bloody water" } else { "through deep water" } },
         Some("shallow-water") => Liquid {
             verb: if aquatic { "swims" } else { "wades" },
-            place: "through shallow water",
+            place: if bloody_water(o) { "through shallow bloody water" } else { "through shallow water" },
         },
         _ => Stands,
     }
@@ -1468,6 +1491,9 @@ fn dream_tile_scene(
             } else {
                 format!("{subject} {}{}.", motion.verb(), stack.space.creature_location(true))
             };
+            let (line, _) = if local && terrain_known && o.current {
+                wall_feeding_line(r, actor, shown, &subject, line)
+            } else { (line, false) };
             append_scene(&mut scene, &line);
         }
         if !used_objects {
@@ -1507,10 +1533,23 @@ fn dream_tile_scene(
 }
 
 fn scene_motion_without_terrain(r: &Run, a: &Actor) -> SceneMotion {
-    if corpse_core::dreamwalking::is_body(a) { SceneMotion::Lies }
+    if corpse_core::dreamwalking::is_body(a) || scene_sleeping(a) { SceneMotion::Lies }
     else if travel::flying(r, a) { SceneMotion::Flies }
     else if has(a, "enemy:beast:rooted") { SceneMotion::Grows }
     else { SceneMotion::Stands }
+}
+/// Reuse the same direct-sight and disguise gates as the roster's Feeding mark.
+fn wall_feeding_line(r: &Run, a: &Actor, shown: &Actor, subject: &str, line: String) -> (String, bool) {
+    if !std::ptr::eq(a, shown) || scene_sleeping(a)
+        || corpse_core::creature_feeding::description(r, a) != Some("Eating")
+        || !vision::directly_visible_actor(r, a)
+    {
+        return (line, false);
+    }
+    let Some(posture) = line.strip_prefix(subject).and_then(|rest| rest.strip_prefix(' ')) else {
+        return (line, false);
+    };
+    (format!("{subject} licks the bloody wall as it {posture}"), true)
 }
 fn append_visible_features(scene:&mut String,o:&vision::ObservedCell) {
     if let Some(h)=o.hazards.as_ref(){
@@ -1591,7 +1630,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 let at = a.y as usize * observation.width + a.x as usize;
                 let remote = observation.cells.get(at).filter(|cell| cell.current);
                 let verb = if dead { "lies" } else {
-                    remote.map_or_else(|| if travel::flying(r, shown) { "flies" } else { "stands" },
+                    remote.map_or_else(|| scene_motion_without_terrain(r, shown).verb(),
                         |cell| scene_motion(r, shown, cell).verb())
                 };
                 let location = if dead { space.location() } else { space.creature_location(true) };
@@ -1603,8 +1642,11 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             } else if dead {
                 if let Some(objects) = stack.objects() { detail.scene = objects; stacked = true; }
             } else {
-                detail.scene=stack.occupied(&scene_subject(r,shown),scene_motion(r,shown,o),&detail.scene);
-                stacked=!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty()||stack.gas.is_some()||stack.flame.is_some()||stack.steam;
+                let subject = scene_subject(r, shown);
+                let line = stack.occupied(&subject, scene_motion(r, shown, o), &detail.scene);
+                let (line, licking) = wall_feeding_line(r, a, shown, &subject, line);
+                detail.scene = line;
+                stacked=licking||scene_sleeping(a)||!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty()||stack.gas.is_some()||stack.flame.is_some()||stack.steam;
             }
             if r.player.x==x as f64 && r.player.y==y as f64 && corpse_core::dreamwalking::same_plane(r,&r.player,a) {
                 append_scene(&mut detail.scene,"Your vessel is here too.");
@@ -1626,7 +1668,12 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 let shown=if crate::hallucination_ui::affects(r,other) {
                     crate::creature_presentation::project_kind(r,other,crate::hallucination_ui::kind(r,other,phase))
                 } else {crate::creature_presentation::project(r,other)};
-                append_scene(&mut detail.scene,&format!("{} is here too.",upper_first(&article(&creature_title_base(shown.as_ref().unwrap_or(other))))));
+                let shown = shown.as_ref().unwrap_or(other);
+                let line = if o.current { creature_scene(r, shown, Some(o)) }
+                    else { format!("{} {} here too.", scene_subject(r, shown), scene_motion_without_terrain(r, shown).verb()) };
+                let (line, _) = if o.current { wall_feeding_line(r, other, shown, &scene_subject(r, shown), line) }
+                    else { (line, false) };
+                append_scene(&mut detail.scene, &line);
             }
         }
         let has_stack = corpse_core::dreamwalking::is_body(a) || space != TileSpace::Ground || stacked || !ground.is_empty()
@@ -2775,6 +2822,43 @@ mod tests {
             assert_eq!(observe_tile(&r, x, y).scene,
                 format!("A giant rat stands over a giant rat heart in the roaring flame {creature_here} as steam rises."));
         }
+    }
+
+    #[test]
+    fn sleeping_creatures_lie_until_they_wake_even_when_they_can_fly() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        let f = r.floor_mut().unwrap();
+        f.substrates = vec!["sand".into(); f.tiles.len()].into();
+        let bat = corpse_core::population::create_actor_revision("cave-bat", 901., 11., 12., true, 52.).unwrap();
+        r.actors_at_mut(r.depth).push(bat);
+        let line = observe_tile(&r, 11, 12).scene;
+        assert_eq!(line, "A sleeping cave bat lies atop the sand.");
+        corpse_core::ai::wake(&mut r.actors_at_mut(r.depth)[0], false);
+        assert_eq!(observe_tile(&r, 11, 12).scene, "A cave bat flies over sand.");
+    }
+
+    #[test]
+    fn bloody_water_and_walls_keep_descriptive_copy() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        let f = r.floor_mut().unwrap();
+        let at = 12 * f.width() + 11;
+        f.tiles[at] = "shallow-water".into();
+        let mut blood = vec![0.; f.tiles.len()];
+        blood[at] = 37.;
+        f.water_blood = blood.into();
+        let line = observe_tile(&r, 11, 12).scene;
+        assert_eq!(line, "Shallow bloody water covers the ground.");
+        let f = r.floor_mut().unwrap();
+        f.tiles[at] = "wall".into();
+        f.water_blood = Field::Missing;
+        let mut walls = vec![false; f.tiles.len()];
+        walls[at] = true;
+        f.bloody_walls = walls.into();
+        assert_eq!(observe_tile(&r, 11, 12).scene, "Blood coats the wall.");
     }
 
     #[test]
