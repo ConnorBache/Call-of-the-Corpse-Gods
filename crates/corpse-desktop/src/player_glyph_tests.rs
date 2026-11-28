@@ -129,6 +129,7 @@ fn player_glyph_dream_and_sleeping_body_share_at_without_changing_identity_or_in
     assert_eq!(row.state, "Sleeping");
     let report = crate::inspection_ui::observe_tile(&run, body.x, body.y);
     assert_eq!(report.title, "Your sleeping body");
+    assert!(report.scene.starts_with("Your sleeping body lies atop the "), "{}", report.scene);
     assert!(report.creature.unwrap().resources.contains("Shared with you"));
     assert_eq!(serde_json::to_vec(&run).unwrap(), before);
     assert_eq!(run.player.glyph, "(≬)");

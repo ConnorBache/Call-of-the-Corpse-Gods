@@ -636,6 +636,9 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
 }
 fn scene_subject(r: &Run, a: &Actor) -> String {
     let name = creature_title(r, a);
+    if corpse_core::dreamwalking::is_body(a) {
+        return "Your sleeping body".into();
+    }
     if name.starts_with("Mercuria’s ")
         || name.starts_with("Mercuria's ")
         || name.starts_with("Your ")
@@ -718,33 +721,12 @@ fn creature_scene(r: &Run, a: &Actor, o: Option<&vision::ObservedCell>) -> Strin
     if terrain.is_empty() {
         return format!("{subject} {}.", if dead { "lies still" } else { "is here" });
     }
-    let verb = if dead {
-        if liquid {
-            "lies in"
-        } else {
-            "lies on"
-        }
-    } else if travel::flying(r, a) {
-        if active(a, "Phase Through") || active(a, "Float Away") {
-            "floats above"
-        } else {
-            "flies over"
-        }
-    } else if a.abilities.iter().any(|s| s == "enemy:beast:rooted") {
-        "grows from"
-    } else if tile == "water" && !ichor && cond(a, "underwater") > 0. {
-        return format!("{subject} lurks beneath the water.");
-    } else if (!a.dead.value_or(false) && tile == "water" && !ichor && !travel::flying(r, a))
-        || (ichor && (crate_has_aquatic(a) || definition(a).is_some_and(|d| d.ichor_family)))
-        || (tile == "shallow-water" && !ichor && crate_has_aquatic(a))
-    {
-        "swims through"
-    } else if liquid {
-        "wades through"
+    if dead {
+        let preposition = if liquid { "in" } else { "on" };
+        format!("{subject} lies {preposition} {terrain}.")
     } else {
-        "stands on"
-    };
-    format!("{subject} {verb} {terrain}.")
+        scene_motion(r, a, o).describe(&subject, terrain)
+    }
 }
 fn crate_has_aquatic(a: &Actor) -> bool {
     has(a, "enemy:beast:aquatic")
@@ -1166,37 +1148,110 @@ impl TileStack {
         }
         None
     }
-    fn occupied(&self,subject:&str,motion:&str,default:&str)->String {
-        let place=self.placement(false);
-        let below=if !self.local_items.is_empty() {
-            let items=prose_list(&self.local_items);
-            if self.corpses.is_empty(){items}else{format!("{items} atop {}",prose_list(&self.corpses))}
-        }else{
+    fn occupied(&self, subject: &str, motion: SceneMotion, default: &str) -> String {
+        let below = if !self.local_items.is_empty() {
+            let items = prose_list(&self.local_items);
+            if self.corpses.is_empty() { items } else {
+                format!("{items} atop {}", prose_list(&self.corpses))
+            }
+        } else {
             prose_list(&self.corpses)
         };
+        if let SceneMotion::Liquid { verb, place } = motion {
+            let mut scene = format!("{subject} {verb} {place}");
+            if !below.is_empty() { scene.push_str(&format!(" over {below}")); }
+            if !self.fixtures.is_empty() {
+                let fixtures: Vec<_> = self.fixtures.iter().map(|f| f.phrase.clone()).collect();
+                scene.push_str(&format!(" beside {}", prose_list(&fixtures)));
+            }
+            scene.push('.');
+            return scene;
+        }
+        let place = self.placement(false);
         if !below.is_empty() {
-            let positioning=if place.is_empty(){String::new()}else{
-                format!(" {} {place}",if self.fixtures.is_empty(){self.preposition()}else{"on"})
+            let positioning = if place.is_empty() { String::new() } else {
+                format!(" {} {place}", if self.fixtures.is_empty() { self.preposition() } else { "on" })
             };
-            return format!("{subject} {motion} over {below}{positioning}.");
+            return match motion {
+                SceneMotion::Lies => format!("{subject} lies atop {below}{positioning}."),
+                SceneMotion::Grows if !place.is_empty() => {
+                    format!("{subject} grows from {place} over {below}.")
+                }
+                _ => format!("{subject} {} over {below}{positioning}.", motion.verb()),
+            };
         }
         if !self.fixtures.is_empty() && !place.is_empty() {
-            return format!("{subject} {motion} {} {place}.",
-                if matches!(motion,"flies"|"floats"){"over"}else{"on"});
+            return motion.describe(subject, &place);
         }
         default.into()
     }
 }
-fn over_motion(r:&Run,a:&Actor,o:&vision::ObservedCell)->&'static str {
-    if travel::flying(r,a) {
-        if active(a,"Phase Through")||active(a,"Float Away") {"floats"} else {"flies"}
-    }else if o.hazards.as_ref().is_some_and(|h|h.ichor.value_or(false)) ||
-        matches!(o.tile.as_deref(),Some("water"|"shallow-water")) {
-        let ichor=o.hazards.as_ref().is_some_and(|h|h.ichor.value_or(false));
-        if !ichor && cond(a,"underwater")>0. && o.tile.as_deref()==Some("water") {"lurks"}
-        else if (!ichor&&o.tile.as_deref()==Some("water"))||crate_has_aquatic(a)
-            || (ichor&&definition(a).is_some_and(|d|d.ichor_family)) {"swims"} else {"wades"}
-    }else if has(a,"enemy:beast:rooted") {"grows"}else{"stands"}
+
+#[derive(Clone, Copy)]
+enum SceneMotion {
+    Stands,
+    Flies,
+    Grows,
+    Lies,
+    Liquid { verb: &'static str, place: &'static str },
+}
+impl SceneMotion {
+    fn verb(self) -> &'static str {
+        match self {
+            Self::Stands => "stands",
+            Self::Flies => "flies",
+            Self::Grows => "grows",
+            Self::Lies => "lies",
+            Self::Liquid { verb, .. } => verb,
+        }
+    }
+    fn describe(self, subject: &str, terrain: &str) -> String {
+        let (preposition, place) = match self {
+            Self::Stands => ("on", terrain),
+            Self::Flies => ("over", terrain),
+            Self::Grows => ("from", terrain),
+            Self::Lies => ("atop", terrain),
+            Self::Liquid { place, .. } => ("", place),
+        };
+        let verb = self.verb();
+        if preposition.is_empty() {
+            return format!("{subject} {verb} {place}.");
+        }
+        if place.is_empty() {
+            return format!("{subject} {}.", if matches!(self, Self::Lies) { "lies here" } else { "is here" });
+        }
+        let article = if matches!(self, Self::Lies) && !["the ", "a ", "an "].iter().any(|p| place.starts_with(p)) {
+            "the "
+        } else {
+            ""
+        };
+        format!("{subject} {verb} {preposition} {article}{place}.")
+    }
+}
+
+// The same observed state drives map, creature-card, and player wording.
+// No movement or submersion behavior is inferred back into simulation.
+fn scene_motion(r: &Run, a: &Actor, o: &vision::ObservedCell) -> SceneMotion {
+    use SceneMotion::*;
+    if corpse_core::dreamwalking::is_body(a) { return Lies; }
+    if travel::flying(r, a) { return Flies; }
+    if has(a, "enemy:beast:rooted") { return Grows; }
+    let aquatic = crate_has_aquatic(a);
+    if o.hazards.as_ref().is_some_and(|h| h.ichor.value_or(false)) {
+        let swims = aquatic || definition(a).is_some_and(|d| d.ichor_family);
+        return Liquid { verb: if swims { "swims" } else { "wades" }, place: "through ichor" };
+    }
+    match o.tile.as_deref() {
+        Some("water") if aquatic && cond(a, "underwater") > 0. => {
+            Liquid { verb: "lurks", place: "in the deep water" }
+        }
+        Some("water") => Liquid { verb: "swims", place: "through deep water" },
+        Some("shallow-water") => Liquid {
+            verb: if aquatic { "swims" } else { "wades" },
+            place: "through shallow water",
+        },
+        _ => Stands,
+    }
 }
 fn append_scene(scene:&mut String,text:&str) {
     let text=text.trim();
@@ -1272,7 +1327,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 detail.scene.clone_from(objects);
                 stacked=true;
             }else if !dead && local {
-                detail.scene=stack.occupied(&scene_subject(r,shown),over_motion(r,shown,o),&detail.scene);
+                detail.scene=stack.occupied(&scene_subject(r,shown),scene_motion(r,shown,o),&detail.scene);
                 stacked=!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty();
             }
             if portal_name.is_some() {
@@ -1332,7 +1387,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         }
         let pocket=crate::non_euclidean_ui::description(r, observation, x, y);
         if let Some(text)=&pocket {append_scene(&mut detail.scene,text);}
-        let has_stack = portal_name.is_some() || stacked || !ground.is_empty()
+        let has_stack = corpse_core::dreamwalking::is_body(a) || portal_name.is_some() || stacked || !ground.is_empty()
             || observed.len()>1 || alias.is_some() || (r.player.x==x as f64&&r.player.y==y as f64)
             || pocket.is_some();
         if has_stack {detail.description=format!("{}\n{}",detail.scene,detail.description);}
@@ -1373,17 +1428,8 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         let occupied = if o.current {
             let stack=TileStack::new(r,o,x,y,portal_name.is_some(),&ground,&[],0);
             if player {
-                let motion=over_motion(r,&r.player,o);
-                let fallback=if stack.accompaniment.is_empty(){"Your vessel is here.".into()}
-                    else {
-                        let prep=match motion {
-                            "flies" | "floats" => "over",
-                            "swims" | "wades" => "through",
-                            "lurks" => "beneath",
-                            _ => stack.preposition(),
-                        };
-                        format!("Your vessel {motion} {prep} {}.",stack.accompaniment)
-                    };
+                let motion = scene_motion(r, &r.player, o);
+                let fallback = motion.describe("Your vessel", stack.accompaniment);
                 Some(stack.occupied("Your vessel",motion,&fallback))
             }else{stack.objects()}
         }else{None};
@@ -2299,13 +2345,80 @@ mod tests {
     }
 
     #[test]
+    fn water_inspector_puts_water_before_the_visible_item() {
+        let cases = [
+            ("rat", "shallow-water", false, "A giant rat wades through shallow water"),
+            ("rat", "water", false, "A giant rat swims through deep water"),
+            ("kelpie", "shallow-water", false, "A kelpie swims through shallow water"),
+            ("kelpie", "water", false, "A kelpie swims through deep water"),
+            ("kelpie", "water", true, "A kelpie lurks in the deep water"),
+            ("river-drake", "shallow-water", false, "A river drake swims through shallow water"),
+            ("river-drake", "water", false, "A river drake swims through deep water"),
+            ("river-drake", "water", true, "A river drake lurks in the deep water"),
+            ("cave-bat", "water", false, "A cave bat flies over water"),
+        ];
+        for (kind, tile, submerged, expected) in cases {
+            let mut r = crate::non_euclidean_ui::tests::scene();
+            r.simulation_revision = 52.0.into();
+            r.player.stats.perception = 100.;
+            let f = r.floor_mut().unwrap();
+            let at = 12 * f.width() + 11;
+            f.tiles[at] = tile.into();
+            let mut a = corpse_core::population::create_actor_revision(kind, 901., 11., 12., false, 52.).unwrap();
+            if submerged {
+                a.conditions.insert("underwater".into(), 1.);
+            } else {
+                a.conditions.shift_remove("underwater");
+            }
+            r.actors_at_mut(r.depth).push(a);
+            assert_eq!(observe_tile(&r, 11, 12).scene, format!("{expected}."));
+            let item = corpse_core::Item {
+                id: 902., name: "Giant Rat Heart".into(), kind: "heart".into(), ..Default::default()
+            };
+            r.ground_at_mut(r.depth).push(corpse_core::GroundItem { x: 11., y: 12., item, ..Default::default() });
+            let expected = if kind == "cave-bat" {
+                "A cave bat flies over a giant rat heart in deep water.".into()
+            } else {
+                format!("{expected} over a giant rat heart.")
+            };
+            let report = observe_tile(&r, 11, 12);
+            assert_eq!(report.scene, expected);
+            assert!(report.creature.unwrap().description.starts_with(&expected));
+        }
+    }
+
+    #[test]
+    fn scene_motion_keeps_rooted_and_ichor_wording_and_uses_flies_for_phasing() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        let f = r.floor_mut().unwrap();
+        let at = 12 * f.width() + 11;
+        f.substrates = vec!["sand".into(); f.tiles.len()].into();
+        let plant = corpse_core::population::create_actor_revision("samara", 901., 11., 12., false, 52.).unwrap();
+        r.actors_at_mut(r.depth).push(plant);
+        assert_eq!(observe_tile(&r, 11, 12).scene, "A devil's samara tree grows from sand.");
+        let f = r.floor_mut().unwrap();
+        let mut ichor = vec![0.; f.tiles.len()];
+        ichor[at] = 1.;
+        f.ichor = ichor.into();
+        let fish = corpse_core::ichor::make_fish_revision(901., 11., 12., 1., 0., 52.);
+        r.actors_at_mut(r.depth)[0] = fish;
+        let line = observe_tile(&r, 11, 12).scene;
+        assert!(line.contains("swims through ichor."), "{line}");
+        r.player.active.push("etill-phase-through".into());
+        let line = observe_tile(&r, 10, 10).scene;
+        assert!(line.contains("Your vessel flies over the sand."), "{line}");
+    }
+
+    #[test]
     fn superseding_occupant_hides_only_the_ordinary_surface() {
         let stack=TileStack {
             accompaniment:"the sand",
             fixtures:vec![TileFixture{phrase:"a bridge".into(),supersedes_surface:true}],
             local_items:vec!["a heart".into()], corpses:vec![], portal:true,
         };
-        assert_eq!(stack.occupied("A bat","flies",""),"A bat flies over a heart on a bridge.");
+        assert_eq!(stack.occupied("A bat",SceneMotion::Flies,""),"A bat flies over a heart on a bridge.");
         assert_eq!(stack.objects().unwrap(),"A heart lies atop a bridge and a portal.");
         let copy=TerrainCopy{name:"Sand".into(),lone:"Pale sand covers the ground.".into(),overlays:vec!["Fire burns here.".into()]};
         assert_eq!(copy.caption(stack.objects().as_deref()),"A heart lies atop a bridge and a portal. Fire burns here.");
