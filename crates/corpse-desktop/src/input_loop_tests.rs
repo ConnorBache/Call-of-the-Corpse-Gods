@@ -17,6 +17,7 @@ pub struct State<'a> {
     pub history: bool,
     pub context: bool,
     pub ability_detail: bool,
+    pub ability_detail_bounds: Option<crate::render::damage::Rect>,
 }
 #[derive(Clone)]
 enum Input {
@@ -171,6 +172,10 @@ pub fn observe(canvas: &mut Canvas<Window>, p: &Painter, state: State<'_>) -> Re
         if let Some(expected)=step.history{check(state.history==expected,"Chronicle drawer")?;}
         if let Some(expected)=step.context{check(state.context==expected,"context detail")?;}
         if let Some(expected)=step.ability_detail{check(state.ability_detail==expected,"ability detail")?;}
+        if step.label=="Cogworks-Row-Aligned" {
+            let y=p.hud_tracks().divine_rows().row(6).1;
+            check(state.ability_detail_bounds.is_some_and(|b|b.y==y as usize*3),"Cogworks panel top edge")?;
+        }
         let engine = state.engine.ok_or_else(|| format!("{}: missing run", step.label))?;
         if step.label=="bow-fire"{
             let arrows=engine.run.inventory.iter().filter(|i|corpse_core::inventory::is_arrow(i))
@@ -473,7 +478,7 @@ fn capture_anchored_details() {
     let late_item=tracks.item_geometry().row(tracks.item_geometry().count-1);
     assert!((y_at(DetailAnchor::Item(late_item)) as i32+(txt.3 as f64*3.*render::DIALOG_SCALE).round() as i32
         -3*(late_item.1+late_item.3)).abs()<=2);
-    for (name,row,ability) in [("Ability-Top",tracks.divine_rows().row(6),true),
+    for (name,row,ability) in [("Cogworks-Row-Aligned",tracks.divine_rows().row(6),true),
         ("Monster-Top",enemy,false),("Floor-Item-Top",ground,false),
         ("Carried-Item-Bottom",late_item,false),("Map-Monster",tile,false)]{
         base_steps.push(show(name,right(row),ability));base_steps.push(close());

@@ -156,7 +156,7 @@ pub fn hover_bounds_painter(p:&Painter,height:i32)->Rect{
 pub enum DetailAnchor {
     #[default]
     Dock,
-    Ability,
+    Ability(Rect),
     Item(Rect),
     Roster(Rect),
     MapTile(Rect),
@@ -171,7 +171,7 @@ impl DetailAnchor {
         // A map creature opens alongside its actual tile. Choose the side
         // with enough room without leaving the map's horizontal span.
         let (edge,row,right_side)=match self {
-            Self::Ability=>(tracks.divine.0,Rect(0,top,0,bottom-top),false),
+            Self::Ability(row)=>(tracks.divine.0,row,false),
             Self::Item(row)=>(tracks.items.0,row,false),
             Self::Roster(row)=>(map_right,row,false),
             Self::MapTile(row)=>{
@@ -437,8 +437,11 @@ mod anchored_details_tests {
             let screen=p.logical_height();
             let early=Rect(map.2+8,t.divine.1+20,100,38);
             let late=Rect(map.2+8,screen-40,100,22);
-            let a=DetailAnchor::Ability.place(&p,240,150);
-            assert_eq!((a.0+a.2,a.1),(t.divine.0,t.divine.1));
+            let ability=t.divine_rows().row(6);
+            let a=DetailAnchor::Ability(ability).place(&p,240,150);
+            assert_eq!((a.0+a.2,a.1),(t.divine.0,ability.1));
+            let flipped=DetailAnchor::Ability(late).place(&p,240,150);
+            assert_eq!((flipped.0+flipped.2,flipped.1+flipped.3),(t.divine.0,late.1+late.3));
             assert!(a.0<map.2);
             let b=DetailAnchor::Roster(early).place(&p,320,230);
             assert_eq!((b.0+b.2,b.1),(map.2,early.1));

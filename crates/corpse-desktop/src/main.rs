@@ -1829,7 +1829,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         if let Some(r) = &run {
                             ability_detail = ability_ui::divine_abilities(&r.run)
                                 .get(ability_offset+index)
-                                .map(|a| (a.id.clone(),modal_ui::DetailAnchor::Ability));
+                                .map(|a| (a.id.clone(),modal_ui::DetailAnchor::Ability(painter.game_ability_rect(index))));
                             ability_detail_scroll = 0;
                             dirty = true;
                         }
@@ -3241,6 +3241,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
             help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),
             history:history.is_some(),context:context_detail.is_some(),ability_detail:ability_detail.is_some(),
+            ability_detail_bounds:ability_detail.as_ref().zip(run.as_ref()).and_then(|((id,anchor),r)|
+                painter.ability_detail_damage(&ability_ui::observe(&r.run,id),*anchor)),
         })? {break 'running;}
         if enter_death_results {
             results_fade = death_pause::ResultsFade::new("dead", skip_ending_motion);

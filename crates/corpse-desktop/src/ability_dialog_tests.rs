@@ -1,4 +1,8 @@
 use super::*;
+fn source_row(p:&Painter) -> (Rect,DetailAnchor) {
+    let row=p.game_ability_rect(6);
+    (row,DetailAnchor::Ability(row))
+}
 fn ability(description: &str) -> AbilityView {
     AbilityView { reserve:None,indicator:None,fortunes:None,pending_reserve_loss:0., id: "test".into(), name: "Observe".into(), description: description.into(),
         color: super::super::GOLD, cost: "10 Energy".into(), state: "Ready".into(),
@@ -20,14 +24,20 @@ fn ability_dialog_fits_content_and_touches_ability_rail_at_every_resolution() {
     let mut p = Painter::new();
     for (w,h) in [(1280,800),(1920,1080),(1537,911),(960,1200),(960,720)] {
         p.resize(w,h); p.set_responsive_canvas(true);
+        let (row,anchor)=source_row(&p);
         for a in [&short, &long] {
-            let layout = Layout::resolve(&p,a);
-            let b = bounds(&p,a,DetailAnchor::Ability).unwrap();
+            let layout = Layout::resolve(&p,a,anchor);
+            let b = bounds(&p,a,anchor).unwrap();
             assert!((b.right() as i32-p.native_x(p.hud_tracks().divine.0 as f64)).abs()<=2);
-            assert_eq!(b.y,p.native_y(p.hud_tracks().divine.1 as f64) as usize);
+            if std::ptr::eq(a,&short) {
+                assert_eq!(b.y,p.native_y(row.1 as f64) as usize);
+            } else {
+                assert_eq!(b.y,p.native_y(p.hud_tracks().divine.1 as f64) as usize,
+                    "very tall panels move above the clicked row, clamped to the rail ceiling");
+            }
             assert!(b.bottom()<=p.height);
             let prior = (p.scale,p.origin,p.responsive_canvas,p.clip);
-            p.clear([1,2,3]); p.ability_detail(a,usize::MAX, crate::modal_ui::DetailAnchor::Ability);
+            p.clear([1,2,3]); p.ability_detail(a,usize::MAX, anchor);
             assert_eq!((p.scale,p.origin,p.responsive_canvas,p.clip),prior);
             for (i,pixel) in p.pixels.chunks_exact(4).enumerate() {
                 if !b.contains(i%p.width,i/p.width) { assert_eq!(&pixel[..3],&[1,2,3],"outside exact dialog bounds"); }
@@ -58,19 +68,20 @@ fn ability_dialog_wraps_headers_and_restores_after_resize_scroll_and_dismissal()
     let mut p=Painter::new(); let mut full=Painter::new();
     for (w,h) in [(1280,800),(1537,911),(960,1200)] {
         for p in [&mut p,&mut full] {p.resize(w,h);p.set_responsive_canvas(true);}
+        let (_,anchor)=source_row(&p);
         let mut plan=crate::render::tile_damage::TilePlanner::default();
         let mut tracker=crate::tile_overlay::Tracker::default();
         plan.replace_view(None,&view,&p);
         let mut clear=None;
         for (step,show) in [None,Some((&short,0)),Some((&long,0)),Some((&long,usize::MAX)),None,Some((&short,0)),None].into_iter().enumerate() {
-            let state=crate::tile_overlay::Frame {panels: show.and_then(|(a,_)|p.ability_detail_damage(a, crate::modal_ui::DetailAnchor::Ability)).into_iter().collect(),redraw_panels:true,..Default::default()};
+            let state=crate::tile_overlay::Frame {panels: show.and_then(|(a,_)|p.ability_detail_damage(a, anchor)).into_iter().collect(),redraw_panels:true,..Default::default()};
             for rect in tracker.changes(&p,&state) { plan.mark_native_rect(rect); }
             crate::tile_overlay::finish_dependencies(&mut p,&mut plan,&state);
             plan.paint_base(&mut p,&view,"Inspect: a remembered floor.",0.);
-            if !p.tile_mask.is_empty() { if let Some((a,offset))=show {p.ability_detail(a,offset, crate::modal_ui::DetailAnchor::Ability);} }
+            if !p.tile_mask.is_empty() { if let Some((a,offset))=show {p.ability_detail(a,offset, anchor);} }
             p.tile_clip_enabled=false;
             full.game_at(&view,"Inspect: a remembered floor.",false,0.);
-            if let Some((a,offset))=show {full.ability_detail(a,offset, crate::modal_ui::DetailAnchor::Ability);}
+            if let Some((a,offset))=show {full.ability_detail(a,offset, anchor);}
             assert!(p.pixels==full.pixels,"tile/full equality {w}x{h} step {step}");
             if show.is_none() { if let Some(base)=&clear {assert_eq!(&p.pixels,base);}else{clear=Some(p.pixels.clone());} }
             else {capture(&format!("ability-{w}x{h}-{step}"),&p);}
@@ -87,11 +98,12 @@ fn ability_dialog_respects_custom_fonts_and_preserves_all_rows() {
     let mut a=ability(&"Large fonts also wrap all their text. ".repeat(30));
     a.name="A full long ability name that must not vanish".into();
     a.supported=false;
-    let l=Layout::resolve(&p,&a);
+    let (_,anchor)=source_row(&p);
+    let l=Layout::resolve(&p,&a,anchor);
     assert!(l.scrolling);
     assert!(l.lines.iter().map(|line|line.text.as_str()).collect::<Vec<_>>().join(" ").ends_with("Native execution coverage pending"));
     assert!(l.lines.iter().all(|line|p.measure_text_role(Role::Tooltips,&line.text,line.size)<=f64::from(l.width-2*PAD)));
-    let b=p.ability_detail_damage(&a, crate::modal_ui::DetailAnchor::Ability).unwrap();
+    let b=p.ability_detail_damage(&a, anchor).unwrap();
     assert!((b.right() as i32-p.native_x(p.hud_tracks().divine.0 as f64)).abs()<=2);
     assert_eq!(b.y,p.native_y(p.hud_tracks().divine.1 as f64) as usize);
 }
@@ -130,15 +142,16 @@ fn ability_dialog_authored_catalog_is_fully_wrapped_and_observation_only() {
     let mut p=Painter::new(); p.set_responsive_canvas(true);
     for entry in corpse_core::progression::catalog_for_revision(52.) {
         let a=crate::ability_ui::observe(&run,&entry.id);
-        let l=Layout::resolve(&p,&a);
+        let (row,anchor)=source_row(&p);
+        let l=Layout::resolve(&p,&a,anchor);
         assert!(l.lines.iter().all(|line|p.measure_text_role(Role::Tooltips,&line.text,line.size)<=f64::from(l.width-2*PAD)),"{}",a.id);
-        let b=p.ability_detail_damage(&a, crate::modal_ui::DetailAnchor::Ability).unwrap();
+        let b=p.ability_detail_damage(&a, anchor).unwrap();
         assert!((b.right() as i32-p.native_x(p.hud_tracks().divine.0 as f64)).abs()<=2,"{}",a.id);
-        assert_eq!(b.y,p.native_y(p.hud_tracks().divine.1 as f64) as usize,"{}",a.id);
+        assert_eq!(b.y,p.native_y(row.1 as f64) as usize,"{}",a.id);
         assert!(b.bottom()<=p.height,"{}",a.id);
         if matches!(a.id.as_str(),"anavani-illuminate"|"morae-see-the-future"|"ursa-dream-see") {
             p.game_at(&view,"You see the floor and a Hemogoblin.",false,0.);
-            p.ability_detail(&a,0, crate::modal_ui::DetailAnchor::Ability);capture(&format!("authored-{}",a.id),&p);
+            p.ability_detail(&a,0, anchor);capture(&format!("authored-{}",a.id),&p);
         }
     }
     assert_eq!(run,frozen);

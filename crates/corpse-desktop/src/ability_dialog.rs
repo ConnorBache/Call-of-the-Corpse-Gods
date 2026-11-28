@@ -10,7 +10,7 @@ struct Layout { width: i32, height: i32, body_height: i32, lines: Vec<Line>, scr
 impl Layout {
     /// O(T²) worst-case measured wrapping / O(T) text storage, once per paint or
     /// damage query. T is detached ability prose, never world or history size.
-    fn resolve(p: &Painter, a: &AbilityView) -> Self {
+    fn resolve(p: &Painter, a: &AbilityView, anchor: DetailAnchor) -> Self {
         let status = [a.mode.as_str(), a.state.as_str()].into_iter()
             .filter(|s| !s.trim().is_empty()).collect::<Vec<_>>().join(" · ");
         let coverage = if a.supported { "" } else { "Native execution coverage pending" };
@@ -19,7 +19,7 @@ impl Layout {
             (coverage, 13, MUTED, 8)];
         let natural = sections.iter().map(|(s,size,_,_)|
             p.measure_text_role(Role::Tooltips, s, *size).ceil() as i32).max().unwrap_or(1);
-        let (width,height)=DetailAnchor::Ability.capacity(p);
+        let (width,height)=anchor.capacity(p);
         let available_width = (width as f64 / DIALOG_SCALE).floor() as i32;
         let inner = natural.clamp(190,480).min((available_width - 2 * PAD).max(1));
         let mut lines = vec![];
@@ -50,11 +50,11 @@ impl Layout {
     }
 }
 pub(super) fn bounds(p: &Painter, a: &AbilityView, anchor: DetailAnchor) -> Option<damage::Rect> {
-    let layout = Layout::resolve(p,a);
+    let layout = Layout::resolve(p,a,anchor);
     p.detail_damage_rect(Rect(0,0,layout.width,layout.height),anchor)
 }
 pub(super) fn paint(p: &mut Painter, a: &AbilityView, offset: usize, anchor: DetailAnchor) {
-    let layout = Layout::resolve(p, a);
+    let layout = Layout::resolve(p, a, anchor);
     p.anchored_sheet(Rect(0,0,layout.width,layout.height),anchor,|p| {
     let prior_clip=p.clip;
     p.rect(0, 0, layout.width, layout.height, [11, 13, 21]);

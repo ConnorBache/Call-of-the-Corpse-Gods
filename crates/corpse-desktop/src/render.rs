@@ -544,11 +544,13 @@ impl Painter {
         let r=anchor.place(self,(b.2 as f64*scale/self.scale).round() as i32,
             (b.3 as f64*scale/self.scale).round() as i32);
         use crate::modal_ui::DetailAnchor;
+        // Align the bottom edge exactly when the panel flips to the row.
+        // If a very tall panel was clamped to the ceiling instead, lock its top.
+        let flipped_to_row=|row:crate::modal_ui::Rect|r.1<row.1 && r.1+r.3==row.1+row.3;
         let (right,bottom)=match anchor {
             DetailAnchor::Dock=>(true,true),
-            DetailAnchor::Ability=>(true,false),
-            DetailAnchor::Item(row)|DetailAnchor::Roster(row)=>(true,r.1<row.1),
-            DetailAnchor::MapTile(row)=>(r.0!=row.0+row.2,r.1<row.1),
+            DetailAnchor::Ability(row)|DetailAnchor::Item(row)|DetailAnchor::Roster(row)=>(true,flipped_to_row(row)),
+            DetailAnchor::MapTile(row)=>(r.0!=row.0+row.2,flipped_to_row(row)),
         };
         let ox=self.native_x((r.0+if right {r.2}else{0}) as f64)
             -((b.0+if right {b.2}else{0}) as f64*scale).round() as i32;

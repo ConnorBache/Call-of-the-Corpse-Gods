@@ -34,11 +34,12 @@ fn compact_dialogs_render_repeatably_and_restore_background_after_dismissal() {
     let engine=corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap();let view=crate::observe::observe(&engine.run);let before=engine.save().unwrap();
     let mut p=Painter::new();p.set_responsive_canvas(true);p.game_at(&view,"",false,0.);let base=p.pixels.clone();
     let ability=crate::ability_ui::AbilityView{reserve:None,indicator:None,fortunes:None,pending_reserve_loss:0.,id:"test".into(),name:"A long observed ability name".into(),description:"Full ability details remain available by scrolling. ".repeat(45),color:GOLD,cost:"6 Energy".into(),state:"Ready".into(),active:false,mode:"Active".into(),supported:true};
+    let ability_anchor=crate::modal_ui::DetailAnchor::Ability(p.game_ability_rect(6));
     for name in ["creatures","ability","hazard","inspection","pack","blessing"] {
         p.pixels.copy_from_slice(&base);
         match name {
             "creatures"=>p.creatures(&view,None,0),
-            "ability"=>p.ability_detail(&ability,usize::MAX, crate::modal_ui::DetailAnchor::Ability),
+            "ability"=>p.ability_detail(&ability,usize::MAX, ability_anchor),
             "hazard"=>p.hazard_prompt("Walk amid razorleaves? Ending your turn there costs 2% of your maximum health (rounded up)."),
             "inspection"=>{let report=crate::inspection_ui::observe_tile(&engine.run,engine.run.player.x as usize,engine.run.player.y as usize);p.docked_sheet(crate::modal_ui::inspection_bounds(&p.profile),|p|crate::inspection_ui::paint(&report,p,0));},
             "pack"=>{let mut pack=crate::pack::PackView::observe(&engine.run);pack.configure(&p,p.frame().map.tuple());let (x,y,w,h)=pack.bounds();let map=crate::modal_ui::map_menu_area(p.frame().map);assert_eq!((x+w,y+h),(map.0+map.2,map.1+map.3));assert!(x>=map.0&&y>=map.1);pack.paint(&mut p);},
