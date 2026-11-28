@@ -181,9 +181,12 @@ mod integration_tests {
         let report = crate::inspection_ui::observe_tile(&r, 8, 4);
         let detail = report.creature.unwrap();
         assert_eq!(detail.behavior, "In mind");
-        assert!(detail.description.contains("Overlapping in the normal plane: Giant Rat"));
-        assert_eq!(view.abilities[0].name, "Wake Up");
-        assert!(!crate::observe::ability_needs_target(&view.abilities[0].id));
+        assert!(detail.description.contains("In the dream world,") && detail.description.contains("In reality, a giant rat"), "{}", detail.description);
+        let wake = view.pack_hud.items.iter().find(|row| row.source == crate::game_hud::QuickSource::Dreamwalk).unwrap();
+        assert_eq!(wake.label, "Wake Up");
+        assert!(matches!(crate::game_hud::activate_quick(&r, wake.source),
+            crate::pack::PackAction::Command(corpse_core::Command::Ability { id, target, .. })
+                if id == corpse_core::dreamwalking::WAKE_UP_ID && target.is_missing()));
         assert!(view.cells.iter().any(|c| c.label == "Shards of the Phantasmii" && c.dream_entity));
         assert_eq!(r, before, "observation must never mutate simulation or consume RNG");
     }
@@ -193,7 +196,7 @@ mod integration_tests {
         r.actors_at_mut(1.)[0]=corpse_core::population::create_actor_revision("skin-walker",10.,8.,4.,false,34.).unwrap();
         let shown=crate::creature_presentation::project(&r,&r.actors_at(1.)[0]).unwrap();
         let report=crate::inspection_ui::observe_tile(&r,8,4);
-        assert!(report.scene.contains(&shown.name));assert!(!report.scene.contains("Skin Walker"));
+        assert!(report.scene.to_lowercase().contains(&shown.name.to_lowercase()));assert!(!report.scene.contains("Skin Walker"));
         let profile=crate::appearance_profile::Profile::default().set("terrain.floor.color",serde_json::json!("#ff0000")).unwrap();
         let view=crate::observe::observe_with_profile(&r,&profile);
         assert!(view.cells.iter().filter(|c|!c.dream_entity).all(|c|c.fg==NORMAL_INK));

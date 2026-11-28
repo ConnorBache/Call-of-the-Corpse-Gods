@@ -791,6 +791,8 @@ pub struct TerrainObservation {
 #[derive(Debug, Clone)]
 pub struct ObservedCell {
     pub index: usize,
+    /// Which plane supplied the admitted terrain and hazard snapshot.
+    pub dream_plane: bool,
     pub current: bool,
     pub remembered: bool,
     pub knowledge: String,
@@ -889,6 +891,7 @@ pub fn observe_terrain(r: &Run) -> Option<TerrainObservation> {
             let direct = all_seeing || direct_chance > 5.0;
             ObservedCell {
                 index: i,
+                dream_plane: dream,
                 current,
                 remembered,
                 direct,

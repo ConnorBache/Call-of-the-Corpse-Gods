@@ -58,8 +58,9 @@ pub fn observed_item_mate(run: &Run, observation: &vision::TerrainObservation, a
     observation.cells.get(mate)?.direct.then_some(mate)
 }
 
-pub const INSPECTOR_SCENE: &str = "Reality warps around a portal.";
-pub const CREATURE_SCENE_SUFFIX: &str = " as reality warps around a portal.";
+pub const INSPECTOR_SCENE: &str = "Reality warps around this portal.";
+#[cfg(test)]
+const CREATURE_SCENE_SUFFIX: &str = " while emerging from a portal.";
 
 pub fn known_name(run: &Run, cell: &vision::ObservedCell) -> Option<String> {
     if !corpse_core::portals::enabled(run) || !(cell.current || cell.remembered) { return None; }
@@ -114,7 +115,7 @@ mod tests {
         r.actors_at_mut(r.depth).clear();
         let empty = crate::inspection_ui::observe_tile(&r, 11, 10);
         assert_eq!(empty.title, "Blue portal");
-        assert_eq!(empty.scene, "Reality warps around a portal.");
+        assert_eq!(empty.scene, "Reality warps around this portal.");
         assert_eq!(empty.lines.first().map(String::as_str), Some(INSPECTOR_SCENE));
         let actor = corpse_core::population::create_actor_revision("rat", 900., 11., 10., false, 35.).unwrap();
         r.actors_at_mut(r.depth).push(actor);
@@ -139,8 +140,8 @@ mod tests {
         assert_eq!(aliases.len(),2);assert!(aliases.iter().any(|c|c.x==11));
         assert_eq!(v.creatures.iter().filter(|c|c.id==900.).count(),1);
         let report=crate::inspection_ui::observe_tile(&r,11,10);
-        assert!(report.scene.contains("linked portal space"));assert!(report.creature.is_some());
-        assert!(report.scene.contains(CREATURE_SCENE_SUFFIX));
+        assert!(report.creature.is_some());
+        assert_eq!(report.scene, "A giant rat stands from within a portal.");
     }
     #[test]
     fn portal_ui_ground_item_alias_observed_only_and_single_identity() {
@@ -152,7 +153,7 @@ mod tests {
         assert!(v.cells.iter().any(|c|c.x==11&&c.y==10&&c.label==name));
         assert!(v.cells.iter().any(|c|c.x==45&&c.y==10&&c.label==name));
         let report=crate::inspection_ui::observe_tile(&r,11,10);
-        assert!(report.scene.contains("through the linked portal"));
+        assert!(report.scene.contains("lies in a portal"));
         assert_eq!(r,before);assert_eq!(r.ground.get(&r.depth.to_string()).unwrap().len(),1);
         let w=r.floor().unwrap().width();let mut o=vision::observe_terrain(&r).unwrap();
         assert_eq!(observed_item_mate(&r,&o,10*w+11),Some(10*w+45));
@@ -161,7 +162,7 @@ mod tests {
         o.cells[10*w+45].direct=true;o.cells[10*w+11].direct=false;
         assert_eq!(observed_item_mate(&r,&o,10*w+11),None);
         r.simulation_revision=34.0.into();
-        assert!(!crate::inspection_ui::observe_tile(&r,11,10).scene.contains("through the linked portal"));
+        assert!(!crate::inspection_ui::observe_tile(&r,11,10).scene.contains("lies in a portal"));
     }
     #[test]
     fn portal_ui_actual_renderer_italic_is_distinct_and_capture() {

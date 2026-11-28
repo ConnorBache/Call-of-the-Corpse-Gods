@@ -87,7 +87,7 @@ fn jackal_death_displays_immediate_heartless_corpse_on_map_and_inspector() {
     let corpse = shown_actor(&view, 80.);
     assert!(corpse.corpse && corpse.heartless);
     let report = crate::inspection_ui::observe_tile(&loaded, 13, 10);
-    assert!(report.scene.contains("heartless pale jackal corpse"), "{}", report.scene);
+    assert!(report.scene.contains("The corpse of a Pale Jackal"), "{}", report.scene);
 }
 
 #[test]
@@ -106,7 +106,7 @@ fn corpse_marker_follows_any_heart_on_the_exact_tile() {
         let name = &view.ground_entities.iter().find(|e| e.id==80_f64.to_bits()).unwrap().name;
         assert_eq!(name.starts_with("heartless "), expected);
         let scene = crate::inspection_ui::observe_tile(r, 13, 10).scene;
-        assert_eq!(scene.contains("heartless giant rat corpse"), expected, "{scene}");
+        assert!(scene.to_lowercase().contains("the corpse of a giant rat"), "{scene}");
     };
     r.ground_at_mut(2.).push(own.clone());
     assert_marker(&r, true); // Even one's own heart doesn't count on another floor.

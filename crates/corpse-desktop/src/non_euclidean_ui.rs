@@ -114,7 +114,7 @@ pub fn description(run: &Run, observation: &vision::TerrainObservation, x: usize
     let all = if at == group.destination { group.sources.clone() } else { vec![group.destination] };
     let exits = observed_exits(run, observation, at);
     let fast = f.speed_up.as_ref().into_iter().flatten().any(|p|p.cells.contains(&at));
-    let mut text = if fast { "Speed-up area." } else { "Non-Euclidean space." }.to_string();
+    let mut text = "Wrongspace.".to_string();
     if run.simulation_revision.value_or(29.) >= 51. {
         text.push_str(&format!(" Link {}. Matching numbers mark the same linked space.", pockets::group_number(f, at)?));
     }
@@ -322,9 +322,9 @@ pub(crate) mod tests {
         assert_eq!(v.creatures.iter().filter(|c|c.id==900.).count(),1);
         let aliases:Vec<_>=v.cells.iter().filter(|c|c.actor_id==Some(900.)).collect();assert_eq!(aliases.len(),3);
         assert!(aliases.iter().any(|c|c.x==11));assert!(aliases.iter().any(|c|c.x==12));
-        assert!(crate::inspection_ui::observe_tile(&r,11,10).scene.contains("already visible"));
+        assert!(crate::inspection_ui::observe_tile(&r,11,10).scene.contains("stands on the wrongspace"));
         assert!(v.cells.iter().any(|c|c.x==14&&c.label==name));
-        assert!(crate::inspection_ui::observe_tile(&r,14,10).scene.contains("linked Non-Euclidean"));
+        assert!(crate::inspection_ui::observe_tile(&r,14,10).scene.contains("lies on the wrongspace"));
         assert_eq!(r,before);assert_eq!(r.ground.get(&r.depth.to_string()).unwrap().len(),1);
         let mut o=vision::observe_terrain(&r).unwrap();let w=o.width;o.cells[10*w+14].direct=false;
         assert!(!observed_item_aliases(&r,&o,10*w+16).contains(&(10*w+14)));
@@ -445,7 +445,7 @@ mod revision51_tests {
         assert_eq!(c.label,"Speed-up area");assert!(c.non_euclidean);assert!(!c.italic);
         assert_eq!(c.background_overlay.map(|(_,alpha)|alpha),Some(0.22));assert!(c.fg[1]>c.fg[0]&&c.fg[2]>c.fg[0]);
         assert!(c.bottom_aligned);assert_eq!(r,before);
-        assert_eq!(crate::inspection_ui::observe_tile(&r,11,12).title,"Speed-up area");
+        assert_eq!(crate::inspection_ui::observe_tile(&r,11,12).title,"Wrongspace");
     }
     #[test]
     fn revision51_speed_up_hidden_replacement_does_not_change_memory_or_exit_preview() {

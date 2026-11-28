@@ -19,6 +19,7 @@ fn observation(value: &Value) -> TerrainObservation {
         .iter()
         .enumerate()
         .map(|(index, c)| ObservedCell {
+            dream_plane: false,
             index,
             current: c["current"].as_bool().unwrap(),
             remembered: !c["current"].as_bool().unwrap(),
