@@ -632,6 +632,9 @@ fn scene_subject(r: &Run, a: &Actor) -> String {
     if corpse_core::dreamwalking::is_body(a) {
         return "Your sleeping body".into();
     }
+    if corpse_core::dreamwalking::is_nightmare(a) {
+        return format!("A {}{name}", if scene_sleeping(a) { "sleeping " } else { "" });
+    }
     if scene_sleeping(a) {
         for prefix in ["Mercuria’s ", "Mercuria's ", "Your ", "The "] {
             if let Some(rest) = name.strip_prefix(prefix) {
@@ -1412,6 +1415,7 @@ impl<'a> TileStack<'a> {
 enum SceneMotion {
     Stands,
     Flies,
+    Floats,
     Grows,
     Lies,
     Liquid { verb: &'static str, place: &'static str },
@@ -1421,6 +1425,7 @@ impl SceneMotion {
         match self {
             Self::Stands => "stands",
             Self::Flies => "flies",
+            Self::Floats => "floats",
             Self::Grows => "grows",
             Self::Lies => "lies",
             Self::Liquid { verb, .. } => verb,
@@ -1429,7 +1434,7 @@ impl SceneMotion {
     fn describe(self, subject: &str, terrain: &str) -> String {
         let (preposition, place) = match self {
             Self::Stands => ("on", terrain),
-            Self::Flies => ("over", terrain),
+            Self::Flies | Self::Floats => ("over", terrain),
             Self::Grows => ("from", terrain),
             Self::Lies => ("atop", terrain),
             Self::Liquid { place, .. } => ("", place),
@@ -1491,7 +1496,7 @@ fn dream_tile_scene(
     use corpse_core::dreamwalking as dream;
     let mut parts = Vec::with_capacity(2);
     for plane in [true, false] {
-        let terrain_known = o.dream_plane == plane && (o.current || o.remembered);
+        let terrain_known = !plane && !o.dream_plane && (o.current || o.remembered);
         let actors: Vec<_> = observed.iter().copied().filter(|a| dream::dream_actor(r, a) == plane).collect();
         let items: Vec<_> = ground.iter().copied().filter(|g| dream::dream_item(r, &g.item) == plane).collect();
         let player_here = r.player.x == x as f64 && r.player.y == y as f64 && dream::dream_actor(r, &r.player) == plane;
@@ -1522,7 +1527,9 @@ fn dream_tile_scene(
                 else { scene_motion_without_terrain(r, shown) };
             let line = if local {
                 used_objects = true;
-                let fallback = if stack.accompaniment.is_empty() && matches!(motion, SceneMotion::Lies) {
+                let fallback = if plane {
+                    format!("{subject} {}.", motion.verb())
+                } else if stack.accompaniment.is_empty() && matches!(motion, SceneMotion::Lies) {
                     format!("{subject} lies atop the ground.")
                 } else if stack.accompaniment.is_empty() {
                     format!("{subject} {} here.", motion.verb())
@@ -1574,6 +1581,7 @@ fn dream_tile_scene(
 
 fn scene_motion_without_terrain(r: &Run, a: &Actor) -> SceneMotion {
     if corpse_core::dreamwalking::is_body(a) || scene_sleeping(a) { SceneMotion::Lies }
+    else if corpse_core::dreamwalking::is_nightmare(a) { SceneMotion::Floats }
     else if travel::flying(r, a) { SceneMotion::Flies }
     else if has(a, "enemy:beast:rooted") { SceneMotion::Grows }
     else { SceneMotion::Stands }
@@ -1633,11 +1641,12 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         None => { owned = vision::observe_terrain(r); let Some(o) = owned.as_ref() else { return unknown(); }; o }
     };
     let o = &observation.cells[y * f.width() + x];
-    let feature_hover = observed_feature_card(r, o, f.width());
-    let portal_name = crate::portal_ui::known_name(r, o);
-    let pocket = crate::non_euclidean_ui::description(r, observation, x, y);
+    let inspect_terrain = !o.dream_plane;
+    let feature_hover = inspect_terrain.then(|| observed_feature_card(r, o, f.width())).flatten();
+    let portal_name = inspect_terrain.then(|| crate::portal_ui::known_name(r, o)).flatten();
+    let pocket = inspect_terrain.then(|| crate::non_euclidean_ui::description(r, observation, x, y)).flatten();
     let space = if portal_name.is_some() { TileSpace::Portal }
-        else if pocket.is_some() || ((o.current || o.remembered) && o.tile.as_deref() == Some("speed-up")) { TileSpace::Wrongspace }
+        else if pocket.is_some() || (inspect_terrain && (o.current || o.remembered) && o.tile.as_deref() == Some("speed-up")) { TileSpace::Wrongspace }
         else { TileSpace::Ground };
     let portal_alias = crate::portal_ui::observed_alias_with_terrain(r, x, y, observation);
     let pocket_alias = crate::non_euclidean_ui::observed_alias_with_terrain(r, x, y, observation);
@@ -1747,21 +1756,23 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             let variants=std::array::from_fn(|phase| {
                 let shown=crate::creature_presentation::project_kind(r,a,crate::hallucination_ui::kind(r,a,phase)).unwrap();
                 if let Some(slot)=scratch.actors_at_mut(r.depth).iter_mut().find(|v|v.id==a.id){*slot=shown.clone();}
-                let mut report=decorate(creature_presented(&scratch,&shown,Some(o),true),&shown,phase);
+                let mut report=decorate(creature_presented(&scratch,&shown,inspect_terrain.then_some(o),true),&shown,phase);
                 question_report(&mut report);report
             });
             let mut report=variants[0].clone();report.hallucination=Some(std::sync::Arc::new(variants));return report;
         }
         let projected=crate::creature_presentation::project(r,a);
-        let mut report=decorate(creature(r,a,Some(o)),projected.as_ref().unwrap_or(a),0);
+        let mut report=decorate(creature(r,a,inspect_terrain.then_some(o)),projected.as_ref().unwrap_or(a),0);
         report.identity_known=corpse_core::actor_presentation::identity_known(r,a);
         return report;
     }
     let mut report = unknown();
-    if o.current || o.remembered {
-        let mut copy=terrain_copy_parts(f,o);
+    if o.current || (o.remembered && inspect_terrain) {
+        let mut copy = if inspect_terrain { terrain_copy_parts(f, o) } else {
+            TerrainCopy { name: String::new(), lone: String::new(), overlays: vec![] }
+        };
         let player = o.current && r.player.x == x as f64 && r.player.y == y as f64;
-        let occupied = if o.current {
+        let occupied = if o.current && inspect_terrain {
             let stack=TileStack::new(r,o,x,y,space,&ground,&[],0);
             if player {
                 let motion = scene_motion(r, &r.player, o);
@@ -1791,7 +1802,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         else if space == TileSpace::Wrongspace { report.title = "Wrongspace".into(); }
         if let Some(text) = &pocket { report.lines.push(text.clone()); }
         if o.current {
-            if let Some(h) = o.hazards.as_ref() {
+            if let Some(h) = o.hazards.as_ref().filter(|_| inspect_terrain) {
                 if let Some(feature) = h.feature.as_ref() {
                     report.title = feature.name.clone();
                     if !feature_description_off_footer(&feature.name) {
@@ -1814,8 +1825,8 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                     }
                 }
             }
-            if let Some(label)=crate::perception_ui::tile_label(r,o) { report.lines.push(label); }
-            if player && !corpse_core::revision51_perception::enabled(r) {
+            if let Some(label) = inspect_terrain.then(|| crate::perception_ui::tile_label(r,o)).flatten() { report.lines.push(label); }
+            if player && inspect_terrain && !corpse_core::revision51_perception::enabled(r) {
                 report.lines.push(format!(
                     "Illumination {}.",
                     js_round(o.illumination.unwrap_or(0.))
@@ -1824,7 +1835,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             for g in &ground {
                 let description=pack::ground_description(r,&g.item);
                 if corpse_core::revision50::enabled(r) {report.item_hover.push(description.clone());}
-                if g.x!=x as f64 || g.y!=y as f64 {
+                if inspect_terrain && (g.x!=x as f64 || g.y!=y as f64) {
                     let text = remote_item_line(g);
                     append_scene(&mut report.scene,&text);
                     report.lines.push(text);
@@ -1852,11 +1863,11 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 if !statuses.is_empty() {
                     report.lines.push(statuses);
                 }
-                if let Some(g) = o.hazards.as_ref().and_then(|h| h.gas.as_ref()) {
+                if let Some(g) = o.hazards.as_ref().filter(|_| inspect_terrain).and_then(|h| h.gas.as_ref()) {
                     report.lines.push(gas_exposure(r, &r.player, g));
                 }
             }
-            if ability(&r.player, "Ascend")
+            if inspect_terrain && ability(&r.player, "Ascend")
                 && r.depth > 1.
                 && r.floors
                     .iter()
@@ -1871,7 +1882,11 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
     }
     if corpse_core::dreamwalking::dream_view(r) && (o.current || o.remembered) {
         let scene = dream_tile_scene(r, o, x, y, space, &ground, &observed, 0, None);
-        if let Some(first) = report.lines.first_mut() { first.clone_from(&scene); }
+        if inspect_terrain {
+            if let Some(first) = report.lines.first_mut() { first.clone_from(&scene); }
+        } else if !scene.is_empty() {
+            report.lines.insert(0, scene.clone());
+        }
         report.scene = scene;
     } else if o.remembered && !o.current && rally_here(r, x, y) {
         append_scene(&mut report.scene, "A rally point is set here.");
@@ -3040,8 +3055,32 @@ mod tests {
         });
         let run_before = serde_json::to_vec(&r).unwrap();
         let line = observe_tile(&r,11,12).scene;
-        assert_eq!(line,"In the dream world, shallow water covers the ground. In reality, your sleeping body lies atop the ground.");
+        assert_eq!(line,"In reality, your sleeping body lies atop the ground.");
         assert_eq!(serde_json::to_vec(&r).unwrap(),run_before);
+    }
+
+    #[test]
+    fn dream_inspector_names_the_nightmare_but_never_names_dream_terrain() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        r.dreamwalking = corpse_core::dreamwalking::State { active:true, depth:r.depth, ..Default::default() }.into();
+        corpse_core::dreamwalking::ensure_layer(&mut r);
+        corpse_core::dreamwalking::with_plane(&mut r, true, |r| {
+            let f = r.floor_mut().unwrap();
+            let at = 12 * f.width() + 11;
+            f.substrates = vec!["sand".into(); f.tiles.len()].into();
+            f.godbeast_event = corpse_core::GodbeastEvent { kind:"Epidite".into(), x:11., y:12., ..Default::default() }.into();
+            f.portals = vec![corpse_core::portals_generation::PortalPair{a:at,b:at+3,color_index:0}].into();
+        });
+        let empty = observe_tile(&r, 11, 12);
+        assert!(empty.title.is_empty() && empty.scene.is_empty() && empty.lines.is_empty());
+        assert!(empty.feature_hover.is_none());
+        r.actors_at_mut(r.depth).push(corpse_core::phantasmii_generation::nightmare(20, 901., 11., 12.));
+        let report = observe_tile(&r, 11, 12);
+        assert_eq!(report.scene, "In the dream world, a Nightmare floats.");
+        assert!(report.feature_hover.is_none());
+        assert!(!report.lines.join(" ").contains("portal"));
     }
 
     #[test]

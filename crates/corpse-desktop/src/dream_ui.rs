@@ -219,7 +219,8 @@ mod integration_tests {
         Arc::make_mut(&mut r.dreamwalking.as_mut().unwrap().floors[0]).tiles[4*79+6]="wall".into();
         let before=r.clone();let view=crate::observe::observe(&r);
         assert_eq!(view.terrain_snapshot.as_ref().unwrap().cells[4*79+6].tile.as_deref(),Some("wall"));
-        assert!(crate::inspection_ui::observe_tile(&r,6,4).scene.to_lowercase().contains("wall"));
+        let report = crate::inspection_ui::observe_tile(&r,6,4);
+        assert!(report.scene.is_empty() && report.lines.is_empty());
         assert_eq!(crate::targeting_ui::observe(&r,Some(crate::targeting_ui::Point{x:7,y:4})).stop_reason,
             crate::targeting_ui::StopReason::Terrain);
         assert!(crate::travel_ui::path_to(&r,7,4,false).iter().all(|s|s.x!=6||s.y!=4));
