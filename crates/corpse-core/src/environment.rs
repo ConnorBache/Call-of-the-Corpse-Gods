@@ -1663,6 +1663,11 @@ fn drift_ground_items(r: &mut Run) -> Result<(), String> {
         .filter(|e| !crate::dreamwalking::protected_ground(&e.item, crate::phantasmii_blessing_rules::dream_shards_only(r)))
         .map(|e| e.y as usize * width + e.x as usize)
         .collect();
+    if crate::remains_rules::current(r) {
+        occupied.extend(r.actors_at(depth).iter()
+            .filter(|a|a.dead.value_or(false)&&!crate::dreamwalking::dream_actor(r,a))
+            .map(|a|a.y as usize*width+a.x as usize));
+    }
     for index in 0..count {
         let entry = &r.ground[&depth.to_string()][index];
         if crate::phantasmii_generation::is_shard(&entry.item) || crate::dreamwalking::dream_ground_item(&entry.item) {continue;}

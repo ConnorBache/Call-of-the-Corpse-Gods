@@ -340,7 +340,7 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
             }),
             Some(glyph(&item)),
         );
-        if crate::borge::accept_thrown_heart(r, index, &item, landing) {
+        if crate::borge::accept_thrown_heart(r, index, &item, landing)? {
             return Ok(Some(true));
         }
         let base = player_throw_base(r, &item);
@@ -379,7 +379,11 @@ pub fn command(r: &mut Run, c: &Command) -> Result<Option<bool>, EngineError> {
         thrown.equipped = Field::Missing;
         if shard && crate::dreamwalking::active(r) {thrown.dream_ground=true.into();}
         if let Some((_,x,y))=recovery {
+            let dream=crate::dreamwalking::dream_item(r,&thrown);
             r.ground_at_mut(depth).push(GroundItem{x,y,item:thrown,auto_pickup_blocked:Field::Missing});
+            if crate::remains_rules::current(r) {
+                crate::corpse_placement::vacate_for_item(r,depth,x,y,dream,None).map_err(EngineError)?;
+            }
             if let Some(f)=r.floor_mut(){f.dirty=true;}
         } else {place(r, depth, landing, thrown, false)?;}
         crate::equipment::settle_removed(r, cap)?;

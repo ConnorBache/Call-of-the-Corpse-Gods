@@ -73,6 +73,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.amulet_rules_from=r.amulet_rules_from.clone();
     next.potion_rules_from=r.potion_rules_from.clone();
     next.potion_retirements_from=r.potion_retirements_from.clone();
+    next.remains_rules_from=r.remains_rules_from.clone();
     next.ring_rules_from=r.ring_rules_from.clone();
     next.gas_rules_from=r.gas_rules_from.clone();
     next.commandment_rules_from=r.commandment_rules_from.clone();
@@ -108,6 +109,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.steam_rules_from=r.steam_rules_from.clone();
     next.future_floor_rules_from=r.future_floor_rules_from.clone();
     next.run_id=r.run_id.clone();
+    crate::corpse_placement::separate_overlaps(&mut next)?;
     next.actors.adopt_epoch_from(&r.actors);
     *r=next;crate::health_dirty::invalidate(r);
     crate::engine::log(r,"You use See The Future.","player");

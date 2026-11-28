@@ -57,6 +57,7 @@ fn clone_snapshot_state(run:&Run)->Run {
             amulet_rules_from: Default::default(),
             potion_rules_from: Default::default(),
             potion_retirements_from: Default::default(),
+            remains_rules_from: Default::default(),
             ring_rules_from: Default::default(),
             gas_rules_from: Default::default(),
             commandment_rules_from: Default::default(),

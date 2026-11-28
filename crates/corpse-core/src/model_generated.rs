@@ -1726,6 +1726,8 @@ pub struct Run {
     pub potion_rules_from: Field<usize>,
     #[serde(rename = "potionRetirementsFrom", default, skip_serializing_if = "Field::is_missing")]
     pub potion_retirements_from: Field<usize>,
+    #[serde(rename = "remainsRulesFrom", default, skip_serializing_if = "Field::is_missing")]
+    pub remains_rules_from: Field<usize>,
     /// Ring rules command boundary; Null denotes a legacy replay prefix.
     #[serde(rename = "ringRulesFrom", default, skip_serializing_if = "Field::is_missing")]
     pub ring_rules_from: Field<usize>,

@@ -537,6 +537,7 @@ pub(crate) fn new_run_shell_revision_policy(seed: &str, mode: &str, dev: bool, r
         amulet_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         potion_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         potion_retirements_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
+        remains_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         ring_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         gas_rules_from: if revision >= 52. { 0usize.into() } else { crate::Field::Missing },
         screamer_schedule: None,

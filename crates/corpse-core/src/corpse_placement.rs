@@ -1,7 +1,7 @@
-//! Physical corpse space independent of living actors and items.
+//! Physical corpse space, independent of living actors.
 use crate::{
-    Actor, GroundItem, Run,
-    item_placement::{PlacementResult, ground_destination},
+    Actor, Run,
+    item_placement::{PlacementResult, cell_key, nearest_free_ground},
 };
 use std::collections::HashSet;
 fn metric(r: &mut Run, k: &str, n: f64) {
@@ -53,16 +53,17 @@ pub fn place_corpse(
             .ok_or("Corpse placement floor missing")?;
         let f = &r.floors[fi];
         let w = f.width();
-        let corpses: Vec<_> = r
-            .actors_at(depth)
-            .iter()
-            .filter(|a| a.dead.value_or(false) && a.id != corpse.id)
-            .map(|a| GroundItem {
-                x: a.x,
-                y: a.y,
-                ..Default::default()
-            })
-            .collect();
+        let shared=crate::remains_rules::current(r);
+        let dream=crate::dreamwalking::dream_actor(r,&corpse);
+        let mut occupied:HashSet<_>=r.actors_at(depth).iter()
+            .filter(|a| a.dead.value_or(false) && a.id!=corpse.id
+                && (!shared || crate::dreamwalking::dream_actor(r,a)==dream))
+            .map(|a| cell_key(f,a.x,a.y)).collect();
+        if shared {
+            occupied.extend(r.ground.get(&depth.to_string()).into_iter().flat_map(|g|g.iter())
+                .filter(|g|crate::dreamwalking::dream_item(r,&g.item)==dream)
+                .map(|g|cell_key(f,g.x,g.y)));
+        }
         let direct = x.fract() == 0.0
             && y.fract() == 0.0
             && x >= 0.0
@@ -74,12 +75,15 @@ pub fn place_corpse(
         let destination = if direct {
             Some((true, x, y))
         } else {
-            ground_destination(f, &corpses, x, y)
+            nearest_free_ground(f, &occupied, x, y)
         };
         let cells = f.tiles.len();
         if !direct {
             metric(r, "corpsePlacementCells", cells as f64);
-            metric(r, "corpsePlacementOccupancyEntries", corpses.len() as f64);
+            let count=if shared {occupied.len()} else {
+                r.actors_at(depth).iter().filter(|a|a.dead.value_or(false)&&a.id!=corpse.id).count()
+            };
+            metric(r, "corpsePlacementOccupancyEntries", count as f64);
         }
         crate::mutation_journal::make_mut(&mut r.floors[fi]).dirty = true;
         let Some((fall, nx, ny)) = destination else {
@@ -146,4 +150,39 @@ pub fn normalize_corpses(
         }
     }
     Ok((relocated, discarded))
+}
+
+/// Fixed-position offerings and death hearts take precedence over corpses, not
+/// over living creatures. Same-plane corpses displaced by the item spread normally.
+pub(crate) fn vacate_for_item(r:&mut Run,depth:f64,x:f64,y:f64,dream:bool,except:Option<f64>)->Result<(),String>{
+    let mut bodies:Vec<_>=r.actors_at(depth).iter().filter(|a|a.dead.value_or(false)
+        && a.x==x && a.y==y && Some(a.id)!=except
+        && crate::dreamwalking::dream_actor(r,a)==dream).cloned().collect();
+    bodies.sort_by(|a,b|a.id.total_cmp(&b.id));
+    for corpse in bodies {
+        place_corpse(r,depth,corpse,|r,d|crate::startup::ensure_floors(r,d as u32))?;
+    }
+    Ok(())
+}
+
+/// One-time legacy adoption (or pre-amendment snapshot restore). Items stay
+/// fixed. Stable depth and actor iteration breaks ties in overlapping corpses.
+pub(crate) fn separate_overlaps(r:&mut Run)->Result<(),String>{
+    if !crate::remains_rules::current(r){return Ok(());}
+    let mut floors:Vec<_>=r.floors.iter().collect();
+    floors.sort_by(|a,b|a.depth.total_cmp(&b.depth));
+    let mut pending=Vec::new();
+    for f in floors {
+        let mut taken:HashSet<_>=r.ground.get(&f.depth.to_string()).into_iter().flat_map(|g|g.iter())
+            .map(|g|(crate::dreamwalking::dream_item(r,&g.item),cell_key(f,g.x,g.y))).collect();
+        for a in r.actors_at(f.depth).iter().filter(|a|a.dead.value_or(false)) {
+            if !taken.insert((crate::dreamwalking::dream_actor(r,a),cell_key(f,a.x,a.y))){
+                pending.push((f.depth,a.clone()));
+            }
+        }
+    }
+    for (depth,corpse) in pending {
+        place_corpse(r,depth,corpse,|r,d|crate::startup::ensure_floors(r,d as u32))?;
+    }
+    Ok(())
 }

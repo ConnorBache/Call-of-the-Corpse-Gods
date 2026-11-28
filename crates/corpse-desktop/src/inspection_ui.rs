@@ -276,7 +276,30 @@ fn terrain_report_title(name: String, current: bool) -> String {
         "Ice" | "Puddle" | "Hellfire" | "Bloody wall" | "Rock wall" | "Stone wall" | "Wall" | "Bare ground" | "Stone floor" | "Rock floor" | "Earthen floor" | "Sand" | "Soot" | "Ash" | "Grass" | "Tree" | "Deep water" | "Shallow water" | "Chasm" | "Upstairs" | "Downstairs" | "Bottomless pit" | "Open door" | "Closed door" | "Grate" | "Bridge"
     ) { String::new() } else { name }
 }
+/// The lone caption can be replaced by the subject of the inspection;
+/// hazards and other supplementary tile facts cannot.
+struct TerrainCopy {
+    name: String,
+    lone: String,
+    overlays: Vec<String>,
+}
+impl TerrainCopy {
+    fn lone_is_enduring(&self) -> bool {
+        matches!(self.name.as_str(),"Ice"|"Puddle"|"Hellfire"|"Bottomless pit")
+    }
+    fn caption(&self, occupied: Option<&str>) -> String {
+        let lone = if occupied.is_none() || self.lone_is_enduring() {Some(self.lone.as_str())}else{None};
+        occupied.into_iter().chain(lone).chain(self.overlays.iter().map(String::as_str))
+            .filter(|line| !line.is_empty()).collect::<Vec<_>>().join(" ")
+    }
+}
+#[cfg(test)]
 fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
+    let copy = terrain_copy_parts(f, o);
+    let caption = copy.caption(None);
+    (copy.name, caption)
+}
+fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
     let mut details = Vec::new();
     let h = o.hazards.as_ref();
     let tile = o.tile.as_deref();
@@ -609,17 +632,11 @@ fn terrain_copy(f: &Floor, o: &vision::ObservedCell) -> (String, String) {
     } else {
         name.into()
     };
-    (
-        name,
-        std::iter::once(scene)
-            .chain(details)
-            .collect::<Vec<_>>()
-            .join(" "),
-    )
+    TerrainCopy { name, lone: scene, overlays: details }
 }
-fn creature_scene(r: &Run, a: &Actor, o: Option<&vision::ObservedCell>) -> String {
+fn scene_subject(r: &Run, a: &Actor) -> String {
     let name = creature_title(r, a);
-    let subject = if name.starts_with("Mercuria’s ")
+    if name.starts_with("Mercuria’s ")
         || name.starts_with("Mercuria's ")
         || name.starts_with("Your ")
         || name.starts_with("The ")
@@ -642,7 +659,10 @@ fn creature_scene(r: &Run, a: &Actor, o: Option<&vision::ObservedCell>) -> Strin
             },
             name.to_lowercase().replace("zillennia", "Zillennia")
         )
-    };
+    }
+}
+fn creature_scene(r: &Run, a: &Actor, o: Option<&vision::ObservedCell>) -> String {
+    let subject = scene_subject(r, a);
     let dead = a.dead.value_or(false) || a.hp <= 0.;
     let Some(o) = o.filter(|o| o.current) else {
         return format!("{subject} {}.", if dead { "lies still" } else { "is here" });
@@ -1047,9 +1067,13 @@ fn observed_ground_at<'a>(r: &'a Run, observation: &vision::TerrainObservation, 
 }
 /// The short scene names the entire known stack; existing detail paragraphs
 /// retain specific behavior (vent timers, item effects, altar instructions).
+struct TileFixture {
+    phrase: String,
+    supersedes_surface: bool,
+}
 struct TileStack {
-    surface: &'static str,
-    fixtures: Vec<String>,
+    accompaniment: &'static str,
+    fixtures: Vec<TileFixture>,
     local_items: Vec<String>,
     corpses: Vec<String>,
     portal: bool,
@@ -1075,7 +1099,7 @@ fn prose_list(parts: &[String]) -> String {
 }
 impl TileStack {
     fn new(r:&Run,o:&vision::ObservedCell,x:usize,y:usize,portal:bool,items:&[&corpse_core::GroundItem],actors:&[&Actor],phase:usize)->Self {
-        let surface=match o.tile.as_deref() {
+        let accompaniment=match o.tile.as_deref() {
             Some("floor"|"speed-up") => match o.substrate.as_deref() {
                 Some("tiled")=>"the stone tiles",Some("rock")=>"bare rock",Some("earth")=>"packed earth",
                 Some("sand")=>"the sand",Some("ash")=>"the ash",Some("soot")=>"the soot",
@@ -1087,16 +1111,17 @@ impl TileStack {
             Some("up")=>"an upward stairway",Some("down")=>"a downward stairway",_=>"",
         };
         let mut fixtures=Vec::new();
+        let mut fixture=|phrase:String,supersedes_surface|fixtures.push(TileFixture{phrase,supersedes_surface});
         if let Some(h)=&o.hazards {
-            if let Some(f)=h.feature.as_ref(){fixtures.push(article(&f.name));}
-            if let Some(source)=h.light_source.as_ref(){fixtures.push(match source.as_str(){
+            if let Some(f)=h.feature.as_ref(){fixture(article(&f.name),false);}
+            if let Some(source)=h.light_source.as_ref(){fixture(match source.as_str(){
                 "beacon"=>"a magical beacon","torch"=>"a wall torch",_=>"a brazier",
-            }.into());}
+            }.into(),false);}
         }
-        if o.entrance {fixtures.push("the blue entrance".into());}
-        if let Some(open)=o.door_open {fixtures.push(if open {"an open door"} else {"a closed door"}.into());}
-        if o.grate {fixtures.push("a grate".into());}
-        if o.bridge {fixtures.push("a bridge".into());}
+        if o.entrance {fixture("the blue entrance".into(),true);}
+        if let Some(open)=o.door_open {fixture(if open {"an open door"} else {"a closed door"}.into(),true);}
+        if o.grate {fixture("a grate".into(),true);}
+        if o.bridge {fixture("a bridge".into(),true);}
         let local_items=items.iter().filter(|g|g.x==x as f64&&g.y==y as f64).map(|g|{
             let name=pack::ground_name(r,&g.item);
             article(&if g.item.kind=="heart" {name.to_lowercase()}else{name})
@@ -1109,20 +1134,24 @@ impl TileStack {
             let name=creature_title_base(shown.as_ref().unwrap_or(a));
             article(&crate::creature_presentation::corpse_name(&name.to_lowercase(), hearts.heartless(a)))
         }).collect();
-        Self{surface,fixtures,local_items,corpses,portal}
+        Self{accompaniment,fixtures,local_items,corpses,portal}
     }
-    fn placement(&self) -> String {
-        let mut fixtures=self.fixtures.clone();
-        if self.portal {fixtures.push("a portal".into());}
-        if fixtures.is_empty(){return self.surface.into();}
+    fn placement(&self, include_portal: bool) -> String {
+        let mut fixtures:Vec<_>=self.fixtures.iter().map(|f|f.phrase.clone()).collect();
+        if include_portal && self.portal {fixtures.push("a portal".into());}
+        if fixtures.is_empty(){return self.accompaniment.into();}
         let result=prose_list(&fixtures);
-        if self.surface.is_empty(){result}else{format!("{result} {} {}",self.preposition(),self.surface)}
+        if self.accompaniment.is_empty() || self.fixtures.iter().any(|f|f.supersedes_surface) {
+            result
+        }else{
+            format!("{result} {} {}",self.preposition(),self.accompaniment)
+        }
     }
     fn preposition(&self)->&'static str {
-        if self.surface.contains("water") {"in"} else {"on"}
+        if self.accompaniment.contains("water") {"in"} else {"on"}
     }
     fn objects(&self)->Option<String> {
-        let place=self.placement();
+        let place=self.placement(true);
         let items=&self.local_items;
         let corpses=&self.corpses;
         let ending=if place.is_empty(){String::new()}else{
@@ -1137,18 +1166,41 @@ impl TileStack {
         }
         None
     }
+    fn occupied(&self,subject:&str,motion:&str,default:&str)->String {
+        let place=self.placement(false);
+        let below=if !self.local_items.is_empty() {
+            let items=prose_list(&self.local_items);
+            if self.corpses.is_empty(){items}else{format!("{items} atop {}",prose_list(&self.corpses))}
+        }else{
+            prose_list(&self.corpses)
+        };
+        if !below.is_empty() {
+            let positioning=if place.is_empty(){String::new()}else{
+                format!(" {} {place}",if self.fixtures.is_empty(){self.preposition()}else{"on"})
+            };
+            return format!("{subject} {motion} over {below}{positioning}.");
+        }
+        if !self.fixtures.is_empty() && !place.is_empty() {
+            return format!("{subject} {motion} {} {place}.",
+                if matches!(motion,"flies"|"floats"){"over"}else{"on"});
+        }
+        default.into()
+    }
+}
+fn over_motion(r:&Run,a:&Actor,o:&vision::ObservedCell)->&'static str {
+    if travel::flying(r,a) {
+        if active(a,"Phase Through")||active(a,"Float Away") {"floats"} else {"flies"}
+    }else if o.hazards.as_ref().is_some_and(|h|h.ichor.value_or(false)) ||
+        matches!(o.tile.as_deref(),Some("water"|"shallow-water")) {
+        let ichor=o.hazards.as_ref().is_some_and(|h|h.ichor.value_or(false));
+        if !ichor && cond(a,"underwater")>0. && o.tile.as_deref()==Some("water") {"lurks"}
+        else if (!ichor&&o.tile.as_deref()==Some("water"))||crate_has_aquatic(a)
+            || (ichor&&definition(a).is_some_and(|d|d.ichor_family)) {"swims"} else {"wades"}
+    }else if has(a,"enemy:beast:rooted") {"grows"}else{"stands"}
 }
 fn append_scene(scene:&mut String,text:&str) {
     let text=text.trim();
     if !text.is_empty(){if !scene.is_empty(){scene.push(' ');}scene.push_str(text);}
-}
-fn has_stacked_terrain(o:&vision::ObservedCell)->bool {
-    o.ice||o.puddles||o.snow||o.hellfire||o.flowers||o.entrance||o.grate||o.bridge||o.door_open.is_some()
-        ||o.hazards.as_ref().is_some_and(|h|h.feature.as_ref().is_some()||h.light_source.as_ref().is_some()
-            ||h.gas.as_ref().is_some()||h.vent.as_ref().is_some()||h.fire.as_ref().is_some()
-            ||h.water_blood.as_ref().is_some()||h.current.as_ref().is_some()||h.bulwark.as_ref().is_some()
-            ||[&h.ichor,&h.blood,&h.bloody_wall,&h.slime,&h.mud,&h.roots,&h.razorleaves,&h.permanent_fire]
-                .iter().any(|v|v.value_or(false)))
 }
 fn append_visible_features(scene:&mut String,o:&vision::ObservedCell) {
     if let Some(h)=o.hazards.as_ref(){
@@ -1207,28 +1259,46 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
     if let Some(a) = observed.iter().copied()
         .min_by_key(|a| (a.dead.value_or(false), !corpse_core::dreamwalking::is_nightmare(a)))
     {
-        let decorate=|mut detail:CreatureReport,phase:usize| {
-        if portal_name.is_some() {
-            detail.scene.truncate(detail.scene.trim_end_matches('.').len());
-            detail.scene.push_str(crate::portal_ui::CREATURE_SCENE_SUFFIX);
-        }
+        let decorate=|mut detail:CreatureReport,shown:&Actor,phase:usize| {
+        let mut stacked=false;
         if o.current {
             let stack=TileStack::new(r,o,x,y,portal_name.is_some(),&ground,&observed,phase);
-            if let Some(objects)=stack.objects(){
-                if a.dead.value_or(false)||a.hp<=0. {
-                    detail.scene=objects;
-                    if portal_name.is_some(){append_scene(&mut detail.scene,crate::portal_ui::INSPECTOR_SCENE);}
-                } else {append_scene(&mut detail.scene,&objects);}
-            } else if !stack.fixtures.is_empty() {
-                append_scene(&mut detail.scene,&format!("Also here: {}.",stack.placement()));
+            let copy=terrain_copy_parts(f,o);
+            let dead=a.dead.value_or(false)||a.hp<=0.;
+            let local=a.x==x as f64 && a.y==y as f64;
+            let objects=(dead || !local).then(||stack.objects()).flatten();
+            let portal_as_sentence=dead && objects.is_some();
+            if let Some(objects)=objects.as_ref().filter(|_|dead) {
+                detail.scene.clone_from(objects);
+                stacked=true;
+            }else if !dead && local {
+                detail.scene=stack.occupied(&scene_subject(r,shown),over_motion(r,shown,o),&detail.scene);
+                stacked=!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty();
+            }
+            if portal_name.is_some() {
+                if portal_as_sentence {append_scene(&mut detail.scene,crate::portal_ui::INSPECTOR_SCENE);}
+                else {
+                    detail.scene.truncate(detail.scene.trim_end_matches('.').len());
+                    detail.scene.push_str(crate::portal_ui::CREATURE_SCENE_SUFFIX);
+                }
+            }
+            if let Some(objects)=objects.as_ref().filter(|_|!local && !dead) {
+                append_scene(&mut detail.scene,objects);
+                stacked=true;
             }
             if r.player.x==x as f64 && r.player.y==y as f64 && corpse_core::dreamwalking::same_plane(r,&r.player,a) {
                 append_scene(&mut detail.scene,"Your vessel is here too.");
             }
-            if has_stacked_terrain(o) {
-                append_scene(&mut detail.scene,&terrain_copy(f,o).1);
-                append_visible_features(&mut detail.scene,o);
+            if copy.lone_is_enduring() {
+                append_scene(&mut detail.scene,&copy.lone);
+                stacked=true;
             }
+            for overlay in &copy.overlays {append_scene(&mut detail.scene,overlay);}
+            stacked|=!copy.overlays.is_empty();
+            append_visible_features(&mut detail.scene,o);
+        } else if portal_name.is_some() {
+            detail.scene.truncate(detail.scene.trim_end_matches('.').len());
+            detail.scene.push_str(crate::portal_ui::CREATURE_SCENE_SUFFIX);
         }
         if alias.is_some_and(|other| a.id == other.id) {
             let text = if portal_alias.is_some() { " This creature occupies the linked portal space at the other end." }
@@ -1262,7 +1332,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
         }
         let pocket=crate::non_euclidean_ui::description(r, observation, x, y);
         if let Some(text)=&pocket {append_scene(&mut detail.scene,text);}
-        let has_stack = portal_name.is_some() || has_stacked_terrain(o) || !ground.is_empty()
+        let has_stack = portal_name.is_some() || stacked || !ground.is_empty()
             || observed.len()>1 || alias.is_some() || (r.player.x==x as f64&&r.player.y==y as f64)
             || pocket.is_some();
         if has_stack {detail.description=format!("{}\n{}",detail.scene,detail.description);}
@@ -1286,27 +1356,49 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             let variants=std::array::from_fn(|phase| {
                 let shown=crate::creature_presentation::project_kind(r,a,crate::hallucination_ui::kind(r,a,phase)).unwrap();
                 if let Some(slot)=scratch.actors_at_mut(r.depth).iter_mut().find(|v|v.id==a.id){*slot=shown.clone();}
-                let mut report=decorate(creature_presented(&scratch,&shown,Some(o),true),phase);
+                let mut report=decorate(creature_presented(&scratch,&shown,Some(o),true),&shown,phase);
                 question_report(&mut report);report
             });
             let mut report=variants[0].clone();report.hallucination=Some(std::sync::Arc::new(variants));return report;
         }
-        let mut report=decorate(creature(r,a,Some(o)),0);
+        let projected=crate::creature_presentation::project(r,a);
+        let mut report=decorate(creature(r,a,Some(o)),projected.as_ref().unwrap_or(a),0);
         report.identity_known=corpse_core::actor_presentation::identity_known(r,a);
         return report;
     }
     let mut report = unknown();
     if o.current || o.remembered {
-        let (name, text) = terrain_copy(f, o);
+        let copy=terrain_copy_parts(f,o);
+        let player = o.current && r.player.x == x as f64 && r.player.y == y as f64;
+        let occupied = if o.current {
+            let stack=TileStack::new(r,o,x,y,portal_name.is_some(),&ground,&[],0);
+            if player {
+                let motion=over_motion(r,&r.player,o);
+                let fallback=if stack.accompaniment.is_empty(){"Your vessel is here.".into()}
+                    else {
+                        let prep=match motion {
+                            "flies" | "floats" => "over",
+                            "swims" | "wades" => "through",
+                            "lurks" => "beneath",
+                            _ => stack.preposition(),
+                        };
+                        format!("Your vessel {motion} {prep} {}.",stack.accompaniment)
+                    };
+                Some(stack.occupied("Your vessel",motion,&fallback))
+            }else{stack.objects()}
+        }else{None};
+        let text=copy.caption(occupied.as_deref());
         report = Report {
-            title: terrain_report_title(name, o.current),
+            title: terrain_report_title(copy.name.clone(), o.current),
             scene: text.clone(),
             lines: vec![text],
             ..Default::default()
         };
         if let Some(name) = &portal_name {
             report.title = name.clone();
-            if !has_stacked_terrain(o) && ground.is_empty() {report.scene.clear();}
+            if copy.overlays.is_empty() && ground.is_empty() && occupied.is_none()
+                && !copy.lone_is_enduring()
+            { report.scene.clear(); }
         }
         if let Some(text) = crate::non_euclidean_ui::description(r, &observation, x, y) {
             report.title = if text.starts_with("Speed-up area.") { "Speed-up area" } else { "Non-Euclidean space" }.into();
@@ -1336,23 +1428,12 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                     report.scene.push_str(&format!(" {text}"));
                 }
             }
-            let player = r.player.x == x as f64 && r.player.y == y as f64;
             if let Some(label)=crate::perception_ui::tile_label(r,o) { report.lines.push(label); }
             if player && !corpse_core::revision51_perception::enabled(r) {
                 report.lines.push(format!(
                     "Illumination {}.",
                     js_round(o.illumination.unwrap_or(0.))
                 ));
-            }
-            let stack=TileStack::new(r,o,x,y,portal_name.is_some(),&ground,&[],0);
-            if let Some(objects)=stack.objects(){
-                report.lines.insert(0,objects.clone());
-                report.scene=format!("{objects} {}",report.scene.trim()).trim_end().into();
-            } else if !stack.fixtures.is_empty() || ((o.ice||o.puddles||o.snow||o.hellfire) && !stack.surface.is_empty()) {
-                let text=if stack.fixtures.is_empty(){format!("Underneath: {}.",stack.surface)}
-                    else{format!("Here: {}.",stack.placement())};
-                append_scene(&mut report.scene,&text);
-                report.lines.push(text);
             }
             let mate=crate::portal_ui::observed_item_mate(r,observation,o.index);
             for g in &ground {
@@ -1368,7 +1449,6 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
             }
             if player {
                 report.title = "Your vessel".into();
-                append_scene(&mut report.scene,"Your vessel is here.");
                 report.lines.push(format!(
                     "Health {:.0}/{} · Energy {}",
                     crate::stat_presentation::current_health(r.player.hp), r.player.max_hp, r.player.energy
@@ -2191,9 +2271,44 @@ mod tests {
         rat.dead=true.into();rat.hp=0.;
         r.actors_at_mut(r.depth).push(rat);
         let report=observe_tile(&r,11,12);
-        assert!(report.scene.starts_with("A giant rat corpse lies atop an Altar of the Phantasmii on the sand."),"{}",report.scene);
+        assert!(report.scene.starts_with("A heartless giant rat corpse lies atop an Altar of the Phantasmii on the sand."),"{}",report.scene);
         assert!(report.scene.contains("Falling razorleaves"));
         assert!(report.creature.unwrap().description.contains("begin the ritual"));
+    }
+
+    #[test]
+    fn occupied_tile_composes_the_creature_item_surface_and_protected_overlays() {
+        let mut r=crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision=52.0.into();
+        r.player.stats.perception=100.;
+        let (x,y)=(11,12);
+        let f=r.floor_mut().unwrap();
+        f.substrates=vec!["sand".into();f.tiles.len()].into();
+        assert_eq!(observe_tile(&r,x,y).scene,"Pale sand covers the ground.");
+        let item=corpse_core::Item{id:902.,name:"Giant Rat Heart".into(),kind:"heart".into(),..Default::default()};
+        r.ground_at_mut(r.depth).push(corpse_core::GroundItem{x:x as f64,y:y as f64,item,..Default::default()});
+        assert_eq!(observe_tile(&r,x,y).scene,"A giant rat heart lies on the sand.");
+        let rat=corpse_core::population::create_actor_revision("rat",901.,x as f64,y as f64,false,52.).unwrap();
+        r.actors_at_mut(r.depth).push(rat);
+        let f=r.floor_mut().unwrap();
+        f.razorleaves=vec![1.0;f.tiles.len()].into();
+        let report=observe_tile(&r,x,y);
+        assert!(report.scene.starts_with("A giant rat stands over a giant rat heart on the sand."),"{}",report.scene);
+        assert!(report.scene.contains("Falling razorleaves"));
+        assert!(!report.scene.contains("Pale sand covers the ground"));
+    }
+
+    #[test]
+    fn superseding_occupant_hides_only_the_ordinary_surface() {
+        let stack=TileStack {
+            accompaniment:"the sand",
+            fixtures:vec![TileFixture{phrase:"a bridge".into(),supersedes_surface:true}],
+            local_items:vec!["a heart".into()], corpses:vec![], portal:true,
+        };
+        assert_eq!(stack.occupied("A bat","flies",""),"A bat flies over a heart on a bridge.");
+        assert_eq!(stack.objects().unwrap(),"A heart lies atop a bridge and a portal.");
+        let copy=TerrainCopy{name:"Sand".into(),lone:"Pale sand covers the ground.".into(),overlays:vec!["Fire burns here.".into()]};
+        assert_eq!(copy.caption(stack.objects().as_deref()),"A heart lies atop a bridge and a portal. Fire burns here.");
     }
 
     #[test]

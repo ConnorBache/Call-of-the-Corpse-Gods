@@ -119,22 +119,22 @@ pub(crate) fn walk_over_satisfied_altar(r: &Run, x: f64, y: f64) -> bool {
     throw_offering_enabled(r) && r.floor().is_some_and(|f| f.godbeast_event.as_ref().is_some_and(|e|
         e.reward_created.value_or(false) && !contains(e, x, y) && altar_at(f, e, x, y)))
 }
-pub(crate) fn accept_thrown_heart(r: &mut Run, index: usize, item: &Item, landing: crate::projectiles::Landing) -> bool {
+pub(crate) fn accept_thrown_heart(r: &mut Run, index: usize, item: &Item, landing: crate::projectiles::Landing) -> Result<bool,EngineError> {
     let (x, y) = (landing.x, landing.y);
     if item.kind != "heart" || !throw_offering_enabled(r) || crate::dreamwalking::active(r)
         || landing.actor_id.is_some() || (x, y) == (r.player.x, r.player.y)
         || !r.floor().is_some_and(|f| f.godbeast_event.as_ref().is_some_and(|e|
             e.activated.value_or(false) && !e.reward_created.value_or(false)
                 && altar_at(f, e, x, y) && matching_heart(e, r.depth, item))) {
-        return false;
+        return Ok(false);
     }
     let heart = crate::inventory::take_one(r, index);
     crate::events::projectile_item(r, heart.id);
-    complete_offering(r, x, y, true);
-    true
+    complete_offering(r, x, y, true)?;
+    Ok(true)
 }
 
-fn complete_offering(r: &mut Run, x: f64, y: f64, on_altar: bool) {
+fn complete_offering(r: &mut Run, x: f64, y: f64, on_altar: bool) -> Result<(),EngineError> {
     let reward = shard(r.next_id);
     let reward_id = reward.id;
     r.next_id += 1.;
@@ -142,6 +142,9 @@ fn complete_offering(r: &mut Run, x: f64, y: f64, on_altar: bool) {
         // A completed ritual puts its reward on the exact altar tile, even if
         // another item is already there. Normal scattered-drop rules don't apply.
         r.ground_at_mut(r.depth).push(GroundItem {x, y, item: reward, auto_pickup_blocked: Field::Missing});
+        if crate::remains_rules::current(r) {
+            crate::corpse_placement::vacate_for_item(r,r.depth,x,y,false,None).map_err(EngineError)?;
+        }
         r.floor_mut().unwrap().dirty = true;
     } else {
         r.inventory.push(reward);
@@ -150,6 +153,7 @@ fn complete_offering(r: &mut Run, x: f64, y: f64, on_altar: bool) {
     engine::log(r,"The offered heart transforms into a Shard of the Borge.","player");
     crate::events::actor_event(r,&r.player,"pulse","Shard of the Borge",Some(crate::events::EventPoint{x,y}),None);
     if !on_altar { crate::events::inventory(r,"E74","diamond",Some(reward_id)); }
+    Ok(())
 }
 pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
     if !interaction_at(r,x,y) || (x-r.player.x).abs().max((y-r.player.y).abs())>1. {return Ok(false);}
@@ -181,7 +185,7 @@ pub fn interact(r: &mut Run,x:f64,y:f64) -> Result<bool,EngineError> {
         engine::log(r,"The altar accepts only the exact heart marked by the Borge.","environment");return Ok(false);
     };
     crate::inventory::take_one(r,index);
-    complete_offering(r, x, y, false);
+    complete_offering(r, x, y, false)?;
     Ok(true)
 }
 /// Ordinary adjacent melee geometry, but no accuracy roll or creature immunity.

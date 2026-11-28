@@ -226,6 +226,7 @@ pub mod animation_amulets;
 pub mod firebolt_travel;
 pub mod amulet_rules;
 pub mod potion_rules;
+pub mod remains_rules;
 pub mod ring_rules;
 pub mod gas_rules;
 pub mod commandment_rules;

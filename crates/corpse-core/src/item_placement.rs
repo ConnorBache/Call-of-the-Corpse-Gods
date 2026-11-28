@@ -12,11 +12,15 @@ pub fn ground_destination(
     x: f64,
     y: f64,
 ) -> Option<(bool, f64, f64)> {
-    let w = f.width();
-    let occupied: HashSet<_> = existing
-        .iter()
-        .map(|e| (e.y * w as f64 + e.x).to_bits())
-        .collect();
+    let occupied = existing.iter().map(|e| cell_key(f,e.x,e.y)).collect();
+    nearest_free_ground(f,&occupied,x,y)
+}
+pub(crate) fn cell_key(f:&Floor,x:f64,y:f64)->u64 {
+    (y*f.width() as f64+x).to_bits()
+}
+/// Stable row-major tie breaking over the same terrain allowed for ordinary items.
+pub(crate) fn nearest_free_ground(f:&Floor,occupied:&HashSet<u64>,x:f64,y:f64)->Option<(bool,f64,f64)> {
+    let w=f.width();
     let integer = x.fract() == 0.0 && y.fract() == 0.0;
     if integer && x >= 0.0 && y >= 0.0 && x < w as f64 && y < f.height() as f64 {
         let at = y as usize * w + x as usize;
@@ -54,10 +58,25 @@ fn metric(r: &mut Run, key: &str, n: f64) {
 /// O(sum(V+I)) over at most40 visited floors, plus explicit generation callback cost.
 pub fn place_ground_item(
     r: &mut Run,
-    mut depth: f64,
+    depth: f64,
     entry: GroundItem,
     ensure: impl Fn(&mut Run, f64) -> Result<(), String>,
 ) -> Result<PlacementResult, String> {
+    place(r,depth,entry,true,ensure)
+}
+/// The heart claims the usual item destination before any bodies are placed.
+pub(crate) fn place_death_heart(r:&mut Run,depth:f64,entry:GroundItem,dying:f64)->Result<PlacementResult,String>{
+    let dream=crate::dreamwalking::dream_item(r,&entry.item);
+    let result=place(r,depth,entry,false,|r,d|crate::startup::ensure_floors(r,d as u32))?;
+    if let PlacementResult::Placed{depth,x,y}=result {
+        crate::corpse_placement::vacate_for_item(r,depth,x,y,dream,Some(dying))?;
+    }
+    Ok(result)
+}
+fn place(
+    r:&mut Run, mut depth:f64, entry:GroundItem, blocks_corpses:bool,
+    ensure:impl Fn(&mut Run,f64)->Result<(),String>,
+)->Result<PlacementResult,String>{
     if !depth.is_finite()
         || depth.fract() != 0.0
         || depth < 1.0
@@ -87,21 +106,28 @@ pub fn place_ground_item(
         if direct && crate::finale::collapsed(r, depth, y as usize*w+x as usize) { break; }
         let key = depth.to_string();
         let dream_shards_only = crate::phantasmii_blessing_rules::dream_shards_only(r);
-        let ground = r
-            .ground
-            .entry(key.clone())
-            .or_insert_with(|| Arc::new(vec![]));
-        let count = ground.len();
-        let cells = f.tiles.len();
-        let destination = if direct {
-            Some((true, x, y))
-        } else {
-            // Dream-owned Shards cannot occupy a waking item's placement cell.
-            if ground.iter().any(|g| crate::dreamwalking::protected_ground(&g.item, dream_shards_only)) {
-                let waking: Vec<_> = ground.iter().filter(|g| !crate::dreamwalking::protected_ground(&g.item, dream_shards_only)).cloned().collect();
-                ground_destination(f, &waking, x, y)
-            } else { ground_destination(f, ground, x, y) }
-        };
+        let ground=r.ground.get(&key).map_or(&[][..],|v|v.as_slice());
+        let count=ground.len();
+        let cells=f.tiles.len();
+        let destination=if direct {
+            Some((true,x,y))
+        } else if crate::remains_rules::current(r) {
+            let dream=crate::dreamwalking::dream_item(r,&entry.item);
+            let mut occupied:HashSet<_>=ground.iter()
+                .filter(|g|crate::dreamwalking::dream_item(r,&g.item)==dream)
+                .map(|g|cell_key(f,g.x,g.y)).collect();
+            if blocks_corpses {
+                occupied.extend(r.actors_at(depth).iter()
+                    .filter(|a|a.dead.value_or(false)&&crate::dreamwalking::dream_actor(r,a)==dream)
+                    .map(|a|cell_key(f,a.x,a.y)));
+            }
+            nearest_free_ground(f,&occupied,x,y)
+        } else if ground.iter().any(|g| crate::dreamwalking::protected_ground(&g.item, dream_shards_only)) {
+            let waking:Vec<_>=ground.iter().filter(|g| !crate::dreamwalking::protected_ground(&g.item, dream_shards_only)).cloned().collect();
+            ground_destination(f,&waking,x,y)
+        } else { ground_destination(f,ground,x,y) };
+        // Preserve the historical empty ground entry even when an item falls.
+        r.ground.entry(key.clone()).or_insert_with(||Arc::new(vec![]));
         if !direct {
             metric(r, "itemPlacementCells", cells as f64);
             metric(r, "itemPlacementOccupancyEntries", count as f64)

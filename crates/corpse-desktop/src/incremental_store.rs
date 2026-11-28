@@ -211,6 +211,9 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
     let had_minotaur_straight = corpse_core::minotaur_straight::current(&engine.run);
     corpse_core::minotaur_straight::admit(&mut engine.run)?;
     let minotaur_straight_migrated = !had_minotaur_straight && corpse_core::minotaur_straight::current(&engine.run);
+    let had_remains_rules=corpse_core::remains_rules::current(&engine.run);
+    corpse_core::remains_rules::admit(&mut engine.run)?;
+    let remains_rules_migrated=!had_remains_rules && corpse_core::remains_rules::current(&engine.run);
     let had_potion_retirements = corpse_core::potion_rules::retirements_current(&engine.run);
     corpse_core::potion_rules::admit_retirements(&mut engine.run)?;
     let potion_retirements_migrated = !had_potion_retirements && corpse_core::potion_rules::retirements_current(&engine.run);
@@ -221,7 +224,7 @@ pub(super) fn decode_with_migration(raw:&[u8])->Result<(corpse_core::temporal::E
     let had_shard_discount = corpse_core::phantasmii_blessing_rules::uses_three_blessing_discount(&engine.run);
     corpse_core::phantasmii_blessing_rules::admit_discount(&mut engine.run)?;
     let shard_discount_migrated = !had_shard_discount && corpse_core::phantasmii_blessing_rules::uses_three_blessing_discount(&engine.run);
-    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || riptide_migrated || star_power_migrated || dream_shards_migrated || stone_seal_migrated || attack_sight_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated || mercuria_amulet_migrated || potion_retirements_migrated || phantasmii_blessings_migrated || shard_discount_migrated))
+    Ok((engine,kind,firebolt_migrated || amulet_migrated || potion_migrated || ring_migrated || gas_migrated || future_migrated || commandment_migrated || screamer_migrated || ember_migrated || ragelight_migrated || steam_migrated || execute_migrated || beckoning_migrated || riptide_migrated || star_power_migrated || dream_shards_migrated || stone_seal_migrated || attack_sight_migrated || ichor_fire_migrated || balance_migrated || collapse_migrated || blood_mist_fire_migrated || half_here_energy_migrated || screamer_range_migrated || borge_throw_migrated || banshee_shriek_migrated || local_floor_ticks_migrated || mercuria_amulet_migrated || potion_retirements_migrated || remains_rules_migrated || phantasmii_blessings_migrated || shard_discount_migrated))
 }
 #[cfg(test)]
 #[derive(Clone,Copy)]

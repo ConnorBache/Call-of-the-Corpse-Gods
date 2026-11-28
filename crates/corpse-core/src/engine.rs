@@ -3440,21 +3440,9 @@ fn death_core_with_source(
                 None
             }
         });
-    if let Some(items) = carried {
-        for item in items {
-            crate::item_placement::place_ground_item(
-                r,
-                r.depth,
-                GroundItem {
-                    x: a.x,
-                    y: a.y,
-                    item,
-                    auto_pickup_blocked: Field::Missing,
-                },
-                |r, depth| crate::startup::ensure_floors(r, depth as u32),
-            )
-            .map_err(EngineError)?;
-        }
+    let shared=crate::remains_rules::current(r);
+    if !shared {
+        drop_carried_on_death(r,&a,carried.as_deref())?;
     }
     crate::lifecycle::ursa_death_cry(r, id, point(&a));
     if a.name == "Mini-Me" {
@@ -3467,7 +3455,12 @@ fn death_core_with_source(
         crate::borge::mark_heart(r, &a, &mut item);
         let heart_id = item.id;
         r.next_id += 1.0;
-        place_item(r, a.x, a.y, item)?;
+        if shared {
+            crate::item_placement::place_death_heart(r,r.depth,GroundItem{x:a.x,y:a.y,item,..Default::default()},id)
+                .map_err(EngineError)?;
+        } else {
+            place_item(r, a.x, a.y, item)?;
+        }
         let track_heart = r.simulation_revision.value_or(29.) >= 52.
             && !a.born_from_birther.value_or(false);
         let corpse = actor_mut_trusted(r, id).unwrap();
@@ -3501,6 +3494,7 @@ fn death_core_with_source(
         })
         .map_err(EngineError)?;
     }
+    if shared {drop_carried_on_death(r,&a,carried.as_deref())?;}
     r.floor_mut().unwrap().dirty = true;
     Ok(())
 }
@@ -3529,6 +3523,25 @@ pub fn ground_destination(
         }
     }
     best.ok_or_else(|| EngineError("full-floor placement overflow".into()))
+}
+fn drop_carried_on_death(r:&mut Run,a:&Actor,carried:Option<&[Item]>)->Result<(),EngineError> {
+    if let Some(items) = carried {
+        for item in items {
+            crate::item_placement::place_ground_item(
+                r,
+                r.depth,
+                GroundItem {
+                    x: a.x,
+                    y: a.y,
+                    item:item.clone(),
+                    auto_pickup_blocked: Field::Missing,
+                },
+                |r, depth| crate::startup::ensure_floors(r, depth as u32),
+            )
+            .map_err(EngineError)?;
+        }
+    }
+    Ok(())
 }
 pub fn place_item(r: &mut Run, x: f64, y: f64, item: Item) -> Result<(), EngineError> {
     crate::item_placement::place_ground_item(

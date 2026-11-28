@@ -153,6 +153,7 @@ impl Snapshot {
         restored.amulet_rules_from = run.amulet_rules_from.clone();
         restored.potion_rules_from = run.potion_rules_from.clone();
         restored.potion_retirements_from = run.potion_retirements_from.clone();
+        restored.remains_rules_from = run.remains_rules_from.clone();
         restored.ring_rules_from = run.ring_rules_from.clone();
         restored.gas_rules_from = run.gas_rules_from.clone();
         restored.commandment_rules_from = run.commandment_rules_from.clone();
@@ -190,6 +191,7 @@ impl Snapshot {
         restored.future_floor = run.future_floor.clone();
         crate::revision52_reserves::normalize_run(&mut restored).map_err(StorageError)?;
         crate::revision50::settle_current_duels(&mut restored);
+        crate::corpse_placement::separate_overlaps(&mut restored).map_err(StorageError)?;
         if let Some(c) = self.cursor {
             let a = run
                 .log_archive
@@ -594,6 +596,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.amulet_rules_from = Field::Missing;
     copy.potion_rules_from = Field::Missing;
     copy.potion_retirements_from = Field::Missing;
+    copy.remains_rules_from = Field::Missing;
     copy.ring_rules_from = Field::Missing;
     copy.gas_rules_from = Field::Missing;
     copy.commandment_rules_from = Field::Missing;
@@ -634,10 +637,13 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
 /// O(anchor bytes + admission); prepare all fallible new-rule work before live mutation.
 fn prepare_future41(run: &Run) -> Result<(Run,History)> {
     let raw=run.future.as_ref().ok_or_else(||StorageError("Future anchor is missing".into()))?;
-    let restored=raw.prepare_restore()?;
+    let mut restored=raw.prepare_restore()?;
     if restored.simulation_revision != run.simulation_revision {
         return Err(StorageError("Future anchor mechanics revision differs from current run".into()));
     }
+    restored.remains_rules_from=run.remains_rules_from.clone();
+    restored.dream_shards_from=run.dream_shards_from.clone();
+    crate::corpse_placement::separate_overlaps(&mut restored).map_err(StorageError)?;
     crate::timeweave::validate_run(&restored).map_err(StorageError)?;
     let mut history=History::import(&restored)?;
     history.full_snapshot=true;
@@ -652,6 +658,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.amulet_rules_from=run.amulet_rules_from.clone();
     restored.potion_rules_from=run.potion_rules_from.clone();
     restored.potion_retirements_from=run.potion_retirements_from.clone();
+    restored.remains_rules_from = run.remains_rules_from.clone();
     restored.ring_rules_from=run.ring_rules_from.clone();
     restored.gas_rules_from=run.gas_rules_from.clone();
     restored.commandment_rules_from=run.commandment_rules_from.clone();
@@ -707,6 +714,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.amulet_rules_from = run.amulet_rules_from.clone();
         restored.potion_rules_from = run.potion_rules_from.clone();
         restored.potion_retirements_from = run.potion_retirements_from.clone();
+        restored.remains_rules_from = run.remains_rules_from.clone();
         restored.ring_rules_from = run.ring_rules_from.clone();
         restored.gas_rules_from = run.gas_rules_from.clone();
         restored.commandment_rules_from = run.commandment_rules_from.clone();
@@ -744,6 +752,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
         restored.future_floor = run.future_floor.clone();
     restored.run_id = run.run_id.clone();
     restored.future = None;
+    crate::corpse_placement::separate_overlaps(&mut restored).map_err(StorageError)?;
     let policy = history.full_snapshot;
     *history = History::import(&restored)?;
     history.full_snapshot = policy;
@@ -1185,6 +1194,7 @@ impl Engine {
         crate::mercuria_rules::admit(&mut run).map_err(StorageError)?;
         crate::potion_rules::admit_retirements(&mut run).map_err(StorageError)?;
         crate::phantasmii_blessing_rules::admit(&mut run).map_err(StorageError)?;
+        crate::remains_rules::admit(&mut run).map_err(StorageError)?;
         Self::new_for_replay(run)
     }
 

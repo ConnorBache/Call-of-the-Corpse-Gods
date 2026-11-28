@@ -52,7 +52,7 @@ pub(crate) fn has_activity(r: &Run, f: &Floor) -> bool {
 /// Once per normal environment tick, in stable ID order. O(A+C log C+C*(B+
 /// R*(A+L)+d)) plus root sever/COW costs; O(C) snapshots, C dead actors.
 /// Snapshot corpse occupancy forbids swaps/following and one reservation owns
-/// each destination. Items and living bodies have separate physical layers.
+/// each destination. Under the current rules, waking items also reserve their cells.
 pub(crate) fn drift(r: &mut Run) {
     if r.simulation_revision.value_or(29.) < 52. || crate::dreamwalking::context_dream(r) {
         return;
@@ -64,7 +64,12 @@ pub(crate) fn drift(r: &mut Run) {
         .filter(|a| a.dead.value_or(false) && !crate::dreamwalking::dream_actor(r, a))
         .map(|a| (a.id, cell(f, a))).collect();
     corpses.sort_by(|a, b| a.0.total_cmp(&b.0));
-    let occupied: HashSet<_> = corpses.iter().map(|&(_, at)| at).collect();
+    let mut occupied: HashSet<_> = corpses.iter().map(|&(_, at)| at).collect();
+    if crate::remains_rules::current(r) {
+        occupied.extend(r.ground.get(&r.depth.to_string()).into_iter().flat_map(|g|g.iter())
+            .filter(|g|!crate::dreamwalking::dream_item(r,&g.item))
+            .map(|g|g.y as usize*w+g.x as usize));
+    }
     let mut reserved = HashSet::new();
     for (id, from) in corpses {
         let f = r.floor().unwrap();
