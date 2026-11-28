@@ -38,7 +38,7 @@ fn compact_dialogs_render_repeatably_and_restore_background_after_dismissal() {
         p.pixels.copy_from_slice(&base);
         match name {
             "creatures"=>p.creatures(&view,None,0),
-            "ability"=>p.ability_detail(&ability,usize::MAX),
+            "ability"=>p.ability_detail(&ability,usize::MAX, crate::modal_ui::DetailAnchor::Ability),
             "hazard"=>p.hazard_prompt("Walk amid razorleaves? Ending your turn there costs 2% of your maximum health (rounded up)."),
             "inspection"=>{let report=crate::inspection_ui::observe_tile(&engine.run,engine.run.player.x as usize,engine.run.player.y as usize);p.docked_sheet(crate::modal_ui::inspection_bounds(&p.profile),|p|crate::inspection_ui::paint(&report,p,0));},
             "pack"=>{let mut pack=crate::pack::PackView::observe(&engine.run);pack.configure(&p,p.frame().map.tuple());let (x,y,w,h)=pack.bounds();let map=crate::modal_ui::map_menu_area(p.frame().map);assert_eq!((x+w,y+h),(map.0+map.2,map.1+map.3));assert!(x>=map.0&&y>=map.1);pack.paint(&mut p);},

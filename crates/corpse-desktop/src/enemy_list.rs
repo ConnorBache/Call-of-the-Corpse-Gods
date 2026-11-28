@@ -159,6 +159,14 @@ impl Content {
         let offset=self.offset(offset);let step=(delta.unsigned_abs() as usize).saturating_mul(48);
         self.offset(if delta<0 {offset.saturating_add(step)}else{offset.saturating_sub(step)})
     }
+    pub fn visible_row(&self,index:usize,offset:usize)->Option<Rect> {
+        let card=self.cards.get(index)?;
+        let area=self.layout.rows;
+        let y=area.1+card.top-self.offset(offset) as i32;
+        let top=y.max(area.1);
+        let bottom=(y+card.height).min(area.1+area.3);
+        (top<bottom).then_some(Rect(area.0,top,area.2,bottom-top))
+    }
     pub fn hit(&self,x:i32,y:i32,offset:usize)->Option<usize> {
         if self.layout.rows.2<24 || !self.layout.rows.contains(x,y) {return None;}
         let at=y-self.layout.rows.1+self.offset(offset) as i32;

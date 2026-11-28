@@ -536,30 +536,51 @@ impl Painter {
     pub fn gameplay_canvas(&self)->bool {self.responsive_canvas}
     /// O(1), shared dock transform for drawing, pointer input and damage.
     /// Keep authored dialog sizes unless the current map cannot contain them.
-    fn dock_transform(&self,b:crate::modal_ui::Rect)->(f64,(i32,i32)) {
-        let a=crate::modal_ui::map_menu_area(self.frame().map);
-        let scale=self.sheet_transform().0.min(a.2 as f64*self.scale/b.2.max(1) as f64)
-            .min(a.3 as f64*self.scale/b.3.max(1) as f64);
-        let origin=(self.native_x((a.0+a.2)as f64)-((b.0+b.2)as f64*scale).round() as i32,
-            self.native_y((a.1+a.3)as f64)-((b.1+b.3)as f64*scale).round() as i32);
-        (scale,origin)
+    fn detail_transform(&self,b:crate::modal_ui::Rect,anchor:crate::modal_ui::DetailAnchor)->(f64,(i32,i32)) {
+        let (w,h)=anchor.capacity(self);
+        let preferred=if anchor==crate::modal_ui::DetailAnchor::Dock {self.sheet_transform().0}else{self.scale*DIALOG_SCALE};
+        let scale=preferred.min(w as f64*self.scale/b.2.max(1) as f64)
+            .min(h as f64*self.scale/b.3.max(1) as f64);
+        let r=anchor.place(self,(b.2 as f64*scale/self.scale).round() as i32,
+            (b.3 as f64*scale/self.scale).round() as i32);
+        use crate::modal_ui::DetailAnchor;
+        let (right,bottom)=match anchor {
+            DetailAnchor::Dock=>(true,true),
+            DetailAnchor::Ability=>(true,false),
+            DetailAnchor::Item(row)|DetailAnchor::Roster(row)=>(true,r.1<row.1),
+            DetailAnchor::MapTile(row)=>(r.0!=row.0+row.2,r.1<row.1),
+        };
+        let ox=self.native_x((r.0+if right {r.2}else{0}) as f64)
+            -((b.0+if right {b.2}else{0}) as f64*scale).round() as i32;
+        let oy=self.native_y((r.1+if bottom {r.3}else{0}) as f64)
+            -((b.1+if bottom {b.3}else{0}) as f64*scale).round() as i32;
+        (scale,(ox,oy))
     }
     pub fn docked_sheet<T>(&mut self,b:crate::modal_ui::Rect,paint:impl FnOnce(&mut Self)->T)->T {
+        self.anchored_sheet(b,crate::modal_ui::DetailAnchor::Dock,paint)
+    }
+    pub fn anchored_sheet<T>(&mut self,b:crate::modal_ui::Rect,anchor:crate::modal_ui::DetailAnchor,paint:impl FnOnce(&mut Self)->T)->T {
         let prior=(self.scale,self.origin,self.responsive_canvas);
-        (self.scale,self.origin)=self.dock_transform(b);self.responsive_canvas=false;
+        (self.scale,self.origin)=self.detail_transform(b,anchor);self.responsive_canvas=false;
         let result=paint(self);
         (self.scale,self.origin,self.responsive_canvas)=prior;
         result
     }
     pub fn logical_point_for_dock(&self,b:crate::modal_ui::Rect,x:i32,y:i32,window:(u32,u32))->(i32,i32) {
-        let (scale,(ox,oy))=self.dock_transform(b);
+        self.logical_point_for_detail(b,crate::modal_ui::DetailAnchor::Dock,x,y,window)
+    }
+    pub fn logical_point_for_detail(&self,b:crate::modal_ui::Rect,anchor:crate::modal_ui::DetailAnchor,x:i32,y:i32,window:(u32,u32))->(i32,i32) {
+        let (scale,(ox,oy))=self.detail_transform(b,anchor);
         let px=x as f64*self.width as f64/window.0.max(1) as f64;
         let py=y as f64*self.height as f64/window.1.max(1) as f64;
         (((px-ox as f64)/scale).floor()as i32,((py-oy as f64)/scale).floor()as i32)
     }
-    pub fn dock_damage_rect(&self,b:crate::modal_ui::Rect)->Option<damage::Rect> {
-        let (scale,origin)=self.dock_transform(b);
+    pub fn detail_damage_rect(&self,b:crate::modal_ui::Rect,anchor:crate::modal_ui::DetailAnchor)->Option<damage::Rect> {
+        let (scale,origin)=self.detail_transform(b,anchor);
         self.transformed_damage_rect(b.tuple(),scale,origin)
+    }
+    pub fn dock_damage_rect(&self,b:crate::modal_ui::Rect)->Option<damage::Rect> {
+        self.detail_damage_rect(b,crate::modal_ui::DetailAnchor::Dock)
     }
     pub fn logical_point_for_sheet(&self,x:i32,y:i32,window:(u32,u32))->(i32,i32) {
         let(scale,origin)=self.sheet_transform();let px=x as f64*self.width as f64/window.0.max(1)as f64;let py=y as f64*self.height as f64/window.1.max(1)as f64;
@@ -2176,11 +2197,11 @@ impl Painter {
         self.clip=clip;
         self.text("[Y] Yes    [N] No", 334, 468, 18, GOLD);
     }
-    pub fn ability_detail(&mut self, a: &crate::ability_ui::AbilityView, offset: usize) {
-        ability_dialog::paint(self, a, offset);
+    pub fn ability_detail(&mut self, a: &crate::ability_ui::AbilityView, offset: usize, anchor: crate::modal_ui::DetailAnchor) {
+        ability_dialog::paint(self, a, offset, anchor);
     }
-    pub fn ability_detail_damage(&self, a: &crate::ability_ui::AbilityView) -> Option<damage::Rect> {
-        ability_dialog::bounds(self, a)
+    pub fn ability_detail_damage(&self, a: &crate::ability_ui::AbilityView, anchor: crate::modal_ui::DetailAnchor) -> Option<damage::Rect> {
+        ability_dialog::bounds(self, a, anchor)
     }
     pub fn inspection_notice_y(&self) -> i32 {
         {let r=self.hud_tracks().inspector; r.1+(r.3-13)/2}

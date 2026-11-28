@@ -16,7 +16,7 @@ impl Rect {
         (self.0, self.1, self.2, self.3)
     }
 }
-/// All in-run menus dock to the same inset corner of the dungeon map.
+/// Full in-run menus dock to the same inset corner of the dungeon map.
 pub fn map_menu_area(map:Rect)->Rect {
     let margin=12.min(map.2/4).min(map.3/4).max(0);
     Rect(map.0+margin,map.1+margin,(map.2-2*margin).max(1),(map.3-2*margin).max(1))
@@ -150,11 +150,61 @@ pub fn hover_bounds_painter(p:&Painter,height:i32)->Rect{
     let h=height.clamp(0,620.min((bottom-2*margin).max(0)));
     Rect((vw-margin-w).max(0),(bottom-margin-h).max(0),w,h)
 }
-pub fn pinned_hover_bounds(p:&Painter,height:i32)->Rect {
-    let area=map_menu_area(p.frame().map);
-    let width=(p.profile.number("ui.layout.tooltipMaxWidth").round() as i32).clamp(1,area.2);
-    let h=height.clamp(0,620.min(area.3));
-    Rect(area.0+area.2-width,area.1+area.3-h,width,h)
+/// Placement of a right-click detail. The source row stays uncovered;
+/// tall cards that would run off-screen flip to the source's bottom edge.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum DetailAnchor {
+    #[default]
+    Dock,
+    Ability,
+    Item(Rect),
+    Roster(Rect),
+    MapTile(Rect),
+}
+impl DetailAnchor {
+    fn limits(self,p:&Painter)->(i32,i32,i32,i32,i32,bool) {
+        let map=p.frame().map;
+        let tracks=p.hud_tracks();
+        let top=tracks.divine.1;
+        let bottom=p.logical_height();
+        let map_right=map.0+map.2;
+        // A map creature opens alongside its actual tile. Choose the side
+        // with enough room without leaving the map's horizontal span.
+        let (edge,row,right_side)=match self {
+            Self::Ability=>(tracks.divine.0,Rect(0,top,0,bottom-top),false),
+            Self::Item(row)=>(tracks.items.0,row,false),
+            Self::Roster(row)=>(map_right,row,false),
+            Self::MapTile(row)=>{
+                let left=row.0-map.0;
+                let right=map_right-row.0-row.2;
+                if left>=right {(row.0,row,false)}else{(row.0+row.2,row,true)}
+            },
+            Self::Dock=>unreachable!("dock geometry is separate"),
+        };
+        let width=if right_side {map_right-edge}else{edge-map.0};
+        (edge,width.max(1),row.1.clamp(top,bottom),(row.1+row.3).clamp(top,bottom),top,right_side)
+    }
+    pub fn capacity(self,p:&Painter)->(i32,i32) {
+        if self==Self::Dock {
+            let area=map_menu_area(p.frame().map);
+            return (area.2,area.3);
+        }
+        let (_,width,_,_,top,_)=self.limits(p);
+        (width,(p.logical_height()-top).max(1))
+    }
+    pub fn place(self,p:&Painter,width:i32,height:i32)->Rect {
+        if self==Self::Dock {return dock_menu(map_menu_area(p.frame().map),width,height);}
+        let (edge,max_width,row_top,row_bottom,top,right_side)=self.limits(p);
+        let bottom=p.logical_height();
+        let w=width.clamp(1,max_width);
+        let h=height.clamp(1,(bottom-top).max(1));
+        let y=if row_top+h<=bottom {row_top}else{(row_bottom-h).clamp(top,bottom-h)};
+        Rect(if right_side {edge}else{edge-w},y,w,h)
+    }
+    pub fn enemy_bounds(self,p:&Painter,height:i32)->Rect {
+        let width=p.profile.number("ui.layout.tooltipMaxWidth").round() as i32;
+        self.place(p,width,height.clamp(1,620))
+    }
 }
 pub fn hover_placement(
     tile: (i32, i32, i32, i32),
@@ -369,5 +419,37 @@ mod tests {
         });
         assert_eq!(rows, ["wide", "words", "01234", "56789", "01234", ""]);
         assert!(wrap_measured("x", 1, |_| 100.)[0] == "x");
+    }
+}
+
+#[cfg(test)]
+mod anchored_details_tests {
+    use super::*;
+
+    #[test]
+    fn context_anchors_use_adjacent_columns_and_flip_at_the_selected_row_bottom() {
+        let mut p=Painter::new();
+        for (w,h) in [(1280,720),(1920,1080),(1537,911),(960,1200)] {
+            p.resize(w,h);
+            p.set_responsive_canvas(true);
+            let map=p.frame().map;
+            let t=p.hud_tracks();
+            let screen=p.logical_height();
+            let early=Rect(map.2+8,t.divine.1+20,100,38);
+            let late=Rect(map.2+8,screen-40,100,22);
+            let a=DetailAnchor::Ability.place(&p,240,150);
+            assert_eq!((a.0+a.2,a.1),(t.divine.0,t.divine.1));
+            assert!(a.0<map.2);
+            let b=DetailAnchor::Roster(early).place(&p,320,230);
+            assert_eq!((b.0+b.2,b.1),(map.2,early.1));
+            let c=DetailAnchor::Roster(late).place(&p,320,230);
+            assert_eq!((c.0+c.2,c.1+c.3),(map.2,late.1+late.3));
+            let d=DetailAnchor::Item(late).place(&p,400,230);
+            assert_eq!((d.0+d.2,d.1+d.3),(t.items.0,late.1+late.3));
+            let tile=Rect(map.2/5,map.1+70,12,18);
+            let e=DetailAnchor::MapTile(tile).place(&p,320,210);
+            assert_eq!((e.0,e.1),(tile.0+tile.2,tile.1));
+            assert!(e.0+e.2<=map.2);
+        }
     }
 }

@@ -1788,17 +1788,18 @@ fn hover_bounds(
 }
 /// Paint the passive, bottom-right gameplay card. It creates no input region.
 pub fn paint_hover(report: &Report, p: &mut Painter) {
-    paint_hover_card(report,p,false)
+    paint_hover_card(report,p,None)
 }
-pub fn paint_pinned_hover(report: &Report, p: &mut Painter) {
-    paint_hover_card(report,p,true)
+pub fn paint_pinned_hover(report: &Report, p: &mut Painter, anchor:modal_ui::DetailAnchor) {
+    paint_hover_card(report,p,Some(anchor))
 }
-fn paint_hover_card(report: &Report, p: &mut Painter, pinned:bool) {
+fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::DetailAnchor>) {
     let Some(c) = report.creature.as_ref().filter(|c| c.hover_available) else {
         paint_item_hover(report,p);
         return;
     };
-    let place=if pinned{modal_ui::pinned_hover_bounds}else{modal_ui::hover_bounds_painter};
+    let pinned=anchor.is_some();
+    let place=|p:&Painter,height|anchor.map_or_else(||modal_ui::hover_bounds_painter(p,height),|a|a.enemy_bounds(p,height));
     let hover_width = place(p, 0).2;
     if hover_width <= 30 { return; }
     let line_height = role_line(p, Role::Tooltips, 15, 21);

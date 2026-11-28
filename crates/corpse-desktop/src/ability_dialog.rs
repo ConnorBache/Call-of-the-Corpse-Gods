@@ -1,6 +1,6 @@
 //! Content-sized, observation-only ability details beside the divine-ability rail.
 use super::{damage, Painter, Rgb, DIALOG_SCALE, INK, MUTED};
-use crate::{modal_ui::{Rect,map_menu_area},ability_ui::AbilityView, typography_ui::{self, Role, RoleStyle}};
+use crate::{modal_ui::{Rect,DetailAnchor},ability_ui::AbilityView, typography_ui::{self, Role, RoleStyle}};
 
 const PAD: i32 = 18;
 const FOOTER: i32 = 22;
@@ -19,9 +19,9 @@ impl Layout {
             (coverage, 13, MUTED, 8)];
         let natural = sections.iter().map(|(s,size,_,_)|
             p.measure_text_role(Role::Tooltips, s, *size).ceil() as i32).max().unwrap_or(1);
-        let map=map_menu_area(p.frame().map);
-        let available_width = (map.2 as f64 / DIALOG_SCALE).floor() as i32;
-        let inner = natural.max(1).min(480).min((available_width - 2 * PAD).max(1));
+        let (width,height)=DetailAnchor::Ability.capacity(p);
+        let available_width = (width as f64 / DIALOG_SCALE).floor() as i32;
+        let inner = natural.clamp(190,480).min((available_width - 2 * PAD).max(1));
         let mut lines = vec![];
         for (text, size, color, gap) in sections {
             if text.trim().is_empty() { continue; }
@@ -32,7 +32,7 @@ impl Layout {
             }
         }
         let natural_height = lines.iter().map(|line| line.height + line.gap).sum::<i32>();
-        let max_height = (map.3 as f64 / DIALOG_SCALE).floor() as i32;
+        let max_height = (height as f64 / DIALOG_SCALE).floor() as i32;
         let height = (natural_height + 2 * PAD + FOOTER).min(max_height);
         let body_height = (height - 2 * PAD - FOOTER).max(1);
         let scrolling = natural_height > body_height;
@@ -49,13 +49,13 @@ impl Layout {
         offset.min(last_page)
     }
 }
-pub(super) fn bounds(p: &Painter, a: &AbilityView) -> Option<damage::Rect> {
+pub(super) fn bounds(p: &Painter, a: &AbilityView, anchor: DetailAnchor) -> Option<damage::Rect> {
     let layout = Layout::resolve(p,a);
-    p.dock_damage_rect(Rect(0,0,layout.width,layout.height))
+    p.detail_damage_rect(Rect(0,0,layout.width,layout.height),anchor)
 }
-pub(super) fn paint(p: &mut Painter, a: &AbilityView, offset: usize) {
+pub(super) fn paint(p: &mut Painter, a: &AbilityView, offset: usize, anchor: DetailAnchor) {
     let layout = Layout::resolve(p, a);
-    p.docked_sheet(Rect(0,0,layout.width,layout.height),|p| {
+    p.anchored_sheet(Rect(0,0,layout.width,layout.height),anchor,|p| {
     let prior_clip=p.clip;
     p.rect(0, 0, layout.width, layout.height, [11, 13, 21]);
     p.border(0, 0, layout.width, layout.height, [53, 55, 68]);

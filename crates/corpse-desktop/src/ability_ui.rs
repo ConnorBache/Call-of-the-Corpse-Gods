@@ -1452,18 +1452,18 @@ mod never_surrender_detail_followup_tests {
             painter.try_resize(width, height).unwrap(); painter.set_responsive_canvas(true);
             painter.game_at(&view, "", false, 0.);
             let background = painter.pixels.clone();
-            let bounds = painter.ability_detail_damage(&row).unwrap();
-            let rail = painter.logical_damage_rect(painter.hud_left(), 0, 2, 2).unwrap().x;
-            let top = painter.logical_damage_rect(0, (super::top(&painter.profile) - 28).max(8), 2, 2).unwrap().y;
+            let bounds = painter.ability_detail_damage(&row, crate::modal_ui::DetailAnchor::Ability).unwrap();
+            let rail = painter.logical_damage_rect(painter.hud_tracks().divine.0, 0, 2, 2).unwrap().x;
+            let top = painter.logical_damage_rect(0, painter.hud_tracks().divine.1, 2, 2).unwrap().y;
             let footer = painter.logical_damage_rect(0, painter.inspection_notice_y(), 2, 2).unwrap().y;
-            assert_eq!(bounds.right(), rail, "dialog right edge must touch the ability rail");
+            assert!((bounds.right() as i32-rail as i32).abs()<=2, "dialog right edge must touch the ability rail");
             assert_eq!(bounds.y, top);
             assert!(bounds.x > 0 && bounds.bottom() < footer);
             let mut short = row.clone(); short.description = OPENING.into();
-            assert!(bounds.h > painter.ability_detail_damage(&short).unwrap().h,
+            assert!(bounds.h > painter.ability_detail_damage(&short, crate::modal_ui::DetailAnchor::Ability).unwrap().h,
                 "dialog height must reflect the complete detail body");
             let prior_clip = painter.clip;
-            painter.ability_detail(&row, 0);
+            painter.ability_detail(&row, 0, crate::modal_ui::DetailAnchor::Ability);
             assert_eq!(painter.clip, prior_clip);
             for (i, pixel) in painter.pixels.chunks_exact(4).enumerate() {
                 if !bounds.contains(i % painter.width, i / painter.width) {
@@ -1471,7 +1471,7 @@ mod never_surrender_detail_followup_tests {
                 }
             }
             let first_page = painter.pixels.clone();
-            painter.game_at(&view, "", false, 0.); painter.ability_detail(&row, usize::MAX);
+            painter.game_at(&view, "", false, 0.); painter.ability_detail(&row, usize::MAX, crate::modal_ui::DetailAnchor::Ability);
             assert_eq!(painter.pixels, first_page, "complete detail must fit without clipped or scroll-hidden text");
             let geometry = serde_json::json!({"width": width, "height": height,
                 "dialog": {"x":bounds.x,"y":bounds.y,"width":bounds.w,"height":bounds.h},

@@ -1,6 +1,6 @@
 //! Read-only contextual projections for HUD right-click, with carried-item
 //! actions admitted through the same command and targeting paths as Pack.
-use crate::{inspection_ui, modal_ui::Rect, pack, render::{Painter,View,INK,GOLD}, typography_ui::Role};
+use crate::{inspection_ui, modal_ui::{DetailAnchor,Rect}, pack, render::{Painter,View,INK,GOLD}, typography_ui::Role};
 use corpse_core::{Command, Run};
 
 pub const SHEET: Rect=Rect(370, 228, 540, 344);
@@ -43,16 +43,24 @@ impl Detail {
     pub fn scroll(&mut self,delta:i32) {
         if let Self::Text{scroll,..}=self { *scroll=if delta<0{scroll.saturating_sub(delta.unsigned_abs() as usize)}else{scroll.saturating_add(delta as usize)}; }
     }
-    pub fn damage(&self,p:&Painter)->Option<crate::render::damage::Rect> {
+    pub fn damage(&self,p:&Painter,anchor:DetailAnchor)->Option<crate::render::damage::Rect> {
         match self {
-            Self::Enemy(_)=>{let b=crate::modal_ui::pinned_hover_bounds(p,620);p.logical_damage_rect(b.0,b.1,b.2,b.3)}
-            Self::Text{..}=>p.dock_damage_rect(SHEET),
+            Self::Enemy(_)=>{
+                // Text height determines whether the card flips above the row.
+                // Cover both possible orientations without wrapping the card twice.
+                let upper=anchor.enemy_bounds(p,620);
+                let lower=anchor.enemy_bounds(p,1);
+                let y=upper.1.min(lower.1);
+                let bottom=p.logical_height().min((upper.1+upper.3).max(lower.1+upper.3));
+                p.logical_damage_rect(upper.0,y,upper.2,bottom-y)
+            }
+            Self::Text{..}=>p.detail_damage_rect(SHEET,anchor),
         }
     }
-    pub fn paint(&self,p:&mut Painter) {
+    pub fn paint(&self,p:&mut Painter,anchor:DetailAnchor) {
         match self {
-            Self::Enemy(report)=>inspection_ui::paint_pinned_hover(report,p),
-            Self::Text{title,copy,ring,scroll}=>p.docked_sheet(SHEET,|p|{
+            Self::Enemy(report)=>inspection_ui::paint_pinned_hover(report,p,anchor),
+            Self::Text{title,copy,ring,scroll}=>p.anchored_sheet(SHEET,anchor,|p|{
                 let Rect(x,y,w,h)=SHEET;
                 p.rect(x,y,w,h,[20,17,29]);p.border(x,y,w,h,[111,88,131]);
                 p.text_role(Role::Headings,title,x+20,y+18,23,GOLD);

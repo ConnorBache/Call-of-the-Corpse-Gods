@@ -627,7 +627,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut pack_view: Option<pack::PackView> = None;
     let mut pending_item: Option<pack::PackTarget> = None;
     let mut context_detail: Option<context_detail::Detail> = None;
-    let mut ability_detail: Option<String> = None;
+    let mut ability_detail: Option<(String,modal_ui::DetailAnchor)> = None;
+    let mut context_anchor=modal_ui::DetailAnchor::Dock;
     let mut ability_detail_scroll = 0usize;
     let mut travel: Option<(travel_ui::Travel, f64)> = None;
     let mut autoexplore = travel_ui::AutoExplore::default();
@@ -804,12 +805,15 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     let (x,y)=painter.logical_point_for_canvas(*x,*y,canvas.window().size(),true);
                     cached_view.as_ref().and_then(|view|{
                         let layout=render::enemy_list::Layout::resolve_frame(&painter.profile,0,painter.frame());
-                        layout.rows.contains(x,y).then(||layout.content_view(&painter,view).hit(x,y,painter.enemy_list_offset)).flatten()
+                        if !layout.rows.contains(x,y){return None;}
+                        let content=layout.content_view(&painter,view);
+                        let index=content.hit(x,y,painter.enemy_list_offset)?;
+                        Some((index,content.visible_row(index,painter.enemy_list_offset)?))
                     })
                 }
                 _=>None,
             };
-            if context_roster_row.zip(cached_view.as_ref()).is_some_and(|(i,v)|
+            if context_roster_row.zip(cached_view.as_ref()).is_some_and(|((i,_),v)|
                 render::enemy_list::Content::ground_index(v,i).is_some_and(|idx|
                     matches!(v.ground_entities[idx].kind,render::enemy_list::GroundKind::Stair|render::enemy_list::GroundKind::Corpse))) {
                 continue;
@@ -833,13 +837,14 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             let dock=if screen!=Screen::Game || run.as_ref().is_some_and(|r|debug_loadout.active(&r.run)){None}
                 else if run.as_ref().is_some_and(|r|!r.run.offers.is_empty()){Some(render::BLESSING_DOCK)}
                 else if tile_report.is_some(){Some(modal_ui::inspection_bounds(&painter.profile))}
-                else if context_detail.is_some(){Some(context_detail::SHEET)}
                 else if inspecting{Some(render::CREATURES_DOCK)}
                 else{None};
-            let to_sheet=|x,y|match dock{
+            let to_sheet=|x,y|if context_detail.is_some() && dock.is_none() {
+                painter.logical_point_for_detail(context_detail::SHEET,context_anchor,x,y,canvas.window().size())
+            }else{match dock{
                 Some(rect)=>painter.logical_point_for_dock(rect,x,y,canvas.window().size()),
                 None=>painter.logical_point_for_sheet(x,y,canvas.window().size()),
-            };
+            }};
             let sheet_pointer=match &event{
                 Event::MouseMotion{x,y,..}|Event::MouseButtonDown{x,y,..}|Event::MouseButtonUp{x,y,..}=>Some(to_sheet(*x,*y)),
                 Event::MouseWheel{mouse_x,mouse_y,..}=>Some(to_sheet(*mouse_x,*mouse_y)),_=>None};
@@ -1765,6 +1770,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     {
                         continue;
                     }
+                    context_anchor=modal_ui::DetailAnchor::Dock;
                     if inventory {
                         if let (Some(pack),Some(r))=(pack_view.as_ref(),run.as_ref()) {
                             if let Some(item)=pack.ring_id_at(x,y).and_then(|id|r.run.inventory.iter().find(|i|i.id==id)){
@@ -1775,7 +1781,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     }
                     if let (Some(view),Some(r))=(cached_view.as_ref(),run.as_ref()) {
                         let tracks=painter.hud_tracks();
-                        if let Some(index)=context_roster_row {
+                        if let Some((index,area))=context_roster_row {
+                            context_anchor=modal_ui::DetailAnchor::Roster(area);
                             if let Some(i)=render::enemy_list::Content::ground_index(view,index){
                                 let row=&view.ground_entities[i];
                                 if row.kind==render::enemy_list::GroundKind::Vent {
@@ -1803,13 +1810,15 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             }
                             continue;
                         }
-                        if let Some(i)=tracks.item_at(x,y,painter.item_rail_offset.min(view.pack_hud.items.len().saturating_sub(tracks.item_rows())),view.pack_hud.items.len()) {
+                        let item_offset=painter.item_rail_offset.min(view.pack_hud.items.len().saturating_sub(tracks.item_rows()));
+                        if let Some(i)=tracks.item_at(x,y,item_offset,view.pack_hud.items.len()) {
+                            context_anchor=modal_ui::DetailAnchor::Item(tracks.item_geometry().row(i-item_offset));
                             match view.pack_hud.items[i].source {
                                 game_hud::QuickSource::Item(id)=>if let Some(item)=r.run.inventory.iter().find(|item|item.id==id){
                                     context_detail=Some(context_detail::Detail::carried(&r.run,item,item.kind=="ring"));
                                 },
                                 game_hud::QuickSource::Dreamwalk=>{
-                                    ability_detail=Some(if corpse_core::dreamwalking::unlocked(&r.run){corpse_core::dreamwalking::DREAMWALK_ID}else{corpse_core::dreamwalking::WAKE_UP_ID}.into());
+                                    ability_detail=Some((if corpse_core::dreamwalking::unlocked(&r.run){corpse_core::dreamwalking::DREAMWALK_ID}else{corpse_core::dreamwalking::WAKE_UP_ID}.into(),context_anchor));
                                     ability_detail_scroll=0;
                                 }
                             }
@@ -1820,7 +1829,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         if let Some(r) = &run {
                             ability_detail = ability_ui::divine_abilities(&r.run)
                                 .get(ability_offset+index)
-                                .map(|a| a.id.clone());
+                                .map(|a| (a.id.clone(),modal_ui::DetailAnchor::Ability));
                             ability_detail_scroll = 0;
                             dirty = true;
                         }
@@ -1837,6 +1846,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             {
                                 if let Some(i)=cell.actor_id.filter(|_|!cell.controllable_ally).and_then(|id|view.creatures.iter().position(|a|a.id==id)) {
                                     if let Some(detail)=context_detail::Detail::enemy(&r.run,view,i) {
+                                        context_anchor=modal_ui::DetailAnchor::MapTile(modal_ui::Rect(ox+tx as i32*cw,oy+ty as i32*ch,cw,ch));
                                         context_detail=Some(detail);dirty=true;continue;
                                     }
                                 }
@@ -3066,7 +3076,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             let paint_notice=inspection_ui::footer_text(&notice, hover_report.as_ref());
                             let aim_notice = (pending_ability.is_some() && r.run.status == "playing" && !notice.is_empty())
                                 .then(|| (ability_aim_banner(&painter), notice.as_str()));
-                            let ability_detail_view=ability_detail.as_ref().map(|id|ability_ui::observe(&r.run,id));
+                            let ability_detail_view=ability_detail.as_ref().map(|(id,anchor)|(ability_ui::observe(&r.run,id),*anchor));
                             let mut planned_overlay=None;
                             let mut full_pack_state=None;
                             if tile_enabled{
@@ -3086,8 +3096,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 if inspecting{panels.extend(painter.dock_damage_rect(render::CREATURES_DOCK));}
                                 if tile_report.is_some(){panels.extend(painter.dock_damage_rect(modal_ui::inspection_bounds(&painter.profile)));}
                                 if hazard_prompt.is_some(){panels.extend(painter.dock_damage_rect(render::HAZARD_DOCK));}
-                                if let Some(detail)=&context_detail{panels.extend(detail.damage(&painter));}
-                                if let Some(ability)=&ability_detail_view{panels.extend(painter.ability_detail_damage(ability));}
+                                if let Some(detail)=&context_detail{panels.extend(detail.damage(&painter,context_anchor));}
+                                if let Some((ability,anchor))=&ability_detail_view{panels.extend(painter.ability_detail_damage(ability,*anchor));}
                                 if let Some(((x,y,w,h),_))=aim_notice {panels.extend(painter.logical_damage_rect(x,y,w,h));}
                                 if debug_loadout.active(&r.run){panels.extend(painter.sheet_damage_rect(0,51,render::WIDTH as i32,718));}
                                 let next=tile_overlay::Frame{pack:pack_state,hover:hover_state,effects:tile_overlay::effects(&painter,current_view,&effects.cues,now,action_reduced),shutter:shutter_state,
@@ -3157,11 +3167,12 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             if let Some((_, message)) = &hazard_prompt {
                                 painter.hazard_prompt(message);
                             }
-                            if let Some(detail)=&context_detail {detail.paint(&mut painter);}
-                            if let Some(ability) = &ability_detail_view {
+                            if let Some(detail)=&context_detail {detail.paint(&mut painter,context_anchor);}
+                            if let Some((ability,anchor)) = &ability_detail_view {
                                 painter.ability_detail(
                                     ability,
                                     ability_detail_scroll,
+                                    *anchor,
                                 );
                             }
                             if r.run.status == "playing"
@@ -3229,7 +3240,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         #[cfg(test)] if input_loop_tests::observe(&mut canvas,&painter,input_loop_tests::State {
             screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
             help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),
-            history:history.is_some(),context:context_detail.is_some(),
+            history:history.is_some(),context:context_detail.is_some(),ability_detail:ability_detail.is_some(),
         })? {break 'running;}
         if enter_death_results {
             results_fade = death_pause::ResultsFade::new("dead", skip_ending_motion);

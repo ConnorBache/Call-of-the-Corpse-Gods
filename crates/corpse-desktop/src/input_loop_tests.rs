@@ -16,6 +16,7 @@ pub struct State<'a> {
     pub ability: bool,
     pub history: bool,
     pub context: bool,
+    pub ability_detail: bool,
 }
 #[derive(Clone)]
 enum Input {
@@ -43,12 +44,13 @@ struct Step {
     cogworks_wall: Option<(usize, usize)>,
     history:Option<bool>,
     context:Option<bool>,
+    ability_detail:Option<bool>,
 }
 impl Step {
     fn game(label: &'static str, inputs: Vec<Input>) -> Self {
         Self { label, inputs, screen: Screen::Game, cursor: false, tile: None,
             inventory: false, help: false, resting: false, item: false, ability: false,
-            readonly: true, capture: false, cogworks_wall: None,history:None,context:None }
+            readonly: true, capture: false, cogworks_wall: None,history:None,context:None,ability_detail:None }
     }
 }
 struct Script {
@@ -168,6 +170,7 @@ pub fn observe(canvas: &mut Canvas<Window>, p: &Painter, state: State<'_>) -> Re
         check(state.ability == step.ability, "ability selector")?;
         if let Some(expected)=step.history{check(state.history==expected,"Chronicle drawer")?;}
         if let Some(expected)=step.context{check(state.context==expected,"context detail")?;}
+        if let Some(expected)=step.ability_detail{check(state.ability_detail==expected,"ability detail")?;}
         let engine = state.engine.ok_or_else(|| format!("{}: missing run", step.label))?;
         if step.label=="bow-fire"{
             let arrows=engine.run.inventory.iter().filter(|i|corpse_core::inventory::is_arrow(i))
@@ -420,4 +423,94 @@ fn capture_supply_panels() {
         let png=std::fs::read(root.join(format!("{name}.png"))).unwrap();
         assert_eq!(&png[16..24],&[0,0,15,0,0,0,8,112],"full native 3840×2160");
     }
+}
+
+#[test]
+#[ignore = "Optional native contextual-placement screenshots; use a generated showcase save and SDL offscreen"]
+fn capture_anchored_details() {
+    use crate::{modal_ui::{DetailAnchor,Rect},render::enemy_list::{Content,GroundKind,Layout}};
+    let Some(root)=std::env::var_os("CORPSE_CONTEXT_CAPTURE").map(PathBuf::from) else{return;};
+    let save=PathBuf::from(std::env::var_os("CORPSE_CONTEXT_SHOWCASE").unwrap());
+    let mut base=session_store::load_tracked(&save).unwrap().0.run.clone();
+    let depth=base.depth;
+    let view=observe::observe(&base);
+    let keep:Vec<_>=view.creatures.iter().take(3).map(|a|a.id).collect();
+    assert!(keep.len()>=2);
+    base.actors_at_mut(depth).retain(|a|keep.contains(&a.id));
+    let mut p=Painter::new();
+    p.resize(3840,2160);p.set_responsive_canvas(true);
+    let key=|k|Input::Key(k,Mod::NOMOD,false);
+    let press=|b:Rect|Input::ClickHud(b.0+b.2/2,b.1+b.3/2);
+    let right=|b:Rect|Input::RightHud(b.0+b.2/2,b.1+b.3/2);
+    let tracks=p.hud_tracks();
+    let run_case=|run:corpse_core::Run, name:&str, steps:Vec<Step>|{
+        let path=root.join(name);
+        std::fs::create_dir_all(&path).unwrap();
+        let grid=cursor_grid(&run).unwrap();
+        let e=temporal::Engine::new(run).unwrap();
+        std::fs::write(path.join("save.json"),session_store::encode(&e,session_store::Kind::Genuine).unwrap()).unwrap();
+        let mut resume=Step::game("resume",vec![Input::Resize(3840,2160),key(Keycode::C)]);resume.readonly=false;
+        let mut resize=Step::game("resize",vec![Input::Resize(3840,2160)]);resize.readonly=false;
+        run_script(path,true,None,grid,vec![resume,resize].into_iter().chain(steps).collect());
+    };
+    let layout=Layout::resolve_frame(&p.profile,0,p.frame());
+    let view=observe::observe(&base);
+    let content=layout.content_view(&p,&view);
+    let enemy=content.visible_row(Content::stair_count(&view),0).unwrap();
+    let land=view.ground_entities.iter().position(|g|g.kind==GroundKind::Item).unwrap();
+    let ground=content.visible_row(Content::row_for_ground(&view,land),0).unwrap();
+    let txt=&crate::context_detail::SHEET;
+    let y_at=|a:DetailAnchor|p.detail_damage_rect(*txt,a).unwrap().y;
+    assert_eq!(y_at(DetailAnchor::Roster(ground)),ground.1 as usize*3);
+    let mut base_steps=vec![];
+    let close=||{let mut step=Step::game("esc",vec![key(Keycode::Escape)]);step.context=Some(false);step.ability_detail=Some(false);step};
+    let show=|name,input,ability:bool|{
+        let mut step=Step::game(name,vec![input]);step.context=Some(!ability);step.ability_detail=Some(ability);step.capture=true;step
+    };
+    let (cw,ch,ox,oy)=p.map_layout(view.width,view.height);
+    let c=view.cells.iter().find(|c|c.actor_id==Some(view.creatures[0].id)).unwrap();
+    let tile=Rect(ox+c.x as i32*cw,oy+c.y as i32*ch,cw,ch);
+    let late_item=tracks.item_geometry().row(tracks.item_geometry().count-1);
+    assert!((y_at(DetailAnchor::Item(late_item)) as i32+(txt.3 as f64*3.*render::DIALOG_SCALE).round() as i32
+        -3*(late_item.1+late_item.3)).abs()<=2);
+    for (name,row,ability) in [("Ability-Top",tracks.divine_rows().row(6),true),
+        ("Monster-Top",enemy,false),("Floor-Item-Top",ground,false),
+        ("Carried-Item-Bottom",late_item,false),("Map-Monster",tile,false)]{
+        base_steps.push(show(name,right(row),ability));base_steps.push(close());
+    }
+    for (name,row) in [("Hearts",tracks.hearts),("Potions",tracks.potions)]{
+        let mut open=Step::game("open-supplies",vec![press(row)]);open.inventory=true;base_steps.push(open);
+        let mut shot=Step::game(name,vec![key(Keycode::Down)]);shot.inventory=true;shot.capture=true;base_steps.push(shot);
+        base_steps.push(close());
+    }
+    run_case(base.clone(),"standard",base_steps);
+
+    // Keep ordinary generated terrain; place additional existing creature
+    // types nearby to exercise a genuinely crowded roster in the real UI.
+    let (px,py)=(base.player.x as i32,base.player.y as i32);
+    let mut used:std::collections::HashSet<_>=base.actors_at(depth).iter().map(|a|(a.x as i32,a.y as i32)).collect();
+    let reference=base.actors_at(depth).to_vec();
+    let (w,h)=(view.width as i32,view.height as i32);
+    for dy in -4i32..=4 {for dx in -7i32..=7 {
+        let (x,y)=(px+dx,py+dy);
+        if dx.abs()+dy.abs()<2||x<0||y<0||x>=w||y>=h||used.contains(&(x,y)){continue;}
+        if base.floor().unwrap().tiles[(y*w+x)as usize]!="floor"{continue;}
+        let mut actor=reference[used.len()%reference.len()].clone();
+        actor.id=base.next_id;base.next_id+=1.;actor.x=x as f64;actor.y=y as f64;
+        base.actors_at_mut(depth).push(actor);
+        used.insert((x,y));
+        let v=observe::observe(&base);
+        let content=layout.content_view(&p,&v);
+        let items=(0..v.ground_entities.len()).filter(|&i| v.ground_entities[i].kind==GroundKind::Item)
+            .filter_map(|i|content.visible_row(Content::row_for_ground(&v,i),0));
+        let late_ground=items.filter(|r|r.1>510).last();
+        let late_enemy=(Content::stair_count(&v)..Content::stair_count(&v)+v.creatures.len())
+            .filter_map(|i|content.visible_row(i,0)).filter(|r|r.1>480).last();
+        if let (Some(floor),Some(enemy))=(late_ground,late_enemy) {
+            assert!(y_at(DetailAnchor::Roster(floor))<floor.1 as usize*3);
+            run_case(base,"crowded",vec![show("Monster-Bottom",right(enemy),false),close(),show("Floor-Item-Bottom",right(floor),false),close()]);
+            return;
+        }
+    }}
+    panic!("could not stage low monster and ground rows");
 }
