@@ -121,7 +121,16 @@ impl Content {
                 let state=chars.next().map(|c|c.to_uppercase().collect::<String>()+chars.as_str()).unwrap_or_default();
                 text(p,&mut card,&mut y,width,&state,10,MUTED);
             }
-            for status in &a.statuses {
+            // Innate/ongoing traits come first. No timer alone is not enough:
+            // statuses like Lucky expire on an action rather than a countdown.
+            const TRAITS: [&str; 7] = ["Flying", "Slow", "Fast", "Haste", "Rooted", "Slime-bound", "Burning"];
+            fn ongoing(s: &crate::statuses_ui::Status) -> Option<&str> {
+                s.duration.is_none().then(|| crate::statuses_ui::display_name(&s.name))
+            }
+            let ordered = TRAITS.iter().flat_map(|&trait_name| {
+                a.statuses.iter().filter(move |s| ongoing(s) == Some(trait_name))
+            }).chain(a.statuses.iter().filter(|s| ongoing(s).is_none_or(|name| !TRAITS.contains(&name))));
+            for status in ordered {
                 if status.name.eq_ignore_ascii_case("Sleeping"){continue;}
                 let name=crate::statuses_ui::display_name(&status.name);
                 let ink=crate::game_hud::status_tint(&status.name,status.duration,0.);
@@ -522,6 +531,25 @@ pub fn paint(p:&mut Painter,v:&View,layout:Layout,now:f64) {
 
 #[cfg(test)] mod resource_grouping_tests {
     use super::*;
+    #[test] fn monster_roster_lists_ongoing_traits_before_conditions_in_fixed_order() {
+        use crate::statuses_ui::Status;
+        let r=corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap().run;
+        let mut v=crate::observe::observe(&r);
+        v.creatures.truncate(1);
+        let a=&mut v.creatures[0];
+        a.state="sleeping".into();
+        a.statuses=[
+            ("Burning",Some(7.)),("Fast",None),("Slow: acts every other turn",None),
+            ("Lucky: next attack",None),("Flying",None),("Sleeping",None),
+            ("Envenomed 3",Some(9.)),("Rooted",Some(2.)),
+        ].into_iter().map(|(name,duration)| Status{name:name.into(),duration}).collect();
+        let p=Painter::new();
+        let layout=Layout::resolve_frame(&p.profile,0,p.frame());
+        let c=layout.content(&p,&v.creatures);
+        let labels=c.cards[0].lines.iter().skip(1).map(|line|line.text.as_str()).collect::<Vec<_>>();
+        assert_eq!(labels,["Sleeping","Flying","Slow","Fast","Burning · 7","Lucky","Envenomed 3 · 9","Rooted · 2"]);
+        assert!(c.cards[0].lines.iter().find(|l|l.text=="Burning · 7").unwrap().burning);
+    }
     #[test] fn creature_name_resources_then_state_form_one_close_group() {
         let mut v=crate::observe::observe(&corpse_core::temporal::Engine::load(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap().run);
         let a=&mut v.creatures[0];a.state="hunting".into();a.statuses.clear();a.perception_range=None;a.shared_resources=false;a.uses_energy=true;
