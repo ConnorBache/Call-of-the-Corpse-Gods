@@ -14,7 +14,7 @@ fn capture(name: &str, p: &Painter) {
     }
 }
 #[test]
-fn ability_dialog_fits_content_and_touches_rail_at_every_resolution() {
+fn ability_dialog_fits_content_and_touches_map_corner_at_every_resolution() {
     let short = ability("See nearby creatures.");
     let long = ability(&format!("FIRST. {} FINAL.", "A complete description remains available by scrolling. ".repeat(80)));
     let mut p = Painter::new();
@@ -23,8 +23,10 @@ fn ability_dialog_fits_content_and_touches_rail_at_every_resolution() {
         for a in [&short, &long] {
             let layout = Layout::resolve(&p,a);
             let b = bounds(&p,a).unwrap();
-            assert_eq!(b.right(),p.native_x(p.hud_left() as f64) as usize);
-            assert_eq!(b.y,p.native_y(top(&p) as f64) as usize);
+            let map=map_menu_area(p.frame().map);
+            assert_eq!(b.right(),p.native_x((map.0+map.2) as f64) as usize);
+            assert_eq!(b.bottom(),p.native_y((map.1+map.3) as f64) as usize);
+            assert!(b.y>=p.native_y(map.1 as f64) as usize);
             assert!(b.bottom() < p.native_y(p.inspection_notice_y() as f64) as usize);
             let prior = (p.scale,p.origin,p.responsive_canvas,p.clip);
             p.clear([1,2,3]); p.ability_detail(a,usize::MAX);
@@ -92,7 +94,9 @@ fn ability_dialog_respects_custom_fonts_and_preserves_all_rows() {
     assert!(l.lines.iter().map(|line|line.text.as_str()).collect::<Vec<_>>().join(" ").ends_with("Native execution coverage pending"));
     assert!(l.lines.iter().all(|line|p.measure_text_role(Role::Tooltips,&line.text,line.size)<=f64::from(l.width-2*PAD)));
     let b=p.ability_detail_damage(&a).unwrap();
-    assert_eq!(b.right(),p.native_x(p.hud_left() as f64)as usize);
+    let map=map_menu_area(p.frame().map);
+    assert_eq!(b.right(),p.native_x((map.0+map.2) as f64)as usize);
+    assert_eq!(b.bottom(),p.native_y((map.1+map.3) as f64)as usize);
 }
 #[test]
 fn footer_damage_covers_text_on_wide_and_portrait_windows() {
@@ -132,7 +136,9 @@ fn ability_dialog_authored_catalog_is_fully_wrapped_and_observation_only() {
         let l=Layout::resolve(&p,&a);
         assert!(l.lines.iter().all(|line|p.measure_text_role(Role::Tooltips,&line.text,line.size)<=f64::from(l.width-2*PAD)),"{}",a.id);
         let b=p.ability_detail_damage(&a).unwrap();
-        assert_eq!(b.right(),p.native_x(p.hud_left() as f64)as usize,"{}",a.id);
+        let map=map_menu_area(p.frame().map);
+        assert_eq!(b.right(),p.native_x((map.0+map.2) as f64)as usize,"{}",a.id);
+        assert_eq!(b.bottom(),p.native_y((map.1+map.3) as f64)as usize,"{}",a.id);
         assert!(b.bottom()<p.native_y(p.inspection_notice_y()as f64)as usize,"{}",a.id);
         if matches!(a.id.as_str(),"anavani-illuminate"|"morae-see-the-future"|"ursa-dream-see") {
             p.game_at(&view,"You see the floor and a Hemogoblin.",false,0.);
@@ -148,12 +154,14 @@ fn inspection_strip_has_own_bounds_and_text_cannot_touch_border(){
     let view=crate::observe::observe(&run);
     for(w,h)in[(1280,800),(1920,1080),(960,1200)]{
         let mut p=Painter::new();p.resize(w,h);p.set_responsive_canvas(true);
-        let top=p.frame().map.1+p.frame().map.3;
-        assert!(p.inspection_notice_y()>top);assert!(p.inspection_notice_y()+15<p.toolbar_y());
+        let strip=p.hud_tracks().inspector;
+        let top=strip.1;
+        let bottom=strip.1+strip.3;
+        assert!(p.inspection_notice_y()>top);assert!(p.inspection_notice_y()+15<bottom);
         p.game_at(&view,"",false,0.);let empty=p.pixels.clone();
         p.game_at(&view,&"Inspect: stone floor, water and a very long creature name. ".repeat(10),false,0.);
         assert_ne!(empty,p.pixels);
-        for y in [top,p.toolbar_y()-1]{
+        for y in [top,bottom-1]{
             let y=p.native_y(y as f64)as usize;
             let start=y*p.width as usize*4;let end=start+p.width as usize*4;
             assert_eq!(&empty[start..end],&p.pixels[start..end],"text must not overwrite border");

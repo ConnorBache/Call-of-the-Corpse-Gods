@@ -482,7 +482,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 x.parse().map_err(|_| "Invalid tile x")?,
                 y.parse().map_err(|_| "Invalid tile y")?,
             );
-            painter.centered_sheet(|p| inspection_ui::paint(&report,p,0));
+            painter.docked_sheet(modal_ui::inspection_bounds(&painter.profile),|p| inspection_ui::paint(&report,p,0));
         }
         if !view.offers.is_empty() {
             painter.blessing_choices(&view.offers, 0);
@@ -830,9 +830,19 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             // Keep both spaces: game clicks outside a modal still target the
             // responsive map/toolbar; only the authored sheet consumes sheet input.
             let raw_pointer=match &event{Event::MouseMotion{x,y,..}|Event::MouseButtonDown{x,y,..}|Event::MouseButtonUp{x,y,..}=>Some((*x,*y)),_=>None};
+            let dock=if screen!=Screen::Game || run.as_ref().is_some_and(|r|debug_loadout.active(&r.run)){None}
+                else if run.as_ref().is_some_and(|r|!r.run.offers.is_empty()){Some(render::BLESSING_DOCK)}
+                else if tile_report.is_some(){Some(modal_ui::inspection_bounds(&painter.profile))}
+                else if context_detail.is_some(){Some(context_detail::SHEET)}
+                else if inspecting{Some(render::CREATURES_DOCK)}
+                else{None};
+            let to_sheet=|x,y|match dock{
+                Some(rect)=>painter.logical_point_for_dock(rect,x,y,canvas.window().size()),
+                None=>painter.logical_point_for_sheet(x,y,canvas.window().size()),
+            };
             let sheet_pointer=match &event{
-                Event::MouseMotion{x,y,..}|Event::MouseButtonDown{x,y,..}|Event::MouseButtonUp{x,y,..}=>Some(painter.logical_point_for_sheet(*x,*y,canvas.window().size())),
-                Event::MouseWheel{mouse_x,mouse_y,..}=>Some(painter.logical_point_for_sheet(*mouse_x,*mouse_y,canvas.window().size())),_=>None};
+                Event::MouseMotion{x,y,..}|Event::MouseButtonDown{x,y,..}|Event::MouseButtonUp{x,y,..}=>Some(to_sheet(*x,*y)),
+                Event::MouseWheel{mouse_x,mouse_y,..}=>Some(to_sheet(*mouse_x,*mouse_y)),_=>None};
             let responsive_input=matches!(screen,Screen::Game|Screen::ReplayGame);
             // Observe transitions between queued events as well as between frames.
             if pending_start.busy() && !matches!(screen,Screen::Start|Screen::Menu) { pending_start.cancel(); }
@@ -3073,11 +3083,9 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 let mut panels=Vec::new();
                                 if effects.plane_transition.is_some(){let b=painter.frame().map;panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}
                                 if !effects::inventory_marks(&effects.cues,now).is_empty(){panels.extend(painter.hud_damage());if let Some(pack)=pack_view.as_ref(){let b=pack.bounds();panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}}
-                                if inspecting{panels.extend(painter.sheet_damage_rect(333,121,644,587));}
-                                if tile_report.is_some(){let(x,y,w,h)=inspection_ui::bounds(&painter.profile);panels.extend(painter.sheet_damage_rect(x,y,w,h));}
-                                // Unclipped hazard prose retains its horizontal band. Ability
-                                // details share exact content-sized bounds with their painter.
-                                if hazard_prompt.is_some(){panels.extend(painter.sheet_damage_rect(0,282,render::WIDTH as i32,render::HEIGHT as i32-282));}
+                                if inspecting{panels.extend(painter.dock_damage_rect(render::CREATURES_DOCK));}
+                                if tile_report.is_some(){panels.extend(painter.dock_damage_rect(modal_ui::inspection_bounds(&painter.profile)));}
+                                if hazard_prompt.is_some(){panels.extend(painter.dock_damage_rect(render::HAZARD_DOCK));}
                                 if let Some(detail)=&context_detail{panels.extend(detail.damage(&painter));}
                                 if let Some(ability)=&ability_detail_view{panels.extend(painter.ability_detail_damage(ability));}
                                 if let Some(((x,y,w,h),_))=aim_notice {panels.extend(painter.logical_damage_rect(x,y,w,h));}
@@ -3144,7 +3152,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 painter.text_role(role,&text,x+10,y+6,14,[243,228,246]);
                             }
                             if let Some(report) = &tile_report {
-                                painter.centered_sheet(|p|inspection_ui::paint(report,p,tile_report_scroll));
+                                painter.docked_sheet(modal_ui::inspection_bounds(&painter.profile),|p|inspection_ui::paint(report,p,tile_report_scroll));
                             }
                             if let Some((_, message)) = &hazard_prompt {
                                 painter.hazard_prompt(message);
@@ -4171,13 +4179,13 @@ fn clear_resize_refusal(notice:&mut String,owned:&mut Option<String>)->bool{
 }
 
 /// O(1), no Run query. Keep window coordinates until the current drawable and
-/// fresh-view handoff; authored inspector hits use their own centered space.
+/// fresh-view handoff; authored inspector hits use the shared dock transform.
 fn resize_hover_blocked(run:Option<&corpse_core::Run>,modal:bool)->bool{
     modal||run.is_some_and(|r| !r.offers.is_empty())
 }
 fn resize_hover_position(p:&Painter,raw:Option<(i32,i32)>,window:(u32,u32),blocked:bool,tile_inspector:bool)->Option<(i32,i32)>{
     let(x,y)=raw?;if blocked||x<0||y<0||x>=window.0 as i32||y>=window.1 as i32{return None}
-    if tile_inspector{let(sx,sy)=p.logical_point_for_sheet(x,y,window);let(xx,yy,w,h)=inspection_ui::bounds(&p.profile);if sx>=xx&&sx<xx+w&&sy>=yy&&sy<yy+h{return None}}
+    if tile_inspector{let b=modal_ui::inspection_bounds(&p.profile);let(sx,sy)=p.logical_point_for_dock(b,x,y,window);if b.contains(sx,sy){return None}}
     Some(p.logical_point_for_canvas(x,y,window,true))
 }
 #[cfg(test)]mod resize_hover_tests{

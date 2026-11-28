@@ -179,8 +179,8 @@ fn help_reconfigures_for_profile_and_viewport_changes_and_restores_clip() {
     h.paint(&mut p);
     assert_eq!(p.clip, clip);
     let l = h.layout.as_ref().unwrap();
-    assert_eq!((l.key.0, l.key.1), (p.logical_width(), p.logical_height()));
-    assert_eq!(l.key.2, p.profile);
+    assert_eq!(l.key.0, Geometry::for_painter(&p).bounds);
+    assert_eq!(l.key.1, p.profile);
     assert!(h.offset <= l.max_scroll());
 }
 
@@ -237,4 +237,15 @@ fn title_help_hover_changes_pixels_only_inside_the_click_target() {
         }
     }
     assert!(changed > 100);
+}
+
+#[test]
+fn gameplay_help_shares_the_map_dock_and_keeps_pointer_actions_aligned() {
+    let mut p=Painter::new();
+    p.resize(1920,1080);p.set_responsive_canvas(true);
+    let mut h=Help::default();h.open(&p);
+    let g=h.layout.as_ref().unwrap().geometry;
+    let map=crate::modal_ui::map_menu_area(p.frame().map);
+    assert_eq!((g.bounds.0+g.bounds.2,g.bounds.1+g.bounds.3),(map.0+map.2,map.1+map.3));
+    assert_eq!(h.event(&click(g.close.0+1,g.close.1+1),&p,true,false),Response::Closed);
 }

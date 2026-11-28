@@ -48,16 +48,20 @@ pub struct Geometry {
 }
 impl Geometry {
     pub fn resolve(width: i32, height: i32) -> Self {
-        // Live logical canvases are at least 1280 x 800. The bounded smaller
-        // cases support deterministic layout tests, not new window policy.
         let width = width.max(320);
         let height = height.max(240);
         let w = 960.min(width - 24);
         let h = 716.min(height - 24);
-        let x = (width - w) / 2;
-        let y = (height - h) / 2;
-        let content = Rect(x + 24, y + 70, w - 72, h - 144);
-        let label_width = 220.min((content.2 - 24) / 3);
+        Self::from_bounds(Rect((width-w)/2,(height-h)/2,w,h))
+    }
+    fn for_painter(p:&Painter)->Self {
+        if p.gameplay_canvas() {
+            Self::from_bounds(crate::modal_ui::dock_menu(crate::modal_ui::map_menu_area(p.frame().map),960,716))
+        }else{Self::resolve(p.logical_width(),p.logical_height())}
+    }
+    fn from_bounds(Rect(x,y,w,h):Rect)->Self {
+        let content = Rect(x + 24, y + 70, (w - 72).max(1), (h - 144).max(1));
+        let label_width = 220.min(((content.2 - 24) / 3).max(1));
         let description_x = content.0 + label_width + 24;
         Self {
             bounds: Rect(x, y, w, h), content,
@@ -73,7 +77,7 @@ impl Geometry {
 struct Line { text: String, x: i32, y: i32, color: [u8; 3] }
 #[derive(Clone)]
 struct Layout {
-    key: (i32, i32, Profile),
+    key: (Rect, Profile),
     geometry: Geometry,
     lines: Vec<Line>,
     line_height: i32,
@@ -83,7 +87,7 @@ impl Layout {
     /// Cache miss only: O(T² + U*F) measured wrap/metrics work, O(T + U)
     /// storage for fixed authored text T, distinct glyphs U, font lookup F.
     fn new(p: &Painter) -> Self {
-        let mut geometry = Geometry::resolve(p.logical_width(), p.logical_height());
+        let mut geometry = Geometry::for_painter(p);
         let size = |role, baseline| crate::typography_ui::resolve(&p.profile, role,
             crate::typography_ui::RoleStyle::baseline(baseline)).font_size.ceil() as i32;
         let body_size = size(Role::Primary, BODY_SIZE as f64);
@@ -126,7 +130,7 @@ impl Layout {
                 y += height + 10;
             }
         }
-        Self { key: (p.logical_width(), p.logical_height(), p.profile.clone()),
+        Self { key: (geometry.bounds, p.profile.clone()),
             geometry, lines, line_height: metrics.line, content_height: y - 10 }
     }
     fn max_scroll(&self) -> i32 { (self.content_height - self.geometry.content.3).max(0) }
@@ -143,8 +147,8 @@ pub struct Help {
 impl Help {
     pub fn active(&self) -> bool { self.active }
     fn configure(&mut self, p: &Painter) {
-        if self.layout.as_ref().is_none_or(|l| l.key.0 != p.logical_width()
-            || l.key.1 != p.logical_height() || l.key.2 != p.profile) {
+        let bounds=Geometry::for_painter(p).bounds;
+        if self.layout.as_ref().is_none_or(|l| l.key.0 != bounds || l.key.1 != p.profile) {
             self.layout = Some(Layout::new(p));
         }
         self.offset = self.offset.clamp(0, self.layout.as_ref().unwrap().max_scroll());

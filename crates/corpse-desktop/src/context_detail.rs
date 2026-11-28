@@ -3,7 +3,7 @@
 use crate::{inspection_ui, modal_ui::Rect, pack, render::{Painter,View,INK,GOLD}, typography_ui::Role};
 use corpse_core::{Command, Run};
 
-const SHEET: Rect=Rect(370, 228, 540, 344);
+pub const SHEET: Rect=Rect(370, 228, 540, 344);
 const DROP: Rect=Rect(736, 290, 150, 37);
 const THROW: Rect=Rect(736, 335, 150, 37);
 pub enum Detail {
@@ -45,14 +45,14 @@ impl Detail {
     }
     pub fn damage(&self,p:&Painter)->Option<crate::render::damage::Rect> {
         match self {
-            Self::Enemy(_)=>{let b=crate::modal_ui::hover_bounds_painter(p,620);p.logical_damage_rect(b.0,b.1,b.2,b.3)}
-            Self::Text{..}=>p.sheet_damage_rect(SHEET.0,SHEET.1,SHEET.2,SHEET.3),
+            Self::Enemy(_)=>{let b=crate::modal_ui::pinned_hover_bounds(p,620);p.logical_damage_rect(b.0,b.1,b.2,b.3)}
+            Self::Text{..}=>p.dock_damage_rect(SHEET),
         }
     }
     pub fn paint(&self,p:&mut Painter) {
         match self {
             Self::Enemy(report)=>inspection_ui::paint_pinned_hover(report,p),
-            Self::Text{title,copy,ring,scroll}=>p.centered_sheet(|p|{
+            Self::Text{title,copy,ring,scroll}=>p.docked_sheet(SHEET,|p|{
                 let Rect(x,y,w,h)=SHEET;
                 p.rect(x,y,w,h,[20,17,29]);p.border(x,y,w,h,[111,88,131]);
                 p.text_role(Role::Headings,title,x+20,y+18,23,GOLD);

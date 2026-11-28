@@ -1798,7 +1798,8 @@ fn paint_hover_card(report: &Report, p: &mut Painter, pinned:bool) {
         paint_item_hover(report,p);
         return;
     };
-    let hover_width = modal_ui::hover_bounds_painter(p, 0).2;
+    let place=if pinned{modal_ui::pinned_hover_bounds}else{modal_ui::hover_bounds_painter};
+    let hover_width = place(p, 0).2;
     if hover_width <= 30 { return; }
     let line_height = role_line(p, Role::Tooltips, 15, 21);
     let mut rows: Vec<(String, [u8; 3], u16, i32)> = vec![];
@@ -1856,7 +1857,7 @@ fn paint_hover_card(report: &Report, p: &mut Painter, pinned:bool) {
     }
     add(&c.heart, GOLD, 14, 0);
     add(&c.bow_shot, INK, 15, 7);
-    let (x, y, w, h) = modal_ui::hover_bounds_painter(p, offset + 12 + if pinned {18}else{0}).tuple();
+    let (x, y, w, h) = place(p, offset + 12 + if pinned {18}else{0}).tuple();
     if h <= 0 { return; }
     let old = p.clip;
     p.clip = Some((x, y, w, h));

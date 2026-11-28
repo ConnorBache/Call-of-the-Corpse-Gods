@@ -1,6 +1,6 @@
 //! Content-sized, observation-only ability details beside the divine-ability rail.
 use super::{damage, Painter, Rgb, DIALOG_SCALE, INK, MUTED};
-use crate::{ability_ui::AbilityView, typography_ui::{self, Role, RoleStyle}};
+use crate::{modal_ui::{Rect,map_menu_area},ability_ui::AbilityView, typography_ui::{self, Role, RoleStyle}};
 
 const PAD: i32 = 18;
 const FOOTER: i32 = 22;
@@ -19,7 +19,8 @@ impl Layout {
             (coverage, 13, MUTED, 8)];
         let natural = sections.iter().map(|(s,size,_,_)|
             p.measure_text_role(Role::Tooltips, s, *size).ceil() as i32).max().unwrap_or(1);
-        let available_width = ((p.hud_left() - 8).max(1) as f64 / DIALOG_SCALE).floor() as i32;
+        let map=map_menu_area(p.frame().map);
+        let available_width = (map.2 as f64 / DIALOG_SCALE).floor() as i32;
         let inner = natural.max(1).min(480).min((available_width - 2 * PAD).max(1));
         let mut lines = vec![];
         for (text, size, color, gap) in sections {
@@ -31,8 +32,7 @@ impl Layout {
             }
         }
         let natural_height = lines.iter().map(|line| line.height + line.gap).sum::<i32>();
-        let top = top(p);
-        let max_height = ((p.inspection_notice_y() - 12 - top).max(1) as f64 / DIALOG_SCALE).floor() as i32;
+        let max_height = (map.3 as f64 / DIALOG_SCALE).floor() as i32;
         let height = (natural_height + 2 * PAD + FOOTER).min(max_height);
         let body_height = (height - 2 * PAD - FOOTER).max(1);
         let scrolling = natural_height > body_height;
@@ -49,27 +49,14 @@ impl Layout {
         offset.min(last_page)
     }
 }
-fn top(p: &Painter) -> i32 { (p.game_ability_top() - 20).max(8) }
-fn transform(p: &Painter, width: i32) -> (f64, (i32, i32)) {
-    let scale = p.scale * DIALOG_SCALE;
-    let right = p.native_x(p.hud_left() as f64);
-    (scale, (right - (width as f64 * scale).round() as i32, p.native_y(top(p) as f64)))
-}
-
 pub(super) fn bounds(p: &Painter, a: &AbilityView) -> Option<damage::Rect> {
-    let layout = Layout::resolve(p, a);
-    let (scale, (x, y)) = transform(p, layout.width);
-    let right = x + (layout.width as f64 * scale).round() as i32;
-    let bottom = y + (layout.height as f64 * scale).round() as i32;
-    let (x, y, right, bottom) = (x.clamp(0, p.width as i32), y.clamp(0, p.height as i32),
-        right.clamp(0, p.width as i32), bottom.clamp(0, p.height as i32));
-    (right > x && bottom > y).then(|| damage::Rect::new(x as usize, y as usize, (right-x) as usize, (bottom-y) as usize))
+    let layout = Layout::resolve(p,a);
+    p.dock_damage_rect(Rect(0,0,layout.width,layout.height))
 }
 pub(super) fn paint(p: &mut Painter, a: &AbilityView, offset: usize) {
     let layout = Layout::resolve(p, a);
-    let prior = (p.scale, p.origin, p.responsive_canvas, p.clip);
-    let (scale, origin) = transform(p, layout.width);
-    p.scale = scale; p.origin = origin; p.responsive_canvas = false;
+    p.docked_sheet(Rect(0,0,layout.width,layout.height),|p| {
+    let prior_clip=p.clip;
     p.rect(0, 0, layout.width, layout.height, [11, 13, 21]);
     p.border(0, 0, layout.width, layout.height, [53, 55, 68]);
     p.clip = Some((PAD, PAD, layout.width - 2 * PAD, layout.body_height));
@@ -90,7 +77,8 @@ pub(super) fn paint(p: &mut Painter, a: &AbilityView, offset: usize) {
         let arrows = format!("{}{}", if first > 0 { "↑" } else { "" }, if last < layout.lines.len() { " ↓" } else { "" });
         p.text_role(Role::Tooltips, arrows.trim(), layout.width - PAD - 22, layout.height - PAD - 12, 12, MUTED);
     }
-    (p.scale, p.origin, p.responsive_canvas, p.clip) = prior;
+    p.clip=prior_clip;
+    });
 }
 
 #[cfg(test)]

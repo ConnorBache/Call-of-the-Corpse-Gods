@@ -16,6 +16,16 @@ impl Rect {
         (self.0, self.1, self.2, self.3)
     }
 }
+/// All in-run menus dock to the same inset corner of the dungeon map.
+pub fn map_menu_area(map:Rect)->Rect {
+    let margin=12.min(map.2/4).min(map.3/4).max(0);
+    Rect(map.0+margin,map.1+margin,(map.2-2*margin).max(1),(map.3-2*margin).max(1))
+}
+pub fn dock_menu(area:Rect,w:i32,h:i32)->Rect {
+    let w=w.clamp(1,area.2);
+    let h=h.clamp(1,area.3);
+    Rect(area.0+area.2-w,area.1+area.3-h,w,h)
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Frame {
     pub map: Rect,
@@ -72,16 +82,15 @@ pub struct PackLayout {
     pub button_padding: i32,
 }
 impl PackLayout {
-    /// The Pack may cover the sidebars: the measured item column takes priority,
-    /// while the detail column retains readable space within the viewport.
+    /// Prefer the measured item width without covering the adjacent roster.
     pub fn resolve_measured(p: &Profile, area: Rect, list_width: i32) -> Self {
         let mut out = Self::resolve(p, area);
-        let margin = 12.min(area.2 / 4).max(0);
-        let width = (list_width + 322 + 36).max(760).min((area.2 - 2 * margin).max(1));
+        let area=map_menu_area(area);
+        let width = (list_width + 322 + 36).max(760).min(area.2);
         let inner = (width - 36).max(2);
         let detail = 322.min((inner - list_width).max(240.min(inner / 3)));
         let list = (inner - detail).max(1);
-        let x = area.0 + (area.2 - width) / 2;
+        let x = dock_menu(area,width,out.bounds.3).0;
         out.bounds.0 = x; out.bounds.2 = width;
         out.list.0 = x + 12; out.list.2 = list;
         out.detail.0 = x + 24 + list; out.detail.2 = detail;
@@ -90,11 +99,7 @@ impl PackLayout {
         out
     }
     pub fn resolve(p: &Profile, map: Rect) -> Self {
-        let margin = 12.min(map.2 / 4).min(map.3 / 4).max(0);
-        let w = 760.min((map.2 - 2 * margin).max(1));
-        let h = 500.min((map.3 - 2 * margin).max(1));
-        let x = map.0 + map.2 - margin - w;
-        let y = map.1 + map.3 - margin - h;
+        let Rect(x,y,w,h)=dock_menu(map_menu_area(map),760,500);
         let inner = (w - 36).max(2);
         let left = (inner as f64 * 1.25 / 2.25).round() as i32;
         let right = (inner - left).max(1);
@@ -144,6 +149,12 @@ pub fn hover_bounds_painter(p:&Painter,height:i32)->Rect{
     let w=(p.profile.number("ui.layout.tooltipMaxWidth").round()as i32).clamp(0,(vw-2*margin).max(0));
     let h=height.clamp(0,620.min((bottom-2*margin).max(0)));
     Rect((vw-margin-w).max(0),(bottom-margin-h).max(0),w,h)
+}
+pub fn pinned_hover_bounds(p:&Painter,height:i32)->Rect {
+    let area=map_menu_area(p.frame().map);
+    let width=(p.profile.number("ui.layout.tooltipMaxWidth").round() as i32).clamp(1,area.2);
+    let h=height.clamp(0,620.min(area.3));
+    Rect(area.0+area.2-width,area.1+area.3-h,width,h)
 }
 pub fn hover_placement(
     tile: (i32, i32, i32, i32),

@@ -221,6 +221,7 @@ pub struct PackView {
     text_metrics: Option<TextMetrics>,
     minimum_list_width: i32,
     heart_metrics: [i32;3],
+    heart_column_x: i32,
     button_metrics: Option<TextMetrics>,
     groups: Vec<Group>,
     stamp: Stamp,
@@ -296,6 +297,7 @@ impl PackView {
             text_metrics: None,
             minimum_list_width: 402,
             heart_metrics: [0,28,0],
+            heart_column_x: 0,
             button_metrics: None,
             groups: display_groups(run),
             quick_kind: None,
@@ -318,14 +320,14 @@ impl PackView {
             return PackLayout::resolve_measured(&p.profile,area,measured_width);
         };
         let mut layout=PackLayout::resolve(&p.profile,area);
-        let base=660.min((area.2-24).max(1));
+        let area=modal_ui::map_menu_area(area);
+        let base=660.min(area.2);
         let width=if kind=="heart" && base>=295 {
             heart_columns(base-155,self.heart_metrics).0+155
         }else{base};
         let row=if kind=="potion"{47}else{34};
-        let height=(88+(self.groups.len() as i32*row).max(155)).min((area.3-24).max(1));
-        let x=area.0+(area.2-width)/2;
-        let y=area.1+(area.3-height)/2;
+        let height=88+(self.groups.len() as i32*row).max(155);
+        let Rect(x,y,width,height)=modal_ui::dock_menu(area,width,height);
         let left=(width-135).max(1);
         layout.bounds=Rect(x,y,width,height);
         layout.close=Rect(x+width-38,y+8,30,28);
@@ -353,7 +355,7 @@ impl PackView {
             crate::typography_ui::overrides(&p.profile, Role::Primary),
         );
         let changed = self.metric_signature.as_ref() != Some(&signature);
-        let area = Rect(0, map.1, p.logical_width(), map.3);
+        let area = Rect(map.0,map.1,map.2,map.3);
         let mut layout = self.resolve_layout(p,area,self.minimum_list_width);
         // Row height is content-derived; geometry/style/content invalidate it together.
         layout.row = self.layout.row;
@@ -385,6 +387,9 @@ impl PackView {
                     badge.max(g.blessings.map_or(28,|n| crate::render::resource_ui::text_width(p,&n.to_string(),12)+12)),
                     stat.max(p.measure_text_role(Role::Inventory,&g.supply_note,12).ceil() as i32),
                 ]);
+                let base=660.min(modal_ui::map_menu_area(area).2);
+                let old=(base-155).max(1);
+                self.heart_column_x=if base>=295 {heart_columns(old,self.heart_metrics).1}else{old*55/100};
             }
             self.layout=self.resolve_layout(p,area,self.minimum_list_width);
             self.list_scroll=self.list_scroll.clamp(0,self.list_max_scroll());
@@ -1067,8 +1072,8 @@ impl PackView {
         p.text("×",self.layout.close.0+7,self.layout.close.1,22,p.profile.rgb("ui.colors.primary"));
         p.text_role(Role::Secondary,"Esc to close",list.0,b.1+b.3-19,11,p.profile.rgb("ui.colors.secondary"));
         p.clip=Some(list.tuple());
-        let (_,heart_badge_x,heart_badge_width)=heart_columns(
-            (660.min((p.logical_width()-24).max(1))-155).max(1),self.heart_metrics);
+        let heart_badge_x=self.heart_column_x;
+        let heart_badge_width=self.heart_metrics[1];
         for (index,yy) in self.row_positions() {
             let y=yy-self.list_scroll;
             let row=Rect(list.0,y,list.2,self.layout.row);
@@ -2273,6 +2278,8 @@ mod tests {
         for (kind,verb,id) in [("heart","Eat",201.),("potion","Drink",203.)] {
             v.focus_kind(&r,Some(kind));
             v.configure(&p,(0,82,948,522));
+            let (x,y,w,h)=v.bounds();
+            assert_eq!((x+w,y+h),(936,592));
             assert_eq!(v.supply_labels(),Some([verb,"Drop","Throw"]));
             assert!(v.selected.is_none());
             let rects=v.button_rects();
