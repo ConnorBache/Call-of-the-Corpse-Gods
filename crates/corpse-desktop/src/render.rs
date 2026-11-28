@@ -37,6 +37,10 @@ pub const HEIGHT: usize = 800; // Authored menu and dialog sheets.
 pub const GAME_HEIGHT: usize = 720;
 pub const GAME_UI_UNIT: i32 = 8;
 pub const BLESSING_DOCK: crate::modal_ui::Rect=crate::modal_ui::Rect(345,70,590,660);
+pub struct BlessingLayout { pub bounds:crate::modal_ui::Rect, cards:Vec<(crate::modal_ui::Rect,Vec<String>)> }
+impl BlessingLayout {
+    pub fn hit(&self,x:i32,y:i32)->Option<usize> { self.cards.iter().position(|(rect,_)|rect.contains(x,y)) }
+}
 pub const HAZARD_DOCK: crate::modal_ui::Rect=crate::modal_ui::Rect(310,290,660,220);
 pub const CREATURES_DOCK: crate::modal_ui::Rect=crate::modal_ui::Rect(337,125,636,579);
 const GAME_RESOURCE_WIDTH: i32 = crate::game_hud::RAIL_WIDTH;
@@ -1074,6 +1078,15 @@ impl Painter {
         }
         output
     }
+    /// Compact panels treat whitespace-only paragraphs as separators, not rows.
+    pub fn compact_text_rows(&self, role: crate::typography_ui::Role, text: &str, width: i32, size: u16) -> Vec<String> {
+        self.wrap_text_role(role, text, width, size).into_iter()
+            .filter(|row| !row.trim().is_empty()).collect()
+    }
+    pub fn widest_text_line(&self, role: crate::typography_ui::Role, text: &str, size: u16) -> i32 {
+        text.lines().map(|line| self.measure_text_role(role, line.trim(), size).ceil() as i32).max().unwrap_or(0)
+    }
+
     /// Warm O(G metric work + mask pixels); cold adds rasterization/weight work; bounded cache.
     pub fn text_role(
         &mut self,
@@ -2129,75 +2142,82 @@ impl Painter {
             }
         }
     }
-    /// O(viewport pixels + bounded offers/text raster work); O(1) dimmer temporary space.
-    pub fn blessing_choices(&mut self, offers: &[crate::ability_ui::AbilityView], selected: usize) {
-        self.docked_sheet(BLESSING_DOCK,|p|p.blessing_choices_sheet(offers,selected));
-    }
-    fn blessing_choices_sheet(&mut self, offers: &[crate::ability_ui::AbilityView], selected: usize) {
-        // O(native viewport area), O(1) space: adjacent logical pixel footprints tile exactly.
-        self.native_fill(0,0,self.width as i32,self.height as i32,[5,4,12],232);
-        self.rect(345, 70, 590, 660, [11, 13, 21]);
-        self.border(345, 70, 590, 660, [53, 55, 68]);
-        for (i, a) in offers.iter().take(3).enumerate() {
-            let y = 180 + i as i32 * 170;
-            self.rect(
-                373,
-                y,
-                534,
-                158,
-                if i == selected {
-                    [36, 41, 53]
-                } else {
-                    [11, 13, 21]
-                },
-            );
-            self.border(373, y, 534, 158, [53, 55, 68]);
-            self.rect(373, y, 3, 158, a.color);
-            self.text(&truncate(&a.name, 41), 389, y + 12, 20, a.color);
-            let mut line = String::new();
-            let mut lines = Vec::new();
-            for word in a.description.split_whitespace() {
-                if line.chars().count() + word.chars().count() + 1 > 54 {
-                    lines.push(line);
-                    line = String::new();
-                }
-                if !line.is_empty() {
-                    line.push(' ');
-                }
-                line.push_str(word);
-            }
-            lines.push(line);
-            self.clip = Some((389, y + 42, 501, 106));
-            for (j, line) in lines.iter().enumerate() {
-                self.text(line, 389, y + 42 + j as i32 * 21, 15, MUTED);
-            }
-            self.clip = None;
+    /// Resolve both hit regions and paint sizes from the visible choices.
+    pub fn blessing_layout(&self, offers:&[crate::ability_ui::AbilityView]) -> BlessingLayout {
+        use crate::typography_ui::Role;
+        let mut cards=vec![];
+        let n=offers.len().min(3);
+        let names=offers.iter().take(n);
+        let max_w=names.clone().map(|a|self.widest_text_line(Role::Headings,&a.name,20)
+                 .max(self.widest_text_line(Role::Tooltips,&a.description,15))).max().unwrap_or(0);
+        let w=(max_w+64).clamp(234,BLESSING_DOCK.2);
+        let mut y=BLESSING_DOCK.1+16;
+        let line=22;
+        let rows_per_card=((BLESSING_DOCK.3-32)/(n.max(1) as i32)-55).max(line)/line;
+        for a in names {
+            let rows=self.compact_text_rows(Role::Tooltips,&a.description,w-64,15)
+                .into_iter().take(rows_per_card as usize).collect::<Vec<_>>();
+            let h=40+rows.len() as i32*line;
+            cards.push((crate::modal_ui::Rect(BLESSING_DOCK.0+16,y,w-32,h),rows));
+            y+=h+10;
         }
+        let bounds=crate::modal_ui::Rect(BLESSING_DOCK.0,BLESSING_DOCK.1,w,y-BLESSING_DOCK.1+6);
+        BlessingLayout { bounds, cards }
     }
-    pub fn hazard_prompt(&mut self, message: &str) {self.docked_sheet(HAZARD_DOCK,|p|p.hazard_prompt_sheet(message));}
-    fn hazard_prompt_sheet(&mut self, message: &str) {
-        self.rect(310, 290, 660, 220, [11, 13, 21]);
-        self.border(310, 290, 660, 220, [255, 217, 53]);
-        let mut line = String::new();
-        let mut lines = Vec::new();
-        for word in message.split_whitespace() {
-            if line.len() + word.len() > 58 {
-                lines.push(line);
-                line = String::new();
+    /// O(viewport pixels + bounded offers/text raster work).
+    pub fn blessing_choices(&mut self, offers:&[crate::ability_ui::AbilityView], selected:usize) {
+        use crate::typography_ui::Role;
+        let layout=self.blessing_layout(offers);
+        let (x,y,w,h)=layout.bounds.tuple();
+        self.docked_sheet(layout.bounds,|p| {
+            p.native_fill(0,0,p.width as i32,p.height as i32,[5,4,12],232);
+            p.rect(x,y,w,h,[11,13,21]);p.border(x,y,w,h,[53,55,68]);
+            for (i,((rect,rows),a)) in layout.cards.iter().zip(offers).enumerate() {
+                let (x,y,w,h)=rect.tuple();
+                p.rect(x,y,w,h,if i==selected {[36,41,53]} else {[11,13,21]});
+                p.border(x,y,w,h,[53,55,68]);p.rect(x,y,3,h,a.color);
+                let name=p.fit_text_role(Role::Headings,&a.name,w-28,20);
+                p.text_role(Role::Headings,&name,x+14,y+9,20,a.color);
+                let old=p.clip;
+                p.clip=Some((x+14,y+34,w-28,h-34));
+                for (i,line) in rows.iter().enumerate() {
+                    p.text_role(Role::Tooltips,line,x+14,y+34+i as i32*22,15,MUTED);
+                }
+                p.clip=old;
             }
-            if !line.is_empty() {
-                line.push(' ');
-            }
-            line.push_str(word);
-        }
-        lines.push(line);
+        });
+    }
+    fn hazard_layout(&self, message: &str) -> (crate::modal_ui::Rect, Vec<String>) {
+        use crate::typography_ui::Role;
+        let width = self.widest_text_line(Role::Tooltips, message, 18).saturating_add(48).clamp(250, HAZARD_DOCK.2);
+        let lines = self.compact_text_rows(Role::Tooltips, message, width - 48, 18);
+        let height = 59 + lines.len().min(6) as i32 * 24;
+        (crate::modal_ui::Rect(HAZARD_DOCK.0, HAZARD_DOCK.1, width, height), lines)
+    }
+    pub fn hazard_damage(&self, message: &str) -> Option<damage::Rect> {
+        self.dock_damage_rect(self.hazard_layout(message).0)
+    }
+    #[cfg(test)]
+    fn hazard_prompt_sheet(&mut self, message:&str) {
+        let (bounds,lines)=self.hazard_layout(message);
+        self.paint_hazard_layout(bounds,&lines);
+    }
+    pub fn hazard_prompt(&mut self, message: &str) {
+        let (bounds, lines) = self.hazard_layout(message);
+        self.docked_sheet(bounds, |p| p.paint_hazard_layout(bounds, &lines));
+    }
+    fn paint_hazard_layout(&mut self, bounds:crate::modal_ui::Rect, lines:&[String]) {
+        use crate::typography_ui::Role;
+        let crate::modal_ui::Rect(x,y,w,h)=bounds;
+        self.rect(x,y,w,h,[11,13,21]);
+        self.border(x,y,w,h,[255,217,53]);
         let clip=self.clip;
-        self.clip=Some((334,315,612,146));
-        for (i, line) in lines.iter().take(6).enumerate() {
-            self.text(line, 334, 316 + i as i32 * 24, 18, INK);
+        self.clip=Some(bounds.tuple());
+        for (i,line) in lines.iter().take(6).enumerate() {
+            self.text_role(Role::Tooltips,line,x+24,y+15+i as i32*24,18,INK);
         }
+        self.text("[Y] Yes    [N] No",x+24,y+h-28,18,GOLD);
         self.clip=clip;
-        self.text("[Y] Yes    [N] No", 334, 468, 18, GOLD);
     }
     pub fn ability_detail(&mut self, a: &crate::ability_ui::AbilityView, offset: usize, anchor: crate::modal_ui::DetailAnchor) {
         ability_dialog::paint(self, a, offset, anchor);

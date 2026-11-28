@@ -4,8 +4,33 @@ use crate::{inspection_ui, modal_ui::{DetailAnchor,Rect}, pack, render::{Painter
 use corpse_core::{Command, Run};
 
 pub const SHEET: Rect=Rect(370, 228, 540, 344);
-const DROP: Rect=Rect(736, 290, 150, 37);
-const THROW: Rect=Rect(736, 335, 150, 37);
+const PAD: i32 = 20;
+const ACTION_WIDTH: i32 = 150;
+const ACTION_BOTTOM: i32 = 144;
+struct TextLayout { bounds: Rect, body_width: i32, top: i32, line: i32, visible: usize, rows: Vec<String> }
+impl TextLayout {
+    fn actions(&self) -> [(Rect,&'static str);2] {
+        let Rect(x,y,w,_) = self.bounds;
+        let left = x + w - 24 - ACTION_WIDTH;
+        [(Rect(left,y+62,ACTION_WIDTH,37),"Drop"),(Rect(left,y+107,ACTION_WIDTH,37),"Throw")]
+    }
+}
+fn layout(p: &Painter, title: &str, copy: &str, actions: bool) -> TextLayout {
+    let copy = copy.strip_prefix(title).and_then(|s| s.strip_prefix('\n')).unwrap_or(copy);
+    let actions_space = if actions { ACTION_WIDTH + 18 } else { 0 };
+    let natural_width = (p.widest_text_line(Role::Tooltips, copy, 15) + actions_space)
+        .max(p.widest_text_line(Role::Headings, title, 23));
+    let width = (natural_width + PAD * 2).max(if actions { 352 } else { 132 }).min(SHEET.2);
+    let body_width = (width - 2*PAD - actions_space).max(1);
+    let rows = p.compact_text_rows(Role::Tooltips, copy, body_width, 15);
+    let style = crate::typography_ui::resolve(&p.profile, Role::Tooltips, crate::typography_ui::RoleStyle::baseline(15.));
+    let line = ((style.font_size * style.line_height).ceil() as i32).max(20);
+    let heading = crate::typography_ui::resolve(&p.profile, Role::Headings, crate::typography_ui::RoleStyle::baseline(23.));
+    let top = if title.trim().is_empty() { PAD } else { PAD + heading.font_size.ceil() as i32 + 12 };
+    let height = (top + rows.len() as i32 * line).max(if actions { ACTION_BOTTOM } else { 0 }).saturating_add(32).min(SHEET.3);
+    let visible = ((height-top-32)/line).max(0) as usize;
+    TextLayout { bounds: Rect(SHEET.0,SHEET.1,width,height), body_width, top, line, visible, rows }
+}
 pub enum Detail {
     Enemy(inspection_ui::Report),
     Text { title:String, copy:String, ring:Option<f64>, scroll:usize },
@@ -34,10 +59,14 @@ impl Detail {
         report.item_hover.clear();
         report.creature.as_ref().is_some_and(|c|c.hover_available).then_some(Self::Enemy(report))
     }
-    pub fn click(&self,x:i32,y:i32)->pack::PackAction {
-        let Self::Text{ring:Some(id),..}=self else{return pack::PackAction::None;};
-        if DROP.contains(x,y){pack::PackAction::Command(Command::Drop{id:*id})}
-        else if THROW.contains(x,y){pack::PackAction::Target(pack::PackTarget::Throw(*id))}
+    pub fn bounds(&self,p:&Painter)->Rect {
+        match self { Self::Text{title,copy,ring,..} => layout(p,title,copy,ring.is_some()).bounds, Self::Enemy(_) => SHEET }
+    }
+    pub fn click(&self,p:&Painter,x:i32,y:i32)->pack::PackAction {
+        let Self::Text{title,copy,ring:Some(id),..}=self else{return pack::PackAction::None;};
+        let [(drop,_),(throw,_)]=layout(p,title,copy,true).actions();
+        if drop.contains(x,y){pack::PackAction::Command(Command::Drop{id:*id})}
+        else if throw.contains(x,y){pack::PackAction::Target(pack::PackTarget::Throw(*id))}
         else{pack::PackAction::None}
     }
     pub fn scroll(&mut self,delta:i32) {
@@ -54,36 +83,35 @@ impl Detail {
                 let bottom=p.logical_height().min((upper.1+upper.3).max(lower.1+upper.3));
                 p.logical_damage_rect(upper.0,y,upper.2,bottom-y)
             }
-            Self::Text{..}=>p.detail_damage_rect(SHEET,anchor),
+            Self::Text{..}=>p.detail_damage_rect(self.bounds(p),anchor),
         }
     }
     pub fn paint(&self,p:&mut Painter,anchor:DetailAnchor) {
         match self {
             Self::Enemy(report)=>inspection_ui::paint_pinned_hover(report,p,anchor),
-            Self::Text{title,copy,ring,scroll}=>p.anchored_sheet(SHEET,anchor,|p|{
-                let Rect(x,y,w,h)=SHEET;
-                p.rect(x,y,w,h,[20,17,29]);p.border(x,y,w,h,[111,88,131]);
-                p.text_role(Role::Headings,title,x+20,y+18,23,GOLD);
-                let clip=p.clip;
-                let body_w=if ring.is_some(){340}else{w-40};
-                let body_y=y+68;
-                let body_h=h-112;
-                p.clip=Some((x+20,body_y,body_w,body_h));
-                let copy=copy.strip_prefix(title).and_then(|s|s.strip_prefix('\n')).unwrap_or(copy);
-                let lines=p.wrap_text_role(Role::Tooltips,copy,body_w-12,15);
-                let max=(body_h/22)as usize;
-                for (index,line) in lines.iter().skip((*scroll).min(lines.len().saturating_sub(max))).take(max).enumerate() {
-                    p.text_role(Role::Tooltips,line,x+20,body_y+index as i32*22,15,INK);
-                }
-                p.clip=clip;
-                if ring.is_some() {
-                    for (Rect(xx,yy,ww,hh),name) in [(DROP,"Drop"),(THROW,"Throw")] {
-                        p.rect(xx,yy,ww,hh,[45,36,55]);p.border(xx,yy,ww,hh,[125,99,143]);
-                        p.text_role(Role::Secondary,name,xx+12,yy+8,15,INK);
+            Self::Text{title,copy,ring,scroll} => {
+                let l = layout(p,title,copy,ring.is_some());
+                p.anchored_sheet(l.bounds,anchor,|p|{
+                    let Rect(x,y,w,h)=l.bounds;
+                    p.rect(x,y,w,h,[20,17,29]);p.border(x,y,w,h,[111,88,131]);
+                    let head = p.fit_text_role(Role::Headings,title,w-2*PAD,23);
+                    p.text_role(Role::Headings,&head,x+PAD,y+18,23,GOLD);
+                    let clip=p.clip;
+                    p.clip=Some((x+PAD,y+l.top,l.body_width,l.visible as i32*l.line));
+                    let first=(*scroll).min(l.rows.len().saturating_sub(l.visible));
+                    for (index,line) in l.rows.iter().skip(first).take(l.visible).enumerate() {
+                        p.text_role(Role::Tooltips,line,x+PAD,y+l.top+index as i32*l.line,15,INK);
                     }
-                }
-                p.close_hint(x+20,y+h-28);
-            }),
+                    p.clip=clip;
+                    if ring.is_some() {
+                        for (Rect(xx,yy,ww,hh),name) in l.actions() {
+                            p.rect(xx,yy,ww,hh,[45,36,55]);p.border(xx,yy,ww,hh,[125,99,143]);
+                            p.text_role(Role::Secondary,name,xx+12,yy+8,15,INK);
+                        }
+                    }
+                    p.close_hint(x+PAD,y+h-24);
+                });
+            }
         }
     }
 }
@@ -120,9 +148,12 @@ mod tests {
             assert!(Detail::ground(&r,&row(kind,ring.id,x as usize,y as usize)).is_none());
         }
         let detail=Detail::ground(&r,&row(GroundKind::Item,ring.id,x as usize,y as usize)).unwrap();
-        assert_eq!(detail.click(DROP.0+2,DROP.1+2),pack::PackAction::None);
+        let p=Painter::new();
         let carried=Detail::carried(&r,&ring,true);
-        assert_eq!(carried.click(DROP.0+2,DROP.1+2),pack::PackAction::Command(Command::Drop{id:ring.id}));
-        assert_eq!(carried.click(THROW.0+2,THROW.1+2),pack::PackAction::Target(pack::PackTarget::Throw(ring.id)));
+        let Detail::Text{title,copy,..}=&carried else { panic!("not a ring"); };
+        let [(drop,_),(throw,_)]=layout(&p,title,copy,true).actions();
+        assert_eq!(detail.click(&p,drop.0+2,drop.1+2),pack::PackAction::None);
+        assert_eq!(carried.click(&p,drop.0+2,drop.1+2),pack::PackAction::Command(Command::Drop{id:ring.id}));
+        assert_eq!(carried.click(&p,throw.0+2,throw.1+2),pack::PackAction::Target(pack::PackTarget::Throw(ring.id)));
     }
 }

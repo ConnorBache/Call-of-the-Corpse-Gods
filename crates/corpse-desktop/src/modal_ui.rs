@@ -142,11 +142,15 @@ pub fn hover_bounds(p: &Profile, tile: (i32, i32, i32, i32), height: i32) -> Rec
 /// Passive gameplay inspector: anchor against the whole canvas, not the
 /// hovered tile or the map column. Keep the footer and toolbar unobscured.
 pub fn hover_bounds_painter(p:&Painter,height:i32)->Rect{
+    let max_width = p.profile.number("ui.layout.tooltipMaxWidth").round() as i32;
+    compact_hover_bounds(p, max_width, height)
+}
+pub fn compact_hover_bounds(p:&Painter,width:i32,height:i32)->Rect {
     let margin=8;
     let vw=p.logical_width().max(0);
     let map=p.frame().map;
     let bottom=(map.1+map.3).clamp(0,p.logical_height());
-    let w=(p.profile.number("ui.layout.tooltipMaxWidth").round()as i32).clamp(0,(vw-2*margin).max(0));
+    let w=width.clamp(0,(vw-2*margin).max(0));
     let h=height.clamp(0,620.min((bottom-2*margin).max(0)));
     Rect((vw-margin-w).max(0),(bottom-margin-h).max(0),w,h)
 }

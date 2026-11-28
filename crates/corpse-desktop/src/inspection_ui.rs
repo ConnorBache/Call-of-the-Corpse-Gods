@@ -2032,7 +2032,7 @@ fn content_top(p: &Painter) -> i32 {
     78.max(42 + role_line(p, Role::Headings, 21, 28))
 }
 fn role_lines(p: &Painter, role: Role, text: &str, width: i32, size: u16) -> Vec<String> {
-    p.wrap_text_role(role, text, width.max(1), size)
+    p.compact_text_rows(role, text, width.max(1), size)
 }
 fn paint_prose_role(
     p: &mut Painter,
@@ -2059,13 +2059,41 @@ fn ui_color(p: &Painter, color: [u8; 3]) -> [u8; 3] {
         color
     }
 }
-fn wrapped(report: &Report, p: &Painter) -> Vec<PaintLine> {
+fn drawer_width(report: &Report, p: &Painter) -> i32 {
+    let mut width = p.widest_text_line(Role::Headings, &report.title, 21) + 65;
+    let prose = if let Some(c) = &report.creature {
+        vec![&c.description, &c.behavior, &c.resources, &c.conditions, &c.your_attack,
+            &c.their_attack, &c.abilities, &c.heart]
+    } else { report.lines.iter().collect() };
+    for text in prose {
+        width = width.max(p.widest_text_line(Role::Primary, text, 15) + 32);
+    }
+    if report.details_open {
+        if let Some(c) = &report.creature {
+            width = width.max(p.widest_text_line(Role::Primary, &c.ability_details, 15) + 32);
+        }
+    }
+    width.max(168).min(bounds(&p.profile).2)
+}
+fn drawer_top(report: &Report, p: &Painter) -> i32 {
+    if report.title.trim().is_empty() { 46 } else { content_top(p) }
+}
+fn drawer_rect(report: &Report, p: &Painter, width: i32, rows: usize) -> Rect {
+    let Rect(x,y,_,max_h) = modal_ui::inspection_bounds(&p.profile);
+    let height = drawer_top(report, p) + rows as i32 * role_line(p, Role::Primary, 15, 21) + 31;
+    Rect(x, y, width, height.min(max_h))
+}
+pub fn drawer_bounds(report: &Report, p: &Painter) -> Rect {
+    let width = drawer_width(report, p);
+    drawer_rect(report, p, width, wrapped(report, p, width).len())
+}
+fn wrapped(report: &Report, p: &Painter, width: i32) -> Vec<PaintLine> {
     let mut rows = Vec::new();
-    let mut add = |text: &str, color: [u8; 3], size: u16, space: bool| {
+    let mut add = |text: &str, color: [u8; 3], size: u16| {
         if text.is_empty() {
             return;
         };
-        for text in role_lines(p, Role::Primary, text, bounds(&p.profile).2 - 32, size) {
+        for text in role_lines(p, Role::Primary, text, width - 32, size) {
             rows.push(PaintLine {
                 text,
                 color,
@@ -2073,26 +2101,22 @@ fn wrapped(report: &Report, p: &Painter) -> Vec<PaintLine> {
                 disclosure: false,
             });
         }
-        if space {
-            rows.push(PaintLine {
-                text: String::new(),
-                color,
-                size,
-                disclosure: false,
-            });
-        }
     };
     if let Some(c) = &report.creature {
-        add(&c.description, MUTED, 15, false);
-        add(&c.behavior, MUTED, 15, false);
-        add(&c.resources, INK, 15, false);
-        add(&c.conditions, [193, 138, 255], 14, true);
-        add("Your attacks", [36, 223, 255], 15, false);
-        add(&c.your_attack, [36, 223, 255], 15, true);
-        add(ENEMY_MELEE_HEADING, [255, 82, 120], 15, false);
-        add(&c.their_attack, [255, 82, 120], 15, true);
-        add(&c.abilities, MUTED, 15, true);
-        add(&c.heart, GOLD, 14, false);
+        add(&c.description, MUTED, 15);
+        add(&c.behavior, MUTED, 15);
+        add(&c.resources, INK, 15);
+        add(&c.conditions, [193, 138, 255], 14);
+        if !c.your_attack.trim().is_empty() {
+            add("Your attacks", [36, 223, 255], 15);
+            add(&c.your_attack, [36, 223, 255], 15);
+        }
+        if !c.their_attack.trim().is_empty() {
+            add(ENEMY_MELEE_HEADING, [255, 82, 120], 15);
+            add(&c.their_attack, [255, 82, 120], 15);
+        }
+        add(&c.abilities, MUTED, 15);
+        add(&c.heart, GOLD, 14);
         if !c.ability_details.is_empty() && c.ability_details != c.abilities {
             rows.push(PaintLine {
                 text: format!(
@@ -2108,7 +2132,7 @@ fn wrapped(report: &Report, p: &Painter) -> Vec<PaintLine> {
                     p,
                     Role::Primary,
                     &c.ability_details,
-                    bounds(&p.profile).2 - 32,
+                    width - 32,
                     15,
                 ) {
                     rows.push(PaintLine {
@@ -2122,16 +2146,17 @@ fn wrapped(report: &Report, p: &Painter) -> Vec<PaintLine> {
         }
     } else {
         for text in &report.lines {
-            add(text, INK, 15, true);
+            add(text, INK, 15);
         }
     }
     rows
 }
 pub fn scroll_line_count(report: &Report, p: &Painter) -> usize {
-    wrapped(report, p).len().saturating_sub(
-        ((bounds(&p.profile).3 - content_top(p) - 31).max(0) / role_line(p, Role::Primary, 15, 21))
-            .max(1) as usize,
-    )
+    let width = drawer_width(report, p);
+    let rows = wrapped(report, p, width).len();
+    let height = drawer_rect(report, p, width, rows).3;
+    rows.saturating_sub(((height - drawer_top(report, p) - 31).max(0)
+        / role_line(p, Role::Primary, 15, 21)).max(1) as usize)
 }
 pub fn toggle_details(report: &mut Report) -> bool {
     if report
@@ -2147,12 +2172,13 @@ pub fn toggle_details(report: &mut Report) -> bool {
 }
 /// Drawer owns its hit testing. Parent consumes every mouse input while open.
 pub fn click(report: &mut Report, p: &Painter, scroll: usize, x: i32, y: i32) -> bool {
-    let (bx, by, w, h) = bounds(&p.profile);
-    if x < bx || x >= bx + w || y < by + content_top(p) || y >= by + h - 25 {
+    let Rect(bx, by, w, h) = drawer_bounds(report, p);
+    let top = drawer_top(report, p);
+    if x < bx || x >= bx + w || y < by + top || y >= by + h - 25 {
         return false;
     }
-    let row = scroll + ((y - by - content_top(p)) / role_line(p, Role::Primary, 15, 21)) as usize;
-    if wrapped(report, p).get(row).is_some_and(|r| r.disclosure) {
+    let row = scroll.min(scroll_line_count(report, p)) + ((y - by - top) / role_line(p, Role::Primary, 15, 21)) as usize;
+    if wrapped(report, p, w).get(row).is_some_and(|r| r.disclosure) {
         return toggle_details(report);
     }
     false
@@ -2161,12 +2187,16 @@ pub fn close_hit(x: i32, y: i32) -> bool {
     let (bx, by, w, _) = BOUNDS;
     x >= bx + w - 40 && x < bx + w - 8 && y >= by + 8 && y < by + 36
 }
-pub fn close_hit_profile(p: &Painter, x: i32, y: i32) -> bool {
-    let (bx, by, w, _) = bounds(&p.profile);
+pub fn close_hit_profile(report: &Report, p: &Painter, x: i32, y: i32) -> bool {
+    let Rect(bx, by, w, _) = drawer_bounds(report, p);
     x >= bx + w - 40 && x < bx + w - 8 && y >= by + 8 && y < by + 36
 }
 pub fn paint(report: &Report, p: &mut Painter, scroll: usize) {
-    let (x, y, w, h) = bounds(&p.profile);
+    let w = drawer_width(report, p);
+    let rows = wrapped(report, p, w);
+    let Rect(x, y, w, h) = drawer_rect(report, p, w, rows.len());
+    let top = drawer_top(report, p);
+    let room = ((h - top - 31).max(0) / role_line(p, Role::Primary, 15, 21)).max(1) as usize;
     let old = p.clip;
     p.clip = Some((x, y, w, h));
     p.rect(x, y, w, h, p.profile.rgb("ui.colors.panel"));
@@ -2182,7 +2212,7 @@ pub fn paint(report: &Report, p: &mut Painter, scroll: usize) {
     p.text("×", x + w - 30, y + 10, 19, MUTED);
     p.text_role(
         Role::Headings,
-        &report.title,
+        &p.fit_text_role(Role::Headings, &report.title, (w-54).max(1), 21),
         x + 13,
         y + 42,
         21,
@@ -2190,14 +2220,13 @@ pub fn paint(report: &Report, p: &mut Painter, scroll: usize) {
     );
     p.clip = Some((
         x + 12,
-        y + content_top(p) - 1,
+        y + top - 1,
         (w - 24).max(0),
-        (h - content_top(p) - 24).max(0),
+        (h - top - 24).max(0),
     ));
-    for (n, line) in wrapped(report, p)
-        .iter()
-        .skip(scroll)
-        .take(((h - content_top(p) - 31).max(0) / role_line(p, Role::Primary, 15, 21)).max(1) as usize)
+    for (n, line) in rows.iter()
+        .skip(scroll.min(rows.len().saturating_sub(room)))
+        .take(room)
         .enumerate()
     {
         paint_prose_role(
@@ -2205,7 +2234,7 @@ pub fn paint(report: &Report, p: &mut Painter, scroll: usize) {
             Role::Primary,
             &line.text,
             x + 14,
-            y + content_top(p) + n as i32 * role_line(p, Role::Primary, 15, 21),
+            y + top + n as i32 * role_line(p, Role::Primary, 15, 21),
             line.size,
             ui_color(p, line.color),
         )
@@ -2270,8 +2299,25 @@ fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::De
         return;
     };
     let pinned=anchor.is_some();
-    let place=|p:&Painter,height|anchor.map_or_else(||modal_ui::hover_bounds_painter(p,height),|a|a.enemy_bounds(p,height));
-    let hover_width = place(p, 0).2;
+    let max_width = anchor.map_or_else(|| modal_ui::hover_bounds_painter(p, 0).2, |a| a.enemy_bounds(p, 1).2);
+    let card = c.creature_card.as_ref();
+    let flavor = if card.is_some_and(|v| v.administrator) { crate::creature_abilities_ui::hover::ADMIN_FLAVOR } else { &c.description };
+    let mut natural = p.widest_text_line(Role::Tooltips, &c.title, 18)
+        .max(if c.hover_resources.is_empty() { 110 } else { 198 * c.hover_resources.len() as i32 });
+    let mut measure = |s: &str| { natural = natural.max(p.widest_text_line(Role::Tooltips, s, 15)); };
+    for text in [flavor, &c.behavior, &c.resources, &c.heart, &c.bow_shot] { measure(text); }
+    if let Some(card) = card {
+        for text in [&card.conditions, &format!("Your melee · {}", card.your_melee), &format!("Enemy melee · {}", card.enemy_melee)] { measure(text); }
+        for text in &card.mechanics { measure(text); }
+    } else { for text in [&c.conditions, &c.abilities, &c.your_attack, &c.their_attack] { measure(text); } }
+    if creature.is_some() { if let Some(feature) = &report.feature_hover {
+        measure(&feature.title); measure(&feature.description);
+        for text in &feature.mechanics { measure(text); }
+    }}
+    let hover_width = (natural + 30).min(max_width);
+    let place = |p: &Painter, height: i32| anchor.map_or_else(
+        || modal_ui::compact_hover_bounds(p, hover_width, height),
+        |a| a.place(p, hover_width, height.clamp(1,620)));
     if hover_width <= 30 { return; }
     let line_height = role_line(p, Role::Tooltips, 15, 21);
     let mut rows: Vec<(String, [u8; 3], u16, i32)> = vec![];
@@ -2286,10 +2332,6 @@ fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::De
         }
         offset += gap;
     };
-    let card = c.creature_card.as_ref();
-    let flavor = if card.is_some_and(|v| v.administrator) {
-        crate::creature_abilities_ui::hover::ADMIN_FLAVOR
-    } else { &c.description };
     add(flavor, MUTED, 15, 4);
     add(&c.behavior, MUTED, 15, 4);
     // Resource meters are an observed detached projection, never parsed from prose.
@@ -2321,10 +2363,14 @@ fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::De
         }
     } else {
         add(&c.conditions, [193, 138, 255], 14, 7);
-        add("Your attacks", [36, 223, 255], 15, 2);
-        add(&c.your_attack, [36, 223, 255], 15, 7);
-        add(ENEMY_MELEE_HEADING, [255, 82, 120], 15, 2);
-        add(&c.their_attack, [255, 82, 120], 15, 7);
+        if !c.your_attack.trim().is_empty() {
+            add("Your attacks", [36, 223, 255], 15, 2);
+            add(&c.your_attack, [36, 223, 255], 15, 7);
+        }
+        if !c.their_attack.trim().is_empty() {
+            add(ENEMY_MELEE_HEADING, [255, 82, 120], 15, 2);
+            add(&c.their_attack, [255, 82, 120], 15, 7);
+        }
         add(&c.abilities, MUTED, 15, 4);
     }
     add(&c.heart, GOLD, 14, 0);
@@ -2336,7 +2382,9 @@ fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::De
             for mechanic in &feature.mechanics { add(mechanic, MUTED, 15, 2); }
         }
     }
-    let (x, y, w, h) = place(p, offset + 12 + if pinned {18}else{0}).tuple();
+    let row_bottom = rows.last().map_or(36, |row| row.3 + line_height);
+    let meter_bottom = if c.hover_resources.is_empty() { 0 } else { resource_y + 26 };
+    let (x, y, w, h) = place(p, row_bottom.max(meter_bottom) + 10 + if pinned {18}else{0}).tuple();
     if h <= 0 { return; }
     let old = p.clip;
     p.clip = Some((x, y, w, h));
@@ -2405,18 +2453,13 @@ fn paint_hover_card(report: &Report, p: &mut Painter, anchor:Option<modal_ui::De
 /// O(text wrapping/font work + clipped tooltip pixels), no world observation.
 fn paint_item_hover(report: &Report, p: &mut Painter) {
     if report.item_hover.is_empty() { return; }
-    let width=modal_ui::hover_bounds_painter(p,0).2;
+    let natural = report.item_hover.iter().map(|s| p.widest_text_line(Role::Tooltips, s, 15)).max().unwrap_or(0);
+    let width = (natural + 28).max(66).min(modal_ui::hover_bounds_painter(p,0).2);
     if width<=28{return;}
     let line_height=role_line(p,Role::Tooltips,15,21);
-    let mut rows=Vec::new();
-    for block in &report.item_hover {
-        for paragraph in block.lines() {
-            rows.extend(role_lines(p,Role::Tooltips,paragraph,width-28,15));
-        }
-        rows.push(String::new());
-    }
-    rows.pop();
-    let (x,y,w,h)=modal_ui::hover_bounds_painter(p,rows.len()as i32*line_height+24).tuple();
+    let rows: Vec<_> = report.item_hover.iter().flat_map(|s| role_lines(p,Role::Tooltips,s,width-28,15)).collect();
+    if rows.is_empty() { return; }
+    let (x,y,w,h)=modal_ui::compact_hover_bounds(p,width,rows.len()as i32*line_height+24).tuple();
     if h<=0{return;}
     let old=p.clip;p.clip=Some((x,y,w,h));
     let left=x.max(0);let top=y.max(0);
@@ -3452,15 +3495,15 @@ mod tests {
             ..Default::default()
         }
         .report();
-        let lines = wrapped(&report, &p);
+        let lines = wrapped(&report, &p, drawer_width(&report, &p));
         let row = lines.iter().position(|l| l.disclosure).unwrap();
-        let (x, y, w, h) = BOUNDS;
+        let Rect(x, y, w, _) = drawer_bounds(&report, &p);
         assert!(!click(&mut report, &p, 0, x - 1, y + 78 + row as i32 * 21));
         assert!(click(&mut report, &p, 0, x + 20, y + 78 + row as i32 * 21));
         assert!(report.details_open);
         assert!(scroll_line_count(&report, &p) > 0);
-        assert!(close_hit(x + w - 20, y + 20));
-        assert!(!close_hit(x + w, y + 20));
+        assert!(close_hit_profile(&report,&p,x + drawer_bounds(&report,&p).2 - 20, y + 20));
+        assert!(!close_hit_profile(&report,&p,x + drawer_bounds(&report,&p).2, y + 20));
         for _ in 0..10 {
             p.rect(
                 0,
@@ -3470,6 +3513,7 @@ mod tests {
                 [93, 31, 113],
             );
             paint(&report, &mut p, 0);
+            let Rect(x,y,w,h) = drawer_bounds(&report,&p);
             for (px, py) in [
                 (x - 1, y),
                 (x + w, y),
@@ -4337,7 +4381,7 @@ mod hover_tests {
             let their_attack = format_attack(&attack, false);
             assert_eq!(their_attack, expected);
             let report = CreatureReport { their_attack, ..Default::default() }.report();
-            let lines = wrapped(&report, &p);
+            let lines = wrapped(&report, &p, drawer_width(&report, &p));
             assert_eq!(lines.iter().filter(|line| line.text == ENEMY_MELEE_HEADING).count(), 1);
             assert!(!lines.iter().any(|line| line.text == "Enemy attacks"));
             assert!(lines.iter().any(|line| line.text == expected));
@@ -4617,25 +4661,26 @@ mod appearance_tests {
         ] {
             p.profile = crate::appearance_profile::Profile::from_value(appearance).unwrap();
             report.details_open = false;
-            let (bx, by, w, h) = bounds(&p.profile);
-            assert!(close_hit_profile(&p, bx + w - 20, by + 20));
-            assert!(!close_hit_profile(&p, bx + w, by + 20));
-            let rows = wrapped(&report, &p);
+            let Rect(bx, by, w, _) = drawer_bounds(&report, &p);
+            assert!(close_hit_profile(&report, &p, bx + w - 20, by + 20));
+            assert!(!close_hit_profile(&report, &p, bx + w, by + 20));
+            let rows = wrapped(&report, &p, drawer_width(&report, &p));
             let disclosure = rows.iter().position(|r| r.disclosure).unwrap();
             let line = role_line(&p, Role::Primary, 15, 21);
-            let scroll = disclosure;
+            let scroll = disclosure.min(scroll_line_count(&report, &p));
             assert!(click(
                 &mut report,
                 &p,
                 scroll,
                 bx + 20,
-                by + content_top(&p) + line / 2
+                by + content_top(&p) + (disclosure-scroll) as i32 * line + line / 2
             ));
             assert!(report.details_open);
             assert!(scroll_line_count(&report, &p) > 0);
             p.clear([93, 31, 113]);
             let visible_scroll = scroll.min(scroll_line_count(&report, &p));
             paint(&report, &mut p, visible_scroll);
+            let Rect(bx,by,w,h) = drawer_bounds(&report,&p);
             for (x, y) in [(bx - 1, by), (bx + w, by), (bx, by - 1), (bx, by + h)] {
                 let at = (y as usize * crate::render::WIDTH + x as usize) * 4;
                 assert_eq!(&p.pixels[at..at + 3], &[93, 31, 113]);

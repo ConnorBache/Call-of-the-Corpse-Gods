@@ -18,7 +18,7 @@ impl Layout {
             (&*a.cost, 14, [36, 223, 255], 4), (&*a.description, 16, INK, 10),
             (coverage, 13, MUTED, 8)];
         let natural = sections.iter().map(|(s,size,_,_)|
-            p.measure_text_role(Role::Tooltips, s, *size).ceil() as i32).max().unwrap_or(1);
+            p.widest_text_line(Role::Tooltips, s, *size)).max().unwrap_or(1);
         let (width,height)=anchor.capacity(p);
         let available_width = (width as f64 / DIALOG_SCALE).floor() as i32;
         let inner = natural.clamp(190,480).min((available_width - 2 * PAD).max(1));
@@ -27,7 +27,7 @@ impl Layout {
             if text.trim().is_empty() { continue; }
             let style = typography_ui::resolve(&p.profile, Role::Tooltips, RoleStyle::baseline(size as f64));
             let height = (style.font_size * style.line_height).ceil().max(style.font_size.ceil()) as i32;
-            for (i, text) in p.wrap_text_role(Role::Tooltips, text, inner, size).into_iter().enumerate() {
+            for (i, text) in p.compact_text_rows(Role::Tooltips, text, inner, size).into_iter().enumerate() {
                 lines.push(Line { text, size, color, height, gap: if i == 0 && !lines.is_empty() { gap } else { 0 } });
             }
         }

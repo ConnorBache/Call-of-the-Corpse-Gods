@@ -41,7 +41,7 @@ fn compact_dialogs_render_repeatably_and_restore_background_after_dismissal() {
             "creatures"=>p.creatures(&view,None,0),
             "ability"=>p.ability_detail(&ability,usize::MAX, ability_anchor),
             "hazard"=>p.hazard_prompt("Walk amid razorleaves? Ending your turn there costs 2% of your maximum health (rounded up)."),
-            "inspection"=>{let report=crate::inspection_ui::observe_tile(&engine.run,engine.run.player.x as usize,engine.run.player.y as usize);p.docked_sheet(crate::modal_ui::inspection_bounds(&p.profile),|p|crate::inspection_ui::paint(&report,p,0));},
+            "inspection"=>{let report=crate::inspection_ui::observe_tile(&engine.run,engine.run.player.x as usize,engine.run.player.y as usize);p.docked_sheet(crate::inspection_ui::drawer_bounds(&report,&p),|p|crate::inspection_ui::paint(&report,p,0));},
             "pack"=>{let mut pack=crate::pack::PackView::observe(&engine.run);pack.configure(&p,p.frame().map.tuple());let (x,y,w,h)=pack.bounds();let map=crate::modal_ui::map_menu_area(p.frame().map);assert_eq!((x+w,y+h),(map.0+map.2,map.1+map.3));assert!(x>=map.0&&y>=map.1);pack.paint(&mut p);},
             _=>p.blessing_choices(&[ability.clone(),ability.clone(),ability.clone()],0),
         }
@@ -50,4 +50,48 @@ fn compact_dialogs_render_repeatably_and_restore_background_after_dismissal() {
         p.game_at(&view,"",false,0.);assert_eq!(p.pixels,base,"closing {name}");
     }
     assert_eq!(engine.save().unwrap(),before);
+}
+
+
+#[test]
+fn transient_layouts_skip_blank_rows_and_hit_the_measured_card() {
+    use crate::{ability_ui, inspection_ui, modal_ui::DetailAnchor};
+    let mut p=Painter::new();
+    p.resize(1920,1080);
+    p.set_responsive_canvas(true);
+    let run=corpse_core::startup::create_avatar_run("02-03-09:compact-panels").unwrap();
+    let mut choice=ability_ui::observe(&run,"shrail-commandment");
+    choice.description="Short copy.\n  \n".into();
+    let short=p.blessing_layout(&[choice.clone()]);
+    choice.description="Short copy.".into();
+    let trimmed=p.blessing_layout(&[choice.clone()]);
+    assert_eq!(short.bounds,trimmed.bounds);
+    assert!(short.bounds.3 < BLESSING_DOCK.3);
+    let at=(short.bounds.0+25,short.bounds.1+24);
+    let pixel=p.docked_sheet(short.bounds,|p|(p.native_x(at.0 as f64),p.native_y(at.1 as f64)));
+    let sheet=p.logical_point_for_dock(short.bounds,pixel.0,pixel.1,(1920,1080));
+    assert_eq!(short.hit(sheet.0,sheet.1),Some(0));
+    assert_eq!(short.hit(at.0,short.bounds.1+short.bounds.3-1),None);
+    choice.description="First detail.\nSecond detail.\nThird detail.".into();
+    assert!(p.blessing_layout(&[choice]).bounds.3>short.bounds.3);
+    let one=inspection_ui::Report{title:"Feature".into(),lines:vec!["One line.".into()],..Default::default()};
+    let mut whitespace=one.clone();
+    whitespace.lines=vec!["One line.".into()," ".into(),String::new()];
+    assert_eq!(inspection_ui::drawer_bounds(&one,&p),inspection_ui::drawer_bounds(&whitespace,&p));
+    let mut two=one.clone();
+    two.lines.push("Second line.".into());
+    assert!(inspection_ui::drawer_bounds(&two,&p).3>inspection_ui::drawer_bounds(&one,&p).3);
+    let a=crate::context_detail::Detail::text("A god".into(),"TODO".into(),None);
+    let b=crate::context_detail::Detail::text("A god".into(),"TODO\n\n".into(),None);
+    assert_eq!(a.bounds(&p),b.bounds(&p));
+    assert!(a.bounds(&p).3 < crate::context_detail::SHEET.3);
+    assert!(a.damage(&p,DetailAnchor::Dock).is_some());
+    let (hazard,rows)=p.hazard_layout("Jump?\n\n");
+    assert_eq!(rows,vec!["Jump?"]);
+    assert!(hazard.3<HAZARD_DOCK.3);
+    let mut shutter=crate::chronicle_overlay::Shutter::default();
+    shutter.open(0.,true);
+    let one=crate::chronicle_overlay::bounds_painter(&p,&shutter,0.,true,1).unwrap();
+    let many=crate::chronicle_overlay::bounds_painter(&p,&shutter,0.,true,20).unwrap();
+    assert!(one.3<many.3);
 }

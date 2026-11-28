@@ -324,9 +324,13 @@ impl PackView {
         let base=660.min(area.2);
         let width=if kind=="heart" && base>=295 {
             heart_columns(base-155,self.heart_metrics).0+155
-        }else{base};
+        } else if kind=="potion" {
+            (self.heart_metrics[0]+173).max(300).min(base)
+        } else {base};
         let row=if kind=="potion"{47}else{34};
-        let height=88+(self.groups.len() as i32*row).max(155);
+        // The three permanent action buttons occupy 108px; the item
+        // column otherwise needs exactly the number of actual rows.
+        let height=76+(self.groups.len() as i32*row).max(108);
         let Rect(x,y,width,height)=modal_ui::dock_menu(area,width,height);
         let left=(width-135).max(1);
         layout.bounds=Rect(x,y,width,height);
@@ -390,6 +394,10 @@ impl PackView {
                 let base=660.min(modal_ui::map_menu_area(area).2);
                 let old=(base-155).max(1);
                 self.heart_column_x=if base>=295 {heart_columns(old,self.heart_metrics).1}else{old*55/100};
+            } else {
+                self.heart_metrics[0]=self.groups.iter().map(|g|
+                    p.widest_text_line(Role::Inventory,&self.row_label(g),14)
+                        .max(p.widest_text_line(Role::Inventory,&g.supply_note,12))).max().unwrap_or(0);
             }
             self.layout=self.resolve_layout(p,area,self.minimum_list_width);
             self.list_scroll=self.list_scroll.clamp(0,self.list_max_scroll());
@@ -1034,9 +1042,10 @@ impl PackView {
             for(i,yy)in self.row_positions(){let r=Rect(self.layout.list.0,yy-self.list_scroll,self.layout.list.2,self.layout.row);if Some(self.groups[i].item.id)!=self.selected&&r.contains(x,y)&&self.layout.list.contains(x,y){if let Some(r)=intersect_rect(r,self.layout.list){hover.push(r);}}}
             if self.layout.detail.contains(x,y){for(i,r)in self.button_rects(){if self.focus_action!=Some(i)&&r.contains(x,y){if let Some(r)=intersect_rect(r,self.layout.detail){hover.push(r);}}}}
         }
-        let tooltip=self.tooltip().filter(|s|!s.is_empty()).zip(self.hover_at).map(|(text,(x,y))|{
-            let width=(p.profile.number("ui.layout.tooltipMaxWidth").round()as i32).min((self.layout.bounds.2-8).max(1));
-            let lines=p.wrap_text_role(Role::Tooltips,&text,(width-16).max(1),13);
+        let tooltip=self.tooltip().filter(|s|!s.trim().is_empty()).zip(self.hover_at).map(|(text,(x,y))|{
+            let width=(p.widest_text_line(Role::Tooltips,&text,13)+16)
+                .min(p.profile.number("ui.layout.tooltipMaxWidth").round()as i32).min((self.layout.bounds.2-8).max(1));
+            let lines=p.compact_text_rows(Role::Tooltips,&text,(width-16).max(1),13);
             let line_height=TextMetrics::new(p,Role::Tooltips,13,18).line;
             let height=(lines.len()as i32*line_height+12).min((self.layout.bounds.3-8).max(1));
             let tx=x.clamp(self.layout.bounds.0+4,(self.layout.bounds.0+self.layout.bounds.2-width-4).max(self.layout.bounds.0+4));

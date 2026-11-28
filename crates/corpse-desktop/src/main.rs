@@ -123,10 +123,10 @@ mod static_bestiary_schedule_tests {
     }
 }
 
-/// Shared menu layout: pointer hover and activation use the same visible rows.
-/// O(1), reuse exact painted/clicked card bounds; only changes UI selection, never dispatches.
-fn update_blessing_hover(selected:&mut usize,count:usize,x:i32,y:i32)->bool{
-    if let Some(index)=render::blessing_choice_at(x,y).filter(|i|*i<count){if *selected!=index{*selected=index;return true;}}false
+/// Hover only changes the selection; the measured card determines its index.
+fn update_blessing_hover(selected:&mut usize, hit:Option<usize>)->bool {
+    if let Some(index)=hit { if *selected!=index { *selected=index; return true; } }
+    false
 }
 fn menu_item_at(x: i32, y: i32) -> Option<usize> {
     menu_ui::item_at(x, y)
@@ -482,7 +482,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 x.parse().map_err(|_| "Invalid tile x")?,
                 y.parse().map_err(|_| "Invalid tile y")?,
             );
-            painter.docked_sheet(modal_ui::inspection_bounds(&painter.profile),|p| inspection_ui::paint(&report,p,0));
+            painter.docked_sheet(inspection_ui::drawer_bounds(&report,&painter),|p| inspection_ui::paint(&report,p,0));
         }
         if !view.offers.is_empty() {
             painter.blessing_choices(&view.offers, 0);
@@ -834,13 +834,17 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             // Keep both spaces: game clicks outside a modal still target the
             // responsive map/toolbar; only the authored sheet consumes sheet input.
             let raw_pointer=match &event{Event::MouseMotion{x,y,..}|Event::MouseButtonDown{x,y,..}|Event::MouseButtonUp{x,y,..}=>Some((*x,*y)),_=>None};
+            let blessing_layout = run.as_ref().filter(|r| screen==Screen::Game && !r.run.offers.is_empty()).map(|r| {
+                let offers=r.run.offers.iter().map(|id|ability_ui::observe(&r.run,id)).collect::<Vec<_>>();
+                painter.blessing_layout(&offers)
+            });
             let dock=if screen!=Screen::Game || run.as_ref().is_some_and(|r|debug_loadout.active(&r.run)){None}
-                else if run.as_ref().is_some_and(|r|!r.run.offers.is_empty()){Some(render::BLESSING_DOCK)}
-                else if tile_report.is_some(){Some(modal_ui::inspection_bounds(&painter.profile))}
+                else if let Some(layout)=blessing_layout.as_ref(){Some(layout.bounds)}
+                else if let Some(report)=tile_report.as_ref(){Some(inspection_ui::drawer_bounds(report,&painter))}
                 else if inspecting{Some(render::CREATURES_DOCK)}
                 else{None};
             let to_sheet=|x,y|if context_detail.is_some() && dock.is_none() {
-                painter.logical_point_for_detail(context_detail::SHEET,context_anchor,x,y,canvas.window().size())
+                painter.logical_point_for_detail(context_detail.as_ref().unwrap().bounds(&painter),context_anchor,x,y,canvas.window().size())
             }else{match dock{
                 Some(rect)=>painter.logical_point_for_dock(rect,x,y,canvas.window().size()),
                 None=>painter.logical_point_for_sheet(x,y,canvas.window().size()),
@@ -1989,7 +1993,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         if let Some(r) = run.as_mut() {
                             if debug_loadout.active(&r.run) { debug_loadout.click(&mut r.run, sheet_pointer.unwrap().0, sheet_pointer.unwrap().1); dirty = true; continue; }
                             if r.run.status == "playing" && !r.run.offers.is_empty() {
-                                if let Some(i) = render::blessing_choice_at(sheet_pointer.unwrap().0,sheet_pointer.unwrap().1) {
+                                if let Some(i) = blessing_layout.as_ref().and_then(|layout| layout.hit(sheet_pointer.unwrap().0,sheet_pointer.unwrap().1)) {
                                     if let Some(id) = r.run.offers.get(i).cloned() {
                                         notice = match dispatch(
                                             r,
@@ -2005,12 +2009,12 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 }
                                 continue;
                             }
-                            if let Some(report) = tile_report.as_mut().filter(|_| {
-                                let (xx, yy, w, h) = inspection_ui::bounds(&painter.profile);
+                            if let Some(report) = tile_report.as_mut().filter(|report| {
+                                let (xx, yy, w, h) = inspection_ui::drawer_bounds(report, &painter).tuple();
                                 let(x,y)=sheet_pointer.unwrap();
                                 x >= xx && x < xx + w && y >= yy && y < yy + h
                             }) {
-                                if inspection_ui::close_hit_profile(&painter,sheet_pointer.unwrap().0,sheet_pointer.unwrap().1) {
+                                if inspection_ui::close_hit_profile(report,&painter,sheet_pointer.unwrap().0,sheet_pointer.unwrap().1) {
                                     tile_report = None;
                                 } else {
                                     inspection_ui::click(
@@ -2026,7 +2030,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             if history.is_some() { continue; }
                             if let Some(detail)=context_detail.as_ref(){
                                 let (sx,sy)=sheet_pointer.unwrap();
-                                match detail.click(sx,sy) {
+                                match detail.click(&painter,sx,sy) {
                                     pack::PackAction::Command(command)=>{
                                         context_detail=None;
                                         notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&command){
@@ -2070,7 +2074,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             }
                             if !inspecting && tile_report.is_none() && hazard_prompt.is_none()
                                 && painter.chronicle_hit_rect().contains(x,y) {
-                                history=Some(bestiary_notices.history(&r.run));shutter.open(start.elapsed().as_millis()as f64,reduced);
+                                history=Some(bestiary_notices.history(&r.run).into_iter().filter(|line|!line.trim().is_empty()).collect());shutter.open(start.elapsed().as_millis()as f64,reduced);
                                 resting=None;travel=None;painter.chronicle_hover=false;
                                 cosmetic_dirty=true;continue;
                             }
@@ -2154,7 +2158,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                         inventory = false;
                                     }
                                     6 => {
-                                        history = Some(bestiary_notices.history(&r.run));
+                                        history = Some(bestiary_notices.history(&r.run).into_iter().filter(|line|!line.trim().is_empty()).collect());
                                         shutter.open(start.elapsed().as_millis()as f64,reduced);resting=None;travel=None;
                                     }
                                     7 => {
@@ -2412,7 +2416,10 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 }
                 Event::MouseMotion { x, y, .. } if screen==Screen::Game && run.as_ref().is_some_and(|r|r.run.status=="playing"&&!r.run.offers.is_empty())=>{
                     let r=run.as_ref().unwrap();
-                    if !debug_loadout.active(&r.run){cosmetic_dirty|=update_blessing_hover(&mut choice_selected,r.run.offers.len(),sheet_pointer.unwrap().0,sheet_pointer.unwrap().1);}
+                    if !debug_loadout.active(&r.run){
+                        cosmetic_dirty |= update_blessing_hover(&mut choice_selected, blessing_layout.as_ref()
+                            .and_then(|layout|layout.hit(sheet_pointer.unwrap().0,sheet_pointer.unwrap().1)));
+                    }
                     continue;
                 }
                 Event::MouseMotion { x, y, .. } if screen == Screen::Game && inventory => {
@@ -2428,8 +2435,8 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         || history.is_some()
                         || ability_detail.is_some()
                         || hazard_prompt.is_some()
-                        || tile_report.as_ref().is_some_and(|_| {
-                            let (xx, yy, w, h) = inspection_ui::bounds(&painter.profile);
+                        || tile_report.as_ref().is_some_and(|report| {
+                            let (xx, yy, w, h) = inspection_ui::drawer_bounds(report, &painter).tuple();
                             let(x,y)=sheet_pointer.unwrap();
                             x >= xx && x < xx + w && y >= yy && y < yy + h
                         });
@@ -3089,13 +3096,13 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 let hover_state=if !inventory&&!inspecting&&context_detail.is_none()&&ability_detail.is_none()&&history.is_none(){
                                     hover_report.as_ref().zip(hover_tile).and_then(|(report,_)|tile_overlay::hover(&painter,report))
                                 }else{None};
-                                let shutter_state=history.as_ref().and_then(|_|chronicle_overlay::bounds_painter(&painter,&shutter,now,reduced).and_then(|(x,y,w,h)|painter.logical_damage_rect(x,y,w,h)).map(|bounds|tile_overlay::Shutter{bounds,offset:shutter.offset}));
+                                let shutter_state=history.as_ref().and_then(|lines|chronicle_overlay::bounds_painter(&painter,&shutter,now,reduced,lines.len()).and_then(|(x,y,w,h)|painter.logical_damage_rect(x,y,w,h)).map(|bounds|tile_overlay::Shutter{bounds,offset:shutter.offset}));
                                 let mut panels=Vec::new();
                                 if effects.plane_transition.is_some(){let b=painter.frame().map;panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}
                                 if !effects::inventory_marks(&effects.cues,now).is_empty(){panels.extend(painter.hud_damage());if let Some(pack)=pack_view.as_ref(){let b=pack.bounds();panels.extend(painter.logical_damage_rect(b.0,b.1,b.2,b.3));}}
                                 if inspecting{panels.extend(painter.dock_damage_rect(render::CREATURES_DOCK));}
-                                if tile_report.is_some(){panels.extend(painter.dock_damage_rect(modal_ui::inspection_bounds(&painter.profile)));}
-                                if hazard_prompt.is_some(){panels.extend(painter.dock_damage_rect(render::HAZARD_DOCK));}
+                                if let Some(report)=&tile_report{panels.extend(painter.dock_damage_rect(inspection_ui::drawer_bounds(report,&painter)));}
+                                if let Some((_,message))=&hazard_prompt{panels.extend(painter.hazard_damage(message));}
                                 if let Some(detail)=&context_detail{panels.extend(detail.damage(&painter,context_anchor));}
                                 if let Some((ability,anchor))=&ability_detail_view{panels.extend(painter.ability_detail_damage(ability,*anchor));}
                                 if let Some(((x,y,w,h),_))=aim_notice {panels.extend(painter.logical_damage_rect(x,y,w,h));}
@@ -3162,7 +3169,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 painter.text_role(role,&text,x+10,y+6,14,[243,228,246]);
                             }
                             if let Some(report) = &tile_report {
-                                painter.docked_sheet(modal_ui::inspection_bounds(&painter.profile),|p|inspection_ui::paint(report,p,tile_report_scroll));
+                                painter.docked_sheet(inspection_ui::drawer_bounds(report,&painter),|p|inspection_ui::paint(report,p,tile_report_scroll));
                             }
                             if let Some((_, message)) = &hazard_prompt {
                                 painter.hazard_prompt(message);
@@ -3414,7 +3421,14 @@ mod tests {
     }
     /// O(1), pointer hover selects without activation and gaps preserve keyboard-selected index.
     #[test]
-    fn blessing_hover_uses_click_bounds_without_auto_choosing(){let mut selected=0;assert!(update_blessing_hover(&mut selected,3,389,350));assert_eq!(selected,1);assert!(!update_blessing_hover(&mut selected,3,389,350));assert!(!update_blessing_hover(&mut selected,3,389,338));assert_eq!(selected,1);assert!(!update_blessing_hover(&mut selected,1,389,520));assert_eq!(selected,1);selected=2;assert!(!update_blessing_hover(&mut selected,3,0,0));assert_eq!(selected,2);}
+    fn blessing_hover_only_changes_selection_for_a_hit() {
+        let mut selected=0;
+        assert!(update_blessing_hover(&mut selected,Some(1)));
+        assert_eq!(selected,1);
+        assert!(!update_blessing_hover(&mut selected,Some(1)));
+        assert!(!update_blessing_hover(&mut selected,None));
+        assert_eq!(selected,1);
+    }
     #[test]
     fn menu_pointer_matches_primary_buttons_and_excludes_gaps() {
         for (i, item) in menu_ui::ITEMS.iter().enumerate() {

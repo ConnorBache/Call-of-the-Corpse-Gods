@@ -24,12 +24,16 @@ pub fn header_hit(x:i32,y:i32)->bool{(12..WIDTH as i32-12).contains(&x)&&(6..44)
 fn capacity()->usize{capacity_height(HEIGHT as i32)}
 fn capacity_height(height:i32)->usize{((height-18-80)/24).max(1)as usize}
 pub fn header_hit_painter(p:&Painter,x:i32,y:i32)->bool{(12..p.logical_width()-12).contains(&x)&&(6..44).contains(&y)}
-pub fn bounds_painter(p:&Painter,shutter:&Shutter,now:f64,reduced:bool)->Option<(i32,i32,i32,i32)>{let h=((p.logical_height()-18)as f64*shutter.fraction(now,reduced)).round()as i32;(h>0).then_some((12,6,p.logical_width()-24,h))}
+pub fn bounds_painter(p:&Painter,shutter:&Shutter,now:f64,reduced:bool,rows:usize)->Option<(i32,i32,i32,i32)>{
+    let measured=80+rows.min(capacity_height(p.logical_height())) as i32*24;
+    let h=(measured.min(p.logical_height()-18)as f64*shutter.fraction(now,reduced)).round()as i32;
+    (h>0).then_some((12,6,p.logical_width()-24,h))
+}
 /// Exact logical painted coverage, including the retracting shutter's current height.
 pub fn bounds(shutter:&Shutter,now:f64,reduced:bool)->Option<(i32,i32,i32,i32)>{let h=((HEIGHT as i32-18)as f64*shutter.fraction(now,reduced)).round()as i32;(h>0).then_some((12,6,WIDTH as i32-24,h))}
 /// O(visible glyphs + clipped panel pixels); no Run access, history observation, or layout search.
 pub fn paint(p:&mut Painter,lines:&[String],shutter:&Shutter,now:f64,reduced:bool){
- let Some((_,_,_,h))=bounds_painter(p,shutter,now,reduced)else{return;};
+ let Some((_,_,_,h))=bounds_painter(p,shutter,now,reduced,lines.len())else{return;};
  let old_clip=p.clip;p.clip=Some((12,6,p.logical_width()-24,h));
  p.rect(12,6,p.logical_width()-24,h,[11,13,21]);p.border(12,6,p.logical_width()-24,h,[104,81,66]);
  p.text("CHRONICLE",28,15,22,[238,211,151]);p.rect(24,44,p.logical_width()-48,1,[83,68,59]);
@@ -40,7 +44,7 @@ pub fn paint(p:&mut Painter,lines:&[String],shutter:&Shutter,now:f64,reduced:boo
  if footer>=46 {
      p.rect(24,footer,p.logical_width()-48,1,[83,68,59]);
      p.close_hint(28,footer+6);
-     p.text("Wheel / ↑ / ↓ to scroll",142,footer+6,11,[167,164,181]);
+     if lines.len()>count { p.text("Wheel / ↑ / ↓ to scroll",142,footer+6,11,[167,164,181]); }
  }
  p.clip=old_clip;
 }
