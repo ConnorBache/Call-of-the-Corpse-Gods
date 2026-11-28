@@ -220,6 +220,7 @@ pub struct PackView {
     )>,
     text_metrics: Option<TextMetrics>,
     minimum_list_width: i32,
+    heart_metrics: [i32;3],
     button_metrics: Option<TextMetrics>,
     groups: Vec<Group>,
     stamp: Stamp,
@@ -264,6 +265,20 @@ impl PackPaintState {
         regions.extend(candidates.into_iter().zip(selected).filter_map(|(r,s)|s.then_some(r)));
     }
 }
+/// The widest detached heart label, blessing box and stat string share columns.
+fn heart_columns(previous:i32, [name,badge,stat]:[i32;3])->(i32,i32,i32) {
+    let old_badge_x=previous*55/100;
+    if previous<140 {
+        return (previous,old_badge_x,badge);
+    }
+    let name_end=8+name.min((old_badge_x-16).max(0));
+    let badge_x=name_end+(old_badge_x-name_end+1)/2;
+    let old_stat_x=old_badge_x+badge+9;
+    let stat=stat.min((previous-old_stat_x-9).max(0));
+    let tail=(previous-old_stat_x-stat).max(0);
+    let width=(badge_x+badge+9+stat+(tail+1)/2).min(previous);
+    (width,badge_x,badge)
+}
 impl PackView {
     pub fn observe(run: &Run) -> Self {
         Self {
@@ -280,6 +295,7 @@ impl PackView {
             metric_signature: None,
             text_metrics: None,
             minimum_list_width: 402,
+            heart_metrics: [0,28,0],
             button_metrics: None,
             groups: display_groups(run),
             quick_kind: None,
@@ -302,7 +318,10 @@ impl PackView {
             return PackLayout::resolve_measured(&p.profile,area,measured_width);
         };
         let mut layout=PackLayout::resolve(&p.profile,area);
-        let width=660.min((area.2-24).max(1));
+        let base=660.min((area.2-24).max(1));
+        let width=if kind=="heart" && base>=295 {
+            heart_columns(base-155,self.heart_metrics).0+155
+        }else{base};
         let row=if kind=="potion"{47}else{34};
         let height=(88+(self.groups.len() as i32*row).max(155)).min((area.3-24).max(1));
         let x=area.0+(area.2-width)/2;
@@ -360,6 +379,13 @@ impl PackView {
             }
         }
         if self.quick_kind.is_some() {
+            if self.quick_kind==Some("heart") {
+                self.heart_metrics=self.groups.iter().fold([0,28,0],|[name,badge,stat],g|[
+                    name.max(p.measure_text_role(Role::Inventory,&self.row_label(g),14).ceil() as i32),
+                    badge.max(g.blessings.map_or(28,|n| crate::render::resource_ui::text_width(p,&n.to_string(),12)+12)),
+                    stat.max(p.measure_text_role(Role::Inventory,&g.supply_note,12).ceil() as i32),
+                ]);
+            }
             self.layout=self.resolve_layout(p,area,self.minimum_list_width);
             self.list_scroll=self.list_scroll.clamp(0,self.list_max_scroll());
             self.detail_scroll=0;
@@ -1041,6 +1067,8 @@ impl PackView {
         p.text("×",self.layout.close.0+7,self.layout.close.1,22,p.profile.rgb("ui.colors.primary"));
         p.text_role(Role::Secondary,"Esc to close",list.0,b.1+b.3-19,11,p.profile.rgb("ui.colors.secondary"));
         p.clip=Some(list.tuple());
+        let (_,heart_badge_x,heart_badge_width)=heart_columns(
+            (660.min((p.logical_width()-24).max(1))-155).max(1),self.heart_metrics);
         for (index,yy) in self.row_positions() {
             let y=yy-self.list_scroll;
             let row=Rect(list.0,y,list.2,self.layout.row);
@@ -1052,7 +1080,7 @@ impl PackView {
             p.rect(row.0,row.1,row.2,row.3-1,p.profile.rgb(bg));
             p.rect(row.0,row.1+row.3-1,row.2,1,p.profile.rgb("ui.colors.border"));
             let label=self.row_label(g);
-            let name_width=if hearts{row.2*55/100}else{row.2-16};
+            let name_width=if hearts{heart_badge_x}else{row.2-16};
             let name=p.fit_text_role(Role::Inventory,&label,(name_width-16).max(1),14);
             p.text_role(Role::Inventory,&name,row.0+8,y+5,14,p.profile.rgb("ui.colors.primary"));
             if let Some(blessings)=g.blessings {
@@ -1061,8 +1089,9 @@ impl PackView {
                 let w=(crate::render::resource_ui::text_width(p,&text,12)+12).max(28);
                 p.rect(x,y+6,w,20,crate::game_hud::YELLOW);
                 p.text(&text,x+(w-crate::render::resource_ui::text_width(p,&text,12))/2,y+8,12,[24,20,8]);
-                let stat=p.fit_text_role(Role::Inventory,&g.supply_note,(row.2-name_width-w-18).max(1),12);
-                p.text_role(Role::Inventory,&stat,x+w+9,y+9,12,p.profile.rgb("ui.colors.secondary"));
+                let stat_x=x+heart_badge_width+9;
+                let stat=p.fit_text_role(Role::Inventory,&g.supply_note,(row.0+row.2-stat_x-4).max(1),12);
+                p.text_role(Role::Inventory,&stat,stat_x,y+9,12,p.profile.rgb("ui.colors.secondary"));
             } else {
                 let note=p.fit_text_role(Role::Inventory,&g.supply_note,(row.2-16).max(1),12);
                 p.text_role(Role::Inventory,&note,row.0+8,y+24,12,p.profile.rgb("ui.colors.secondary"));
@@ -2217,6 +2246,19 @@ mod tests {
     fn run() -> Run {
         serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap()
     }
+    #[test]
+    fn heart_columns_halve_both_spacers_without_compressing_labels() {
+        let old_list=505;
+        let name=146;let badge=28;let stat=80;
+        let (width,badge_x,badge_w)=heart_columns(old_list,[name,badge,stat]);
+        let old_badge_x=old_list*55/100;
+        let name_end=8+name;
+        let old_tail=old_list-old_badge_x-badge-9-stat;
+        assert_eq!(badge_x-name_end,(old_badge_x-name_end+1)/2);
+        assert_eq!(width-badge_x-badge_w-9-stat,(old_tail+1)/2);
+        assert!(width<old_list);
+    }
+
     #[test]
     fn supply_panels_start_unselected_with_stable_stacked_actions() {
         let mut r=run();
