@@ -269,6 +269,10 @@ fn gas_label(kind: &str) -> &str {
         _ => kind,
     }
 }
+fn gas_in_sentence(kind: &str) -> String {
+    let label = gas_label(kind);
+    if matches!(label, "Blood Mist" | "Death Gas") { label.into() } else { label.to_lowercase() }
+}
 /// Every dynamic detail is sourced from the one observed snapshot.
 // Presentation only: remembered terrain and later feature-title overrides remain intact.
 fn terrain_report_title(name: String, current: bool) -> String {
@@ -594,16 +598,14 @@ fn terrain_copy_parts(f: &Floor, o: &vision::ObservedCell) -> TerrainCopy {
             ));
         }
         if let Some(g) = h.gas.as_ref() {
-            details.push(format!(
-                "{} {} in the air{}.",
-                gas_label(&g.r#type),
-                if o.current { "hangs" } else { "hung" },
-                if g.concentration == 0. {
-                    " in a lingering haze"
-                } else {
-                    ""
-                }
-            ));
+            if !o.current {
+                details.push(format!(
+                    "{} hung in the air{}.", gas_label(&g.r#type),
+                    if g.concentration == 0. { " in a lingering haze" } else { "" },
+                ));
+            } else if g.concentration == 0. {
+                details.push("Only a lingering haze remains.".into());
+            }
             if g.r#type == corpse_core::death_gas_rules::GAS {
                 details.push("It is both caustic and hallucinogenic.".into());
             }
@@ -1053,12 +1055,13 @@ struct TileFixture {
     phrase: String,
     supersedes_surface: bool,
 }
-struct TileStack {
+struct TileStack<'a> {
     accompaniment: &'static str,
     fixtures: Vec<TileFixture>,
     local_items: Vec<String>,
     corpses: Vec<String>,
     portal: bool,
+    gas: Option<&'a str>,
 }
 fn article(name: &str) -> String {
     if name.starts_with("The ") || name.starts_with("the ") {
@@ -1079,8 +1082,8 @@ fn prose_list(parts: &[String]) -> String {
         _ => format!("{}, and {}",parts[..parts.len()-1].join(", "),parts.last().unwrap()),
     }
 }
-impl TileStack {
-    fn new(r:&Run,o:&vision::ObservedCell,x:usize,y:usize,portal:bool,items:&[&corpse_core::GroundItem],actors:&[&Actor],phase:usize)->Self {
+impl<'a> TileStack<'a> {
+    fn new(r:&Run,o:&'a vision::ObservedCell,x:usize,y:usize,portal:bool,items:&[&corpse_core::GroundItem],actors:&[&Actor],phase:usize)->Self {
         let accompaniment=match o.tile.as_deref() {
             Some("floor"|"speed-up") => match o.substrate.as_deref() {
                 Some("tiled")=>"the stone tiles",Some("rock")=>"bare rock",Some("earth")=>"packed earth",
@@ -1116,7 +1119,8 @@ impl TileStack {
             let name=creature_title_base(shown.as_ref().unwrap_or(a));
             article(&crate::creature_presentation::corpse_name(&name.to_lowercase(), hearts.heartless(a)))
         }).collect();
-        Self{accompaniment,fixtures,local_items,corpses,portal}
+        let gas = o.hazards.as_ref().and_then(|h| h.gas.as_ref()).map(|g| g.r#type.as_str());
+        Self{accompaniment,fixtures,local_items,corpses,portal,gas}
     }
     fn placement(&self, include_portal: bool) -> String {
         let mut fixtures:Vec<_>=self.fixtures.iter().map(|f|f.phrase.clone()).collect();
@@ -1132,21 +1136,30 @@ impl TileStack {
     fn preposition(&self)->&'static str {
         if self.accompaniment.contains("water") {"in"} else {"on"}
     }
-    fn objects(&self)->Option<String> {
-        let place=self.placement(true);
-        let items=&self.local_items;
-        let corpses=&self.corpses;
-        let ending=if place.is_empty(){String::new()}else{
-            format!(" {} {place}",if self.fixtures.is_empty() {if self.portal {"on"}else{self.preposition()}}else{"atop"})
+    fn objects(&self) -> Option<String> {
+        let place = self.placement(true);
+        let items = &self.local_items;
+        let corpses = &self.corpses;
+        let ending = if place.is_empty() { String::new() } else {
+            let prep = if !self.fixtures.is_empty() { "atop" }
+                else if self.portal { "on" } else { self.preposition() };
+            format!(" {prep} {place}")
         };
-        if !items.is_empty(){
-            let below=if corpses.is_empty(){String::new()}else{format!(" atop {}",prose_list(corpses))};
-            return Some(format!("{} {}{below}{ending}.",upper_first(&prose_list(items)),if items.len()==1{"lies"}else{"lie"}));
+        let gas = self.gas;
+        let suffix = gas.map_or_else(|| ".".into(), |g| format!(" as {} floats above.", gas_in_sentence(g)));
+        if !items.is_empty() {
+            let below = if corpses.is_empty() { String::new() } else { format!(" atop {}", prose_list(corpses)) };
+            let verb = if items.len() == 1 { "lies" } else { "lie" };
+            return Some(format!("{} {verb}{below}{ending}{suffix}", upper_first(&prose_list(items))));
         }
-        if !corpses.is_empty(){
-            return Some(format!("{} {}{ending}.",upper_first(&prose_list(corpses)),if corpses.len()==1{"lies"}else{"lie"}));
+        if !corpses.is_empty() {
+            let verb = if corpses.len() == 1 { "lies" } else { "lie" };
+            return Some(format!("{} {verb}{ending}{suffix}", upper_first(&prose_list(corpses))));
         }
-        None
+        gas.map(|g| {
+            let name = gas_label(g);
+            if place.is_empty() { format!("{name} floats here.") } else { format!("{name} floats above {place}.") }
+        })
     }
     fn occupied(&self, subject: &str, motion: SceneMotion, default: &str) -> String {
         let below = if !self.local_items.is_empty() {
@@ -1157,6 +1170,9 @@ impl TileStack {
         } else {
             prose_list(&self.corpses)
         };
+        let gas_suffix = self.gas.map_or_else(
+            || ".".into(), |g| format!(" in the {}.", gas_in_sentence(g)),
+        );
         if let SceneMotion::Liquid { verb, place } = motion {
             let mut scene = format!("{subject} {verb} {place}");
             if !below.is_empty() { scene.push_str(&format!(" over {below}")); }
@@ -1164,26 +1180,46 @@ impl TileStack {
                 let fixtures: Vec<_> = self.fixtures.iter().map(|f| f.phrase.clone()).collect();
                 scene.push_str(&format!(" beside {}", prose_list(&fixtures)));
             }
-            scene.push('.');
+            scene.push_str(&gas_suffix);
             return scene;
         }
         let place = self.placement(false);
+        if self.gas.is_some() && matches!(motion, SceneMotion::Stands | SceneMotion::Flies) {
+            let mut scene = format!("{subject} {}", motion.verb());
+            if !below.is_empty() {
+                scene.push_str(&format!(" over {below}"));
+                if !self.fixtures.is_empty() && !place.is_empty() {
+                    scene.push_str(&format!(" on {place}"));
+                }
+            } else if !self.fixtures.is_empty() && !place.is_empty() {
+                let prep = if matches!(motion, SceneMotion::Flies) { "over" } else { "on" };
+                scene.push_str(&format!(" {prep} {place}"));
+            }
+            scene.push_str(&gas_suffix);
+            return scene;
+        }
         if !below.is_empty() {
             let positioning = if place.is_empty() { String::new() } else {
                 format!(" {} {place}", if self.fixtures.is_empty() { self.preposition() } else { "on" })
             };
             return match motion {
-                SceneMotion::Lies => format!("{subject} lies atop {below}{positioning}."),
+                SceneMotion::Lies => format!("{subject} lies atop {below}{positioning}{gas_suffix}"),
                 SceneMotion::Grows if !place.is_empty() => {
-                    format!("{subject} grows from {place} over {below}.")
+                    format!("{subject} grows from {place} over {below}{gas_suffix}")
                 }
-                _ => format!("{subject} {} over {below}{positioning}.", motion.verb()),
+                _ => format!("{subject} {} over {below}{positioning}{gas_suffix}", motion.verb()),
             };
         }
-        if !self.fixtures.is_empty() && !place.is_empty() {
-            return motion.describe(subject, &place);
+        let sentence = if !self.fixtures.is_empty() && !place.is_empty() {
+            motion.describe(subject, &place)
+        } else {
+            default.into()
+        };
+        if self.gas.is_some() {
+            format!("{}{gas_suffix}", sentence.trim_end_matches('.'))
+        } else {
+            sentence
         }
-        default.into()
     }
 }
 
@@ -1328,7 +1364,7 @@ fn observe_tile_inner(r: &Run, x: usize, y: usize, terrain: Option<&vision::Terr
                 stacked=true;
             }else if !dead && local {
                 detail.scene=stack.occupied(&scene_subject(r,shown),scene_motion(r,shown,o),&detail.scene);
-                stacked=!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty();
+                stacked=!stack.local_items.is_empty()||!stack.corpses.is_empty()||!stack.fixtures.is_empty()||stack.gas.is_some();
             }
             if portal_name.is_some() {
                 if portal_as_sentence {append_scene(&mut detail.scene,crate::portal_ui::INSPECTOR_SCENE);}
@@ -2412,11 +2448,54 @@ mod tests {
     }
 
     #[test]
+    fn gas_inspector_names_the_cloud_for_each_occupancy() {
+        let mut r = crate::non_euclidean_ui::tests::scene();
+        r.simulation_revision = 52.0.into();
+        r.player.stats.perception = 100.;
+        let f = r.floor_mut().unwrap();
+        let at = 12 * f.width() + 11;
+        f.substrates = vec!["sand".into(); f.tiles.len()].into();
+        assert!(corpse_core::environment::add_gas(f, at, "confusion", 12., -1.).unwrap());
+        assert_eq!(observe_tile(&r, 11, 12).scene, "Confusion gas floats above the sand.");
+
+        let item = corpse_core::Item {
+            id: 902., name: "Giant Rat Heart".into(), kind: "heart".into(), ..Default::default()
+        };
+        r.ground_at_mut(r.depth).push(corpse_core::GroundItem { x: 11., y: 12., item, ..Default::default() });
+        assert_eq!(observe_tile(&r, 11, 12).scene,
+            "A giant rat heart lies on the sand as confusion gas floats above.");
+
+        let rat = corpse_core::population::create_actor_revision("rat", 901., 11., 12., false, 52.).unwrap();
+        r.actors_at_mut(r.depth).push(rat);
+        let report = observe_tile(&r, 11, 12);
+        assert_eq!(report.scene, "A giant rat stands over a giant rat heart in the confusion gas.");
+        assert!(report.creature.unwrap().description.starts_with(&report.scene));
+
+        let f = r.floor_mut().unwrap();
+        f.tiles[at] = "shallow-water".into();
+        assert_eq!(observe_tile(&r, 11, 12).scene,
+            "A giant rat wades through shallow water over a giant rat heart in the confusion gas.");
+
+        let f = r.floor_mut().unwrap();
+        f.tiles[at] = "floor".into();
+        let ground = r.ground_at_mut(r.depth).pop().unwrap();
+        assert_eq!(observe_tile(&r, 11, 12).scene, "A giant rat stands in the confusion gas.");
+        let bat = corpse_core::population::create_actor_revision("cave-bat", 901., 11., 12., false, 52.).unwrap();
+        r.actors_at_mut(r.depth)[0] = bat;
+        assert_eq!(observe_tile(&r, 11, 12).scene, "A cave bat flies in the confusion gas.");
+        r.ground_at_mut(r.depth).push(ground);
+        let f = r.floor_mut().unwrap();
+        assert!(corpse_core::environment::add_gas(f, at, corpse_core::death_gas_rules::GAS, 12., -1.).unwrap());
+        let report = observe_tile(&r, 11, 12);
+        assert_eq!(report.scene, "A cave bat flies over a giant rat heart in the Death Gas. It is both caustic and hallucinogenic.");
+    }
+
+    #[test]
     fn superseding_occupant_hides_only_the_ordinary_surface() {
         let stack=TileStack {
             accompaniment:"the sand",
             fixtures:vec![TileFixture{phrase:"a bridge".into(),supersedes_surface:true}],
-            local_items:vec!["a heart".into()], corpses:vec![], portal:true,
+            local_items:vec!["a heart".into()], corpses:vec![], portal:true, gas:None,
         };
         assert_eq!(stack.occupied("A bat",SceneMotion::Flies,""),"A bat flies over a heart on a bridge.");
         assert_eq!(stack.objects().unwrap(),"A heart lies atop a bridge and a portal.");
