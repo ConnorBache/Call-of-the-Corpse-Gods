@@ -130,6 +130,8 @@ struct Group {
     count: f64,
     name: String,
     description: String,
+    supply_note: String,
+    blessings: Option<f64>,
     actions: Vec<Button>,
     section: usize,
 }
@@ -295,6 +297,34 @@ impl PackView {
             focus_action: None,
         }
     }
+    fn resolve_layout(&self, p: &Painter, area: Rect, measured_width: i32) -> PackLayout {
+        let Some(kind)=self.quick_kind else {
+            return PackLayout::resolve_measured(&p.profile,area,measured_width);
+        };
+        let mut layout=PackLayout::resolve(&p.profile,area);
+        let width=660.min((area.2-24).max(1));
+        let row=if kind=="potion"{47}else{34};
+        let height=(88+(self.groups.len() as i32*row).max(155)).min((area.3-24).max(1));
+        let x=area.0+(area.2-width)/2;
+        let y=area.1+(area.3-height)/2;
+        let left=(width-135).max(1);
+        layout.bounds=Rect(x,y,width,height);
+        layout.close=Rect(x+width-38,y+8,30,28);
+        layout.list=Rect(x+14,y+48,(left-20).max(1),(height-76).max(1));
+        layout.detail=Rect(x+left,y+48,(width-left-14).max(1),(height-76).max(1));
+        layout.row=row;
+        layout
+    }
+    fn supply_labels(&self) -> Option<[&'static str;3]> {
+        self.quick_kind.map(|kind|[if kind=="heart"{"Eat"}else{"Drink"},"Drop","Throw"])
+    }
+    fn button_at(&self,index:usize)->Option<&Button> {
+        let actions=&self.selected_group()?.actions;
+        if let Some(labels)=self.supply_labels() {
+            let label=labels.get(index)?;
+            actions.iter().find(|b|b.label==*label)
+        }else{actions.get(index)}
+    }
     /// Warm O(fixed layout/style fields), no group/text scan when unchanged.
     /// Content/style/layout invalidation costs O(group label bytes + selected detail wrapping).
     /// Detached metrics never observe or rebuild simulation state.
@@ -305,7 +335,7 @@ impl PackView {
         );
         let changed = self.metric_signature.as_ref() != Some(&signature);
         let area = Rect(0, map.1, p.logical_width(), map.3);
-        let mut layout = PackLayout::resolve_measured(&p.profile, area, self.minimum_list_width);
+        let mut layout = self.resolve_layout(p,area,self.minimum_list_width);
         // Row height is content-derived; geometry/style/content invalidate it together.
         layout.row = self.layout.row;
         if !changed && !self.content_metrics_dirty && self.layout==layout && self.text_metrics.is_some() && self.button_metrics.is_some(){return;}
@@ -328,6 +358,12 @@ impl PackView {
             for b in &g.actions {
                 self.button_metrics.as_mut().unwrap().ensure(p, &b.label);
             }
+        }
+        if self.quick_kind.is_some() {
+            self.layout=self.resolve_layout(p,area,self.minimum_list_width);
+            self.list_scroll=self.list_scroll.clamp(0,self.list_max_scroll());
+            self.detail_scroll=0;
+            return;
         }
         // O(A*E + label bytes), only on content/style/geometry invalidation.
         // Reserve room even before the longest legal Tinkered amulet is acquired.
@@ -403,9 +439,6 @@ impl PackView {
         self.list_scroll=0;
         self.detail_scroll=0;
         self.refresh(run);
-        if kind.is_some(){
-            if let Some(group)=self.groups.first(){self.selected=Some(group.item.id);self.reveal_selected();}
-        }
     }
     pub fn display_order(&self) -> Vec<f64> {
         if self.quick_kind.is_some(){return self.quick_order.clone();}
@@ -551,14 +584,13 @@ impl PackView {
             return PackAction::None;
         }
         let Some(button) = self
-            .selected_group()
-            .and_then(|g| g.actions.get(index))
+            .button_at(index)
             .cloned()
         else {
             return PackAction::None;
         };
         if let Some(blocker) = button.blocker {
-            return PackAction::Notice(blocker);
+            return if self.quick_kind.is_some() { PackAction::None } else { PackAction::Notice(blocker) };
         }
         match button.action {
             ButtonAction::Command(c) => {
@@ -595,6 +627,17 @@ impl PackView {
         self.paint_epoch=self.paint_epoch.wrapping_add(1);
         PackAction::Order(self.display_order())
     }
+    /// The same clipped row geometry as click; inspecting commits no Pack action.
+    pub fn ring_id_at(&self,x:i32,y:i32)->Option<f64> {
+        if self.pending || self.read_only || self.request.is_some() || !self.layout.list.contains(x,y) {
+            return None;
+        }
+        self.row_positions().into_iter().find_map(|(i,y0)| {
+            let g=&self.groups[i];
+            let r=Rect(self.layout.list.0,y0-self.list_scroll,self.layout.list.2,self.layout.row);
+            (g.item.kind=="ring"&&r.contains(x,y)).then_some(g.item.id)
+        })
+    }
     pub fn click(&mut self, x: i32, y: i32) -> PackAction {
         if self.layout.close.contains(x, y) {
             self.cancel_selection();
@@ -615,7 +658,7 @@ impl PackView {
                     if self.request.is_some() {
                         return self.select_target(index);
                     }
-                    if !self.read_only && x >= self.layout.list.0 + self.layout.list.2 - 52 {
+                    if self.quick_kind.is_none() && !self.read_only && x >= self.layout.list.0 + self.layout.list.2 - 52 {
                         return self.move_group(
                             index,
                             if x < self.layout.list.0 + self.layout.list.2 - 26 {
@@ -691,7 +734,7 @@ impl PackView {
                     (self.list_scroll + self.layout.list.3).min(self.list_max_scroll())
             }
             Keycode::Tab if !self.read_only && self.request.is_none() => {
-                let len = self.selected_group().map_or(0, |g| g.actions.len());
+                let len = self.selected_group().map_or(0, |g| self.supply_labels().map_or(g.actions.len(),|labels|labels.len()));
                 if len > 0 {
                     self.focus_action =
                         Some(if modifiers.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD) {
@@ -741,10 +784,7 @@ impl PackView {
     /// O(G + S) time and O(S) memory: five R50 sections or two legacy sections.
     /// Unsupported direct projections stay visible without claiming trinket space.
     fn section_positions(&self) -> Vec<(usize, i32)> {
-        if let Some(kind)=self.quick_kind {
-            let section=if self.stamp.revision<50. {1} else if kind=="heart" {4} else {3};
-            return vec![(section,self.layout.list.1)];
-        }
+        if self.quick_kind.is_some() {return vec![];}
         let count = if self.stamp.revision >= 50. { self.stamp.category_headers.len() } else { 2 };
         let mut y = self.layout.list.1;
         let mut group = 0;
@@ -762,7 +802,7 @@ impl PackView {
     fn row_positions(&self) -> Vec<(usize, i32)> {
         if self.quick_kind.is_some(){
             return self.groups.iter().enumerate().map(|(index,_)|
-                (index,self.layout.list.1+24+index as i32*self.layout.row)).collect();
+                (index,self.layout.list.1+index as i32*self.layout.row)).collect();
         }
         let sections = self.section_positions();
         let mut offsets = vec![0; sections.len()];
@@ -773,7 +813,7 @@ impl PackView {
         }).collect()
     }
     fn list_max_scroll(&self) -> i32 {
-        let height = if self.quick_kind.is_some(){24+self.layout.row*self.groups.len() as i32} else if self.stamp.revision >= 50. {
+        let height = if self.quick_kind.is_some(){self.layout.row*self.groups.len() as i32} else if self.stamp.revision >= 50. {
             self.stamp.category_headers.len() as i32 * 24 + self.layout.row * self.groups.len() as i32
         } else {
             48 + self.layout.row * self.groups.len().max(20) as i32
@@ -835,6 +875,10 @@ impl PackView {
         lines
     }
     fn button_rects(&self) -> Vec<(usize, Rect)> {
+        if self.quick_kind.is_some() {
+            let Rect(x,y,w,_)=self.layout.detail;
+            return (0..3).map(|i|(i,Rect(x+9,y+i as i32*38,(w-9).max(1),32))).collect();
+        }
         if self.read_only || self.request.is_some() {
             return vec![];
         }
@@ -865,6 +909,7 @@ impl PackView {
         result
     }
     fn detail_max_scroll(&self) -> i32 {
+        if self.quick_kind.is_some(){return 0;}
         let content = self.button_rects().last().map_or(
             self.detail_lines().len() as i32 * self.detail_line_height(),
             |(_, r)| r.1 + r.3 + self.detail_scroll - self.layout.detail.1 + 8,
@@ -913,6 +958,7 @@ impl PackView {
                 )
                 .contains(x, y)
                 {
+                    if self.quick_kind.is_some(){return None;}
                     let g = &self.groups[i];
                     if self.request.is_some() {
                         let hint = self.target_blocker(self.target_member(g))
@@ -921,7 +967,7 @@ impl PackView {
                             format!("{}\n{hint}", g.description)
                         } else { hint });
                     }
-                    if !self.read_only && x >= self.layout.list.0 + self.layout.list.2 - 52 {
+                    if self.quick_kind.is_none() && !self.read_only && x >= self.layout.list.0 + self.layout.list.2 - 52 {
                         let delta = if x < self.layout.list.0 + self.layout.list.2 - 26 { -1 } else { 1 };
                         if self.stamp.revision >= 50. && self.reorder_neighbor(i, delta).is_none() {
                             return Some("Items stay within their category (no turn).".into());
@@ -943,7 +989,7 @@ impl PackView {
         if self.layout.detail.contains(x, y) {
             for (i, rect) in self.button_rects() {
                 if rect.contains(x, y) {
-                    let b = &self.selected_group()?.actions[i];
+                    let b=self.button_at(i)?;
                     return Some(b.blocker.clone().unwrap_or_else(|| b.tip.clone()));
                 }
             }
@@ -983,10 +1029,65 @@ impl PackView {
             crate::action_marks::paint(p,&mark,x,y,w,h,color,alpha);
         }
     }
+    fn paint_supply_panel(&self,p:&mut Painter) {
+        let old=p.clip;
+        let b=self.layout.bounds;
+        let list=self.layout.list;
+        p.clip=Some(b.tuple());
+        p.rect(b.0,b.1,b.2,b.3,p.profile.rgb("ui.colors.panel"));
+        modal_ui::border(p,b,p.profile.rgb("ui.colors.border"));
+        let hearts=self.quick_kind==Some("heart");
+        p.text_role(Role::Headings,if hearts{"Hearts"}else{"Potions"},list.0,b.1+12,20,p.profile.rgb("ui.colors.headings"));
+        p.text("×",self.layout.close.0+7,self.layout.close.1,22,p.profile.rgb("ui.colors.primary"));
+        p.text_role(Role::Secondary,"Esc to close",list.0,b.1+b.3-19,11,p.profile.rgb("ui.colors.secondary"));
+        p.clip=Some(list.tuple());
+        for (index,yy) in self.row_positions() {
+            let y=yy-self.list_scroll;
+            let row=Rect(list.0,y,list.2,self.layout.row);
+            if intersect_rect(row,list).is_none() {continue;}
+            let g=&self.groups[index];
+            let bg=if self.selected==Some(g.item.id) {"ui.colors.selected"}
+                else if self.hover_at.is_some_and(|(x,y)|row.contains(x,y)){ "ui.colors.hover" }
+                else {"ui.colors.panel"};
+            p.rect(row.0,row.1,row.2,row.3-1,p.profile.rgb(bg));
+            p.rect(row.0,row.1+row.3-1,row.2,1,p.profile.rgb("ui.colors.border"));
+            let label=self.row_label(g);
+            let name_width=if hearts{row.2*55/100}else{row.2-16};
+            let name=p.fit_text_role(Role::Inventory,&label,(name_width-16).max(1),14);
+            p.text_role(Role::Inventory,&name,row.0+8,y+5,14,p.profile.rgb("ui.colors.primary"));
+            if let Some(blessings)=g.blessings {
+                let x=row.0+name_width;
+                let text=blessings.to_string();
+                let w=(crate::render::resource_ui::text_width(p,&text,12)+12).max(28);
+                p.rect(x,y+6,w,20,crate::game_hud::YELLOW);
+                p.text(&text,x+(w-crate::render::resource_ui::text_width(p,&text,12))/2,y+8,12,[24,20,8]);
+                let stat=p.fit_text_role(Role::Inventory,&g.supply_note,(row.2-name_width-w-18).max(1),12);
+                p.text_role(Role::Inventory,&stat,x+w+9,y+9,12,p.profile.rgb("ui.colors.secondary"));
+            } else {
+                let note=p.fit_text_role(Role::Inventory,&g.supply_note,(row.2-16).max(1),12);
+                p.text_role(Role::Inventory,&note,row.0+8,y+24,12,p.profile.rgb("ui.colors.secondary"));
+            }
+        }
+        draw_scrollbar(p,list,self.list_scroll,self.list_max_scroll());
+        p.clip=Some(b.tuple());
+        if let Some(labels)=self.supply_labels() {
+            for (i,r) in self.button_rects() {
+                let enabled=!self.pending&&!self.read_only&&self.stamp.playable()
+                    &&self.button_at(i).is_some_and(|a|a.blocker.is_none());
+                let focused=enabled&&(self.focus_action==Some(i)||self.hover_at.is_some_and(|(x,y)|r.contains(x,y)));
+                p.rect(r.0,r.1,r.2,r.3,if !enabled{[39,39,47]}else if focused{p.profile.rgb("ui.colors.hover")}else{p.profile.rgb("ui.colors.button")});
+                modal_ui::border(p,r,if enabled{p.profile.rgb("ui.colors.border")}else{[63,63,72]});
+                p.text_role(Role::Primary,labels[i],r.0+12,r.1+7,14,
+                    p.profile.rgb(if enabled{"ui.colors.primary"}else{"ui.colors.disabled"}));
+            }
+        }
+        p.clip=old;
+    }
     pub fn paint(&self,p:&mut Painter){let state=self.paint_state(p);self.paint_prepared(p,&state);}
     /// Paints the same full logical composition through the independent native damage scissor.
     /// Prepared tooltip layout is reused, so damage discovery does not wrap it twice.
     pub fn paint_prepared(&self, p: &mut Painter,state:&PackPaintState) {
+        if self.quick_kind.is_some(){self.paint_supply_panel(p);return;}
         let old_clip = p.clip;
         p.clip = Some(self.layout.bounds.tuple());
         p.rect(
@@ -1237,6 +1338,8 @@ impl PackView {
             modal_ui::border(p,tip.bounds,p.profile.rgb("ui.colors.border"));
             for(i,line)in tip.lines.iter().enumerate(){p.text_role(Role::Tooltips,line,tx+8,ty+6+i as i32*tip.line_height,13,p.profile.rgb("ui.colors.primary"));}
         }
+        p.clip = Some(self.layout.bounds.tuple());
+        p.text_role(Role::Secondary,"Esc to close",self.layout.bounds.0+12,self.layout.bounds.1+self.layout.bounds.3-13,10,p.profile.rgb("ui.colors.secondary"));
         p.clip = old_clip;
     }
 }
@@ -1381,6 +1484,8 @@ fn display_groups(run: &Run) -> Vec<Group> {
                 count: item.quantity.value_or(1.),
                 name: displayed_name(run, item),
                 description: describe_item_with_offense(run, item, offense),
+                supply_note: supply_note(run,item),
+                blessings: (item.kind=="heart").then(||inventory::effective_heart_rewards(run,item).blessings),
                 actions: item_actions(run, item),
                 section: item_section(run.simulation_revision.value_or(29.), item),
             });
@@ -2007,6 +2112,46 @@ fn titlecase(s: &str) -> String {
         None => String::new(),
     }
 }
+/// Short supply-panel labels. Inspecting an unknown potion never reveals its effect.
+fn supply_note(run:&Run,item:&Item)->String {
+    if item.kind=="heart" {
+        let stat=if corpse_core::fast_mode::enabled(run) {
+            bonuses(inventory::effective_heart_rewards(run,item).bonus.as_ref(),None)
+        }else{bonuses(item.bonus.as_ref(),item.base_bonus.as_ref())};
+        return if stat.is_empty(){"No stat bonus".into()}else{
+            stat.replace("maxHp","Max HP").replace("maxEnergy","Max Energy")
+                .replace(" dodge"," Dodge").replace(" accuracy"," Accuracy")
+                .replace(" perception"," Perception").replace(" dr"," DR")
+        };
+    }
+    if item.kind!="potion"{return String::new();}
+    if corpse_core::revision50_potions::retired(run,item){return "Retired potion.".into();}
+    if !potion_known(run,item){return "Unidentified.".into();}
+    let effect=item.effect.as_ref().map_or("",String::as_str).to_ascii_lowercase();
+    let amount=if item.diluted.value_or(false){25}else{50};
+    match effect.as_str() {
+        "healing"=>return format!("Contains liquid which heals {amount} HP."),
+        "energy"=>return format!("Contains liquid which restores {amount} energy."),
+        "incineration"=>"Bursts into flames upon opening.",
+        "caustic gas"=>"Contains condensed caustic gas.",
+        "paralysis"=>"Contains condensed paralysis gas.",
+        "confusion"=>"Contains condensed confusion gas.",
+        "telepathy"=>"Contains a liquid which grants supernatural empathy.",
+        "levitation"=>"Contains a liquid which causes creatures to ignore gravity.",
+        "speed"=>"Contains a liquid that increases a creature’s reflexes.",
+        "invisibility"=>"Contains a liquid that causes a creature to become transparent.",
+        "descent"=>"Contains a heavy gas which burrows through the floor.",
+        "fire immunity"=>"Contains a liquid which renders a creature immune to burning.",
+        "darkness"=>"Contains a gas which blocks out light.",
+        "freezing"=>"Freezes water and slows creatures.",
+        "discord"=>"Turns creatures against each other.",
+        "teleportation"=>"Contains a liquid which causes a creature to appear elsewhere.",
+        "shattering"=>"Contains a liquid which burrows through walls.",
+        "verdania sap"|"veridian sap"=>"A miracle sap which fully restores HP, Energy and Blessings.",
+        _=>"See the potion's full details in the Pack.",
+    }.into()
+}
+
 fn describe_potion(run: &Run, i: &Item) -> String {
     if corpse_core::revision50_potions::retired(run,i) { return inventory::potion_description(run,i); }
     if corpse_core::revision50::enabled(run) {
@@ -2071,6 +2216,83 @@ mod tests {
 
     fn run() -> Run {
         serde_json::from_str(include_str!("../../../fixtures/avatar-room-v1.json")).unwrap()
+    }
+    #[test]
+    fn supply_panels_start_unselected_with_stable_stacked_actions() {
+        let mut r=run();
+        r.simulation_revision=52.0.into();
+        let mut potion=Item{id:203.,kind:"potion".into(),name:"Potion of Healing".into(),
+            effect:"healing".to_string().into(),..Default::default()};
+        r.inventory=vec![heart(201.),heart(202.),potion.clone()];
+        let before=serde_json::to_vec(&r).unwrap();
+        let mut p=Painter::new();
+        p.set_responsive_canvas(true);
+        let mut v=PackView::observe(&r);
+        for (kind,verb,id) in [("heart","Eat",201.),("potion","Drink",203.)] {
+            v.focus_kind(&r,Some(kind));
+            v.configure(&p,(0,82,948,522));
+            assert_eq!(v.supply_labels(),Some([verb,"Drop","Throw"]));
+            assert!(v.selected.is_none());
+            let rects=v.button_rects();
+            assert_eq!(rects.len(),3);
+            assert!(rects.windows(2).all(|w|w[0].1.0==w[1].1.0&&w[0].1.1<w[1].1.1));
+            let select=|v:&mut PackView| {
+                let y=v.row_positions()[0].1;
+                v.click(v.layout.list.0+v.layout.list.2-3,y+5)
+            };
+            let invoke=|v:&mut PackView,i:usize| {
+                let b=rects[i].1;v.click(b.0+4,b.1+4)
+            };
+            assert_eq!(invoke(&mut v,0),PackAction::None);
+            v.paint(&mut p);
+            let b=rects[0].1;
+            let px=((b.1+3) as usize*p.width+(b.0+3)as usize)*4;
+            assert_eq!(&p.pixels[px..px+3],&[39,39,47]);
+            assert_eq!(select(&mut v),PackAction::None);
+            assert_eq!(v.selected,Some(id));
+            assert_eq!(v.button_rects(),rects);
+            if kind=="heart" {
+                assert!(v.row_label(&v.groups[0]).ends_with(" ×2"));
+                assert_eq!(v.groups[0].blessings,Some(1.));
+                assert!(!v.groups[0].supply_note.is_empty());
+            } else {assert_eq!(v.groups[0].supply_note,"Contains liquid which heals 50 HP.");}
+            assert_eq!(invoke(&mut v,0),PackAction::Command(Command::Use{id}));
+            v.refresh(&r);
+            assert_eq!(invoke(&mut v,1),PackAction::Command(Command::Drop{id}));
+            v.refresh(&r);
+            assert_eq!(invoke(&mut v,2),PackAction::Target(PackTarget::Throw(id)));
+            assert_eq!(v.key(Keycode::Escape,Mod::NOMOD),PackAction::Close);
+        }
+        assert_eq!(serde_json::to_vec(&r).unwrap(),before);
+        r.simulation_revision=29.0.into();
+        r.known_potions.clear();
+        potion.identified=Field::Missing;
+        assert_eq!(supply_note(&r,&potion),"Unidentified.");
+    }
+    #[test]
+    fn supply_potion_notes_use_actual_dose_and_preserve_identification() {
+        let mut r=run();
+        r.simulation_revision=52.0.into();
+        for (effect,unit,verb) in [("healing","HP","heals"),("energy","energy","restores")] {
+            let mut i=Item { kind:"potion".into(), effect:effect.to_string().into(), ..Default::default() };
+            assert_eq!(supply_note(&r,&i),format!("Contains liquid which {verb} 50 {unit}."));
+            i.diluted=true.into();
+            assert_eq!(supply_note(&r,&i),format!("Contains liquid which {verb} 25 {unit}."));
+            r.simulation_revision=29.0.into();
+            r.known_potions.clear();
+            assert_eq!(supply_note(&r,&i),"Unidentified.");
+            i.identified=true.into();
+            assert_eq!(supply_note(&r,&i),format!("Contains liquid which {verb} 25 {unit}."));
+            r.simulation_revision=52.0.into();
+        }
+        let p=Painter::new();
+        let note_width=489;
+        for effect in corpse_core::revision50_potions::CURRENT_ORDINARY {
+            let i=Item { kind:"potion".into(),effect:effect.to_string().into(), ..Default::default() };
+            let note=supply_note(&r,&i);
+            assert_eq!(note,p.fit_text_role(Role::Inventory,&note,note_width,12),
+                       "default inventory text clips for {effect}");
+        }
     }
     #[test]
     fn fast_heart_description_matches_awarded_rewards_without_mutating_item() {

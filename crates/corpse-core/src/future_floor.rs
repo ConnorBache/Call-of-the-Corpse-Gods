@@ -72,6 +72,7 @@ pub fn restore(r:&mut Run)->Result<bool,String>{
     next.firebolt_travel_from=r.firebolt_travel_from.clone();
     next.amulet_rules_from=r.amulet_rules_from.clone();
     next.potion_rules_from=r.potion_rules_from.clone();
+    next.potion_retirements_from=r.potion_retirements_from.clone();
     next.ring_rules_from=r.ring_rules_from.clone();
     next.gas_rules_from=r.gas_rules_from.clone();
     next.commandment_rules_from=r.commandment_rules_from.clone();

@@ -58,6 +58,7 @@ fn clone_anchor_state(run:&Run)->Run {
             firebolt_travel_from: Default::default(),
             amulet_rules_from: Default::default(),
             potion_rules_from: Default::default(),
+            potion_retirements_from: Default::default(),
             ring_rules_from: Default::default(),
             gas_rules_from: Default::default(),
             commandment_rules_from: Default::default(),

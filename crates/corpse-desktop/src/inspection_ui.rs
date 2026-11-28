@@ -1677,7 +1677,7 @@ fn wrapped(report: &Report, p: &Painter) -> Vec<PaintLine> {
 }
 pub fn scroll_line_count(report: &Report, p: &Painter) -> usize {
     wrapped(report, p).len().saturating_sub(
-        ((bounds(&p.profile).3 - content_top(p) - 16).max(0) / role_line(p, Role::Primary, 15, 21))
+        ((bounds(&p.profile).3 - content_top(p) - 31).max(0) / role_line(p, Role::Primary, 15, 21))
             .max(1) as usize,
     )
 }
@@ -1696,7 +1696,7 @@ pub fn toggle_details(report: &mut Report) -> bool {
 /// Drawer owns its hit testing. Parent consumes every mouse input while open.
 pub fn click(report: &mut Report, p: &Painter, scroll: usize, x: i32, y: i32) -> bool {
     let (bx, by, w, h) = bounds(&p.profile);
-    if x < bx || x >= bx + w || y < by + content_top(p) || y >= by + h - 12 {
+    if x < bx || x >= bx + w || y < by + content_top(p) || y >= by + h - 25 {
         return false;
     }
     let row = scroll + ((y - by - content_top(p)) / role_line(p, Role::Primary, 15, 21)) as usize;
@@ -1740,12 +1740,12 @@ pub fn paint(report: &Report, p: &mut Painter, scroll: usize) {
         x + 12,
         y + content_top(p) - 1,
         (w - 24).max(0),
-        (h - content_top(p) - 11).max(0),
+        (h - content_top(p) - 24).max(0),
     ));
     for (n, line) in wrapped(report, p)
         .iter()
         .skip(scroll)
-        .take(((h - content_top(p) - 16).max(0) / role_line(p, Role::Primary, 15, 21)) as usize + 1)
+        .take(((h - content_top(p) - 31).max(0) / role_line(p, Role::Primary, 15, 21)).max(1) as usize)
         .enumerate()
     {
         paint_prose_role(
@@ -1758,6 +1758,8 @@ pub fn paint(report: &Report, p: &mut Painter, scroll: usize) {
             ui_color(p, line.color),
         )
     }
+    p.clip = Some((x,y,w,h));
+    p.close_hint(x+14,y+h-22);
     p.clip = old;
 }
 /// Exact source enemyHoverPlacement geometry, with its viewport supplied by
@@ -1786,6 +1788,12 @@ fn hover_bounds(
 }
 /// Paint the passive, bottom-right gameplay card. It creates no input region.
 pub fn paint_hover(report: &Report, p: &mut Painter) {
+    paint_hover_card(report,p,false)
+}
+pub fn paint_pinned_hover(report: &Report, p: &mut Painter) {
+    paint_hover_card(report,p,true)
+}
+fn paint_hover_card(report: &Report, p: &mut Painter, pinned:bool) {
     let Some(c) = report.creature.as_ref().filter(|c| c.hover_available) else {
         paint_item_hover(report,p);
         return;
@@ -1848,7 +1856,7 @@ pub fn paint_hover(report: &Report, p: &mut Painter) {
     }
     add(&c.heart, GOLD, 14, 0);
     add(&c.bow_shot, INK, 15, 7);
-    let (x, y, w, h) = modal_ui::hover_bounds_painter(p, offset + 12).tuple();
+    let (x, y, w, h) = modal_ui::hover_bounds_painter(p, offset + 12 + if pinned {18}else{0}).tuple();
     if h <= 0 { return; }
     let old = p.clip;
     p.clip = Some((x, y, w, h));
@@ -1906,6 +1914,10 @@ pub fn paint_hover(report: &Report, p: &mut Painter) {
         } else {
             p.text(&r.label, xx, yy, 14, MUTED)
         }
+    }
+    if pinned {
+        p.rect(x+1,y+h-20,w-2,19,p.profile.rgb("ui.colors.tooltip"));
+        p.close_hint(x+14,y+h-17);
     }
     p.clip = old;
 }

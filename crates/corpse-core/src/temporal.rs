@@ -152,6 +152,7 @@ impl Snapshot {
         restored.firebolt_travel_from = run.firebolt_travel_from.clone();
         restored.amulet_rules_from = run.amulet_rules_from.clone();
         restored.potion_rules_from = run.potion_rules_from.clone();
+        restored.potion_retirements_from = run.potion_retirements_from.clone();
         restored.ring_rules_from = run.ring_rules_from.clone();
         restored.gas_rules_from = run.gas_rules_from.clone();
         restored.commandment_rules_from = run.commandment_rules_from.clone();
@@ -592,6 +593,7 @@ pub fn remember_future(run: &mut Run, history: &History) -> Result<()> {
     copy.firebolt_travel_from = Field::Missing;
     copy.amulet_rules_from = Field::Missing;
     copy.potion_rules_from = Field::Missing;
+    copy.potion_retirements_from = Field::Missing;
     copy.ring_rules_from = Field::Missing;
     copy.gas_rules_from = Field::Missing;
     copy.commandment_rules_from = Field::Missing;
@@ -649,6 +651,7 @@ fn commit_future41(run:&mut Run, history:&mut History, mut restored:Run, next_hi
     restored.firebolt_travel_from=run.firebolt_travel_from.clone();
     restored.amulet_rules_from=run.amulet_rules_from.clone();
     restored.potion_rules_from=run.potion_rules_from.clone();
+    restored.potion_retirements_from=run.potion_retirements_from.clone();
     restored.ring_rules_from=run.ring_rules_from.clone();
     restored.gas_rules_from=run.gas_rules_from.clone();
     restored.commandment_rules_from=run.commandment_rules_from.clone();
@@ -703,6 +706,7 @@ pub fn restore_future(run: &mut Run, history: &mut History) -> Result<bool> {
     restored.firebolt_travel_from = run.firebolt_travel_from.clone();
         restored.amulet_rules_from = run.amulet_rules_from.clone();
         restored.potion_rules_from = run.potion_rules_from.clone();
+        restored.potion_retirements_from = run.potion_retirements_from.clone();
         restored.ring_rules_from = run.ring_rules_from.clone();
         restored.gas_rules_from = run.gas_rules_from.clone();
         restored.commandment_rules_from = run.commandment_rules_from.clone();
@@ -1179,6 +1183,7 @@ impl Engine {
         crate::local_floor_rules::admit(&mut run).map_err(StorageError)?;
         crate::minotaur_straight::admit(&mut run).map_err(StorageError)?;
         crate::mercuria_rules::admit(&mut run).map_err(StorageError)?;
+        crate::potion_rules::admit_retirements(&mut run).map_err(StorageError)?;
         crate::phantasmii_blessing_rules::admit(&mut run).map_err(StorageError)?;
         Self::new_for_replay(run)
     }

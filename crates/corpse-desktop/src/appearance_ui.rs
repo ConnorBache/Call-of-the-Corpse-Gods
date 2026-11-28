@@ -902,6 +902,7 @@ impl SettingsView {
         p.text("[↑↓] Setting  [←→] Adjust", 60, 650, 13, MUTED);
         p.text("[Enter] Edit  [Ctrl+A] Replace", 60, 672, 12, MUTED);
         p.text("[Ctrl+Z / Shift+Z] Undo / redo", 60, 694, 12, MUTED);
+        p.close_hint(60,783);
         for (i, line) in crate::manual::wrap(&self.notice, 148)
             .iter()
             .take(2)

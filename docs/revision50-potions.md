@@ -135,3 +135,7 @@ Teleportation/RNG, Shattering protections, serde/snapshot/Future retention and
 inactive-floor expiry. Native results are reported separately after execution.
 Normal R50 save/replay/new-run admission remains closed; raw serde/snapshots do
 not constitute released save or platform verification.
+
+### Freezing and Discord retirement
+
+Current runs choose from 15 ordinary potion effects. Freezing and Discord no longer roll; any already-generated bottles are labeled retired and cannot be drunk or thrown. This does not remove the Discord Amulet, other ice sources, or Verdania Sap. A separate command boundary preserves legacy seed loot, old journal commands, and historical use/throw behavior; it is recorded before generation in a new game and after the historical command ledger when resuming an old save. Generation still draws exactly once per potion: the static roster lookup and retired-effect match add O(1) time and memory per item with no rerolls.

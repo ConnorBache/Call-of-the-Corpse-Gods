@@ -229,7 +229,8 @@ impl Selection {
         if !picker.notice.is_empty() {
             p.prose(&picker.notice, 58, 669, 19, [255, 173, 153], false);
         }
-        p.prose("Arrows / Tab move    Enter choose    Esc cancel", 58, 720, 21, PAPER, false);
+        p.prose("Arrows / Tab move    Enter choose", 58, 720, 21, PAPER, false);
+        p.close_hint(58,757);
         let (x, y, w, h) = CANCEL;
         let focused = picker.selected == GODS.len();
         p.rect(x, y, w, h, if focused { PAPER } else { SURFACE });

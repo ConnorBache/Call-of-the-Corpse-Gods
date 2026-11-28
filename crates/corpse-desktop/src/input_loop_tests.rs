@@ -14,6 +14,8 @@ pub struct State<'a> {
     pub resting: bool,
     pub item: bool,
     pub ability: bool,
+    pub history: bool,
+    pub context: bool,
 }
 #[derive(Clone)]
 enum Input {
@@ -23,6 +25,7 @@ enum Input {
     Toolbar(usize),
     Resize(u32, u32),
     ClickHud(i32,i32),
+    RightHud(i32,i32),
 }
 struct Step {
     label: &'static str,
@@ -38,12 +41,14 @@ struct Step {
     readonly: bool,
     capture: bool,
     cogworks_wall: Option<(usize, usize)>,
+    history:Option<bool>,
+    context:Option<bool>,
 }
 impl Step {
     fn game(label: &'static str, inputs: Vec<Input>) -> Self {
         Self { label, inputs, screen: Screen::Game, cursor: false, tile: None,
             inventory: false, help: false, resting: false, item: false, ability: false,
-            readonly: true, capture: false, cogworks_wall: None }
+            readonly: true, capture: false, cogworks_wall: None,history:None,context:None }
     }
 }
 struct Script {
@@ -108,11 +113,11 @@ pub fn inject(sdl: &sdl2::Sdl, canvas: &mut Canvas<Window>, p: &Painter) -> Resu
                         x: ((x + w / 2) as f64 * scale * ww as f64 / p.width as f64).round() as i32,
                         y: ((rect.1+rect.3/2) as f64 * scale * wh as f64 / p.height as f64).round() as i32 }
                 },
-                Input::ClickHud(x,y) => {
+                Input::ClickHud(x,y)|Input::RightHud(x,y) => {
                     let (ww,wh)=canvas.window().size();
                     let scale=render::canvas_scale(p.width,p.height,true);
                     Event::MouseButtonDown { timestamp:0,window_id:canvas.window().id(),which:0,
-                        mouse_btn:MouseButton::Left,clicks:1,
+                        mouse_btn:if matches!(input,Input::RightHud(..)){MouseButton::Right}else{MouseButton::Left},clicks:1,
                         x:(*x as f64*scale*ww as f64/p.width as f64).round() as i32,
                         y:(*y as f64*scale*wh as f64/p.height as f64).round() as i32 }
                 }
@@ -161,6 +166,8 @@ pub fn observe(canvas: &mut Canvas<Window>, p: &Painter, state: State<'_>) -> Re
         check(state.resting == step.resting, "rest")?;
         check(state.item == step.item, "item selector")?;
         check(state.ability == step.ability, "ability selector")?;
+        if let Some(expected)=step.history{check(state.history==expected,"Chronicle drawer")?;}
+        if let Some(expected)=step.context{check(state.context==expected,"context detail")?;}
         let engine = state.engine.ok_or_else(|| format!("{}: missing run", step.label))?;
         if step.label=="bow-fire"{
             let arrows=engine.run.inventory.iter().filter(|i|corpse_core::inventory::is_arrow(i))
@@ -356,4 +363,61 @@ fn record_mockup_hud_walkthrough() {
     let record=Recording {pipe:ffmpeg.stdin.take().unwrap(),since:now,next:now,frames:0};
     run_script_record(staging,true,None,grid,steps,Some(record));
     assert!(ffmpeg.wait().unwrap().success());
+}
+
+#[test]
+#[ignore = "Optional native Hearts and Potions stills; use SDL offscreen"]
+fn capture_supply_panels() {
+    use corpse_core::{Item,PartialStats};
+    let Some(root)=std::env::var_os("CORPSE_SUPPLY_CAPTURE").map(PathBuf::from) else{return;};
+    std::fs::create_dir_all(&root).unwrap();
+    let mut run=corpse_core::startup::create_avatar_run("02-03-09:layout-review").unwrap();
+    run.inventory.retain(|item|!matches!(item.kind.as_str(),"heart"|"potion"));
+    for (name,n,exp,bonus) in [
+        ("Giant Rat heart",2,2.,PartialStats{offense:2.0.into(),..Default::default()}),
+        ("Cave Bat heart",1,2.,PartialStats{dodge:2.0.into(),..Default::default()}),
+        ("Pale Jackal heart",1,4.,PartialStats{max_hp:4.0.into(),..Default::default()}),
+    ] {
+        for _ in 0..n {
+            let id=run.next_id;run.next_id+=1.;
+            run.inventory.push(Item{id,name:name.into(),kind:"heart".into(),glyph:"♥".into(),exp:exp.into(),bonus:bonus.clone().into(),..Default::default()});
+        }
+    }
+    for (name,effect,n) in [
+        ("Potion of Healing","healing",2),("Potion of Levitation","levitation",1),("Potion of Confusion","confusion",1),
+        ("Verdania Sap","Veridian Sap",1),
+    ] {
+        for _ in 0..n {
+            let id=run.next_id;run.next_id+=1.;
+            run.inventory.push(Item{id,name:name.into(),kind:"potion".into(),glyph:"!".into(),effect:effect.to_owned().into(),identified:true.into(),..Default::default()});
+        }
+    }
+    let grid=cursor_grid(&run).unwrap();
+    let e=temporal::Engine::new(run).unwrap();
+    std::fs::write(root.join("save.json"),crate::session_store::encode(&e,crate::session_store::Kind::Genuine).unwrap()).unwrap();
+    let key=|k|Input::Key(k,Mod::NOMOD,false);
+    let mut entry=Step::game("resume",vec![Input::Resize(3840,2160),key(Keycode::C)]);entry.readonly=false;
+    let mut resize=Step::game("resize",vec![Input::Resize(3840,2160)]);resize.readonly=false;
+    let mut steps=vec![entry,resize];
+    let mut p=Painter::new();
+    p.resize(3840,2160);p.set_responsive_canvas(true);
+    let tracks=p.hud_tracks();
+    for (rect,unselected,selected) in [
+        (tracks.hearts,"hearts-unselected","hearts"),
+        (tracks.potions,"potions-unselected","potions"),
+    ] {
+        let mut step=Step::game(unselected,vec![Input::ClickHud(rect.0+rect.2/2,rect.1+rect.3/2)]);step.inventory=true;step.capture=true;steps.push(step);
+        let mut step=Step::game(selected,vec![key(Keycode::Down)]);step.inventory=true;step.capture=true;steps.push(step);
+        steps.push(Step::game("esc-close",vec![key(Keycode::Escape)]));
+    }
+    let gods=tracks.gods;
+    let mut god=Step::game("right-click-god",vec![Input::RightHud(gods.0+12,gods.1+8)]);god.context=Some(true);steps.push(god);
+    let mut close=Step::game("close-god-detail",vec![key(Keycode::Escape)]);close.context=Some(false);steps.push(close);
+    let chronicle=p.hud_tracks().chronicle;
+    let mut open=Step::game("click-chronicle",vec![Input::ClickHud(chronicle.0+4,chronicle.1+4)]);open.history=Some(true);steps.push(open);
+    run_script(root.clone(),true,None,grid,steps);
+    for name in ["hearts-unselected","hearts","potions-unselected","potions"] {
+        let png=std::fs::read(root.join(format!("{name}.png"))).unwrap();
+        assert_eq!(&png[16..24],&[0,0,15,0,0,0,8,112],"full native 3840×2160");
+    }
 }

@@ -583,7 +583,7 @@ impl Painter {
     pub fn ability_inspect_at(&self,count:usize,x:i32,y:i32)->Option<usize>{
         self.hud_tracks().divine_rows().index(x,y).filter(|i|*i<count)
     }
-    pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{let r=self.hud_tracks().chronicle;crate::modal_ui::Rect(8,8,r.2-16,r.3-16)}
+    pub fn chronicle_hit_rect(&self)->crate::modal_ui::Rect{self.hud_tracks().chronicle}
     fn native_x(&self, x: f64) -> i32 {
         self.origin.0 + (x * self.scale).round() as i32
     }
@@ -849,6 +849,9 @@ impl Painter {
                 }
             }
         }
+    }
+    pub fn close_hint(&mut self, x:i32, y:i32) {
+        self.text("Esc to close",x,y,11,[167,164,181]);
     }
     pub fn text(&mut self, s: &str, x: i32, y: i32, size: u16, c: Rgb) {
         let displayed=crate::ability_ui::display_text(s);let s=displayed.as_ref();
@@ -1885,7 +1888,7 @@ impl Painter {
     pub fn import_save(&mut self, notice: &str) {
         self.clear([5, 4, 12]);
         self.text("Import save", 284, 195, 35, GOLD);
-        self.text("[Esc] Main menu", 284, 340, 16, MUTED);
+        self.close_hint(284,760);
         self.text(&truncate(notice, 76), 284, 410, 15, [240, 130, 110]);
     }
     pub fn start(&mut self, seed: &str, _mode: &str, focus: bool, playtest: Option<(&str, bool)>, notice: &str) {
@@ -1915,6 +1918,7 @@ impl Painter {
         self.text(if playtest.is_some() { "Reconstruct prior floors / choose abilities" } else { "Descend" }, 305, button_y + 15, 22, [8, 8, 8]);
         self.text("Back", 284, 615, 18, INK);
         self.text(&truncate(notice, 80), 284, 657, 15, [240, 130, 110]);
+        self.close_hint(284,760);
     }
     pub fn history(&mut self, lines: &[String], offset: usize) {
         self.rect(350, 125, 918, 579, [11, 13, 21]);
@@ -2304,6 +2308,7 @@ impl Painter {
             self.text("No creatures in sight", 361, 204, 18, MUTED);
         }
         self.clip = None;
+        self.close_hint(361,676);
 
     }
     pub fn game(&mut self, v: &View, notice: &str, inventory: bool) {

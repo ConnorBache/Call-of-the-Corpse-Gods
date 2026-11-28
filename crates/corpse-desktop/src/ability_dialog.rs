@@ -3,6 +3,7 @@ use super::{damage, Painter, Rgb, DIALOG_SCALE, INK, MUTED};
 use crate::{ability_ui::AbilityView, typography_ui::{self, Role, RoleStyle}};
 
 const PAD: i32 = 18;
+const FOOTER: i32 = 22;
 struct Line { text: String, size: u16, color: Rgb, height: i32, gap: i32 }
 struct Layout { width: i32, height: i32, body_height: i32, lines: Vec<Line>, scrolling: bool }
 
@@ -32,9 +33,9 @@ impl Layout {
         let natural_height = lines.iter().map(|line| line.height + line.gap).sum::<i32>();
         let top = top(p);
         let max_height = ((p.inspection_notice_y() - 12 - top).max(1) as f64 / DIALOG_SCALE).floor() as i32;
-        let height = (natural_height + 2 * PAD).min(max_height);
-        let scrolling = natural_height + 2 * PAD > height;
-        let body_height = (height - 2 * PAD - if scrolling { 20 } else { 0 }).max(1);
+        let height = (natural_height + 2 * PAD + FOOTER).min(max_height);
+        let body_height = (height - 2 * PAD - FOOTER).max(1);
+        let scrolling = natural_height > body_height;
         Self { width: inner + 2 * PAD, height, body_height, lines, scrolling }
     }
     fn first(&self, offset: usize) -> usize {
@@ -83,10 +84,11 @@ pub(super) fn paint(p: &mut Painter, a: &AbilityView, offset: usize) {
         y += line.height;
         last = i + 1;
     }
-    p.clip = Some((PAD, layout.height - PAD - 18, layout.width - 2 * PAD, 18));
+    p.clip = Some((PAD, layout.height - PAD - FOOTER, layout.width - 2 * PAD, FOOTER + PAD - 1));
+    p.close_hint(PAD,layout.height-PAD-12);
     if layout.scrolling {
         let arrows = format!("{}{}", if first > 0 { "↑" } else { "" }, if last < layout.lines.len() { " ↓" } else { "" });
-        p.text_role(Role::Tooltips, arrows.trim(), PAD, layout.height - PAD - 18, 12, MUTED);
+        p.text_role(Role::Tooltips, arrows.trim(), layout.width - PAD - 22, layout.height - PAD - 12, 12, MUTED);
     }
     (p.scale, p.origin, p.responsive_canvas, p.clip) = prior;
 }

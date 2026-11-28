@@ -123,11 +123,12 @@ impl Profiles {
             [240, 130, 110],
         );
         p.text(
-            "Drop a profile JSON to view.  [↑/↓] Select  [Enter] Details  [Esc] Main menu",
+            "Drop a profile JSON to view.  [↑/↓] Select  [Enter] Details",
             60,
             744,
             16,
             GOLD,
         );
+        p.close_hint(60,760);
     }
 }

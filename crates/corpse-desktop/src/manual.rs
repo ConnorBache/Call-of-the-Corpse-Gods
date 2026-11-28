@@ -369,6 +369,7 @@ impl Manual {
 
 fn paint_footer(p: &mut Painter, ink: [u8; 3]) {
     p.rect(16, 741, 1242, 3, ink);
+    p.prose("Esc to close",18,754,14,ink,false);
 }
 
 #[derive(Debug)]

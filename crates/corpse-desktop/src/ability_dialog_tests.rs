@@ -34,7 +34,7 @@ fn ability_dialog_fits_content_and_touches_rail_at_every_resolution() {
             }
             if a.id == short.id && a.description == short.description {
                 assert!(!layout.scrolling);
-                assert_eq!(layout.height,layout.lines.iter().map(|l|l.height+l.gap).sum::<i32>()+2*PAD);
+                assert_eq!(layout.height,layout.lines.iter().map(|l|l.height+l.gap).sum::<i32>()+2*PAD+FOOTER);
                 assert!(layout.height < 200,"short prose must not retain the old 500-pixel box");
                 assert!(layout.width < 516,"short prose shrinks horizontally too");
             } else {

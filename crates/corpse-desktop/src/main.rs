@@ -1,5 +1,6 @@
 #![cfg_attr(all(target_os = "windows", not(debug_assertions), not(feature = "dev-tools")), windows_subsystem = "windows")]
 
+mod context_detail;
 mod gameplay_pause;
 mod game_hud;
 mod display_names;
@@ -625,6 +626,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
     let mut inventory = false;
     let mut pack_view: Option<pack::PackView> = None;
     let mut pending_item: Option<pack::PackTarget> = None;
+    let mut context_detail: Option<context_detail::Detail> = None;
     let mut ability_detail: Option<String> = None;
     let mut ability_detail_scroll = 0usize;
     let mut travel: Option<(travel_ui::Travel, f64)> = None;
@@ -722,7 +724,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     if screen==Screen::Game && !keyboard_aim && !keyboard_cursor.active() {
                         let mouse=events.mouse_state();
                         let raw=canvas.window().has_mouse_focus().then_some((mouse.x(),mouse.y()));
-                        let position=resize_hover_position(&painter,raw,canvas.window().size(),resize_hover_blocked(run.as_ref().map(|r| &r.run),inventory||inspecting||history.is_some()||ability_detail.is_some()||hazard_prompt.is_some()),tile_report.is_some());
+                        let position=resize_hover_position(&painter,raw,canvas.window().size(),resize_hover_blocked(run.as_ref().map(|r| &r.run),inventory||inspecting||context_detail.is_some()||history.is_some()||ability_detail.is_some()||hazard_prompt.is_some()),tile_report.is_some());
                         pending_hover_raw=Some(raw.filter(|_|position.is_some()));
                         if let Some(r)=run.as_ref(){defer_hover_position(&painter,&r.run,position,&mut pending_hover_position,&mut hover_tile,&mut hover_path,&mut hover_report);}
                     }
@@ -794,6 +796,24 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             // A held X is one press, not preview confirmation or cancellation.
             if matches!(event, Event::KeyDown { keycode: Some(Keycode::X), repeat: true, .. }) { continue; }
+            // A roster stair/corpse has no context action; consume before
+            // generic mouse handling so ongoing rest, travel, and aim survive.
+            let context_roster_row=match &event {
+                Event::MouseButtonDown{x,y,mouse_btn:sdl2::mouse::MouseButton::Right,..}
+                    if screen==Screen::Game&&!inventory&&!inspecting=>{
+                    let (x,y)=painter.logical_point_for_canvas(*x,*y,canvas.window().size(),true);
+                    cached_view.as_ref().and_then(|view|{
+                        let layout=render::enemy_list::Layout::resolve_frame(&painter.profile,0,painter.frame());
+                        layout.rows.contains(x,y).then(||layout.content_view(&painter,view).hit(x,y,painter.enemy_list_offset)).flatten()
+                    })
+                }
+                _=>None,
+            };
+            if context_roster_row.zip(cached_view.as_ref()).is_some_and(|(i,v)|
+                render::enemy_list::Content::ground_index(v,i).is_some_and(|idx|
+                    matches!(v.ground_entities[idx].kind,render::enemy_list::GroundKind::Stair|render::enemy_list::GroundKind::Corpse))) {
+                continue;
+            }
             let cancel_explore = cancels_autoexplore(&event);
             let was_exploring = cancel_explore && (autoexplore.path().is_some()
                 || travel.as_ref().is_some_and(|(walk, _)| walk.exploring()));
@@ -804,7 +824,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             if observed_seed!=seed {avatar_selection.sync_seed(&seed);observed_seed=seed.clone();}
             dirty |= menu_visits.observe(screen,pending_start.busy(),&mut avatar_selection,&mut seed,&mut notice);
             if screen!=Screen::Menu {avatar_selection.close();}
-            dirty|=cancel_aim_for_context(screen!=Screen::Game||inventory||inspecting||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
+            dirty|=cancel_aim_for_context(screen!=Screen::Game||inventory||inspecting||context_detail.is_some()||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
                 &mut pending_item,&mut pending_ability,&mut implant_attacker,&mut keyboard_aim);
             painter.set_responsive_canvas(matches!(screen,Screen::Game|Screen::ReplayGame));
             // Keep both spaces: game clicks outside a modal still target the
@@ -836,7 +856,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             let help_available = (screen == Screen::Menu && !pending_start.busy()
                 && !avatar_selection.active() && !menu_seed_focus)
                 || (screen == Screen::Game && !inventory && !inspecting && history.is_none()
-                    && ability_detail.is_none() && tile_report.is_none() && hazard_prompt.is_none()
+                    && context_detail.is_none() && ability_detail.is_none() && tile_report.is_none() && hazard_prompt.is_none()
                     && run.as_ref().is_some_and(|r| r.run.offers.is_empty() && !debug_loadout.active(&r.run)));
             if matches!(event, Event::Window { win_event: sdl2::event::WindowEvent::Leave | sdl2::event::WindowEvent::FocusLost, .. })
                 && painter.toolbar_focus == Some(help_ui::ACTION) {
@@ -874,7 +894,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
             }
             if pending_item.is_none()&&pending_ability.is_none(){keyboard_aim=false;}
             let cursor_available = cursor_context_available(screen,
-                inventory||inspecting||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
+                inventory||inspecting||context_detail.is_some()||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
                 run.as_ref().map(|r| &r.run),run.as_ref().is_some_and(|r|debug_loadout.active(&r.run)));
             if !cursor_available || pending_item.is_some() || pending_ability.is_some() {
                 keyboard_cursor.clear();
@@ -908,7 +928,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     }
                 }
             }
-            if screen==Screen::Game&&!inventory&&!inspecting&&history.is_none()&&ability_detail.is_none()
+            if screen==Screen::Game&&!inventory&&!inspecting&&context_detail.is_none()&&history.is_none()&&ability_detail.is_none()
                 &&tile_report.is_none()&&hazard_prompt.is_none()&&(pending_item.is_some()||pending_ability.is_some()) {
                 if let Event::KeyDown{keycode:Some(key),keymod,timestamp,window_id,..}=&event {
                     if !aim_modifiers_allowed(*keymod) { /* Preserve fullscreen/system shortcuts. */ }
@@ -1018,7 +1038,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                         }
                         continue;
                     }
-                    if screen == Screen::Game && !inventory && ability_detail.is_none() && history.is_none() {
+                    if screen == Screen::Game && !inventory && context_detail.is_none() && ability_detail.is_none() && history.is_none() {
                         let shift = keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD);
                         painter.toolbar_focus = match key {
                             Keycode::M => Some(7),
@@ -1122,6 +1142,19 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     let was_resting = resting.take().is_some();
                     if (was_resting || was_exploring) && key == Keycode::Escape {
                         continue;
+                    }
+                    if screen==Screen::Game {
+                        if let Some(detail)=context_detail.as_mut() {
+                            match key{
+                                Keycode::Escape=>context_detail=None,
+                                Keycode::Up=>detail.scroll(-1),
+                                Keycode::Down=>detail.scroll(1),
+                                Keycode::PageUp=>detail.scroll(-8),
+                                Keycode::PageDown=>detail.scroll(8),
+                                _=>{},
+                            }
+                            dirty=true;continue;
+                        }
                     }
                     if tile_report.is_some() && screen == Screen::Game {
                         match key {
@@ -1708,10 +1741,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     y,
                     mouse_btn: sdl2::mouse::MouseButton::Right,
                     ..
-                } if screen == Screen::Game && !inventory && !inspecting => {
+                } if screen == Screen::Game && !inspecting => {
                     resting = None;
                     travel = None;
                     if hazard_prompt.is_some()
+                        || context_detail.is_some()
                         || tile_report.is_some()
                         || history.is_some()
                         || ability_detail.is_some()
@@ -1721,28 +1755,55 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     {
                         continue;
                     }
-                    if let Some(view) = cached_view.as_ref() {
-                        let (_,_,ox,_) = painter.map_layout(view.width,view.height);
-                        let layout=render::enemy_list::Layout::resolve_frame(&painter.profile,ox,painter.frame());
-                        if let Some(index)=layout.rows.contains(x,y).then(||layout.content_view(&painter,view).hit(x,y,painter.enemy_list_offset)).flatten() {
-                            if let Some((tx,ty))=render::enemy_list::Content::ground(view,index) {
-                                if let Some(r)=run.as_ref(){tile_report=Some(inspection_ui::observe_tile(&r.run,tx,ty));tile_report_scroll=0;}
-                                painter.enemy_hover=None;painter.ground_hover=None;cosmetic_dirty=true;continue;
+                    if inventory {
+                        if let (Some(pack),Some(r))=(pack_view.as_ref(),run.as_ref()) {
+                            if let Some(item)=pack.ring_id_at(x,y).and_then(|id|r.run.inventory.iter().find(|i|i.id==id)){
+                                context_detail=Some(context_detail::Detail::carried(&r.run,item,true));dirty=true;
                             }
-                            let Some(index)=render::enemy_list::Content::creature_index(view,index) else{continue;};
-                            inspected_actor=view.creatures.get(index).map(|a|a.id);
-                            creature_offset=index;
-                            inspecting=true;
-                            painter.enemy_hover=None;
-                            // This branch is cosmetic: update the detached presentation inputs
-                            // that a world rebuild would assign, without observing the Run again.
-                            if let Some(view)=cached_view.as_mut(){
-                                if tile_enabled{tile_overlay::mark_presentation(&painter,view,&mut tile_plan);}
-                                sync_enemy_inspection_view(view,inspected_actor,&hover_path);
-                                if tile_enabled{tile_overlay::mark_presentation(&painter,view,&mut tile_plan);}
+                        }
+                        continue;
+                    }
+                    if let (Some(view),Some(r))=(cached_view.as_ref(),run.as_ref()) {
+                        let tracks=painter.hud_tracks();
+                        if let Some(index)=context_roster_row {
+                            if let Some(i)=render::enemy_list::Content::ground_index(view,index){
+                                let row=&view.ground_entities[i];
+                                if row.kind==render::enemy_list::GroundKind::Vent {
+                                    tile_report=Some(inspection_ui::observe_tile(&r.run,row.x,row.y));tile_report_scroll=0;dirty=true;
+                                }else{
+                                    context_detail=context_detail::Detail::ground(&r.run,row);
+                                }
+                            }else if let Some(i)=render::enemy_list::Content::creature_index(view,index){
+                                context_detail=context_detail::Detail::enemy(&r.run,view,i);
                             }
-                            cosmetic_dirty=true;
+                            if context_detail.is_some(){dirty=true;}
                             continue;
+                        }
+                        if let Some(i)=game_hud::ring_at(&painter,&view.pack_hud,x,y) {
+                            if let Some(item)=r.run.inventory.iter().filter(|i|i.kind=="ring"&&corpse_core::revision50_inventory::active(&r.run,i)).nth(i){
+                                context_detail=Some(context_detail::Detail::carried(&r.run,item,true));dirty=true;
+                            }
+                            continue;
+                        }
+                        let z=tracks.gods;
+                        if z.contains(x,y) {
+                            let i=(0..3).find(|&i|x<z.0+z.2*(i+1)/3).unwrap_or(2) as usize;
+                            if let Some((name,_))=view.god_labels.get(i) {
+                                context_detail=Some(context_detail::Detail::text(name.clone(),"TODO".into(),None));dirty=true;
+                            }
+                            continue;
+                        }
+                        if let Some(i)=tracks.item_at(x,y,painter.item_rail_offset.min(view.pack_hud.items.len().saturating_sub(tracks.item_rows())),view.pack_hud.items.len()) {
+                            match view.pack_hud.items[i].source {
+                                game_hud::QuickSource::Item(id)=>if let Some(item)=r.run.inventory.iter().find(|item|item.id==id){
+                                    context_detail=Some(context_detail::Detail::carried(&r.run,item,item.kind=="ring"));
+                                },
+                                game_hud::QuickSource::Dreamwalk=>{
+                                    ability_detail=Some(if corpse_core::dreamwalking::unlocked(&r.run){corpse_core::dreamwalking::DREAMWALK_ID}else{corpse_core::dreamwalking::WAKE_UP_ID}.into());
+                                    ability_detail_scroll=0;
+                                }
+                            }
+                            dirty=true;continue;
                         }
                     }
                     if let Some(index)=cached_view.as_ref().and_then(|v|painter.ability_inspect_at(v.abilities.len(),x,y)) {
@@ -1764,6 +1825,11 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             if let Some(cell) =
                                 view.cells.iter().rev().find(|c| c.x == tx && c.y == ty)
                             {
+                                if let Some(i)=cell.actor_id.filter(|_|!cell.controllable_ally).and_then(|id|view.creatures.iter().position(|a|a.id==id)) {
+                                    if let Some(detail)=context_detail::Detail::enemy(&r.run,view,i) {
+                                        context_detail=Some(detail);dirty=true;continue;
+                                    }
+                                }
                                 let command = if cell.controllable_ally
                                     && view
                                         .cells
@@ -1938,6 +2004,25 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 continue;
                             }
                             if history.is_some() { continue; }
+                            if let Some(detail)=context_detail.as_ref(){
+                                let (sx,sy)=sheet_pointer.unwrap();
+                                match detail.click(sx,sy) {
+                                    pack::PackAction::Command(command)=>{
+                                        context_detail=None;
+                                        notice=match dispatch(r,&mut effects,start.elapsed().as_millis() as f64,&command){
+                                            Ok(_)=>String::new(),Err(e)=>e.to_string(),
+                                        };
+                                    }
+                                    pack::PackAction::Target(target)=>{
+                                        context_detail=None;
+                                        inventory=false;
+                                        notice=directional_zap_ui::prompt(&r.run,&target).into();
+                                        pending_item=Some(target);
+                                    }
+                                    _=>{}
+                                }
+                                continue;
+                            }
                             if ability_detail.is_some() {
                                 ability_detail = None;
                                 continue;
@@ -2318,6 +2403,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                 }
                 Event::MouseMotion { x, y, .. } if screen == Screen::Game => {
                     let blocked = inventory
+                        || context_detail.is_some()
                         || inspecting
                         || history.is_some()
                         || ability_detail.is_some()
@@ -2390,6 +2476,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                     ..
                 } if screen == Screen::Game => {
                     if let Some(r) = run.as_ref().filter(|r| debug_loadout.active(&r.run)) { debug_loadout.scroll(&r.run,y); dirty=true; continue; }
+                    if let Some(detail)=context_detail.as_mut(){detail.scroll(-y);dirty=true;continue;}
                     if let Some(report) = tile_report.as_ref() {
                         if y < 0 {
                             tile_report_scroll = (tile_report_scroll + (-y) as usize)
@@ -2589,7 +2676,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         if observed_seed!=seed {avatar_selection.sync_seed(&seed);observed_seed=seed.clone();}
         dirty |= menu_visits.observe(screen,pending_start.busy(),&mut avatar_selection,&mut seed,&mut notice);
         if screen!=Screen::Menu {avatar_selection.close();}
-        dirty|=cancel_aim_for_context(screen!=Screen::Game||inventory||inspecting||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
+        dirty|=cancel_aim_for_context(screen!=Screen::Game||inventory||inspecting||context_detail.is_some()||history.is_some()||ability_detail.is_some()||tile_report.is_some()||hazard_prompt.is_some(),
             &mut pending_item,&mut pending_ability,&mut implant_attacker,&mut keyboard_aim);
         if pending_gpu_failure.is_some(){continue 'running;}
         // Leaving the form, including importing another run, invalidates its result.
@@ -2679,7 +2766,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         effects.gameplay_pause.observe(run.as_ref().filter(|_|screen==Screen::Game).map(|r|&r.run));
         if screen==Screen::Game&&(effects.gameplay_pause.active()||effects.gameplay_pause.waiting||health_warning.active()||run.as_ref().is_some_and(|r|death_pause::terminal(&r.run.status))) {
             travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;
-            inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;
+            inventory=false;inspecting=false;context_detail=None;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;
         }
         if !effects.presentation_pending(now) && !effects.gameplay_pause.active() && !effects.gameplay_pause.waiting && !help.active() && screen == Screen::Game && travel.as_ref().is_some_and(|(_, next)| now >= *next) {
             if let (Some((mut walk, _)), Some(r)) = (travel.take(), run.as_mut()) {
@@ -2752,7 +2839,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         }
 
         if health_warning.observe(run.as_ref().filter(|r|screen==Screen::Game&&r.run.status=="playing").map(|r|(r.run.player.hp,r.run.player.max_hp))){dirty=true;tile_plan.invalidate();tile_overlays.invalidate();force_texture_upload=true;}
-        if health_warning.active(){travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;inventory=false;inspecting=false;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;}
+        if health_warning.active(){travel=None;resting=None;autoexplore.cancel();pending_item=None;pending_ability=None;implant_attacker=None;riptide_target.cancel();keyboard_aim=false;inventory=false;inspecting=false;context_detail=None;ability_detail=None;tile_report=None;hazard_prompt=None;history=None;hover_report=None;}
         let action_reduced=reduced || settings.store.action_animation_mode!=appearance_store::ActionAnimationMode::Normal;
         let action_instant=settings.store.action_animation_mode==appearance_store::ActionAnimationMode::Instant;
         replays.configure_motion(action_reduced,action_instant);
@@ -2893,7 +2980,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 bestiary_notices.apply(&r.run,&mut view);
                                 painter.bestiary_unread=manual.progress.has_unread();
                                 if let Some(raw)=pending_hover_raw.take(){
-                                    pending_hover_position=Some(resize_hover_position(&painter,raw,canvas.window().size(),resize_hover_blocked(Some(&r.run),inventory||inspecting||history.is_some()||ability_detail.is_some()||hazard_prompt.is_some()),tile_report.is_some()));
+                                    pending_hover_position=Some(resize_hover_position(&painter,raw,canvas.window().size(),resize_hover_blocked(Some(&r.run),inventory||inspecting||context_detail.is_some()||history.is_some()||ability_detail.is_some()||hazard_prompt.is_some()),tile_report.is_some()));
                                 }
                                 if let Some(position)=pending_hover_position.take(){
                                     hover_tile=position.and_then(|(x,y)|pointer_tile(&painter,&view,x,y));
@@ -2902,7 +2989,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 let mouse=events.mouse_state();
                                 let point=canvas.window().has_mouse_focus().then(||painter.logical_point_for_canvas(mouse.x(),mouse.y(),canvas.window().size(),true));
                                 refresh_panel_hover(&mut painter,&view,point,r.run.offers.is_empty()&&r.run.status=="playing"
-                                    &&!(inventory||inspecting||history.is_some()||ability_detail.is_some()||hazard_prompt.is_some()||tile_report.is_some()));
+                                    &&!(inventory||inspecting||context_detail.is_some()||history.is_some()||ability_detail.is_some()||hazard_prompt.is_some()||tile_report.is_some()));
                                 hover_report=None;hover_path.clear();
                                 if let Some((x, y)) = hover_tile {
                                     hover_report = Some(hover_tile_report(&r.run,x,y,pending_item.as_ref(),view.terrain_snapshot.as_deref()));
@@ -2979,7 +3066,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                     if dirty{pack.refresh(&r.run);pack.configure(&painter,painter.frame().map.tuple());}
                                     Some(pack.paint_state(&painter))
                                 }else{None};
-                                let hover_state=if !inventory&&!inspecting&&ability_detail.is_none()&&history.is_none(){
+                                let hover_state=if !inventory&&!inspecting&&context_detail.is_none()&&ability_detail.is_none()&&history.is_none(){
                                     hover_report.as_ref().zip(hover_tile).and_then(|(report,_)|tile_overlay::hover(&painter,report))
                                 }else{None};
                                 let shutter_state=history.as_ref().and_then(|_|chronicle_overlay::bounds_painter(&painter,&shutter,now,reduced).and_then(|(x,y,w,h)|painter.logical_damage_rect(x,y,w,h)).map(|bounds|tile_overlay::Shutter{bounds,offset:shutter.offset}));
@@ -2991,6 +3078,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 // Unclipped hazard prose retains its horizontal band. Ability
                                 // details share exact content-sized bounds with their painter.
                                 if hazard_prompt.is_some(){panels.extend(painter.sheet_damage_rect(0,282,render::WIDTH as i32,render::HEIGHT as i32-282));}
+                                if let Some(detail)=&context_detail{panels.extend(detail.damage(&painter));}
                                 if let Some(ability)=&ability_detail_view{panels.extend(painter.ability_detail_damage(ability));}
                                 if let Some(((x,y,w,h),_))=aim_notice {panels.extend(painter.logical_damage_rect(x,y,w,h));}
                                 if debug_loadout.active(&r.run){panels.extend(painter.sheet_damage_rect(0,51,render::WIDTH as i32,718));}
@@ -3028,7 +3116,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                                 pack.paint_action_marks(&mut painter,&effects.cues,now);
                             }
                             effects::paint_inventory_hud(&mut painter,current_view,&effects.cues,now,inventory);
-                            if !inventory&&!inspecting&&ability_detail.is_none()&&history.is_none() {
+                            if !inventory&&!inspecting&&context_detail.is_none()&&ability_detail.is_none()&&history.is_none() {
                                 if let Some((report,_))=hover_report.as_ref().zip(hover_tile) {
                                     inspection_ui::paint_hover(report,&mut painter);
                                 }
@@ -3061,6 +3149,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
                             if let Some((_, message)) = &hazard_prompt {
                                 painter.hazard_prompt(message);
                             }
+                            if let Some(detail)=&context_detail {detail.paint(&mut painter);}
                             if let Some(ability) = &ability_detail_view {
                                 painter.ability_detail(
                                     ability,
@@ -3132,6 +3221,7 @@ fn run_app(args: Vec<String>) -> Result<(), String> {
         #[cfg(test)] if input_loop_tests::observe(&mut canvas,&painter,input_loop_tests::State {
             screen,engine:run.as_ref(),cursor:keyboard_cursor.active(),tile:hover_tile,inventory,
             help:help.active(),resting:resting.is_some(),item:pending_item.is_some(),ability:pending_ability.is_some(),
+            history:history.is_some(),context:context_detail.is_some(),
         })? {break 'running;}
         if enter_death_results {
             results_fade = death_pause::ResultsFade::new("dead", skip_ending_motion);

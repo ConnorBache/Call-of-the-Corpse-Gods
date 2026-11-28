@@ -180,12 +180,13 @@ impl Replays {
             MUTED,
         );
         p.text(
-            "Drop a replay JSON file to import.  [Enter] View  [↑/↓] Select  [Esc] Main menu",
+            "Drop a replay JSON file to import.  [Enter] View  [↑/↓] Select",
             60,
             730,
             16,
             GOLD,
         );
+        p.close_hint(60,760);
     }
     pub fn paint(&mut self, p: &mut Painter, now: f64, reduced: bool) {
         if self.profile.data() != p.profile.data() {
@@ -222,12 +223,13 @@ impl Replays {
                 GOLD,
             );
             p.text(
-                "[Space] Step   [P] Play / Pause   [R] Restart   [Esc] Exit replay",
+                "[Space] Step   [P] Play / Pause   [R] Restart",
                 25,
                 p.logical_height()-50,
                 17,
                 INK,
             );
+            p.close_hint(25,p.logical_height()-30);
             if !self.notice.is_empty() {
                 p.text(
                     &crate::render::truncate(&self.notice, 95),

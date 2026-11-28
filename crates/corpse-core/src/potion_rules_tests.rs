@@ -94,3 +94,58 @@ fn future_restore_keeps_both_live_amendment_boundaries() {
     assert_eq!(loaded.run.potion_rules_from,Field::Value(0));
     assert!(crate::amulet_rules::current(&loaded.run));assert!(current(&loaded.run));
 }
+
+#[test]
+fn freezing_and_discord_potion_retirement_respects_replay_boundaries() {
+    use crate::{Item,revision50_potions as potions};
+    let seed="02-03-09:potion-retirement-r52";
+    let mut fresh=crate::startup::create_avatar_run(seed).unwrap();
+    assert!(retirements_current(&fresh));
+    assert_eq!(potions::roster_for_run(&fresh).len(),15);
+    for depth in [1,2,6,15,20] {
+        for i in 0..16 {
+            let mut rng=crate::population::population_random(&format!("retired-potions-{depth}-{i}"));
+            let items=crate::equipment::generate_floor_loot_for_run(&mut fresh,depth,&mut rng,&[],12).unwrap();
+            for pot in items.iter().filter(|i|i.kind=="potion") {
+                assert!(potions::roster_for_run(&fresh).contains(&pot.effect.as_ref().unwrap().as_str()));
+            }
+        }
+    }
+    let record=ReplayRecord::try_from_run(&crate::startup::create_avatar_run(seed).unwrap()).unwrap();
+    let current=ReplaySession::create(record.clone(),true).unwrap();
+    assert!(retirements_current(&current.engine.run));
+    for effect in ["freezing","discord"] {
+        let mut r=current.engine.run.clone();
+        let (id,x,y)=(r.next_id,r.player.x,r.player.y);
+        r.next_id+=1.;
+        r.inventory.push(Item{id,kind:"potion".into(),name:format!("Potion of {effect}"),effect:effect.to_owned().into(),..Default::default()});
+        let i=r.inventory.len()-1;
+        let before=r.clone();
+        for thrown in [false,true] {
+            assert_eq!(crate::potions::apply(&mut r,i,x,y,thrown).unwrap_err().0,potions::RETIRED_MESSAGE);
+            assert_eq!(r,before);
+        }
+        r.potion_retirements_from=Field::Missing;
+        assert!(potions::roster_for_run(&r).contains(&effect));
+        assert!(crate::potions::apply(&mut r,i,x,y,false).unwrap());
+        assert!(!r.inventory.iter().any(|item|item.id==id));
+    }
+    let mut legacy=record;
+    legacy.potion_retirements_from=Field::Missing;
+    let mut old=ReplaySession::create(legacy,true).unwrap();
+    assert!(!retirements_current(&old.engine.run));
+    assert!(potions::roster_for_run(&old.engine.run).contains(&"discord"));
+    old.engine.dispatch(&Command::Wait).unwrap();
+    let mut live=Engine::load(&old.engine.save().unwrap()).unwrap();
+    assert_eq!(live.run.potion_retirements_from,Field::Value(1));
+    live.dispatch(&Command::Wait).unwrap();
+    let mut mixed=ReplaySession::create(ReplayRecord::try_from_run(&live.run).unwrap(),true).unwrap();
+    assert!(!retirements_current(&mixed.engine.run));
+    assert!(mixed.step().unwrap());
+    assert!(retirements_current(&mixed.engine.run));
+    while mixed.step().unwrap(){}
+    assert_eq!(mixed.engine.save().unwrap(),live.save().unwrap());
+    mixed.restart().unwrap();
+    while mixed.step().unwrap(){}
+    assert_eq!(mixed.engine.save().unwrap(),live.save().unwrap());
+}

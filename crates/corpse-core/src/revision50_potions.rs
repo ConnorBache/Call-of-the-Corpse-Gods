@@ -5,9 +5,18 @@ use crate::{Actor, Field, Floor, Run, engine::{self, EngineError}};
 use serde::{Deserialize, Serialize};
 pub const ORDINARY: [&str;20] = ["healing","energy","incineration","caustic gas","paralysis","confusion","telepathy","levitation","speed","invisibility","descent","cleansing","fire immunity","darkness","flooding","freezing","repulsion","discord","teleportation","shattering"];
 pub const CURRENT_ORDINARY: [&str;17] = ["healing","energy","incineration","caustic gas","paralysis","confusion","telepathy","levitation","speed","invisibility","descent","fire immunity","darkness","freezing","discord","teleportation","shattering"];
+const LIVE_ORDINARY: [&str;15] = ["healing","energy","incineration","caustic gas","paralysis","confusion","telepathy","levitation","speed","invisibility","descent","fire immunity","darkness","teleportation","shattering"];
 pub const RETIRED_MESSAGE: &str = "This potion has been retired.";
 pub fn retired(r:&Run,item:&crate::Item)->bool {
-    crate::potion_rules::current(r) && item.kind=="potion" && matches!(item.effect.as_ref().map(String::as_str),Some("cleansing"|"flooding"|"repulsion"))
+    item.kind=="potion" && retired_effect(r,item.effect.as_ref().map_or("",String::as_str))
+}
+fn retired_effect(r:&Run,effect:&str)->bool {
+    (crate::potion_rules::current(r) && matches!(effect,"cleansing"|"flooding"|"repulsion"))
+        || (crate::potion_rules::retirements_current(r) && matches!(effect,"freezing"|"discord"))
+}
+pub fn roster_for_run(r:&Run)->&'static [&'static str] {
+    if crate::potion_rules::retirements_current(r) {&LIVE_ORDINARY}
+    else {roster(crate::potion_rules::current(r))}
 }
 pub fn roster(current:bool)->&'static [&'static str] {if current {&CURRENT_ORDINARY} else {&ORDINARY}}
 pub const FIRE_IMMUNITY:&str="r50FireImmunity";
@@ -234,7 +243,7 @@ pub fn incinerate(r:&mut Run,x:f64,y:f64,strength:f64)->Result<(),EngineError> {
 }
 pub fn apply(r:&mut Run,effect:&str,target:Option<f64>,x:f64,y:f64,strength:f64,fresh:bool)->Result<bool,EngineError> {
     if !new_effect(effect){return Ok(false)}
-    if crate::potion_rules::current(r)&&matches!(effect,"cleansing"|"flooding"|"repulsion") {return Err(EngineError(RETIRED_MESSAGE.into()))}
+    if retired_effect(r,effect) {return Err(EngineError(RETIRED_MESSAGE.into()))}
     if !crate::revision50::enabled(r){return Err(EngineError("This potion requires revision 50.".into()))}
     let target=target.filter(|&id|mutable_target(r,id));
     match effect {

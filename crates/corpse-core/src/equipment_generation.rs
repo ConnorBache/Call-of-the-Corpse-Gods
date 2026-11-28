@@ -227,7 +227,7 @@ pub fn generate_floor_loot_revision(
 ) -> Result<Vec<Item>, String> {
     let mut generated = false;
     generate_floor_loot_with_budget(depth, rng, next_id, excluded, count, revision,
-        if revision >= 51. { Some(&mut generated) } else { None },true,revision>=52.,revision>=52.)
+        if revision >= 51. { Some(&mut generated) } else { None },true,crate::revision50_potions::roster(revision>=52.),revision>=52.)
 }
 /// Production entry point: all generated floors share the persisted run budget.
 /// Same bounded loot cost, plus a one-time import scan documented in unique_composite_bow.
@@ -242,7 +242,7 @@ pub fn generate_floor_loot_for_run(
         return Err("Invalid ordinary loot slot count".into());
     }
     let current=crate::amulet_rules::current(run);
-    let current_potions=crate::potion_rules::current(run);
+    let current_potions=crate::revision50_potions::roster_for_run(run);
     let current_rings=crate::ring_rules::current(run);
     crate::unique_composite_bow::initialize(run);
     if let Some(primary) = revision51::primary_kind(&run.seed, depth) {
@@ -258,7 +258,7 @@ pub fn generate_floor_loot_for_run(
 }
 fn generate_floor_loot_with_budget(
     depth: u32, rng: &mut GenerationRng, next_id: &mut f64,
-    excluded: &[String], count: usize, revision: f64, mut bow_generated: Option<&mut bool>, current:bool,current_potions:bool,current_rings:bool,
+    excluded: &[String], count: usize, revision: f64, mut bow_generated: Option<&mut bool>, current:bool,current_potions:&[&str],current_rings:bool,
 ) -> Result<Vec<Item>, String> {
     if !(2..=20).contains(&count) {
         return Err("Invalid ordinary loot slot count".into());
@@ -292,7 +292,7 @@ fn generate_floor_loot_with_budget(
     for _ in permanents..count {
         let id = *next_id;
         *next_id += 1.0;
-        let effect = *pick(if revision>=50. {crate::revision50_potions::roster(current_potions)} else {&POTIONS[..]}, rng);
+        let effect = *pick(if revision>=50. {current_potions} else {&POTIONS[..]}, rng);
         items.push(Item {
             id,
             name: "Unidentified potion".into(),

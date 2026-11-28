@@ -22,7 +22,7 @@ impl Shutter{
 pub fn header_hit(x:i32,y:i32)->bool{(12..WIDTH as i32-12).contains(&x)&&(6..44).contains(&y)}
 /// O(1), maximum visible rows at full height.
 fn capacity()->usize{capacity_height(HEIGHT as i32)}
-fn capacity_height(height:i32)->usize{((height-18-76)/24).max(1)as usize}
+fn capacity_height(height:i32)->usize{((height-18-80)/24).max(1)as usize}
 pub fn header_hit_painter(p:&Painter,x:i32,y:i32)->bool{(12..p.logical_width()-12).contains(&x)&&(6..44).contains(&y)}
 pub fn bounds_painter(p:&Painter,shutter:&Shutter,now:f64,reduced:bool)->Option<(i32,i32,i32,i32)>{let h=((p.logical_height()-18)as f64*shutter.fraction(now,reduced)).round()as i32;(h>0).then_some((12,6,p.logical_width()-24,h))}
 /// Exact logical painted coverage, including the retracting shutter's current height.
@@ -33,9 +33,15 @@ pub fn paint(p:&mut Painter,lines:&[String],shutter:&Shutter,now:f64,reduced:boo
  let old_clip=p.clip;p.clip=Some((12,6,p.logical_width()-24,h));
  p.rect(12,6,p.logical_width()-24,h,[11,13,21]);p.border(12,6,p.logical_width()-24,h,[104,81,66]);
  p.text("CHRONICLE",28,15,22,[238,211,151]);p.rect(24,44,p.logical_width()-48,1,[83,68,59]);
+ let footer=6+h-27;
+ // The bottom rule travels with the shutter as it slides down over the map.
  let count=capacity_height(p.logical_height());let end=lines.len().saturating_sub(shutter.offset.min(lines.len().saturating_sub(count)));let begin=end.saturating_sub(count);
- for(i,line)in lines[begin..end].iter().enumerate(){let y=58+i as i32*24;if y>=6+h{break;}p.text(&crate::render::truncate(line,130),28,y,16,crate::chronicle::color(line));}
- p.text("Wheel / Up / Down: earlier or later events",28,p.logical_height()-38,14,[183,176,166]);
+ for(i,line)in lines[begin..end].iter().enumerate(){let y=58+i as i32*24;if y+18>footer{break;}p.text(&crate::render::truncate(line,130),28,y,16,crate::chronicle::color(line));}
+ if footer>=46 {
+     p.rect(24,footer,p.logical_width()-48,1,[83,68,59]);
+     p.close_hint(28,footer+6);
+     p.text("Wheel / ↑ / ↓ to scroll",142,footer+6,11,[167,164,181]);
+ }
  p.clip=old_clip;
 }
 #[cfg(test)]mod tests{

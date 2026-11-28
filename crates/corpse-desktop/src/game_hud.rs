@@ -372,13 +372,14 @@ pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
         paint_supply(p,t.potions,POTIONS,"Potions",pack.potions,pack.potion_capacity);
     }
 }
-fn paint_ring_boxes(p:&mut Painter,r:Rect,names:&[String]) {
-    let mut groups=Vec::<(&str,usize)>::new();
-    for name in names {
+fn ring_boxes(p:&Painter,r:Rect,names:&[String])->Vec<(Rect,usize,String,u16)> {
+    let mut boxes=Vec::new();
+    let mut groups=Vec::<(&str,usize,usize)>::new();
+    for (i,name) in names.iter().enumerate() {
         let name=name.strip_suffix(" Ring").unwrap_or(name);
-        if let Some((_,count))=groups.iter_mut().find(|(key,_)|*key==name){*count+=1}else{groups.push((name,1))}
+        if let Some((_,count,_))=groups.iter_mut().find(|(key,_,_)|*key==name){*count+=1}else{groups.push((name,1,i))}
     }
-    let labels=groups.iter().map(|(name,n)|if *n==1{name.to_string()}else{format!("{name} ×{n}")}).collect::<Vec<_>>();
+    let labels=groups.iter().map(|(name,n,_)|if *n==1{name.to_string()}else{format!("{name} ×{n}")}).collect::<Vec<_>>();
     let role=crate::typography_ui::Role::Primary;
     let max=r.2-14;
     let widths=|p:&Painter,size:u16|labels.iter().map(|s|p.measure_text_role(role,s,size).ceil() as i32+10).collect::<Vec<_>>();
@@ -399,12 +400,23 @@ fn paint_ring_boxes(p:&mut Painter,r:Rect,names:&[String]) {
         let n=range.len().max(1) as i32;
         for i in range {
             let width=if compressed{max/n}else{cuts[i]};
-            p.border(x,y,width-3,16,[115,98,78]);
             let label=p.fit_text_role(role,&labels[i],width-10,size);
-            p.text(&label,x+4,y+(16-size as i32)/2,size,[220,199,145]);
+            boxes.push((Rect(x,y,width-3,16),groups[i].2,label,size));
             x+=width;
         }
     }
+    boxes
+}
+fn paint_ring_boxes(p:&mut Painter,r:Rect,names:&[String]) {
+    for (Rect(x,y,w,h),_,label,size) in ring_boxes(p,r,names) {
+        p.border(x,y,w,h,[115,98,78]);
+        p.text(&label,x+4,y+(h-size as i32)/2,size,[220,199,145]);
+    }
+}
+pub fn ring_at(p:&Painter,pack:&PackHud,x:i32,y:i32)->Option<usize> {
+    let bounds=p.hud_tracks().rings;
+    if !bounds.contains(x,y) { return None; }
+    ring_boxes(p,bounds,&pack.rings).into_iter().find_map(|(b,i,_,_)|b.contains(x,y).then_some(i))
 }
 pub fn scroll_mark(p:&mut Painter,r:Rect,count:usize,visible:usize,offset:usize) {
     if visible==0 || count<=visible { return; }
