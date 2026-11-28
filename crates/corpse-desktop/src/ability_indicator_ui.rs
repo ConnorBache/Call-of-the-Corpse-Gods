@@ -17,6 +17,21 @@ pub(super) fn ragelight_width(p:&Painter,cost_bits:u64)->i32 {
     (resource_ui::text_width(p,&ragelight_label(cost_bits),12)+12).max(25)
 }
 
+fn paint_nightmare_boxes(p:&mut Painter,count:u64,until:u64,x:i32,y:i32,w:i32,h:i32) {
+    use crate::game_hud::{nightmare_box_width,NIGHTMARE_COUNTER_GAP as GAP};
+    let count_w=nightmare_box_width(count,2);
+    let timer_w=nightmare_box_width(until,3);
+    let x=x+(w-count_w-GAP-timer_w).max(0);
+    for (x,w,text,fill,border,ink) in [
+        (x,count_w,count.to_string(),[0,0,0],[132,130,148],INK),
+        (x+count_w+GAP,timer_w,until.to_string(),[32,139,72],[113,240,91],[255,255,255]),
+    ] {
+        p.rect(x,y,w,h,fill);
+        p.border(x,y,w,h,border);
+        centered(p,&text,x,y+(h-8)/2,w,8,ink);
+    }
+}
+
 fn paint_blood_drop(p: &mut Painter, count: u64, x: i32, y: i32) {
     // Rasterize a pointed droplet with a rounded bottom, bounded 29x30.
     for dy in 0i32..30 {
@@ -33,11 +48,7 @@ fn paint_blood_drop(p: &mut Painter, count: u64, x: i32, y: i32) {
 pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
     match value {
         CustomIndicator::Nightmares{count,until}=>{
-            let w=32;
-            p.rect(x,y,w,19,[75,47,152]);
-            p.border(x,y,w,19,[143,119,241]);
-            centered(p,&count.to_string(),x,y+2,w,12,INK);
-            centered(p,&until.to_string(),x,y+20,w,10,[180,164,242]);
+            paint_nightmare_boxes(p,count,until,x,y,width,19);
         }
         CustomIndicator::Reactions(count)=>{
             p.rect(x,y,30,21,[218,173,53]);
@@ -99,7 +110,10 @@ pub fn paint(p:&mut Painter,value:CustomIndicator,x:i32,y:i32,width:i32) {
 pub fn paint_compact(p:&mut Painter,value:CustomIndicator,r:crate::modal_ui::Rect) {
     let crate::modal_ui::Rect(x,y,w,h)=r;
     let (text,fill,border)=match value {
-        CustomIndicator::Nightmares{count,until}=>(format!("{count} · {until}"),[75,47,152],[143,119,241]),
+        CustomIndicator::Nightmares{count,until}=>{
+            paint_nightmare_boxes(p,count,until,x,y,w,h);
+            return;
+        },
         CustomIndicator::Reactions(n)=>(n.to_string(),[77,65,33],[255,219,113]),
         CustomIndicator::Rescue(ready)|CustomIndicator::Future(ready)=>(if ready{"Ready"}else{"Spent"}.into(),[40,64,105],[126,171,255]),
         CustomIndicator::RagelightCost(bits)=>(ragelight_label(bits),RAGELIGHT_FILL,RAGELIGHT_OUTLINE),
@@ -164,6 +178,8 @@ mod tests {
     #[test]
     fn custom_indicators_use_serialized_values_and_acquisition_order() {
         let mut r=room();let before=r.clone();let v=crate::ability_ui::visible_abilities(&r);
+        assert_eq!(v[0].name,"Nightmare");
+        assert_eq!(v[0].id,IDS[0]);
         assert_eq!(v[0].indicator,Some(CustomIndicator::Nightmares{count:3,until:43}));
         assert_eq!(v[1].indicator,Some(CustomIndicator::Reactions(2)));assert_eq!(v[2].indicator,None);
         assert_eq!(v[3].indicator,Some(CustomIndicator::Rescue(true)));
@@ -175,6 +191,28 @@ mod tests {
         assert_eq!(crate::ability_ui::observe(&r,IDS[3]).indicator,Some(CustomIndicator::Rescue(false)));
         r.player.abilities.insert(0,"isheilah-missed-me".into());
         assert_eq!(crate::ability_ui::observe(&r,"isheilah-missed-me").indicator,None);
+    }
+
+    #[test]
+    fn compact_nightmare_boxes_and_cogworks_full_reserve_fit() {
+        use crate::game_hud::{COGWORKS_RESERVE_WIDTH,nightmare_box_width,nightmare_extra_width};
+        let mut p=Painter::new();
+        assert_eq!(resource_ui::fit_value(&p,"10/10",6,COGWORKS_RESERVE_WIDTH-6).0,"10/10");
+        let count=1000;
+        let until=100;
+        let indicator=CustomIndicator::Nightmares{count,until};
+        let width=48+nightmare_extra_width(Some(indicator));
+        let count_w=nightmare_box_width(count,2);
+        let timer_w=nightmare_box_width(until,3);
+        assert_eq!(width,count_w+3+timer_w);
+        assert!(resource_ui::text_width(&p,&count.to_string(),8)<=count_w-6);
+        assert!(resource_ui::text_width(&p,&until.to_string(),8)<=timer_w-6);
+        p.clear([24,32,40]);
+        paint_compact(&mut p,indicator,crate::modal_ui::Rect(10,10,width,13));
+        let pixel=|x,y|{let i=(y*p.width+x)*4;&p.pixels[i..i+3]};
+        assert_eq!(pixel(11,11),[0,0,0]);
+        assert_eq!(pixel(10+count_w as usize+4,11),[32,139,72]);
+        assert_eq!(pixel(10+count_w as usize+1,11),[24,32,40]);
     }
 
     #[test]
@@ -327,23 +365,20 @@ mod ragelight_tests {
                 assert_eq!(full.pixels,retained_p.pixels);
                 assert_eq!(full.pixels,tile.pixels);
 
-                let left=full.hud_left();
-                let y=crate::ability_ui::top(&full.profile);
-                let rail=full.logical_width()-left-24;
-                let bar_x=left+12+rail-rail/3;
-                let box_w=ragelight_width(&full,expected.to_bits());
-                let box_x=bar_x-box_w-6;
+                let row=full.game_ability_rect(0);
+                let crate::modal_ui::Rect(bar_x,y,_,h)=crate::game_hud::right_slot(row);
+                let (box_x,box_w)=(bar_x-28,26);
                 let row_color=|x:i32,y:i32| {
                     let at=(full.native_y(y as f64)as usize*full.width+full.native_x(x as f64)as usize)*4;
                     &full.pixels[at..at+3]
                 };
                 assert_eq!(row_color(box_x+2,y+2),RAGELIGHT_FILL);
-                assert_eq!(row_color(bar_x+3,y+7),super::super::game_color(&full.profile,"ui.colors.energy"));
-                for dy in -5..=5 {for dx in -5..=5 {
-                    assert!(![[100,255,114],[255,155,56],[110,110,125]].iter()
-                        .any(|rgb|row_color(left+23+dx,y+11+dy)==rgb));
+                assert_eq!(row_color(bar_x+2,y+2),super::super::game_color(&full.profile,"ui.colors.energy"));
+                for dy in 0..h {for dx in 4..row.2-4 {
+                    assert!(![[100,255,114],[255,155,56],[142,142,158]].iter()
+                        .any(|rgb|row_color(row.0+dx,y+dy)==rgb));
                 }}
-                let glyph:Vec<_>=(3..17).flat_map(|dy|(3..box_w-3).map(move |dx|(dx,dy)))
+                let glyph:Vec<_>=(1..h-1).flat_map(|dy|(3..box_w-3).map(move |dx|(dx,dy)))
                     .map(|(dx,dy)|row_color(box_x+dx,y+dy)!=RAGELIGHT_FILL).collect();
                 if let Some(zero)=&zero_pixels {assert_eq!(&glyph==zero,expected==0.);}
                 else {zero_pixels=Some(glyph);}

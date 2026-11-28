@@ -2773,11 +2773,13 @@ impl Painter {
             let ragelight=matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::RagelightCost(_)));
             let passive=ragelight||(a.mode.eq_ignore_ascii_case("passive")&&!selecting);
             let reserve=if passive&&!ragelight{None}else{a.reserve};
-            let slot=crate::game_hud::right_slot(bounds);
+            let mut slot=crate::game_hud::right_slot(bounds);
+            let extra=crate::game_hud::nightmare_extra_width(a.indicator);
+            slot.0-=extra;slot.2+=extra;
             let has_metadata=reserve.is_some()||a.indicator.is_some()||a.fortunes.is_some()||!passive;
-            let badges=if cogworks&&reserve.is_some(){40}
+            let badges=if cogworks&&reserve.is_some(){crate::game_hud::COGWORKS_RESERVE_OFFSET}
                 else if a.indicator.is_some()&&reserve.is_some(){28}else{0};
-            let meter=if cogworks&&reserve.is_some(){crate::modal_ui::Rect(slot.0-40,slot.1,36,slot.3)}else{slot};
+            let meter=if cogworks&&reserve.is_some(){crate::modal_ui::Rect(slot.0-badges,slot.1,crate::game_hud::COGWORKS_RESERVE_WIDTH,slot.3)}else{slot};
             let right=if has_metadata{slot.0-badges-4}else{r.0+r.2-9};
             let name=crate::game_hud::fitted_name(self,name_role,&a.name,"",right-r.0-8,size);
             let previous=self.clip;

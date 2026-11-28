@@ -81,6 +81,7 @@ pub fn display_text(text:&str)->std::borrow::Cow<'_,str> {
         ("Relentless Pursuit", "Hunter"),
         ("Shadow in the Dark", "Shadow cloak"),
         ("Erase Metaphysical", "Erase"),
+        ("Waking Nightmares", "Nightmare"),
         ("See The Future", "Futuresight"),
         ("See the Future", "Futuresight"),
         ("Are You Sure About That?", "Redirect"),

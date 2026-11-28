@@ -289,7 +289,6 @@ pub fn paint_resources(p:&mut Painter,v:&View,t:Tracks,now:f64) {
         resource_ui::paint_bar_pending(p,name,&value,x,y,w,h,color,fill,13,pending);
     }
     let z=t.status;
-    if v.player_meters.is_empty() {p.text("No status effects",z.0,z.1+4,11,MUTED);}
     for (i,m) in v.player_meters.iter().skip(v.player_status_offset).take(STATUS_SLOTS).enumerate(){
         let w=(z.2-8*(STATUS_SLOTS as i32-1))/STATUS_SLOTS as i32;
         p.condition_meter_tinted(m,z.0+i as i32*(w+8),z.1,w,status_tint(&m.name,m.duration,now));
@@ -364,9 +363,7 @@ pub fn paint_footer(p:&mut Painter,v:&View,t:Tracks,notice:&str) {
         let shards=format!("Phantasmii {}",pack.shards);
         p.text(&shards,z.0+8,z.1+32,10,[194,161,236]);
         let z=t.rings;
-        if pack.rings.is_empty() {
-            p.text("No rings worn",z.0+8,z.1+8,11,MUTED);
-        } else {
+        if !pack.rings.is_empty() {
             let count=supply_label(pack.rings.len() as u32,pack.ring_capacity);
             p.text(&format!("{count} rings"),z.0+8,z.1+5,11,INK);
             paint_ring_boxes(p,z,&pack.rings);
@@ -426,12 +423,24 @@ pub fn fitted_name(p:&Painter,role:crate::typography_ui::Role,name:&str,suffix:&
     let reserved=p.measure_text_role(role,suffix,size).ceil() as i32;
     format!("{}{suffix}",p.fit_text_role(role,name,(width-reserved).max(0),size))
 }
+pub const COGWORKS_RESERVE_WIDTH: i32 = 44;
+pub const COGWORKS_RESERVE_OFFSET: i32 = COGWORKS_RESERVE_WIDTH + 4;
+pub const NIGHTMARE_COUNTER_GAP: i32 = 3;
+/// IBM Plex Mono digits at 8 logical pixels advance 5 pixels each.
+pub fn nightmare_box_width(value: u64, min_digits: u32) -> i32 {
+    6 + 5 * (value.checked_ilog10().map_or(1, |n| n + 1).max(min_digits) as i32)
+}
+pub fn nightmare_extra_width(indicator: Option<crate::ability_ui::CustomIndicator>) -> i32 {
+    if let Some(crate::ability_ui::CustomIndicator::Nightmares{count,until})=indicator {
+        (nightmare_box_width(count,2)+NIGHTMARE_COUNTER_GAP+nightmare_box_width(until,3)-48).max(0)
+    }else{0}
+}
 pub fn divine_name_width(a:&crate::ability_ui::AbilityView,rail:i32)->i32 {
     let passive=a.mode.eq_ignore_ascii_case("passive");
     let ragelight=matches!(a.indicator,Some(crate::ability_ui::CustomIndicator::RagelightCost(_)));
     let reserve=a.reserve.is_some()&&(!passive||ragelight);
     if !passive||ragelight||a.indicator.is_some()||a.fortunes.is_some() {
-        rail-69-if reserve&&a.id=="kative-cogworks"{40}else if reserve&&a.indicator.is_some(){28}else{0}
+        rail-69-nightmare_extra_width(a.indicator)-if reserve&&a.id=="kative-cogworks"{COGWORKS_RESERVE_OFFSET}else if reserve&&a.indicator.is_some(){28}else{0}
     }else{rail-17}
 }
 pub fn right_slot(row:Rect)->Rect {Rect(row.0+row.2-53,row.1+(row.3-13)/2,48,13)}
@@ -515,6 +524,31 @@ mod tests {
         assert_eq!(shard.hint.as_deref(),Some("Throw"));
         assert_eq!(actions.iter().filter(|a|a.label=="Shard of the Borge").count(),1);
         assert!(matches!(activate_quick(&r,shard.source),crate::pack::PackAction::Target(crate::pack::PackTarget::Throw(40001.))));
+    }
+
+    #[test]
+    fn hud_empty_ring_box_and_status_strip_have_no_placeholder_ink() {
+        let mut p=Painter::new();
+        p.resize(1280,720);
+        p.set_responsive_canvas(true);
+        let t=p.hud_tracks();
+        let mut v=crate::observe::observe(&sample());
+        v.pack_hud.rings.clear();
+        v.player_meters.clear();
+        let mut blank=Painter::new();
+        blank.resize(1280,720);
+        blank.set_responsive_canvas(true);
+        panel(&mut blank,t.rings);
+        panel(&mut blank,t.resources);
+        paint_footer(&mut p,&v,t,"");
+        paint_resources(&mut p,&v,t,0.);
+        for Rect(x,y,w,h) in [t.rings,t.status] {
+            for row in y..y+h {
+                let at=(row as usize*p.width+x as usize)*4;
+                let end=at+w as usize*4;
+                assert!(p.pixels[at..end]==blank.pixels[at..end],"placeholder ink at row {row}");
+            }
+        }
     }
 
     #[test]
