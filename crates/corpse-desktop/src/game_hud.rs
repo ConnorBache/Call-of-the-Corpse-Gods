@@ -93,20 +93,25 @@ pub fn observe(run: &Run) -> PackHud {
                 arrows:None,reserve:None,tier:None,hint:Some(if cooldown==0{"Ready".into()}else{format!("{cooldown} turns")})});
         }
     }
+    for i in run.inventory.iter().filter(|i| corpse_core::borge::is_shard(i) && is_quick_item(run,i)) {
+        out.items.push(ItemAction{source:QuickSource::Item(i.id),label:crate::pack::ground_name(run,i),
+            arrows:None,reserve:None,tier:None,hint:Some("Throw".into())});
+    }
     if corpse_core::dreamwalking::unlocked(run)||corpse_core::dreamwalking::active(run) {
         let active=corpse_core::dreamwalking::active(run);
         out.items.push(ItemAction{source:QuickSource::Dreamwalk,label:if active&&!corpse_core::dreamwalking::unlocked(run){"Wake Up".into()}else{"Dreamwalk".into()},
             arrows:None,reserve:None,tier:None,hint:Some(if active{"ON"}else{"OFF"}.into())});
     }
     for bow in [true,false] {
-        for i in run.inventory.iter().filter(|i| corpse_core::projectiles::is_bow(i)==bow && is_quick_item(run,i)&&!corpse_core::ahvamitt::is_mask(i)) {
+        for i in run.inventory.iter().filter(|i| corpse_core::projectiles::is_bow(i)==bow && is_quick_item(run,i)
+            &&!corpse_core::ahvamitt::is_mask(i)&&!corpse_core::borge::is_shard(i)) {
             let label=if bow {"Bow".into()} else {crate::pack::ground_name(run,i)};
             let tier=if !bow && corpse_core::revision52_amulet_tiers::enabled(run) {
                 corpse_core::revision52_amulet_tiers::profile(run,i).map(|p|p.tier)
             } else {None};
             out.items.push(ItemAction{source:QuickSource::Item(i.id),label,arrows:bow.then_some(arrows as u32),
                 reserve:resource_ui::amulet_reserve(i,revision),tier,
-                hint:corpse_core::borge::is_shard(i).then(||"Throw".into())});
+                hint:None});
         }
     }
     out
@@ -498,13 +503,17 @@ mod tests {
         use corpse_core::Command;
         let mut r=sample();
         r.dreamwalking=corpse_core::dreamwalking::State{unlocked:true,..Default::default()}.into();
-        r.inventory.push(corpse_core::ahvamitt::mask_for_revision(40000.,52.));
         r.inventory.push(corpse_core::borge::shard(40001.));
+        assert_eq!(observe(&r).items[0].label,"Shard of the Borge");
+        r.inventory.push(corpse_core::ahvamitt::mask_for_revision(40000.,52.));
         let actions=observe(&r).items;
         assert_eq!(actions[0].label,"Ahvamitt Teleport");
         assert!(matches!(activate_quick(&r,actions[0].source),crate::pack::PackAction::Command(Command::Ability{id,..}) if id==corpse_core::ahvamitt::TELEPORT_ID));
-        assert!(matches!(activate_quick(&r,actions[1].source),crate::pack::PackAction::Command(Command::Ability{id,..}) if id==corpse_core::dreamwalking::DREAMWALK_ID));
-        let shard=actions.iter().find(|a|a.label=="Shard of the Borge").unwrap();
+        assert!(matches!(activate_quick(&r,actions[2].source),crate::pack::PackAction::Command(Command::Ability{id,..}) if id==corpse_core::dreamwalking::DREAMWALK_ID));
+        let shard=&actions[1];
+        assert_eq!(shard.label,"Shard of the Borge");
+        assert_eq!(shard.hint.as_deref(),Some("Throw"));
+        assert_eq!(actions.iter().filter(|a|a.label=="Shard of the Borge").count(),1);
         assert!(matches!(activate_quick(&r,shard.source),crate::pack::PackAction::Target(crate::pack::PackTarget::Throw(40001.))));
     }
 
@@ -753,11 +762,11 @@ mod tests {
         for name in ["'Till Death","Hunter","Shadow cloak","Erase"] {assert!(view.abilities.iter().any(|a|a.name==name));}
         for name in ["Vanish Amulet","Wall Amulet"] {assert!(view.pack_hud.items.iter().any(|a|a.label==name));}
         assert_eq!(view.pack_hud.items[0].label,"Ahvamitt Teleport");
-        assert_eq!(view.pack_hud.items[1].label,"Dreamwalk");
+        assert_eq!(view.pack_hud.items[1].label,"Shard of the Borge");
+        assert_eq!(view.pack_hud.items[2].label,"Dreamwalk");
         assert_eq!(view.pack_hud.rings.len(),13);
         assert_eq!(view.pack_hud.items.len(),14);
         assert!(view.creatures.iter().any(|a|a.statuses.iter().any(|s|s.name=="Burning")&&a.statuses.iter().any(|s|s.name.starts_with("Envenomed"))));
-        assert!(view.pack_hud.items.iter().any(|a|a.label=="Shard of the Borge"));
         assert!(view.creatures.iter().filter(|a|a.has_heart==Some(false)).count()>=2,
             "the walkthrough must show multiple visible heartless enemies");
         assert!(view.creatures.iter().any(|a|a.has_heart==Some(true)));
